@@ -32,7 +32,7 @@ export class InspectStack implements APIRequest<WasmStack> {
             return new WasmStack(resp.stack);
         }
         catch (e) {
-            throw new APIRequestInvalidParse(`No ack for Pause`);
+            throw new APIRequestInvalidParse(`No response for inspect stack`);
         }
     }
 };
