@@ -1,0 +1,31 @@
+{
+  "name": "wasmito",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha './dist/test/**/*.js' --recursive"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/carllocos/Wasmito.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/carllocos/Wasmito/issues"
+  },
+  "homepage": "https://github.com/carllocos/Wasmito#readme",
+  "devDependencies": {
+    "@types/chai": "^4.3.6",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^20.6.1",
+    "chai": "^4.3.8",
+    "mocha": "^10.2.0",
+    "typescript": "^5.2.2"
+  }
+}
