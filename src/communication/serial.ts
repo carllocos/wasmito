@@ -1,51 +1,65 @@
 import { SerialPort } from 'serialport';
-import { ObsersableChannel, ObserverChannel } from './observer_interface';
+import { ReadlineParser } from '@serialport/parser-readline'
+import { Channel } from './channel_interface';
 
-export class SerialConnection implements ObsersableChannel {
+export class SerialConnection implements Channel {
     private port: SerialPort;
-    private observers: ObserverChannel[] = [];
+    private callbacks: ((data: string) => void)[] = [];
 
     constructor(portName: string, baudRate: number) {
         this.port = new SerialPort({
             path: portName, baudRate: baudRate,
             autoOpen: false,
         });
+        this.port.pipe(new ReadlineParser({ delimiter: '\r\n' }))
         this.setupEventListeners();
     }
 
-    addObserver(observer: ObserverChannel) {
-        this.observers.push(observer);
+    addOnData(callback: (data: string) => void) {
+        this.callbacks.push(callback);
     }
 
-    removeObserver(observer: ObserverChannel) {
-        this.observers = this.observers.filter((o) => o !== observer);
+    removeOnData(callback: (data: string) => void) {
+        this.callbacks = this.callbacks.filter((c) => c !== callback);
     }
 
-    sendData(data: string) {
-        if (this.port.isOpen) {
-            this.port.write(data, (err) => {
+    send(data: string): Promise<void> {
+        return new Promise((res, rej) => {
+            if (this.port.isOpen) {
+                this.port.write(data, (err) => {
+                    if (err) {
+                        rej(new Error(`Error sending data: ${err.message}`));
+                    }
+                    res()
+                });
+            } else {
+                rej(new Error('Serial port is not open.'));
+            }
+        })
+    }
+
+    open(): Promise<void> {
+        return new Promise((res, rej) => {
+
+        })
+    }
+
+    close(): Promise<void> {
+        return new Promise((res, rej) => {
+            this.port.close((err) => {
                 if (err) {
-                    throw Error(`Error sending data: ${err.message}`);
+                    console.error(`Error closing serial port: ${err.message}`);
+                    rej(err);
+                } else {
+                    res();
                 }
             });
-        } else {
-            throw Error('Serial port is not open.');
-        }
-    }
-
-    close() {
-        this.port.close((err) => {
-            if (err) {
-                console.error(`Error closing serial port: ${err.message}`);
-            } else {
-                console.log('Serial port closed.');
-            }
-        });
+        })
     }
 
     private setupEventListeners() {
         this.port.on('data', (data: Buffer) => {
-            this.notifyObservers(data.toString());
+            this.notifyCallbacks(data.toString());
         });
 
         // Handle errors
@@ -63,7 +77,7 @@ export class SerialConnection implements ObsersableChannel {
         });
     }
 
-    private notifyObservers(data: string) {
-        this.observers.forEach((observer) => observer.update(data));
+    private notifyCallbacks(data: string) {
+        this.callbacks.forEach((cb) => cb(data));
     }
 }
