@@ -1,8 +1,8 @@
-import { type WASM } from './wasm'
+import { type WASM } from './wasm';
 
 export class WasmStack {
-  private readonly values: WASM.Value[]
-  constructor (stack: WASM.Value[]) {
-    this.values = stack
+  private readonly values: WASM.Value[];
+  constructor(stack: WASM.Value[]) {
+    this.values = stack;
   }
 }

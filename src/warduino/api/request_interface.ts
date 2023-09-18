@@ -1,8 +1,8 @@
 export class APIRequestInvalidParse extends Error {}
 
 export interface APIRequest<R> {
-  getData: () => string
-  parse: (input: string) => R
+  getData: () => string;
+  parse: (input: string) => R;
 }
 
 export enum Instruction {

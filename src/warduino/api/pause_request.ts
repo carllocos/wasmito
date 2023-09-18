@@ -1,18 +1,18 @@
 import {
   type APIRequest,
   APIRequestInvalidParse,
-  Instruction
-} from './request_interface'
+  Instruction,
+} from './request_interface';
 
 export class PauseRequest implements APIRequest<string> {
-  getData (): string {
-    return `${Instruction.Pause}`
+  getData(): string {
+    return `${Instruction.Pause}`;
   }
 
-  parse (input: string): string {
+  parse(input: string): string {
     if (input === 'Pause') {
-      return input
+      return input;
     }
-    throw new APIRequestInvalidParse('No ack for Pause')
+    throw new APIRequestInvalidParse('No ack for Pause');
   }
 }

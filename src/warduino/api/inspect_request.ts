@@ -1,10 +1,10 @@
 import {
   type APIRequest,
   APIRequestInvalidParse,
-  Instruction
-} from './request_interface'
-import { WasmStack } from '../../state/wasm_stack'
-import { type WASM } from '../../state/wasm'
+  Instruction,
+} from './request_interface';
+import { WasmStack } from '../../state/wasm_stack';
+import { type WASM } from '../../state/wasm';
 
 enum InspectableState {
   pcState = '01',
@@ -21,20 +21,20 @@ enum InspectableState {
 }
 
 export interface StackInpsectResponse {
-  stack: WASM.Value[]
+  stack: WASM.Value[];
 }
 
 export class InspectStack implements APIRequest<WasmStack> {
-  getData (): string {
-    return `${Instruction.Inspect}${InspectableState.stackState}`
+  getData(): string {
+    return `${Instruction.Inspect}${InspectableState.stackState}`;
   }
 
-  parse (input: string): WasmStack {
+  parse(input: string): WasmStack {
     try {
-      const resp: StackInpsectResponse = JSON.parse(input)
-      return new WasmStack(resp.stack)
+      const resp: StackInpsectResponse = JSON.parse(input);
+      return new WasmStack(resp.stack);
     } catch (e) {
-      throw new APIRequestInvalidParse('No response for inspect stack')
+      throw new APIRequestInvalidParse('No response for inspect stack');
     }
   }
 }
