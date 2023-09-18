@@ -1,15 +1,18 @@
-import { APIRequest, APIRequestInvalidParse, Instruction } from "./request_interface";
+import {
+  type APIRequest,
+  APIRequestInvalidParse,
+  Instruction
+} from './request_interface'
 
-class StepRequest implements APIRequest<string> {
+export class StepRequest implements APIRequest<string> {
+  getData (): string {
+    return `${Instruction.Step}`
+  }
 
-    getData(): string {
-        return `${Instruction.Step}`;
+  parse (input: string): string {
+    if (input === 'Step') {
+      return input
     }
-
-    parse(input: string): string {
-        if (input === 'Step') {
-            return input;
-        }
-        throw new APIRequestInvalidParse(`No ack for Step`);
-    }
-};
+    throw new APIRequestInvalidParse('No ack for Step')
+  }
+}
