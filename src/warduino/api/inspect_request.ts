@@ -7,7 +7,7 @@ import { WasmStack } from '../../state/wasm_stack';
 import { type WASM } from '../../state/wasm';
 
 enum InspectableState {
-  pcState = '01',
+  pcState = "01",
   breakpointState = '02',
   callstackState = '03',
   globalsState = '04',
