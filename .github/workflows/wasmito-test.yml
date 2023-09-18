@@ -9,25 +9,37 @@ on:
       - main
 
 jobs:
-  test-wasmito:
-    runs-on: ubuntu-latest
+  lint and test wasmito:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout Code
+        uses: actions/checkout@v2
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: 16
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
 
-    - name: Install dependencies
-      run: npm install
+      - name: Install Dependencies
+        run: npm install
 
-    - name: build TS
-      run: npx tsc
+      - name: Run Linter
+        run: npm run lint
 
-    -  name: yarn install and test
-       run:  |
-        yarn 
-        yarn test
+      - name: Fail on Linting Errors
+        run: |
+          if [ ${{ failure() }} == true ]; then
+            echo "Linting failed, failing the workflow."
+            exit 1
+          fi
+
+      - name: build TS
+        run: npx tsc
+
+      - name: Run Tests
+        run: npm test
