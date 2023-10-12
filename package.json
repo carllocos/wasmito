@@ -12,7 +12,6 @@
     "lint": "eslint . --ext .ts",
     "build": "npx tsc",
     "cli": "npm run build && node './dist/src/cli/cli.js'"
-
   },
   "repository": {
     "type": "git",
@@ -30,6 +29,7 @@
     "@types/figlet": "^1.5.6",
     "@types/mocha": "^10.0.1",
     "@types/node": "^20.6.1",
+    "@types/winston": "^2.4.4",
     "@typescript-eslint/eslint-plugin": "^6.7.0",
     "chai": "^4.3.8",
     "eslint": "^8.49.0",
@@ -47,6 +47,7 @@
     "commander": "^11.0.0",
     "figlet": "^1.6.0",
     "serialport": "^12.0.0",
+    "winston": "^3.11.0",
     "yarn": "^1.22.19"
   }
 }
