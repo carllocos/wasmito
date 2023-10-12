@@ -9,7 +9,10 @@
   "scripts": {
     "start": "tsc --watch",
     "test": "mocha './dist/test/**/*.js' --recursive",
-    "lint": "eslint . --ext .ts"
+    "lint": "eslint . --ext .ts",
+    "build": "npx tsc",
+    "cli": "npm run build && node './dist/src/cli/cli.js'"
+
   },
   "repository": {
     "type": "git",
