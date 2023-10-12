@@ -4,7 +4,7 @@ import {
   readProjectVersionNumber,
   readProjectDescription,
   readProjectName,
-} from './project_config';
+} from '../project_config';
 
 program
   .version(readProjectVersionNumber())
