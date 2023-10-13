@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "tsc --watch",
-    "test": "mocha './dist/test/**/*.js' --recursive",
+    "test": "npm run build && mocha './dist/test/**/*.js' --recursive",
     "lint": "eslint . --ext .ts",
     "build": "npx tsc",
     "cli": "npm run build && node './dist/src/cli/cli.js'"
