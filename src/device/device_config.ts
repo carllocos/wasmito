@@ -17,7 +17,7 @@ export interface DeviceConfig {
 }
 
 export interface DevicesConfig {
-  devices: string[];
+  devices: DeviceConfig[];
 }
 
 function isValidDeviceConfig(value: any): string[] {
