@@ -5,7 +5,7 @@ import {
   readProjectDescription,
   readProjectName,
 } from '../project_config';
-import { parseDeviceConfig, type DevicesConfig } from '../device/device_config';
+import { type DeviceConfig, parseDeviceConfigs } from '../device/device_config';
 import {
   type LogLevel,
   parseLogLevel,
@@ -38,7 +38,7 @@ export function startCLI(): void {
 
   setLogLevel(logLevel);
 
-  const configs: DevicesConfig | undefined = parseDeviceConfig(
+  const configs: DeviceConfig[] | undefined = parseDeviceConfigs(
     options.devicesConfig,
   );
   if (configs === undefined) {

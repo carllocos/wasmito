@@ -16,11 +16,7 @@ export interface DeviceConfig {
   program: string;
 }
 
-export interface DevicesConfig {
-  devices: DeviceConfig[];
-}
-
-function isValidDeviceConfig(value: any): string[] {
+export function isValidDeviceConfig(value: any): string[] {
   const errors: string[] = [];
 
   if (typeof value !== 'object') {
@@ -75,7 +71,7 @@ function isValidDevicesConfig(value: any): string[] {
   return errors;
 }
 
-export function parseDeviceConfig(path: any): DevicesConfig | undefined {
+export function parseDeviceConfigs(path: any): DeviceConfig[] | undefined {
   let fileContent: any;
   try {
     fileContent = fs.readFileSync(path, 'utf-8');
@@ -98,5 +94,5 @@ export function parseDeviceConfig(path: any): DevicesConfig | undefined {
     Logger.error(`Invalid configuration: `, errors.join(' '));
     return undefined;
   }
-  return jsonData;
+  return jsonData.devices;
 }
