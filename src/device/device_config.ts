@@ -57,7 +57,7 @@ export function isValidDeviceConfig(value: any): string[] {
 
 const Logger = createLogger('DeviceConfiguration');
 
-function isValidDevicesConfig(value: any): string[] {
+export function isValidDevicesConfig(value: any): string[] {
   const errors: string[] = [];
   if (typeof value !== 'object') {
     errors.push('Devices config is not valid json');
