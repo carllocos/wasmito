@@ -2,10 +2,10 @@ import { createLogger } from '../logger/logger';
 import * as fs from 'fs';
 
 enum DeviceMode {
-  Emulated,
-  MCU,
-  Proxied,
-  Mirror,
+  Emulate = 'emulate',
+  MCU = 'mcu',
+  Proxy = 'proxy',
+  Mirror = 'mirror',
 }
 
 export interface DeviceConfig {
