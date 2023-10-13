@@ -38,11 +38,16 @@ export function isValidDeviceConfig(value: any): string[] {
       errors.push('Property "program" should be a string');
     }
 
-    if (!Object.values(DeviceMode).includes(value.mode)) {
+    let mode: any = value.mode;
+    if (typeof mode === 'string') {
+      mode = mode.toLowerCase();
+    }
+
+    if (!Object.values(DeviceMode).includes(mode)) {
       errors.push(
-        `Property "mode" is not a valid DeviceMode (choice ${Object.values(
+        `Property "mode" is not a valid DeviceMode (choices ${Object.values(
           DeviceMode,
-        ).toString()}`,
+        ).toString()})`,
       );
     }
   }
