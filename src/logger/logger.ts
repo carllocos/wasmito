@@ -34,7 +34,7 @@ export function createLogger(name: string): winston.Logger {
       winston.format.colorize(),
       winston.format.timestamp(),
       winston.format.printf(({ timestamp, level, message }) => {
-        return `${timestamp} ${level}[${name}]: ${message}`;
+        return `[${timestamp} ${level}] ${name} : ${message}`;
       }),
     ),
     transports: [
@@ -58,7 +58,7 @@ export function getGlobalLogger(): winston.Logger {
         winston.format.colorize(),
         winston.format.timestamp(),
         winston.format.printf(({ timestamp, level, message }) => {
-          return `${timestamp} ${level}: ${message}`;
+          return `[${timestamp} ${level}]: ${message}`;
         }),
       ),
       transports: [
