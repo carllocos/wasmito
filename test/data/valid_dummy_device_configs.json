@@ -1,0 +1,18 @@
+{
+    "devices": [
+        {
+            "name": "A",
+            "id": "A",
+            "mode": "mcu",
+            "port": "port A",
+            "program": "program A"
+        },
+        {
+            "name": "B",
+            "id": "B",
+            "mode": "mcu",
+            "port": "port B",
+            "program": "program B"
+        }
+    ]
+}
