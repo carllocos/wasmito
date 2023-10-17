@@ -11,7 +11,7 @@
     "test": "npm run build && mocha './dist/test/**/*.js' --recursive",
     "lint": "eslint . --ext .ts",
     "build": "npx tsc",
-    "cli": "npm run build && node './dist/src/cli/cli.js'"
+    "cli": "npm run build && LogLevel=debug node './dist/src/cli/cli.js'"
   },
   "repository": {
     "type": "git",
