@@ -11,7 +11,31 @@ export enum LogLevel {
   LogNotice = 'notice',
 }
 
-let logLevel: LogLevel = LogLevel.LogInfo;
+function getLogLevelFromString(levelString: string): LogLevel | undefined {
+  switch (levelString) {
+    case 'info':
+      return LogLevel.LogInfo;
+    case 'debug':
+      return LogLevel.LogDebug;
+    case 'error':
+      return LogLevel.LogError;
+    case 'emerg':
+      return LogLevel.LogEmerg;
+    case 'alert':
+      return LogLevel.LogAlert;
+    case 'crit':
+      return LogLevel.LogCritical;
+    case 'warning':
+      return LogLevel.LogWarning;
+    case 'notice':
+      return LogLevel.LogNotice;
+    default:
+      return undefined;
+  }
+}
+
+let logLevel: LogLevel =
+  getLogLevelFromString(process.env.LogLevel ?? 'info') ?? LogLevel.LogInfo;
 
 export function setLogLevel(level: LogLevel): void {
   logLevel = level;
