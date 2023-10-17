@@ -1,7 +1,7 @@
 import { createLogger } from '../logger/logger';
 import * as fs from 'fs';
 
-enum DeviceMode {
+export enum DeviceMode {
   Emulate = 'emulate',
   MCU = 'mcu',
   Proxy = 'proxy',
@@ -53,6 +53,15 @@ export function isValidDeviceConfig(value: any): string[] {
   }
 
   return errors;
+}
+
+export function parseDeviceConfig(config: any): DeviceConfig | undefined {
+  const errors = isValidDeviceConfig(config);
+  if (errors.length > 0) {
+    Logger.error(`Invalid device config: ${errors.join(', ')}`);
+    return undefined;
+  }
+  return config;
 }
 
 const Logger = createLogger('DeviceConfiguration');

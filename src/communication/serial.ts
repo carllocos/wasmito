@@ -24,14 +24,14 @@ export class SerialConnection implements Channel {
     this.callbacks = this.callbacks.filter((c) => c !== callback);
   }
 
-  async send(data: string): Promise<void> {
-    await new Promise<void>((resolve, reject) => {
+  async send(data: string): Promise<boolean> {
+    return await new Promise<boolean>((resolve, reject) => {
       if (this.port.isOpen) {
         this.port.write(data, (err) => {
           if (err !== null) {
             reject(new Error(`Error sending data: ${err?.message}`));
           }
-          resolve();
+          resolve(true);
         });
       } else {
         reject(new Error('Serial port is not open.'));
@@ -39,18 +39,20 @@ export class SerialConnection implements Channel {
     });
   }
 
-  async open(): Promise<void> {
-    await new Promise((resolve, reject) => {});
+  async open(timeout: number): Promise<boolean> {
+    return await new Promise((resolve, reject) => {
+      resolve(true);
+    });
   }
 
-  async close(): Promise<void> {
-    await new Promise<void>((resolve, reject) => {
+  async close(): Promise<boolean> {
+    return await new Promise<boolean>((resolve, reject) => {
       this.port.close((err) => {
         if (err !== null) {
           console.error(`Error closing serial port: ${err.message}`);
           reject(err);
         } else {
-          resolve();
+          resolve(true);
         }
       });
     });

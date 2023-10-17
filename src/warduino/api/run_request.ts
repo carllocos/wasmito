@@ -10,7 +10,7 @@ export class RunRequest implements APIRequest<string> {
   }
 
   parse(data: string): string {
-    if (data === 'GO') {
+    if (data === 'GO!') {
       return data;
     }
     throw new APIRequestInvalidParse('No ack for Run');

@@ -35,3 +35,27 @@ export function readProjectName(): string {
     return 'Error in Name';
   }
 }
+
+let warduinoSDKPath: string | undefined;
+let warduinoPathToEmulatorBin: string | undefined;
+
+export function getPath2WARDuinoSDK(): string | undefined {
+  if (warduinoSDKPath === undefined) {
+    warduinoSDKPath = process.env.WARDUINO_SDK;
+  }
+  return warduinoSDKPath;
+}
+
+export function setPath2WARDuinoSDK(path: string): void {
+  warduinoSDKPath = path;
+}
+
+export function getPath2WARDuinoSDKEmulatorBinary(): string | undefined {
+  if (warduinoPathToEmulatorBin === undefined) {
+    const path = getPath2WARDuinoSDK();
+    if (path !== undefined) {
+      warduinoPathToEmulatorBin = `${warduinoSDKPath}/build-emu/wdcli`;
+    }
+  }
+  return warduinoPathToEmulatorBin;
+}
