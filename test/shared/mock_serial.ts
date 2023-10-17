@@ -7,11 +7,17 @@ export class MockSerialConnection implements Channel {
     this.callbacks = [];
   }
 
-  async open(): Promise<void> {}
+  async open(timedout: number): Promise<boolean> {
+    return true;
+  }
 
-  async close(): Promise<void> {}
+  async close(): Promise<boolean> {
+    return true;
+  }
 
-  async send(data: string): Promise<void> {}
+  async send(data: string): Promise<boolean> {
+    return true;
+  }
 
   addOnData(callback: (data: string) => void): void {
     this.callbacks.push(callback);
