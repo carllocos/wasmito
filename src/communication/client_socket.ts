@@ -59,7 +59,7 @@ abstract class AbstractChannel implements Channel {
       if (line.length > 0 && line.charAt(line.length - 1) === '\r') {
         line = line.slice(0, line.length - 1);
       }
-      console.log(`${this.channelName}: ${line}`);
+      getGlobalLogger().debug(`${this.channelName}: ${line}`);
       lines.push(line);
       idx = this.dataBuffered.indexOf('\n');
     }
