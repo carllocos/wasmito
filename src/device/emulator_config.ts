@@ -6,6 +6,7 @@ export interface SpawnArguments {
   proxyPort?: string;
   baudrate?: number;
   mode?: string;
+  disableStrictModuleLoad?: boolean;
 }
 
 function isEmulatorSpawnArguments(obj: any): obj is SpawnArguments {
@@ -20,7 +21,9 @@ function isEmulatorSpawnArguments(obj: any): obj is SpawnArguments {
     (typeof obj.proxyPort === 'undefined' ||
       typeof obj.proxyPort === 'string') &&
     (typeof obj.baudrate === 'undefined' || typeof obj.baudrate === 'number') &&
-    (typeof obj.mode === 'undefined' || typeof obj.mode === 'string')
+    (typeof obj.mode === 'undefined' || typeof obj.mode === 'string') &&
+    (typeof obj.disableStrictModuleLoad === 'undefined' ||
+      typeof obj.disableStrictModuleLoad === 'boolean')
   );
 }
 
@@ -32,6 +35,7 @@ export class EmulatorSpawnArguments {
   public proxyPort?: string;
   public baudrate?: number;
   public mode = 'interpret';
+  public disableStrictModuleLoad?: boolean;
 
   constructor(args: any) {
     if (!isEmulatorSpawnArguments(args)) {
@@ -61,6 +65,9 @@ export class EmulatorSpawnArguments {
     }
     if (typeof args.mode === 'string') {
       this.mode = args.mode;
+    }
+    if (typeof args.disableStrictModuleLoad === 'boolean') {
+      this.disableStrictModuleLoad = args.disableStrictModuleLoad;
     }
   }
 }
