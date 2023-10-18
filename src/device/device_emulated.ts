@@ -7,6 +7,7 @@ import { RunRequest } from '../warduino/api/run_request';
 import { type DeviceConfig } from './device_config';
 import type winston from 'winston';
 import { createLogger } from '../logger/logger';
+import { type APIRequest } from '../warduino/api/request_interface';
 
 export class EmulateDevice implements WARDuinoAPI {
   private readonly process?: ChildProcess;
@@ -43,9 +44,9 @@ export class EmulateDevice implements WARDuinoAPI {
     return false;
   }
 
-  public async run(): Promise<boolean> {
+  public async run(timeout?: number): Promise<boolean> {
     const request = new RunRequest();
-    const cmd = new Command<string>(this.channel, request, 3000);
+    const cmd = new Command<string>(this.channel, request, timeout);
     this.logger.debug(
       `Sending RunRequest (payload=${request.getData()}) to emulator process`,
     );
