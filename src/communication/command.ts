@@ -57,7 +57,7 @@ export class Command<T> {
           reject(v);
         }
       };
-      const d = this.request.getData() + '\n';
+      const d = this.request.getData();
       this.connection.addOnData(this.onDataListener);
       this.connection
         .send(d)

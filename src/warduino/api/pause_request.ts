@@ -6,7 +6,7 @@ import {
 
 export class PauseRequest implements APIRequest<string> {
   getData(): string {
-    return `${Instruction.Pause}`;
+    return `${Instruction.Pause}\n`;
   }
 
   parse(input: string): string {
