@@ -32,7 +32,7 @@ export class Command<T> {
         const parsed = this.request.parse(data);
         this.requestResolver(parsed);
       }
-    } catch (APIRequestInvalidParse) {}
+    } catch (err) {}
   }
 
   timedout(): void {
