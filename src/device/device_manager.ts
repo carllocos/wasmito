@@ -51,6 +51,12 @@ export class DeviceManager {
     if (args.pauseOnStart) {
       processArgs.push('--paused');
     }
+    if (
+      args.disableStrictModuleLoad !== undefined &&
+      args.disableStrictModuleLoad
+    ) {
+      processArgs.push('--disable-strict-module-load');
+    }
     return processArgs;
   }
 
@@ -92,6 +98,7 @@ export class DeviceManager {
       program: deviceConfig.program,
       listenPort: port,
       pauseOnStart: true,
+      disableStrictModuleLoad: true,
     });
     const correctedArgs = await this.correctSpawnArguments(args);
     const processArgs = this.buildProcessArguments(correctedArgs);

@@ -32,7 +32,7 @@ export class Command<T> {
         const parsed = this.request.parse(data);
         this.requestResolver(parsed);
       }
-    } catch (APIRequestInvalidParse) {}
+    } catch (err) {}
   }
 
   timedout(): void {
@@ -57,7 +57,7 @@ export class Command<T> {
           reject(v);
         }
       };
-      const d = this.request.getData() + '\n';
+      const d = this.request.getData();
       this.connection.addOnData(this.onDataListener);
       this.connection
         .send(d)

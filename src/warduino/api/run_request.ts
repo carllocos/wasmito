@@ -6,7 +6,7 @@ import {
 
 export class RunRequest implements APIRequest<string> {
   getData(): string {
-    return `${Instruction.Run}`;
+    return `${Instruction.Run}\n`;
   }
 
   parse(data: string): string {

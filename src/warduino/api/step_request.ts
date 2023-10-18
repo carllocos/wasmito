@@ -6,7 +6,7 @@ import {
 
 export class StepRequest implements APIRequest<string> {
   getData(): string {
-    return `${Instruction.Step}`;
+    return `${Instruction.Step}\n`;
   }
 
   parse(input: string): string {

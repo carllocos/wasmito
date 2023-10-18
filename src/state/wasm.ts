@@ -1,3 +1,6 @@
+import { getGlobalLogger } from '../logger/logger';
+import { encodeLEB128ToHex, floatToHexString } from '../util/encoder';
+
 export namespace WASM {
   export enum Type {
     f32,
@@ -14,9 +17,48 @@ export namespace WASM {
     ['i64', Type.i64],
   ]);
 
+  export const typeToHex = new Map<Type, string>([
+    [Type.i32, '7f'],
+    [Type.i64, '7e'],
+    [Type.f32, '7d'],
+    [Type.f64, '7c'],
+  ]);
+
   export interface Value {
     type: Type;
     value: number;
+  }
+
+  export interface EncodingWasmValueOptions {
+    includeType: boolean;
+  }
+
+  export function encodeWasmValue(
+    value: WASM.Value,
+    options: EncodingWasmValueOptions,
+  ): string {
+    let encodedValue = '';
+    if (options.includeType) {
+      const hexType = typeToHex.get(value.type);
+      if (hexType !== undefined) {
+        encodedValue += hexType;
+      }
+    }
+    switch (value.type) {
+      case Type.i32:
+      case Type.i64:
+        encodedValue += encodeLEB128ToHex(value.value);
+        break;
+      case Type.f32:
+        encodedValue += floatToHexString(value.value);
+        break;
+      case Type.f64:
+        getGlobalLogger().error(`encodingWasmValue with unexisting value type`);
+        break;
+      default:
+        getGlobalLogger().error(`encodingWasmValue with unexisting value type`);
+    }
+    return encodedValue;
   }
 
   export interface Frame {

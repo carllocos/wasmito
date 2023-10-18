@@ -26,7 +26,7 @@ export interface StackInpsectResponse {
 
 export class InspectStack implements APIRequest<WasmStack> {
   getData(): string {
-    return `${Instruction.Inspect}${InspectableState.stackState}`;
+    return `${Instruction.Inspect}${InspectableState.stackState}\n`;
   }
 
   parse(input: string): WasmStack {
