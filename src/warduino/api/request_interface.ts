@@ -11,7 +11,7 @@ export enum Instruction {
   Pause = '03',
   Step = '04',
   Inspect = '09',
-  StartRecording = '50',
+  AroundFunction = '50',
   StopRecording = '51',
 }
 
