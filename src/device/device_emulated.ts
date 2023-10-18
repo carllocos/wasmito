@@ -59,6 +59,14 @@ export class EmulateDevice implements WARDuinoAPI {
     return await this.channel.open(timeout);
   }
 
+  public async sendRequest<T>(
+    request: APIRequest<T>,
+    timeout?: number,
+  ): Promise<T> {
+    const command = new Command(this.channel, request, timeout);
+    return await command.execute();
+  }
+
   public async sendCommand<T>(command: Command<T>): Promise<T> {
     return await command.execute();
   }
