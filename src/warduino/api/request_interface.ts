@@ -12,7 +12,7 @@ export enum Instruction {
   Step = '04',
   Inspect = '09',
   AroundFunction = '50',
-  StopRecording = '51',
+  MonitorWasmAddr = '51',
 }
 
 export function getInstructionFromString(str: string): Instruction | undefined {
@@ -30,7 +30,7 @@ export function getInstructionFromString(str: string): Instruction | undefined {
     case '50':
       return Instruction.AroundFunction;
     case '51':
-      return Instruction.StopRecording;
+      return Instruction.MonitorWasmAddr;
     default:
       return undefined;
   }
