@@ -3,14 +3,18 @@ import { type EmulateDevice } from '../device/device_emulated';
 import { DeviceManager } from '../device/device_manager';
 import { getGlobalLogger } from '../logger/logger';
 import { WASM } from '../state/wasm';
+import { newTimeStamp } from '../instrumentor/timestamp';
 import {
-  AroundFunctionRequest,
-  EmptyValueSubstitution,
   ScheduleAfterTimeStamp,
   ScheduleBeforeTimeStamp,
+} from '../instrumentor/schedule';
+import {
+  EmptyValueSubstitution,
   ValueSubstitution,
+} from '../instrumentor/action';
+import {
+  AroundFunctionRequest,
   isSuccessfulReply,
-  newTimeStamp,
 } from '../warduino/api/around_function_request';
 
 const dm = new DeviceManager();
