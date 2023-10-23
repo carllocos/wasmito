@@ -43,3 +43,53 @@ export function floatToHexString(float: number): string {
   const buf = floatToSinglePrecisionBuffer(float);
   return bufferToHexString(buf);
 }
+
+export function serializeUInt16BE(n: number): string {
+  return serializeUInt(n, 2, true);
+}
+
+export function serializeUInt(
+  n: number,
+  amountBytes: number,
+  bigendian: boolean,
+): string {
+  const buff = Buffer.allocUnsafe(amountBytes);
+  if (amountBytes === 1) {
+    if (n < 0) {
+      buff.writeInt8(n);
+    } else {
+      buff.writeUInt8(n);
+    }
+  } else if (amountBytes === 2) {
+    if (bigendian) {
+      if (n < 0) {
+        buff.writeUInt16BE(n);
+      } else {
+        buff.writeUInt16BE(n);
+      }
+    } else {
+      if (n < 0) {
+        buff.writeInt16LE(n);
+      } else {
+        buff.writeUInt16LE(n);
+      }
+    }
+  } else if (amountBytes === 4) {
+    if (bigendian) {
+      if (n < 0) {
+        buff.writeInt32BE(n);
+      } else {
+        buff.writeUInt32BE(n);
+      }
+    } else {
+      if (n < 0) {
+        buff.writeInt32LE(n);
+      } else {
+        buff.writeUInt32LE(n);
+      }
+    }
+  } else {
+    throw new Error('invalid amount of bytes');
+  }
+  return buff.toString('hex');
+}
