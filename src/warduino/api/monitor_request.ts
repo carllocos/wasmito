@@ -99,12 +99,14 @@ export class MontiroWasmAddrRequest
     this.moment = MonitorMoment.MonitorBefore;
   }
 
-  monitorBefore(): void {
+  before(): MontiroWasmAddrRequest {
     this.moment = MonitorMoment.MonitorBefore;
+    return this;
   }
 
-  monitorAfter(): void {
+  after(): MontiroWasmAddrRequest {
     this.moment = MonitorMoment.MonitorAfter;
+    return this;
   }
 
   addAction(action: InstrumentAction): MontiroWasmAddrRequest {
