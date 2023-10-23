@@ -7,10 +7,12 @@ import {
   ScheduleOnce,
 } from '../instrumentor/schedule';
 import { type TimeStamp } from '../instrumentor/timestamp';
+import { type StateRequest } from '../warduino/api/inspect_request';
 
 enum ActionKind {
   RemoteCall = '01',
   ValueSubstitution = '02',
+  StateToInspect = '03',
 }
 
 export abstract class InstrumentAction {
@@ -76,5 +78,17 @@ export class ValueSubstitution extends InstrumentAction {
 export class EmptyValueSubstitution extends ValueSubstitution {
   constructor() {
     super(undefined);
+  }
+}
+
+export class StateInspect extends InstrumentAction {
+  private readonly req: StateRequest;
+  constructor(stateRequest: StateRequest) {
+    super(ActionKind.StateToInspect);
+    this.req = stateRequest;
+  }
+
+  public serializeBinary(): string {
+    return `${this.kind}${this.req.generateInterrupt()}`;
   }
 }
