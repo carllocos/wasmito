@@ -10,12 +10,16 @@ import {
 } from '../instrumentor/schedule';
 import {
   EmptyValueSubstitution,
+  InspectState,
   ValueSubstitution,
+  type WasmState,
 } from '../instrumentor/action';
 import {
   AroundFunctionRequest,
   isSuccessfulReply,
 } from '../warduino/api/around_function_request';
+import { MontiroWasmAddrRequest } from '../warduino/api/monitor_request';
+import { StateRequest } from '../warduino/api/inspect_request';
 
 const dm = new DeviceManager();
 
@@ -121,6 +125,96 @@ export async function instrumentTempWasm(em: EmulateDevice): Promise<boolean> {
   return allSucess;
 }
 
+export async function instrumentPrimitiveAlways(
+  em: EmulateDevice,
+): Promise<boolean> {
+  const chipLedCSetup = 3;
+  const emptyAction0 = new EmptyValueSubstitution();
+  const requestChipLedCSteup = new AroundFunctionRequest(
+    chipLedCSetup,
+  ).addAction(emptyAction0);
+
+  const attachPinID = 4;
+
+  const emptyAction = new EmptyValueSubstitution();
+  const requestAttachPin = new AroundFunctionRequest(attachPinID).addAction(
+    emptyAction,
+  );
+
+  const analogWriteID = 5;
+
+  const emptyAction2 = new EmptyValueSubstitution();
+  const requestAnalogWrite = new AroundFunctionRequest(analogWriteID).addAction(
+    emptyAction2,
+  );
+
+  const tempID = 6;
+  const value: WASM.Value = {
+    type: WASM.Type.f32,
+    value: 23.0004,
+  };
+  const requestTemp = new AroundFunctionRequest(tempID).addAction(
+    new ValueSubstitution(value),
+  );
+
+  const requests = [
+    requestTemp,
+    requestAttachPin,
+    requestAnalogWrite,
+    requestChipLedCSteup,
+  ];
+  const replies = await Promise.all(
+    requests.map(async (req) => {
+      return await em.sendRequest(req);
+    }),
+  );
+  let allSucess = true;
+  replies.forEach((reply) => {
+    getGlobalLogger().debug(
+      `Got reply interrupt=${reply.interrupt} responseType=${reply.responseType} error_code?=${reply.error_code}`,
+    );
+    allSucess = allSucess && isSuccessfulReply(reply);
+  });
+  return true;
+}
+
+export function onMonitoredState(d: WasmState): void {
+  const vals = d.stack ?? [];
+  const s = vals
+    .map((v) => {
+      return `{"idx":${v.idx},"type":${v.type},"value":${v.value}}`;
+    })
+    .join(', ');
+  getGlobalLogger().info(`addr=${d.pc} stack=[${s}]`);
+}
+
+export async function instrumentForMonitor(
+  em: EmulateDevice,
+): Promise<boolean> {
+  if (!(await instrumentPrimitiveAlways(em))) {
+    return false;
+  }
+  const funcAddresses = [344, 269, 275, 348, 339, 356, 358, 360];
+  const stateRequest = new StateRequest();
+  stateRequest.includeStack().includeGlobals().includePC();
+  const requestsBefore = funcAddresses.map((addr) => {
+    const inspectAction = new InspectState(stateRequest, addr);
+    inspectAction.onSubscriptionData = onMonitoredState;
+    return new MontiroWasmAddrRequest(addr).before().addAction(inspectAction);
+  });
+  const repliesBefore = await Promise.all(
+    requestsBefore.map(async (req) => {
+      return await em.sendRequest(req);
+    }),
+  );
+  repliesBefore.forEach((reply) => {
+    getGlobalLogger().debug(
+      `Got reply interrupt=${reply.interrupt} responseType=${reply.responseType} error_code?=${reply.error_code}`,
+    );
+  });
+  return true;
+}
+
 export async function createEmulator(
   wasmApp: string,
 ): Promise<EmulateDevice | undefined> {
@@ -134,7 +228,8 @@ export async function createEmulator(
   if (dc !== undefined) {
     const em = await dm.connectToExitingEmulator(dc, 8000);
     // const em = await dm.spawnEmulator(dc, 8000);
-    const success = await instrumentTempWasm(em);
+    // const success = await instrumentTempWasm(em);
+    const success = await instrumentForMonitor(em);
 
     if (success) {
       await em.run();
