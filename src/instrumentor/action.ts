@@ -9,7 +9,7 @@ import {
 import { type TimeStamp } from '../instrumentor/timestamp';
 import { type StateRequest } from '../warduino/api/inspect_request';
 
-enum ActionKind {
+export enum ActionKind {
   RemoteCall = '01',
   ValueSubstitution = '02',
   StateToInspect = '03',
