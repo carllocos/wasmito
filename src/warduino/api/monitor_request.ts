@@ -91,11 +91,13 @@ export class MontiroWasmAddrRequest extends APISubscriptionRequest<MonitorWasmAd
   public readonly wasmAddr;
   public readonly actions: Array<InstrumentAction<any>>;
   private moment: MonitorMoment;
+  private readonly interruptNr: Instruction;
   constructor(wasmAddr: number) {
     super();
     this.wasmAddr = wasmAddr;
     this.actions = [];
     this.moment = MonitorMoment.MonitorBefore;
+    this.interruptNr = Instruction.MonitorWasmAddr;
   }
 
   before(): MontiroWasmAddrRequest {
@@ -123,7 +125,7 @@ export class MontiroWasmAddrRequest extends APISubscriptionRequest<MonitorWasmAd
     const encodedAddr = encodeLEB128ToHex(this.wasmAddr);
     const encodedSchedule = this.actions[0].schedule.serializeBinary();
     const encodedAction = this.actions[0].serializeBinary();
-    return `${Instruction.MonitorWasmAddr}${encodedAddr}${this.moment}${encodedSchedule}${encodedAction}\n`;
+    return `${this.interruptNr}${encodedAddr}${this.moment}${encodedSchedule}${encodedAction}\n`;
   }
 
   override parse(input: string): MonitorWasmAddrResponse {
