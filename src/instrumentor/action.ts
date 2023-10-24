@@ -85,14 +85,38 @@ export class EmptyValueSubstitution extends ValueSubstitution {
   }
 }
 
-export class StateInspect extends InstrumentAction {
+export interface WasmState {
+  pc: number;
+  stack?: any[];
+  globals?: any[];
+}
+
+export class StateInspect extends InstrumentAction<WasmState> {
   private readonly req: StateRequest;
-  constructor(stateRequest: StateRequest) {
+  private readonly wasmAddress?: number;
+  constructor(stateRequest: StateRequest, wasmAddress?: number) {
     super(ActionKind.StateToInspect);
     this.req = stateRequest;
+    this.parseSubscriptionData = this.deserializeSubscriptionMessage;
+    this.wasmAddress = wasmAddress;
+    if (this.wasmAddress !== undefined) {
+      this.req.includePC(); // include pc is mandatory
+    }
   }
 
   public serializeBinary(): string {
     return `${this.kind}${this.req.generateInterrupt()}`;
+  }
+
+  deserializeSubscriptionMessage(input: string): WasmState {
+    const parsed = this.req.parse(input);
+    if (this.wasmAddress !== undefined && parsed.pc !== this.wasmAddress) {
+      throw new Error(`no valid inspect state response`);
+    }
+    return {
+      pc: parsed.pc,
+      stack: parsed.stack,
+      globals: parsed.globals,
+    };
   }
 }
