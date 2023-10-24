@@ -18,9 +18,14 @@ export class Command<T> {
     this.resolved = false;
     this.rejected = false;
     this.onDataListener = (data: string) => {
-      this.update(data);
       if (this.resolved || this.rejected) {
-        this.connection.removeOnData(this.onDataListener);
+        if (this.request.handleSubscriptionData === undefined) {
+          this.connection.removeOnData(this.onDataListener);
+        } else {
+          this.request.handleSubscriptionData(data);
+        }
+      } else {
+        this.update(data);
       }
     };
     this.timeout = timeout;
