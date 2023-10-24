@@ -115,4 +115,60 @@ export class StateRequest {
       this.state.push(s);
     }
   }
+
+  public parse(line: string): any {
+    const response = JSON.parse(line);
+    for (let i = 0; i < this.state.length; i++) {
+      const s = this.state[i];
+      if (s === InspectableState.pcState && response.pc === undefined) {
+        throw new Error('invalid state');
+      } else if (
+        s === InspectableState.breakpointState &&
+        response.breakpoints === undefined
+      ) {
+        throw new Error('invalid state');
+      } else if (
+        s === InspectableState.callstackState &&
+        response.callstack === undefined
+      ) {
+        throw new Error('invalid state');
+      } else if (
+        s === InspectableState.globalsState &&
+        response.globals === undefined
+      ) {
+        throw new Error('invalid state');
+      } else if (
+        s === InspectableState.tableState &&
+        response.table === undefined
+      ) {
+        throw new Error('invalid state');
+      } else if (
+        s === InspectableState.memState &&
+        response.memory === undefined
+      ) {
+        throw new Error('invalid state');
+      } else if (
+        s === InspectableState.branchingTableState &&
+        response.br_table === undefined
+      ) {
+        throw new Error('invalid state');
+      } else if (
+        s === InspectableState.stackState &&
+        response.stack === undefined
+      ) {
+        throw new Error('invalid state');
+      } else if (
+        s === InspectableState.callbacksState &&
+        response.callbacks === undefined
+      ) {
+        throw new Error('invalid state');
+      } else if (
+        s === InspectableState.eventsState &&
+        response.events === undefined
+      ) {
+        throw new Error('invalid state');
+      }
+    }
+    return response;
+  }
 }
