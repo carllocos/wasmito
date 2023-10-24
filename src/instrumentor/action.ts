@@ -15,7 +15,7 @@ export enum ActionKind {
   StateToInspect = '03',
 }
 
-export abstract class InstrumentAction {
+export abstract class InstrumentAction<SubscriptionType> {
   public readonly kind: ActionKind;
   public schedule: ActionSchedule;
   constructor(kind: ActionKind) {
@@ -23,12 +23,12 @@ export abstract class InstrumentAction {
     this.schedule = new ScheduleAways();
   }
 
-  scheduleFor(newSchedule: ActionSchedule): InstrumentAction {
+  scheduleFor(newSchedule: ActionSchedule): InstrumentAction<SubscriptionType> {
     this.schedule = newSchedule;
     return this;
   }
 
-  scheduleOnce(timestamp?: TimeStamp): InstrumentAction {
+  scheduleOnce(timestamp?: TimeStamp): InstrumentAction<SubscriptionType> {
     if (timestamp !== undefined) {
       this.schedule = new ScheduleOnTimeStamp(timestamp);
     } else {
@@ -38,6 +38,8 @@ export abstract class InstrumentAction {
   }
 
   abstract serializeBinary(): string;
+  parseSubscriptionData?: (input: string) => SubscriptionType;
+  onSubscriptionData?: (data: SubscriptionType) => void;
 }
 
 export class RemoteCallAction extends InstrumentAction {
