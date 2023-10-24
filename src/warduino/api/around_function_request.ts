@@ -84,13 +84,13 @@ export function isAroundFunctionJSONResponse(
 
 export class AroundFunctionRequest implements APIRequest<AroundActionResponse> {
   public readonly function_idx;
-  public readonly actions: InstrumentAction[];
+  public readonly actions: Array<InstrumentAction<any>>;
   constructor(fidx: number) {
     this.function_idx = fidx;
     this.actions = [];
   }
 
-  addAction(action: InstrumentAction): AroundFunctionRequest {
+  addAction(action: InstrumentAction<any>): AroundFunctionRequest {
     if (this.actions.length === 0) {
       this.actions.push(action);
     } else {
