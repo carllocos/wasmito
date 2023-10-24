@@ -1,10 +1,10 @@
 import { getGlobalLogger } from '../../logger/logger';
 import { encodeLEB128ToHex } from '../../util/encoder';
 import {
-  type APIRequest,
   Instruction,
   APIRequestInvalidParse,
   getInstructionFromString,
+  APISubscriptionRequest,
 } from './request_interface';
 
 import { type InstrumentAction } from '../../instrumentor/action';
@@ -87,13 +87,12 @@ export function isMonitorWasmAddrResponse(
   return false;
 }
 
-export class MontiroWasmAddrRequest
-  implements APIRequest<MonitorWasmAddrResponse>
-{
+export class MontiroWasmAddrRequest extends APISubscriptionRequest<MonitorWasmAddrResponse> {
   public readonly wasmAddr;
-  public readonly actions: InstrumentAction[];
+  public readonly actions: Array<InstrumentAction<any>>;
   private moment: MonitorMoment;
   constructor(wasmAddr: number) {
+    super();
     this.wasmAddr = wasmAddr;
     this.actions = [];
     this.moment = MonitorMoment.MonitorBefore;
@@ -109,7 +108,7 @@ export class MontiroWasmAddrRequest
     return this;
   }
 
-  addAction(action: InstrumentAction): MontiroWasmAddrRequest {
+  addAction(action: InstrumentAction<any>): MontiroWasmAddrRequest {
     if (this.actions.length === 0) {
       this.actions.push(action);
     } else {
@@ -120,14 +119,14 @@ export class MontiroWasmAddrRequest
     return this;
   }
 
-  getData(): string {
+  override getData(): string {
     const encodedAddr = encodeLEB128ToHex(this.wasmAddr);
     const encodedSchedule = this.actions[0].schedule.serializeBinary();
     const encodedAction = this.actions[0].serializeBinary();
     return `${Instruction.MonitorWasmAddr}${encodedAddr}${this.moment}${encodedSchedule}${encodedAction}\n`;
   }
 
-  parse(input: string): MonitorWasmAddrResponse {
+  override parse(input: string): MonitorWasmAddrResponse {
     const err = new APIRequestInvalidParse(
       'No reply for AroundFunctionRequest',
     );
@@ -141,6 +140,21 @@ export class MontiroWasmAddrRequest
       }
     } else {
       throw err;
+    }
+  }
+
+  override handleSubscriptionData(data: string): void {
+    for (let i = 0; i < this.actions.length; i++) {
+      const action = this.actions[i];
+      if (
+        action.parseSubscriptionData !== undefined &&
+        action.onSubscriptionData !== undefined
+      ) {
+        try {
+          const response = action.parseSubscriptionData(data);
+          action.onSubscriptionData(response);
+        } catch (e) {}
+      }
     }
   }
 }
