@@ -91,7 +91,7 @@ export interface WasmState {
   globals?: any[];
 }
 
-export class StateInspect extends InstrumentAction<WasmState> {
+export class InspectState extends InstrumentAction<WasmState> {
   private readonly req: StateRequest;
   private readonly wasmAddress?: number;
   constructor(stateRequest: StateRequest, wasmAddress?: number) {
