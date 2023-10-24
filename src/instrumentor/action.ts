@@ -42,7 +42,9 @@ export abstract class InstrumentAction<SubscriptionType> {
   onSubscriptionData?: (data: SubscriptionType) => void;
 }
 
-export class RemoteCallAction extends InstrumentAction {
+export abstract class ActionWithoutSubscription extends InstrumentAction<void> {}
+
+export class RemoteCallAction extends ActionWithoutSubscription {
   public readonly targetfidx: number;
   constructor(targetfidx: number) {
     super(ActionKind.RemoteCall);
@@ -56,7 +58,7 @@ export class RemoteCallAction extends InstrumentAction {
   }
 }
 
-export class ValueSubstitution extends InstrumentAction {
+export class ValueSubstitution extends ActionWithoutSubscription {
   public readonly value?: WASM.Value;
   constructor(value?: WASM.Value) {
     super(ActionKind.ValueSubstitution);
