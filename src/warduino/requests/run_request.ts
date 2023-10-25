@@ -1,8 +1,8 @@
 import {
   type APIRequest,
   APIRequestInvalidParse,
-  Instruction,
-} from './request_interface';
+} from '../api/request_interface';
+import { Instruction } from '../api/instructions';
 
 export class RunRequest implements APIRequest<string> {
   getData(): string {

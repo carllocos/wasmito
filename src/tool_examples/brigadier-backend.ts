@@ -17,9 +17,9 @@ import {
 import {
   AroundFunctionRequest,
   isSuccessfulReply,
-} from '../warduino/api/around_function_request';
-import { MontiroWasmAddrRequest } from '../warduino/api/monitor_request';
-import { StateRequest } from '../warduino/api/inspect_request';
+} from '../warduino/requests/around_function_request';
+import { MontiroWasmAddrRequest } from '../warduino/requests/monitor_request';
+import { StateRequest } from '../warduino/requests/inspect_request';
 
 const dm = new DeviceManager();
 

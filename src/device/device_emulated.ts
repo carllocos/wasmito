@@ -3,7 +3,7 @@ import { type EmulatorSpawnArguments } from './emulator_config';
 import { ClientSideSocket } from '../communication/client_socket';
 import { type WARDuinoAPI } from '../warduino/api/warduino_api';
 import { Command } from '../communication/command';
-import { RunRequest } from '../warduino/api/run_request';
+import { RunRequest } from '../warduino/requests/run_request';
 import { type DeviceConfig } from './device_config';
 import type winston from 'winston';
 import { createLogger } from '../logger/logger';

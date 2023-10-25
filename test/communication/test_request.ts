@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { InspectStack } from '../../src/warduino/api/inspect_request';
+import { InspectStack } from '../../src/warduino/requests/inspect_request';
 import { type WasmStack } from '../../src/state/wasm_stack';
 
 describe('Inspect Request Test Suite', () => {

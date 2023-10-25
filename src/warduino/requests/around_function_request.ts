@@ -1,20 +1,13 @@
 import { getGlobalLogger } from '../../logger/logger';
 import { encodeLEB128ToHex } from '../../util/encoder';
 import {
-  Instruction,
+  type APIRequest,
   APIRequestInvalidParse,
-  getInstructionFromString,
-  APISubscriptionRequest,
-} from './request_interface';
-
+} from '../api/request_interface';
+import { Instruction, getInstructionFromString } from '../api/instructions';
 import { type InstrumentAction } from '../../instrumentor/action';
 
-enum MonitorMoment {
-  MonitorBefore = '01',
-  MonitorAfter = '02',
-}
-
-export interface MonitorWasmAddrJSONResponse {
+export interface AroundFunctionJSONResponse {
   interrupt: string;
   kind: string;
   error_code?: string;
@@ -35,26 +28,26 @@ function getResponseTypeFromString(str: string): ResponseType | undefined {
   }
 }
 
-export interface MonitorWasmAddrResponse {
+export interface AroundActionResponse {
   interrupt: Instruction;
   responseType: ResponseType;
   error_code?: number;
 }
 
-export function createMonitorWasmAddrResponse(
-  obj: MonitorWasmAddrJSONResponse,
-): MonitorWasmAddrResponse | undefined {
+export function createAroundFunctionResponse(
+  obj: AroundFunctionJSONResponse,
+): AroundActionResponse | undefined {
   const instr = getInstructionFromString(obj.interrupt);
   const responseType = getResponseTypeFromString(obj.kind);
   if (
     instr === undefined ||
     responseType === undefined ||
-    instr !== Instruction.MonitorWasmAddr
+    instr !== Instruction.AroundFunction
   ) {
     return undefined;
   }
 
-  const reply: MonitorWasmAddrResponse = {
+  const reply: AroundActionResponse = {
     interrupt: instr,
     responseType,
   };
@@ -68,13 +61,13 @@ export function createMonitorWasmAddrResponse(
 
   return reply;
 }
-export function isSuccessfulReply(reply: MonitorWasmAddrResponse): boolean {
+export function isSuccessfulReply(reply: AroundActionResponse): boolean {
   return reply.responseType === ResponseType.SuccessResponse;
 }
 
-export function isMonitorWasmAddrResponse(
+export function isAroundFunctionJSONResponse(
   content: any,
-): content is MonitorWasmAddrJSONResponse {
+): content is AroundFunctionJSONResponse {
   const validFields =
     typeof content === 'object' &&
     typeof content.interrupt === 'string' &&
@@ -82,35 +75,20 @@ export function isMonitorWasmAddrResponse(
     (typeof content.error_code === 'string' ||
       content.error_code === undefined);
   if (validFields) {
-    return content.interrupt === Instruction.MonitorWasmAddr;
+    return content.interrupt === Instruction.AroundFunction;
   }
   return false;
 }
 
-export class MontiroWasmAddrRequest extends APISubscriptionRequest<MonitorWasmAddrResponse> {
-  public readonly wasmAddr;
+export class AroundFunctionRequest implements APIRequest<AroundActionResponse> {
+  public readonly function_idx;
   public readonly actions: Array<InstrumentAction<any>>;
-  private moment: MonitorMoment;
-  private readonly interruptNr: Instruction;
-  constructor(wasmAddr: number) {
-    super();
-    this.wasmAddr = wasmAddr;
+  constructor(fidx: number) {
+    this.function_idx = fidx;
     this.actions = [];
-    this.moment = MonitorMoment.MonitorBefore;
-    this.interruptNr = Instruction.MonitorWasmAddr;
   }
 
-  before(): MontiroWasmAddrRequest {
-    this.moment = MonitorMoment.MonitorBefore;
-    return this;
-  }
-
-  after(): MontiroWasmAddrRequest {
-    this.moment = MonitorMoment.MonitorAfter;
-    return this;
-  }
-
-  addAction(action: InstrumentAction<any>): MontiroWasmAddrRequest {
+  addAction(action: InstrumentAction<any>): AroundFunctionRequest {
     if (this.actions.length === 0) {
       this.actions.push(action);
     } else {
@@ -121,20 +99,20 @@ export class MontiroWasmAddrRequest extends APISubscriptionRequest<MonitorWasmAd
     return this;
   }
 
-  override getData(): string {
-    const encodedAddr = encodeLEB128ToHex(this.wasmAddr);
+  getData(): string {
+    const encodedFidx = encodeLEB128ToHex(this.function_idx);
     const encodedSchedule = this.actions[0].schedule.serializeBinary();
     const encodedAction = this.actions[0].serializeBinary();
-    return `${this.interruptNr}${encodedAddr}${this.moment}${encodedSchedule}${encodedAction}\n`;
+    return `${Instruction.AroundFunction}${encodedFidx}${encodedSchedule}${encodedAction}\n`;
   }
 
-  override parse(input: string): MonitorWasmAddrResponse {
+  parse(input: string): AroundActionResponse {
     const err = new APIRequestInvalidParse(
       'No reply for AroundFunctionRequest',
     );
     const obj = JSON.parse(input);
-    if (isMonitorWasmAddrResponse(obj)) {
-      const reply = createMonitorWasmAddrResponse(obj);
+    if (isAroundFunctionJSONResponse(obj)) {
+      const reply = createAroundFunctionResponse(obj);
       if (reply === undefined) {
         throw err;
       } else {
@@ -142,21 +120,6 @@ export class MontiroWasmAddrRequest extends APISubscriptionRequest<MonitorWasmAd
       }
     } else {
       throw err;
-    }
-  }
-
-  override handleSubscriptionData(data: string): void {
-    for (let i = 0; i < this.actions.length; i++) {
-      const action = this.actions[i];
-      if (
-        action.parseSubscriptionData !== undefined &&
-        action.onSubscriptionData !== undefined
-      ) {
-        try {
-          const response = action.parseSubscriptionData(data);
-          action.onSubscriptionData(response);
-        } catch (e) {}
-      }
     }
   }
 }

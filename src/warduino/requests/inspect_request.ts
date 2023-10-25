@@ -1,8 +1,8 @@
 import {
   type APIRequest,
   APIRequestInvalidParse,
-  Instruction,
-} from './request_interface';
+} from '../api/request_interface';
+import { Instruction } from '../api/instructions';
 import { WasmStack } from '../../state/wasm_stack';
 import { type WASM } from '../../state/wasm';
 import { serializeUInt16BE } from '../../util/encoder';

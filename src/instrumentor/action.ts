@@ -7,7 +7,7 @@ import {
   ScheduleOnce,
 } from '../instrumentor/schedule';
 import { type TimeStamp } from '../instrumentor/timestamp';
-import { type StateRequest } from '../warduino/api/inspect_request';
+import { type StateRequest } from '../warduino/requests/inspect_request';
 
 export enum ActionKind {
   RemoteCall = '01',
