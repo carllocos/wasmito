@@ -38,7 +38,7 @@ export abstract class InstrumentAction<SubscriptionType> {
   }
 
   abstract serializeBinary(): string;
-  parseSubscriptionData?: (input: string) => SubscriptionType;
+  parseSubscriptionData?: (input: any) => SubscriptionType;
   onSubscriptionData?: (data: SubscriptionType) => void;
 }
 
@@ -108,11 +108,8 @@ export class InspectState extends InstrumentAction<WasmState> {
     return `${this.kind}${this.req.generateInterrupt()}`;
   }
 
-  deserializeSubscriptionMessage(input: string): WasmState {
+  deserializeSubscriptionMessage(input: any): WasmState {
     const parsed = this.req.parse(input);
-    if (this.wasmAddress !== undefined && parsed.pc !== this.wasmAddress) {
-      throw new Error(`no valid inspect state response`);
-    }
     return {
       pc: parsed.pc,
       stack: parsed.stack,
