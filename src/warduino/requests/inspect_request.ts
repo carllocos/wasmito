@@ -116,8 +116,13 @@ export class StateRequest {
     }
   }
 
-  public parse(line: string): any {
-    const response = JSON.parse(line);
+  public parse(line: any): any {
+    let response: any = {};
+    if (typeof line === 'string') {
+      response = JSON.parse(line);
+    } else if (typeof line === 'object') {
+      response = line;
+    }
     for (let i = 0; i < this.state.length; i++) {
       const s = this.state[i];
       if (s === InspectableState.pcState && response.pc === undefined) {

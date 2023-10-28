@@ -7,82 +7,36 @@ import {
 import { type InstrumentAction } from '../../instrumentor/action';
 import { Instruction, getInstructionFromString } from '../api/instructions';
 
-enum MonitorMoment {
+export enum MonitorMoment {
   MonitorBefore = '01',
   MonitorAfter = '02',
 }
 
-export interface MonitorWasmAddrJSONResponse {
-  interrupt: string;
-  kind: string;
-  error_code?: string;
-}
-export enum ResponseType {
-  SuccessResponse = '01',
-  ErrorResponse = '02',
-}
-
-function getResponseTypeFromString(str: string): ResponseType | undefined {
+export function getMonitorMomentFromString(
+  str: string,
+): MonitorMoment | undefined {
   switch (str) {
     case '01':
-      return ResponseType.SuccessResponse;
+      return MonitorMoment.MonitorBefore;
     case '02':
-      return ResponseType.ErrorResponse;
+      return MonitorMoment.MonitorAfter;
     default:
       return undefined;
   }
 }
 
-export interface MonitorWasmAddrResponse {
-  interrupt: Instruction;
-  responseType: ResponseType;
-  error_code?: number;
+export interface MonitorWasmAddrJSONResponse extends RequestMessage {}
+
+export interface MonitorWasmAddrResponse extends MonitorWasmAddrJSONResponse {}
+
+function isMonitorWasmAddrResponse(response: RequestMessage): boolean {
+  return response.interrupt === Instruction.MonitorWasmAddr;
 }
 
 export function createMonitorWasmAddrResponse(
-  obj: MonitorWasmAddrJSONResponse,
-): MonitorWasmAddrResponse | undefined {
-  const instr = getInstructionFromString(obj.interrupt);
-  const responseType = getResponseTypeFromString(obj.kind);
-  if (
-    instr === undefined ||
-    responseType === undefined ||
-    instr !== Instruction.MonitorWasmAddr
-  ) {
-    return undefined;
-  }
-
-  const reply: MonitorWasmAddrResponse = {
-    interrupt: instr,
-    responseType,
-  };
-  if (obj.error_code !== undefined) {
-    const code = parseInt(obj.error_code);
-    if (!isNaN(code)) {
-      return undefined;
-    }
-    reply.error_code = code;
-  }
-
-  return reply;
-}
-export function isSuccessfulReply(reply: MonitorWasmAddrResponse): boolean {
-  return reply.responseType === ResponseType.SuccessResponse;
-}
-
-export function isMonitorWasmAddrResponse(
-  content: any,
-): content is MonitorWasmAddrJSONResponse {
-  const validFields =
-    typeof content === 'object' &&
-    typeof content.interrupt === 'string' &&
-    typeof content.kind === 'string' &&
-    (typeof content.error_code === 'string' ||
-      content.error_code === undefined);
-  if (validFields) {
-    return content.interrupt === Instruction.MonitorWasmAddr;
-  }
-  return false;
+  msg: RequestMessage,
+): MonitorWasmAddrResponse {
+  return msg;
 }
 
 export class MontiroWasmAddrRequest extends APISubscriptionRequest<MonitorWasmAddrResponse> {
