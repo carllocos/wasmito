@@ -3,9 +3,12 @@ import { encodeLEB128ToHex } from '../../util/encoder';
 import {
   APIRequestInvalidParse,
   APISubscriptionRequest,
+  createRequestMessage,
+  isSubscriptionMessage,
+  type RequestMessage,
 } from '../api/request_interface';
 import { type InstrumentAction } from '../../instrumentor/action';
-import { Instruction, getInstructionFromString } from '../api/instructions';
+import { Instruction } from '../api/instructions';
 
 export enum MonitorMoment {
   MonitorBefore = '01',
@@ -81,12 +84,13 @@ export class MontiroWasmAddrRequest extends APISubscriptionRequest<MonitorWasmAd
   }
 
   override parse(input: string): MonitorWasmAddrResponse {
-    const err = new APIRequestInvalidParse(
-      'No reply for AroundFunctionRequest',
-    );
-    const obj = JSON.parse(input);
-    if (isMonitorWasmAddrResponse(obj)) {
-      const reply = createMonitorWasmAddrResponse(obj);
+    const err = new APIRequestInvalidParse('No reply for MonitorWasmAddr');
+    const msg: RequestMessage | undefined = createRequestMessage(input);
+    if (msg === undefined) {
+      throw err;
+    }
+    if (isMonitorWasmAddrResponse(msg)) {
+      const reply = createMonitorWasmAddrResponse(msg);
       if (reply === undefined) {
         throw err;
       } else {
@@ -98,17 +102,46 @@ export class MontiroWasmAddrRequest extends APISubscriptionRequest<MonitorWasmAd
   }
 
   override handleSubscriptionData(data: string): void {
-    for (let i = 0; i < this.actions.length; i++) {
-      const action = this.actions[i];
-      if (
-        action.parseSubscriptionData !== undefined &&
-        action.onSubscriptionData !== undefined
-      ) {
-        try {
-          const response = action.parseSubscriptionData(data);
-          action.onSubscriptionData(response);
-        } catch (e) {}
-      }
+    const msg = createRequestMessage(data);
+    if (msg === undefined || !isSubscriptionMessage(msg)) {
+      return;
     }
+    try {
+      let subContent: any = {};
+      if (typeof msg.sub === 'string') {
+        subContent = JSON.parse(msg.sub);
+      } else if (typeof msg.sub === 'object') {
+        subContent = msg.sub;
+      }
+
+      if (
+        typeof subContent.moment !== 'string' ||
+        subContent.val === undefined
+      ) {
+        return;
+      }
+      const monitorMoment = getMonitorMomentFromString(subContent.moment);
+      if (monitorMoment === undefined || monitorMoment !== this.moment) {
+        return;
+      }
+
+      const monitoredAddr = parseInt(subContent.addr, 16);
+      if (isNaN(monitoredAddr) || this.wasmAddr !== monitoredAddr) {
+        return;
+      }
+
+      for (let i = 0; i < this.actions.length; i++) {
+        const action = this.actions[i];
+        if (
+          action.parseSubscriptionData !== undefined &&
+          action.onSubscriptionData !== undefined
+        ) {
+          try {
+            const parsed = action.parseSubscriptionData(subContent.val);
+            action.onSubscriptionData(parsed);
+          } catch (e) {}
+        }
+      }
+    } catch (e) {}
   }
 }
