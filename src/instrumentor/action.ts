@@ -93,7 +93,7 @@ export interface WasmState {
 
 export class InspectState extends InstrumentAction<WasmState> {
   private readonly req: StateRequest;
-  private readonly wasmAddress?: number;
+  public readonly wasmAddress?: number;
   constructor(stateRequest: StateRequest, wasmAddress?: number) {
     super(ActionKind.StateToInspect);
     this.req = stateRequest;
