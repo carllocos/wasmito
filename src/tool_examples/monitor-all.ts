@@ -38,6 +38,8 @@ class WriteJSON {
   private firstWrite: boolean;
   private readonly prefix: string;
   private readonly suffix: string;
+  private addSeperator: boolean;
+  private bufSize: number;
 
   constructor(filepath: string, maxBuffer: number) {
     this.filepath = filepath;
@@ -45,22 +47,34 @@ class WriteJSON {
     this.firstWrite = true;
     this.prefix = '{"monitored":[';
     this.suffix = ']}';
+    this.addSeperator = false;
+    this.bufSize = 0;
   }
 
   public write(obj: any): void {
     if (this.firstWrite) {
       fs.writeFileSync(this.filepath, this.prefix, 'utf-8');
       this.firstWrite = false;
+      this.addSeperator = false;
     }
+
+    if (this.addSeperator) {
+      this.content.push(',');
+    }
+
     this.content.push(JSON.stringify(obj));
-    if (this.content.length >= this.maxBuffer) {
-      const jsonData = this.content.join(',\n');
+    this.addSeperator = true;
+    this.bufSize += 1;
+
+    if (this.bufSize >= this.maxBuffer) {
+      const jsonData = this.content.join('');
       fs.appendFile(this.filepath, jsonData, 'utf-8', (err) => {
         if (err !== null) {
           getGlobalLogger().error(`Error writing to file ${this.filepath}`);
         }
       });
       this.content = [];
+      this.bufSize = 0;
     }
   }
 
