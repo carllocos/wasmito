@@ -98,7 +98,7 @@ export function parseDissambledFunction(input: string):
     }
 
     // Extract the first keyword after the vertical bar
-    let keyword = keywordParts[1].trim();
+    const keyword = keywordParts[1].trim();
     if (
       opcodesThatNeedEnd.find((op) => {
         return op === keyword;
@@ -107,7 +107,6 @@ export function parseDissambledFunction(input: string):
       opcodesWaitingForEnd.push(keyword);
     } else if (keyword === 'end') {
       const op = opcodesWaitingForEnd.pop() as string;
-      keyword = `${op}_${keyword}`;
       if (op.includes('func[')) {
         inFunction = false;
         funcOpcodes.push({
