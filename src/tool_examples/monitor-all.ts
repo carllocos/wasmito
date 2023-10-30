@@ -83,7 +83,144 @@ class WriteJSON {
   }
 }
 
+class BrigadierJSONWriter {
+  private readonly writer: WriteJSON;
+  private readonly befores: Map<number, [number, WasmOpcode, string, number[]]>;
+  private readonly after: Map<number, [WasmOpcode, string]>;
+
+  constructor(writer: WriteJSON) {
+    this.writer = writer;
+    this.befores = new Map();
+    this.after = new Map();
+  }
+
+  public addBefore(addr: number, opcode: WasmOpcode): void {
+    this.befores.set(addr, [addr, opcode, opcode.getLabels().join(' '), []]);
+  }
+
+  public addAfter(addr: number, opcode: WasmOpcode): void {
+    this.after.set(addr, [opcode, opcode.getLabels().join(' ')]);
+  }
+
+  public writeBefore(address: number, state: WasmState): void {
+    const val = this.befores.get(address);
+    if (val === undefined) {
+      getGlobalLogger().error(`No before saved for address ${address}`);
+      return;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [addr, opcode, labels, _args] = val;
+    const opcodeType = opcode.getType();
+    if (opcodeType instanceof PlaceholderType) {
+      getGlobalLogger().error(
+        `Opcode Type still needs to be determined for opcode: ${opcode.name} at addr ${address}`,
+      );
+      return;
+    }
+    const operands: number[] = [];
+    if (state.pc !== address) {
+      getGlobalLogger().error(
+        `Monitored before addr does not match monitored pc: expected ${address} got ${state.pc}`,
+      );
+    } else if (state.stack !== undefined) {
+      if (state.stack.length < opcodeType.nrArgs) {
+        getGlobalLogger().error(
+          `Stack contains insufficient values for to be used as arguments for opcode ${
+            opcode.name
+          } ${labels}. Opcode expects #${
+            opcode.getType().nrArgs
+          } stack has size #${state.stack.length}`,
+        );
+      } else if (opcodeType.nrArgs > 0) {
+        const ops = state.stack.slice(
+          state.stack.length - opcode.getType().nrArgs,
+          state.stack.length,
+        );
+        ops.forEach((o) => {
+          operands.push(o.value);
+        });
+        this.befores.set(address, [addr, opcode, labels, operands]);
+      }
+    } else {
+      getGlobalLogger().error(
+        `Stack is undefined for ${opcode.name} ${labels} address #${address}`,
+      );
+    }
+    const content = {
+      op: opcode.name,
+      labels,
+      when: 'before',
+      operands,
+    };
+    JSONWriter.write(content);
+  }
+
+  public writeAfter(address: number, state: WasmState): void {
+    const val = this.after.get(address);
+    if (val === undefined) {
+      getGlobalLogger().error(`No after saved for address ${address}`);
+      return;
+    }
+    const [opcode, labels] = val;
+
+    const opcodeType = opcode.getType();
+    if (state.stack === undefined) {
+      getGlobalLogger().error(
+        `Stack is undefined for ${opcode.name} address #${address}`,
+      );
+    } else if (opcodeType.hasResult() && state.stack.length < 1) {
+      getGlobalLogger().error(
+        `Stack should contain the result of running opcode ${opcode.name} ${labels}`,
+      );
+    } else {
+      const beforeMonitoring = this.befores.get(address);
+      if (beforeMonitoring === undefined) {
+        getGlobalLogger().error(
+          `operands for ${opcode.name} ${labels} were not registered during the before monitoring`,
+        );
+        return;
+      }
+
+      const operands: number[] = beforeMonitoring[3];
+      if (operands.length < opcodeType.nrArgs) {
+        getGlobalLogger().error(
+          `not all operands for ${
+            opcode.name
+          } ${labels} were registered during the before monitoring. Expected #${
+            opcodeType.nrResults
+          } operands got [${operands.join(' ')}]`,
+        );
+        return;
+      }
+
+      const results: number[] = [];
+      if (opcodeType.hasResult()) {
+        if (state.stack.length < 1) {
+          getGlobalLogger().error(
+            `Stack does not contain a value. Altough opcodel ${opcode.name} ${labels} produces a result`,
+          );
+          return;
+        }
+        // if (result.type !== opcodeType.resultType) {
+        // }
+        results.push(state.stack[state.stack.length - 1].value);
+      }
+
+      const content = {
+        op: opcode.name,
+        labels,
+        when: 'after',
+        operands,
+        result: results,
+      };
+      JSONWriter.write(content);
+    }
+  }
+}
+
 const JSONWriter = new WriteJSON('./example-wat/monitored.json', 500);
+const Brigadier = new BrigadierJSONWriter(JSONWriter);
 
 const dm = new DeviceManager();
 
@@ -583,44 +720,17 @@ export function createJSONWriter(
   address: number,
   opcode: WasmOpcode,
   when: MonitorMoment,
-) {
+): (state: WasmState) => void {
+  if (when === MonitorMoment.MonitorBefore) {
+    Brigadier.addBefore(address, opcode);
+  } else {
+    Brigadier.addAfter(address, opcode);
+  }
   return (state: WasmState) => {
     if (when === MonitorMoment.MonitorBefore) {
-      const opcodeType = opcode.getType();
-      if (opcodeType instanceof PlaceholderType) {
-        getGlobalLogger().error(
-          `Opcode Type still needs to be determined for opcode: ${opcode.name} at addr ${address}`,
-        );
-      }
-      const operands: number[] = [];
-      if (state.pc !== address) {
-        getGlobalLogger().error(
-          `Unexpected before addr: expected ${address} got ${state.pc}`,
-        );
-      } else if (state.stack !== undefined) {
-        if (state.stack.length < opcodeType.nrArgs) {
-          getGlobalLogger().error(
-            `Invalid nr of arguments: opcode ${opcode.name} expects #${
-              opcode.getType().nrArgs
-            } stack has size #${state.stack.length}`,
-          );
-        } else if (opcodeType.nrArgs > 0) {
-          const ops = state.stack.slice(
-            state.stack.length - opcode.getType().nrArgs,
-            state.stack.length,
-          );
-          ops.forEach((o) => {
-            operands.push(o.value);
-          });
-        }
-      }
-      const content = {
-        op: opcode.name,
-        labels: opcode.getLabels().join(' '),
-        when: 'before',
-        operands,
-      };
-      JSONWriter.write(content);
+      Brigadier.writeBefore(address, state);
+    } else {
+      Brigadier.writeAfter(address, state);
     }
   };
 }
