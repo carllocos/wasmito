@@ -6,14 +6,14 @@ import {
 import { encodeLEB128ToHex } from '../util/encoder';
 
 enum ScheduleKind {
-  ScheduleOnce = '01', // action run once and as soon as possible
-  ScheduleAlways = '03', // action runs everytime when needed
-  ScheduleOnTimeStamp = '21', // action executed on timestamp
-  ScheduleBeforeTimeStamp = '22', // action executed before timestamp
-  ScheduleAfterTimeStamp = '23', // action executed after timestamp
+  ScheduleOnce = '01', // hook run once and as soon as possible
+  ScheduleAlways = '03', // hook runs everytime when needed
+  ScheduleOnTimeStamp = '21', // hook executed on timestamp
+  ScheduleBeforeTimeStamp = '22', // hook executed before timestamp
+  ScheduleAfterTimeStamp = '23', // hook executed after timestamp
 }
 
-export abstract class ActionSchedule {
+export abstract class HookSchedule {
   public readonly scheduleKind: ScheduleKind;
   constructor(scheduleKind: ScheduleKind) {
     this.scheduleKind = scheduleKind;
@@ -24,19 +24,19 @@ export abstract class ActionSchedule {
   }
 }
 
-export class ScheduleOnce extends ActionSchedule {
+export class ScheduleOnce extends HookSchedule {
   constructor() {
     super(ScheduleKind.ScheduleOnce);
   }
 }
 
-export class ScheduleAways extends ActionSchedule {
+export class ScheduleAways extends HookSchedule {
   constructor() {
     super(ScheduleKind.ScheduleAlways);
   }
 }
 
-export abstract class TimeStampScheduling extends ActionSchedule {
+export abstract class TimeStampScheduling extends HookSchedule {
   public readonly timestamp: TimeStamp;
   constructor(scheduleKind: ScheduleKind, timestamp: TimeStamp) {
     super(scheduleKind);

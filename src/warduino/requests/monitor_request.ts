@@ -7,7 +7,7 @@ import {
   isSubscriptionMessage,
   type RequestMessage,
 } from '../api/request_interface';
-import { type InstrumentAction } from '../../instrumentor/action';
+import { type InstrumentHook } from '../../instrumentor/hook';
 import { Instruction } from '../api/instructions';
 
 export enum MonitorMoment {
@@ -44,13 +44,13 @@ export function createMonitorWasmAddrResponse(
 
 export class MontiroWasmAddrRequest extends APISubscriptionRequest<MonitorWasmAddrResponse> {
   public readonly wasmAddr;
-  public readonly actions: Array<InstrumentAction<any>>;
+  public readonly hooks: Array<InstrumentHook<any>>;
   private moment: MonitorMoment;
   private readonly interruptNr: Instruction;
   constructor(wasmAddr: number) {
     super();
     this.wasmAddr = wasmAddr;
-    this.actions = [];
+    this.hooks = [];
     this.moment = MonitorMoment.MonitorBefore;
     this.interruptNr = Instruction.MonitorWasmAddr;
   }
@@ -65,12 +65,12 @@ export class MontiroWasmAddrRequest extends APISubscriptionRequest<MonitorWasmAd
     return this;
   }
 
-  addAction(action: InstrumentAction<any>): MontiroWasmAddrRequest {
-    if (this.actions.length === 0) {
-      this.actions.push(action);
+  addHook(hook: InstrumentHook<any>): MontiroWasmAddrRequest {
+    if (this.hooks.length === 0) {
+      this.hooks.push(hook);
     } else {
       getGlobalLogger().debug(
-        'Todo support multiple actions. For now just one action',
+        'Todo support multiple hooks. For now just one hook',
       );
     }
     return this;
@@ -78,9 +78,9 @@ export class MontiroWasmAddrRequest extends APISubscriptionRequest<MonitorWasmAd
 
   override getData(): string {
     const encodedAddr = encodeLEB128ToHex(this.wasmAddr);
-    const encodedSchedule = this.actions[0].schedule.serializeBinary();
-    const encodedAction = this.actions[0].serializeBinary();
-    return `${this.interruptNr}${encodedAddr}${this.moment}${encodedSchedule}${encodedAction}\n`;
+    const encodedSchedule = this.hooks[0].schedule.serializeBinary();
+    const encodedHook = this.hooks[0].serializeBinary();
+    return `${this.interruptNr}${encodedAddr}${this.moment}${encodedSchedule}${encodedHook}\n`;
   }
 
   override parse(input: string): MonitorWasmAddrResponse {
@@ -130,15 +130,15 @@ export class MontiroWasmAddrRequest extends APISubscriptionRequest<MonitorWasmAd
         return;
       }
 
-      for (let i = 0; i < this.actions.length; i++) {
-        const action = this.actions[i];
+      for (let i = 0; i < this.hooks.length; i++) {
+        const hook = this.hooks[i];
         if (
-          action.parseSubscriptionData !== undefined &&
-          action.onSubscriptionData !== undefined
+          hook.parseSubscriptionData !== undefined &&
+          hook.onSubscriptionData !== undefined
         ) {
           try {
-            const parsed = action.parseSubscriptionData(subContent.val);
-            action.onSubscriptionData(parsed);
+            const parsed = hook.parseSubscriptionData(subContent.val);
+            hook.onSubscriptionData(parsed);
           } catch (e) {}
         }
       }
