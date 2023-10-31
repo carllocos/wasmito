@@ -1,34 +1,34 @@
 import { WASM } from '../state/wasm';
 import { encodeLEB128ToHex } from '../util/encoder';
 import {
-  type ActionSchedule,
+  type HookSchedule,
   ScheduleAways,
   ScheduleOnTimeStamp,
   ScheduleOnce,
-} from '../instrumentor/schedule';
-import { type TimeStamp } from '../instrumentor/timestamp';
+} from './schedule';
+import { type TimeStamp } from './timestamp';
 import { type StateRequest } from '../warduino/requests/inspect_request';
 
-export enum ActionKind {
+export enum HookKind {
   RemoteCall = '01',
   ValueSubstitution = '02',
   StateToInspect = '03',
 }
 
-export abstract class InstrumentAction<SubscriptionType> {
-  public readonly kind: ActionKind;
-  public schedule: ActionSchedule;
-  constructor(kind: ActionKind) {
+export abstract class InstrumentHook<SubscriptionType> {
+  public readonly kind: HookKind;
+  public schedule: HookSchedule;
+  constructor(kind: HookKind) {
     this.kind = kind;
     this.schedule = new ScheduleAways();
   }
 
-  scheduleFor(newSchedule: ActionSchedule): InstrumentAction<SubscriptionType> {
+  scheduleFor(newSchedule: HookSchedule): InstrumentHook<SubscriptionType> {
     this.schedule = newSchedule;
     return this;
   }
 
-  scheduleOnce(timestamp?: TimeStamp): InstrumentAction<SubscriptionType> {
+  scheduleOnce(timestamp?: TimeStamp): InstrumentHook<SubscriptionType> {
     if (timestamp !== undefined) {
       this.schedule = new ScheduleOnTimeStamp(timestamp);
     } else {
@@ -42,31 +42,31 @@ export abstract class InstrumentAction<SubscriptionType> {
   onSubscriptionData?: (data: SubscriptionType) => void;
 }
 
-export abstract class ActionWithoutSubscription extends InstrumentAction<void> {}
+export abstract class HookWithoutSubscription extends InstrumentHook<void> {}
 
-export class RemoteCallAction extends ActionWithoutSubscription {
+export class RemoteCallHook extends HookWithoutSubscription {
   public readonly targetfidx: number;
   constructor(targetfidx: number) {
-    super(ActionKind.RemoteCall);
+    super(HookKind.RemoteCall);
     this.targetfidx = targetfidx;
   }
 
   serializeBinary(): string {
-    // format: ActionKind (1 BYTE) | target fidx (LEB128)
+    // format: HookKind (1 BYTE) | target fidx (LEB128)
     const target = encodeLEB128ToHex(this.targetfidx);
     return `${this.kind}${target}`;
   }
 }
 
-export class ValueSubstitution extends ActionWithoutSubscription {
+export class ValueSubstitution extends HookWithoutSubscription {
   public readonly value?: WASM.Value;
   constructor(value?: WASM.Value) {
-    super(ActionKind.ValueSubstitution);
+    super(HookKind.ValueSubstitution);
     this.value = value;
   }
 
   serializeBinary(): string {
-    // format: ActionKind (1 Byte) | HasValue (1 Byte) | Value
+    // format: HookKind (1 Byte) | HasValue (1 Byte) | Value
     let valueEncoded = '';
     let hasValue = '00';
     if (this.value !== undefined) {
@@ -91,11 +91,11 @@ export interface WasmState {
   globals?: any[];
 }
 
-export class InspectState extends InstrumentAction<WasmState> {
+export class InspectState extends InstrumentHook<WasmState> {
   private readonly req: StateRequest;
   public readonly wasmAddress?: number;
   constructor(stateRequest: StateRequest, wasmAddress?: number) {
-    super(ActionKind.StateToInspect);
+    super(HookKind.StateToInspect);
     this.req = stateRequest;
     this.parseSubscriptionData = this.deserializeSubscriptionMessage;
     this.wasmAddress = wasmAddress;
