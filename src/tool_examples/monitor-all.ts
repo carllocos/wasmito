@@ -13,7 +13,7 @@ import {
   InspectState,
   ValueSubstitution,
   type WasmState,
-} from '../instrumentor/action';
+} from '../instrumentor/hook';
 import {
   AroundFunctionRequest,
   isSuccessfulReply,
@@ -239,7 +239,7 @@ export async function instrumentBlinkWasm(em: EmulateDevice): Promise<boolean> {
     requestChipDigWrite,
   ];
   requests.forEach((req) => {
-    req.addAction(new EmptyValueSubstitution());
+    req.addHook(new EmptyValueSubstitution());
   });
   const replies = await Promise.all(
     requests.map(async (req) => {
@@ -266,29 +266,29 @@ export async function instrumentTempWasm(em: EmulateDevice): Promise<boolean> {
   // (import "env" "temperature"            (func $env.get_temperature     (type $void->f32)))
 
   const chipLedCSetup = 3;
-  const emptyAction0 = new EmptyValueSubstitution().scheduleFor(
+  const emptyHook0 = new EmptyValueSubstitution().scheduleFor(
     new ScheduleBeforeTimeStamp(newTimeStamp(30, 0)),
   );
-  const requestChipLedCSteup = new AroundFunctionRequest(
-    chipLedCSetup,
-  ).addAction(emptyAction0);
+  const requestChipLedCSteup = new AroundFunctionRequest(chipLedCSetup).addHook(
+    emptyHook0,
+  );
 
   const attachPinID = 4;
 
-  const emptyAction = new EmptyValueSubstitution().scheduleFor(
+  const emptyHook = new EmptyValueSubstitution().scheduleFor(
     new ScheduleAfterTimeStamp(newTimeStamp(3, 0)),
   );
-  const requestAttachPin = new AroundFunctionRequest(attachPinID).addAction(
-    emptyAction,
+  const requestAttachPin = new AroundFunctionRequest(attachPinID).addHook(
+    emptyHook,
   );
 
   const analogWriteID = 5;
 
-  const emptyAction2 = new EmptyValueSubstitution().scheduleFor(
+  const emptyHook2 = new EmptyValueSubstitution().scheduleFor(
     new ScheduleAfterTimeStamp(newTimeStamp(23, 54)),
   );
-  const requestAnalogWrite = new AroundFunctionRequest(analogWriteID).addAction(
-    emptyAction2,
+  const requestAnalogWrite = new AroundFunctionRequest(analogWriteID).addHook(
+    emptyHook2,
   );
 
   const tempID = 6;
@@ -296,7 +296,7 @@ export async function instrumentTempWasm(em: EmulateDevice): Promise<boolean> {
     type: WASM.Type.f32,
     value: 23.0004,
   };
-  const requestTemp = new AroundFunctionRequest(tempID).addAction(
+  const requestTemp = new AroundFunctionRequest(tempID).addHook(
     new ValueSubstitution(value),
   );
 
@@ -326,23 +326,23 @@ export async function instrumentPrimitiveAlways(
   em: EmulateDevice,
 ): Promise<boolean> {
   const chipLedCSetup = 3;
-  const emptyAction0 = new EmptyValueSubstitution();
-  const requestChipLedCSteup = new AroundFunctionRequest(
-    chipLedCSetup,
-  ).addAction(emptyAction0);
+  const emptyHook0 = new EmptyValueSubstitution();
+  const requestChipLedCSteup = new AroundFunctionRequest(chipLedCSetup).addHook(
+    emptyHook0,
+  );
 
   const attachPinID = 4;
 
-  const emptyAction = new EmptyValueSubstitution();
-  const requestAttachPin = new AroundFunctionRequest(attachPinID).addAction(
-    emptyAction,
+  const emptyHook = new EmptyValueSubstitution();
+  const requestAttachPin = new AroundFunctionRequest(attachPinID).addHook(
+    emptyHook,
   );
 
   const analogWriteID = 5;
 
-  const emptyAction2 = new EmptyValueSubstitution();
-  const requestAnalogWrite = new AroundFunctionRequest(analogWriteID).addAction(
-    emptyAction2,
+  const emptyHook2 = new EmptyValueSubstitution();
+  const requestAnalogWrite = new AroundFunctionRequest(analogWriteID).addHook(
+    emptyHook2,
   );
 
   const tempID = 6;
@@ -350,7 +350,7 @@ export async function instrumentPrimitiveAlways(
     type: WASM.Type.f32,
     value: 23.0004,
   };
-  const requestTemp = new AroundFunctionRequest(tempID).addAction(
+  const requestTemp = new AroundFunctionRequest(tempID).addHook(
     new ValueSubstitution(value),
   );
 
@@ -392,9 +392,9 @@ export async function instrumentForMonitor(
   // const stateRequest = new StateRequest();
   // stateRequest.includeStack().includeGlobals().includePC();
   // const requestsBefore = funcAddresses.map((addr) => {
-  //   const inspectAction = new InspectState(stateRequest, addr);
-  //   inspectAction.onSubscriptionData = onMonitoredState;
-  //   return new MontiroWasmAddrRequest(addr).before().addAction(inspectAction);
+  //   const inspectHook = new InspectState(stateRequest, addr);
+  //   inspectHook.onSubscriptionData = onMonitoredState;
+  //   return new MontiroWasmAddrRequest(addr).before().addHook(inspectHook);
   // });
   // const repliesBefore = await Promise.all(
   //   requestsBefore.map(async (req) => {
@@ -450,7 +450,7 @@ export async function monitorGlobalGet(em: EmulateDevice): Promise<boolean> {
       'global.get',
       addr,
     );
-    return new MontiroWasmAddrRequest(addr).before().addAction(inspectStack);
+    return new MontiroWasmAddrRequest(addr).before().addHook(inspectStack);
   });
   const repliesBefore = await Promise.all(
     beforeMonitoring.map(async (req) => {
@@ -470,7 +470,7 @@ export async function monitorGlobalGet(em: EmulateDevice): Promise<boolean> {
       'global.get',
       addr,
     );
-    return new MontiroWasmAddrRequest(addr).after().addAction(inspectStack);
+    return new MontiroWasmAddrRequest(addr).after().addHook(inspectStack);
   });
   const repliesAfter = await Promise.all(
     afterMonitoring.map(async (req) => {
@@ -493,7 +493,7 @@ export async function monitorFuncCalls(em: EmulateDevice): Promise<boolean> {
     const inspectStackRequest = new StateRequest().includeStack();
     const inspectStack = new InspectState(inspectStackRequest, addr);
     inspectStack.onSubscriptionData = createOnMonitorBeforeState('call', addr);
-    return new MontiroWasmAddrRequest(addr).before().addAction(inspectStack);
+    return new MontiroWasmAddrRequest(addr).before().addHook(inspectStack);
   });
   const repliesBefore = await Promise.all(
     beforeMonitoring.map(async (req) => {
@@ -510,7 +510,7 @@ export async function monitorFuncCalls(em: EmulateDevice): Promise<boolean> {
     const inspectStackRequest = new StateRequest().includeStack();
     const inspectStack = new InspectState(inspectStackRequest, addr);
     inspectStack.onSubscriptionData = createOnMonitorAfterState('call', addr);
-    return new MontiroWasmAddrRequest(addr).after().addAction(inspectStack);
+    return new MontiroWasmAddrRequest(addr).after().addHook(inspectStack);
   });
   const repliesAfter = await Promise.all(
     afterMonitoring.map(async (req) => {
@@ -566,7 +566,7 @@ export async function monitorTestExample(em: EmulateDevice): Promise<boolean> {
     opcode = `${funcName0} ${opcode}`;
     const inspectStack = new InspectState(inspectStackRequest);
     inspectStack.onSubscriptionData = createOnMonitorAfterState(opcode, addr);
-    return new MontiroWasmAddrRequest(addr).after().addAction(inspectStack);
+    return new MontiroWasmAddrRequest(addr).after().addHook(inspectStack);
   });
 
   const r1 = await Promise.all(
@@ -592,7 +592,7 @@ export async function monitorTestExample(em: EmulateDevice): Promise<boolean> {
     opcode = `${funcName1} ${opcode}`;
     const inspectStack = new InspectState(inspectStackRequest);
     inspectStack.onSubscriptionData = createOnMonitorAfterState(opcode, addr);
-    return new MontiroWasmAddrRequest(addr).after().addAction(inspectStack);
+    return new MontiroWasmAddrRequest(addr).after().addHook(inspectStack);
   });
 
   const r2 = await Promise.all(
@@ -619,7 +619,7 @@ export async function monitorTestExample(em: EmulateDevice): Promise<boolean> {
     opcode = `${funcName2} ${opcode}`;
     const inspectStack = new InspectState(inspectStackRequest);
     inspectStack.onSubscriptionData = createOnMonitorAfterState(opcode, addr);
-    return new MontiroWasmAddrRequest(addr).after().addAction(inspectStack);
+    return new MontiroWasmAddrRequest(addr).after().addHook(inspectStack);
   });
 
   const r3 = await Promise.all(
@@ -648,7 +648,7 @@ export async function monitorTestExample(em: EmulateDevice): Promise<boolean> {
     opcode = `${funcName3} ${opcode}`;
     const inspectStack = new InspectState(inspectStackRequest);
     inspectStack.onSubscriptionData = createOnMonitorAfterState(opcode, addr);
-    return new MontiroWasmAddrRequest(addr).after().addAction(inspectStack);
+    return new MontiroWasmAddrRequest(addr).after().addHook(inspectStack);
   });
 
   const r4 = await Promise.all(
@@ -671,7 +671,7 @@ export async function monitorTestExample(em: EmulateDevice): Promise<boolean> {
     opcode = `${funcNameIndCall} ${opcode}`;
     const inspectStack = new InspectState(inspectStackRequest);
     inspectStack.onSubscriptionData = createOnMonitorAfterState(opcode, addr);
-    return new MontiroWasmAddrRequest(addr).after().addAction(inspectStack);
+    return new MontiroWasmAddrRequest(addr).after().addHook(inspectStack);
   });
 
   const funcNameMain = 'func_main';
@@ -696,7 +696,7 @@ export async function monitorTestExample(em: EmulateDevice): Promise<boolean> {
     opcode = `${funcNameMain} ${opcode}`;
     const inspectStack = new InspectState(inspectStackRequest);
     inspectStack.onSubscriptionData = createOnMonitorAfterState(opcode, addr);
-    return new MontiroWasmAddrRequest(addr).after().addAction(inspectStack);
+    return new MontiroWasmAddrRequest(addr).after().addHook(inspectStack);
   });
 
   const r6 = await Promise.all(
@@ -756,9 +756,9 @@ export async function monitorAllOpcodes(
     return false;
   }
   const requests = funcs.map((f) => {
-    const emptyAction0 = new EmptyValueSubstitution();
+    const emptyHook0 = new EmptyValueSubstitution();
     const fId = f?.id === undefined ? 0 : f.id;
-    return new AroundFunctionRequest(fId).addAction(emptyAction0);
+    return new AroundFunctionRequest(fId).addHook(emptyHook0);
   });
   const repliesAround = await Promise.all(
     requests.map(async (req) => {
@@ -781,7 +781,7 @@ export async function monitorAllOpcodes(
     );
     return new MontiroWasmAddrRequest(pair.address)
       .before()
-      .addAction(inspectStack);
+      .addHook(inspectStack);
   });
 
   const repliesBefore = await Promise.all(
@@ -803,7 +803,7 @@ export async function monitorAllOpcodes(
     );
     return new MontiroWasmAddrRequest(pair.address)
       .after()
-      .addAction(inspectStack);
+      .addHook(inspectStack);
   });
 
   const repliesAfter = await Promise.all(

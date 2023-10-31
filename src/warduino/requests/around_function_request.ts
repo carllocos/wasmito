@@ -5,7 +5,7 @@ import {
   APIRequestInvalidParse,
 } from '../api/request_interface';
 import { Instruction, getInstructionFromString } from '../api/instructions';
-import { type InstrumentAction } from '../../instrumentor/action';
+import { type InstrumentHook } from '../../instrumentor/hook';
 
 export interface AroundFunctionJSONResponse {
   interrupt: string;
@@ -28,7 +28,7 @@ function getResponseTypeFromString(str: string): ResponseType | undefined {
   }
 }
 
-export interface AroundActionResponse {
+export interface AroundHookResponse {
   interrupt: Instruction;
   responseType: ResponseType;
   error_code?: number;
@@ -36,7 +36,7 @@ export interface AroundActionResponse {
 
 export function createAroundFunctionResponse(
   obj: AroundFunctionJSONResponse,
-): AroundActionResponse | undefined {
+): AroundHookResponse | undefined {
   const instr = getInstructionFromString(obj.interrupt);
   const responseType = getResponseTypeFromString(obj.kind);
   if (
@@ -47,7 +47,7 @@ export function createAroundFunctionResponse(
     return undefined;
   }
 
-  const reply: AroundActionResponse = {
+  const reply: AroundHookResponse = {
     interrupt: instr,
     responseType,
   };
@@ -61,7 +61,7 @@ export function createAroundFunctionResponse(
 
   return reply;
 }
-export function isSuccessfulReply(reply: AroundActionResponse): boolean {
+export function isSuccessfulReply(reply: AroundHookResponse): boolean {
   return reply.responseType === ResponseType.SuccessResponse;
 }
 
@@ -80,20 +80,20 @@ export function isAroundFunctionJSONResponse(
   return false;
 }
 
-export class AroundFunctionRequest implements APIRequest<AroundActionResponse> {
+export class AroundFunctionRequest implements APIRequest<AroundHookResponse> {
   public readonly function_idx;
-  public readonly actions: Array<InstrumentAction<any>>;
+  public readonly hooks: Array<InstrumentHook<any>>;
   constructor(fidx: number) {
     this.function_idx = fidx;
-    this.actions = [];
+    this.hooks = [];
   }
 
-  addAction(action: InstrumentAction<any>): AroundFunctionRequest {
-    if (this.actions.length === 0) {
-      this.actions.push(action);
+  addHook(hook: InstrumentHook<any>): AroundFunctionRequest {
+    if (this.hooks.length === 0) {
+      this.hooks.push(hook);
     } else {
       getGlobalLogger().debug(
-        'Todo support multiple actions. For now just one action',
+        'Todo support multiple hooks. For now just one hook',
       );
     }
     return this;
@@ -101,12 +101,12 @@ export class AroundFunctionRequest implements APIRequest<AroundActionResponse> {
 
   getData(): string {
     const encodedFidx = encodeLEB128ToHex(this.function_idx);
-    const encodedSchedule = this.actions[0].schedule.serializeBinary();
-    const encodedAction = this.actions[0].serializeBinary();
-    return `${Instruction.AroundFunction}${encodedFidx}${encodedSchedule}${encodedAction}\n`;
+    const encodedSchedule = this.hooks[0].schedule.serializeBinary();
+    const encodedHook = this.hooks[0].serializeBinary();
+    return `${Instruction.AroundFunction}${encodedFidx}${encodedSchedule}${encodedHook}\n`;
   }
 
-  parse(input: string): AroundActionResponse {
+  parse(input: string): AroundHookResponse {
     const err = new APIRequestInvalidParse(
       'No reply for AroundFunctionRequest',
     );
