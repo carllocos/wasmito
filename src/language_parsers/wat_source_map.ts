@@ -1,7 +1,7 @@
 import { type WasmType } from '../state/opcode_type';
 import { replaceFileExtension } from '../util/file_util';
 import { readFunctionTypes, readImports, readTypes } from './details';
-import { readDissambledOpcodes } from './dissambled';
+import { parseOpcodes } from './dissambled';
 import { WasmOpcode } from './opcodes';
 
 export class WASMFunction {
@@ -142,9 +142,7 @@ export class WATSourceMap {
         new WASMFunction(i.importName, i.funcID, [], funcType),
       );
     }
-    const opcodes = await readDissambledOpcodes(
-      replaceFileExtension(path, '.diss'),
-    );
+    const opcodes = await parseOpcodes(replaceFileExtension(path, '.diss'));
     if (opcodes === undefined) {
       return undefined;
     }

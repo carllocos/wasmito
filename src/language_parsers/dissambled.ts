@@ -137,7 +137,7 @@ export function parseDissambledFunction(input: string):
   return result;
 }
 
-export async function readDissambledOpcodes(filepath: string): Promise<
+export async function parseOpcodes(filepath: string): Promise<
   | Map<
       string,
       Array<{
