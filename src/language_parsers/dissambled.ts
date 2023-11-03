@@ -1,36 +1,24 @@
 import * as fs from 'fs';
+import { WasmOpcodeHasImmediate, wasmOpcodeFromNr } from './opcodes';
+
+export interface ParsedOpcode {
+  address: number;
+  opcodeName: string;
+  opcodeNr: number;
+  immediate?: number;
+  opcodeLabels: string[];
+}
 
 /*
  * Parser for output generated from `wasm-objdump -d` command
  */
 
-export function parseDissambledFunction(input: string):
-  | Map<
-      string,
-      Array<{
-        address: number;
-        opcodeNr: number;
-        opcodeLabels: string[];
-        opcodeName: string;
-      }>
-    >
-  | undefined {
+export function parseOpcodesFromDissambledOutput(
+  input: string,
+): Map<string, ParsedOpcode[]> | undefined {
   const lines = input.split('\n');
-  const result = new Map<
-    string,
-    Array<{
-      address: number;
-      opcodeNr: number;
-      opcodeName: string;
-      opcodeLabels: string[];
-    }>
-  >();
-  let funcOpcodes: Array<{
-    address: number;
-    opcodeNr: number;
-    opcodeName: string;
-    opcodeLabels: string[];
-  }> = [];
+  const result = new Map<string, ParsedOpcode[]>();
+  let funcOpcodes: ParsedOpcode[] = [];
   const opcodesThatNeedEnd: string[] = ['loop', 'block', 'if'];
   const opcodesWaitingForEnd: string[] = [];
 
@@ -97,6 +85,12 @@ export function parseDissambledFunction(input: string):
       return undefined;
     }
 
+    const wasmOpcode = wasmOpcodeFromNr(opcodeNr);
+    if (wasmOpcode === undefined) {
+      // invalid opcodeNr
+      return undefined;
+    }
+
     // Extract the first keyword after the vertical bar
     const keyword = keywordParts[1].trim();
     if (
@@ -105,20 +99,6 @@ export function parseDissambledFunction(input: string):
       }) !== undefined
     ) {
       opcodesWaitingForEnd.push(keyword);
-    } else if (keyword === 'end') {
-      const op = opcodesWaitingForEnd.pop() as string;
-      if (op.includes('func[')) {
-        inFunction = false;
-        funcOpcodes.push({
-          address,
-          opcodeName: keyword,
-          opcodeLabels: [],
-          opcodeNr,
-        });
-        result.set(op, funcOpcodes);
-        funcOpcodes = [];
-        continue;
-      }
     }
 
     const splits = keyword.split(' ');
@@ -126,36 +106,52 @@ export function parseDissambledFunction(input: string):
     const opcodeLabels =
       splits.length > 1 ? splits.splice(1, splits.length) : [];
 
-    funcOpcodes.push({
+    const parsedOpcode: ParsedOpcode = {
       address,
       opcodeNr,
       opcodeName,
       opcodeLabels,
-    });
+    };
+
+    if (WasmOpcodeHasImmediate(wasmOpcode)) {
+      const immediate = parseInt(opcodeLabels[0]);
+      if (isNaN(immediate)) {
+        return undefined;
+      }
+      parsedOpcode.immediate = immediate;
+      parsedOpcode.opcodeLabels = opcodeLabels.slice(1, opcodeLabels.length);
+    }
+
+    if (keyword === 'end') {
+      const op = opcodesWaitingForEnd[opcodesWaitingForEnd.length - 1];
+      opcodeLabels.unshift(`${keyword}_${op}`);
+    }
+
+    funcOpcodes.push(parsedOpcode);
+
+    if (keyword === 'end') {
+      const op = opcodesWaitingForEnd.pop() as string;
+      if (op.includes('func[')) {
+        inFunction = false;
+        result.set(op, funcOpcodes);
+        funcOpcodes = [];
+      }
+    }
   }
 
   return result;
 }
 
-export async function parseOpcodes(filepath: string): Promise<
-  | Map<
-      string,
-      Array<{
-        address: number;
-        opcodeName: string;
-        opcodeLabels: string[];
-        opcodeNr: number;
-      }>
-    >
-  | undefined
-> {
+export async function parseOpcodes(
+  filepath: string,
+): Promise<Map<string, ParsedOpcode[]> | undefined> {
   return await new Promise((resolve) => {
     fs.readFile(filepath, 'utf8', (err, data) => {
       if (data === '' && (err !== undefined || err !== null)) {
         console.error(`Error reading the file`);
         resolve(undefined);
       } else {
-        resolve(parseDissambledFunction(data));
+        resolve(parseOpcodesFromDissambledOutput(data));
       }
     });
   });

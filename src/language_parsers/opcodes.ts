@@ -3,10 +3,16 @@ import { PlaceholderType, WasmType } from '../state/opcode_type';
 export class WasmOpcode {
   public readonly nr: WASMOpcodeNumber;
   public readonly name: string;
+  public immediate?: number;
   private type: WasmType;
   private readonly labels: string[];
 
-  constructor(opcodeName: string, opcodeLabels: string[], opcodeNr: number) {
+  constructor(
+    opcodeName: string,
+    opcodeNr: number,
+    immediate?: number,
+    opcodeLabels?: string[],
+  ) {
     this.name = opcodeName;
     this.nr = opcodeNr;
     const op = wasmOpcodeFromNr(opcodeNr);
@@ -18,7 +24,8 @@ export class WasmOpcode {
       throw Error(`unexsting opcode type for ${opcodeName}`);
     }
     this.type = t;
-    this.labels = opcodeLabels;
+    this.labels = opcodeLabels ?? [];
+    this.immediate = immediate;
   }
 
   public changeType(type: WasmType): void {
@@ -267,5 +274,22 @@ export function wasmOpcodeFromNr(
       return WASMOpcodeNumber.I32ROTR;
     default:
       return undefined;
+  }
+}
+
+export function WasmOpcodeHasImmediate(opcode: WASMOpcodeNumber): boolean {
+  switch (opcode) {
+    case WASMOpcodeNumber.I32Const:
+    case WASMOpcodeNumber.I64Const:
+    case WASMOpcodeNumber.F32Const:
+    case WASMOpcodeNumber.F64Const:
+    case WASMOpcodeNumber.Get_global:
+    case WASMOpcodeNumber.Get_local:
+    case WASMOpcodeNumber.Set_global:
+    case WASMOpcodeNumber.Br:
+    case WASMOpcodeNumber.Call:
+      return true;
+    default:
+      return false;
   }
 }

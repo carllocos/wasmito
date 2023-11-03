@@ -179,7 +179,12 @@ export class WATSourceMap {
       const c = codes.map((d) => {
         return {
           address: d.address,
-          opcode: new WasmOpcode(d.opcodeName, d.opcodeLabels, d.opcodeNr),
+          opcode: new WasmOpcode(
+            d.opcodeName,
+            d.opcodeNr,
+            d.immediate,
+            d.opcodeLabels,
+          ),
         };
       });
       funcs.push(new WASMFunction(funcName, funcId, c, funcType));
@@ -195,19 +200,13 @@ export class WATSourceMap {
           return op.opcode.name.includes('call');
         })
         .map((op) => {
-          const labels = op.opcode.getLabels();
-          if (labels.length === 0) {
+          const funcNr = op.opcode.immediate;
+          if (funcNr === undefined) {
             throw new Error(
-              `found a call opcode without funcId ${op.opcode.name} labels`,
+              `found Nr not provided in opcode ${op.opcode.name}`,
             );
           }
 
-          const funcNr = parseInt(labels[0]);
-          if (isNaN(funcNr)) {
-            throw new Error(
-              `func Id is not a number of call opcode ${op.opcode.name}`,
-            );
-          }
           return { opcode: op.opcode, funCalled: funcNr };
         });
 
