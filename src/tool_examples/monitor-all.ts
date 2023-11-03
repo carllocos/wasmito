@@ -119,6 +119,10 @@ class BrigadierJSONWriter {
       return;
     }
     const operands: number[] = [];
+    if (opcode.immediate !== undefined) {
+      operands.push(opcode.immediate);
+    }
+
     if (state.pc !== address) {
       getGlobalLogger().error(
         `Monitored before addr does not match monitored pc: expected ${address} got ${state.pc}`,
@@ -153,7 +157,7 @@ class BrigadierJSONWriter {
       when: 'before',
       operands,
     };
-    JSONWriter.write(content);
+    this.writer.write(content);
   }
 
   public writeAfter(address: number, state: WasmState): void {
@@ -214,7 +218,7 @@ class BrigadierJSONWriter {
         operands,
         result: results,
       };
-      JSONWriter.write(content);
+      this.writer.write(content);
     }
   }
 }
