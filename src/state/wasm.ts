@@ -90,7 +90,7 @@ export namespace WASM {
   }
 
   export interface BRTable {
-    size: string;
+    size: number;
     labels: number[];
   }
 
