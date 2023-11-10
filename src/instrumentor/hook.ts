@@ -85,10 +85,21 @@ export class EmptyValueSubstitution extends ValueSubstitution {
   }
 }
 
+export interface WASMValueIndexed extends WASM.Value {
+  idx: number;
+}
+
 export interface WasmState {
-  pc: number;
-  stack?: any[];
-  globals?: any[];
+  pc?: number;
+  breakpoints?: number[];
+  stack?: WASMValueIndexed[];
+  callstack?: WASM.Frame[];
+  globals?: WASMValueIndexed[];
+  table?: WASM.Table;
+  memory?: WASM.Memory;
+  br_table?: WASM.BRTable;
+  callbacks?: WASM.CallbackMapping[];
+  events?: WASM.Event[];
 }
 
 export class InspectState extends InstrumentHook<WasmState> {
@@ -110,10 +121,65 @@ export class InspectState extends InstrumentHook<WasmState> {
 
   deserializeSubscriptionMessage(input: any): WasmState {
     const parsed = this.req.parse(input);
-    return {
-      pc: parsed.pc,
-      stack: parsed.stack,
-      globals: parsed.globals,
-    };
+    const state: WasmState = {};
+    if (parsed.pc !== undefined) {
+      state.pc = parsed.pc;
+    }
+    if (parsed.breakpoints !== undefined) {
+      state.breakpoints = parsed.breakpoints;
+    }
+    if (parsed.stack !== undefined) {
+      state.stack = parsed.stack.map(
+        (sv: { idx: number; type: string; value: number }) => {
+          return {
+            idx: sv.idx,
+            type: WASM.typing.get(sv.type),
+            value: sv.value,
+          };
+        },
+      );
+    }
+
+    if (parsed.globals !== undefined) {
+      state.globals = parsed.globals.map(
+        (gv: { idx: number; type: string; value: number }) => {
+          return {
+            idx: gv.idx,
+            type: WASM.typing.get(gv.type),
+            value: gv.value,
+          };
+        },
+      );
+    }
+
+    if (parsed.callstack !== undefined) {
+      state.callstack = parsed.callstack;
+    }
+    if (parsed.table !== undefined) {
+      getGlobalLogger().error(
+        `TODO: handle the case where table is present in inspectedState`,
+      );
+    }
+    if (parsed.memory !== undefined) {
+      getGlobalLogger().error(
+        `TODO: handle the case where memory is present in inspectedState`,
+      );
+    }
+    if (parsed.br_table !== undefined) {
+      getGlobalLogger().error(
+        `TODO: handle the case where br_table is present in inspectedState`,
+      );
+    }
+    if (parsed.callbacks !== undefined) {
+      getGlobalLogger().error(
+        `TODO: handle the case where callbacks are present in inspectedState`,
+      );
+    }
+    if (parsed.events !== undefined) {
+      getGlobalLogger().error(
+        `TODO: handle the case where events are present in inspectedState`,
+      );
+    }
+    return state;
   }
 }

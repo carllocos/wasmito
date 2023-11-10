@@ -84,6 +84,21 @@ export namespace WASM {
     bytes: Uint8Array;
   }
 
+  export interface CallbackMapping {
+    callbackid: string;
+    tableIndexes: number[];
+  }
+
+  export interface BRTable {
+    size: string;
+    labels: number[];
+  }
+
+  export interface Event {
+    topic: string;
+    payload: string;
+  }
+
   export function leb128(a: number): string {
     // TODO can only handle 32 bit
     a |= 0;
