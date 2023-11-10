@@ -8,7 +8,7 @@ import {
   ScheduleAfterTimeStamp,
   ScheduleBeforeTimeStamp,
 } from '../hooks/schedule';
-import { type WasmState, InspectState } from '../hooks/hook_inspect';
+import { type WasmState, InspectState } from '../hooks/hook_inspect_state';
 import {
   EmptyValueSubstitution,
   ValueSubstitution,
