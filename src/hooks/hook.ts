@@ -16,7 +16,7 @@ export enum HookKind {
   ChangeRunningState = '04',
 }
 
-export abstract class InstrumentHook<SubscriptionType> {
+export abstract class Hook<SubscriptionType> {
   public readonly kind: HookKind;
   public schedule: HookSchedule;
   constructor(kind: HookKind) {
@@ -24,12 +24,12 @@ export abstract class InstrumentHook<SubscriptionType> {
     this.schedule = new ScheduleAways();
   }
 
-  scheduleFor(newSchedule: HookSchedule): InstrumentHook<SubscriptionType> {
+  scheduleFor(newSchedule: HookSchedule): Hook<SubscriptionType> {
     this.schedule = newSchedule;
     return this;
   }
 
-  scheduleOnce(timestamp?: TimeStamp): InstrumentHook<SubscriptionType> {
+  scheduleOnce(timestamp?: TimeStamp): Hook<SubscriptionType> {
     if (timestamp !== undefined) {
       this.schedule = new ScheduleOnTimeStamp(timestamp);
     } else {
@@ -43,7 +43,7 @@ export abstract class InstrumentHook<SubscriptionType> {
   onSubscriptionData?: (data: SubscriptionType) => void;
 }
 
-export abstract class HookWithoutSubscription extends InstrumentHook<void> {}
+export abstract class HookWithoutSubscription extends Hook<void> {}
 
 export class RemoteCallHook extends HookWithoutSubscription {
   public readonly targetfidx: number;
@@ -103,7 +103,7 @@ export interface WasmState {
   events?: WASM.Event[];
 }
 
-export class InspectState extends InstrumentHook<WasmState> {
+export class InspectState extends Hook<WasmState> {
   private readonly req: StateRequest;
   public readonly wasmAddress?: number;
   constructor(stateRequest: StateRequest, wasmAddress?: number) {

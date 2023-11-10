@@ -5,7 +5,7 @@ import {
   APIRequestInvalidParse,
 } from '../api/request_interface';
 import { Instruction, getInstructionFromString } from '../api/instructions';
-import { type InstrumentHook } from '../../hooks/hook';
+import { type Hook } from '../../hooks/hook';
 
 export interface AroundFunctionJSONResponse {
   interrupt: string;
@@ -82,13 +82,13 @@ export function isAroundFunctionJSONResponse(
 
 export class AroundFunctionRequest implements APIRequest<AroundHookResponse> {
   public readonly function_idx;
-  public readonly hooks: Array<InstrumentHook<any>>;
+  public readonly hooks: Array<Hook<any>>;
   constructor(fidx: number) {
     this.function_idx = fidx;
     this.hooks = [];
   }
 
-  addHook(hook: InstrumentHook<any>): AroundFunctionRequest {
+  addHook(hook: Hook<any>): AroundFunctionRequest {
     if (this.hooks.length === 0) {
       this.hooks.push(hook);
     } else {

@@ -7,7 +7,7 @@ import {
   isSubscriptionMessage,
   type RequestMessage,
 } from '../api/request_interface';
-import { type InstrumentHook } from '../../hooks/hook';
+import { type Hook } from '../../hooks/hook';
 import { Instruction } from '../api/instructions';
 
 export enum MonitorMoment {
@@ -44,7 +44,7 @@ export function createMonitorWasmAddrResponse(
 
 export class MontiroWasmAddrRequest extends APISubscriptionRequest<MonitorWasmAddrResponse> {
   public readonly wasmAddr;
-  public readonly hooks: Array<InstrumentHook<any>>;
+  public readonly hooks: Array<Hook<any>>;
   private moment: MonitorMoment;
   private readonly interruptNr: Instruction;
   constructor(wasmAddr: number) {
@@ -65,7 +65,7 @@ export class MontiroWasmAddrRequest extends APISubscriptionRequest<MonitorWasmAd
     return this;
   }
 
-  addHook(hook: InstrumentHook<any>): MontiroWasmAddrRequest {
+  addHook(hook: Hook<any>): MontiroWasmAddrRequest {
     if (this.hooks.length === 0) {
       this.hooks.push(hook);
     } else {
