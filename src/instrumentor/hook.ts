@@ -13,6 +13,7 @@ export enum HookKind {
   RemoteCall = '01',
   ValueSubstitution = '02',
   StateToInspect = '03',
+  ChangeRunningState = '04',
 }
 
 export abstract class InstrumentHook<SubscriptionType> {
@@ -242,5 +243,35 @@ export class InspectState extends InstrumentHook<WasmState> {
       });
     }
     return state;
+  }
+}
+
+export enum WARDuinoRunState {
+  WARDuinoRun = '02',
+  WARDuinoPause = '03',
+}
+
+export class ChangeRunningStateHook extends HookWithoutSubscription {
+  public readonly runState: WARDuinoRunState;
+  constructor(runState: WARDuinoRunState) {
+    super(HookKind.ChangeRunningState);
+    this.runState = runState;
+  }
+
+  serializeBinary(): string {
+    // format: HookKind (1 BYTE) | RunState (1 BYTE)
+    return `${this.kind}${this.runState}`;
+  }
+}
+
+export class PauseVMHook extends ChangeRunningStateHook {
+  constructor() {
+    super(WARDuinoRunState.WARDuinoPause);
+  }
+}
+
+export class RunVMHook extends ChangeRunningStateHook {
+  constructor() {
+    super(WARDuinoRunState.WARDuinoRun);
   }
 }
