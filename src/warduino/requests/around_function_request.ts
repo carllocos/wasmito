@@ -5,7 +5,7 @@ import {
   APIRequestInvalidParse,
 } from '../api/request_interface';
 import { Instruction, getInstructionFromString } from '../api/instructions';
-import { type InstrumentHook } from '../../instrumentor/hook';
+import { type InstrumentHook } from '../../hooks/hook';
 
 export interface AroundFunctionJSONResponse {
   interrupt: string;

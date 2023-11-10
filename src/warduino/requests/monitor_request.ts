@@ -7,7 +7,7 @@ import {
   isSubscriptionMessage,
   type RequestMessage,
 } from '../api/request_interface';
-import { type InstrumentHook } from '../../instrumentor/hook';
+import { type InstrumentHook } from '../../hooks/hook';
 import { Instruction } from '../api/instructions';
 
 export enum MonitorMoment {

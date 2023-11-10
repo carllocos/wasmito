@@ -3,17 +3,17 @@ import { type EmulateDevice } from '../device/device_emulated';
 import { DeviceManager } from '../device/device_manager';
 import { getGlobalLogger } from '../logger/logger';
 import { WASM } from '../state/wasm';
-import { newTimeStamp } from '../instrumentor/timestamp';
+import { newTimeStamp } from '../hooks/timestamp';
 import {
   ScheduleAfterTimeStamp,
   ScheduleBeforeTimeStamp,
-} from '../instrumentor/schedule';
+} from '../hooks/schedule';
 import {
   EmptyValueSubstitution,
   InspectState,
   ValueSubstitution,
   type WasmState,
-} from '../instrumentor/hook';
+} from '../hooks/hook';
 import {
   AroundFunctionRequest,
   isSuccessfulReply,
