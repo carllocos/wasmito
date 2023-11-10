@@ -19,7 +19,7 @@ export interface WasmState {
   events?: WASM.Event[];
 }
 
-export class InspectState extends Hook<WasmState> {
+export class InspectStateHook extends Hook<WasmState> {
   private readonly req: StateRequest;
   public readonly wasmAddress?: number;
   constructor(stateRequest: StateRequest, wasmAddress?: number) {

@@ -8,7 +8,7 @@ import {
   ScheduleAfterTimeStamp,
   ScheduleBeforeTimeStamp,
 } from '../hooks/schedule';
-import { type WasmState, InspectState } from '../hooks/hook_inspect_state';
+import { type WasmState, InspectStateHook } from '../hooks/hook_inspect_state';
 import {
   EmptyValueSubstitution,
   ValueSubstitution,
@@ -448,7 +448,7 @@ export async function monitorGlobalGet(em: EmulateDevice): Promise<boolean> {
 
   const beforeMonitoring = addresses.map((addr) => {
     const inspectStackRequest = new StateRequest().includeStack();
-    const inspectStack = new InspectState(inspectStackRequest, addr);
+    const inspectStack = new InspectStateHook(inspectStackRequest, addr);
     inspectStack.onSubscriptionData = createOnMonitorBeforeState(
       'global.get',
       addr,
@@ -468,7 +468,7 @@ export async function monitorGlobalGet(em: EmulateDevice): Promise<boolean> {
 
   const afterMonitoring = addresses.map((addr) => {
     const inspectStackRequest = new StateRequest().includeStack();
-    const inspectStack = new InspectState(inspectStackRequest, addr);
+    const inspectStack = new InspectStateHook(inspectStackRequest, addr);
     inspectStack.onSubscriptionData = createOnMonitorAfterState(
       'global.get',
       addr,
@@ -494,7 +494,7 @@ export async function monitorFuncCalls(em: EmulateDevice): Promise<boolean> {
 
   const beforeMonitoring = addresses.map((addr) => {
     const inspectStackRequest = new StateRequest().includeStack();
-    const inspectStack = new InspectState(inspectStackRequest, addr);
+    const inspectStack = new InspectStateHook(inspectStackRequest, addr);
     inspectStack.onSubscriptionData = createOnMonitorBeforeState('call', addr);
     return new MontiroWasmAddrRequest(addr).before().addHook(inspectStack);
   });
@@ -511,7 +511,7 @@ export async function monitorFuncCalls(em: EmulateDevice): Promise<boolean> {
 
   const afterMonitoring = addresses.map((addr) => {
     const inspectStackRequest = new StateRequest().includeStack();
-    const inspectStack = new InspectState(inspectStackRequest, addr);
+    const inspectStack = new InspectStateHook(inspectStackRequest, addr);
     inspectStack.onSubscriptionData = createOnMonitorAfterState('call', addr);
     return new MontiroWasmAddrRequest(addr).after().addHook(inspectStack);
   });
@@ -567,7 +567,7 @@ export async function monitorTestExample(em: EmulateDevice): Promise<boolean> {
     const addr = pair[1] as number;
     let opcode = pair[0] as string;
     opcode = `${funcName0} ${opcode}`;
-    const inspectStack = new InspectState(inspectStackRequest);
+    const inspectStack = new InspectStateHook(inspectStackRequest);
     inspectStack.onSubscriptionData = createOnMonitorAfterState(opcode, addr);
     return new MontiroWasmAddrRequest(addr).after().addHook(inspectStack);
   });
@@ -593,7 +593,7 @@ export async function monitorTestExample(em: EmulateDevice): Promise<boolean> {
     const addr = pair[1] as number;
     let opcode = pair[0] as string;
     opcode = `${funcName1} ${opcode}`;
-    const inspectStack = new InspectState(inspectStackRequest);
+    const inspectStack = new InspectStateHook(inspectStackRequest);
     inspectStack.onSubscriptionData = createOnMonitorAfterState(opcode, addr);
     return new MontiroWasmAddrRequest(addr).after().addHook(inspectStack);
   });
@@ -620,7 +620,7 @@ export async function monitorTestExample(em: EmulateDevice): Promise<boolean> {
     const addr = pair[1] as number;
     let opcode = pair[0] as string;
     opcode = `${funcName2} ${opcode}`;
-    const inspectStack = new InspectState(inspectStackRequest);
+    const inspectStack = new InspectStateHook(inspectStackRequest);
     inspectStack.onSubscriptionData = createOnMonitorAfterState(opcode, addr);
     return new MontiroWasmAddrRequest(addr).after().addHook(inspectStack);
   });
@@ -649,7 +649,7 @@ export async function monitorTestExample(em: EmulateDevice): Promise<boolean> {
     const addr = pair[1] as number;
     let opcode = pair[0] as string;
     opcode = `${funcName3} ${opcode}`;
-    const inspectStack = new InspectState(inspectStackRequest);
+    const inspectStack = new InspectStateHook(inspectStackRequest);
     inspectStack.onSubscriptionData = createOnMonitorAfterState(opcode, addr);
     return new MontiroWasmAddrRequest(addr).after().addHook(inspectStack);
   });
@@ -672,7 +672,7 @@ export async function monitorTestExample(em: EmulateDevice): Promise<boolean> {
     const addr = pair[1] as number;
     let opcode = pair[0] as string;
     opcode = `${funcNameIndCall} ${opcode}`;
-    const inspectStack = new InspectState(inspectStackRequest);
+    const inspectStack = new InspectStateHook(inspectStackRequest);
     inspectStack.onSubscriptionData = createOnMonitorAfterState(opcode, addr);
     return new MontiroWasmAddrRequest(addr).after().addHook(inspectStack);
   });
@@ -697,7 +697,7 @@ export async function monitorTestExample(em: EmulateDevice): Promise<boolean> {
     const addr = pair[1] as number;
     let opcode = pair[0] as string;
     opcode = `${funcNameMain} ${opcode}`;
-    const inspectStack = new InspectState(inspectStackRequest);
+    const inspectStack = new InspectStateHook(inspectStackRequest);
     inspectStack.onSubscriptionData = createOnMonitorAfterState(opcode, addr);
     return new MontiroWasmAddrRequest(addr).after().addHook(inspectStack);
   });
@@ -776,7 +776,7 @@ export async function monitorAllOpcodes(
 
   const opcodesBeforeRequests = sourceMap.opcodes().map((pair) => {
     const inspectStackRequest = new StateRequest().includeStack().includePC();
-    const inspectStack = new InspectState(inspectStackRequest);
+    const inspectStack = new InspectStateHook(inspectStackRequest);
     inspectStack.onSubscriptionData = createJSONWriter(
       pair.address,
       pair.opcode,
@@ -798,7 +798,7 @@ export async function monitorAllOpcodes(
   }
   const opcodesAfterRequests = sourceMap.opcodes().map((pair) => {
     const inspectStackRequest = new StateRequest().includeStack().includePC();
-    const inspectStack = new InspectState(inspectStackRequest);
+    const inspectStack = new InspectStateHook(inspectStackRequest);
     inspectStack.onSubscriptionData = createJSONWriter(
       pair.address,
       pair.opcode,
