@@ -18,7 +18,6 @@ enum InspectableState {
   stackState = '08',
   callbacksState = '09',
   eventsState = '0a',
-  errorState = '0b',
 }
 
 export interface StackInpsectResponse {
@@ -84,11 +83,6 @@ export class StateRequest {
 
   public includeBreakpoints(): StateRequest {
     this.pushState(InspectableState.breakpointState);
-    return this;
-  }
-
-  public includeError(): StateRequest {
-    this.pushState(InspectableState.errorState);
     return this;
   }
 
