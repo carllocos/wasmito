@@ -8,12 +8,11 @@ import {
   ScheduleAfterTimeStamp,
   ScheduleBeforeTimeStamp,
 } from '../hooks/schedule';
+import { type WasmState, InspectState } from '../hooks/hook_inspect';
 import {
   EmptyValueSubstitution,
-  InspectState,
   ValueSubstitution,
-  type WasmState,
-} from '../hooks/hook';
+} from '../hooks/hook_value_substitution';
 import {
   AroundFunctionRequest,
   isSuccessfulReply,
