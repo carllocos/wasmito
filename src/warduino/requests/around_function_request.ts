@@ -1,8 +1,8 @@
 import { getGlobalLogger } from '../../logger/logger';
 import { encodeLEB128ToHex } from '../../util/encoder';
 import {
-  type APIRequest,
   APIRequestInvalidParse,
+  APIRequestNoSubscription,
 } from '../api/request_interface';
 import { Instruction, getInstructionFromString } from '../api/instructions';
 import { type Hook } from '../../hooks/hook';
@@ -80,10 +80,11 @@ export function isAroundFunctionJSONResponse(
   return false;
 }
 
-export class AroundFunctionRequest implements APIRequest<AroundHookResponse> {
+export class AroundFunctionRequest extends APIRequestNoSubscription<AroundHookResponse> {
   public readonly function_idx;
   public readonly hooks: Array<Hook<any>>;
   constructor(fidx: number) {
+    super();
     this.function_idx = fidx;
     this.hooks = [];
   }

@@ -1,8 +1,8 @@
 import { getGlobalLogger } from '../../logger/logger';
 import { encodeLEB128ToHex } from '../../util/encoder';
 import {
+  APIRequest,
   APIRequestInvalidParse,
-  APISubscriptionRequest,
   createRequestMessage,
   isSubscriptionMessage,
   type RequestMessage,
@@ -42,7 +42,7 @@ export function createMonitorWasmAddrResponse(
   return msg;
 }
 
-export class MontiroWasmAddrRequest extends APISubscriptionRequest<MonitorWasmAddrResponse> {
+export class MontiroWasmAddrRequest extends APIRequest<MonitorWasmAddrResponse> {
   public readonly wasmAddr;
   public readonly hooks: Array<Hook<any>>;
   private moment: MonitorMoment;

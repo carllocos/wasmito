@@ -1,10 +1,10 @@
 import {
-  type APIRequest,
   APIRequestInvalidParse,
+  APIRequestNoSubscription,
 } from '../api/request_interface';
 import { Instruction } from '../api/instructions';
 
-export class PauseRequest implements APIRequest<string> {
+export class PauseRequest extends APIRequestNoSubscription<string> {
   getData(): string {
     return `${Instruction.Pause}\n`;
   }

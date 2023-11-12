@@ -1,10 +1,10 @@
 import {
-  type APIRequest,
   APIRequestInvalidParse,
+  APIRequestNoSubscription,
 } from '../api/request_interface';
 import { Instruction } from '../api/instructions';
 
-export class RunRequest implements APIRequest<string> {
+export class RunRequest extends APIRequestNoSubscription<string> {
   getData(): string {
     return `${Instruction.Run}\n`;
   }
