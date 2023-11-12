@@ -41,7 +41,12 @@ export class Command<T> {
   }
 
   timedout(): void {
-    if (this.requestRejector !== undefined && this.timeout !== undefined) {
+    if (
+      !this.rejected &&
+      !this.resolved &&
+      this.requestRejector !== undefined &&
+      this.timeout !== undefined
+    ) {
       const errMsg = `Command timedout after ${this.timeout} ms while waiting for reply`;
       getGlobalLogger().error(errMsg);
       this.requestRejector(new CommandError(errMsg));
