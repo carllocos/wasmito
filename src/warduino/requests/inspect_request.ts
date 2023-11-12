@@ -56,7 +56,7 @@ export class InspectStack extends APIRequestNoSubscription<WasmStack> {
   }
 }
 
-export class StateRequest {
+export class StateRequest extends APIRequestNoSubscription<WasmState> {
   private readonly state: string[] = [];
 
   public isRequestEmpty(): boolean {
@@ -118,6 +118,10 @@ export class StateRequest {
     const numberBytes = serializeUInt16BE(this.state.length);
     const stateToReq = this.state.join('');
     return `${Instruction.Inspect}${numberBytes}${stateToReq}`;
+  }
+
+  getData(): string {
+    return `${this.generateInterrupt()}\n`;
   }
 
   private pushState(s: string): void {
