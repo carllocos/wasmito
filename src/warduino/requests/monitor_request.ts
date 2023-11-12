@@ -47,12 +47,15 @@ export class MontiroWasmAddrRequest extends APIRequest<MonitorWasmAddrResponse> 
   public readonly hooks: Array<Hook<any>>;
   private moment: MonitorMoment;
   private readonly interruptNr: Instruction;
+  protected isaddRequest: boolean; // true for add, false for remove;
+
   constructor(wasmAddr: number) {
     super();
     this.wasmAddr = wasmAddr;
     this.hooks = [];
     this.moment = MonitorMoment.MonitorBefore;
     this.interruptNr = Instruction.MonitorWasmAddr;
+    this.isaddRequest = true;
   }
 
   before(): MontiroWasmAddrRequest {
@@ -78,9 +81,15 @@ export class MontiroWasmAddrRequest extends APIRequest<MonitorWasmAddrResponse> 
 
   override getData(): string {
     const encodedAddr = encodeLEB128ToHex(this.wasmAddr);
-    const encodedSchedule = this.hooks[0].schedule.serializeBinary();
-    const encodedHook = this.hooks[0].serializeBinary();
-    return `${this.interruptNr}${encodedAddr}${this.moment}${encodedSchedule}${encodedHook}\n`;
+    let encodedSchedule = '';
+    let encodedHook = '';
+    let encodedAddOrRemoveOp = '00';
+    if (this.isaddRequest) {
+      encodedSchedule = this.hooks[0].schedule.serializeBinary();
+      encodedHook = this.hooks[0].serializeBinary();
+      encodedAddOrRemoveOp = '01';
+    }
+    return `${this.interruptNr}${encodedAddr}${this.moment}${encodedAddOrRemoveOp}${encodedSchedule}${encodedHook}\n`;
   }
 
   override parse(input: string): MonitorWasmAddrResponse {
@@ -143,5 +152,14 @@ export class MontiroWasmAddrRequest extends APIRequest<MonitorWasmAddrResponse> 
         }
       }
     } catch (e) {}
+  }
+}
+
+export interface RemoveAddrResponse extends MonitorWasmAddrJSONResponse {}
+
+export class RemoveMonitorWasmAddrRequest extends MontiroWasmAddrRequest {
+  constructor(wasmAddr: number) {
+    super(wasmAddr);
+    this.isaddRequest = false;
   }
 }
