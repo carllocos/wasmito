@@ -8,6 +8,7 @@ import { type DeviceConfig } from './device_config';
 import type winston from 'winston';
 import { createLogger } from '../logger/logger';
 import { type APIRequest } from '../warduino/api/request_interface';
+import { StepRequest } from '../warduino/requests/step_request';
 
 export class EmulateDevice implements WARDuinoAPI {
   private readonly process?: ChildProcess;
@@ -53,6 +54,16 @@ export class EmulateDevice implements WARDuinoAPI {
     const ack = await this.sendCommand(cmd);
     this.logger.debug(`Received RunRequest reply=${ack}`);
     return true;
+  }
+
+  public async step(timeout?: number): Promise<void> {
+    const request = new StepRequest();
+    const cmd = new Command<string>(this.channel, request, timeout);
+    this.logger.debug(
+      `Sending StepRequest (payload=${request.getData()}) to emulator process`,
+    );
+    const ack = await this.sendCommand(cmd);
+    this.logger.debug(`Received RunRequest reply=${ack}`);
   }
 
   public async connectToProcess(timeout: number): Promise<boolean> {
