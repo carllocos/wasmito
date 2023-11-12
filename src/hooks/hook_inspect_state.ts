@@ -1,23 +1,9 @@
 import { WASM } from '../state/wasm';
-import { type StateRequest } from '../warduino/requests/inspect_request';
+import {
+  type WasmState,
+  type StateRequest,
+} from '../warduino/requests/inspect_request';
 import { Hook, HookKind } from './hook';
-
-export interface WASMValueIndexed extends WASM.Value {
-  idx: number;
-}
-
-export interface WasmState {
-  pc?: number;
-  breakpoints?: number[];
-  stack?: WASMValueIndexed[];
-  callstack?: WASM.Frame[];
-  globals?: WASMValueIndexed[];
-  table?: WASM.Table;
-  memory?: WASM.Memory;
-  br_table?: WASM.BRTable;
-  callbacks?: WASM.CallbackMapping[];
-  events?: WASM.Event[];
-}
 
 export class InspectStateHook extends Hook<WasmState> {
   private readonly req: StateRequest;

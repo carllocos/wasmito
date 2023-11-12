@@ -8,7 +8,7 @@ import {
   ScheduleAfterTimeStamp,
   ScheduleBeforeTimeStamp,
 } from '../hooks/schedule';
-import { type WasmState, InspectStateHook } from '../hooks/hook_inspect_state';
+import { InspectStateHook } from '../hooks/hook_inspect_state';
 import {
   EmptyValueSubstitution,
   ValueSubstitution,
@@ -22,7 +22,10 @@ import {
   MontiroWasmAddrRequest,
   MonitorMoment,
 } from '../warduino/requests/monitor_request';
-import { StateRequest } from '../warduino/requests/inspect_request';
+import {
+  StateRequest,
+  type WasmState,
+} from '../warduino/requests/inspect_request';
 import { ResponseType } from '../warduino/api/request_interface';
 import { WATSourceMap } from '../language_parsers/wat_source_map';
 import * as fs from 'fs';
