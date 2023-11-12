@@ -10,7 +10,7 @@ export class StepRequest extends APIRequestNoSubscription<string> {
   }
 
   parse(input: string): string {
-    if (input === 'Step') {
+    if (input === 'STEP!') {
       return input;
     }
     throw new APIRequestInvalidParse('No ack for Step');
