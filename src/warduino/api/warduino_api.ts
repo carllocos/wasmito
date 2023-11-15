@@ -1,4 +1,4 @@
 export interface WARDuinoAPI {
-  run: (timedout?: number) => Promise<boolean>;
-  step: (timedout?: number) => Promise<void>;
+  run: (timeout?: number) => Promise<boolean>;
+  step: (timeout?: number) => Promise<void>;
 }
