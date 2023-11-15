@@ -40,11 +40,6 @@ export class EmulatedWARDuinoVM implements WARDuinoAPI {
     return this.process === p;
   }
 
-  public async addBreakpoint(wasmaddress: number): Promise<boolean> {
-    this.logger.error('TODO addBreakpoint to implement');
-    return false;
-  }
-
   public async run(timeout?: number): Promise<boolean> {
     const request = new RunRequest();
     const cmd = new Command<string>(this.channel, request, timeout);
