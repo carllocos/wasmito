@@ -1,0 +1,53 @@
+import type winston from 'winston';
+import { type Channel } from '../../communication/channel_interface';
+import { type WARDuinoAPI } from '../api/warduino_api';
+import { RunRequest } from '../requests/run_request';
+import { StepRequest } from '../requests/step_request';
+import { type APIRequest } from '../api/request_interface';
+import { Command } from '../../communication/command';
+
+export abstract class WARDuinoVM implements WARDuinoAPI {
+  protected readonly channel: Channel;
+  protected abstract logger: winston.Logger;
+
+  constructor(channel: Channel) {
+    this.channel = channel;
+  }
+
+  public async run(timeout?: number): Promise<boolean> {
+    const request = new RunRequest();
+    const cmd = new Command<string>(this.channel, request, timeout);
+    this.logger.debug(
+      `Sending RunRequest (payload=${request.getData()}) to emulator process`,
+    );
+    const ack = await this.sendCommand(cmd);
+    this.logger.debug(`Received RunRequest reply=${ack}`);
+    return true;
+  }
+
+  public async step(timeout?: number): Promise<void> {
+    const request = new StepRequest();
+    const cmd = new Command<string>(this.channel, request, timeout);
+    this.logger.debug(
+      `Sending StepRequest (payload=${request.getData()}) to emulator process`,
+    );
+    const ack = await this.sendCommand(cmd);
+    this.logger.debug(`Received RunRequest reply=${ack}`);
+  }
+
+  public async connectToProcess(timeout: number): Promise<boolean> {
+    return await this.channel.open(timeout);
+  }
+
+  public async sendRequest<T>(
+    request: APIRequest<T>,
+    timeout?: number,
+  ): Promise<T> {
+    const command = new Command(this.channel, request, timeout);
+    return await command.execute();
+  }
+
+  public async sendCommand<T>(command: Command<T>): Promise<T> {
+    return await command.execute();
+  }
+}
