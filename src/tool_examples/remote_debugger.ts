@@ -54,7 +54,7 @@ function onBreakpointStateUpdate(
     em.step()
       .then(async (v) => {
         const sr = new StateRequest().includePC();
-        const s = await em.sendRequest<WasmState>(sr);
+        await em.sendRequest<WasmState>(sr);
         await em.run();
       })
       .catch(console.error);
