@@ -850,7 +850,7 @@ export async function createEmulator(
     name: 'emulator',
   });
   if (dc !== undefined) {
-    const em = await dm.connectToExitingEmulator(dc, 8000);
+    const em = await dm.connectToExistingEmulator(dc, 8000);
 
     // const em = await dm.spawnEmulator(dc, 8000);
     // const success = await instrumentTempWasm(em);

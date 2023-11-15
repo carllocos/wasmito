@@ -60,7 +60,7 @@ export class DeviceManager {
     return processArgs;
   }
 
-  async connectToExitingEmulator(
+  async connectToExistingEmulator(
     deviceConfig: DeviceConfig,
     maxWaitTime: number,
   ): Promise<EmulatedWARDuinoVM> {

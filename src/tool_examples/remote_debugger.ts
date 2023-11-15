@@ -188,7 +188,7 @@ export async function runDebugScenario(
 
   const em = spawn
     ? await dm.spawnEmulator(dc, 8000)
-    : await dm.connectToExitingEmulator(dc, 8000);
+    : await dm.connectToExistingEmulator(dc, 8000);
   const funcCallHardwareSetup = 463;
   const i32const5000 = 408;
   const i32const12 = 411;
