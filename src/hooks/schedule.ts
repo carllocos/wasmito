@@ -3,7 +3,7 @@ import {
   timeStampNrOfEvents,
   timeStampNrOfInstructions,
 } from './timestamp';
-import { encodeLEB128ToHex } from '../util/encoder';
+import { encodeToHexLEB128 } from '../util/encoder';
 
 enum ScheduleKind {
   ScheduleOnce = '01', // hook run once and as soon as possible
@@ -47,9 +47,9 @@ export abstract class TimeStampScheduling extends HookSchedule {
     // format expected: SCHEDULE_KIND (1 BYTE)
     // format timestamp: nr of instructions (LEB32) | nr of events (LEB32);
     const nrOfInstr = timeStampNrOfInstructions(this.timestamp);
-    const instrAsHex = encodeLEB128ToHex(nrOfInstr);
+    const instrAsHex = encodeToHexLEB128(nrOfInstr);
     const nrOfEvents = timeStampNrOfEvents(this.timestamp);
-    const evtsAsHex = encodeLEB128ToHex(nrOfEvents);
+    const evtsAsHex = encodeToHexLEB128(nrOfEvents);
     return `${this.scheduleKind}${instrAsHex}${evtsAsHex}`;
   }
 }

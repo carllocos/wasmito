@@ -15,7 +15,7 @@ export function encodeLEB128(value: number): number[] {
   return result;
 }
 
-export function encodeLEB128ToHex(value: number): string {
+export function encodeToHexLEB128(value: number): string {
   const bytes = encodeLEB128(value);
   const hexString = bytes
     .map((byte) => byte.toString(16).padStart(2, '0'))
