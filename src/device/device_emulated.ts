@@ -10,7 +10,7 @@ import { createLogger } from '../logger/logger';
 import { type APIRequest } from '../warduino/api/request_interface';
 import { StepRequest } from '../warduino/requests/step_request';
 
-export class EmulateDevice implements WARDuinoAPI {
+export class EmulatedWARDuinoVM implements WARDuinoAPI {
   private readonly process?: ChildProcess;
   private readonly args: EmulatorSpawnArguments;
   private readonly deviceConfig: DeviceConfig;

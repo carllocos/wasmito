@@ -3,7 +3,7 @@ import type winston from 'winston';
 import { getFreePort, isPortInUse } from '../util/socket_util';
 import { spawn } from 'child_process';
 import { createLogger } from '../logger/logger';
-import { EmulateDevice } from './device_emulated';
+import { EmulatedWARDuinoVM } from './device_emulated';
 import { type DeviceConfig } from './device_config';
 import { getPath2WARDuinoSDKEmulatorBinary } from '../project_config';
 
@@ -17,7 +17,7 @@ export class SpawnEmulatorError extends Error {
 
 export class DeviceManager {
   logger: winston.Logger;
-  localprocesses: EmulateDevice[];
+  localprocesses: EmulatedWARDuinoVM[];
 
   constructor() {
     this.logger = createLogger('DeviceManager');
@@ -63,7 +63,7 @@ export class DeviceManager {
   async connectToExitingEmulator(
     deviceConfig: DeviceConfig,
     maxWaitTime: number,
-  ): Promise<EmulateDevice> {
+  ): Promise<EmulatedWARDuinoVM> {
     const port: number | undefined = parseInt(deviceConfig.port, 10);
     if (isNaN(port)) {
       throw new SpawnEmulatorError('port number is missing');
@@ -74,7 +74,7 @@ export class DeviceManager {
       pauseOnStart: true,
     });
 
-    const emulatedDevice = new EmulateDevice(deviceConfig, args);
+    const emulatedDevice = new EmulatedWARDuinoVM(deviceConfig, args);
     const connected = await emulatedDevice.connectToProcess(maxWaitTime);
     if (!connected) {
       this.logger.info(
@@ -89,7 +89,7 @@ export class DeviceManager {
   async spawnEmulator(
     deviceConfig: DeviceConfig,
     maxWaitTime: number,
-  ): Promise<EmulateDevice> {
+  ): Promise<EmulatedWARDuinoVM> {
     let port: number | undefined = parseInt(deviceConfig.port, 10);
     if (isNaN(port)) {
       port = undefined;
@@ -128,12 +128,14 @@ export class DeviceManager {
     childProcess.on('close', (code) => {
       this.logger.info(`Spawned process exit with code ${code}`);
       this.logger.debug('Removing process from local list');
-      this.localprocesses = this.localprocesses.filter((e: EmulateDevice) => {
-        return !e.isProcess(childProcess);
-      });
+      this.localprocesses = this.localprocesses.filter(
+        (e: EmulatedWARDuinoVM) => {
+          return !e.isProcess(childProcess);
+        },
+      );
     });
 
-    const emulatedDevice = new EmulateDevice(
+    const emulatedDevice = new EmulatedWARDuinoVM(
       deviceConfig,
       correctedArgs,
       childProcess,

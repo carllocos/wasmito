@@ -1,5 +1,5 @@
 import { parseDeviceConfig, DeviceMode } from '../device/device_config';
-import { type EmulateDevice } from '../device/device_emulated';
+import { type EmulatedWARDuinoVM } from '../device/device_emulated';
 import { DeviceManager } from '../device/device_manager';
 import { getGlobalLogger } from '../logger/logger';
 import { WASM } from '../state/wasm';
@@ -230,7 +230,9 @@ const Brigadier = new BrigadierJSONWriter(JSONWriter);
 
 const dm = new DeviceManager();
 
-export async function instrumentBlinkWasm(em: EmulateDevice): Promise<boolean> {
+export async function instrumentBlinkWasm(
+  em: EmulatedWARDuinoVM,
+): Promise<boolean> {
   const chipDelayIdx = 0;
   const requestChipDelay = new AroundFunctionRequest(chipDelayIdx);
 
@@ -262,7 +264,9 @@ export async function instrumentBlinkWasm(em: EmulateDevice): Promise<boolean> {
   return allSucess;
 }
 
-export async function instrumentTempWasm(em: EmulateDevice): Promise<boolean> {
+export async function instrumentTempWasm(
+  em: EmulatedWARDuinoVM,
+): Promise<boolean> {
   // (import "env" "chip_delay" (func $env.chip_delay (type $i32->void)))
   // (import "env" "chip_pin_mode" (func $env.chip_pin_mode (type $i32->i32->void)))
   // (import "env" "subscribe_interrupt" (func $env.subscribe_interrupt (type $i32->i32->i32->void)))
@@ -329,7 +333,7 @@ export async function instrumentTempWasm(em: EmulateDevice): Promise<boolean> {
 }
 
 export async function instrumentPrimitiveAlways(
-  em: EmulateDevice,
+  em: EmulatedWARDuinoVM,
 ): Promise<boolean> {
   const chipLedCSetup = 3;
   const emptyHook0 = new EmptyValueSubstitution();
@@ -392,7 +396,7 @@ export function onMonitoredState(d: WasmState): void {
 }
 
 export async function instrumentForMonitor(
-  em: EmulateDevice,
+  em: EmulatedWARDuinoVM,
 ): Promise<boolean> {
   // const funcAddresses = [344, 269, 275, 348, 339, 356, 358, 360];
   // const stateRequest = new StateRequest();
@@ -446,7 +450,9 @@ export function createOnMonitorBeforeState(nameOpcode: string, addr: number) {
   };
 }
 
-export async function monitorGlobalGet(em: EmulateDevice): Promise<boolean> {
+export async function monitorGlobalGet(
+  em: EmulatedWARDuinoVM,
+): Promise<boolean> {
   const addresses = [271, 346, 335, 350, 311, 313, 320, 327, 362]; // global.get
 
   const beforeMonitoring = addresses.map((addr) => {
@@ -491,7 +497,9 @@ export async function monitorGlobalGet(em: EmulateDevice): Promise<boolean> {
   return true;
 }
 
-export async function monitorFuncCalls(em: EmulateDevice): Promise<boolean> {
+export async function monitorFuncCalls(
+  em: EmulatedWARDuinoVM,
+): Promise<boolean> {
   // hexa addr    = ['0x158', '0x10d', '0x113', '0x15c', '0x153', '0x160', '0x164', '0x166', '0x168', '0x16c']
   const addresses = [344, 269, 275, 348, 339, 352, 356, 358, 360, 364]; // call
 
@@ -558,7 +566,9 @@ export function logReplies(replies: MonitorWasmAddrResponse[]): void {
   });
 }
 
-export async function monitorTestExample(em: EmulateDevice): Promise<boolean> {
+export async function monitorTestExample(
+  em: EmulatedWARDuinoVM,
+): Promise<boolean> {
   const funcName0 = 'func_block_return';
   const opcodesFunBlockRet = [
     ['block', 96],
@@ -742,7 +752,7 @@ export function createJSONWriter(
 }
 
 export async function monitorAllOpcodes(
-  em: EmulateDevice,
+  em: EmulatedWARDuinoVM,
   app: string,
 ): Promise<boolean> {
   const sourceMap = await WATSourceMap.fromPath(app);
@@ -831,7 +841,7 @@ export async function monitorAllOpcodes(
 
 export async function createEmulator(
   wasmApp: string,
-): Promise<EmulateDevice | undefined> {
+): Promise<EmulatedWARDuinoVM | undefined> {
   const dc = parseDeviceConfig({
     program: wasmApp,
     mode: DeviceMode.Emulate,

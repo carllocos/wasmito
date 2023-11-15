@@ -1,5 +1,5 @@
 import { parseDeviceConfig, DeviceMode } from '../device/device_config';
-import { type EmulateDevice } from '../device/device_emulated';
+import { type EmulatedWARDuinoVM } from '../device/device_emulated';
 import { DeviceManager } from '../device/device_manager';
 import { getGlobalLogger } from '../logger/logger';
 import { InspectStateHook } from '../hooks/hook_inspect_state';
@@ -48,7 +48,7 @@ export function logReplies(replies: RequestMessage[]): void {
 }
 
 function onBreakpointStateUpdate(
-  em: EmulateDevice,
+  em: EmulatedWARDuinoVM,
 ): (state: WasmState) => void {
   return (state: WasmState) => {
     em.step()
@@ -64,7 +64,7 @@ function onBreakpointStateUpdate(
 export async function addBreakpoint(
   address: number,
   sourceMap: WATSourceMap,
-  em: EmulateDevice,
+  em: EmulatedWARDuinoVM,
   onBreakPointReached: (data: WasmState) => void,
 ): Promise<boolean> {
   const opcode = sourceMap.getOpcode(address);
@@ -118,7 +118,7 @@ export function snapshotRequest(): StateRequest {
 export async function addBreakpointSnapshot(
   address: number,
   sourceMap: WATSourceMap,
-  em: EmulateDevice,
+  em: EmulatedWARDuinoVM,
 ): Promise<boolean> {
   const opcode = sourceMap.getOpcode(address);
   if (opcode === undefined) {
@@ -150,7 +150,7 @@ export async function addBreakpointSnapshot(
 export async function removeBreakpoint(
   address: number,
   sourceMap: WATSourceMap,
-  em: EmulateDevice,
+  em: EmulatedWARDuinoVM,
 ): Promise<boolean> {
   const opcode = sourceMap.getOpcode(address);
   if (opcode === undefined) {
@@ -166,7 +166,7 @@ export async function removeBreakpoint(
 export async function runDebugScenario(
   wasmApp: string,
   spawn: boolean,
-): Promise<EmulateDevice | undefined> {
+): Promise<EmulatedWARDuinoVM | undefined> {
   const dc = parseDeviceConfig({
     program: wasmApp,
     mode: DeviceMode.Emulate,
