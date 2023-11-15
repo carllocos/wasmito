@@ -13,7 +13,20 @@ export interface DeviceConfig {
   id: string;
   mode: DeviceMode;
   port: string;
+  host: string;
   program: string;
+}
+
+export function isValidIP(str: string): boolean {
+  const ipPattern =
+    /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+
+  return ipPattern.test(str);
+}
+
+export function isSerialPort(str: string): boolean {
+  const unixPattern = /^(\/dev\/ttyS\w+|\/dev\/ttyUSB\w+)$/i;
+  return unixPattern.test(str);
 }
 
 export function isValidDeviceConfig(value: any): string[] {
@@ -32,6 +45,25 @@ export function isValidDeviceConfig(value: any): string[] {
 
     if (typeof value.port !== 'string') {
       errors.push('Property "port" should be a string');
+    }
+
+    if (typeof value.host !== 'string') {
+      errors.push('Property "host" should be a string');
+    } else if (value.host !== '') {
+      const addr = value.host.toLowerCase();
+      if (addr !== 'localhost' && isValidIP(addr)) {
+        errors.push(
+          'Property "host" is not a valid host address. Expected `localhost` or an ipv4 address',
+        );
+      }
+
+      if (isNaN(parseInt(value.port))) {
+        errors.push(
+          `Property "port" is not a valid port number. Got ${value.port}`,
+        );
+      }
+    } else if (value.host === '' && !isSerialPort(value.port)) {
+      errors.push('Property "port" should be a valid serial port');
     }
 
     if (typeof value.program !== 'string') {
