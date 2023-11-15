@@ -5,12 +5,15 @@ import { RunRequest } from '../requests/run_request';
 import { StepRequest } from '../requests/step_request';
 import { type APIRequest } from '../api/request_interface';
 import { Command } from '../../communication/command';
+import { type PlatformBuilderConfig } from '../../builder/platform_config';
 
 export abstract class WARDuinoVM implements WARDuinoAPI {
   protected readonly channel: Channel;
   protected abstract logger: winston.Logger;
+  protected readonly platformConfig: PlatformBuilderConfig;
 
-  constructor(channel: Channel) {
+  constructor(platformConfig: PlatformBuilderConfig, channel: Channel) {
+    this.platformConfig = platformConfig;
     this.channel = channel;
   }
 

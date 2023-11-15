@@ -5,6 +5,11 @@ import { ClientSideSocket } from '../../communication/client_socket';
 import { type DeviceConfig } from '../../device/device_config';
 import type winston from 'winston';
 import { createLogger } from '../../logger/logger';
+import {
+  BoardBaudRate,
+  Platform,
+  PlatformBuilderConfig,
+} from '../../builder/platform_config';
 
 export class EmulatedWARDuinoVMError extends Error {
   constructor(message: string) {
@@ -26,7 +31,18 @@ export class EmulatedWARDuinoVM extends WARDuinoVM {
     args: EmulatorSpawnArguments,
     process?: ChildProcess,
   ) {
-    super(new ClientSideSocket(socketPort, 'localhost'));
+    super(
+      new PlatformBuilderConfig(
+        Platform.Emulated,
+        BoardBaudRate.NONE,
+        {
+          boardName: '',
+          fqbn: '',
+        },
+        deviceConfig,
+      ),
+      new ClientSideSocket(socketPort, 'localhost'),
+    );
     this.args = args;
     this.process = process;
     this.deviceConfig = deviceConfig;
