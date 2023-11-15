@@ -3,15 +3,20 @@ import type winston from 'winston';
 import { getFreePort, isPortInUse } from '../util/socket_util';
 import { spawn } from 'child_process';
 import { createLogger } from '../logger/logger';
-import { EmulatedWARDuinoVM } from './device_emulated';
 import { type DeviceConfig } from './device_config';
 import { getPath2WARDuinoSDKEmulatorBinary } from '../project_config';
+import { type Channel } from '../communication/channel_interface';
+import { EmulatedWARDuinoVM } from '../warduino/vm/emulated_vm';
+import { MCUWARDuinoVM } from '../warduino/vm/mcu_vm';
+import { type PlatformBuilderConfig } from '../builder/platform_config';
+import { SerialConnection } from '../communication/serial';
+import { ClientSideSocket } from '../communication/client_socket';
 
-export class SpawnEmulatorError extends Error {
+export class DeviceManagerError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'SpawnEmulatorError';
-    Error.captureStackTrace(this, SpawnEmulatorError);
+    this.name = 'DeviceManagerError';
+    Error.captureStackTrace(this, DeviceManagerError);
   }
 }
 
@@ -29,12 +34,12 @@ export class DeviceManager {
   ): Promise<EmulatorSpawnArguments> {
     if (args.listenPort !== undefined) {
       if (await isPortInUse(args.listenPort)) {
-        throw new SpawnEmulatorError(`Port ${args.listenPort} already in use`);
+        throw new DeviceManagerError(`Port ${args.listenPort} already in use`);
       }
     } else {
       const openPort = await getFreePort();
       if (openPort === undefined) {
-        throw new SpawnEmulatorError('Could not find a free port');
+        throw new DeviceManagerError('Could not find a free port');
       }
       args.listenPort = openPort;
     }
@@ -66,7 +71,7 @@ export class DeviceManager {
   ): Promise<EmulatedWARDuinoVM> {
     const port: number | undefined = parseInt(deviceConfig.port, 10);
     if (isNaN(port)) {
-      throw new SpawnEmulatorError('port number is missing');
+      throw new DeviceManagerError('port number is missing');
     }
     const args: EmulatorSpawnArguments = new EmulatorSpawnArguments({
       program: deviceConfig.program,
@@ -74,13 +79,13 @@ export class DeviceManager {
       pauseOnStart: true,
     });
 
-    const emulatedDevice = new EmulatedWARDuinoVM(deviceConfig, args);
+    const emulatedDevice = new EmulatedWARDuinoVM(port, deviceConfig, args);
     const connected = await emulatedDevice.connectToProcess(maxWaitTime);
     if (!connected) {
       this.logger.info(
         `Failed to connect to local emulator process at port ${args.listenPort}`,
       );
-      throw new SpawnEmulatorError('timed out connecting to emulator process');
+      throw new DeviceManagerError('timed out connecting to emulator process');
     }
     this.localprocesses.push(emulatedDevice);
     return emulatedDevice;
@@ -107,7 +112,7 @@ export class DeviceManager {
     );
     const spawnCommand = getPath2WARDuinoSDKEmulatorBinary();
     if (spawnCommand === undefined) {
-      throw new SpawnEmulatorError(
+      throw new DeviceManagerError(
         "Path to WARDuino SDK is not set. You can set it via env variable 'WARDUINO_SDK=PATH'",
       );
     }
@@ -136,6 +141,7 @@ export class DeviceManager {
     });
 
     const emulatedDevice = new EmulatedWARDuinoVM(
+      args.listenPort as number,
       deviceConfig,
       correctedArgs,
       childProcess,
@@ -147,9 +153,34 @@ export class DeviceManager {
       );
       this.logger.info('Killing local emulator process');
       childProcess.kill();
-      throw new SpawnEmulatorError('timed out connecting to emulator process');
+      throw new DeviceManagerError('timed out connecting to emulator process');
     }
     this.localprocesses.push(emulatedDevice);
     return emulatedDevice;
+  }
+
+  async spawnHardwareEmulator(
+    platformConfig: PlatformBuilderConfig,
+  ): Promise<MCUWARDuinoVM> {
+    let channel: Channel | undefined;
+    if (platformConfig.configuredForSerial()) {
+      channel = new SerialConnection(
+        platformConfig.deviceConfig.port,
+        platformConfig.baudrate,
+      );
+    } else if (platformConfig.configuredForNetwork()) {
+      const port = parseInt(platformConfig.deviceConfig.port);
+      if (isNaN(port)) {
+        throw new DeviceManagerError(
+          `Port is expected to be a number. Given ${port}`,
+        );
+      }
+      channel = new ClientSideSocket(port, platformConfig.deviceConfig.host);
+    } else {
+      throw new DeviceManagerError(
+        `DeviceConfiguration has not been configured to serial or network`,
+      );
+    }
+    return new MCUWARDuinoVM(platformConfig, channel);
   }
 }
