@@ -11,7 +11,7 @@ export enum Platform {
 }
 
 export enum BoardBaudRate {
-  OFF = 0,
+  NONE = 0,
   BD_19200 = 19200,
 }
 
@@ -39,7 +39,7 @@ export class PlatformBuilderConfig {
     return (
       this.platform !== Platform.Emulated &&
       isSerialPort(this.deviceConfig.port) &&
-      this.baudrate !== BoardBaudRate.OFF
+      this.baudrate !== BoardBaudRate.NONE
     );
   }
 
