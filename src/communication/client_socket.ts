@@ -107,12 +107,8 @@ export class ClientSideSocket extends AbstractChannel {
     });
   }
 
-  public async open(maxAttempts: number): Promise<boolean> {
-    const isPortOpen = await waitForPortToBeUsed(
-      this.port,
-      this.host,
-      maxAttempts,
-    );
+  public async open(timeout: number): Promise<boolean> {
+    const isPortOpen = await waitForPortToBeUsed(this.port, this.host, timeout);
     if (!isPortOpen) {
       return false;
     }
