@@ -66,9 +66,10 @@ describe('Loading device config with valid input', () => {
     const config: any = {};
     config.name = 'some Name';
     config.id = 'some id';
-    config.port = 'some port';
+    config.port = '/dev/ttyUSB1'; // valid unix port
     config.program = 'some program';
     config.mode = 'Emulate';
+    config.host = '';
 
     const errorsMsgs: string[] = isValidDeviceConfig(config);
     assert(
@@ -83,9 +84,10 @@ describe('Loading device config with valid input', () => {
     const config: any = {};
     config.name = 'some Name';
     config.id = 'some id';
-    config.port = 'some port';
+    config.port = '/dev/ttyUSB1'; // valid unix port
     config.program = 'some program';
     config.mode = 'EmUlaTE'; // mix (non)-capital
+    config.host = '';
 
     let errorsMsgs: string[] = isValidDeviceConfig(config);
     assert(
@@ -139,8 +141,9 @@ describe('Loading multile device configs', () => {
       name: 'a',
       id: 'b',
       mode: 'mcu',
-      port: 'some port',
+      port: '/dev/ttyUSB1', // valid unix port
       program: 'some program',
+      host: '',
     };
 
     const invalid: any = {
