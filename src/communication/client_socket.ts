@@ -20,7 +20,7 @@ abstract class AbstractChannel implements Channel {
     cb?: ((err?: Error | undefined) => void) | undefined,
   ): boolean;
 
-  public abstract open(timeout: number): Promise<boolean>;
+  public abstract open(timeout?: number): Promise<boolean>;
 
   public abstract close(): Promise<boolean>;
 
@@ -107,7 +107,7 @@ export class ClientSideSocket extends AbstractChannel {
     });
   }
 
-  public async open(timeout: number): Promise<boolean> {
+  public async open(timeout?: number): Promise<boolean> {
     const isPortOpen = await waitForPortToBeUsed(this.port, this.host, timeout);
     if (!isPortOpen) {
       return false;
