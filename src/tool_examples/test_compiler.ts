@@ -32,6 +32,7 @@ async function runBuilder(): Promise<void> {
     name: 'm5stickc',
     id: 'some id',
     mode: DeviceMode.MCU,
+    host: '',
     port: boardPort,
     program: 'program',
   };
