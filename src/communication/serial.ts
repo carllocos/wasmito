@@ -39,7 +39,7 @@ export class SerialConnection implements Channel {
     });
   }
 
-  async open(timeout: number): Promise<boolean> {
+  async open(timeout?: number): Promise<boolean> {
     return await new Promise((resolve, reject) => {
       resolve(true);
     });
