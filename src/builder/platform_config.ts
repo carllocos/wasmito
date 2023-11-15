@@ -1,4 +1,4 @@
-import { type DeviceConfig } from '../device/device_config';
+import { isSerialPort, type DeviceConfig } from '../device/device_config';
 
 export interface BoardFQBN {
   boardName: string;
@@ -7,9 +7,11 @@ export interface BoardFQBN {
 
 export enum Platform {
   Arduino,
+  Emulated,
 }
 
 export enum BoardBaudRate {
+  OFF = 0,
   BD_19200 = 19200,
 }
 
@@ -31,5 +33,17 @@ export class PlatformBuilderConfig {
     this.baudrate = baudrate;
     this.fqbn = fqbn;
     this.deviceConfig = deviceConfig;
+  }
+
+  configuredForSerial(): boolean {
+    return (
+      this.platform !== Platform.Emulated &&
+      isSerialPort(this.deviceConfig.port) &&
+      this.baudrate !== BoardBaudRate.OFF
+    );
+  }
+
+  configuredForNetwork(): boolean {
+    return false;
   }
 }
