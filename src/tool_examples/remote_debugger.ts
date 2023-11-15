@@ -1,5 +1,4 @@
 import { parseDeviceConfig, DeviceMode } from '../device/device_config';
-import { type EmulatedWARDuinoVM } from '../device/device_emulated';
 import { DeviceManager } from '../device/device_manager';
 import { getGlobalLogger } from '../logger/logger';
 import { InspectStateHook } from '../hooks/hook_inspect_state';
@@ -18,6 +17,7 @@ import {
   ResponseType,
 } from '../warduino/api/request_interface';
 import { WATSourceMap } from '../language_parsers/wat_source_map';
+import { type EmulatedWARDuinoVM } from '../warduino/vm/emulated_vm';
 
 export function allSucceeded(replies: MonitorWasmAddrResponse[]): boolean {
   let idx = 0;
