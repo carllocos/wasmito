@@ -1,5 +1,4 @@
 import { parseDeviceConfig, DeviceMode } from '../device/device_config';
-import { type EmulatedWARDuinoVM } from '../device/device_emulated';
 import { DeviceManager } from '../device/device_manager';
 import { getGlobalLogger } from '../logger/logger';
 import { WASM } from '../state/wasm';
@@ -32,6 +31,7 @@ import * as fs from 'fs';
 import { type WasmOpcode } from '../language_parsers/opcodes';
 import { PlaceholderType } from '../state/opcode_type';
 import { exit } from 'process';
+import { type EmulatedWARDuinoVM } from '../warduino/vm/emulated_vm';
 
 class WriteJSON {
   private readonly maxBuffer: number;
