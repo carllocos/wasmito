@@ -4,15 +4,17 @@
             "name": "A",
             "id": "A",
             "mode": "mcu",
-            "port": "port A",
-            "program": "program A"
+            "port": "/dev/ttyUSB0",
+            "program": "program A",
+            "host": ""
         },
         {
             "name": "B",
             "id": "B",
             "mode": "mcu",
-            "port": "port B",
-            "program": "program B"
+            "port": "/dev/ttyUSB1",
+            "program": "program B",
+            "host": ""
         }
     ]
 }
