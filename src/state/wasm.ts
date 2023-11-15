@@ -1,5 +1,5 @@
 import { getGlobalLogger } from '../logger/logger';
-import { encodeLEB128ToHex, floatToHexString } from '../util/encoder';
+import { encodeToHexLEB128, floatToHexString } from '../util/encoder';
 
 export namespace WASM {
   export enum Type {
@@ -47,7 +47,7 @@ export namespace WASM {
     switch (value.type) {
       case Type.i32:
       case Type.i64:
-        encodedValue += encodeLEB128ToHex(value.value);
+        encodedValue += encodeToHexLEB128(value.value);
         break;
       case Type.f32:
         encodedValue += floatToHexString(value.value);

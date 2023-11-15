@@ -1,5 +1,5 @@
 import { getGlobalLogger } from '../../logger/logger';
-import { encodeLEB128ToHex } from '../../util/encoder';
+import { encodeToHexLEB128 } from '../../util/encoder';
 import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
@@ -101,7 +101,7 @@ export class AroundFunctionRequest extends APIRequestNoSubscription<AroundHookRe
   }
 
   getData(): string {
-    const encodedFidx = encodeLEB128ToHex(this.function_idx);
+    const encodedFidx = encodeToHexLEB128(this.function_idx);
     const encodedSchedule = this.hooks[0].schedule.serializeBinary();
     const encodedHook = this.hooks[0].serializeBinary();
     return `${Instruction.AroundFunction}${encodedFidx}${encodedSchedule}${encodedHook}\n`;

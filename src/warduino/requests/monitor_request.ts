@@ -1,5 +1,5 @@
 import { getGlobalLogger } from '../../logger/logger';
-import { encodeLEB128ToHex } from '../../util/encoder';
+import { encodeToHexLEB128 } from '../../util/encoder';
 import {
   APIRequest,
   APIRequestInvalidParse,
@@ -80,7 +80,7 @@ export class MontiroWasmAddrRequest extends APIRequest<MonitorWasmAddrResponse> 
   }
 
   override getData(): string {
-    const encodedAddr = encodeLEB128ToHex(this.wasmAddr);
+    const encodedAddr = encodeToHexLEB128(this.wasmAddr);
     let encodedSchedule = '';
     let encodedHook = '';
     let encodedAddOrRemoveOp = '00';

@@ -1,4 +1,4 @@
-import { encodeLEB128ToHex } from '../util/encoder';
+import { encodeToHexLEB128 } from '../util/encoder';
 import { HookWithoutSubscription, HookKind } from './hook';
 
 export class RemoteCallHook extends HookWithoutSubscription {
@@ -10,7 +10,7 @@ export class RemoteCallHook extends HookWithoutSubscription {
 
   serializeBinary(): string {
     // format: HookKind (1 BYTE) | target fidx (LEB128)
-    const target = encodeLEB128ToHex(this.targetfidx);
+    const target = encodeToHexLEB128(this.targetfidx);
     return `${this.kind}${target}`;
   }
 }
