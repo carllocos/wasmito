@@ -23,7 +23,8 @@ jobs:
             cmake .. . -DBUILD_EMULATOR=ON
             make
             cd ..
-            echo "WARDUINO_SDK=$(realpath)" >> $GITHUB_ENV
+            echo "WARDUINO_PATH=$(realpath)" >> $GITHUB_ENV
+            echo $WARDUINO_PATH
 
       - name: Setup Node.js
         uses: actions/setup-node@v2
@@ -39,4 +40,4 @@ jobs:
       - name: yarn install and test
         run: |
           yarn 
-          yarn test
+          WARDUINO_SDK=$WARDUINO_PATH yarn test
