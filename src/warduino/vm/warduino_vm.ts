@@ -12,6 +12,8 @@ import { PauseRequest } from '../requests/pause_request';
 import { ProxifyRequest } from '../requests/proxify_request';
 import { type WasmState } from '../../state/wasm';
 import { StateRequest } from '../requests/inspect_request';
+import { LoadStateRequestBuilder } from '../requests/load_state_request';
+import { timeoutPromise } from '../../util/promise_util';
 
 export abstract class WARDuinoVM implements WARDuinoAPI {
   protected readonly channel: Channel;
@@ -93,6 +95,21 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
 
   public async sendCommand<T>(command: Command<T>): Promise<T> {
     return await command.execute();
+  }
+
+  public async loadWasmState(
+    wasmState: WasmState,
+    timeout?: number,
+  ): Promise<void> {
+    const builder = new LoadStateRequestBuilder(wasmState);
+    const requests = Promise.all(
+      builder.buildRequests().map(async (req) => await this.sendRequest(req)),
+    );
+    if (timeout !== undefined) {
+      await timeoutPromise(requests, timeout);
+    } else {
+      await requests;
+    }
   }
 
   public async proxify(timeout?: number): Promise<void> {

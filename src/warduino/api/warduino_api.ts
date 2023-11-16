@@ -15,4 +15,5 @@ export interface WARDuinoAPI {
   ) => Promise<boolean>;
   inspect: (neededState: StateRequest, timeout?: number) => Promise<WasmState>;
   snapshot: (timeout?: number) => Promise<WasmState>;
+  loadWasmState: (state: WasmState, timeout?: number) => Promise<void>;
 }
