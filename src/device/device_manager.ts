@@ -169,6 +169,10 @@ export class DeviceManager {
     return emulatedDevice;
   }
 
+  async closeEmulatorVM(vm: EmulatedWARDuinoVM): Promise<boolean> {
+    return await vm.close();
+  }
+
   async spawnHardwareVM(
     platformConfig: PlatformBuilderConfig,
     buildOutputDir?: string,
