@@ -75,4 +75,11 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   public async sendCommand<T>(command: Command<T>): Promise<T> {
     return await command.execute();
   }
+
+  public async proxify(timeout?: number): Promise<void> {
+    const request = new ProxifyRequest();
+    this.logger.debug('Sending ProxifyRequest');
+    await this.sendRequest(request, timeout);
+    this.logger.info('VM in proxy mode');
+  }
 }
