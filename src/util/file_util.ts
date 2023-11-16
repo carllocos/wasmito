@@ -38,3 +38,15 @@ export async function copyRecursive(
     });
   });
 }
+
+export async function readFileAsBuffer(filePath: string): Promise<Buffer> {
+  return await new Promise((resolve, reject) => {
+    fs.readFile(filePath, (err, data) => {
+      if (err !== undefined) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+}
