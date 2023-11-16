@@ -54,8 +54,4 @@ export class EmulatedWARDuinoVM extends WARDuinoVM {
   public isProcess(p: ChildProcess): boolean {
     return this.process === p;
   }
-
-  public async connectToProcess(timeout: number): Promise<boolean> {
-    return await this.channel.open(timeout);
-  }
 }
