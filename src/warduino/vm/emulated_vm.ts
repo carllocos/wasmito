@@ -30,6 +30,7 @@ export class EmulatedWARDuinoVM extends WARDuinoVM {
     deviceConfig: DeviceConfig,
     args: EmulatorSpawnArguments,
     process?: ChildProcess,
+    buildOutputDir?: string,
   ) {
     super(
       new PlatformBuilderConfig(
@@ -42,6 +43,7 @@ export class EmulatedWARDuinoVM extends WARDuinoVM {
         deviceConfig,
       ),
       new ClientSideSocket(socketPort, 'localhost'),
+      buildOutputDir,
     );
     this.args = args;
     this.process = process;

@@ -7,8 +7,12 @@ import { createLogger } from '../../logger/logger';
 export class MCUWARDuinoVM extends WARDuinoVM {
   protected logger: Logger;
 
-  constructor(platformConfig: PlatformBuilderConfig, channel: Channel) {
-    super(platformConfig, channel);
+  constructor(
+    platformConfig: PlatformBuilderConfig,
+    channel: Channel,
+    buildOutputDir?: string,
+  ) {
+    super(platformConfig, channel, buildOutputDir);
     this.logger = createLogger(
       `MCUWARDuino ${platformConfig.deviceConfig.name} (${platformConfig.fqbn.boardName})`,
     );

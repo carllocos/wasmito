@@ -68,6 +68,7 @@ export class DeviceManager {
   async connectToExistingEmulator(
     deviceConfig: DeviceConfig,
     maxWaitTime: number,
+    buildOutputDir?: string,
   ): Promise<EmulatedWARDuinoVM> {
     const port: number | undefined = parseInt(deviceConfig.port, 10);
     if (isNaN(port)) {
@@ -79,7 +80,14 @@ export class DeviceManager {
       pauseOnStart: true,
     });
 
-    const emulatedDevice = new EmulatedWARDuinoVM(port, deviceConfig, args);
+    const noChildProcess = undefined;
+    const emulatedDevice = new EmulatedWARDuinoVM(
+      port,
+      deviceConfig,
+      args,
+      noChildProcess,
+      buildOutputDir,
+    );
     const connected = await emulatedDevice.connectToProcess(maxWaitTime);
     if (!connected) {
       this.logger.info(
@@ -94,6 +102,7 @@ export class DeviceManager {
   async spawnEmulator(
     deviceConfig: DeviceConfig,
     maxWaitTime: number,
+    buildOutputDir?: string,
   ): Promise<EmulatedWARDuinoVM> {
     let port: number | undefined = parseInt(deviceConfig.port, 10);
     if (isNaN(port)) {
@@ -145,6 +154,7 @@ export class DeviceManager {
       deviceConfig,
       correctedArgs,
       childProcess,
+      buildOutputDir,
     );
     const connected = await emulatedDevice.connectToProcess(maxWaitTime);
     if (!connected) {
@@ -159,8 +169,9 @@ export class DeviceManager {
     return emulatedDevice;
   }
 
-  async spawnHardwareEmulator(
+  async spawnHardwareVM(
     platformConfig: PlatformBuilderConfig,
+    buildOutputDir?: string,
   ): Promise<MCUWARDuinoVM> {
     let channel: Channel | undefined;
     if (platformConfig.configuredForSerial()) {
@@ -181,6 +192,6 @@ export class DeviceManager {
         `DeviceConfiguration has not been configured to serial or network`,
       );
     }
-    return new MCUWARDuinoVM(platformConfig, channel);
+    return new MCUWARDuinoVM(platformConfig, channel, buildOutputDir);
   }
 }
