@@ -10,6 +10,8 @@ import { type PlatformBuilder } from '../../builder/platformbuilder';
 import { createPlatformBuilder } from '../../builder/platformbuilder_factory';
 import { PauseRequest } from '../requests/pause_request';
 import { ProxifyRequest } from '../requests/proxify_request';
+import { type WasmState } from '../../state/wasm';
+import { StateRequest } from '../requests/inspect_request';
 
 export abstract class WARDuinoVM implements WARDuinoAPI {
   protected readonly channel: Channel;
@@ -61,6 +63,19 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     this.logger.debug('Sending StepRequest');
     await this.sendRequest(request, timeout);
     this.logger.info('Stepped');
+  }
+
+  async inspect(
+    neededState: StateRequest,
+    timeout?: number,
+  ): Promise<WasmState> {
+    return await this.sendRequest(neededState, timeout);
+  }
+
+  async snapshot(timeout?: number): Promise<WasmState> {
+    const request = new StateRequest();
+    request.includeAll();
+    return await this.sendRequest(request, timeout);
   }
 
   abstract uploadSourceCode(
