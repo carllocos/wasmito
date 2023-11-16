@@ -12,7 +12,7 @@ export enum Platform {
 
 export enum BoardBaudRate {
   NONE = 0,
-  BD_19200 = 19200,
+  BD_115200 = 115200,
 }
 
 export const SerialBaudrates: number[] = [19200];
