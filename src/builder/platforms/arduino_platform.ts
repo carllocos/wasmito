@@ -93,16 +93,23 @@ export async function ArduinoCompile(
     });
 
     compile.on('close', (code) => {
-      arduinoLogger.info(`Arduino compilation exited with code ${code}`);
       if (code !== null) {
+        const msg = `Arduino compilation exited with code ${code}`;
+        if (code === 0) {
+          arduinoLogger.info(msg);
+        } else {
+          arduinoLogger.error(msg);
+        }
         resolve(code);
+      } else {
+        reject(
+          new Error(`Arduino compilation exit code is not a number: ${code}`),
+        );
       }
-      reject(
-        new Error(`Arduino compilation exit code is not a number: ${code}`),
-      );
     });
   });
 }
+
 async function ArduinoFlash(
   pathToArduinoSketch: string,
   port: string,
@@ -119,15 +126,22 @@ async function ArduinoFlash(
     flash.stderr.on('data', (data: string) => {
       const errMsg = data.toString();
       arduinoLogger.error(errMsg);
-      reject(errMsg);
     });
 
     flash.on('close', (code) => {
-      arduinoLogger.info(`Arduino flashing exited with code ${code}`);
       if (code !== null) {
+        const msg = `Arduino flashing exited with code ${code}`;
+        if (code === 0) {
+          arduinoLogger.info(msg);
+        } else {
+          arduinoLogger.error(msg);
+        }
         resolve(code);
+      } else {
+        reject(
+          new Error(`Arduino flashing exit code is not a number: ${code}`),
+        );
       }
-      reject(new Error(`Arduino flashing exit code is not a number: ${code}`));
     });
   });
 }
@@ -153,9 +167,15 @@ export class ArduinoBoardBuilder extends PlatformBuilder {
 
   async compile(sourceFile: string): Promise<number> {
     // copy Arduino template
+    this.logger.info(
+      `Copying Arduino template for ${this.platformConfig.deviceConfig.name} (board=${this.platformConfig.fqbn.boardName}, ID=${this.platformConfig.deviceConfig.id}) from ${this.pathToArduinoTemplate} to ${this.pathToArduinoSketch}`,
+    );
     await copyRecursive(
       `${this.pathToArduinoTemplate}/*`,
       this.pathToArduinoSketch,
+    );
+    this.logger.info(
+      `Arduino compiling sketch ${this.pathToArduinoSketch} for ${this.platformConfig.deviceConfig.name} (board=${this.platformConfig.fqbn.boardName}, ID=${this.platformConfig.deviceConfig.id})`,
     );
     return await ArduinoCompile(
       this.platformConfig.fqbn.fqbn,
@@ -165,6 +185,9 @@ export class ArduinoBoardBuilder extends PlatformBuilder {
   }
 
   async upload(): Promise<number> {
+    this.logger.info(
+      `Arduino flashing sketch ${this.pathToArduinoSketch} for ${this.platformConfig.deviceConfig.name} (board=${this.platformConfig.fqbn.boardName}, ID=${this.platformConfig.deviceConfig.id})`,
+    );
     return await ArduinoFlash(
       this.pathToArduinoSketch,
       this.platformConfig.deviceConfig.port,
