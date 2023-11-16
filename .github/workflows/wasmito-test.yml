@@ -23,7 +23,7 @@ jobs:
             cmake .. . -DBUILD_EMULATOR=ON
             make
             cd ..
-            echo "WARDUINO_PATH=$(realpath)" >> $GITHUB_ENV
+            echo "WARDUINO_PATH=$(realpath .)" >> $GITHUB_ENV
             echo $WARDUINO_PATH
 
       - name: Setup Node.js
