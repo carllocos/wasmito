@@ -43,4 +43,8 @@ export abstract class PlatformBuilder {
   abstract compile(sourceFile: string): Promise<number>;
 
   abstract upload(): Promise<number>;
+
+  abstract getWasmPath(): string;
+
+  abstract getWasm(): Promise<Buffer>;
 }
