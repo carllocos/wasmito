@@ -6,15 +6,23 @@ import { StepRequest } from '../requests/step_request';
 import { type APIRequest } from '../api/request_interface';
 import { Command } from '../../communication/command';
 import { type PlatformBuilderConfig } from '../../builder/platform_config';
+import { type PlatformBuilder } from '../../builder/platformbuilder';
+import { createPlatformBuilder } from '../../builder/platformbuilder_factory';
 
 export abstract class WARDuinoVM implements WARDuinoAPI {
   protected readonly channel: Channel;
   protected abstract logger: winston.Logger;
   protected readonly platformConfig: PlatformBuilderConfig;
+  protected readonly platform: PlatformBuilder;
 
-  constructor(platformConfig: PlatformBuilderConfig, channel: Channel) {
+  constructor(
+    platformConfig: PlatformBuilderConfig,
+    channel: Channel,
+    buildOutputDir?: string,
+  ) {
     this.platformConfig = platformConfig;
     this.channel = channel;
+    this.platform = createPlatformBuilder(platformConfig, buildOutputDir);
   }
 
   public async run(timeout?: number): Promise<boolean> {
