@@ -7,7 +7,7 @@ import { WasmStack } from '../../state/wasm_stack';
 import { serializeUInt16BE } from '../../util/encoder';
 import { type WasmState, type WASM } from '../../state/wasm';
 
-enum InspectableState {
+export enum InspectableState {
   pcState = '01',
   breakpointState = '02',
   callstackState = '03',
