@@ -12,6 +12,7 @@ export enum Platform {
 
 export enum BoardBaudRate {
   NONE = 0,
+  BD_9600 = 9600,
   BD_115200 = 115200,
 }
 
