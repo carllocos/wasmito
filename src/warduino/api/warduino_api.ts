@@ -4,4 +4,5 @@ export interface WARDuinoAPI {
   close: () => Promise<boolean>;
   run: (timeout?: number) => Promise<boolean>;
   step: (timeout?: number) => Promise<void>;
+  proxify: (timeout?: number) => Promise<void>;
 }

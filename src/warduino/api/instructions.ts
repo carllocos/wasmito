@@ -6,6 +6,8 @@ export enum Instruction {
   Inspect = '09',
   AroundFunction = '50',
   MonitorWasmAddr = '51',
+
+  Proxify = '65',
 }
 
 export function getInstructionFromString(str: string): Instruction | undefined {
