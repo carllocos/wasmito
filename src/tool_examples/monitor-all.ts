@@ -848,6 +848,7 @@ export async function createEmulator(
     port: '8300',
     id: '1',
     name: 'emulator',
+    host: 'localhost',
   });
   if (dc !== undefined) {
     const em = await dm.connectToExistingEmulator(dc, 8000);

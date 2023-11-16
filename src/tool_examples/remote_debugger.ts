@@ -173,6 +173,7 @@ export async function runDebugScenario(
     port: '8300',
     id: '1',
     name: 'emulator',
+    host: 'localhost',
   });
 
   if (dc === undefined) {
