@@ -1,5 +1,4 @@
 import { listAllFQBN, listAvailableBoards } from '../builder/util_platform';
-import { createPlatformBuilder } from '../builder/platformbuilder_factory';
 import {
   BoardBaudRate,
   Platform,
@@ -7,6 +6,7 @@ import {
 } from '../builder/platform_config';
 import { type DeviceConfig, DeviceMode } from '../device/device_config';
 import { createLogger } from '../logger/logger';
+import { DeviceManager } from '../device/device_manager';
 const testCompilerLogger = createLogger('TestCompiler');
 
 async function runBuilder(): Promise<void> {
@@ -39,26 +39,27 @@ async function runBuilder(): Promise<void> {
 
   const platformConfig = new PlatformBuilderConfig(
     Platform.Arduino,
-    BoardBaudRate.BD_19200,
+    BoardBaudRate.BD_115200,
     targetBoard,
     deviceConfig,
   );
   const wasmBinaryPath = process.cwd() + '/example-wat/test-example.wasm';
   const compileOutputDirectory =
     process.cwd() + '/example-wat/platform_arduino/';
-  const builder = createPlatformBuilder(platformConfig, compileOutputDirectory);
+  // const builder = createPlatformBuilder(platformConfig, compileOutputDirectory);
   // const builder = createPlatformBuilder(platformConfig);
-  const exitCode = await builder.compile(wasmBinaryPath);
-  testCompilerLogger.info(
-    `Compilation to ${deviceConfig.name} (board=${targetBoard.boardName}, ID=${deviceConfig.id}) exited with code ${exitCode}`,
+  const deviceManager = new DeviceManager();
+  const mcuVM = await deviceManager.spawnHardwareVM(
+    platformConfig,
+    compileOutputDirectory,
   );
-  if (exitCode !== 0) {
-    return;
+  const uploaded = await mcuVM.uploadSourceCode(wasmBinaryPath);
+  if (uploaded) {
+    testCompilerLogger.info('Successfully updated source code');
+    await mcuVM.run();
+  } else {
+    testCompilerLogger.error('failed to update source code');
   }
-  const uploadExitCode = await builder.upload();
-  testCompilerLogger.info(
-    `Flash to ${deviceConfig.name} (board=${targetBoard.boardName}, ID=${deviceConfig.id}) exited with code ${uploadExitCode}`,
-  );
 }
 
 runBuilder()
