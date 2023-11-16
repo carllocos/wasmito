@@ -3,6 +3,7 @@ export interface WARDuinoAPI {
   disconnect: (timeout?: number) => Promise<boolean>;
   close: () => Promise<boolean>;
   run: (timeout?: number) => Promise<boolean>;
+  pause: (timeout?: number) => Promise<void>;
   step: (timeout?: number) => Promise<void>;
   proxify: (timeout?: number) => Promise<void>;
   uploadSourceCode: (
