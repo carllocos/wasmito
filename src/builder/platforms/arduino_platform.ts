@@ -2,7 +2,7 @@ import { exec, spawn } from 'child_process';
 import { createLogger } from '../../logger/logger';
 import { type PlatformBuilderConfig, type BoardFQBN } from '../platform_config';
 import { PlatformBuilder } from '../platformbuilder';
-import { copyRecursive } from '../../util/file_util';
+import { copyRecursive, readFileAsBuffer } from '../../util/file_util';
 
 const arduinoLogger = createLogger('Arduino');
 
@@ -90,7 +90,6 @@ export async function ArduinoCompile(
     compile.stderr.on('data', (data: string) => {
       const errMsg = data.toString();
       arduinoLogger.error(errMsg);
-      reject(errMsg);
     });
 
     compile.on('close', (code) => {
@@ -141,6 +140,15 @@ export class ArduinoBoardBuilder extends PlatformBuilder {
     super(config, outputDir);
     this.pathToArduinoTemplate = `${this.sdkPath}platforms/Arduino`;
     this.pathToArduinoSketch = `${this.outputDirectory}/Arduino/`;
+  }
+
+  getWasmPath(): string {
+    return `${this.pathToArduinoSketch}bin/upload.wasm`;
+  }
+
+  async getWasm(): Promise<Buffer> {
+    const pathToWasm = this.getWasmPath();
+    return await readFileAsBuffer(pathToWasm);
   }
 
   async compile(sourceFile: string): Promise<number> {
