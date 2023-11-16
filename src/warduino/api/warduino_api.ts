@@ -1,3 +1,6 @@
+import { type WasmState } from '../../state/wasm';
+import { type StateRequest } from '../requests/inspect_request';
+
 export interface WARDuinoAPI {
   connect: (timeout?: number) => Promise<boolean>;
   disconnect: (timeout?: number) => Promise<boolean>;
@@ -10,4 +13,6 @@ export interface WARDuinoAPI {
     sourceCodePath: string,
     timeout?: number,
   ) => Promise<boolean>;
+  inspect: (neededState: StateRequest, timeout?: number) => Promise<WasmState>;
+  snapshot: (timeout?: number) => Promise<WasmState>;
 }
