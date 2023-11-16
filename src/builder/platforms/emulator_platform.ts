@@ -3,7 +3,7 @@ import { type PlatformBuilderConfig } from '../platform_config';
 import { PlatformBuilder } from '../platformbuilder';
 
 export class EmulatorPlatform extends PlatformBuilder {
-  private readonly pathToSrcDir: string;
+  private pathToSrcDir: string;
 
   constructor(config: PlatformBuilderConfig, outputDir: string = '') {
     super(config, outputDir);
@@ -11,7 +11,7 @@ export class EmulatorPlatform extends PlatformBuilder {
   }
 
   getWasmPath(): string {
-    return `${this.outputDirectory}bin/upload.wasm`;
+    return this.pathToSrcDir; // depends on where he compilere will write this
   }
 
   async getWasm(): Promise<Buffer> {
@@ -20,6 +20,7 @@ export class EmulatorPlatform extends PlatformBuilder {
   }
 
   async compile(sourceFile: string): Promise<number> {
+    this.pathToSrcDir = sourceFile; // for now path to wasm
     return 0;
   }
 
