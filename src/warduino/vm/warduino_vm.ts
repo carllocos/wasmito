@@ -8,6 +8,7 @@ import { Command } from '../../communication/command';
 import { type PlatformBuilderConfig } from '../../builder/platform_config';
 import { type PlatformBuilder } from '../../builder/platformbuilder';
 import { createPlatformBuilder } from '../../builder/platformbuilder_factory';
+import { PauseRequest } from '../requests/pause_request';
 import { ProxifyRequest } from '../requests/proxify_request';
 
 export abstract class WARDuinoVM implements WARDuinoAPI {
@@ -46,6 +47,13 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     await this.sendRequest(request, timeout);
     this.logger.info('Running');
     return true;
+  }
+
+  public async pause(timeout?: number): Promise<void> {
+    const request = new PauseRequest();
+    this.logger.debug('Sending PauseRequest');
+    await this.sendRequest(request, timeout);
+    this.logger.info('Paused');
   }
 
   public async step(timeout?: number): Promise<void> {
