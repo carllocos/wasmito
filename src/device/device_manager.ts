@@ -88,7 +88,7 @@ export class DeviceManager {
       noChildProcess,
       buildOutputDir,
     );
-    const connected = await emulatedDevice.connectToProcess(maxWaitTime);
+    const connected = await emulatedDevice.connect(maxWaitTime);
     if (!connected) {
       this.logger.info(
         `Failed to connect to local emulator process at port ${args.listenPort}`,
@@ -156,7 +156,7 @@ export class DeviceManager {
       childProcess,
       buildOutputDir,
     );
-    const connected = await emulatedDevice.connectToProcess(maxWaitTime);
+    const connected = await emulatedDevice.connect(maxWaitTime);
     if (!connected) {
       this.logger.info(
         `Failed to connect to local emulator process at port ${correctedArgs.listenPort}`,

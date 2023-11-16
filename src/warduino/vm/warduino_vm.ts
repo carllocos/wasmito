@@ -25,6 +25,18 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     this.platform = createPlatformBuilder(platformConfig, buildOutputDir);
   }
 
+  async connect(timeout?: number): Promise<boolean> {
+    const opened = await this.channel.open(timeout);
+    this.logger.info(opened ? 'Channel opened' : 'Channel failed to open');
+    return opened;
+  }
+
+  public async disconnect(): Promise<boolean> {
+    const closed = await this.channel.close();
+    this.logger.info(closed ? 'Channel closed' : 'Channel failed to close');
+    return closed;
+  }
+
   public async run(timeout?: number): Promise<boolean> {
     const request = new RunRequest();
     const cmd = new Command<string>(this.channel, request, timeout);
