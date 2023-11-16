@@ -10,6 +10,8 @@ export enum Instruction {
   AroundFunction = '50',
   MonitorWasmAddr = '51',
 
+  LoadSnapshot = '62',
+
   Proxify = '65',
 }
 
