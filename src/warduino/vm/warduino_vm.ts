@@ -25,6 +25,8 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     this.platform = createPlatformBuilder(platformConfig, buildOutputDir);
   }
 
+  abstract close(): Promise<boolean>;
+
   async connect(timeout?: number): Promise<boolean> {
     const opened = await this.channel.open(timeout);
     this.logger.info(opened ? 'Channel opened' : 'Channel failed to open');
