@@ -54,9 +54,10 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     this.logger.info('Stepped');
   }
 
-  public async connectToProcess(timeout: number): Promise<boolean> {
-    return await this.channel.open(timeout);
-  }
+  abstract uploadSourceCode(
+    sourceCodePath: string,
+    timeout?: number,
+  ): Promise<boolean>;
 
   public async sendRequest<T>(
     request: APIRequest<T>,
