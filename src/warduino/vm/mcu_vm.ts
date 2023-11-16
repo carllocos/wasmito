@@ -17,4 +17,15 @@ export class MCUWARDuinoVM extends WARDuinoVM {
       `MCUWARDuino ${platformConfig.deviceConfig.name} (${platformConfig.fqbn.boardName})`,
     );
   }
+
+  async close(): Promise<boolean> {
+    this.logger.info('closing VM');
+    const closedChannel = await this.channel.close();
+    this.logger.debug(
+      closedChannel
+        ? 'VM channel successfully closed'
+        : 'VM channel could not be closed',
+    );
+    return closedChannel;
+  }
 }

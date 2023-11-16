@@ -51,6 +51,23 @@ export class EmulatedWARDuinoVM extends WARDuinoVM {
     this.logger = createLogger(deviceConfig.name);
   }
 
+  async close(): Promise<boolean> {
+    this.logger.info('closing VM');
+    const closedChannel = await this.channel.close();
+    const closedProcess = this.process?.kill() ?? true;
+    this.logger.debug(
+      closedChannel
+        ? 'VM channel successfully closed'
+        : 'VM channel could not be closed',
+    );
+    this.logger.debug(
+      closedProcess
+        ? 'VM Process successfully killed'
+        : 'VM process could not be killed',
+    );
+    return closedChannel && closedProcess;
+  }
+
   public isProcess(p: ChildProcess): boolean {
     return this.process === p;
   }
