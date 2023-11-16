@@ -8,12 +8,19 @@ export interface WARDuinoAPI {
   run: (timeout?: number) => Promise<boolean>;
   pause: (timeout?: number) => Promise<void>;
   step: (timeout?: number) => Promise<void>;
+
   proxify: (timeout?: number) => Promise<void>;
+
   uploadSourceCode: (
     sourceCodePath: string,
     timeout?: number,
   ) => Promise<boolean>;
+
   inspect: (neededState: StateRequest, timeout?: number) => Promise<WasmState>;
+
   snapshot: (timeout?: number) => Promise<WasmState>;
+
   loadWasmState: (state: WasmState, timeout?: number) => Promise<void>;
+
+  resolveEvent: (timeout?: number) => Promise<void>;
 }
