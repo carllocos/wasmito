@@ -41,23 +41,17 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
 
   public async run(timeout?: number): Promise<boolean> {
     const request = new RunRequest();
-    const cmd = new Command<string>(this.channel, request, timeout);
-    this.logger.debug(
-      `Sending RunRequest (payload=${request.getData()}) to emulator process`,
-    );
-    const ack = await this.sendCommand(cmd);
-    this.logger.debug(`Received RunRequest reply=${ack}`);
+    this.logger.debug('Sending RunRequest');
+    await this.sendRequest(request, timeout);
+    this.logger.info('Running');
     return true;
   }
 
   public async step(timeout?: number): Promise<void> {
     const request = new StepRequest();
-    const cmd = new Command<string>(this.channel, request, timeout);
-    this.logger.debug(
-      `Sending StepRequest (payload=${request.getData()}) to emulator process`,
-    );
-    const ack = await this.sendCommand(cmd);
-    this.logger.debug(`Received RunRequest reply=${ack}`);
+    this.logger.debug('Sending StepRequest');
+    await this.sendRequest(request, timeout);
+    this.logger.info('Stepped');
   }
 
   public async connectToProcess(timeout: number): Promise<boolean> {
