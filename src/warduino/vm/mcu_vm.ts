@@ -3,6 +3,15 @@ import { type PlatformBuilderConfig } from '../../builder/platform_config';
 import { WARDuinoVM } from './warduino_vm';
 import { type Channel } from '../../communication/channel_interface';
 import { createLogger } from '../../logger/logger';
+import { timeoutPromise } from '../../util/promise_util';
+
+export class MCUWARDuinoVMError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'MCUWARDuinoVMError';
+    Error.captureStackTrace(this, MCUWARDuinoVMError);
+  }
+}
 
 export class MCUWARDuinoVM extends WARDuinoVM {
   protected logger: Logger;
@@ -27,5 +36,30 @@ export class MCUWARDuinoVM extends WARDuinoVM {
         : 'VM channel could not be closed',
     );
     return closedChannel;
+  }
+
+  async uploadSourceCode(
+    sourceCodePath: string,
+    timeout?: number | undefined,
+  ): Promise<boolean> {
+    const exitCode = await this.platform.compile(sourceCodePath);
+    if (exitCode !== 0) {
+      return false;
+    }
+
+    // close connection otherwise flashing cannot work
+    await this.channel.close();
+
+    const exitCodeUpload = await (timeout !== undefined
+      ? timeoutPromise(
+          this.platform.upload(),
+          timeout,
+          new MCUWARDuinoVMError('flashing to MCU timedout'),
+        )
+      : this.platform.upload());
+
+    // open connection after flashing
+    await this.channel.open();
+    return exitCodeUpload === 0;
   }
 }

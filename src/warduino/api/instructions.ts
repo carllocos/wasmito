@@ -4,6 +4,9 @@ export enum Instruction {
   Pause = '03',
   Step = '04',
   Inspect = '09',
+
+  UpdateWasmModule = '22',
+
   AroundFunction = '50',
   MonitorWasmAddr = '51',
 

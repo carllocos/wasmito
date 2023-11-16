@@ -10,6 +10,7 @@ import {
   Platform,
   PlatformBuilderConfig,
 } from '../../builder/platform_config';
+import { UpdateWasmModuleRequest } from '../requests/update_module_request';
 
 export class EmulatedWARDuinoVMError extends Error {
   constructor(message: string) {
@@ -70,5 +71,20 @@ export class EmulatedWARDuinoVM extends WARDuinoVM {
 
   public isProcess(p: ChildProcess): boolean {
     return this.process === p;
+  }
+
+  public async uploadSourceCode(
+    sourceCodePath: string,
+    timeout?: number,
+  ): Promise<boolean> {
+    const exitCode = await this.platform.compile(sourceCodePath);
+    if (exitCode !== 0) {
+      return false;
+    }
+
+    const wasm = await this.platform.getWasm();
+    const updateRequest = new UpdateWasmModuleRequest(wasm);
+    await this.sendRequest(updateRequest, timeout);
+    return true;
   }
 }
