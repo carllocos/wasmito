@@ -1,7 +1,7 @@
 import { parseDeviceConfig, DeviceMode } from '../device/device_config';
 import { DeviceManager } from '../device/device_manager';
 import { getGlobalLogger } from '../logger/logger';
-import { WASM } from '../state/wasm';
+import { WASM, type WasmState } from '../state/wasm';
 import { newTimeStamp } from '../hooks/timestamp';
 import {
   ScheduleAfterTimeStamp,
@@ -21,10 +21,7 @@ import {
   MontiroWasmAddrRequest,
   MonitorMoment,
 } from '../warduino/requests/monitor_request';
-import {
-  StateRequest,
-  type WasmState,
-} from '../warduino/requests/inspect_request';
+import { StateRequest } from '../warduino/requests/inspect_request';
 import { ResponseType } from '../warduino/api/request_interface';
 import { WATSourceMap } from '../language_parsers/wat_source_map';
 import * as fs from 'fs';

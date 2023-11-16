@@ -117,3 +117,19 @@ export namespace WASM {
     }
   }
 }
+
+export interface WASMValueIndexed extends WASM.Value {
+  idx: number;
+}
+export interface WasmState {
+  pc?: number;
+  breakpoints?: number[];
+  stack?: WASMValueIndexed[];
+  callstack?: WASM.Frame[];
+  globals?: WASMValueIndexed[];
+  table?: WASM.Table;
+  memory?: WASM.Memory;
+  br_table?: WASM.BRTable;
+  callbacks?: WASM.CallbackMapping[];
+  events?: WASM.Event[];
+}

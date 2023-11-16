@@ -1,8 +1,5 @@
-import { WASM } from '../state/wasm';
-import {
-  type WasmState,
-  type StateRequest,
-} from '../warduino/requests/inspect_request';
+import { WASM, type WasmState } from '../state/wasm';
+import { type StateRequest } from '../warduino/requests/inspect_request';
 import { Hook, HookKind } from './hook';
 
 export class InspectStateHook extends Hook<WasmState> {
