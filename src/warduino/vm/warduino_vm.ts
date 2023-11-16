@@ -8,6 +8,7 @@ import { Command } from '../../communication/command';
 import { type PlatformBuilderConfig } from '../../builder/platform_config';
 import { type PlatformBuilder } from '../../builder/platformbuilder';
 import { createPlatformBuilder } from '../../builder/platformbuilder_factory';
+import { ProxifyRequest } from '../requests/proxify_request';
 
 export abstract class WARDuinoVM implements WARDuinoAPI {
   protected readonly channel: Channel;
