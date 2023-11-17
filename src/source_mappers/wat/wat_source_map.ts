@@ -1,7 +1,7 @@
 import { type WasmType } from '../../state/opcode_type';
 import { replaceFileExtension } from '../../util/file_util';
-import { readFunctionTypes, readImports, readTypes } from '../details';
-import { parseOpcodes } from '../dissambled';
+import { readFunctionTypes, readImports, readTypes } from '../parsers/details';
+import { parseOpcodes } from '../parsers/dissambled';
 import { WasmOpcode } from '../opcodes';
 
 export class WASMFunction {

@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { WasmOpcodeHasImmediate, wasmOpcodeFromNr } from './opcodes';
+import { WasmOpcodeHasImmediate, wasmOpcodeFromNr } from '../opcodes';
 
 export interface ParsedOpcode {
   address: number;
