@@ -1,4 +1,4 @@
-import { PlaceholderType, WasmType } from '../state/opcode_type';
+import { PlaceholderType, WasmType } from '../../state/opcode_type';
 
 export class WasmOpcode {
   public readonly nr: WASMOpcodeNumber;
