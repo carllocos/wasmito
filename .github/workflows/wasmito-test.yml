@@ -14,17 +14,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Build warduino cli
+      - name: Build submodules
         run: |
-            git clone --recursive https://github.com/carllocos/WARDuino.git
-            cd WARDuino
-            mkdir build-emu
-            cd build-emu
-            cmake .. . -DBUILD_EMULATOR=ON
-            make
-            cd ..
-            echo "WARDUINO_PATH=$(pwd)" >> $GITHUB_ENV
-            echo Path to SDK $WARDUINO_PATH
+            echo "Running installation script"
+            bash ./install.sh
 
       - name: Setup Node.js
         uses: actions/setup-node@v2
