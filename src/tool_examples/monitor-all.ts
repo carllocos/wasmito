@@ -23,9 +23,9 @@ import {
 } from '../warduino/requests/monitor_request';
 import { StateRequest } from '../warduino/requests/inspect_request';
 import { ResponseType } from '../warduino/api/request_interface';
-import { WATSourceMap } from '../language_parsers/wat_source_map';
+import { WATSourceMap } from '../source_mappers/wat/wat_source_map';
 import * as fs from 'fs';
-import { type WasmOpcode } from '../language_parsers/opcodes';
+import { type WasmOpcode } from '../source_mappers/wat/opcodes';
 import { PlaceholderType } from '../state/opcode_type';
 import { exit } from 'process';
 import { type EmulatedWARDuinoVM } from '../warduino/vm/emulated_vm';

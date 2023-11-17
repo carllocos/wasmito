@@ -13,7 +13,7 @@ import {
   type RequestMessage,
   ResponseType,
 } from '../warduino/api/request_interface';
-import { WATSourceMap } from '../language_parsers/wat_source_map';
+import { WATSourceMap } from '../source_mappers/wat/wat_source_map';
 import { type EmulatedWARDuinoVM } from '../warduino/vm/emulated_vm';
 import { type WasmState } from '../state/wasm';
 
