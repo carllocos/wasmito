@@ -1,4 +1,6 @@
 import * as fs from 'fs';
+import * as path from 'path';
+import { getGlobalLogger } from './logger/logger';
 
 let packageConfig: any;
 
@@ -36,26 +38,113 @@ export function readProjectName(): string {
   }
 }
 
-let warduinoSDKPath: string | undefined;
-let warduinoPathToEmulatorBin: string | undefined;
+interface SDKPaths {
+  WARDUINO_SDK?: string;
+  WABT?: string;
+}
+
+const sdkPaths: SDKPaths = {};
 
 export function getPath2WARDuinoSDK(): string | undefined {
-  if (warduinoSDKPath === undefined) {
-    warduinoSDKPath = process.env.WARDUINO_SDK;
+  if (sdkPaths.WARDUINO_SDK === undefined) {
+    const path = process.env.WARDUINO_SDK;
+    if (path === undefined) {
+      loadSDKConfig();
+    } else {
+      sdkPaths.WARDUINO_SDK = path;
+    }
   }
-  return warduinoSDKPath;
+  return sdkPaths.WARDUINO_SDK;
 }
 
 export function setPath2WARDuinoSDK(path: string): void {
-  warduinoSDKPath = path;
+  sdkPaths.WARDUINO_SDK = path;
 }
 
 export function getPath2WARDuinoSDKEmulatorBinary(): string | undefined {
-  if (warduinoPathToEmulatorBin === undefined) {
+  if (sdkPaths.WARDUINO_SDK === undefined) {
     const path = getPath2WARDuinoSDK();
     if (path !== undefined) {
-      warduinoPathToEmulatorBin = `${warduinoSDKPath}/build-emu/wdcli`;
+      sdkPaths.WARDUINO_SDK = `${path}/build-emu/wdcli`;
     }
   }
-  return warduinoPathToEmulatorBin;
+  return sdkPaths.WARDUINO_SDK;
+}
+
+function loadSDKConfig(): void {
+  const file = './.wasmito/sdk_config.cfg';
+  const currentFilePath = __filename;
+  const currentDir = path.dirname(currentFilePath);
+  getGlobalLogger().error(`CurrentDir ${currentDir}`);
+  getGlobalLogger().error(`CurrentFilePath ${currentFilePath}`);
+  const cfgFile = findFileInParentDirectory(file, currentDir);
+  if (cfgFile !== undefined) {
+    const fp = readSDKPaths(cfgFile);
+    if (fp !== undefined) {
+      if (fp.WARDUINO_SDK !== undefined) {
+        sdkPaths.WARDUINO_SDK = fp.WARDUINO_SDK;
+      }
+      if (fp.WABT !== undefined) {
+        sdkPaths.WABT = fp.WABT;
+      }
+    }
+  }
+}
+
+function readSDKPaths(filePath: string): SDKPaths | undefined {
+  if (!fs.existsSync(filePath)) {
+    return undefined;
+  }
+
+  try {
+    const fileContent = fs.readFileSync(filePath, 'utf-8');
+    const lines = fileContent.split('\n');
+
+    const config: SDKPaths = {};
+
+    lines.forEach((line) => {
+      const content = line.split('=');
+      if (content.length !== 2) {
+        return;
+      }
+      const [key, path] = content;
+      if (key === 'WARDUINO_SDK') {
+        if (path !== '') {
+          config.WARDUINO_SDK = path;
+        }
+      } else if (key === 'WABT') {
+        if (path !== '') {
+          config.WABT = path;
+        }
+      }
+    });
+
+    return config;
+  } catch (error) {
+    return undefined;
+  }
+}
+
+function findFileInParentDirectory(
+  fileName: string,
+  currentPath: string,
+): string | undefined {
+  const parentPath = path.resolve(currentPath, '..');
+
+  if (fs.existsSync(parentPath)) {
+    const filePath = path.join(parentPath, fileName);
+
+    if (fs.existsSync(filePath) && fs.lstatSync(filePath).isFile()) {
+      return filePath;
+    }
+
+    // Stop if Git repo is encountered
+    if (fs.existsSync(path.join(parentPath, '.git'))) {
+      return undefined;
+    }
+
+    return findFileInParentDirectory(fileName, parentPath);
+  }
+
+  return undefined;
 }
