@@ -1,0 +1,6 @@
+[submodule "libs/wabt"]
+	path = libs/wabt
+	url = https://github.com/TOPLLab/wabt.git
+[submodule "libs/WARDuino"]
+	path = libs/WARDuino
+	url = https://github.com/carllocos/WARDuino.git
