@@ -1,8 +1,8 @@
-import { type WasmType } from '../state/opcode_type';
-import { replaceFileExtension } from '../util/file_util';
-import { readFunctionTypes, readImports, readTypes } from './details';
-import { parseOpcodes } from './dissambled';
-import { WasmOpcode } from './opcodes';
+import { type WasmType } from '../../state/opcode_type';
+import { replaceFileExtension } from '../../util/file_util';
+import { readFunctionTypes, readImports, readTypes } from '../details';
+import { parseOpcodes } from '../dissambled';
+import { WasmOpcode } from '../opcodes';
 
 export class WASMFunction {
   public readonly name: string;
