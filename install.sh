@@ -21,18 +21,20 @@ cmake .. . -DBUILD_EMULATOR=ON
 make
 cd ../../
 
-echo "> WABT: fetching submodules"
-cd wabt 
-git submodule update --init
+# echo "> WABT: fetching submodules"
+# cd wabt 
+# git submodule update --init
 
-echo "> WABT: building tools"
-mkdir -p build
-cd build
-cmake ..
-make
+# echo "> WABT: building tools"
+# mkdir -p build
+# cd build
+# cmake ..
+# make
+# cd ../../
+
 
 echo "> Wasmito: Creating libs config"
-cd ../../../ # go to root of project
+cd ../ # go to root of project
 WASMITO_DIR=.wasmito
 if [ ! -d "$WASMITO_DIR" ]; then
     mkdir "$WASMITO_DIR"
