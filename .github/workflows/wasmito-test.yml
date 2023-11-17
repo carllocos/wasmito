@@ -33,4 +33,4 @@ jobs:
       - name: yarn install and test
         run: |
           yarn 
-          WARDUINO_SDK=$WARDUINO_PATH yarn test
+          yarn test
