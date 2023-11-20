@@ -21,16 +21,16 @@ cmake .. . -DBUILD_EMULATOR=ON
 make
 cd ../../
 
-# echo "> WABT: fetching submodules"
-# cd wabt 
-# git submodule update --init
+echo "> WABT: fetching submodules"
+cd wabt 
+git submodule update --init
 
-# echo "> WABT: building tools"
-# mkdir -p build
-# cd build
-# cmake ..
-# make
-# cd ../../
+echo "> WABT: building tools"
+mkdir -p build
+cd build
+cmake ..
+make
+cd ../../
 
 
 echo "> Wasmito: Creating libs config"
