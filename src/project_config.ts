@@ -1,6 +1,13 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { getGlobalLogger } from './logger/logger';
+
+export class ProjectConfigError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'ProjectConfigError';
+    Error.captureStackTrace(this, ProjectConfigError);
+  }
+}
 
 let packageConfig: any;
 
