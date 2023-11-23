@@ -30,7 +30,6 @@ export class EmulatedWARDuinoVM extends WARDuinoVM {
     socketPort: number,
     deviceConfig: DeviceConfig,
     args: EmulatorSpawnArguments,
-    process?: ChildProcess,
     buildOutputDir?: string,
   ) {
     super(
@@ -47,7 +46,6 @@ export class EmulatedWARDuinoVM extends WARDuinoVM {
       buildOutputDir,
     );
     this.args = args;
-    this.process = process;
     this.deviceConfig = deviceConfig;
     this.logger = createLogger(deviceConfig.name);
   }
