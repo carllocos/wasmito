@@ -1,12 +1,18 @@
 import * as fs from 'fs';
-import { WasmOpcodeHasImmediate, wasmOpcodeFromNr } from '../wat/opcodes';
+import {
+  WasmOpcode,
+  WasmOpcodeHasImmediate,
+  wasmOpcodeFromNr,
+} from '../wat/opcodes';
 
 export interface ParsedOpcode {
   address: number;
-  opcodeName: string;
-  opcodeNr: number;
-  immediate?: number;
-  opcodeLabels: string[];
+  opcode: WasmOpcode;
+}
+
+export interface ParsedFunctionBody {
+  funName: string;
+  opcodes: ParsedOpcode[];
 }
 
 /*
@@ -15,15 +21,14 @@ export interface ParsedOpcode {
 
 export function parseOpcodesFromDissambledOutput(
   input: string,
-): Map<string, ParsedOpcode[]> | undefined {
+): Map<number, ParsedFunctionBody> | undefined {
   const lines = input.split('\n');
-  const result = new Map<string, ParsedOpcode[]>();
+  const opcodes = new Map<number, ParsedFunctionBody>();
   let funcOpcodes: ParsedOpcode[] = [];
   const opcodesThatNeedEnd: string[] = ['loop', 'block', 'if'];
   const opcodesWaitingForEnd: string[] = [];
 
   let inFunction = false;
-
   for (const line of lines) {
     // Remove leading and trailing whitespace
     const trimmedLine = line.trim();
@@ -103,48 +108,62 @@ export function parseOpcodesFromDissambledOutput(
 
     const splits = keyword.split(' ');
     const opcodeName = splits.length > 1 ? splits[0] : keyword;
-    const opcodeLabels =
+    const parsedOpcodeLabels =
       splits.length > 1 ? splits.splice(1, splits.length) : [];
 
-    const parsedOpcode: ParsedOpcode = {
-      address,
-      opcodeNr,
-      opcodeName,
-      opcodeLabels,
-    };
-
+    let immediate: number | undefined;
+    let opcodeLabels: string[] | undefined;
     if (WasmOpcodeHasImmediate(wasmOpcode)) {
-      const immediate = parseInt(opcodeLabels[0]);
-      if (isNaN(immediate)) {
+      const parsedImmediate = parseInt(parsedOpcodeLabels[0]);
+      if (isNaN(parsedImmediate)) {
         return undefined;
       }
-      parsedOpcode.immediate = immediate;
-      parsedOpcode.opcodeLabels = opcodeLabels.slice(1, opcodeLabels.length);
+      immediate = parsedImmediate;
+      opcodeLabels = parsedOpcodeLabels.slice(1, parsedOpcodeLabels.length);
     }
 
     if (keyword === 'end') {
       const op = opcodesWaitingForEnd[opcodesWaitingForEnd.length - 1];
-      opcodeLabels.unshift(`${keyword}_${op}`);
+      parsedOpcodeLabels.unshift(`${keyword}_${op}`);
     }
+    const opcode = new WasmOpcode(
+      opcodeName,
+      opcodeNr,
+      immediate,
+      opcodeLabels,
+    );
 
-    funcOpcodes.push(parsedOpcode);
+    funcOpcodes.push({
+      address,
+      opcode,
+    });
 
     if (keyword === 'end') {
       const op = opcodesWaitingForEnd.pop() as string;
-      if (op.includes('func[')) {
+      const regexPattern = /func\[(\d+)\](?:_<([^>]*)>)?/;
+      const match = op.match(regexPattern);
+      if (match !== undefined && match !== null) {
+        const funcId = parseInt(match[1]); // Contains the number in square brackets
+        if (isNaN(funcId)) {
+          throw new Error(`Failed to parse funct ID from ${op}`);
+        }
+        let funcName = match[2];
+        if (funcName === '' || funcName === undefined) {
+          funcName = `func_${funcId}`;
+        }
+
+        opcodes.set(funcId, { funName: funcName, opcodes: funcOpcodes });
         inFunction = false;
-        result.set(op, funcOpcodes);
         funcOpcodes = [];
       }
     }
   }
-
-  return result;
+  return opcodes;
 }
 
-export async function parseOpcodes(
+export async function parseOpcodesFromFile(
   filepath: string,
-): Promise<Map<string, ParsedOpcode[]> | undefined> {
+): Promise<Map<number, ParsedFunctionBody> | undefined> {
   return await new Promise((resolve) => {
     fs.readFile(filepath, 'utf8', (err, data) => {
       if (data === '' && (err !== undefined || err !== null)) {
