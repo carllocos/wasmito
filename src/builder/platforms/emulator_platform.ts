@@ -1,27 +1,30 @@
-import { readFileAsBuffer } from '../../util/file_util';
+import { makeSourceCodeCompiler } from '../../source_mappers/compilers/compiler_factory';
+import { getAbsolutePath } from '../../util/file_util';
 import { type PlatformBuilderConfig } from '../platform_config';
 import { PlatformBuilder } from '../platformbuilder';
 
 export class EmulatorPlatform extends PlatformBuilder {
-  private pathToSrcDir: string;
+  private pathToSourceCodeFile: string;
 
   constructor(config: PlatformBuilderConfig, outputDir: string = '') {
     super(config, outputDir);
-    this.pathToSrcDir = ''; // path to uncompiled source code
-  }
-
-  getWasmPath(): string {
-    return this.pathToSrcDir; // depends on where he compilere will write this
-  }
-
-  async getWasm(): Promise<Buffer> {
-    const pathToWasm = this.getWasmPath();
-    return await readFileAsBuffer(pathToWasm);
+    this.pathToSourceCodeFile = ''; // path to uncompiled source code
   }
 
   async compile(sourceFile: string): Promise<number> {
-    this.pathToSrcDir = sourceFile; // for now path to wasm
-    return 0;
+    this.pathToSourceCodeFile = getAbsolutePath(sourceFile);
+    this.sourceCodeCompiler = makeSourceCodeCompiler(
+      this.pathToSourceCodeFile,
+      this.outputDirectory,
+    );
+    this.sourceMap = await this.sourceCodeCompiler.compile(
+      this.pathToSourceCodeFile,
+    );
+    if (this.sourceMap === undefined) {
+      return -1;
+    } else {
+      return 0;
+    }
   }
 
   async upload(): Promise<number> {
