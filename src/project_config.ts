@@ -72,10 +72,10 @@ export function getPath2WARDuinoSDKEmulatorBinary(): string | undefined {
   if (sdkPaths.WARDUINO_SDK === undefined) {
     const path = getPath2WARDuinoSDK();
     if (path !== undefined) {
-      sdkPaths.WARDUINO_SDK = `${path}/build-emu/wdcli`;
+      return `${path}/build-emu/wdcli`;
     }
   }
-  return sdkPaths.WARDUINO_SDK;
+  return `${sdkPaths.WARDUINO_SDK}/build-emu/wdcli`;
 }
 
 function loadSDKConfig(): void {
