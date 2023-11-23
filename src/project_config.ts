@@ -174,10 +174,7 @@ export function getPath2WABT(): string {
 }
 
 export function getPath2WAT2WASM(): string {
-  let path = sdkPaths.WABT;
-  if (path === undefined) {
-    path = getPath2WABT();
-  }
+  const path = getPath2WABT();
   return `${path}/wat2wasm`;
 }
 
