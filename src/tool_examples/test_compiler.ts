@@ -43,17 +43,14 @@ async function runBuilder(): Promise<void> {
     targetBoard,
     deviceConfig,
   );
-  const wasmBinaryPath = process.cwd() + '/example-wat/test-example.wasm';
-  const compileOutputDirectory =
-    process.cwd() + '/example-wat/platform_arduino/';
-  // const builder = createPlatformBuilder(platformConfig, compileOutputDirectory);
-  // const builder = createPlatformBuilder(platformConfig);
+  const sourceFilePath = './example-wat/dimmer-double-button.wat';
+  const compileOutputDirectory = './example-wat/platform_arduino/';
   const deviceManager = new DeviceManager();
   const mcuVM = await deviceManager.spawnHardwareVM(
     platformConfig,
     compileOutputDirectory,
   );
-  const uploaded = await mcuVM.uploadSourceCode(wasmBinaryPath);
+  const uploaded = await mcuVM.uploadSourceCode(sourceFilePath);
   if (uploaded) {
     testCompilerLogger.info('Successfully updated source code');
     await mcuVM.run();

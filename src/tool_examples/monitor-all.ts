@@ -1,4 +1,4 @@
-import { parseDeviceConfig, DeviceMode } from '../device/device_config';
+import { DeviceMode, type DeviceConfig } from '../device/device_config';
 import { DeviceManager } from '../device/device_manager';
 import { getGlobalLogger } from '../logger/logger';
 import { WASM, type WasmState } from '../state/wasm';
@@ -23,7 +23,6 @@ import {
 } from '../warduino/requests/monitor_request';
 import { StateRequest } from '../warduino/requests/inspect_request';
 import { ResponseType } from '../warduino/api/request_interface';
-import { WATSourceMap } from '../source_mappers/wat/wat_source_map';
 import * as fs from 'fs';
 import { type WasmOpcode } from '../source_mappers/wat/opcodes';
 import { PlaceholderType } from '../state/opcode_type';
@@ -205,8 +204,6 @@ class BrigadierJSONWriter {
           );
           return;
         }
-        // if (result.type !== opcodeType.resultType) {
-        // }
         results.push(state.stack[state.stack.length - 1].value);
       }
 
@@ -750,13 +747,11 @@ export function createJSONWriter(
 
 export async function monitorAllOpcodes(
   em: EmulatedWARDuinoVM,
-  app: string,
 ): Promise<boolean> {
-  const sourceMap = await WATSourceMap.fromPath(app);
+  const sourceMap = em.getSourceMap();
   if (sourceMap === undefined) {
     return false;
   }
-
   const chipLedCSetup = sourceMap.getFunction(5);
   const chipLedCAttachPin = sourceMap.getFunction(6);
   const chipAnalogWrite = sourceMap.getFunction(7);
@@ -838,36 +833,48 @@ export async function monitorAllOpcodes(
 
 export async function createEmulator(
   wasmApp: string,
+  outputDir: string,
 ): Promise<EmulatedWARDuinoVM | undefined> {
-  const dc = parseDeviceConfig({
+  const dc: DeviceConfig = {
     program: wasmApp,
     mode: DeviceMode.Emulate,
-    port: '8300',
+    port: '',
     id: '1',
     name: 'emulator',
     host: 'localhost',
-  });
-  if (dc !== undefined) {
-    const em = await dm.connectToExistingEmulator(dc, 8000);
+  };
+  // const dc = parseDeviceConfig({
+  //   program: wasmApp,
+  //   mode: DeviceMode.Emulate,
+  //   port: '',
+  //   id: '1',
+  //   name: 'emulator',
+  //   host: 'localhost',
+  // });
+  // const em = await dm.connectToExistingEmulator(dc, 8000);
 
-    // const em = await dm.spawnEmulator(dc, 8000);
-    // const success = await instrumentTempWasm(em);
-    // if (!(await instrumentPrimitiveAlways(em))) {
-    //   return;
-    // }
-    // if (await monitorTestExample(em)) {
-    //   await em.run();
-    // }
+  const em = await dm.spawnEmulator(dc, 8000, outputDir);
+  // const success = await instrumentTempWasm(em);
+  // if (!(await instrumentPrimitiveAlways(em))) {
+  //   return;
+  // }
+  // if (await monitorTestExample(em)) {
+  //   await em.run();
+  // }
 
-    if (await monitorAllOpcodes(em, app)) {
-      await em.run();
-    }
-    return em;
+  if (await monitorAllOpcodes(em)) {
+    await em.run();
   }
+  return em;
 }
 
-const app = './example-wat/test-example.diss';
-createEmulator(app)
+const app = './example-wat/dimmer-double-button.wat';
+// const app =
+//   '/home/carllocos/Projects/wasmito/example-wat/dimmer-double-button.wat';
+const output = './example-wat/';
+
+// const output = '/home/carllocos/Projects/wasmito/example-wat/';
+createEmulator(app, output)
   .then((_) => {})
   .catch(console.error);
 // const dimApp =
