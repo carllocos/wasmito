@@ -3,6 +3,8 @@ import { createLogger } from '../logger/logger';
 import { getPath2WARDuinoSDK, readProjectName } from '../project_config';
 import { type PlatformBuilderConfig } from './platform_config';
 import { createTempDirectory, getAbsolutePath } from '../util/file_util';
+import { type SourceCodeCompiler } from '../source_mappers/compilers/compiler';
+import { type SourceMap } from '../source_mappers/source_map';
 
 export class PlatformBuilderError extends Error {
   constructor(message: string) {
@@ -18,6 +20,8 @@ export abstract class PlatformBuilder {
   protected readonly sdkPath: string;
   protected readonly tmpDirPrefix: string;
   protected readonly outputDirectory: string;
+  protected sourceCodeCompiler?: SourceCodeCompiler;
+  protected sourceMap?: SourceMap;
 
   constructor(config: PlatformBuilderConfig, outputDir: string = '') {
     this.platformConfig = config;
@@ -45,7 +49,7 @@ export abstract class PlatformBuilder {
 
   abstract upload(): Promise<number>;
 
-  abstract getWasmPath(): string;
-
-  abstract getWasm(): Promise<Buffer>;
+  public getSourceMap(): SourceMap | undefined {
+    return this.sourceMap;
+  }
 }
