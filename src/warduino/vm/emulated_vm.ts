@@ -23,7 +23,7 @@ export class EmulatedWARDuinoVMError extends Error {
 
 export class EmulatedWARDuinoVM extends WARDuinoVM {
   protected logger: winston.Logger;
-  private readonly process?: ChildProcess;
+  private process?: ChildProcess;
   private readonly args: EmulatorSpawnArguments;
   private readonly deviceConfig: DeviceConfig;
 
@@ -128,6 +128,8 @@ export class EmulatedWARDuinoVM extends WARDuinoVM {
     childProcess.stderr.on('data', (data) => {
       this.logger.error(`${this.deviceConfig.name} (Spawned process): ${data}`);
     });
+
+    this.process = childProcess;
 
     return childProcess;
   }
