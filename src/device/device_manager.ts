@@ -1,10 +1,8 @@
 import { EmulatorSpawnArguments } from './emulator_config';
 import type winston from 'winston';
 import { getFreePort, isPortInUse } from '../util/socket_util';
-import { spawn } from 'child_process';
 import { createLogger } from '../logger/logger';
 import { type DeviceConfig } from './device_config';
-import { getPath2WARDuinoSDKEmulatorBinary } from '../project_config';
 import { type Channel } from '../communication/channel_interface';
 import { EmulatedWARDuinoVM } from '../warduino/vm/emulated_vm';
 import { MCUWARDuinoVM } from '../warduino/vm/mcu_vm';
@@ -46,25 +44,6 @@ export class DeviceManager {
     return args;
   }
 
-  private buildProcessArguments(args: EmulatorSpawnArguments): string[] {
-    const processArgs: string[] = [args.program];
-
-    if (args.listenPort !== undefined) {
-      processArgs.push('--socket');
-      processArgs.push(args.listenPort.toString());
-    }
-    if (args.pauseOnStart) {
-      processArgs.push('--paused');
-    }
-    if (
-      args.disableStrictModuleLoad !== undefined &&
-      args.disableStrictModuleLoad
-    ) {
-      processArgs.push('--disable-strict-module-load');
-    }
-    return processArgs;
-  }
-
   async connectToExistingEmulator(
     deviceConfig: DeviceConfig,
     maxWaitTime: number,
@@ -80,12 +59,10 @@ export class DeviceManager {
       pauseOnStart: true,
     });
 
-    const noChildProcess = undefined;
     const emulatedDevice = new EmulatedWARDuinoVM(
       port,
       deviceConfig,
       args,
-      noChildProcess,
       buildOutputDir,
     );
     const connected = await emulatedDevice.connect(maxWaitTime);
@@ -115,29 +92,14 @@ export class DeviceManager {
       disableStrictModuleLoad: true,
     });
     const correctedArgs = await this.correctSpawnArguments(args);
-    const processArgs = this.buildProcessArguments(correctedArgs);
-    this.logger.info(
-      `starting emulator process with arguments ${processArgs.join(' ')}`,
-    );
-    const spawnCommand = getPath2WARDuinoSDKEmulatorBinary();
-    if (spawnCommand === undefined) {
-      throw new DeviceManagerError(
-        "Path to WARDuino SDK is not set. You can set it via env variable 'WARDUINO_SDK=PATH'",
-      );
-    }
-
-    this.logger.debug(
-      'decide whether to move callbacks on data or on close to the EmulateDevice class',
+    const emulatedDevice = new EmulatedWARDuinoVM(
+      args.listenPort as number,
+      deviceConfig,
+      correctedArgs,
+      buildOutputDir,
     );
 
-    const childProcess = spawn(spawnCommand, processArgs);
-    childProcess.stdout.on('data', (data) => {
-      this.logger.debug(`${deviceConfig.name} (Spawned process): ${data}`);
-    });
-
-    childProcess.stderr.on('data', (data) => {
-      this.logger.error(`${deviceConfig.name} (Spawned process): ${data}`);
-    });
+    const childProcess = await emulatedDevice.spawn();
 
     childProcess.on('close', (code) => {
       this.logger.info(`Spawned process exit with code ${code}`);
@@ -148,14 +110,6 @@ export class DeviceManager {
         },
       );
     });
-
-    const emulatedDevice = new EmulatedWARDuinoVM(
-      args.listenPort as number,
-      deviceConfig,
-      correctedArgs,
-      childProcess,
-      buildOutputDir,
-    );
     const connected = await emulatedDevice.connect(maxWaitTime);
     if (!connected) {
       this.logger.info(
