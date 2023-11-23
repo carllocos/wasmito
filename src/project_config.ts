@@ -154,7 +154,7 @@ function findFileInParentDirectory(
   return undefined;
 }
 
-export function getPath2WABT(): string | undefined {
+export function getPath2WABT(): string {
   if (sdkPaths.WABT === undefined) {
     sdkPaths.WABT = process.env.WABT;
     if (sdkPaths.WABT !== undefined) {
