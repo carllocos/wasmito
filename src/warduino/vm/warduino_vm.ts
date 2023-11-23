@@ -15,6 +15,7 @@ import { StateRequest } from '../requests/inspect_request';
 import { LoadStateRequestBuilder } from '../requests/load_state_request';
 import { timeoutPromise } from '../../util/promise_util';
 import { ResolveEventRequest } from '../requests/resolve_event_request';
+import { type SourceMap } from '../../source_mappers/source_map';
 
 export abstract class WARDuinoVM implements WARDuinoAPI {
   protected readonly channel: Channel;
@@ -123,5 +124,9 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     this.logger.debug('Sending ProxifyRequest');
     await this.sendRequest(request, timeout);
     this.logger.info('VM in proxy mode');
+  }
+
+  public getSourceMap(): SourceMap | undefined {
+    return this.platform.getSourceMap();
   }
 }
