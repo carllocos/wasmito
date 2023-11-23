@@ -14,6 +14,33 @@ export function replaceFileExtension(
   return path.join(filePathWithoutFile, `${fileNameWithoutExt}${newExtension}`);
 }
 
+export function getFileExtension(filePath: string): string | undefined {
+  const parts: string[] = filePath.split('.');
+  if (parts.length === 1 || (parts[0] === '' && parts.length === 2)) {
+    return undefined;
+  }
+  const extension: string = parts[parts.length - 1];
+  return extension;
+}
+
+export function getFileName(filename: string): string {
+  const splits = filename.split('/');
+  if (splits.length === 0) {
+    return '';
+  } else {
+    return splits[splits.length - 1];
+  }
+}
+
+export function removeFileExtension(filename: string): string {
+  const dotIdx = filename.lastIndexOf('.');
+  if (dotIdx === -1) {
+    return filename;
+  } else {
+    return filename.substring(0, dotIdx);
+  }
+}
+
 export function createTempDirectory(prefix: string): string {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
   return tempDir;
@@ -46,6 +73,37 @@ export async function readFileAsBuffer(filePath: string): Promise<Buffer> {
         reject(err);
       } else {
         resolve(data);
+      }
+    });
+  });
+}
+
+export function createDirectoryIfUnexisting(directoryPath: string): void {
+  if (!fs.existsSync(directoryPath)) {
+    fs.mkdirSync(directoryPath, { recursive: true });
+  }
+}
+
+export function getAbsolutePath(inputPath: string): string {
+  const isAbsolutePath = path.isAbsolute(inputPath);
+  if (isAbsolutePath) {
+    return inputPath;
+  }
+  return path.resolve(inputPath);
+}
+export async function renameFile(
+  filePath: string,
+  newName: string,
+): Promise<string> {
+  return await new Promise<string>((resolve, reject) => {
+    const directory = path.dirname(filePath);
+    const newFilePath = path.join(directory, newName);
+
+    fs.rename(filePath, newFilePath, (err) => {
+      if (err !== null) {
+        reject(err);
+      } else {
+        resolve(newFilePath);
       }
     });
   });
