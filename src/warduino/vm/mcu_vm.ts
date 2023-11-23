@@ -50,13 +50,16 @@ export class MCUWARDuinoVM extends WARDuinoVM {
     // close connection otherwise flashing cannot work
     await this.channel.close();
 
-    const exitCodeUpload = await (timeout !== undefined
-      ? timeoutPromise(
-          this.platform.upload(),
-          timeout,
-          new MCUWARDuinoVMError('flashing to MCU timedout'),
-        )
-      : this.platform.upload());
+    let upload: Promise<number> = this.platform.upload();
+    if (timeout !== undefined) {
+      upload = timeoutPromise(
+        upload,
+        timeout,
+        new MCUWARDuinoVMError('flashing to MCU timedout'),
+      );
+    }
+
+    const exitCodeUpload = await upload;
 
     // open connection after flashing
     await this.channel.open();
