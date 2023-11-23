@@ -146,3 +146,43 @@ function findFileInParentDirectory(
 
   return undefined;
 }
+
+export function getPath2WABT(): string | undefined {
+  if (sdkPaths.WABT === undefined) {
+    sdkPaths.WABT = process.env.WABT;
+    if (sdkPaths.WABT !== undefined) {
+      sdkPaths.WABT = `${sdkPaths.WABT}/bin`;
+    } else {
+      loadSDKConfig();
+    }
+  }
+
+  if (sdkPaths.WABT === undefined) {
+    throw new ProjectConfigError(
+      `WABT path has not been set. Set it either via env variable WABT, call to setPath2WABT, or .wasmito/adk_config.cfg file.`,
+    );
+  }
+
+  return `${sdkPaths.WABT}/bin`;
+}
+
+export function getPath2WAT2WASM(): string {
+  let path = sdkPaths.WABT;
+  if (path === undefined) {
+    path = getPath2WABT();
+  }
+  return `${path}/wat2wasm`;
+}
+
+export function setPath2WABT(path: string): void {
+  sdkPaths.WABT = path;
+}
+
+export function getPath2ObjDump(): string {
+  const path = getPath2WABT();
+  return `${path}/wasm-objdump`;
+}
+
+export function getPath2XXD(): string {
+  return 'xxd';
+}
