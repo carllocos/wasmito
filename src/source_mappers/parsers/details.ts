@@ -5,9 +5,7 @@ import { WasmType } from '../../state/opcode_type';
  * Parser for output generated from `wasm-objdump -x` command
  */
 
-function extractTypeInfo(
-  input: string,
-): { number: number; args: string[]; resultType: string } | undefined {
+export function extractTypeInfo(input: string): WasmType | undefined {
   const pattern = /type\[(\d+)\]\s*\(([^)]*)\)\s*->\s*(\w+)/;
   const match = input.match(pattern);
 
@@ -18,14 +16,9 @@ function extractTypeInfo(
         ? []
         : match[2].split(',').map((keyword) => keyword.trim());
     const resultType = match[3];
-
-    return {
-      number,
-      args,
-      resultType,
-    };
+    const nrResults = resultType.trim().toLocaleLowerCase() !== 'nil' ? 1 : 0;
+    return new WasmType(args.length, nrResults, number);
   }
-
   return undefined;
 }
 
@@ -70,29 +63,17 @@ function extractImportNrInfo(
 }
 
 export function readTypes(path: string): WasmType[] | undefined {
-  //   const typeMap = new Map<number, string[]>();
   const content = fs.readFileSync(path, 'utf8');
-  const lines = content
-    .split('\n')
-    .filter((line: string) => {
-      return line.includes('- type[');
-    })
-    .map(extractTypeInfo);
-
+  const lines = content.split('\n');
   if (lines.length === 0) {
     return undefined;
   }
 
   const types = lines
-    .map((obj) => {
-      if (obj !== undefined) {
-        const nrArgs =
-          obj.resultType.trim().toLocaleLowerCase() !== 'nil' ? 1 : 0;
-        return new WasmType(obj.args.length, nrArgs, obj.number);
-      } else {
-        return undefined;
-      }
+    .filter((line: string) => {
+      return line.includes('- type[');
     })
+    .map(extractTypeInfo)
     .filter((l) => {
       return l !== undefined;
     });
