@@ -75,8 +75,6 @@ function loadSDKConfig(): void {
   const file = './.wasmito/sdk_config.cfg';
   const currentFilePath = __filename;
   const currentDir = path.dirname(currentFilePath);
-  getGlobalLogger().error(`CurrentDir ${currentDir}`);
-  getGlobalLogger().error(`CurrentFilePath ${currentFilePath}`);
   const cfgFile = findFileInParentDirectory(file, currentDir);
   if (cfgFile !== undefined) {
     const fp = readSDKPaths(cfgFile);
