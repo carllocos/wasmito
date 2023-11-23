@@ -1,4 +1,3 @@
-import { parseDeviceConfig, DeviceMode } from '../device/device_config';
 import { DeviceManager } from '../device/device_manager';
 import { getGlobalLogger } from '../logger/logger';
 import { InspectStateHook } from '../hooks/hook_inspect_state';
@@ -13,9 +12,11 @@ import {
   type RequestMessage,
   ResponseType,
 } from '../warduino/api/request_interface';
-import { WATSourceMap } from '../source_mappers/wat/wat_source_map';
+import { type WATSourceMap } from '../source_mappers/wat/wat_source_map';
 import { type EmulatedWARDuinoVM } from '../warduino/vm/emulated_vm';
 import { type WasmState } from '../state/wasm';
+import { type SourceMap } from '../source_mappers/source_map';
+import { DeviceMode } from '../device/device_config';
 
 export function allSucceeded(replies: MonitorWasmAddrResponse[]): boolean {
   let idx = 0;
@@ -61,7 +62,7 @@ function onBreakpointStateUpdate(
 
 export async function addBreakpoint(
   address: number,
-  sourceMap: WATSourceMap,
+  sourceMap: SourceMap,
   em: EmulatedWARDuinoVM,
   onBreakPointReached: (data: WasmState) => void,
 ): Promise<boolean> {
@@ -163,31 +164,26 @@ export async function removeBreakpoint(
 
 export async function runDebugScenario(
   wasmApp: string,
-  spawn: boolean,
+  connectToExistingProcess: boolean,
+  outputDir: string,
 ): Promise<EmulatedWARDuinoVM | undefined> {
-  const dc = parseDeviceConfig({
+  const dc = {
     program: wasmApp,
     mode: DeviceMode.Emulate,
-    port: '8300',
+    port: '',
     id: '1',
     name: 'emulator',
     host: 'localhost',
-  });
-
-  if (dc === undefined) {
-    return undefined;
-  }
-
-  const sourceMap = await WATSourceMap.fromPath(app);
-  if (sourceMap === undefined) {
-    return undefined;
-  }
+  };
 
   const dm = new DeviceManager();
-
-  const em = spawn
-    ? await dm.spawnEmulator(dc, 8000)
-    : await dm.connectToExistingEmulator(dc, 8000);
+  const em = connectToExistingProcess
+    ? await dm.connectToExistingEmulator(dc, 8000, outputDir)
+    : await dm.spawnEmulator(dc, 8000, outputDir);
+  const sourceMap = em.getSourceMap();
+  if (sourceMap === undefined) {
+    return;
+  }
   const funcCallHardwareSetup = 463;
   const i32const5000 = 408;
   const i32const12 = 411;
@@ -239,7 +235,9 @@ export async function runDebugScenario(
   return em;
 }
 
-const app = './example-wat/test-example.diss';
-runDebugScenario(app, false)
+const app = './example-wat/dimmer-double-button.wat';
+const output = './example-wat/';
+const connectToExistingProcess = false;
+runDebugScenario(app, connectToExistingProcess, output)
   .then((_) => {})
   .catch(console.error);
