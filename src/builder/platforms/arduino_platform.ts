@@ -2,7 +2,15 @@ import { exec, spawn } from 'child_process';
 import { createLogger } from '../../logger/logger';
 import { type PlatformBuilderConfig, type BoardFQBN } from '../platform_config';
 import { PlatformBuilder } from '../platformbuilder';
-import { copyRecursive, readFileAsBuffer } from '../../util/file_util';
+import {
+  copyRecursive,
+  createDirectoryIfUnexisting,
+  getAbsolutePath,
+  getFileName,
+  renameFile,
+} from '../../util/file_util';
+import { makeSourceCodeCompiler } from '../../source_mappers/compilers/compiler_factory';
+import path from 'path';
 
 const arduinoLogger = createLogger('Arduino');
 
@@ -77,7 +85,7 @@ export async function ArduinoCompile(
   return await new Promise<number>((resolve, reject) => {
     const compile = spawn(
       'make',
-      ['recompile', `FQBN=${fqbn}`, `BINARY=${wasmBinaryPath}`, 'PAUSED=true'],
+      ['compile', `FQBN=${fqbn}`, `BINARY=${wasmBinaryPath}`, 'PAUSED=true'],
       {
         cwd: outputDir,
       },
@@ -146,50 +154,109 @@ async function ArduinoFlash(
   });
 }
 
+export async function ArduinoClean(outputDir: string): Promise<number> {
+  return await new Promise<number>((resolve, reject) => {
+    const clean = spawn('make', ['clean'], {
+      cwd: outputDir,
+    });
+
+    clean.stdout.on('data', (data) => {
+      arduinoLogger.debug(data.toString());
+    });
+
+    clean.stderr.on('data', (data: string) => {
+      const errMsg = data.toString();
+      arduinoLogger.error(errMsg);
+    });
+
+    clean.on('close', (code) => {
+      if (code !== null) {
+        const msg = `Arduino clean exited with code ${code}`;
+        if (code === 0) {
+          arduinoLogger.info(msg);
+        } else {
+          arduinoLogger.error(msg);
+        }
+        resolve(code);
+      } else {
+        reject(new Error(`Arduino clean exit code is not a number: ${code}`));
+      }
+    });
+  });
+}
+
 export class ArduinoBoardBuilder extends PlatformBuilder {
-  private readonly pathToArduinoTemplate: string;
-  private readonly pathToArduinoSketch: string;
+  private readonly pathToArduinoTemplateDir: string;
+  private readonly pathToArduinoSketchDir: string;
+  private readonly pathToArduinoWasmBinaryDir: string;
 
   constructor(config: PlatformBuilderConfig, outputDir: string = '') {
     super(config, outputDir);
-    this.pathToArduinoTemplate = `${this.sdkPath}platforms/Arduino`;
-    this.pathToArduinoSketch = `${this.outputDirectory}/Arduino/`;
-  }
-
-  getWasmPath(): string {
-    return `${this.pathToArduinoSketch}bin/upload.wasm`;
-  }
-
-  async getWasm(): Promise<Buffer> {
-    const pathToWasm = this.getWasmPath();
-    return await readFileAsBuffer(pathToWasm);
+    this.pathToArduinoTemplateDir = getAbsolutePath(
+      path.join(this.sdkPath, 'platforms/Arduino'),
+    );
+    this.pathToArduinoSketchDir = getAbsolutePath(
+      path.join(this.outputDirectory, '/Arduino'),
+    );
+    this.pathToArduinoWasmBinaryDir = getAbsolutePath(
+      path.join(this.pathToArduinoSketchDir, '/bin'),
+    );
   }
 
   async compile(sourceFile: string): Promise<number> {
     // copy Arduino template
     this.logger.info(
-      `Copying Arduino template for ${this.platformConfig.deviceConfig.name} (board=${this.platformConfig.fqbn.boardName}, ID=${this.platformConfig.deviceConfig.id}) from ${this.pathToArduinoTemplate} to ${this.pathToArduinoSketch}`,
+      `Copying Arduino template for ${this.platformConfig.deviceConfig.name} (board=${this.platformConfig.fqbn.boardName}, ID=${this.platformConfig.deviceConfig.id}) from ${this.pathToArduinoTemplateDir} to ${this.pathToArduinoSketchDir}`,
     );
     await copyRecursive(
-      `${this.pathToArduinoTemplate}/*`,
-      this.pathToArduinoSketch,
+      `${this.pathToArduinoTemplateDir}/*`,
+      this.pathToArduinoSketchDir,
     );
-    this.logger.info(
-      `Arduino compiling sketch ${this.pathToArduinoSketch} for ${this.platformConfig.deviceConfig.name} (board=${this.platformConfig.fqbn.boardName}, ID=${this.platformConfig.deviceConfig.id})`,
-    );
-    return await ArduinoCompile(
-      this.platformConfig.fqbn.fqbn,
+
+    const exitCodeClean = await ArduinoClean(this.pathToArduinoSketchDir);
+    if (exitCodeClean !== 0) {
+      return exitCodeClean;
+    }
+
+    // compile the source code
+    createDirectoryIfUnexisting(this.pathToArduinoWasmBinaryDir);
+    this.sourceCodeCompiler = makeSourceCodeCompiler(
       sourceFile,
-      this.pathToArduinoSketch,
+      this.pathToArduinoWasmBinaryDir,
     );
+    this.sourceMap = await this.sourceCodeCompiler.compile(sourceFile);
+    if (this.sourceMap === undefined) {
+      this.logger.info(`Could not compile source code for file ${sourceFile}`);
+      return -1;
+    }
+
+    this.logger.info(
+      `Arduino compiling sketch ${this.pathToArduinoSketchDir} for ${this.platformConfig.deviceConfig.name} (board=${this.platformConfig.fqbn.boardName}, ID=${this.platformConfig.deviceConfig.id})`,
+    );
+
+    let wasmPath = this.sourceMap.getWasmPath();
+    const filename = getFileName(wasmPath);
+    if (filename === 'upload.wasm') {
+      // special case where the output file has the same name as the file used to flash.
+      // rename file to avoid conflicts
+      wasmPath = await renameFile(wasmPath, `tmp-name-${filename}`);
+    }
+
+    const exitCodeCompile = await ArduinoCompile(
+      this.platformConfig.fqbn.fqbn,
+      wasmPath,
+      this.pathToArduinoSketchDir,
+    );
+
+    return exitCodeCompile;
   }
 
   async upload(): Promise<number> {
     this.logger.info(
-      `Arduino flashing sketch ${this.pathToArduinoSketch} for ${this.platformConfig.deviceConfig.name} (board=${this.platformConfig.fqbn.boardName}, ID=${this.platformConfig.deviceConfig.id})`,
+      `Arduino flashing sketch ${this.pathToArduinoSketchDir} for ${this.platformConfig.deviceConfig.name} (board=${this.platformConfig.fqbn.boardName}, ID=${this.platformConfig.deviceConfig.id})`,
     );
     return await ArduinoFlash(
-      this.pathToArduinoSketch,
+      this.pathToArduinoSketchDir,
       this.platformConfig.deviceConfig.port,
       this.platformConfig.fqbn.fqbn,
     );
