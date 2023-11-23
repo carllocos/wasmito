@@ -8,7 +8,7 @@ describe('Update Wasm Module Request', () => {
   let app: string = '';
 
   before(async () => {
-    app = process.cwd() + '/test/data/test-example.wasm';
+    app = './test/data/test-example.wat';
     deviceManager = new DeviceManager();
     const deviceConfig: DeviceConfig = {
       program: app,

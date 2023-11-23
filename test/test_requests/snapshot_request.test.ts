@@ -7,7 +7,7 @@ describe('Snapshot Request', () => {
   let vm: EmulatedWARDuinoVM | undefined;
 
   before(async () => {
-    const app = process.cwd() + '/test/data/test-example.wasm';
+    const app = './test/data/test-example.wat';
     deviceManager = new DeviceManager();
     const deviceConfig: DeviceConfig = {
       program: app,
