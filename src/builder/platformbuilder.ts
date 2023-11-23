@@ -2,7 +2,7 @@ import type winston from 'winston';
 import { createLogger } from '../logger/logger';
 import { getPath2WARDuinoSDK, readProjectName } from '../project_config';
 import { type PlatformBuilderConfig } from './platform_config';
-import { createTempDirectory } from '../util/file_util';
+import { createTempDirectory, getAbsolutePath } from '../util/file_util';
 
 export class PlatformBuilderError extends Error {
   constructor(message: string) {
@@ -37,6 +37,7 @@ export abstract class PlatformBuilder {
       );
       this.outputDirectory = createTempDirectory(this.tmpDirPrefix);
     }
+    this.outputDirectory = getAbsolutePath(this.outputDirectory);
     this.logger.info(`Using output directory: ${this.outputDirectory}`);
   }
 
