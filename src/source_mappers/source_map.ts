@@ -88,6 +88,7 @@ export abstract class SourceMap {
 
   public abstract opcodes(): Array<{
     address: number;
+    lineInfo: LineInfo;
     opcode: WasmOpcode;
   }>;
 

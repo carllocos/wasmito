@@ -1,5 +1,5 @@
 import { type WasmType } from '../../state/opcode_type';
-import { type VariableInfo } from '../parsers/obj-dump_parser';
+import { type LineInfo, type VariableInfo } from '../parsers/obj-dump_parser';
 import { SourceMap, type WASMFunction } from '../source_map';
 import { type WasmOpcode } from './opcodes';
 
@@ -36,10 +36,12 @@ export class WATSourceMap extends SourceMap {
 
   public opcodes(): Array<{
     address: number;
+    lineInfo: LineInfo;
     opcode: WasmOpcode;
   }> {
     let opcodes: Array<{
       address: number;
+      lineInfo: LineInfo;
       opcode: WasmOpcode;
     }> = [];
     for (const func of this.functions) {
