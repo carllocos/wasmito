@@ -459,6 +459,12 @@ async function spawnEmulator(
   return await dm.spawnEmulator(dc, 8000, outputDir);
 }
 
+async function sleep(ms: number): Promise<void> {
+  await new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
 export async function runMonitorApp(
   wasmApp: string,
   monitorTime: number,
@@ -479,6 +485,7 @@ export async function runMonitorApp(
     vm = await spawnEmulator(dm, wasmApp, outputDir);
   } else if (monitorMode === DeviceMode.MCU) {
     vm = await spawnHardwareVM(dm, wasmApp, outputDir);
+    await sleep(5000); // sleep to let MCU load module first
   } else {
     getGlobalLogger().error(`unsupported mode ${monitorMode}`);
   }
