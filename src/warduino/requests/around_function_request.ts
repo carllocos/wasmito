@@ -3,6 +3,8 @@ import { encodeToHexLEB128 } from '../../util/encoder';
 import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
+  ResponseType,
+  getResponseTypeFromString,
 } from '../api/request_interface';
 import { Instruction, getInstructionFromString } from '../api/instructions';
 import { type Hook } from '../../hooks/hook';
@@ -11,21 +13,6 @@ export interface AroundFunctionJSONResponse {
   interrupt: string;
   kind: string;
   error_code?: string;
-}
-export enum ResponseType {
-  SuccessResponse = '01',
-  ErrorResponse = '02',
-}
-
-function getResponseTypeFromString(str: string): ResponseType | undefined {
-  switch (str) {
-    case '01':
-      return ResponseType.SuccessResponse;
-    case '02':
-      return ResponseType.ErrorResponse;
-    default:
-      return undefined;
-  }
 }
 
 export interface AroundHookResponse {
