@@ -99,7 +99,7 @@ export class ClientSideSocket extends AbstractChannel {
 
   public async send(data: string): Promise<boolean> {
     return this.write(data, (err?: Error | undefined) => {
-      if (err !== undefined) {
+      if (err !== undefined && err !== null) {
         getGlobalLogger().error(
           `Error occurred when writing to socket: ${err.message}`,
         );
