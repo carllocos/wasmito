@@ -17,6 +17,25 @@ export interface DeviceConfig {
   program: string;
 }
 
+export function deviceModeFromString(mode: string): DeviceMode | undefined {
+  const modes: Record<string, DeviceMode> = {
+    emulate: DeviceMode.Emulate,
+    mcu: DeviceMode.MCU,
+    proxy: DeviceMode.Proxy,
+    mirror: DeviceMode.Mirror,
+  };
+
+  const lowerCaseInput = mode.toLowerCase();
+
+  for (const key in modes) {
+    if (key.toLowerCase() === lowerCaseInput) {
+      return modes[key];
+    }
+  }
+
+  return undefined;
+}
+
 export function isValidIP(str: string): boolean {
   const ipPattern =
     /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
