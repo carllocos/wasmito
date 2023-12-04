@@ -70,13 +70,19 @@ export function validateDeviceConfig(value: any): string[] {
       errors.push('Property "host" should be a string');
     } else if (value.host !== '') {
       const addr = value.host.toLowerCase();
-      if (addr !== 'localhost' && isValidIP(addr)) {
-        errors.push(
-          'Property "host" is not a valid host address. Expected `localhost` or an ipv4 address',
-        );
+      let validatePort = false;
+      if (addr !== 'localhost') {
+        if (!isValidIP(addr)) {
+          errors.push(
+            'Property "host" is not a valid host address. Expected `localhost` or an ipv4 address',
+          );
+        }
+        validatePort = true;
+      } else if (value.port !== '') {
+        validatePort = true;
       }
 
-      if (isNaN(parseInt(value.port))) {
+      if (validatePort && isNaN(parseInt(value.port))) {
         errors.push(
           `Property "port" is not a valid port number. Got ${value.port}`,
         );
