@@ -104,7 +104,42 @@ export function typeFromWasmOpcode(
     case WASMOpcodeNumber.LE_Unsigned:
     case WASMOpcodeNumber.GESigned:
     case WASMOpcodeNumber.GEUnsinged:
+    case WASMOpcodeNumber.F32Add:
+    case WASMOpcodeNumber.F32Sub:
+    case WASMOpcodeNumber.F32Mult:
+    case WASMOpcodeNumber.F32Div:
+    case WASMOpcodeNumber.F32Min:
+    case WASMOpcodeNumber.F32Max:
+    case WASMOpcodeNumber.F32CopySign:
       return new WasmType(2, 1);
+
+    // unary operators
+    case WASMOpcodeNumber.I32Wrap_I64:
+    case WASMOpcodeNumber.I32Trunc_s_F32:
+    case WASMOpcodeNumber.I32Trunc_u_F32:
+    case WASMOpcodeNumber.I32Trunc_s_F64:
+    case WASMOpcodeNumber.I32Trunc_u_F64:
+    case WASMOpcodeNumber.I64Extend_s_I32:
+    case WASMOpcodeNumber.I64Extend_u_I32:
+    case WASMOpcodeNumber.I64Trunc_s_F32:
+    case WASMOpcodeNumber.I64Trunc_u_F32:
+    case WASMOpcodeNumber.I64Trunc_s_F64:
+    case WASMOpcodeNumber.I64Trunc_u_F64:
+    case WASMOpcodeNumber.F32Convert_s_I32:
+    case WASMOpcodeNumber.F32Convert_u_I32:
+    case WASMOpcodeNumber.F32Convert_s_I64:
+    case WASMOpcodeNumber.F32Convert_u_I64:
+    case WASMOpcodeNumber.F32Demote_F64:
+    case WASMOpcodeNumber.F64Convert_s_I32:
+    case WASMOpcodeNumber.F64Convert_u_I32:
+    case WASMOpcodeNumber.F64Convert_s_I64:
+    case WASMOpcodeNumber.F64Convert_u_I64:
+    case WASMOpcodeNumber.F64Promote_F32:
+    case WASMOpcodeNumber.I32Reinterpret_F32:
+    case WASMOpcodeNumber.I64Reinterpret_F64:
+    case WASMOpcodeNumber.F32Reinterpret_I32:
+    case WASMOpcodeNumber.F64Reinterpret_I64:
+      return new WasmType(1, 1);
     default:
       return undefined;
   }
@@ -164,6 +199,45 @@ export enum WASMOpcodeNumber {
   I32ShrUnsigned = 0x76,
   I32ROTL = 0x77,
   I32ROTR = 0x78,
+
+  F32Add = 0x92,
+  F32Sub = 0x93,
+  F32Mult = 0x94,
+  F32Div = 0x95,
+  F32Min = 0x96,
+  F32Max = 0x97,
+  F32CopySign = 0x98,
+
+  I32Wrap_I64 = 0xa7,
+  I32Trunc_s_F32 = 0xa8,
+  I32Trunc_u_F32 = 0xa9,
+  I32Trunc_s_F64 = 0xaa,
+  I32Trunc_u_F64 = 0xab,
+
+  I64Extend_s_I32 = 0xac,
+  I64Extend_u_I32 = 0xad,
+  I64Trunc_s_F32 = 0xae,
+  I64Trunc_u_F32 = 0xaf,
+  I64Trunc_s_F64 = 0xb0,
+  I64Trunc_u_F64 = 0xb1,
+
+  F32Convert_s_I32 = 0xb2,
+  F32Convert_u_I32 = 0xb3,
+  F32Convert_s_I64 = 0xb4,
+  F32Convert_u_I64 = 0xb5,
+  F32Demote_F64 = 0xb6,
+
+  F64Convert_s_I32 = 0xb7,
+  F64Convert_u_I32 = 0xb8,
+
+  F64Convert_s_I64 = 0xb9,
+  F64Convert_u_I64 = 0xba,
+  F64Promote_F32 = 0xbb,
+
+  I32Reinterpret_F32 = 0xbc,
+  I64Reinterpret_F64 = 0xbd,
+  F32Reinterpret_I32 = 0xbe,
+  F64Reinterpret_I64 = 0xbf,
 }
 
 export function wasmOpcodeFromNr(
@@ -272,6 +346,73 @@ export function wasmOpcodeFromNr(
       return WASMOpcodeNumber.I32ROTL;
     case 0x78:
       return WASMOpcodeNumber.I32ROTR;
+
+    case 0x92:
+      return WASMOpcodeNumber.F32Add;
+    case 0x93:
+      return WASMOpcodeNumber.F32Sub;
+    case 0x94:
+      return WASMOpcodeNumber.F32Mult;
+    case 0x95:
+      return WASMOpcodeNumber.F32Div;
+    case 0x96:
+      return WASMOpcodeNumber.F32Min;
+    case 0x97:
+      return WASMOpcodeNumber.F32Max;
+    case 0x98:
+      return WASMOpcodeNumber.F32CopySign;
+
+    case 0xa7:
+      return WASMOpcodeNumber.I32Wrap_I64;
+    case 0xa8:
+      return WASMOpcodeNumber.I32Trunc_s_F32;
+    case 0xa9:
+      return WASMOpcodeNumber.I32Trunc_u_F32;
+    case 0xaa:
+      return WASMOpcodeNumber.I32Trunc_s_F64;
+    case 0xab:
+      return WASMOpcodeNumber.I32Trunc_u_F64;
+    case 0xac:
+      return WASMOpcodeNumber.I64Extend_s_I32;
+    case 0xad:
+      return WASMOpcodeNumber.I64Extend_u_I32;
+    case 0xae:
+      return WASMOpcodeNumber.I64Trunc_s_F32;
+    case 0xaf:
+      return WASMOpcodeNumber.I64Trunc_u_F32;
+    case 0xb0:
+      return WASMOpcodeNumber.I64Trunc_s_F64;
+    case 0xb1:
+      return WASMOpcodeNumber.I64Trunc_u_F64;
+    case 0xb2:
+      return WASMOpcodeNumber.F32Convert_s_I32;
+    case 0xb3:
+      return WASMOpcodeNumber.F32Convert_u_I32;
+    case 0xb4:
+      return WASMOpcodeNumber.F32Convert_s_I64;
+    case 0xb5:
+      return WASMOpcodeNumber.F32Convert_u_I64;
+    case 0xb6:
+      return WASMOpcodeNumber.F32Demote_F64;
+    case 0xb7:
+      return WASMOpcodeNumber.F64Convert_s_I32;
+    case 0xb8:
+      return WASMOpcodeNumber.F64Convert_u_I32;
+    case 0xb9:
+      return WASMOpcodeNumber.F64Convert_s_I64;
+    case 0xba:
+      return WASMOpcodeNumber.F64Convert_u_I64;
+    case 0xbb:
+      return WASMOpcodeNumber.F64Promote_F32;
+    case 0xbc:
+      return WASMOpcodeNumber.I32Reinterpret_F32;
+    case 0xbd:
+      return WASMOpcodeNumber.I64Reinterpret_F64;
+    case 0xbe:
+      return WASMOpcodeNumber.F32Reinterpret_I32;
+    case 0xbf:
+      return WASMOpcodeNumber.F64Reinterpret_I64;
+
     default:
       return undefined;
   }
