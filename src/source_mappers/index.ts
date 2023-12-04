@@ -1,5 +1,6 @@
 export * from './compilers/compiler';
 export * from './compilers/compiler_factory';
+export * from './compilers/wat_compilers';
 export * from './parsers/details';
 export * from './parsers/dissambled';
 export * from './parsers/obj-dump_parser';
