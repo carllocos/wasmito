@@ -29,7 +29,7 @@ export function isSerialPort(str: string): boolean {
   return unixPattern.test(str);
 }
 
-export function isValidDeviceConfig(value: any): string[] {
+export function validateDeviceConfig(value: any): string[] {
   const errors: string[] = [];
 
   if (typeof value !== 'object') {
@@ -87,8 +87,13 @@ export function isValidDeviceConfig(value: any): string[] {
   return errors;
 }
 
+export function isValidDeviceConfig(value: any): boolean {
+  const errors = validateDeviceConfig(value);
+  return errors.length === 0;
+}
+
 export function parseDeviceConfig(config: any): DeviceConfig | undefined {
-  const errors = isValidDeviceConfig(config);
+  const errors = validateDeviceConfig(config);
   if (errors.length > 0) {
     Logger.error(`Invalid device config: ${errors.join(', ')}`);
     return undefined;
@@ -107,7 +112,7 @@ export function isValidDevicesConfig(value: any): string[] {
       errors.push('Property "devices" should be an array of DeviceConfig');
     } else {
       for (const device of value.devices) {
-        const deviceErrors = isValidDeviceConfig(device);
+        const deviceErrors = validateDeviceConfig(device);
         if (deviceErrors.length > 0) {
           return deviceErrors;
         }

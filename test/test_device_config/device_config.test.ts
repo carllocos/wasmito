@@ -1,15 +1,15 @@
 import {
   type DeviceConfig,
-  isValidDeviceConfig,
   isValidDevicesConfig,
   parseDeviceConfigs,
+  validateDeviceConfig,
 } from '../../src/device/device_config';
 import { assert } from 'console';
 
 describe('Loading device config with invalid input', () => {
   it('Empty input config should give error', () => {
     const config: any = {};
-    const errorsMsgs: string[] = isValidDeviceConfig(config);
+    const errorsMsgs: string[] = validateDeviceConfig(config);
     assert(
       errorsMsgs.length > 0,
       'The error messages list should have one or more items',
@@ -19,7 +19,7 @@ describe('Loading device config with invalid input', () => {
   it('Input config with non-expected entries should give error', () => {
     const config: any = {};
     config.unExistingField = 'value';
-    const errorsMsgs: string[] = isValidDeviceConfig(config);
+    const errorsMsgs: string[] = validateDeviceConfig(config);
     assert(
       errorsMsgs.length > 0,
       'The error messages list should have one or more items',
@@ -29,7 +29,7 @@ describe('Loading device config with invalid input', () => {
   it('Input config with only `name` property should give error', () => {
     const config: any = {};
     config.name = 'device name';
-    const errorsMsgs: string[] = isValidDeviceConfig(config);
+    const errorsMsgs: string[] = validateDeviceConfig(config);
     assert(
       errorsMsgs.length > 0,
       'The error messages list should have one or more items',
@@ -39,7 +39,7 @@ describe('Loading device config with invalid input', () => {
   it('Input config with only `id` property should give error', () => {
     const config: any = {};
     config.id = 'some id';
-    const errorsMsgs: string[] = isValidDeviceConfig(config);
+    const errorsMsgs: string[] = validateDeviceConfig(config);
     assert(
       errorsMsgs.length > 0,
       'The error messages list should have one or more items',
@@ -53,7 +53,7 @@ describe('Loading device config with invalid input', () => {
     config.port = 'some port';
     config.program = 'some program';
     config.mode = 'Unexsting mode';
-    const errorsMsgs: string[] = isValidDeviceConfig(config);
+    const errorsMsgs: string[] = validateDeviceConfig(config);
     assert(
       errorsMsgs.length > 0,
       'The error messages list should have one or more items',
@@ -71,7 +71,7 @@ describe('Loading device config with valid input', () => {
     config.mode = 'Emulate';
     config.host = '';
 
-    const errorsMsgs: string[] = isValidDeviceConfig(config);
+    const errorsMsgs: string[] = validateDeviceConfig(config);
     assert(
       errorsMsgs.length === 0,
       `The error messages list should be empty got errors: ${errorsMsgs.join(
@@ -89,7 +89,7 @@ describe('Loading device config with valid input', () => {
     config.mode = 'EmUlaTE'; // mix (non)-capital
     config.host = '';
 
-    let errorsMsgs: string[] = isValidDeviceConfig(config);
+    let errorsMsgs: string[] = validateDeviceConfig(config);
     assert(
       errorsMsgs.length === 0,
       `Error occurred when loading an emulated device config got errors: ${errorsMsgs.join(
@@ -98,7 +98,7 @@ describe('Loading device config with valid input', () => {
     );
 
     config.mode = 'mcU';
-    errorsMsgs = isValidDeviceConfig(config);
+    errorsMsgs = validateDeviceConfig(config);
     assert(
       errorsMsgs.length === 0,
       `Error occurred when loading a mcu device config got errors: ${errorsMsgs.join(
@@ -107,7 +107,7 @@ describe('Loading device config with valid input', () => {
     );
 
     config.mode = 'ProXy';
-    errorsMsgs = isValidDeviceConfig(config);
+    errorsMsgs = validateDeviceConfig(config);
     assert(
       errorsMsgs.length === 0,
       `Error occurred when loading a proxy device config got errors: ${errorsMsgs.join(
@@ -116,7 +116,7 @@ describe('Loading device config with valid input', () => {
     );
 
     config.mode = 'MIRROR';
-    errorsMsgs = isValidDeviceConfig(config);
+    errorsMsgs = validateDeviceConfig(config);
     assert(
       errorsMsgs.length === 0,
       `Error occurred when loading a mirror device config got errors: ${errorsMsgs.join(
