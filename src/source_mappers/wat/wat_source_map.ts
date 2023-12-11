@@ -45,7 +45,7 @@ export class WATSourceMap extends SourceMap {
   public mappings(): SourceCodeMapping[] {
     let opcodes: SourceCodeMapping[] = [];
     for (const func of this.functions) {
-      opcodes = opcodes.concat(func.opcodes);
+      opcodes = opcodes.concat(func.mappings);
     }
     return opcodes;
   }

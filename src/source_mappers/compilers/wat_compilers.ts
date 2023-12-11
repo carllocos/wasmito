@@ -224,7 +224,7 @@ async function buildWATSourceMap(
 
   // fix the missing types of opcodes
   functions.forEach((fun) => {
-    const funsCalled = fun.opcodes
+    const funsCalled = fun.mappings
       .filter((op) => {
         return op.opcode.name.includes('call');
       })

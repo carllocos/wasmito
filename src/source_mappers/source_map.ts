@@ -12,7 +12,7 @@ export interface SourceCodeMapping {
 export class WASMFunction {
   public readonly name: string;
   public readonly id: number;
-  public readonly opcodes: SourceCodeMapping[];
+  public readonly mappings: SourceCodeMapping[];
 
   public readonly type: WasmType;
   private smallestAddress?: number;
@@ -28,7 +28,7 @@ export class WASMFunction {
   ) {
     this.name = name;
     this.id = id;
-    this.opcodes = opcodes;
+    this.mappings = opcodes;
     this.type = funcType;
     this.locals = locals;
     this.findSmallestAndGreatesAddress(opcodes);
@@ -66,7 +66,7 @@ export class WASMFunction {
       return undefined;
     }
 
-    const op = this.opcodes.find((op) => {
+    const op = this.mappings.find((op) => {
       return op.address === address;
     });
     if (op === undefined) {
@@ -76,7 +76,7 @@ export class WASMFunction {
   }
 
   public getSourceCodeLocations(): SourceCodeMapping[] {
-    return this.opcodes;
+    return this.mappings;
   }
 }
 
