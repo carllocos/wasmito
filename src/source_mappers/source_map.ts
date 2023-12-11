@@ -3,7 +3,7 @@ import { readFileAsBuffer } from '../util/file_util';
 import { type LineInfo, type VariableInfo } from './parsers/obj-dump_parser';
 import { type WasmOpcode } from './wat/opcodes';
 
-export interface SourceCodeLocation {
+export interface SourceCodeMapping {
   address: number;
   lineInfo: LineInfo;
   opcode: WasmOpcode;
@@ -12,7 +12,7 @@ export interface SourceCodeLocation {
 export class WASMFunction {
   public readonly name: string;
   public readonly id: number;
-  public readonly opcodes: SourceCodeLocation[];
+  public readonly opcodes: SourceCodeMapping[];
 
   public readonly type: WasmType;
   private smallestAddress?: number;
@@ -22,7 +22,7 @@ export class WASMFunction {
   constructor(
     name: string,
     id: number,
-    opcodes: SourceCodeLocation[],
+    opcodes: SourceCodeMapping[],
     funcType: WasmType,
     locals: VariableInfo[],
   ) {
@@ -75,7 +75,7 @@ export class WASMFunction {
     return op.opcode;
   }
 
-  public getSourceCodeLocations(): SourceCodeLocation[] {
+  public getSourceCodeLocations(): SourceCodeMapping[] {
     return this.opcodes;
   }
 }
@@ -92,20 +92,20 @@ export abstract class SourceMap {
 
   public abstract getFunction(id: number): WASMFunction | undefined;
 
-  public abstract opcodes(): SourceCodeLocation[];
+  public abstract mappings(): SourceCodeMapping[];
 
-  public getSourceCodeLocationFromAddress(
+  public getSourceCodeMappingFromAddress(
     wasmAddr: number,
-  ): SourceCodeLocation | undefined {
-    const location = this.opcodes().find((location: SourceCodeLocation) => {
+  ): SourceCodeMapping | undefined {
+    const location = this.mappings().find((location: SourceCodeMapping) => {
       return location.address === wasmAddr;
     });
     return location;
   }
 
-  public abstract getPreviousSourceCodeLocationFromAddress(
+  public abstract getPrevSourceCodeMappingFromAddress(
     wasmAddr: number,
-  ): SourceCodeLocation | undefined;
+  ): SourceCodeMapping | undefined;
 
   getWasmPath(): string {
     return this.wasmFilePath;

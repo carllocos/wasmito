@@ -322,7 +322,7 @@ async function registerBeforeHooks(
   sourceMap: SourceMap,
 ): Promise<boolean> {
   const opcodesBeforeRequests = sourceMap
-    .opcodes()
+    .mappings()
     .map(({ address, lineInfo, opcode }) => {
       const inspectStackRequest = new StateRequest().includeStack().includePC();
       const inspectStack = new InspectStateHook(inspectStackRequest);
@@ -352,7 +352,7 @@ async function registerAfterHooks(
   sourceMap: SourceMap,
 ): Promise<boolean> {
   const opcodesAfterRequests = sourceMap
-    .opcodes()
+    .mappings()
     .map(({ address, lineInfo, opcode }) => {
       const inspectStackRequest = new StateRequest().includeStack().includePC();
       const inspectStack = new InspectStateHook(inspectStackRequest);

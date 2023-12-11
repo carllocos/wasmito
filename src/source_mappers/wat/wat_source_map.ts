@@ -1,7 +1,7 @@
 import { type WasmType } from '../../state/opcode_type';
 import { type VariableInfo } from '../parsers/obj-dump_parser';
 import {
-  type SourceCodeLocation,
+  type SourceCodeMapping,
   SourceMap,
   type WASMFunction,
 } from '../source_map';
@@ -42,8 +42,8 @@ export class WATSourceMap extends SourceMap {
     return this.globals.find((gb) => gb.index === index);
   }
 
-  public opcodes(): SourceCodeLocation[] {
-    let opcodes: SourceCodeLocation[] = [];
+  public mappings(): SourceCodeMapping[] {
+    let opcodes: SourceCodeMapping[] = [];
     for (const func of this.functions) {
       opcodes = opcodes.concat(func.opcodes);
     }
@@ -60,9 +60,9 @@ export class WATSourceMap extends SourceMap {
     return undefined;
   }
 
-  public getPreviousSourceCodeLocationFromAddress(
+  public getPrevSourceCodeMappingFromAddress(
     wasmAddr: number,
-  ): SourceCodeLocation | undefined {
+  ): SourceCodeMapping | undefined {
     const func = this.functions.find((func: WASMFunction) => {
       return func.getOpcode(wasmAddr);
     });
