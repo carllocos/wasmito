@@ -9,6 +9,7 @@ export enum LogLevel {
   LogCritical = 'crit',
   LogWarning = 'warning',
   LogNotice = 'notice',
+  LogOff = 'off',
 }
 
 function getLogLevelFromString(levelString: string): LogLevel | undefined {
@@ -29,6 +30,8 @@ function getLogLevelFromString(levelString: string): LogLevel | undefined {
       return LogLevel.LogWarning;
     case 'notice':
       return LogLevel.LogNotice;
+    case 'off':
+      return LogLevel.LogOff;
     default:
       return undefined;
   }
@@ -52,7 +55,7 @@ export function parseLogLevel(value: string): LogLevel | undefined {
 }
 
 export function createLogger(name: string): winston.Logger {
-  return winston.createLogger({
+  const _logger = winston.createLogger({
     level: logLevel,
     format: winston.format.combine(
       winston.format.colorize(),
@@ -67,6 +70,10 @@ export function createLogger(name: string): winston.Logger {
       new winston.transports.File({ filename: 'combined.log' }),
     ],
   });
+  if (logLevel === LogLevel.LogOff) {
+    _logger.remove(winston.transports.Console);
+  }
+  return _logger;
 }
 
 let globalLogger: winston.Logger | undefined;
@@ -91,6 +98,10 @@ export function getGlobalLogger(): winston.Logger {
         new winston.transports.File({ filename: 'combined.log' }),
       ],
     });
+
+    if (logLevel === LogLevel.LogOff) {
+      globalLogger.remove(winston.transports.Console);
+    }
   }
 
   return globalLogger;
