@@ -4,7 +4,7 @@ import {
   ScheduleOnTimeStamp,
   ScheduleOnce,
 } from './schedule';
-import { type TimeStamp } from './timestamp';
+import { type LogicalClock } from './timestamp';
 
 export enum HookKind {
   RemoteCall = '01',
@@ -26,9 +26,9 @@ export abstract class Hook<SubscriptionType> {
     return this;
   }
 
-  scheduleOnce(timestamp?: TimeStamp): Hook<SubscriptionType> {
-    if (timestamp !== undefined) {
-      this.schedule = new ScheduleOnTimeStamp(timestamp);
+  scheduleOnce(logicalClock?: LogicalClock): Hook<SubscriptionType> {
+    if (logicalClock !== undefined) {
+      this.schedule = new ScheduleOnTimeStamp(logicalClock);
     } else {
       this.schedule = new ScheduleOnce();
     }

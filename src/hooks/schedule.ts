@@ -1,16 +1,16 @@
 import {
-  type TimeStamp,
-  timeStampNrOfEvents,
-  timeStampNrOfInstructions,
+  type LogicalClock,
+  logicalClockNrOfEvents,
+  logicalClockNrOfInstructions,
 } from './timestamp';
 import { encodeToHexLEB128 } from '../util/encoder';
 
 enum ScheduleKind {
   ScheduleOnce = '01', // hook run once and as soon as possible
   ScheduleAlways = '03', // hook runs everytime when needed
-  ScheduleOnTimeStamp = '21', // hook executed on timestamp
-  ScheduleBeforeTimeStamp = '22', // hook executed before timestamp
-  ScheduleAfterTimeStamp = '23', // hook executed after timestamp
+  ScheduleOnLogicalClock = '21', // hook executed on logical clock
+  ScheduleBeforeLogicalClock = '22', // hook executed before logical clock
+  ScheduleAfterLogicalClock = '23', // hook executed after logical clock
 }
 
 export abstract class HookSchedule {
@@ -36,38 +36,38 @@ export class ScheduleAways extends HookSchedule {
   }
 }
 
-export abstract class TimeStampScheduling extends HookSchedule {
-  public readonly timestamp: TimeStamp;
-  constructor(scheduleKind: ScheduleKind, timestamp: TimeStamp) {
+export abstract class LogicalClockScheduling extends HookSchedule {
+  public readonly logicalClock: LogicalClock;
+  constructor(scheduleKind: ScheduleKind, timestamp: LogicalClock) {
     super(scheduleKind);
-    this.timestamp = timestamp;
+    this.logicalClock = timestamp;
   }
 
   serializeBinary(): string {
     // format expected: SCHEDULE_KIND (1 BYTE)
-    // format timestamp: nr of instructions (LEB32) | nr of events (LEB32);
-    const nrOfInstr = timeStampNrOfInstructions(this.timestamp);
+    // format logicalClock: nr of instructions (LEB32) | nr of events (LEB32);
+    const nrOfInstr = logicalClockNrOfInstructions(this.logicalClock);
     const instrAsHex = encodeToHexLEB128(nrOfInstr);
-    const nrOfEvents = timeStampNrOfEvents(this.timestamp);
+    const nrOfEvents = logicalClockNrOfEvents(this.logicalClock);
     const evtsAsHex = encodeToHexLEB128(nrOfEvents);
     return `${this.scheduleKind}${instrAsHex}${evtsAsHex}`;
   }
 }
 
-export class ScheduleOnTimeStamp extends TimeStampScheduling {
-  constructor(timestamp: TimeStamp) {
-    super(ScheduleKind.ScheduleOnTimeStamp, timestamp);
+export class ScheduleOnTimeStamp extends LogicalClockScheduling {
+  constructor(logicalClock: LogicalClock) {
+    super(ScheduleKind.ScheduleOnLogicalClock, logicalClock);
   }
 }
 
-export class ScheduleBeforeTimeStamp extends TimeStampScheduling {
-  constructor(timestamp: TimeStamp) {
-    super(ScheduleKind.ScheduleBeforeTimeStamp, timestamp);
+export class ScheduleBeforeTimeStamp extends LogicalClockScheduling {
+  constructor(logicalClock: LogicalClock) {
+    super(ScheduleKind.ScheduleBeforeLogicalClock, logicalClock);
   }
 }
 
-export class ScheduleAfterTimeStamp extends TimeStampScheduling {
-  constructor(timestamp: TimeStamp) {
-    super(ScheduleKind.ScheduleAfterTimeStamp, timestamp);
+export class ScheduleAfterTimeStamp extends LogicalClockScheduling {
+  constructor(logicalClock: LogicalClock) {
+    super(ScheduleKind.ScheduleAfterLogicalClock, logicalClock);
   }
 }
