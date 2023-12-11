@@ -14,7 +14,10 @@
   },
   "types": "dist/types/src/index.d.ts",
   "files": [
-    "dist/"
+    "dist/",
+    ".wasmito/",
+    "libs/",
+    "package.json"
   ],
   "directories": {
     "test": "test"
