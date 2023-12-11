@@ -93,7 +93,7 @@ export class WATCompiler extends SourceCodeCompiler {
   }
 }
 async function runCommand(command: string): Promise<[string, string]> {
-  return await new Promise((resolve, reject) => {
+  const resp = await new Promise<[string, string]>((resolve, reject) => {
     getGlobalLogger().info(`Running command: ${command}`);
     exec(command, (error, stdout, stderr) => {
       if (error !== null) {
@@ -103,6 +103,7 @@ async function runCommand(command: string): Promise<[string, string]> {
       }
     });
   });
+  return resp;
 }
 
 async function compileWAT2WASM(
