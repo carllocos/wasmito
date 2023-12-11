@@ -1,6 +1,10 @@
 import { exec } from 'child_process';
 import { createLogger, getGlobalLogger } from '../../logger/logger';
-import { WASMFunction, type SourceMap } from '../source_map';
+import {
+  WASMFunction,
+  type SourceMap,
+  type SourceCodeMapping,
+} from '../source_map';
 import { SourceCodeCompiler } from './compiler';
 import {
   getPath2ObjDump,
@@ -25,7 +29,6 @@ import {
   type FunctionInfo,
 } from '../parsers/obj-dump_parser';
 import { writeFileSync } from 'fs';
-import { type WasmOpcode } from '../wat/opcodes';
 import { type WasmType } from '../../state/opcode_type';
 import { parseOpcodesFromDissambledOutput } from '../parsers/dissambled';
 
@@ -136,11 +139,7 @@ function fromFunctionInfoToWASMFunc(
       `Could not find type ${fun.type} for function ${fun.name}`,
     );
   } else {
-    const opcodes: Array<{
-      address: number;
-      lineInfo: LineInfo;
-      opcode: WasmOpcode;
-    }> = [];
+    const opcodes: SourceCodeMapping[] = [];
     return new WASMFunction(fun.name, fun.index, opcodes, funcType, fun.locals);
   }
 }
@@ -208,7 +207,9 @@ async function buildWATSourceMap(
         }
         return {
           address: opcode.address,
-          lineInfo: mapping.lineInfo,
+          linenr: mapping.lineInfo.line,
+          columnStart: mapping.lineInfo.columnStart,
+          columnEnd: mapping.lineInfo.columnEnd,
           opcode: opcode.opcode,
         };
       });

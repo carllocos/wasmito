@@ -18,7 +18,6 @@ import { PlaceholderType } from '../../state/opcode_type';
 import { exit } from 'process';
 import { type WARDuinoVM } from '../../warduino/vm/warduino_vm';
 import { type SourceMap } from '../../source_mappers/source_map';
-import { type LineInfo } from '../../source_mappers/parsers/obj-dump_parser';
 import path from 'path';
 import { type MCUWARDuinoVM } from '../../warduino/vm/mcu_vm';
 import { listAllFQBN, listAvailableBoards } from '../../builder/util_platform';
@@ -102,7 +101,9 @@ class BrigadierJSONWriter {
 
   public writeBefore(
     address: number,
-    lineInfo: LineInfo,
+    linenr: number,
+    columnStart: number,
+    columnEnd: number,
     state: WasmState,
   ): void {
     const val = this.befores.get(address);
@@ -158,16 +159,18 @@ class BrigadierJSONWriter {
       labels,
       when: 'before',
       operands,
-      linenr: lineInfo.line,
-      columnstart: lineInfo.columnStart,
-      columnend: lineInfo.columnEnd,
+      linenr,
+      columnstart: columnStart,
+      columnend: columnEnd,
     };
     this.writer.write(content);
   }
 
   public writeAfter(
     address: number,
-    lineInfo: LineInfo,
+    linenr: number,
+    columnStart: number,
+    columnEnd: number,
     state: WasmState,
   ): void {
     const val = this.after.get(address);
@@ -224,9 +227,9 @@ class BrigadierJSONWriter {
         when: 'after',
         operands,
         result: results,
-        linenr: lineInfo.line,
-        columnstart: lineInfo.columnStart,
-        columnend: lineInfo.columnEnd,
+        linenr,
+        columnstart: columnStart,
+        columnend: columnEnd,
       };
       this.writer.write(content);
     }
@@ -265,7 +268,9 @@ let Brigadier: BrigadierJSONWriter | undefined;
 
 function createJSONWriter(
   address: number,
-  lineInfo: LineInfo,
+  linenr: number,
+  columnStart: number,
+  columnEnd: number,
   opcode: WasmOpcode,
   when: MonitorMoment,
 ): (state: WasmState) => void {
@@ -279,9 +284,9 @@ function createJSONWriter(
   }
   return (state: WasmState) => {
     if (when === MonitorMoment.MonitorBefore) {
-      Brigadier?.writeBefore(address, lineInfo, state);
+      Brigadier?.writeBefore(address, linenr, columnStart, columnEnd, state);
     } else {
-      Brigadier?.writeAfter(address, lineInfo, state);
+      Brigadier?.writeAfter(address, linenr, columnStart, columnEnd, state);
     }
   };
 }
@@ -323,12 +328,14 @@ async function registerBeforeHooks(
 ): Promise<boolean> {
   const opcodesBeforeRequests = sourceMap
     .mappings()
-    .map(({ address, lineInfo, opcode }) => {
+    .map(({ address, linenr, columnStart, columnEnd, opcode }) => {
       const inspectStackRequest = new StateRequest().includeStack().includePC();
       const inspectStack = new InspectStateHook(inspectStackRequest);
       inspectStack.onSubscriptionData = createJSONWriter(
         address,
-        lineInfo,
+        linenr,
+        columnStart,
+        columnEnd,
         opcode,
         MonitorMoment.MonitorBefore,
       );
@@ -353,12 +360,14 @@ async function registerAfterHooks(
 ): Promise<boolean> {
   const opcodesAfterRequests = sourceMap
     .mappings()
-    .map(({ address, lineInfo, opcode }) => {
+    .map(({ address, linenr, columnStart, columnEnd, opcode }) => {
       const inspectStackRequest = new StateRequest().includeStack().includePC();
       const inspectStack = new InspectStateHook(inspectStackRequest);
       inspectStack.onSubscriptionData = createJSONWriter(
         address,
-        lineInfo,
+        linenr,
+        columnStart,
+        columnEnd,
         opcode,
         MonitorMoment.MonitorAfter,
       );

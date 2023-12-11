@@ -1,11 +1,13 @@
 import { type WasmType } from '../state/opcode_type';
 import { readFileAsBuffer } from '../util/file_util';
-import { type LineInfo, type VariableInfo } from './parsers/obj-dump_parser';
+import { type VariableInfo } from './parsers/obj-dump_parser';
 import { type WasmOpcode } from './wat/opcodes';
 
 export interface SourceCodeMapping {
   address: number;
-  lineInfo: LineInfo;
+  linenr: number;
+  columnStart: number;
+  columnEnd: number;
   opcode: WasmOpcode;
 }
 
