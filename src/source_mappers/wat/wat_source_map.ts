@@ -1,6 +1,10 @@
 import { type WasmType } from '../../state/opcode_type';
-import { type LineInfo, type VariableInfo } from '../parsers/obj-dump_parser';
-import { SourceMap, type WASMFunction } from '../source_map';
+import { type VariableInfo } from '../parsers/obj-dump_parser';
+import {
+  type SourceCodeLocation,
+  SourceMap,
+  type WASMFunction,
+} from '../source_map';
 import { type WasmOpcode } from './opcodes';
 
 export class WATSourceMap extends SourceMap {
@@ -23,7 +27,7 @@ export class WATSourceMap extends SourceMap {
   }
 
   public getFunction(id: number): WASMFunction | undefined {
-    if (id > this.imports.length) {
+    if (id >= this.imports.length) {
       return this.functions.find((f) => {
         return f.id === id;
       });
@@ -34,16 +38,12 @@ export class WATSourceMap extends SourceMap {
     }
   }
 
-  public opcodes(): Array<{
-    address: number;
-    lineInfo: LineInfo;
-    opcode: WasmOpcode;
-  }> {
-    let opcodes: Array<{
-      address: number;
-      lineInfo: LineInfo;
-      opcode: WasmOpcode;
-    }> = [];
+  public getGlobalFromIndex(index: number): VariableInfo | undefined {
+    return this.globals.find((gb) => gb.index === index);
+  }
+
+  public opcodes(): SourceCodeLocation[] {
+    let opcodes: SourceCodeLocation[] = [];
     for (const func of this.functions) {
       opcodes = opcodes.concat(func.opcodes);
     }
@@ -58,5 +58,32 @@ export class WATSourceMap extends SourceMap {
       }
     }
     return undefined;
+  }
+
+  public getPreviousSourceCodeLocationFromAddress(
+    wasmAddr: number,
+  ): SourceCodeLocation | undefined {
+    const func = this.functions.find((func: WASMFunction) => {
+      return func.getOpcode(wasmAddr);
+    });
+
+    if (func === undefined) {
+      return undefined;
+    }
+
+    const locations = func.getSourceCodeLocations();
+    let idxPrevLocation = -1;
+    for (let index = 0; index < locations.length; index++) {
+      const location = locations[index];
+      if (location.address === wasmAddr) {
+        idxPrevLocation = index - 1;
+        break;
+      }
+    }
+
+    if (idxPrevLocation < 0) {
+      return undefined;
+    }
+    return locations[idxPrevLocation];
   }
 }
