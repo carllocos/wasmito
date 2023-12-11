@@ -10,6 +10,21 @@ export namespace WASM {
     unknown,
   }
 
+  export function typeToString(wasmType: Type): string | undefined {
+    switch (wasmType) {
+      case Type.f32:
+        return 'f32';
+      case Type.f64:
+        return 'f64';
+      case Type.i32:
+        return 'i32';
+      case Type.i64:
+        return 'i64';
+      default:
+        return undefined;
+    }
+  }
+
   export const typing = new Map<string, Type>([
     ['f32', Type.f32],
     ['f64', Type.f64],
@@ -69,6 +84,37 @@ export namespace WASM {
     block_key: number;
     ra: number;
     idx: number;
+  }
+
+  export enum FrameType {
+    FUNC = 0,
+    INITEXPR = 1,
+    BLOCK = 2,
+    LOOP = 3,
+    IF = 4,
+    PROXY_GUARD = 254,
+    CALLBACK_GUARD = 255,
+  }
+
+  export function frameTypeFromNumber(n: number): FrameType | undefined {
+    switch (n) {
+      case FrameType.FUNC:
+        return FrameType.FUNC;
+      case FrameType.INITEXPR:
+        return FrameType.INITEXPR;
+      case FrameType.BLOCK:
+        return FrameType.BLOCK;
+      case FrameType.LOOP:
+        return FrameType.LOOP;
+      case FrameType.IF:
+        return FrameType.IF;
+      case FrameType.PROXY_GUARD:
+        return FrameType.PROXY_GUARD;
+      case FrameType.CALLBACK_GUARD:
+        return FrameType.CALLBACK_GUARD;
+      default:
+        return undefined;
+    }
   }
 
   export interface Table {

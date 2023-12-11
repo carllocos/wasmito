@@ -649,22 +649,15 @@ export class StateBinaryEncoder {
   private serializeFrame(frame: WASM.Frame): string {
     // | Frame type | StackPointer | FramePointer |   Return Adress  | FID or Block ID
     // |  1*2 bytes |   4*2bytes   |   4*2bytes   | serializePointer | 4*2bytes or serializePointer
-    const FRAME_FUNC_TYPE = 0;
-    const FRAME_INITEXPR_TYPE = 1;
-    const FRAME_BLOCK_TYPE = 2;
-    const FRAME_LOOP_TYPE = 3;
-    const FRAME_IF_TYPE = 4;
-    const FRAME_PROXY_GUARD_TYPE = 254;
-    const FRAME_CALLBACK_GUARD_TYPE = 255;
 
     const validTypes = [
-      FRAME_FUNC_TYPE,
-      FRAME_INITEXPR_TYPE,
-      FRAME_BLOCK_TYPE,
-      FRAME_LOOP_TYPE,
-      FRAME_IF_TYPE,
-      FRAME_PROXY_GUARD_TYPE,
-      FRAME_CALLBACK_GUARD_TYPE,
+      WASM.FrameType.FUNC,
+      WASM.FrameType.INITEXPR,
+      WASM.FrameType.BLOCK,
+      WASM.FrameType.LOOP,
+      WASM.FrameType.IF,
+      WASM.FrameType.CALLBACK_GUARD,
+      WASM.FrameType.PROXY_GUARD,
     ];
 
     if (!validTypes.includes(frame.type)) {
@@ -677,12 +670,12 @@ export class StateBinaryEncoder {
     const ra = this.serializePointer(frame.ra);
     let rest = '';
     let resStr = ''; // TODO remove
-    if (frame.type === FRAME_FUNC_TYPE) {
+    if (frame.type === WASM.FrameType.FUNC) {
       rest = HexaEncoderSerializeUInt32BE(Number(frame.fidx));
       resStr = `fun_idx=${Number(frame.fidx)}`;
     } else if (
-      frame.type === FRAME_PROXY_GUARD_TYPE ||
-      frame.type === FRAME_CALLBACK_GUARD_TYPE
+      frame.type === WASM.FrameType.PROXY_GUARD ||
+      frame.type === WASM.FrameType.CALLBACK_GUARD
     ) {
       // Nothing has to happen
     } else {
