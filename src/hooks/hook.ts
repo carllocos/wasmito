@@ -4,7 +4,7 @@ import {
   ScheduleOnTimeStamp,
   ScheduleOnce,
 } from './schedule';
-import { type LogicalClock } from './timestamp';
+import { type LogicalClock } from './logicalclock';
 
 export enum HookKind {
   RemoteCall = '01',

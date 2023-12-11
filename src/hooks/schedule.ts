@@ -2,7 +2,7 @@ import {
   type LogicalClock,
   logicalClockNrOfEvents,
   logicalClockNrOfInstructions,
-} from './timestamp';
+} from './logicalclock';
 import { encodeToHexLEB128 } from '../util/encoder';
 
 enum ScheduleKind {
