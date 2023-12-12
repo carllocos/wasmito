@@ -4,7 +4,7 @@ import {
   parseDeviceConfigs,
   validateDeviceConfig,
 } from '../../src/device/device_config';
-import { assert } from 'console';
+import assert from 'assert';
 
 describe('Loading device config with invalid input', () => {
   it('Empty input config should give error', () => {
@@ -199,7 +199,7 @@ describe('Loading multile device configs', () => {
       `parsing correct input configs should yield 2 configs`,
     );
 
-    const configs: DeviceConfig[] = loadedConfigs as DeviceConfig[];
+    const configs: DeviceConfig[] = loadedConfigs;
 
     const configA = configs[0];
     assert(configA.id === 'A', 'invalid id');
