@@ -21,16 +21,14 @@
   },
   "scripts": {
     "start": "tsc --watch",
-    "test": "npm run build && mocha './dist/test/**/*.js' --recursive",
+    "test": "npm run build:cjs && LogLevel=error mocha './dist/cjs/test/**/*.cjs' --recursive",
     "lint": "eslint . --ext .ts",
-    "build": "npx tsc",
+    "build": "npm run build:cjs",
     "cli": "npm run build && LogLevel=debug node './dist/src/cli/cli.js'",
     "submodules": "bash install.sh",
-    "buildforpack": "npm run clean && npm run build:cjs && npm run build:esm",
-    "build:cjs": "tsc --project tsconfig.packbuild.json --module commonjs --outDir dist/cjs && npx convert-extension cjs dist/cjs/ && rm dist/cjs/**/*.map",
-    "build:esm": "tsc --project tsconfig.packbuild.json --module es6 --outDir dist/esm",
-    "clean": "rm -rf dist/cjs && rm -rf dist/esm && rm -rf dist/types",
-    "prepack": "npm run buildforpack"
+    "build:cjs": "rm -rf dist/cjs && tsc --project tsconfig.json && npx convert-extension cjs dist/cjs/",
+    "cleanNotUsed": "rm -rf dist/cjs && rm -rf dist/esm && rm -rf dist/types",
+    "prepack": "npm run build"
   },
   "repository": {
     "type": "git",
