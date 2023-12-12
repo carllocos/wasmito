@@ -84,11 +84,13 @@ export class WASMFunction {
 
 export abstract class SourceMap {
   private readonly _filepath: string;
+  private readonly _filename: string;
   public readonly wasmFilePath: string;
   private wasmBuffer?: Buffer;
 
   constructor(filepath: string, wasmFilePath: string) {
     this._filepath = filepath;
+    this._filename = getFileName(filepath);
     this.wasmFilePath = wasmFilePath;
   }
 
@@ -115,6 +117,10 @@ export abstract class SourceMap {
 
   get sourceCodeFilePath(): string {
     return this._filepath;
+  }
+
+  get sourceCodeFileName(): string {
+    return this._filename;
   }
 
   async getWasm(): Promise<Buffer> {
