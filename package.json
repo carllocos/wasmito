@@ -2,10 +2,7 @@
   "name": "wasmito",
   "version": "1.0.0",
   "description": "",
-  "type": [
-    "module",
-    "commonjs"
-  ],
+  "type": "module",
   "main": "dist/cjs/src/index.cjs",
   "exports": {
     "types": "./dist/types/src/index.d.ts",
