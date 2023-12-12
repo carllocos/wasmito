@@ -11,6 +11,12 @@ export interface SourceCodeMapping {
   opcode: WasmOpcode;
 }
 
+export interface SourceCodeLocation {
+  linenr: number;
+  columnStart?: number;
+  columnEnd?: number;
+}
+
 export class WASMFunction {
   public readonly name: string;
   public readonly id: number;
