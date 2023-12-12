@@ -139,4 +139,24 @@ export abstract class SourceMap {
   public abstract getOpcode(address: number): WasmOpcode | undefined;
 
   public abstract getGlobalFromIndex(index: number): VariableInfo | undefined;
+
+  public getMappingsFromSourceCodeLocation(
+    location: SourceCodeLocation,
+  ): SourceCodeMapping[] {
+    return this.mappings().filter((mapping: SourceCodeMapping) => {
+      if (mapping.linenr === location.linenr) {
+        let equalStart = true;
+        if (location.columnStart !== undefined) {
+          equalStart = mapping.columnStart <= location.columnStart;
+        }
+
+        let equalEnd = true;
+        if (location.columnEnd !== undefined) {
+          equalEnd = mapping.columnEnd >= location.columnEnd;
+        }
+        return equalStart && equalEnd;
+      }
+      return false;
+    });
+  }
 }
