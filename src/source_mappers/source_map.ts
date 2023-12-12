@@ -1,5 +1,5 @@
 import { type WasmType } from '../state/opcode_type';
-import { readFileAsBuffer } from '../util/file_util';
+import { getFileName, readFileAsBuffer } from '../util/file_util';
 import { type VariableInfo } from './parsers/obj-dump_parser';
 import { type WasmOpcode } from './wat/opcodes';
 
