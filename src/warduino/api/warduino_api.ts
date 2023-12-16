@@ -1,4 +1,5 @@
 import { type Hook } from '../../hooks/hook';
+import { type SourceCodeLocation } from '../../source_mappers';
 import { type WasmState } from '../../state/wasm';
 import { type StateRequest } from '../requests/inspect_request';
 
@@ -14,12 +15,14 @@ export interface WARDuinoAPI {
   step: (timeout?: number) => Promise<void>;
 
   addBreakpoint: (
-    sourceCodeLocation: number,
+    sourceCodeLocation: SourceCodeLocation,
+    stateOnBreakpoint?: StateRequest,
+    stateHandler?: (state: WasmState) => void,
     timeout?: number,
   ) => Promise<boolean>;
 
   removeBreakpoint: (
-    sourceCodeLocation: number,
+    sourceCodeLocation: SourceCodeLocation,
     timeout?: number,
   ) => Promise<boolean>;
 
@@ -40,13 +43,13 @@ export interface WARDuinoAPI {
 
   // Hook API
   addHookBefore: <T>(
-    sourceCodeLocation: number,
+    sourceCodeLocation: SourceCodeLocation,
     hook: Hook<T>,
     timeout?: number,
   ) => Promise<boolean>;
 
   addHookAfter: <T>(
-    sourceCodeLocation: number,
+    sourceCodeLocation: SourceCodeLocation,
     hook: Hook<T>,
     timeout?: number,
   ) => Promise<boolean>;

@@ -3,7 +3,7 @@ import { type Channel } from '../../communication/channel_interface';
 import { type WARDuinoAPI } from '../api/warduino_api';
 import { RunRequest } from '../requests/run_request';
 import { StepRequest } from '../requests/step_request';
-import { type APIRequest } from '../api/request_interface';
+import { isSuccessfulMessage, type APIRequest } from '../api/request_interface';
 import { Command } from '../../communication/command';
 import { type PlatformBuilderConfig } from '../../builder/platform_config';
 import { type PlatformBuilder } from '../../builder/platformbuilder';
@@ -15,7 +15,15 @@ import { StateRequest } from '../requests/inspect_request';
 import { LoadStateRequestBuilder } from '../requests/load_state_request';
 import { timeoutPromise } from '../../util/promise_util';
 import { ResolveEventRequest } from '../requests/resolve_event_request';
-import { type SourceMap } from '../../source_mappers/source_map';
+import {
+  type SourceCodeLocation,
+  type SourceMap,
+} from '../../source_mappers/source_map';
+import { PauseVMHook, type Hook, InspectStateHook } from '../../hooks/index';
+import {
+  MonitorMoment,
+  MontiroWasmAddrRequest,
+} from '../requests/monitor_request';
 
 export abstract class WARDuinoVM implements WARDuinoAPI {
   protected readonly channel: Channel;
@@ -128,5 +136,107 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
 
   public getSourceMap(): SourceMap | undefined {
     return this.platform.getSourceMap();
+  }
+
+  async addBreakpoint(
+    sourceCodeLocation: SourceCodeLocation,
+    stateOnBreakpoint?: StateRequest,
+    stateHandler?: (state: WasmState) => void,
+    timeout?: number | undefined,
+  ): Promise<boolean> {
+    const hookAdded = await this.addHookBefore(
+      sourceCodeLocation,
+      new PauseVMHook(),
+      timeout,
+    );
+    if (stateOnBreakpoint === undefined) {
+      if (stateHandler !== undefined) {
+        throw new Error(
+          'Expected `stateOnBreakpoint` to be set in order to handle it via callback `stateHandler`',
+        );
+      }
+      return hookAdded;
+    }
+
+    if (stateHandler === undefined) {
+      throw new Error(
+        'Expected `stateHandler` callback argument as handler for `stateOnBreakpoint`',
+      );
+    }
+    const inspectHook = new InspectStateHook(stateOnBreakpoint);
+    inspectHook.onSubscriptionData = stateHandler;
+    if (await this.addHookBefore(sourceCodeLocation, inspectHook, timeout)) {
+      this.logger.info(`breakpoint added upon ${sourceCodeLocation.linenr}`);
+      return true;
+    }
+    this.logger.error(
+      `could not add breakpoint upon ${sourceCodeLocation.linenr}`,
+    );
+    return false;
+  }
+
+  async removeBreakpoint(
+    sourceCodeLocation: SourceCodeLocation,
+    timeout?: number | undefined,
+  ): Promise<boolean> {
+    throw new Error('not implemented');
+  }
+
+  async addHookBefore<T>(
+    sourceCodeLocation: SourceCodeLocation,
+    hook: Hook<T>,
+    timeout?: number | undefined,
+  ): Promise<boolean> {
+    return this.addHook(
+      sourceCodeLocation,
+      hook,
+      MonitorMoment.MonitorBefore,
+      timeout,
+    );
+  }
+
+  async addHookAfter<T>(
+    sourceCodeLocation: SourceCodeLocation,
+    hook: Hook<T>,
+    timeout?: number | undefined,
+  ): Promise<boolean> {
+    return this.addHook(
+      sourceCodeLocation,
+      hook,
+      MonitorMoment.MonitorAfter,
+      timeout,
+    );
+  }
+
+  private async addHook<T>(
+    sourceCodeLocation: SourceCodeLocation,
+    hook: Hook<T>,
+    moment: MonitorMoment,
+    timeout?: number,
+  ): Promise<boolean> {
+    const sm = this.getSourceMap();
+    if (sm === undefined) {
+      throw new Error(`There is no source Mapper set for current module`);
+    }
+    const mappings = sm.getMappingsFromSourceCodeLocation(sourceCodeLocation);
+    if (mappings.length === 0) {
+      throw new Error(
+        `Cannot set hook upon unexisting wasm address derived from source location ${sourceCodeLocation.linenr}`,
+      );
+    }
+    const addr = mappings[0].address;
+    const req = new MontiroWasmAddrRequest(addr).addHook(hook);
+    switch (moment) {
+      case MonitorMoment.MonitorBefore:
+        req.before();
+        break;
+      case MonitorMoment.MonitorAfter:
+        req.after();
+        break;
+      default:
+        throw new Error('Cannot set hook upon unexisting hook moment');
+    }
+    const response = await this.sendRequest(req, timeout);
+    return isSuccessfulMessage(response);
   }
 }
