@@ -13,11 +13,13 @@ export class SerialConnection implements Channel {
   private callbacks: Array<(data: string) => void> = [];
   private dataBuffered: string = '';
   private readonly logger: winston.Logger;
+  private readonly removedListeners: Set<(data: string) => void>;
 
   constructor(portName: string, baudRate: number) {
     this.portName = portName;
     this.baudRate = baudRate;
     this.logger = createLogger(this.portName);
+    this.removedListeners = new Set();
   }
 
   addOnData(callback: (data: string) => void): void {
@@ -31,13 +33,19 @@ export class SerialConnection implements Channel {
   protected onDataHandler(data: Buffer): void {
     this.dataBuffered += data.toString();
     this.handleLines(this.parseLines());
+    this.callbacks = this.callbacks.filter((cb) => {
+      return !this.removedListeners.has(cb);
+    });
+    this.removedListeners.clear();
   }
 
   private handleLines(lines: string[]): void {
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       this.callbacks.forEach((cb) => {
-        cb(line);
+        if (!this.removedListeners.has(cb)) {
+          cb(line);
+        }
       });
     }
   }

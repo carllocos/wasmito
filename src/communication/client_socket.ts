@@ -8,10 +8,12 @@ abstract class AbstractChannel implements Channel {
   protected connection?: net.Socket;
   private dataBuffered: string = '';
   private listeners: Array<(data: string) => void>;
+  private readonly removedListeners: Set<(data: string) => void>;
 
   constructor(channelName: string) {
     this.channelName = channelName;
     this.listeners = [];
+    this.removedListeners = new Set();
   }
 
   // Abstract methods
@@ -31,21 +33,25 @@ abstract class AbstractChannel implements Channel {
   }
 
   public removeOnData(callback: (data: string) => void): void {
-    this.listeners = this.listeners.filter((cb) => {
-      return cb !== callback;
-    });
+    this.removedListeners.add(callback);
   }
 
   protected onDataHandler(data: Buffer): void {
     this.dataBuffered += data.toString();
     this.handleLines(this.parseLines());
+    this.listeners = this.listeners.filter((cb) => {
+      return !this.removedListeners.has(cb);
+    });
+    this.removedListeners.clear();
   }
 
   private handleLines(lines: string[]): void {
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       this.listeners.forEach((listener) => {
-        listener(line);
+        if (!this.removedListeners.has(listener)) {
+          listener(line);
+        }
       });
     }
   }
