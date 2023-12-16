@@ -12,7 +12,12 @@
         "ecmaVersion": "latest",
         "sourceType": "module"
     },
-    "plugins": ["prettier"],
+    "ignorePatterns": [
+        "dist/*"
+    ],
+    "plugins": [
+        "prettier"
+    ],
     "rules": {
         "@typescript-eslint/no-namespace": "off",
         "prettier/prettier": [
