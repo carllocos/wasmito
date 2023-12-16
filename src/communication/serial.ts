@@ -59,7 +59,7 @@ export class SerialConnection implements Channel {
   }
 
   async send(data: string): Promise<boolean> {
-    return await new Promise<boolean>((resolve, reject) => {
+    return new Promise<boolean>((resolve, reject) => {
       if (this.port === undefined) {
         reject(new Error('Serial port is not open.'));
       } else if (!this.port.isOpen) {
@@ -106,14 +106,14 @@ export class SerialConnection implements Channel {
     });
 
     if (timeout !== undefined) {
-      return await timeoutPromise<boolean>(openPromise, timeout);
+      return timeoutPromise<boolean>(openPromise, timeout);
     } else {
-      return await openPromise;
+      return openPromise;
     }
   }
 
   async close(): Promise<boolean> {
-    return await new Promise<boolean>((resolve, reject) => {
+    return new Promise<boolean>((resolve, reject) => {
       if (this.port === undefined) {
         resolve(true);
         return;

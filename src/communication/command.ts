@@ -57,7 +57,7 @@ export class Command<T> {
   }
 
   async execute(): Promise<T> {
-    return await new Promise<T>((resolve, reject) => {
+    return new Promise<T>((resolve, reject) => {
       this.requestResolver = (v: T) => {
         if (!this.resolved && !this.rejected) {
           this.resolved = true;

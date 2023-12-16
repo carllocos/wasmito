@@ -112,7 +112,7 @@ export class ClientSideSocket extends AbstractChannel {
     if (!isPortOpen) {
       return false;
     }
-    return await new Promise((resolve) => {
+    return new Promise((resolve) => {
       const addr = { port: this.port, host: this.host };
       this.connection = new net.Socket();
       this.connection.connect(addr, () => {

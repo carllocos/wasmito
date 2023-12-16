@@ -67,7 +67,7 @@ export async function copyRecursive(
 }
 
 export async function readFileAsBuffer(filePath: string): Promise<Buffer> {
-  return await new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     fs.readFile(filePath, (err, data) => {
       if (err !== undefined && err != null) {
         reject(err);
@@ -95,7 +95,7 @@ export async function renameFile(
   filePath: string,
   newName: string,
 ): Promise<string> {
-  return await new Promise<string>((resolve, reject) => {
+  return new Promise<string>((resolve, reject) => {
     const directory = path.dirname(filePath);
     const newFilePath = path.join(directory, newName);
 

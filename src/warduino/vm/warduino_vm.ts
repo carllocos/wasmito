@@ -73,13 +73,13 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     neededState: StateRequest,
     timeout?: number,
   ): Promise<WasmState> {
-    return await this.sendRequest(neededState, timeout);
+    return this.sendRequest(neededState, timeout);
   }
 
   async snapshot(timeout?: number): Promise<WasmState> {
     const request = new StateRequest();
     request.includeAll();
-    return await this.sendRequest(request, timeout);
+    return this.sendRequest(request, timeout);
   }
 
   abstract uploadSourceCode(
@@ -92,11 +92,11 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     timeout?: number,
   ): Promise<T> {
     const command = new Command(this.channel, request, timeout);
-    return await command.execute();
+    return command.execute();
   }
 
   public async sendCommand<T>(command: Command<T>): Promise<T> {
-    return await command.execute();
+    return command.execute();
   }
 
   public async loadWasmState(
@@ -105,7 +105,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   ): Promise<void> {
     const builder = new LoadStateRequestBuilder(wasmState);
     const requests = Promise.all(
-      builder.buildRequests().map(async (req) => await this.sendRequest(req)),
+      builder.buildRequests().map(async (req) => this.sendRequest(req)),
     );
     if (timeout !== undefined) {
       await timeoutPromise(requests, timeout);
