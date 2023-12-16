@@ -2,11 +2,11 @@
   "name": "wasmito",
   "version": "1.0.0",
   "description": "",
-  "type": "module",
+  "type": "commonjs",
   "main": "dist/cjs/src/index.cjs",
   "exports": {
     "types": "./dist/types/src/index.d.ts",
-    "import": "./dist/esm/src/index.js",
+    "import": "./dist/cjs/src/index.cjs",
     "require": "./dist/cjs/src/index.cjs"
   },
   "types": "dist/types/src/index.d.ts",
@@ -24,9 +24,10 @@
     "test": "npm run build:cjs && LogLevel=error mocha './dist/cjs/test/**/*.cjs' --recursive",
     "lint": "eslint . --ext .ts",
     "build": "npm run build:cjs",
-    "cli": "npm run build && LogLevel=debug node './dist/src/cli/cli.js'",
+    "cli": "npm run build && LogLevel=debug node './dist/cjs/src/cli/cli.cjs'",
     "submodules": "bash install.sh",
     "build:cjs": "rm -rf dist/cjs && tsc --project tsconfig.json && npx convert-extension cjs dist/cjs/",
+    "build:esm": "rm -rf dist/esm  && tsc --project tsconfig-esm.json",
     "cleanNotUsed": "rm -rf dist/cjs && rm -rf dist/esm && rm -rf dist/types",
     "prepack": "npm run build"
   },
