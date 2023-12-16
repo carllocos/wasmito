@@ -1,10 +1,7 @@
 import { DeviceManager } from '../device/device_manager';
 import { getGlobalLogger } from '../logger/logger';
-import { InspectStateHook } from '../hooks/hook_inspect_state';
-import { PauseVMHook } from '../hooks/hook_run_pause';
 import {
   type MonitorWasmAddrResponse,
-  MontiroWasmAddrRequest,
   RemoveMonitorWasmAddrRequest,
 } from '../warduino/requests/monitor_request';
 import { StateRequest } from '../warduino/requests/inspect_request';
@@ -15,7 +12,6 @@ import {
 import { type WATSourceMap } from '../source_mappers/wat/wat_source_map';
 import { type EmulatedWARDuinoVM } from '../warduino/vm/emulated_vm';
 import { type WasmState } from '../state/wasm';
-import { type SourceMap } from '../source_mappers/source_map';
 import { DeviceMode } from '../device/device_config';
 
 export function allSucceeded(replies: MonitorWasmAddrResponse[]): boolean {
@@ -61,42 +57,24 @@ function onBreakpointStateUpdate(
 }
 
 export async function addBreakpoint(
-  address: number,
-  sourceMap: SourceMap,
+  lineNr: number,
   em: EmulatedWARDuinoVM,
   onBreakPointReached: (data: WasmState) => void,
 ): Promise<boolean> {
-  const opcode = sourceMap.getOpcode(address);
-  if (opcode === undefined) {
-    return false;
-  }
-
-  const pauseHook = new PauseVMHook();
-  const requestPause = new MontiroWasmAddrRequest(address)
-    .before()
-    .addHook(pauseHook);
-
   const stateOnBreakpoint = new StateRequest()
     .includeStack()
     .includePC()
     .includeGlobals()
     .includeCallstack()
     .includeEvents();
-  const inspectHook = new InspectStateHook(stateOnBreakpoint);
-  inspectHook.onSubscriptionData = onBreakPointReached;
 
-  const requestInspect = new MontiroWasmAddrRequest(address)
-    .before()
-    .addHook(inspectHook);
-
-  const requests = [requestPause, requestInspect];
-  const replies = await Promise.all(
-    requests.map(async (req) => {
-      return await em.sendRequest(req);
-    }),
+  return em.addBreakpoint(
+    {
+      linenr: lineNr,
+    },
+    stateOnBreakpoint,
+    onBreakPointReached,
   );
-  logReplies(replies);
-  return allSucceeded(replies);
 }
 
 export function snapshotRequest(): StateRequest {
@@ -115,35 +93,17 @@ export function snapshotRequest(): StateRequest {
 }
 
 export async function addBreakpointSnapshot(
-  address: number,
-  sourceMap: WATSourceMap,
+  linenr: number,
   em: EmulatedWARDuinoVM,
+  onBreakPointReached: (data: WasmState) => void,
 ): Promise<boolean> {
-  const opcode = sourceMap.getOpcode(address);
-  if (opcode === undefined) {
-    return false;
-  }
-
-  const pauseHook = new PauseVMHook();
-  const requestPause = new MontiroWasmAddrRequest(address)
-    .before()
-    .addHook(pauseHook);
-
-  const inspectHook = new InspectStateHook(snapshotRequest());
-  inspectHook.onSubscriptionData = console.log;
-
-  const requestInspect = new MontiroWasmAddrRequest(address)
-    .before()
-    .addHook(inspectHook);
-
-  const requests = [requestPause, requestInspect];
-  const replies = await Promise.all(
-    requests.map(async (req) => {
-      return await em.sendRequest(req);
-    }),
+  return em.addBreakpoint(
+    {
+      linenr,
+    },
+    snapshotRequest(),
+    onBreakPointReached,
   );
-  logReplies(replies);
-  return allSucceeded(replies);
 }
 
 export async function removeBreakpoint(
@@ -184,58 +144,47 @@ export async function runDebugScenario(
   if (sourceMap === undefined) {
     return;
   }
-  const funcCallHardwareSetup = 463;
-  const i32const5000 = 408;
-  const i32const12 = 411;
-  const funcCallChipLedCSetupCall = 413;
+  const funcCallHardwareSetup = 29;
   if (
     !(await addBreakpoint(
       funcCallHardwareSetup,
-      sourceMap,
       em,
       onBreakpointStateUpdate(em),
     ))
   ) {
     return undefined;
   }
-  if (
-    !(await addBreakpoint(
-      i32const5000,
-      sourceMap,
-      em,
-      onBreakpointStateUpdate(em),
-    ))
-  ) {
-    return undefined;
-  }
-  if (
-    !(await addBreakpoint(
-      i32const12,
-      sourceMap,
-      em,
-      onBreakpointStateUpdate(em),
-    ))
-  ) {
-    return undefined;
-  }
+  // if (!(await addBreakpoint(i32const5000, em, onBreakpointStateUpdate(em)))) {
+  //   return undefined;
+  // }
+  // if (
+  //   !(await addBreakpoint(
+  //     i32const12,
+  //     sourceMap,
+  //     em,
+  //     onBreakpointStateUpdate(em),
+  //   ))
+  // ) {
+  //   return undefined;
+  // }
   // if (!(await removeBreakpoint(i32const5000, sourceMap, em))) {
   //   return undefined;
   // }
-  if (
-    !(await addBreakpoint(
-      funcCallChipLedCSetupCall,
-      sourceMap,
-      em,
-      onBreakpointStateUpdate(em),
-    ))
-  ) {
-    return undefined;
-  }
+  // if (
+  //   !(await addBreakpoint(
+  //     funcCallChipLedCSetupCall,
+  //     sourceMap,
+  //     em,
+  //     onBreakpointStateUpdate(em),
+  //   ))
+  // ) {
+  //   return undefined;
+  // }
   await em.run();
   return em;
 }
 
-const app = './example-wat/dimmer-double-button.wat';
+const app = './example-wat/dim-using-temperature.wat';
 const output = './example-wat/';
 const connectToExistingProcess = false;
 runDebugScenario(app, connectToExistingProcess, output)
