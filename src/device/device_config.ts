@@ -47,7 +47,9 @@ export class DeviceConfig {
   }
 }
 
-export function deviceModeFromString(mode: string): DeploymentMode | undefined {
+export function deploymentModeFromString(
+  mode: string,
+): DeploymentMode | undefined {
   const modes: Record<string, DeploymentMode> = {
     emulate: DeploymentMode.DevVM,
     mcu: DeploymentMode.MCUVM,
