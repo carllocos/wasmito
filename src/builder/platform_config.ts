@@ -32,7 +32,7 @@ export class PlatformBuilderConfig {
   configuredForSerial(): boolean {
     return (
       this.platform !== Platform.Emulated &&
-      isSerialPort(this.deviceConfig.port) &&
+      this.deviceConfig.vmConfig.hasSerialPort() &&
       this.baudrate !== BoardBaudRate.NONE
     );
   }

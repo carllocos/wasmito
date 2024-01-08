@@ -257,7 +257,7 @@ export class ArduinoBoardBuilder extends PlatformBuilder {
     );
     return await ArduinoFlash(
       this.pathToArduinoSketchDir,
-      this.platformConfig.deviceConfig.port,
+      this.platformConfig.deviceConfig.vmConfig.serialPort,
       this.platformConfig.fqbn.fqbn,
     );
   }
