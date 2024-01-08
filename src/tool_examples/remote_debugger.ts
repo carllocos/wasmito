@@ -10,7 +10,7 @@ import {
   ResponseType,
 } from '../warduino/api/request_interface';
 import { type WATSourceMap } from '../source_mappers/wat/wat_source_map';
-import { type WARDuinoDevVM } from '../warduino/vm/emulated_vm';
+import { type WARDuinoDevVM } from '../warduino/vm/dev_vm';
 import { type WasmState } from '../state/wasm';
 import { type DeviceConfigArgs, DeviceMode } from '../device/device_config';
 import { type VMConfigArgs } from '../device/vm_config';

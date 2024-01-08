@@ -1,5 +1,5 @@
 import { DeviceManager } from '../../src/device/device_manager';
-import { type WARDuinoDevVM } from '../../src/warduino/vm/emulated_vm';
+import { type WARDuinoDevVM } from '../../src/warduino/vm/dev_vm';
 import { type VMConfigArgs } from '../../src';
 
 describe('Proxy Call suite', () => {

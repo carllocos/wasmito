@@ -1,6 +1,6 @@
 import { DeviceManager } from '../../src/device/device_manager';
 import { type VMConfigArgs } from '../../src/device/vm_config';
-import { type WARDuinoDevVM } from '../../src/warduino/vm/emulated_vm';
+import { type WARDuinoDevVM } from '../../src/warduino/vm/dev_vm';
 
 describe('Proxify Request', () => {
   let deviceManager: DeviceManager | undefined;
