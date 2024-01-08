@@ -36,18 +36,6 @@ export function deviceModeFromString(mode: string): DeviceMode | undefined {
   return undefined;
 }
 
-export function isValidIP(str: string): boolean {
-  const ipPattern =
-    /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-
-  return ipPattern.test(str);
-}
-
-export function isSerialPort(str: string): boolean {
-  const unixPattern = /^(\/dev\/ttyS\w+|\/dev\/ttyUSB\w+)$/i;
-  return unixPattern.test(str);
-}
-
 export function validateDeviceConfig(value: any): string[] {
   const errors: string[] = [];
 
