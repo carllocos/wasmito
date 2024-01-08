@@ -3,10 +3,10 @@ import * as fs from 'fs';
 import { type VMConfiguration } from './vm_config';
 
 export enum DeploymentMode {
-  DevVM = 'dev-vm',
-  MCUVM = 'mcu-vm',
-  ProxyVM = 'proxy-vm',
-  MirrorVM = 'mirror-vm',
+  DevVM = 'DevVM',
+  MCUVM = 'MCUVM',
+  ProxyVM = 'ProxyVM',
+  MirrorVM = 'MirrorVM',
 }
 
 export interface DeviceConfigArgs {
