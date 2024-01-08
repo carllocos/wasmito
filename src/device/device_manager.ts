@@ -7,7 +7,7 @@ import {
   DeviceConfig,
 } from './device_config';
 import { type Channel } from '../communication/channel_interface';
-import { EmulatedWARDuinoVM } from '../warduino/vm/emulated_vm';
+import { WARDuinoDevVM } from '../warduino/vm/emulated_vm';
 import { MCUWARDuinoVM } from '../warduino/vm/mcu_vm';
 import { type PlatformBuilderConfig } from '../builder/platform_config';
 import { SerialConnection } from '../communication/serial';
@@ -24,7 +24,7 @@ export class DeviceManagerError extends Error {
 
 export class DeviceManager {
   logger: winston.Logger;
-  localprocesses: EmulatedWARDuinoVM[];
+  localprocesses: WARDuinoDevVM[];
 
   constructor() {
     this.logger = createLogger('DeviceManager');
@@ -37,13 +37,13 @@ export class DeviceManager {
     program: string,
     maxWaitTime: number,
     buildOutputDir?: string,
-  ): Promise<EmulatedWARDuinoVM> {
+  ): Promise<WARDuinoDevVM> {
     const vmConfig = new VMConfiguration({
       program,
       toolPort,
     });
     const deviceConfig = new DeviceConfig(deviceConfigArgs, vmConfig);
-    const emulatedDevice = new EmulatedWARDuinoVM(
+    const emulatedDevice = new WARDuinoDevVM(
       deviceConfig,
       vmConfig,
       buildOutputDir,
@@ -54,7 +54,7 @@ export class DeviceManager {
       this.logger.info(
         `Failed to connect to local DevelopmentVM at port ${vmConfig.toolPort}`,
       );
-      throw new DeviceManagerError('timed out connecting to emulator process');
+      throw new DeviceManagerError('timed out connecting to DevVM process');
     }
     this.localprocesses.push(emulatedDevice);
     return emulatedDevice;
@@ -66,7 +66,7 @@ export class DeviceManager {
     vmConfigArgs: VMConfigArgs,
     maxWaitTime: number,
     buildOutputDir?: string,
-  ): Promise<EmulatedWARDuinoVM> {
+  ): Promise<WARDuinoDevVM> {
     return this.spawnDevelopmentVMFromConfigs(
       vmName,
       vmID,
@@ -83,7 +83,7 @@ export class DeviceManager {
     vmConfigArgs: VMConfigArgs,
     maxWaitTime: number,
     buildOutputDir?: string,
-  ): Promise<EmulatedWARDuinoVM> {
+  ): Promise<WARDuinoDevVM> {
     return this.spawnDevelopmentVMFromConfigs(
       vmName,
       vmID,
@@ -117,7 +117,7 @@ export class DeviceManager {
     return new MCUWARDuinoVM(platformConfig, channel, buildOutputDir);
   }
 
-  async closeVM(vm: EmulatedWARDuinoVM): Promise<boolean> {
+  async closeVM(vm: WARDuinoDevVM): Promise<boolean> {
     return await vm.close();
   }
 
@@ -125,11 +125,9 @@ export class DeviceManager {
     vmProcess.on('close', (code) => {
       this.logger.info(`Spawned process exit with code ${code}`);
       this.logger.debug('Removing process from local list');
-      this.localprocesses = this.localprocesses.filter(
-        (e: EmulatedWARDuinoVM) => {
-          return !e.isProcess(vmProcess);
-        },
-      );
+      this.localprocesses = this.localprocesses.filter((e: WARDuinoDevVM) => {
+        return !e.isProcess(vmProcess);
+      });
     });
   }
 
@@ -140,7 +138,7 @@ export class DeviceManager {
     spawnArgs: VMConfigArgs,
     maxWaitTime: number,
     buildOutputDir?: string,
-  ): Promise<EmulatedWARDuinoVM> {
+  ): Promise<WARDuinoDevVM> {
     const vmConfig = new VMConfiguration(spawnArgs);
     const deviceConfigArgs: DeviceConfigArgs = {
       name: vmHumanReadableName,
@@ -148,7 +146,7 @@ export class DeviceManager {
       mode,
     };
     const deviceConfig = new DeviceConfig(deviceConfigArgs, vmConfig);
-    const emulatedDevice = new EmulatedWARDuinoVM(
+    const emulatedDevice = new WARDuinoDevVM(
       deviceConfig,
       vmConfig,
       buildOutputDir,

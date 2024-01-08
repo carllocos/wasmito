@@ -12,15 +12,15 @@ import { getFreePort, isPortInUse } from '../../util/socket_util';
 import { NoChannel } from '../../communication/no_channel';
 import { BoardBaudRate } from '../../util/serial_port';
 
-export class EmulatedWARDuinoVMError extends Error {
+export class WARDuinoDevVMError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'EmulatedWARDuinoVMError';
-    Error.captureStackTrace(this, EmulatedWARDuinoVMError);
+    this.name = 'WARDuinoDevVMError';
+    Error.captureStackTrace(this, WARDuinoDevVMError);
   }
 }
 
-export class EmulatedWARDuinoVM extends WARDuinoVM {
+export class WARDuinoDevVM extends WARDuinoVM {
   protected logger: winston.Logger;
   private process?: ChildProcess;
   private readonly vmConfig: VMConfiguration;
@@ -83,7 +83,7 @@ export class EmulatedWARDuinoVM extends WARDuinoVM {
 
     const sourceMap = this.platform.getSourceMap();
     if (sourceMap === undefined) {
-      throw new EmulatedWARDuinoVMError(`SourceMap is undefined`);
+      throw new WARDuinoDevVMError(`SourceMap is undefined`);
     }
     const wasm = await sourceMap.getWasm();
     const updateRequest = new UpdateWasmModuleRequest(wasm);
@@ -101,13 +101,13 @@ export class EmulatedWARDuinoVM extends WARDuinoVM {
 
     const exitCode = await this.platform.compile(this.vmConfig.program);
     if (exitCode !== 0) {
-      throw new EmulatedWARDuinoVMError(
-        `Could not start emulator. Compilation exited with code: ${exitCode}`,
+      throw new WARDuinoDevVMError(
+        `Could not start DevVM. Compilation exited with code: ${exitCode}`,
       );
     }
     const sourceMap = this.platform.getSourceMap();
     if (sourceMap === undefined) {
-      throw new EmulatedWARDuinoVMError(`Could not generate SourceMap`);
+      throw new WARDuinoDevVMError(`Could not generate SourceMap`);
     }
     const processArgs = this.buildProcessArguments(
       sourceMap.wasmFilePath,
@@ -115,7 +115,7 @@ export class EmulatedWARDuinoVM extends WARDuinoVM {
     );
     const spawnCommand = getPath2WARDuinoSDKEmulatorBinary();
     if (spawnCommand === undefined) {
-      throw new EmulatedWARDuinoVMError(
+      throw new WARDuinoDevVMError(
         "Path to WARDuino SDK is not set. You can set it via env variable 'WARDUINO_SDK=PATH'",
       );
     }
@@ -141,9 +141,7 @@ export class EmulatedWARDuinoVM extends WARDuinoVM {
       );
       this.logger.info('Killing local DevelopmentVM process');
       childProcess.kill();
-      throw new EmulatedWARDuinoVMError(
-        'timed out connecting to emulator process',
-      );
+      throw new WARDuinoDevVMError('timed out connecting to DevVM process');
     }
 
     this.process = childProcess;
@@ -173,7 +171,7 @@ export class EmulatedWARDuinoVM extends WARDuinoVM {
   private async assertExistanceToolPort(): Promise<void> {
     if (this.vmConfig.hasToolPort()) {
       if (await isPortInUse(this.vmConfig.toolPort)) {
-        throw new EmulatedWARDuinoVMError(
+        throw new WARDuinoDevVMError(
           `Cannot spawn a DevelopmentVM on Port ${this.vmConfig.toolPort} as it is already in use`,
         );
       }
@@ -183,7 +181,7 @@ export class EmulatedWARDuinoVM extends WARDuinoVM {
       );
       const openPort = await getFreePort();
       if (openPort === undefined) {
-        throw new EmulatedWARDuinoVMError(
+        throw new WARDuinoDevVMError(
           'Cannot spawn a DevelopmentVM as no free port was found',
         );
       }
