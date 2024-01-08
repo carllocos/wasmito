@@ -26,7 +26,7 @@ import {
 } from '../requests/monitor_request';
 
 export abstract class WARDuinoVM implements WARDuinoAPI {
-  protected readonly channel: Channel;
+  protected channel: Channel;
   protected abstract logger: winston.Logger;
   protected readonly platformConfig: PlatformBuilderConfig;
   protected readonly platform: PlatformBuilder;
