@@ -70,24 +70,33 @@ export function validateDeviceConfig(value: any): string[] {
   } else {
     if (typeof value.name !== 'string') {
       errors.push('Property "name" should be a string');
+    } else {
+      if (value.name === '') {
+        errors.push('Property "name" should not be an empty string');
+      }
     }
 
     if (typeof value.id !== 'string') {
       errors.push('Property "id" should be a string');
+    } else {
+      if (value.id === '') {
+        errors.push('Property "id" should not be an empty string');
+      }
     }
-  }
 
-  let mode: any = value.mode;
-  if (typeof mode === 'string') {
-    mode = mode.toLowerCase();
-  }
-
-  if (!Object.values(DeploymentMode).includes(mode)) {
-    errors.push(
-      `Property "deploymentMode" is not a valid DeviceMode (choices ${Object.values(
-        DeploymentMode,
-      ).toString()})`,
-    );
+    if (typeof value.deploymentMode !== 'string') {
+      errors.push(
+        'Property "deploymentMode" has invalid type should be a string',
+      );
+    } else {
+      if (deploymentModeFromString(value.deploymentMode) === undefined) {
+        errors.push(
+          `Property "deploymentMode" is not a valid DeviceMode (choices ${Object.values(
+            DeploymentMode,
+          ).toString()}) given ${value.deploymentMode}`,
+        );
+      }
+    }
   }
 
   return errors;
