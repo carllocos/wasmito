@@ -3,7 +3,7 @@ import { getAbsolutePath } from '../../util/file_util';
 import { type PlatformBuilderConfig } from '../platform_config';
 import { PlatformBuilder } from '../platformbuilder';
 
-export class EmulatorPlatform extends PlatformBuilder {
+export class DevVMPlatform extends PlatformBuilder {
   private pathToSourceCodeFile: string;
 
   constructor(config: PlatformBuilderConfig, outputDir: string = '') {

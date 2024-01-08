@@ -8,7 +8,7 @@ export interface BoardFQBN {
 
 export enum Platform {
   Arduino,
-  Emulated,
+  DevVM,
 }
 
 export class PlatformBuilderConfig {
@@ -31,7 +31,7 @@ export class PlatformBuilderConfig {
 
   configuredForSerial(): boolean {
     return (
-      this.platform !== Platform.Emulated &&
+      this.platform !== Platform.DevVM &&
       this.deviceConfig.vmConfig.hasSerialPort() &&
       this.baudrate !== BoardBaudRate.NONE
     );
