@@ -12,7 +12,7 @@ import {
 import { type WATSourceMap } from '../source_mappers/wat/wat_source_map';
 import { type WARDuinoDevVM } from '../warduino/vm/dev_vm';
 import { type WasmState } from '../state/wasm';
-import { type DeviceConfigArgs, DeviceMode } from '../device/device_config';
+import { type DeviceConfigArgs, DeploymentMode } from '../device/device_config';
 import { type VMConfigArgs } from '../device/vm_config';
 
 export function allSucceeded(replies: MonitorWasmAddrResponse[]): boolean {
@@ -142,7 +142,7 @@ export async function runDebugScenario(
   const dc: DeviceConfigArgs = {
     id: vmID,
     name: vmName,
-    mode: DeviceMode.Emulate,
+    deploymentMode: DeploymentMode.DevVM,
   };
 
   // program: wasmApp,

@@ -1,7 +1,7 @@
 import { listAllFQBN, listAvailableBoards } from '../builder/util_platform';
 import { Platform, PlatformBuilderConfig } from '../builder/platform_config';
 import {
-  DeviceMode,
+  DeploymentMode,
   type DeviceConfigArgs,
   DeviceConfig,
 } from '../device/device_config';
@@ -38,7 +38,7 @@ async function runBuilder(): Promise<void> {
   const deviceConfigArgs: DeviceConfigArgs = {
     name: 'm5stickc',
     id: 'some id',
-    mode: DeviceMode.MCU,
+    deploymentMode: DeploymentMode.MCUVM,
   };
   const deviceConfig = new DeviceConfig(deviceConfigArgs, vmConfig);
 

@@ -2,30 +2,30 @@ import { createLogger } from '../logger/logger';
 import * as fs from 'fs';
 import { type VMConfiguration } from './vm_config';
 
-export enum DeviceMode {
-  Emulate = 'emulate',
-  MCU = 'mcu',
-  Proxy = 'proxy',
-  Mirror = 'mirror',
+export enum DeploymentMode {
+  DevVM = 'dev-vm',
+  MCUVM = 'mcu-vm',
+  ProxyVM = 'proxy-vm',
+  MirrorVM = 'mirror-vm',
 }
 
 export interface DeviceConfigArgs {
   name: string;
   id: string;
-  mode: DeviceMode;
+  deploymentMode: DeploymentMode;
 }
 
 export class DeviceConfig {
   private readonly _name: string;
   private readonly _id: string;
-  private readonly _mode: DeviceMode;
+  private readonly _deploymentMode: DeploymentMode;
   private readonly _vmConfig: VMConfiguration;
 
   constructor(deviceConfig: DeviceConfigArgs, vmConfig: VMConfiguration) {
     // TODO validate deviceConfigArgs
     this._name = deviceConfig.name;
     this._id = deviceConfig.id;
-    this._mode = deviceConfig.mode;
+    this._deploymentMode = deviceConfig.deploymentMode;
     this._name = deviceConfig.name;
     this._vmConfig = vmConfig;
   }
@@ -38,8 +38,8 @@ export class DeviceConfig {
     return this._id;
   }
 
-  get mode(): string {
-    return this._mode;
+  get deploymentMode(): string {
+    return this._deploymentMode;
   }
 
   get vmConfig(): VMConfiguration {
@@ -47,12 +47,12 @@ export class DeviceConfig {
   }
 }
 
-export function deviceModeFromString(mode: string): DeviceMode | undefined {
-  const modes: Record<string, DeviceMode> = {
-    emulate: DeviceMode.Emulate,
-    mcu: DeviceMode.MCU,
-    proxy: DeviceMode.Proxy,
-    mirror: DeviceMode.Mirror,
+export function deviceModeFromString(mode: string): DeploymentMode | undefined {
+  const modes: Record<string, DeploymentMode> = {
+    emulate: DeploymentMode.DevVM,
+    mcu: DeploymentMode.MCUVM,
+    proxy: DeploymentMode.ProxyVM,
+    mirror: DeploymentMode.MirrorVM,
   };
 
   const lowerCaseInput = mode.toLowerCase();
@@ -86,10 +86,10 @@ export function validateDeviceConfig(value: any): string[] {
     mode = mode.toLowerCase();
   }
 
-  if (!Object.values(DeviceMode).includes(mode)) {
+  if (!Object.values(DeploymentMode).includes(mode)) {
     errors.push(
-      `Property "mode" is not a valid DeviceMode (choices ${Object.values(
-        DeviceMode,
+      `Property "deploymentMode" is not a valid DeviceMode (choices ${Object.values(
+        DeploymentMode,
       ).toString()})`,
     );
   }
