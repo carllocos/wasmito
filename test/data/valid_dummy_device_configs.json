@@ -3,18 +3,12 @@
         {
             "name": "A",
             "id": "A",
-            "mode": "mcu",
-            "port": "/dev/ttyUSB0",
-            "program": "program A",
-            "host": ""
+            "deploymentMode": "mcuvm"
         },
         {
             "name": "B",
             "id": "B",
-            "mode": "mcu",
-            "port": "/dev/ttyUSB1",
-            "program": "program B",
-            "host": ""
+            "deploymentMode": "mcuvm"
         }
     ]
 }
