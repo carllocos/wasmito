@@ -1,17 +1,16 @@
 import { spawn, type ChildProcess } from 'child_process';
 import { WARDuinoVM } from './warduino_vm';
-import { type EmulatorSpawnArguments } from '../../device/emulator_config';
+import { type VMConfiguration } from '../../device/emulator_config';
 import { ClientSideSocket } from '../../communication/client_socket';
 import { type DeviceConfig } from '../../device/device_config';
 import type winston from 'winston';
 import { createLogger } from '../../logger/logger';
-import {
-  BoardBaudRate,
-  Platform,
-  PlatformBuilderConfig,
-} from '../../builder/platform_config';
+import { Platform, PlatformBuilderConfig } from '../../builder/platform_config';
 import { UpdateWasmModuleRequest } from '../requests/update_module_request';
 import { getPath2WARDuinoSDKEmulatorBinary } from '../../project_config';
+import { getFreePort, isPortInUse } from '../../util/socket_util';
+import { NoChannel } from '../../communication/no_channel';
+import { BoardBaudRate } from '../../util/serial_port';
 
 export class EmulatedWARDuinoVMError extends Error {
   constructor(message: string) {
@@ -24,13 +23,12 @@ export class EmulatedWARDuinoVMError extends Error {
 export class EmulatedWARDuinoVM extends WARDuinoVM {
   protected logger: winston.Logger;
   private process?: ChildProcess;
-  private readonly args: EmulatorSpawnArguments;
+  private readonly vmConfig: VMConfiguration;
   private readonly deviceConfig: DeviceConfig;
 
   constructor(
-    socketPort: number,
     deviceConfig: DeviceConfig,
-    args: EmulatorSpawnArguments,
+    vmConfig: VMConfiguration,
     buildOutputDir?: string,
   ) {
     super(
@@ -43,10 +41,12 @@ export class EmulatedWARDuinoVM extends WARDuinoVM {
         },
         deviceConfig,
       ),
-      new ClientSideSocket(socketPort, 'localhost'),
+      vmConfig.hasToolPort()
+        ? new ClientSideSocket(vmConfig.toolPort, vmConfig.toolHostIP)
+        : new NoChannel(),
       buildOutputDir,
     );
-    this.args = args;
+    this.vmConfig = vmConfig;
     this.deviceConfig = deviceConfig;
     this.logger = createLogger(deviceConfig.name);
   }
@@ -91,8 +91,15 @@ export class EmulatedWARDuinoVM extends WARDuinoVM {
     return true;
   }
 
-  public async spawn(): Promise<ChildProcess> {
-    const exitCode = await this.platform.compile(this.deviceConfig.program);
+  public async spawn(maxWaitTime?: number): Promise<ChildProcess> {
+    await this.assertExistanceToolPort();
+
+    this.channel = new ClientSideSocket(
+      this.vmConfig.toolPort,
+      this.vmConfig.toolHostIP,
+    );
+
+    const exitCode = await this.platform.compile(this.vmConfig.program);
     if (exitCode !== 0) {
       throw new EmulatedWARDuinoVMError(
         `Could not start emulator. Compilation exited with code: ${exitCode}`,
@@ -104,10 +111,7 @@ export class EmulatedWARDuinoVM extends WARDuinoVM {
     }
     const processArgs = this.buildProcessArguments(
       sourceMap.wasmFilePath,
-      this.args,
-    );
-    this.logger.info(
-      `starting emulator process with arguments ${processArgs.join(' ')}`,
+      this.vmConfig,
     );
     const spawnCommand = getPath2WARDuinoSDKEmulatorBinary();
     if (spawnCommand === undefined) {
@@ -116,10 +120,11 @@ export class EmulatedWARDuinoVM extends WARDuinoVM {
       );
     }
 
-    this.logger.debug(
-      'decide whether to move callbacks on data or on close to the EmulateDevice class',
+    this.logger.info(
+      `starting DevelopmentVM process ${spawnCommand} with arguments ${processArgs.join(
+        ' ',
+      )}`,
     );
-
     const childProcess = spawn(spawnCommand, processArgs);
     childProcess.stdout.on('data', (data) => {
       this.logger.debug(`${this.deviceConfig.name} (Spawned process): ${data}`);
@@ -129,6 +134,18 @@ export class EmulatedWARDuinoVM extends WARDuinoVM {
       this.logger.error(`${this.deviceConfig.name} (Spawned process): ${data}`);
     });
 
+    const connected = await this.connect(maxWaitTime);
+    if (!connected) {
+      this.logger.info(
+        `Failed to connect to local DevelopmentVM at port ${this.vmConfig.toolPort}`,
+      );
+      this.logger.info('Killing local DevelopmentVM process');
+      childProcess.kill();
+      throw new EmulatedWARDuinoVMError(
+        'timed out connecting to emulator process',
+      );
+    }
+
     this.process = childProcess;
 
     return childProcess;
@@ -136,23 +153,41 @@ export class EmulatedWARDuinoVM extends WARDuinoVM {
 
   private buildProcessArguments(
     programPath: string,
-    args: EmulatorSpawnArguments,
+    args: VMConfiguration,
   ): string[] {
     const processArgs: string[] = [programPath];
 
-    if (args.listenPort !== undefined) {
+    if (args.hasToolPort()) {
       processArgs.push('--socket');
-      processArgs.push(args.listenPort.toString());
+      processArgs.push(args.toolPort.toString());
     }
     if (args.pauseOnStart) {
       processArgs.push('--paused');
     }
-    if (
-      args.disableStrictModuleLoad !== undefined &&
-      args.disableStrictModuleLoad
-    ) {
+    if (args.disableStrictModuleLoad) {
       processArgs.push('--disable-strict-module-load');
     }
     return processArgs;
+  }
+
+  private async assertExistanceToolPort(): Promise<void> {
+    if (this.vmConfig.hasToolPort()) {
+      if (await isPortInUse(this.vmConfig.toolPort)) {
+        throw new EmulatedWARDuinoVMError(
+          `Cannot spawn a DevelopmentVM on Port ${this.vmConfig.toolPort} as it is already in use`,
+        );
+      }
+    } else {
+      this.logger.info(
+        'No toolPort provided so will open a random available one',
+      );
+      const openPort = await getFreePort();
+      if (openPort === undefined) {
+        throw new EmulatedWARDuinoVMError(
+          'Cannot spawn a DevelopmentVM as no free port was found',
+        );
+      }
+      this.vmConfig.toolPort = openPort;
+    }
   }
 }
