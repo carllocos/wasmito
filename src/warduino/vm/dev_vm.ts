@@ -7,7 +7,7 @@ import type winston from 'winston';
 import { createLogger } from '../../logger/logger';
 import { Platform, PlatformBuilderConfig } from '../../builder/platform_config';
 import { UpdateWasmModuleRequest } from '../requests/update_module_request';
-import { getPath2WARDuinoSDKEmulatorBinary } from '../../project_config';
+import { getPath2WARDuinoSDKVMBinary } from '../../project_config';
 import { getFreePort, isPortInUse } from '../../util/socket_util';
 import { NoChannel } from '../../communication/no_channel';
 import { BoardBaudRate } from '../../util/serial_port';
@@ -113,7 +113,7 @@ export class WARDuinoDevVM extends WARDuinoVM {
       sourceMap.wasmFilePath,
       this.vmConfig,
     );
-    const spawnCommand = getPath2WARDuinoSDKEmulatorBinary();
+    const spawnCommand = getPath2WARDuinoSDKVMBinary();
     if (spawnCommand === undefined) {
       throw new WARDuinoDevVMError(
         "Path to WARDuino SDK is not set. You can set it via env variable 'WARDUINO_SDK=PATH'",

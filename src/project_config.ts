@@ -68,7 +68,7 @@ export function setPath2WARDuinoSDK(path: string): void {
   sdkPaths.WARDUINO_SDK = path;
 }
 
-export function getPath2WARDuinoSDKEmulatorBinary(): string | undefined {
+export function getPath2WARDuinoSDKVMBinary(): string | undefined {
   if (sdkPaths.WARDUINO_SDK === undefined) {
     const path = getPath2WARDuinoSDK();
     if (path !== undefined) {
