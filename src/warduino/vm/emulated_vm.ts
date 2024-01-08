@@ -1,6 +1,6 @@
 import { spawn, type ChildProcess } from 'child_process';
 import { WARDuinoVM } from './warduino_vm';
-import { type VMConfiguration } from '../../device/emulator_config';
+import { type VMConfiguration } from '../../device/vm_config';
 import { ClientSideSocket } from '../../communication/client_socket';
 import { type DeviceConfig } from '../../device/device_config';
 import type winston from 'winston';
