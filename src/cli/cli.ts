@@ -72,37 +72,38 @@ function registerDeviceManagerCommands(
   program: Command,
 ): void {
   program
-    .command('spawn-emulator')
-    .description('spawn an emulator locally')
+    .command('spawn-vm')
+    .description('spawn an Development VM locally')
     .argument('<string>', 'Wasm program to run')
+    .option('-p, --port <number>', 'the port where the VM will listen upon')
     .option(
-      '-p, --port <number>',
-      'the port where the emulator will listen upon',
+      '--pause <boolean>',
+      'Should the program run on the VM be paused on start',
+      true,
     )
-    .option('--pause <boolean>', 'Should the emulator be paused on start', true)
     .option(
       '-n, --name <string>',
       'a human readable name to assign for logging',
     )
     .option('--id <string>', 'a unique identifier to identify device')
     .action(async (wasmApp, options) => {
-      getGlobalLogger().info(`spawning emulator for program ${wasmApp}`);
-      const name: string = options.name ?? 'emulator';
+      getGlobalLogger().info(`spawning a DevVM for program ${wasmApp}`);
+      const name: string = options.name ?? 'DevVM';
       const ID: string = options.id ?? '1';
       const vmConfigArgs: VMConfigArgs = {
         program: wasmApp,
         toolPort: options.port ?? '',
       };
 
-      const maxWaitTime = 3000; // Max waittime for connecting to the emulator
+      const maxWaitTime = 3000; // Max waittime for connecting to the DevVM
       try {
-        await manager.spawnEmulator(deviceConfig, maxWaitTime);
+        await manager.spawnDevelopmentVM(name, ID, vmConfigArgs, maxWaitTime);
       } catch (err: unknown) {
         let errMsg = '';
         if (err instanceof Error) {
           errMsg = `: ${err.message}`;
         }
-        getGlobalLogger().error(`could not spawn emulator ${errMsg}`);
+        getGlobalLogger().error(`could not spawn DevVM ${errMsg}`);
         getGlobalLogger().info('closing CLI');
         process.exit(-1);
       }
