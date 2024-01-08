@@ -43,21 +43,17 @@ export class DeviceManager {
       toolPort,
     });
     const deviceConfig = new DeviceConfig(deviceConfigArgs, vmConfig);
-    const emulatedDevice = new WARDuinoDevVM(
-      deviceConfig,
-      vmConfig,
-      buildOutputDir,
-    );
+    const devVM = new WARDuinoDevVM(deviceConfig, vmConfig, buildOutputDir);
 
-    const connected = await emulatedDevice.connect(maxWaitTime);
+    const connected = await devVM.connect(maxWaitTime);
     if (!connected) {
       this.logger.info(
         `Failed to connect to local DevelopmentVM at port ${vmConfig.toolPort}`,
       );
       throw new DeviceManagerError('timed out connecting to DevVM process');
     }
-    this.localprocesses.push(emulatedDevice);
-    return emulatedDevice;
+    this.localprocesses.push(devVM);
+    return devVM;
   }
 
   async spawnDevelopmentVM(
@@ -146,14 +142,10 @@ export class DeviceManager {
       mode,
     };
     const deviceConfig = new DeviceConfig(deviceConfigArgs, vmConfig);
-    const emulatedDevice = new WARDuinoDevVM(
-      deviceConfig,
-      vmConfig,
-      buildOutputDir,
-    );
-    const childProcess = await emulatedDevice.spawn(maxWaitTime);
+    const devVM = new WARDuinoDevVM(deviceConfig, vmConfig, buildOutputDir);
+    const childProcess = await devVM.spawn(maxWaitTime);
     this.registerListenersOnVMProcess(childProcess);
-    this.localprocesses.push(emulatedDevice);
-    return emulatedDevice;
+    this.localprocesses.push(devVM);
+    return devVM;
   }
 }
