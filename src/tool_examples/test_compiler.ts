@@ -1,12 +1,14 @@
 import { listAllFQBN, listAvailableBoards } from '../builder/util_platform';
+import { Platform, PlatformBuilderConfig } from '../builder/platform_config';
 import {
-  BoardBaudRate,
-  Platform,
-  PlatformBuilderConfig,
-} from '../builder/platform_config';
-import { type DeviceConfig, DeviceMode } from '../device/device_config';
+  DeviceMode,
+  type DeviceConfigArgs,
+  DeviceConfig,
+} from '../device/device_config';
 import { createLogger } from '../logger/logger';
 import { DeviceManager } from '../device/device_manager';
+import { BoardBaudRate } from '../util/serial_port';
+import { VMConfiguration } from '../device';
 const testCompilerLogger = createLogger('TestCompiler');
 
 async function runBuilder(): Promise<void> {
@@ -28,14 +30,17 @@ async function runBuilder(): Promise<void> {
     return;
   }
 
-  const deviceConfig: DeviceConfig = {
+  const vmConfig = new VMConfiguration({
+    program: 'program',
+    serialPort: boardPort,
+  });
+
+  const deviceConfigArgs: DeviceConfigArgs = {
     name: 'm5stickc',
     id: 'some id',
     mode: DeviceMode.MCU,
-    host: '',
-    port: boardPort,
-    program: 'program',
   };
+  const deviceConfig = new DeviceConfig(deviceConfigArgs, vmConfig);
 
   const platformConfig = new PlatformBuilderConfig(
     Platform.Arduino,
