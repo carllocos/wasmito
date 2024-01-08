@@ -206,11 +206,11 @@ describe('Loading multile device configs', () => {
     const configA = configs[0];
     assert(configA.id === 'A', 'invalid id');
     assert(configA.name === 'A', 'invalid name');
-    assert(configA.mode === 'mcu', 'invalid mode');
+    assert(configA.deploymentMode === 'mcu-vm', 'invalid mode');
 
     const configB = configs[1];
     assert(configB.id === 'B', 'invalid id');
     assert(configB.name === 'B', 'invalid name');
-    assert(configB.mode === 'mcu', 'invalid mode');
+    assert(configB.deploymentMode === 'mcu-vm', 'invalid mode');
   });
 });

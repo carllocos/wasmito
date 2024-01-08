@@ -2,7 +2,7 @@ import { VMConfiguration, type VMConfigArgs } from './vm_config';
 import type winston from 'winston';
 import { createLogger } from '../logger/logger';
 import {
-  DeviceMode,
+  DeploymentMode,
   type DeviceConfigArgs,
   DeviceConfig,
 } from './device_config';
@@ -66,7 +66,7 @@ export class DeviceManager {
     return this.spawnDevelopmentVMFromConfigs(
       vmName,
       vmID,
-      DeviceMode.Emulate,
+      DeploymentMode.DevVM,
       vmConfigArgs,
       maxWaitTime,
       buildOutputDir,
@@ -83,7 +83,7 @@ export class DeviceManager {
     return this.spawnDevelopmentVMFromConfigs(
       vmName,
       vmID,
-      DeviceMode.Proxy,
+      DeploymentMode.ProxyVM,
       vmConfigArgs,
       maxWaitTime,
       buildOutputDir,
@@ -130,7 +130,7 @@ export class DeviceManager {
   private async spawnDevelopmentVMFromConfigs(
     vmHumanReadableName: string,
     vmID: string,
-    mode: DeviceMode,
+    mode: DeploymentMode,
     spawnArgs: VMConfigArgs,
     maxWaitTime: number,
     buildOutputDir?: string,
@@ -139,7 +139,7 @@ export class DeviceManager {
     const deviceConfigArgs: DeviceConfigArgs = {
       name: vmHumanReadableName,
       id: vmID,
-      mode,
+      deploymentMode: mode,
     };
     const deviceConfig = new DeviceConfig(deviceConfigArgs, vmConfig);
     const devVM = new WARDuinoDevVM(deviceConfig, vmConfig, buildOutputDir);

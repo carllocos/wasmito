@@ -1,5 +1,5 @@
 import {
-  DeviceMode,
+  DeploymentMode,
   type DeviceConfigArgs,
   DeviceConfig,
 } from '../../device/device_config';
@@ -437,7 +437,7 @@ export async function spawnHardwareVM(
   const deviceConfigArgs: DeviceConfigArgs = {
     name: 'm5stickc',
     id: 'some id',
-    mode: DeviceMode.MCU,
+    deploymentMode: DeploymentMode.MCUVM,
   };
 
   const deviceConfig: DeviceConfig = new DeviceConfig(
@@ -470,7 +470,7 @@ export async function runMonitorApp(
   monitorTime: number,
   outputDir: string,
   nameOutputFile: string,
-  monitorMode: DeviceMode,
+  monitorMode: DeploymentMode,
 ): Promise<boolean> {
   const bufferSizePriorWrite = 500;
   const JSONWriter = new WriteJSON(
@@ -481,7 +481,7 @@ export async function runMonitorApp(
 
   const dm = new DeviceManager();
   let vm: WARDuinoVM | undefined;
-  if (monitorMode === DeviceMode.Emulate) {
+  if (monitorMode === DeploymentMode.DevVM) {
     const vmConfigArgs: VMConfigArgs = {
       program: wasmApp,
       disableStrictModuleLoad: true,
@@ -496,7 +496,7 @@ export async function runMonitorApp(
       8000,
       outputDir,
     );
-  } else if (monitorMode === DeviceMode.MCU) {
+  } else if (monitorMode === DeploymentMode.MCUVM) {
     vm = await spawnHardwareVM(dm, wasmApp, outputDir);
     await sleep(5000); // sleep to let MCU load module first
   } else {
@@ -509,7 +509,7 @@ export async function runMonitorApp(
 
   const registered = await registerAllHooks(
     vm,
-    monitorMode === DeviceMode.Emulate,
+    monitorMode === DeploymentMode.DevVM,
   );
   if (!registered) {
     return false;
@@ -532,7 +532,7 @@ runMonitorApp(
   recordTime,
   outputDir,
   nameMonitorOutputFile,
-  DeviceMode.Emulate,
+  DeploymentMode.DevVM,
 )
   .then((_) => {})
   .catch(console.error);
