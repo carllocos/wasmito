@@ -3,6 +3,7 @@ import {
   isValidDevicesConfig,
   parseDeviceConfigs,
   validateDeviceConfig,
+  DeploymentMode,
 } from '../../src/device/device_config';
 import assert from 'assert';
 
@@ -46,13 +47,11 @@ describe('Loading device config with invalid input', () => {
     );
   });
 
-  it('Input config with unsupported `mode` value should give error', () => {
+  it('Input config with unsupported `deploymentMode` value should give error', () => {
     const config: any = {};
     config.name = 'some Name';
     config.id = 'some id';
-    config.port = 'some port';
-    config.program = 'some program';
-    config.mode = 'Unexsting mode';
+    config.deploymentMode = 'Unexsting deployment mode';
     const errorsMsgs: string[] = validateDeviceConfig(config);
     assert(
       errorsMsgs.length > 0,
@@ -66,10 +65,7 @@ describe('Loading device config with valid input', () => {
     const config: any = {};
     config.name = 'some Name';
     config.id = 'some id';
-    config.port = '/dev/ttyUSB1'; // valid unix port
-    config.program = 'some program';
-    config.mode = 'Emulate';
-    config.host = '';
+    config.deploymentMode = 'DevVM';
 
     const errorsMsgs: string[] = validateDeviceConfig(config);
     assert(
@@ -80,24 +76,21 @@ describe('Loading device config with valid input', () => {
     );
   });
 
-  it('The `mode` property of an input config should be case insensitive', () => {
+  it('The `deploymentMode` property of an input config should be case insensitive', () => {
     const config: any = {};
     config.name = 'some Name';
     config.id = 'some id';
-    config.port = '/dev/ttyUSB1'; // valid unix port
-    config.program = 'some program';
-    config.mode = 'EmUlaTE'; // mix (non)-capital
-    config.host = '';
+    config.deploymentMode = 'dEvVm'; // mix (non)-capital
 
     let errorsMsgs: string[] = validateDeviceConfig(config);
     assert(
       errorsMsgs.length === 0,
-      `Error occurred when loading an emulated device config got errors: ${errorsMsgs.join(
+      `Error occurred when loading a DevVM device config got errors: ${errorsMsgs.join(
         ',',
       )}`,
     );
 
-    config.mode = 'mcU';
+    config.deploymentMode = 'mcUvm';
     errorsMsgs = validateDeviceConfig(config);
     assert(
       errorsMsgs.length === 0,
@@ -106,7 +99,7 @@ describe('Loading device config with valid input', () => {
       )}`,
     );
 
-    config.mode = 'ProXy';
+    config.deploymentMode = 'ProXyVm';
     errorsMsgs = validateDeviceConfig(config);
     assert(
       errorsMsgs.length === 0,
@@ -115,7 +108,7 @@ describe('Loading device config with valid input', () => {
       )}`,
     );
 
-    config.mode = 'MIRROR';
+    config.deploymentMode = 'MIRRORVM';
     errorsMsgs = validateDeviceConfig(config);
     assert(
       errorsMsgs.length === 0,
@@ -140,18 +133,13 @@ describe('Loading multile device configs', () => {
     const valid: any = {
       name: 'a',
       id: 'b',
-      mode: 'mcu',
-      port: '/dev/ttyUSB1', // valid unix port
-      program: 'some program',
-      host: '',
+      deploymentMode: 'mcuvm',
     };
 
     const invalid: any = {
       name: 'a',
       id: 'b',
-      mode: 'UNEXISTING MODE',
-      port: 'some port',
-      program: 'some program',
+      deploymentMode: 'UNEXISTING DEPLOYMENT MODE',
     };
 
     let configs: any = { devices: [valid, invalid] };
@@ -173,22 +161,16 @@ describe('Loading multile device configs', () => {
     const validMCU: any = {
       name: 'a',
       id: 'b',
-      mode: 'mcu',
-      port: '/dev/ttyUSB0',
-      host: '',
-      program: 'some program',
+      deploymentMode: 'mcuvm',
     };
 
-    const validEmulated: any = {
+    const validDevVM: any = {
       name: 'a',
       id: 'b',
-      mode: 'emulate',
-      port: '8300',
-      host: 'localhost',
-      program: 'some program',
+      deploymentMode: 'devvm',
     };
 
-    const configs: any = { devices: [validMCU, validEmulated] };
+    const configs: any = { devices: [validMCU, validDevVM] };
     const errorMsgs = isValidDevicesConfig(configs);
     assert(errorMsgs.length === 0, 'Valid input configs should parse');
   });
@@ -206,11 +188,17 @@ describe('Loading multile device configs', () => {
     const configA = configs[0];
     assert(configA.id === 'A', 'invalid id');
     assert(configA.name === 'A', 'invalid name');
-    assert(configA.deploymentMode === 'mcu-vm', 'invalid mode');
+    assert(
+      configA.deploymentMode === DeploymentMode.MCUVM,
+      'invalid deployment mode',
+    );
 
     const configB = configs[1];
     assert(configB.id === 'B', 'invalid id');
     assert(configB.name === 'B', 'invalid name');
-    assert(configB.deploymentMode === 'mcu-vm', 'invalid mode');
+    assert(
+      configB.deploymentMode === DeploymentMode.MCUVM,
+      'invalid deployment mode',
+    );
   });
 });
