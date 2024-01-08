@@ -1,4 +1,8 @@
-import { DeviceMode, type DeviceConfig } from '../../device/device_config';
+import {
+  DeviceMode,
+  type DeviceConfigArgs,
+  DeviceConfig,
+} from '../../device/device_config';
 import { DeviceManager } from '../../device/device_manager';
 import { getGlobalLogger } from '../../logger/logger';
 import { type WasmState } from '../../state/wasm';
@@ -21,12 +25,9 @@ import { type SourceMap } from '../../source_mappers/source_map';
 import path from 'path';
 import { type MCUWARDuinoVM } from '../../warduino/vm/mcu_vm';
 import { listAllFQBN, listAvailableBoards } from '../../builder/util_platform';
-import {
-  BoardBaudRate,
-  Platform,
-  PlatformBuilderConfig,
-} from '../../builder/platform_config';
-import { type EmulatedWARDuinoVM } from '../../warduino/vm/emulated_vm';
+import { Platform, PlatformBuilderConfig } from '../../builder/platform_config';
+import { BoardBaudRate } from '../../util/serial_port';
+import { type VMConfigArgs, VMConfiguration } from '../../device/vm_config';
 
 class WriteJSON {
   private readonly maxBuffer: number;
@@ -428,14 +429,21 @@ export async function spawnHardwareVM(
     return undefined;
   }
 
-  const deviceConfig: DeviceConfig = {
+  const vmConfig = new VMConfiguration({
+    serialPort: boardPort,
+    program: wasmApp,
+  });
+
+  const deviceConfigArgs: DeviceConfigArgs = {
     name: 'm5stickc',
     id: 'some id',
     mode: DeviceMode.MCU,
-    host: '',
-    port: boardPort,
-    program: wasmApp,
   };
+
+  const deviceConfig: DeviceConfig = new DeviceConfig(
+    deviceConfigArgs,
+    vmConfig,
+  );
 
   const platformConfig = new PlatformBuilderConfig(
     Platform.Arduino,
@@ -449,23 +457,6 @@ export async function spawnHardwareVM(
     return undefined;
   }
   return mcuVM;
-}
-
-async function spawnEmulator(
-  dm: DeviceManager,
-  wasmApp: string,
-  outputDir: string,
-): Promise<EmulatedWARDuinoVM | undefined> {
-  const dc: DeviceConfig = {
-    program: wasmApp,
-    mode: DeviceMode.Emulate,
-    port: '',
-    id: '1',
-    name: 'emulator',
-    host: 'localhost',
-  };
-
-  return await dm.spawnEmulator(dc, 8000, outputDir);
 }
 
 async function sleep(ms: number): Promise<void> {
@@ -491,7 +482,20 @@ export async function runMonitorApp(
   const dm = new DeviceManager();
   let vm: WARDuinoVM | undefined;
   if (monitorMode === DeviceMode.Emulate) {
-    vm = await spawnEmulator(dm, wasmApp, outputDir);
+    const vmConfigArgs: VMConfigArgs = {
+      program: wasmApp,
+      disableStrictModuleLoad: true,
+    };
+
+    const vmName = 'DevVM';
+    const vmID = '1';
+    vm = await dm.spawnDevelopmentVM(
+      vmName,
+      vmID,
+      vmConfigArgs,
+      8000,
+      outputDir,
+    );
   } else if (monitorMode === DeviceMode.MCU) {
     vm = await spawnHardwareVM(dm, wasmApp, outputDir);
     await sleep(5000); // sleep to let MCU load module first
@@ -523,6 +527,12 @@ const app = './example-wat/dimmer-double-button.wat';
 const recordTime = 30; // seconds
 const outputDir = './example-wat/';
 const nameMonitorOutputFile = 'monitor_m5stickc.json';
-runMonitorApp(app, recordTime, outputDir, nameMonitorOutputFile, DeviceMode.MCU)
+runMonitorApp(
+  app,
+  recordTime,
+  outputDir,
+  nameMonitorOutputFile,
+  DeviceMode.Emulate,
+)
   .then((_) => {})
   .catch(console.error);

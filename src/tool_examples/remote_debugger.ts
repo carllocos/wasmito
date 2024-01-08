@@ -10,9 +10,10 @@ import {
   ResponseType,
 } from '../warduino/api/request_interface';
 import { type WATSourceMap } from '../source_mappers/wat/wat_source_map';
-import { type EmulatedWARDuinoVM } from '../warduino/vm/emulated_vm';
+import { type WARDuinoDevVM } from '../warduino/vm/emulated_vm';
 import { type WasmState } from '../state/wasm';
-import { DeviceMode } from '../device/device_config';
+import { type DeviceConfigArgs, DeviceMode } from '../device/device_config';
+import { type VMConfigArgs } from '../device/vm_config';
 
 export function allSucceeded(replies: MonitorWasmAddrResponse[]): boolean {
   let idx = 0;
@@ -43,7 +44,7 @@ export function logReplies(replies: RequestMessage[]): void {
 }
 
 function onBreakpointStateUpdate(
-  em: EmulatedWARDuinoVM,
+  em: WARDuinoDevVM,
 ): (state: WasmState) => void {
   return (state: WasmState) => {
     em.step()
@@ -58,7 +59,7 @@ function onBreakpointStateUpdate(
 
 export async function addBreakpoint(
   lineNr: number,
-  em: EmulatedWARDuinoVM,
+  em: WARDuinoDevVM,
   onBreakPointReached: (data: WasmState) => void,
 ): Promise<boolean> {
   const stateOnBreakpoint = new StateRequest()
@@ -94,7 +95,7 @@ export function snapshotRequest(): StateRequest {
 
 export async function addBreakpointSnapshot(
   linenr: number,
-  em: EmulatedWARDuinoVM,
+  em: WARDuinoDevVM,
   onBreakPointReached: (data: WasmState) => void,
 ): Promise<boolean> {
   return em.addBreakpoint(
@@ -109,7 +110,7 @@ export async function addBreakpointSnapshot(
 export async function removeBreakpoint(
   address: number,
   sourceMap: WATSourceMap,
-  em: EmulatedWARDuinoVM,
+  em: WARDuinoDevVM,
 ): Promise<boolean> {
   const opcode = sourceMap.getOpcode(address);
   if (opcode === undefined) {
@@ -126,20 +127,41 @@ export async function runDebugScenario(
   wasmApp: string,
   connectToExistingProcess: boolean,
   outputDir: string,
-): Promise<EmulatedWARDuinoVM | undefined> {
-  const dc = {
+): Promise<WARDuinoDevVM | undefined> {
+  const toolPort = 8000;
+  const maxWaitTime = 3000;
+
+  const vmConfigArgs: VMConfigArgs = {
     program: wasmApp,
-    mode: DeviceMode.Emulate,
-    port: '',
-    id: '1',
-    name: 'emulator',
-    host: 'localhost',
+    toolPort,
+    disableStrictModuleLoad: true,
   };
 
+  const vmName = 'DevVM';
+  const vmID = '1';
+  const dc: DeviceConfigArgs = {
+    id: vmID,
+    name: vmName,
+    mode: DeviceMode.Emulate,
+  };
+
+  // program: wasmApp,
   const dm = new DeviceManager();
   const em = connectToExistingProcess
-    ? await dm.connectToExistingEmulator(dc, 8000, outputDir)
-    : await dm.spawnEmulator(dc, 8000, outputDir);
+    ? await dm.connectToExistingDevVM(
+        dc,
+        toolPort,
+        wasmApp,
+        maxWaitTime,
+        outputDir,
+      )
+    : await dm.spawnDevelopmentVM(
+        vmName,
+        vmID,
+        vmConfigArgs,
+        toolPort,
+        outputDir,
+      );
   const sourceMap = em.getSourceMap();
   if (sourceMap === undefined) {
     return;
