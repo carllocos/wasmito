@@ -24,7 +24,12 @@ export class DeviceConfig {
   private readonly _vmConfig: VMConfiguration;
 
   constructor(deviceConfig: DeviceConfigArgs, vmConfig: VMConfiguration) {
-    // TODO validate deviceConfigArgs
+    const errorMsgs = validateDeviceConfig(deviceConfig);
+    if (errorMsgs.length > 0) {
+      const msg = errorMsgs.join(',');
+      Logger.error(`Invalid config: ${msg}`);
+      throw new Error(msg);
+    }
     this._name = deviceConfig.name;
     this._id = deviceConfig.id;
     this._deploymentMode = deviceConfig.deploymentMode;
