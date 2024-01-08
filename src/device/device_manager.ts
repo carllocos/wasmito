@@ -1,4 +1,4 @@
-import { VMConfiguration, type VMConfigArgs } from './emulator_config';
+import { VMConfiguration, type VMConfigArgs } from './vm_config';
 import type winston from 'winston';
 import { createLogger } from '../logger/logger';
 import {
