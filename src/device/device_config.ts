@@ -2,6 +2,8 @@ import { createLogger } from '../logger/logger';
 import * as fs from 'fs';
 import { type VMConfiguration } from './vm_config';
 
+const Logger = createLogger('DeviceConfiguration');
+
 export enum DeploymentMode {
   DevVM = 'DevVM',
   MCUVM = 'MCUVM',
@@ -115,8 +117,6 @@ export function parseDeviceConfig(config: any): DeviceConfigArgs | undefined {
   }
   return config;
 }
-
-const Logger = createLogger('DeviceConfiguration');
 
 export function isValidDevicesConfig(value: any): string[] {
   const errors: string[] = [];
