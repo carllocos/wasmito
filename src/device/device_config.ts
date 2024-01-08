@@ -160,5 +160,14 @@ export function parseDeviceConfigs(path: any): DeviceConfigArgs[] | undefined {
     Logger.error(`Invalid configuration: `, errors.join(' '));
     return undefined;
   }
-  return jsonData.devices;
+  return jsonData.devices.map((config: any) => {
+    const arg: DeviceConfigArgs = {
+      name: config.name,
+      id: config.id,
+      deploymentMode: deploymentModeFromString(
+        config.deploymentMode,
+      ) as DeploymentMode,
+    };
+    return arg;
+  });
 }
