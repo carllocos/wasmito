@@ -12,8 +12,8 @@ export enum Platform {
 }
 
 export class PlatformBuilderConfig {
-  public readonly platform;
-  public readonly deviceConfig;
+  public readonly platform: Platform;
+  public readonly deviceConfig: DeviceConfig;
   public readonly baudrate: BoardBaudRate;
   public readonly fqbn: BoardFQBN;
 
