@@ -1,33 +1,37 @@
 import { DeviceManager } from '../../src/device/device_manager';
-import { DeviceMode, type DeviceConfig } from '../../src/device/device_config';
-import { type EmulatedWARDuinoVM } from '../../src/warduino/vm/emulated_vm';
+import { type WARDuinoDevVM } from '../../src/warduino/vm/emulated_vm';
+import { type VMConfigArgs } from '../../src/device/vm_config';
 
 describe('Update Wasm Module Request', () => {
   let deviceManager: DeviceManager | undefined;
-  let vm: EmulatedWARDuinoVM | undefined;
-  let app: string = '';
+  let vm: WARDuinoDevVM | undefined;
+  const vmName = 'DevVM';
+  const vmID = '1';
+  const app = './test/data/test-example.wat';
 
   before(async () => {
-    app = './test/data/test-example.wat';
     deviceManager = new DeviceManager();
-    const deviceConfig: DeviceConfig = {
+
+    const vmConfigArgs: VMConfigArgs = {
       program: app,
-      mode: DeviceMode.Emulate,
-      id: '1',
-      name: 'emulator',
-      host: 'localhost',
-      port: '',
+      disableStrictModuleLoad: true,
     };
-    vm = await deviceManager.spawnEmulator(deviceConfig, 3000);
+
+    vm = await deviceManager.spawnDevelopmentVM(
+      vmName,
+      vmID,
+      vmConfigArgs,
+      3000,
+    );
   });
 
-  it('Request should resolve on emulator', async () => {
+  it('Request should resolve on DevVM', async () => {
     await vm?.uploadSourceCode(app);
   });
 
   after(async () => {
     if (deviceManager !== undefined && vm !== undefined) {
-      await deviceManager?.closeEmulatorVM(vm);
+      await deviceManager?.closeVM(vm);
     }
   });
 });

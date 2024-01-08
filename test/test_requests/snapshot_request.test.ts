@@ -1,32 +1,35 @@
 import { DeviceManager } from '../../src/device/device_manager';
-import { DeviceMode, type DeviceConfig } from '../../src/device/device_config';
-import { type EmulatedWARDuinoVM } from '../../src/warduino/vm/emulated_vm';
+import { type WARDuinoDevVM } from '../../src/warduino/vm/emulated_vm';
+import { type VMConfigArgs } from '../../src';
 
 describe('Snapshot Request', () => {
   let deviceManager: DeviceManager | undefined;
-  let vm: EmulatedWARDuinoVM | undefined;
+  let vm: WARDuinoDevVM | undefined;
 
   before(async () => {
-    const app = './test/data/test-example.wat';
     deviceManager = new DeviceManager();
-    const deviceConfig: DeviceConfig = {
-      program: app,
-      mode: DeviceMode.Emulate,
-      id: '1',
-      name: 'emulator',
-      host: 'localhost',
-      port: '',
+    const vmName = 'DevVM';
+    const vmID = '1';
+    const vmConfigArgs: VMConfigArgs = {
+      program: './test/data/test-example.wat',
+      disableStrictModuleLoad: true,
     };
-    vm = await deviceManager.spawnEmulator(deviceConfig, 3000);
+
+    vm = await deviceManager.spawnDevelopmentVM(
+      vmName,
+      vmID,
+      vmConfigArgs,
+      5000,
+    );
   });
 
-  it('Request should resolve on emulator', async () => {
+  it('Request should resolve on DevVM', async () => {
     await vm?.snapshot();
   });
 
   after(async () => {
     if (deviceManager !== undefined && vm !== undefined) {
-      await deviceManager?.closeEmulatorVM(vm);
+      await deviceManager?.closeVM(vm);
     }
   });
 });
