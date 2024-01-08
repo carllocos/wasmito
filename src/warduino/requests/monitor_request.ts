@@ -145,10 +145,21 @@ export class MontiroWasmAddrRequest extends APIRequest<MonitorWasmAddrResponse> 
           hook.parseSubscriptionData !== undefined &&
           hook.onSubscriptionData !== undefined
         ) {
+          let parsed: any;
+          let successfulParse = false;
           try {
-            const parsed = hook.parseSubscriptionData(subContent.val);
-            hook.onSubscriptionData(parsed);
+            parsed = hook.parseSubscriptionData(subContent.val);
+            successfulParse = true;
           } catch (e) {}
+
+          if (successfulParse) {
+            try {
+              hook.onSubscriptionData(parsed);
+            } catch (e) {
+              getGlobalLogger().info(`Hook handler threw error: `);
+              getGlobalLogger().info(e);
+            }
+          }
         }
       }
     } catch (e) {}
