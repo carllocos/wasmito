@@ -1,6 +1,6 @@
 import { createLogger } from '../logger/logger';
 import * as fs from 'fs';
-import { type VMConfiguration } from './emulator_config';
+import { type VMConfiguration } from './vm_config';
 
 export enum DeviceMode {
   Emulate = 'emulate',
