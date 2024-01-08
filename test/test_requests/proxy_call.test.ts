@@ -1,20 +1,20 @@
 import { DeviceManager } from '../../src/device/device_manager';
-import { type VMConfigArgs } from '../../src/device/vm_config';
 import { type WARDuinoDevVM } from '../../src/warduino/vm/emulated_vm';
+import { type VMConfigArgs } from '../../src';
 
-describe('Proxify Request', () => {
+describe('Proxy Call suite', () => {
   let deviceManager: DeviceManager | undefined;
   let vm: WARDuinoDevVM | undefined;
 
   before(async () => {
     deviceManager = new DeviceManager();
+
     const vmName = 'DevVM';
     const vmID = '1';
     const vmConfigArgs: VMConfigArgs = {
       program: './test/data/test-example.wat',
       disableStrictModuleLoad: true,
     };
-
     vm = await deviceManager.spawnDevelopmentVM(
       vmName,
       vmID,

@@ -1,5 +1,5 @@
 import {
-  type DeviceConfig,
+  type DeviceConfigArgs,
   isValidDevicesConfig,
   parseDeviceConfigs,
   validateDeviceConfig,
@@ -201,20 +201,16 @@ describe('Loading multile device configs', () => {
       `parsing correct input configs should yield 2 configs`,
     );
 
-    const configs: DeviceConfig[] = loadedConfigs;
+    const configs: DeviceConfigArgs[] = loadedConfigs;
 
     const configA = configs[0];
     assert(configA.id === 'A', 'invalid id');
     assert(configA.name === 'A', 'invalid name');
-    assert(configA.port === '/dev/ttyUSB0', 'invalid port');
-    assert(configA.program === 'program A', 'invalid program');
     assert(configA.mode === 'mcu', 'invalid mode');
 
     const configB = configs[1];
     assert(configB.id === 'B', 'invalid id');
     assert(configB.name === 'B', 'invalid name');
-    assert(configB.port === '/dev/ttyUSB1', 'invalid port');
-    assert(configB.program === 'program B', 'invalid program');
     assert(configB.mode === 'mcu', 'invalid mode');
   });
 });
