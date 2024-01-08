@@ -48,20 +48,14 @@ export class DeviceConfig {
 }
 
 export function deploymentModeFromString(
-  mode: string,
+  val: string,
 ): DeploymentMode | undefined {
-  const modes: Record<string, DeploymentMode> = {
-    emulate: DeploymentMode.DevVM,
-    mcu: DeploymentMode.MCUVM,
-    proxy: DeploymentMode.ProxyVM,
-    mirror: DeploymentMode.MirrorVM,
-  };
+  const modes: DeploymentMode[] = Object.values(DeploymentMode);
 
-  const lowerCaseInput = mode.toLowerCase();
-
-  for (const key in modes) {
-    if (key.toLowerCase() === lowerCaseInput) {
-      return modes[key];
+  const lowerCase = val.toLowerCase();
+  for (const mode of modes) {
+    if (mode.toLowerCase() === lowerCase) {
+      return mode;
     }
   }
 
