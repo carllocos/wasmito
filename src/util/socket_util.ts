@@ -76,3 +76,14 @@ export async function waitForPortToBeUsed(
     checkPort();
   });
 }
+
+export function isValidIP(addr: string): boolean {
+  const ipPattern =
+    /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+
+  return ipPattern.test(addr);
+}
+
+export function isLocalHost(addr: string): boolean {
+  return addr === 'localhost' || addr === '127.0.0.1';
+}

@@ -1,4 +1,5 @@
-import { isSerialPort, type DeviceConfig } from '../device/device_config';
+import { type DeviceConfig } from '../device/device_config';
+import { BoardBaudRate } from '../util/serial_port';
 
 export interface BoardFQBN {
   boardName: string;
@@ -9,14 +10,6 @@ export enum Platform {
   Arduino,
   Emulated,
 }
-
-export enum BoardBaudRate {
-  NONE = 0,
-  BD_9600 = 9600,
-  BD_115200 = 115200,
-}
-
-export const SerialBaudrates: number[] = [19200];
 
 export class PlatformBuilderConfig {
   public readonly platform;
