@@ -73,7 +73,7 @@ export class DeviceManager {
     );
   }
 
-  async spawnProxiedDevelopmentVM(
+  async spawnProxiedVM(
     vmName: string,
     vmID: string,
     vmConfigArgs: VMConfigArgs,
