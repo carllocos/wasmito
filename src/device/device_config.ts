@@ -1,5 +1,6 @@
 import { createLogger } from '../logger/logger';
 import * as fs from 'fs';
+import { type VMConfiguration } from './emulator_config';
 
 export enum DeviceMode {
   Emulate = 'emulate',
@@ -8,13 +9,42 @@ export enum DeviceMode {
   Mirror = 'mirror',
 }
 
-export interface DeviceConfig {
+export interface DeviceConfigArgs {
   name: string;
   id: string;
   mode: DeviceMode;
-  port: string;
-  host: string;
-  program: string;
+}
+
+export class DeviceConfig {
+  private readonly _name: string;
+  private readonly _id: string;
+  private readonly _mode: DeviceMode;
+  private readonly _vmConfig: VMConfiguration;
+
+  constructor(deviceConfig: DeviceConfigArgs, vmConfig: VMConfiguration) {
+    // TODO validate deviceConfigArgs
+    this._name = deviceConfig.name;
+    this._id = deviceConfig.id;
+    this._mode = deviceConfig.mode;
+    this._name = deviceConfig.name;
+    this._vmConfig = vmConfig;
+  }
+
+  get name(): string {
+    return this._name;
+  }
+
+  get id(): string {
+    return this._id;
+  }
+
+  get mode(): string {
+    return this._mode;
+  }
+
+  get vmConfig(): VMConfiguration {
+    return this._vmConfig;
+  }
 }
 
 export function deviceModeFromString(mode: string): DeviceMode | undefined {
@@ -49,52 +79,19 @@ export function validateDeviceConfig(value: any): string[] {
     if (typeof value.id !== 'string') {
       errors.push('Property "id" should be a string');
     }
+  }
 
-    if (typeof value.port !== 'string') {
-      errors.push('Property "port" should be a string');
-    }
+  let mode: any = value.mode;
+  if (typeof mode === 'string') {
+    mode = mode.toLowerCase();
+  }
 
-    if (typeof value.host !== 'string') {
-      errors.push('Property "host" should be a string');
-    } else if (value.host !== '') {
-      const addr = value.host.toLowerCase();
-      let validatePort = false;
-      if (addr !== 'localhost') {
-        if (!isValidIP(addr)) {
-          errors.push(
-            'Property "host" is not a valid host address. Expected `localhost` or an ipv4 address',
-          );
-        }
-        validatePort = true;
-      } else if (value.port !== '') {
-        validatePort = true;
-      }
-
-      if (validatePort && isNaN(parseInt(value.port))) {
-        errors.push(
-          `Property "port" is not a valid port number. Got ${value.port}`,
-        );
-      }
-    } else if (value.host === '' && !isSerialPort(value.port)) {
-      errors.push('Property "port" should be a valid serial port');
-    }
-
-    if (typeof value.program !== 'string') {
-      errors.push('Property "program" should be a string');
-    }
-
-    let mode: any = value.mode;
-    if (typeof mode === 'string') {
-      mode = mode.toLowerCase();
-    }
-
-    if (!Object.values(DeviceMode).includes(mode)) {
-      errors.push(
-        `Property "mode" is not a valid DeviceMode (choices ${Object.values(
-          DeviceMode,
-        ).toString()})`,
-      );
-    }
+  if (!Object.values(DeviceMode).includes(mode)) {
+    errors.push(
+      `Property "mode" is not a valid DeviceMode (choices ${Object.values(
+        DeviceMode,
+      ).toString()})`,
+    );
   }
 
   return errors;
@@ -105,7 +102,7 @@ export function isValidDeviceConfig(value: any): boolean {
   return errors.length === 0;
 }
 
-export function parseDeviceConfig(config: any): DeviceConfig | undefined {
+export function parseDeviceConfig(config: any): DeviceConfigArgs | undefined {
   const errors = validateDeviceConfig(config);
   if (errors.length > 0) {
     Logger.error(`Invalid device config: ${errors.join(', ')}`);
@@ -135,7 +132,7 @@ export function isValidDevicesConfig(value: any): string[] {
   return errors;
 }
 
-export function parseDeviceConfigs(path: any): DeviceConfig[] | undefined {
+export function parseDeviceConfigs(path: any): DeviceConfigArgs[] | undefined {
   let fileContent: any;
   try {
     fileContent = fs.readFileSync(path, 'utf-8');
