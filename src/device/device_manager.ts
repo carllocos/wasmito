@@ -7,7 +7,7 @@ import {
   DeviceConfig,
 } from './device_config';
 import { type Channel } from '../communication/channel_interface';
-import { WARDuinoDevVM } from '../warduino/vm/emulated_vm';
+import { WARDuinoDevVM } from '../warduino/vm/dev_vm';
 import { MCUWARDuinoVM } from '../warduino/vm/mcu_vm';
 import { type PlatformBuilderConfig } from '../builder/platform_config';
 import { SerialConnection } from '../communication/serial';

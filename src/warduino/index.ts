@@ -11,6 +11,6 @@ export * from './requests/resolve_event_request';
 export * from './requests/run_request';
 export * from './requests/step_request';
 export * from './requests/update_module_request';
-export * from './vm/emulated_vm';
+export * from './vm/dev_vm';
 export * from './vm/warduino_vm';
 export * from './vm/mcu_vm';
