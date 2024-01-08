@@ -33,7 +33,7 @@ export class WARDuinoDevVM extends WARDuinoVM {
   ) {
     super(
       new PlatformBuilderConfig(
-        Platform.Emulated,
+        Platform.DevVM,
         BoardBaudRate.NONE,
         {
           boardName: '',
