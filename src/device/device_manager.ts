@@ -1,14 +1,18 @@
-import { EmulatorSpawnArguments } from './emulator_config';
+import { VMConfiguration, type VMConfigArgs } from './emulator_config';
 import type winston from 'winston';
-import { getFreePort, isPortInUse } from '../util/socket_util';
 import { createLogger } from '../logger/logger';
-import { type DeviceConfig } from './device_config';
+import {
+  DeviceMode,
+  type DeviceConfigArgs,
+  DeviceConfig,
+} from './device_config';
 import { type Channel } from '../communication/channel_interface';
 import { EmulatedWARDuinoVM } from '../warduino/vm/emulated_vm';
 import { MCUWARDuinoVM } from '../warduino/vm/mcu_vm';
 import { type PlatformBuilderConfig } from '../builder/platform_config';
 import { SerialConnection } from '../communication/serial';
 import { ClientSideSocket } from '../communication/client_socket';
+import { type ChildProcess } from 'child_process';
 
 export class DeviceManagerError extends Error {
   constructor(message: string) {
@@ -27,48 +31,28 @@ export class DeviceManager {
     this.localprocesses = [];
   }
 
-  async correctSpawnArguments(
-    args: EmulatorSpawnArguments,
-  ): Promise<EmulatorSpawnArguments> {
-    if (args.listenPort !== undefined) {
-      if (await isPortInUse(args.listenPort)) {
-        throw new DeviceManagerError(`Port ${args.listenPort} already in use`);
-      }
-    } else {
-      const openPort = await getFreePort();
-      if (openPort === undefined) {
-        throw new DeviceManagerError('Could not find a free port');
-      }
-      args.listenPort = openPort;
-    }
-    return args;
-  }
-
-  async connectToExistingEmulator(
-    deviceConfig: DeviceConfig,
+  async connectToExistingDevVM(
+    deviceConfigArgs: DeviceConfigArgs,
+    toolPort: number,
+    program: string,
     maxWaitTime: number,
     buildOutputDir?: string,
   ): Promise<EmulatedWARDuinoVM> {
-    const port: number | undefined = parseInt(deviceConfig.port, 10);
-    if (isNaN(port)) {
-      throw new DeviceManagerError('port number is missing');
-    }
-    const args: EmulatorSpawnArguments = new EmulatorSpawnArguments({
-      program: deviceConfig.program,
-      listenPort: port,
-      pauseOnStart: true,
+    const vmConfig = new VMConfiguration({
+      program,
+      toolPort,
     });
-
+    const deviceConfig = new DeviceConfig(deviceConfigArgs, vmConfig);
     const emulatedDevice = new EmulatedWARDuinoVM(
-      port,
       deviceConfig,
-      args,
+      vmConfig,
       buildOutputDir,
     );
+
     const connected = await emulatedDevice.connect(maxWaitTime);
     if (!connected) {
       this.logger.info(
-        `Failed to connect to local emulator process at port ${args.listenPort}`,
+        `Failed to connect to local DevelopmentVM at port ${vmConfig.toolPort}`,
       );
       throw new DeviceManagerError('timed out connecting to emulator process');
     }
@@ -76,55 +60,38 @@ export class DeviceManager {
     return emulatedDevice;
   }
 
-  async spawnEmulator(
-    deviceConfig: DeviceConfig,
+  async spawnDevelopmentVM(
+    vmName: string,
+    vmID: string,
+    vmConfigArgs: VMConfigArgs,
     maxWaitTime: number,
     buildOutputDir?: string,
   ): Promise<EmulatedWARDuinoVM> {
-    let port: number | undefined = parseInt(deviceConfig.port, 10);
-    if (isNaN(port)) {
-      port = undefined;
-    }
-    const args: EmulatorSpawnArguments = new EmulatorSpawnArguments({
-      program: deviceConfig.program,
-      listenPort: port,
-      pauseOnStart: true,
-      disableStrictModuleLoad: true,
-    });
-    const correctedArgs = await this.correctSpawnArguments(args);
-    const emulatedDevice = new EmulatedWARDuinoVM(
-      args.listenPort as number,
-      deviceConfig,
-      correctedArgs,
+    return this.spawnDevelopmentVMFromConfigs(
+      vmName,
+      vmID,
+      DeviceMode.Emulate,
+      vmConfigArgs,
+      maxWaitTime,
       buildOutputDir,
     );
-
-    const childProcess = await emulatedDevice.spawn();
-
-    childProcess.on('close', (code) => {
-      this.logger.info(`Spawned process exit with code ${code}`);
-      this.logger.debug('Removing process from local list');
-      this.localprocesses = this.localprocesses.filter(
-        (e: EmulatedWARDuinoVM) => {
-          return !e.isProcess(childProcess);
-        },
-      );
-    });
-    const connected = await emulatedDevice.connect(maxWaitTime);
-    if (!connected) {
-      this.logger.info(
-        `Failed to connect to local emulator process at port ${correctedArgs.listenPort}`,
-      );
-      this.logger.info('Killing local emulator process');
-      childProcess.kill();
-      throw new DeviceManagerError('timed out connecting to emulator process');
-    }
-    this.localprocesses.push(emulatedDevice);
-    return emulatedDevice;
   }
 
-  async closeEmulatorVM(vm: EmulatedWARDuinoVM): Promise<boolean> {
-    return await vm.close();
+  async spawnProxiedDevelopmentVM(
+    vmName: string,
+    vmID: string,
+    vmConfigArgs: VMConfigArgs,
+    maxWaitTime: number,
+    buildOutputDir?: string,
+  ): Promise<EmulatedWARDuinoVM> {
+    return this.spawnDevelopmentVMFromConfigs(
+      vmName,
+      vmID,
+      DeviceMode.Proxy,
+      vmConfigArgs,
+      maxWaitTime,
+      buildOutputDir,
+    );
   }
 
   async spawnHardwareVM(
@@ -134,22 +101,61 @@ export class DeviceManager {
     let channel: Channel | undefined;
     if (platformConfig.configuredForSerial()) {
       channel = new SerialConnection(
-        platformConfig.deviceConfig.port,
+        platformConfig.deviceConfig.vmConfig.serialPort,
         platformConfig.baudrate,
       );
     } else if (platformConfig.configuredForNetwork()) {
-      const port = parseInt(platformConfig.deviceConfig.port);
-      if (isNaN(port)) {
-        throw new DeviceManagerError(
-          `Port is expected to be a number. Given ${port}`,
-        );
-      }
-      channel = new ClientSideSocket(port, platformConfig.deviceConfig.host);
+      channel = new ClientSideSocket(
+        platformConfig.deviceConfig.vmConfig.toolPort,
+        platformConfig.deviceConfig.vmConfig.toolHostIP,
+      );
     } else {
       throw new DeviceManagerError(
         `DeviceConfiguration has not been configured to serial or network`,
       );
     }
     return new MCUWARDuinoVM(platformConfig, channel, buildOutputDir);
+  }
+
+  async closeVM(vm: EmulatedWARDuinoVM): Promise<boolean> {
+    return await vm.close();
+  }
+
+  private registerListenersOnVMProcess(vmProcess: ChildProcess): void {
+    vmProcess.on('close', (code) => {
+      this.logger.info(`Spawned process exit with code ${code}`);
+      this.logger.debug('Removing process from local list');
+      this.localprocesses = this.localprocesses.filter(
+        (e: EmulatedWARDuinoVM) => {
+          return !e.isProcess(vmProcess);
+        },
+      );
+    });
+  }
+
+  private async spawnDevelopmentVMFromConfigs(
+    vmHumanReadableName: string,
+    vmID: string,
+    mode: DeviceMode,
+    spawnArgs: VMConfigArgs,
+    maxWaitTime: number,
+    buildOutputDir?: string,
+  ): Promise<EmulatedWARDuinoVM> {
+    const vmConfig = new VMConfiguration(spawnArgs);
+    const deviceConfigArgs: DeviceConfigArgs = {
+      name: vmHumanReadableName,
+      id: vmID,
+      mode,
+    };
+    const deviceConfig = new DeviceConfig(deviceConfigArgs, vmConfig);
+    const emulatedDevice = new EmulatedWARDuinoVM(
+      deviceConfig,
+      vmConfig,
+      buildOutputDir,
+    );
+    const childProcess = await emulatedDevice.spawn(maxWaitTime);
+    this.registerListenersOnVMProcess(childProcess);
+    this.localprocesses.push(emulatedDevice);
+    return emulatedDevice;
   }
 }
