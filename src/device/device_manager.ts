@@ -6,11 +6,12 @@ import {
   type DeviceConfigArgs,
   DeviceConfig,
 } from './device_config';
-import { type Channel } from '../communication/channel_interface';
 import { WARDuinoDevVM } from '../warduino/vm/dev_vm';
 import { MCUWARDuinoVM } from '../warduino/vm/mcu_vm';
 import { type PlatformBuilderConfig } from '../builder/platform_config';
 import { type ChildProcess } from 'child_process';
+import { type WARDuinoVM } from '../warduino';
+import { WARDuinoProxiedVM } from '../warduino/vm/proxy_vm';
 
 export class DeviceManagerError extends Error {
   constructor(message: string) {
@@ -72,20 +73,17 @@ export class DeviceManager {
   }
 
   async spawnProxiedVM(
-    vmName: string,
-    vmID: string,
-    vmConfigArgs: VMConfigArgs,
-    maxWaitTime: number,
+    vmToProxy: WARDuinoVM,
+    maxWaitTime?: number,
     buildOutputDir?: string,
-  ): Promise<WARDuinoDevVM> {
-    return this.spawnDevelopmentVMFromConfigs(
-      vmName,
-      vmID,
-      DeploymentMode.ProxyVM,
-      vmConfigArgs,
-      maxWaitTime,
-      buildOutputDir,
-    );
+  ): Promise<WARDuinoProxiedVM> {
+    // TODO register hooks for events
+    // TODO use shareable channel
+    const vm = new WARDuinoProxiedVM(vmToProxy, buildOutputDir);
+    const childProcess = await vm.spawn(maxWaitTime);
+    this.registerListenersOnVMProcess(childProcess);
+    this.localprocesses.push(vm);
+    return vm;
   }
 
   async spawnHardwareVM(
