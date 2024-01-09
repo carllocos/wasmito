@@ -15,6 +15,7 @@ export class MCUWARDuinoVMError extends Error {
 
 export class MCUWARDuinoVM extends WARDuinoVM {
   protected logger: Logger;
+  protected ErrorClass = MCUWARDuinoVMError;
 
   constructor(
     platformConfig: PlatformBuilderConfig,

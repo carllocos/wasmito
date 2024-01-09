@@ -25,6 +25,7 @@ export class WARDuinoDevVM extends WARDuinoVM {
   private process?: ChildProcess;
   private readonly vmConfig: VMConfiguration;
   private readonly deviceConfig: DeviceConfig;
+  protected ErrorClass = WARDuinoDevVMError;
 
   constructor(
     deviceConfig: DeviceConfig,
@@ -83,7 +84,7 @@ export class WARDuinoDevVM extends WARDuinoVM {
 
     const sourceMap = this.platform.getSourceMap();
     if (sourceMap === undefined) {
-      throw new WARDuinoDevVMError(`SourceMap is undefined`);
+      throw new this.ErrorClass(`SourceMap is undefined`);
     }
     const wasm = await sourceMap.getWasm();
     const updateRequest = new UpdateWasmModuleRequest(wasm);
@@ -101,13 +102,13 @@ export class WARDuinoDevVM extends WARDuinoVM {
 
     const exitCode = await this.platform.compile(this.vmConfig.program);
     if (exitCode !== 0) {
-      throw new WARDuinoDevVMError(
+      throw new this.ErrorClass(
         `Could not start DevVM. Compilation exited with code: ${exitCode}`,
       );
     }
     const sourceMap = this.platform.getSourceMap();
     if (sourceMap === undefined) {
-      throw new WARDuinoDevVMError(`Could not generate SourceMap`);
+      throw new this.ErrorClass(`Could not generate SourceMap`);
     }
     const processArgs = this.buildProcessArguments(
       sourceMap.wasmFilePath,
@@ -115,7 +116,7 @@ export class WARDuinoDevVM extends WARDuinoVM {
     );
     const spawnCommand = getPath2WARDuinoSDKVMBinary();
     if (spawnCommand === undefined) {
-      throw new WARDuinoDevVMError(
+      throw new this.ErrorClass(
         "Path to WARDuino SDK is not set. You can set it via env variable 'WARDUINO_SDK=PATH'",
       );
     }
@@ -141,7 +142,7 @@ export class WARDuinoDevVM extends WARDuinoVM {
       );
       this.logger.info('Killing local DevelopmentVM process');
       childProcess.kill();
-      throw new WARDuinoDevVMError('timed out connecting to DevVM process');
+      throw new this.ErrorClass('timed out connecting to DevVM process');
     }
 
     this.process = childProcess;
@@ -149,7 +150,7 @@ export class WARDuinoDevVM extends WARDuinoVM {
     return childProcess;
   }
 
-  private buildProcessArguments(
+  protected buildProcessArguments(
     programPath: string,
     args: VMConfiguration,
   ): string[] {
@@ -171,7 +172,7 @@ export class WARDuinoDevVM extends WARDuinoVM {
   private async assertExistanceToolPort(): Promise<void> {
     if (this.vmConfig.hasToolPort()) {
       if (await isPortInUse(this.vmConfig.toolPort)) {
-        throw new WARDuinoDevVMError(
+        throw new this.ErrorClass(
           `Cannot spawn a DevelopmentVM on Port ${this.vmConfig.toolPort} as it is already in use`,
         );
       }
@@ -181,7 +182,7 @@ export class WARDuinoDevVM extends WARDuinoVM {
       );
       const openPort = await getFreePort();
       if (openPort === undefined) {
-        throw new WARDuinoDevVMError(
+        throw new this.ErrorClass(
           'Cannot spawn a DevelopmentVM as no free port was found',
         );
       }

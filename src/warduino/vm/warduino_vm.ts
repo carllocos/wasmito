@@ -30,6 +30,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   protected abstract logger: winston.Logger;
   public readonly platformConfig: PlatformBuilderConfig;
   protected readonly platform: PlatformBuilder;
+  protected abstract readonly ErrorClass: new (errorMsg: string) => Error;
 
   constructor(
     platformConfig: PlatformBuilderConfig,
@@ -159,7 +160,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     );
     if (stateOnBreakpoint === undefined) {
       if (stateHandler !== undefined) {
-        throw new Error(
+        throw new this.ErrorClass(
           'Expected `stateOnBreakpoint` to be set in order to handle it via callback `stateHandler`',
         );
       }
@@ -167,7 +168,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     }
 
     if (stateHandler === undefined) {
-      throw new Error(
+      throw new this.ErrorClass(
         'Expected `stateHandler` callback argument as handler for `stateOnBreakpoint`',
       );
     }
@@ -187,7 +188,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     sourceCodeLocation: SourceCodeLocation,
     timeout?: number | undefined,
   ): Promise<boolean> {
-    throw new Error('not implemented');
+    throw new this.ErrorClass('not implemented');
   }
 
   async addHookBefore<T>(
@@ -224,11 +225,13 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   ): Promise<boolean> {
     const sm = this.getSourceMap();
     if (sm === undefined) {
-      throw new Error(`There is no source Mapper set for current module`);
+      throw new this.ErrorClass(
+        `There is no source Mapper set for current module`,
+      );
     }
     const mappings = sm.getMappingsFromSourceCodeLocation(sourceCodeLocation);
     if (mappings.length === 0) {
-      throw new Error(
+      throw new this.ErrorClass(
         `Cannot set hook upon unexisting wasm address derived from source location ${sourceCodeLocation.linenr}`,
       );
     }
@@ -242,7 +245,9 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
         req.after();
         break;
       default:
-        throw new Error('Cannot set hook upon unexisting hook moment');
+        throw new this.ErrorClass(
+          'Cannot set hook upon unexisting hook moment',
+        );
     }
     const response = await this.sendRequest(req, timeout);
     return isSuccessfulMessage(response);
