@@ -4,6 +4,7 @@ import { WARDuinoVM } from './warduino_vm';
 import { type Channel } from '../../communication/channel_interface';
 import { createLogger } from '../../logger/logger';
 import { timeoutPromise } from '../../util/promise_util';
+import { ClientSideSocket, SerialConnection } from '../../communication';
 
 export class MCUWARDuinoVMError extends Error {
   constructor(message: string) {
@@ -13,16 +14,30 @@ export class MCUWARDuinoVMError extends Error {
   }
 }
 
+function createChannel(platformConfig: PlatformBuilderConfig): Channel {
+  if (platformConfig.configuredForSerial()) {
+    return new SerialConnection(
+      platformConfig.deviceConfig.vmConfig.serialPort,
+      platformConfig.baudrate,
+    );
+  } else if (platformConfig.configuredForNetwork()) {
+    return new ClientSideSocket(
+      platformConfig.deviceConfig.vmConfig.toolPort,
+      platformConfig.deviceConfig.vmConfig.toolHostIP,
+    );
+  } else {
+    throw new MCUWARDuinoVMError(
+      `DeviceConfiguration has not been configured to serial or network`,
+    );
+  }
+}
+
 export class MCUWARDuinoVM extends WARDuinoVM {
   protected logger: Logger;
   protected ErrorClass = MCUWARDuinoVMError;
 
-  constructor(
-    platformConfig: PlatformBuilderConfig,
-    channel: Channel,
-    buildOutputDir?: string,
-  ) {
-    super(platformConfig, channel, buildOutputDir);
+  constructor(platformConfig: PlatformBuilderConfig, buildOutputDir?: string) {
+    super(platformConfig, createChannel(platformConfig), buildOutputDir);
     this.logger = createLogger(
       `MCUWARDuino ${platformConfig.deviceConfig.name} (${platformConfig.fqbn.boardName})`,
     );
