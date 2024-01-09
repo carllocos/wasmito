@@ -10,8 +10,6 @@ import { type Channel } from '../communication/channel_interface';
 import { WARDuinoDevVM } from '../warduino/vm/dev_vm';
 import { MCUWARDuinoVM } from '../warduino/vm/mcu_vm';
 import { type PlatformBuilderConfig } from '../builder/platform_config';
-import { SerialConnection } from '../communication/serial';
-import { ClientSideSocket } from '../communication/client_socket';
 import { type ChildProcess } from 'child_process';
 
 export class DeviceManagerError extends Error {
@@ -94,23 +92,7 @@ export class DeviceManager {
     platformConfig: PlatformBuilderConfig,
     buildOutputDir?: string,
   ): Promise<MCUWARDuinoVM> {
-    let channel: Channel | undefined;
-    if (platformConfig.configuredForSerial()) {
-      channel = new SerialConnection(
-        platformConfig.deviceConfig.vmConfig.serialPort,
-        platformConfig.baudrate,
-      );
-    } else if (platformConfig.configuredForNetwork()) {
-      channel = new ClientSideSocket(
-        platformConfig.deviceConfig.vmConfig.toolPort,
-        platformConfig.deviceConfig.vmConfig.toolHostIP,
-      );
-    } else {
-      throw new DeviceManagerError(
-        `DeviceConfiguration has not been configured to serial or network`,
-      );
-    }
-    return new MCUWARDuinoVM(platformConfig, channel, buildOutputDir);
+    return new MCUWARDuinoVM(platformConfig, buildOutputDir);
   }
 
   async closeVM(vm: WARDuinoDevVM): Promise<boolean> {
