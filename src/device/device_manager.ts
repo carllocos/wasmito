@@ -114,7 +114,7 @@ export class DeviceManager {
     vmID: string,
     mode: DeploymentMode,
     spawnArgs: VMConfigArgs,
-    maxWaitTime: number,
+    maxWaitTime?: number,
     buildOutputDir?: string,
   ): Promise<WARDuinoDevVM> {
     const vmConfig = new VMConfiguration(spawnArgs);
