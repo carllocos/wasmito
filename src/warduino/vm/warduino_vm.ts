@@ -26,7 +26,7 @@ import {
 } from '../requests/monitor_request';
 
 export abstract class WARDuinoVM implements WARDuinoAPI {
-  protected channel: Channel;
+  private _channel: Channel;
   protected abstract logger: winston.Logger;
   public readonly platformConfig: PlatformBuilderConfig;
   protected readonly platform: PlatformBuilder;
@@ -34,11 +34,11 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
 
   constructor(
     platformConfig: PlatformBuilderConfig,
-    channel: Channel,
+    communicationChannel: Channel,
     buildOutputDir?: string,
   ) {
     this.platformConfig = platformConfig;
-    this.channel = channel;
+    this._channel = communicationChannel;
     this.platform = createPlatformBuilder(platformConfig, buildOutputDir);
   }
 
@@ -62,6 +62,15 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
       this.logger.error('Channel failed to close');
     }
     return closed;
+  }
+
+  get channel(): Channel {
+    return this._channel;
+  }
+
+  set channel(newChannel: Channel) {
+    // TODO: figure out whether to update config
+    this._channel = newChannel;
   }
 
   public async run(timeout?: number): Promise<boolean> {
