@@ -202,10 +202,12 @@ class HexaStateMessages {
         `Payload is not even. Got length ${this.currentMsg.length}`,
       );
     }
-    const regexHexa = /[0-9A-Fa-f]{6}/g;
+    const regexHexa = /^[0-9A-Fa-f]+$/g;
     const matched = payload.match(regexHexa);
-    if (matched !== null) {
-      throw new Error('Payload should only contain hexa chars');
+    if (matched === null) {
+      throw new Error(
+        `Payload should only contain hexa chars. Given ${payload}`,
+      );
     }
   }
 
