@@ -138,7 +138,7 @@ export class SerialConnection implements Channel {
       }
       this.port.close((err) => {
         if (err !== null) {
-          console.error(`Error closing serial port: ${err.message}`);
+          this.logger.error(`Error closing serial port: ${err.message}`);
           reject(err);
         } else {
           resolve(true);

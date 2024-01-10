@@ -1,6 +1,7 @@
 import type * as net from 'net';
 import { type Channel } from './channel_interface';
-import { getGlobalLogger } from '../logger/logger';
+import { createLogger } from '../logger/logger';
+import type winston from 'winston';
 
 export abstract class AbstractChannel implements Channel {
   readonly channelName: string;
@@ -8,11 +9,13 @@ export abstract class AbstractChannel implements Channel {
   private dataBuffered: string = '';
   private listeners: Array<(data: string) => void>;
   private readonly removedListeners: Set<(data: string) => void>;
+  protected logger: winston.Logger;
 
   constructor(channelName: string) {
     this.channelName = channelName;
     this.listeners = [];
     this.removedListeners = new Set();
+    this.logger = createLogger(this.channelName);
   }
 
   // Abstract methods
@@ -64,7 +67,7 @@ export abstract class AbstractChannel implements Channel {
       if (line.length > 0 && line.charAt(line.length - 1) === '\r') {
         line = line.slice(0, line.length - 1);
       }
-      getGlobalLogger().debug(`${this.channelName}: ${line}`);
+      this.logger.debug(line);
       lines.push(line);
       idx = this.dataBuffered.indexOf('\n');
     }
