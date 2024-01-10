@@ -63,10 +63,12 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
+    "@types/uuid": "^9.0.7",
     "commander": "^11.0.0",
     "figlet": "^1.6.0",
     "portfinder": "^1.0.32",
     "serialport": "^12.0.0",
+    "uuid": "^9.0.1",
     "winston": "^3.11.0",
     "yarn": "^1.22.19"
   }
