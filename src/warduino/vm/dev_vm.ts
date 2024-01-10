@@ -22,9 +22,9 @@ export class WARDuinoDevVMError extends Error {
 
 export class WARDuinoDevVM extends WARDuinoVM {
   protected logger: winston.Logger;
-  private process?: ChildProcess;
-  private readonly vmConfig: VMConfiguration;
-  private readonly deviceConfig: DeviceConfig;
+  protected process?: ChildProcess;
+  public readonly vmConfig: VMConfiguration;
+  protected readonly deviceConfig: DeviceConfig;
   protected ErrorClass = WARDuinoDevVMError;
 
   constructor(
@@ -161,7 +161,7 @@ export class WARDuinoDevVM extends WARDuinoVM {
     return processArgs;
   }
 
-  private async assertExistanceToolPort(): Promise<void> {
+  protected async assertExistanceToolPort(): Promise<void> {
     if (this.vmConfig.hasToolPort()) {
       if (await isPortInUse(this.vmConfig.toolPort)) {
         throw new this.ErrorClass(
