@@ -4,7 +4,7 @@ import { WARDuinoVM } from './warduino_vm';
 import { type Channel } from '../../communication/channel_interface';
 import { createLogger } from '../../logger/logger';
 import { timeoutPromise } from '../../util/promise_util';
-import { ClientSideSocket, SerialConnection } from '../../communication';
+import { ClientSideSocket, SerialConnection } from '../../communication/index';
 
 export class MCUWARDuinoVMError extends Error {
   constructor(message: string) {
