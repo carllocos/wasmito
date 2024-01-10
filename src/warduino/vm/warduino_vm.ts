@@ -227,7 +227,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
       return false;
     } else {
       this.logger.error(
-        `Received unexpected aroundRequest ack message of type ${reply.responseType} for function ${f.name}`,
+        `Received unexpected aroundRequest ack message of type ${reply.responseType} for function ${funcToProxy.name}`,
       );
       return false;
     }
