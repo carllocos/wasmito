@@ -1,7 +1,7 @@
 export interface Channel {
   readonly channelName: string;
   open: (timeout?: number) => Promise<boolean>;
-  close: () => Promise<boolean>;
+  close: (timeout?: number) => Promise<boolean>;
   write: (
     data: any,
     cb?: ((err?: Error | null | undefined) => void) | undefined,

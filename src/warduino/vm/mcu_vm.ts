@@ -43,9 +43,9 @@ export class MCUWARDuinoVM extends WARDuinoVM {
     );
   }
 
-  async close(): Promise<boolean> {
+  async close(timedout?: number): Promise<boolean> {
     this.logger.info('closing VM');
-    const closedChannel = await this.channel.close();
+    const closedChannel = await this.channel.close(timedout);
     this.logger.debug(
       closedChannel
         ? 'VM channel successfully closed'
@@ -64,7 +64,7 @@ export class MCUWARDuinoVM extends WARDuinoVM {
     }
 
     // close connection otherwise flashing cannot work
-    await this.channel.close();
+    await this.channel.close(timeout);
 
     let upload: Promise<number> = this.platform.upload();
     if (timeout !== undefined) {

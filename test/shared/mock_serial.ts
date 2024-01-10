@@ -20,7 +20,7 @@ export class MockSerialConnection implements Channel {
     return true;
   }
 
-  async close(): Promise<boolean> {
+  async close(timedout?: number): Promise<boolean> {
     return true;
   }
 
