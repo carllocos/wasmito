@@ -79,6 +79,10 @@ export class MontiroWasmAddrRequest extends APIRequest<MonitorWasmAddrResponse> 
     return this;
   }
 
+  description(): string {
+    return `MonitorRequest for ${this.wasmAddr}`;
+  }
+
   override getData(): string {
     const encodedAddr = encodeToHexLEB128(this.wasmAddr);
     let encodedSchedule = '';

@@ -5,6 +5,10 @@ import {
 import { Instruction } from '../api/instructions';
 
 export class StepRequest extends APIRequestNoSubscription<string> {
+  description(): string {
+    return 'StepRequest';
+  }
+
   getData(): string {
     return `${Instruction.Step}\n`;
   }

@@ -14,6 +14,10 @@ export class UpdateWasmModuleRequest extends APIRequestNoSubscription<string> {
     this.wasm = new Uint8Array(wasm);
   }
 
+  description(): string {
+    return 'UpdateModule';
+  }
+
   override getData(): string {
     const sizeHex = encodeToHexLEB128(this.wasm.length);
     const sizeBuffer = Buffer.allocUnsafe(4);

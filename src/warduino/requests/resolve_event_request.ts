@@ -5,6 +5,10 @@ import {
 } from '../api/request_interface';
 
 export class ResolveEventRequest extends APIRequestNoSubscription<void> {
+  description(): string {
+    return 'ResolveEventRequest';
+  }
+
   getData(): string {
     return `${Instruction.PopEvent}\n`;
   }

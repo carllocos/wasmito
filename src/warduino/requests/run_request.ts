@@ -5,6 +5,10 @@ import {
 import { Instruction } from '../api/instructions';
 
 export class RunRequest extends APIRequestNoSubscription<string> {
+  description(): string {
+    return 'RunRequest';
+  }
+
   getData(): string {
     return `${Instruction.Run}\n`;
   }

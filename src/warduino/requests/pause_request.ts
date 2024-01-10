@@ -5,6 +5,10 @@ import {
 import { Instruction } from '../api/instructions';
 
 export class PauseRequest extends APIRequestNoSubscription<string> {
+  description(): string {
+    return 'PauseRequest';
+  }
+
   getData(): string {
     return `${Instruction.Pause}\n`;
   }

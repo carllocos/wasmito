@@ -3,6 +3,7 @@ import { getInstructionFromString, type Instruction } from './instructions';
 export class APIRequestInvalidParse extends Error {}
 
 export abstract class APIRequest<R> {
+  abstract description(): string;
   abstract getData(): string;
   abstract parse(input: string): R;
   abstract handleSubscriptionData(data: string): void;

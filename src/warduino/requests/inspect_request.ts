@@ -25,6 +25,10 @@ export interface StackInpsectResponse {
 }
 
 export class InspectStack extends APIRequestNoSubscription<WasmStack> {
+  description(): string {
+    return `InspectStack`;
+  }
+
   getData(): string {
     return `${Instruction.Inspect}${InspectableState.stackState}\n`;
   }
@@ -111,6 +115,10 @@ export class StateRequest extends APIRequestNoSubscription<WasmState> {
     const numberBytes = serializeUInt16BE(this.state.length);
     const stateToReq = this.state.join('');
     return `${Instruction.Inspect}${numberBytes}${stateToReq}`;
+  }
+
+  description(): string {
+    return `InspectState`;
   }
 
   getData(): string {
