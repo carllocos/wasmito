@@ -12,6 +12,8 @@ export class DevVMPlatform extends PlatformBuilder {
   }
 
   async compile(sourceFile: string): Promise<number> {
+    createDirectoryIfUnexisting(this.outputDirectory);
+
     this.pathToSourceCodeFile = getAbsolutePath(sourceFile);
     this.sourceCodeCompiler = makeSourceCodeCompiler(
       this.pathToSourceCodeFile,
