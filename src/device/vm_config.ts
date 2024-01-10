@@ -228,6 +228,10 @@ export class VMConfiguration {
     return this._toolPort !== undefined;
   }
 
+  public hasToolHostIPAddr(): boolean {
+    return this._toolHostIP !== undefined;
+  }
+
   private checkValidityArgs(args: VMConfigArgs): string[] {
     const errors: string[] = [];
     if (args.program === '') {
