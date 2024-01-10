@@ -8,6 +8,15 @@ import { type Channel } from './channel_interface';
  */
 
 export class NoChannel implements Channel {
+  write(
+    data: any,
+    cb?: ((err?: Error | null | undefined) => void) | undefined,
+  ): boolean {
+    throw Error(
+      'NoChannel has no implementation and serves only as transition channel',
+    );
+  }
+
   async open(timeout?: number | undefined): Promise<boolean> {
     throw Error(
       'NoChannel has no implementation and serves only as transition channel',

@@ -17,8 +17,8 @@ export abstract class AbstractChannel implements Channel {
 
   // Abstract methods
   public abstract write(
-    data: string,
-    cb?: ((err?: Error | undefined) => void) | undefined,
+    data: any,
+    cb?: ((err?: Error | null | undefined) => void) | undefined,
   ): boolean;
 
   public abstract open(timeout?: number): Promise<boolean>;

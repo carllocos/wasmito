@@ -22,6 +22,13 @@ export class SerialConnection implements Channel {
     this.removedListeners = new Set();
   }
 
+  public write(
+    data: any,
+    cb?: ((err?: Error | null | undefined) => void) | undefined,
+  ): boolean {
+    return this.port?.write(data, cb) ?? false;
+  }
+
   addOnData(callback: (data: string) => void): void {
     this.callbacks.push(callback);
   }

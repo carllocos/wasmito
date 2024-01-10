@@ -14,8 +14,8 @@ export class ClientSideSocket extends AbstractChannel {
   }
 
   public write(
-    data: string,
-    cb?: ((err?: Error | undefined) => void) | undefined,
+    data: string | Uint8Array,
+    cb?: ((err?: Error | null | undefined) => void) | undefined,
   ): boolean {
     if (this.connection !== undefined) {
       return this.connection.write(data, cb);
@@ -34,7 +34,7 @@ export class ClientSideSocket extends AbstractChannel {
   }
 
   public async send(data: string): Promise<boolean> {
-    return this.write(data, (err?: Error | undefined) => {
+    return this.write(data, (err?: Error | null | undefined) => {
       if (err !== undefined && err !== null) {
         getGlobalLogger().error(
           `Error occurred when writing to socket: ${err.message}`,
