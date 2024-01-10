@@ -11,7 +11,7 @@ import { MCUWARDuinoVM } from '../warduino/vm/mcu_vm';
 import { type PlatformBuilderConfig } from '../builder/platform_config';
 import { type ChildProcess } from 'child_process';
 import { type WARDuinoVM } from '../warduino';
-import { WARDuinoProxiedVM } from '../warduino/vm/proxy_vm';
+import { OutOfPlaceMode, WARDuinoOutOfPlaceVM } from '../warduino/vm/proxy_vm';
 
 export class DeviceManagerError extends Error {
   constructor(message: string) {
@@ -76,10 +76,12 @@ export class DeviceManager {
     vmToProxy: WARDuinoVM,
     maxWaitTime?: number,
     buildOutputDir?: string,
-  ): Promise<WARDuinoProxiedVM> {
-    // TODO register hooks for events
-    // TODO use shareable channel
-    const vm = new WARDuinoProxiedVM(vmToProxy, buildOutputDir);
+  ): Promise<WARDuinoOutOfPlaceVM> {
+    const vm = new WARDuinoOutOfPlaceVM(
+      OutOfPlaceMode.RedirectOOP,
+      vmToProxy,
+      buildOutputDir,
+    );
     const childProcess = await vm.spawn(maxWaitTime);
     this.registerListenersOnVMProcess(childProcess);
     this.localprocesses.push(vm);
