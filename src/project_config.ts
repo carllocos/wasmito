@@ -68,11 +68,15 @@ export function setPath2WARDuinoSDK(path: string): void {
   sdkPaths.WARDUINO_SDK = path;
 }
 
-export function getPath2WARDuinoSDKVMBinary(): string | undefined {
+export function getPath2WARDuinoSDKVMBinary(): string {
   if (sdkPaths.WARDUINO_SDK === undefined) {
     const path = getPath2WARDuinoSDK();
     if (path !== undefined) {
       return `${path}/build-emu/wdcli`;
+    } else {
+      throw new ProjectConfigError(
+        "Path to WARDuino SDK is not set. You can set it via env variable 'WARDUINO_SDK=PATH', call to setPath2WABT, or .wasmito/adk_config.cfg file.",
+      );
     }
   }
   return `${sdkPaths.WARDUINO_SDK}/build-emu/wdcli`;
