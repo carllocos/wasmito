@@ -2,9 +2,11 @@ import type { Channel } from '../../src/communication/channel_interface';
 
 export class MockSerialConnection implements Channel {
   private callbacks: Array<(data: string) => void>;
+  readonly channelName: string;
 
   constructor(port: string, baudrate: number) {
     this.callbacks = [];
+    this.channelName = 'mockChannel';
   }
 
   write(

@@ -15,10 +15,13 @@ export class SerialConnection implements Channel {
   private readonly logger: winston.Logger;
   private readonly removedListeners: Set<(data: string) => void>;
 
+  readonly channelName: string;
+
   constructor(portName: string, baudRate: number) {
     this.portName = portName;
     this.baudRate = baudRate;
-    this.logger = createLogger(this.portName);
+    this.channelName = this.portName;
+    this.logger = createLogger(this.channelName);
     this.removedListeners = new Set();
   }
 

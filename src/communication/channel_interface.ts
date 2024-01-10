@@ -1,4 +1,5 @@
 export interface Channel {
+  readonly channelName: string;
   open: (timeout?: number) => Promise<boolean>;
   close: () => Promise<boolean>;
   write: (
