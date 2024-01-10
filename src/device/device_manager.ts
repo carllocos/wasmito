@@ -23,7 +23,7 @@ export class DeviceManagerError extends Error {
 
 export class DeviceManager {
   logger: winston.Logger;
-  localprocesses: WARDuinoDevVM[];
+  localprocesses: Array<[WARDuinoDevVM, ChildProcess?]>;
 
   constructor() {
     this.logger = createLogger('DeviceManager');
@@ -51,7 +51,8 @@ export class DeviceManager {
       );
       throw new DeviceManagerError('timed out connecting to DevVM process');
     }
-    this.localprocesses.push(devVM);
+    const noProcess = undefined;
+    this.localprocesses.push([devVM, noProcess]);
     return devVM;
   }
 
@@ -84,7 +85,7 @@ export class DeviceManager {
     );
     const childProcess = await vm.spawn(maxWaitTime);
     this.registerListenersOnVMProcess(childProcess);
-    this.localprocesses.push(vm);
+    this.localprocesses.push([vm, childProcess]);
     return vm;
   }
 
@@ -101,11 +102,25 @@ export class DeviceManager {
 
   private registerListenersOnVMProcess(vmProcess: ChildProcess): void {
     vmProcess.on('close', (code) => {
-      this.logger.info(`Spawned process exit with code ${code}`);
-      this.logger.debug('Removing process from local list');
-      this.localprocesses = this.localprocesses.filter((e: WARDuinoDevVM) => {
-        return !e.isProcess(vmProcess);
-      });
+      const vm = this.localprocesses.find(
+        ([, p]: [WARDuinoDevVM, ChildProcess?]) => {
+          return p === vmProcess;
+        },
+      )?.[0];
+
+      const config = vm?.platformConfig.deviceConfig;
+      this.logger.info(
+        `Spawned process ${config?.name} (ID=${config?.id}) exit with code ${code}`,
+      );
+      this.logger.debug(
+        `Removing process ${config?.name} (ID=${config?.id}) from local list`,
+      );
+
+      this.localprocesses = this.localprocesses.filter(
+        ([, p]: [WARDuinoDevVM, ChildProcess?]) => {
+          return p !== vmProcess;
+        },
+      );
     });
   }
 
@@ -127,7 +142,7 @@ export class DeviceManager {
     const devVM = new WARDuinoDevVM(deviceConfig, vmConfig, buildOutputDir);
     const childProcess = await devVM.spawn(maxWaitTime);
     this.registerListenersOnVMProcess(childProcess);
-    this.localprocesses.push(devVM);
+    this.localprocesses.push([devVM, childProcess]);
     return devVM;
   }
 }
