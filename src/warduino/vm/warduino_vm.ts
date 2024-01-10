@@ -80,6 +80,11 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     this._channel = newChannel;
   }
 
+  /*
+   *
+   * WARDUINO API implementation
+   */
+
   public async run(timeout?: number): Promise<boolean> {
     const request = new RunRequest();
     this.logger.debug('Sending RunRequest');
