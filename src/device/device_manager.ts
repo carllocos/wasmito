@@ -93,8 +93,8 @@ export class DeviceManager {
     return new MCUWARDuinoVM(platformConfig, buildOutputDir);
   }
 
-  async closeVM(vm: WARDuinoDevVM): Promise<boolean> {
-    return await vm.close();
+  async closeVM(vm: WARDuinoDevVM, timeout?: number): Promise<boolean> {
+    return await vm.close(timeout);
   }
 
   private registerListenersOnVMProcess(vmProcess: ChildProcess): void {
