@@ -115,16 +115,8 @@ export class WARDuinoDevVM extends WARDuinoVM {
       this.vmConfig,
     );
     const spawnCommand = getPath2WARDuinoSDKVMBinary();
-    if (spawnCommand === undefined) {
-      throw new this.ErrorClass(
-        "Path to WARDuino SDK is not set. You can set it via env variable 'WARDUINO_SDK=PATH'",
-      );
-    }
-
     this.logger.info(
-      `starting DevelopmentVM process ${spawnCommand} with arguments ${processArgs.join(
-        ' ',
-      )}`,
+      `starting DevelopmentVM process ${spawnCommand} ${processArgs.join(' ')}`,
     );
     const childProcess = spawn(spawnCommand, processArgs);
     childProcess.stdout.on('data', (data) => {
@@ -137,10 +129,10 @@ export class WARDuinoDevVM extends WARDuinoVM {
 
     const connected = await this.connect(maxWaitTime);
     if (!connected) {
-      this.logger.info(
+      this.logger.error(
         `Failed to connect to local DevelopmentVM at port ${this.vmConfig.toolPort}`,
       );
-      this.logger.info('Killing local DevelopmentVM process');
+      this.logger.error('Killing local DevelopmentVM process');
       childProcess.kill();
       throw new this.ErrorClass('timed out connecting to DevVM process');
     }
@@ -177,15 +169,16 @@ export class WARDuinoDevVM extends WARDuinoVM {
         );
       }
     } else {
-      this.logger.info(
-        'No toolPort provided so will open a random available one',
-      );
+      this.logger.info('No toolPort provided so will open a free port');
       const openPort = await getFreePort();
       if (openPort === undefined) {
         throw new this.ErrorClass(
           'Cannot spawn a DevelopmentVM as no free port was found',
         );
       }
+      this.logger.info(
+        `No toolPort provided so will start using port ${openPort}`,
+      );
       this.vmConfig.toolPort = openPort;
     }
   }
