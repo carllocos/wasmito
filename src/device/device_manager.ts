@@ -11,7 +11,7 @@ import { MCUWARDuinoVM } from '../warduino/vm/mcu_vm';
 import { type PlatformBuilderConfig } from '../builder/platform_config';
 import { type ChildProcess } from 'child_process';
 import { type WARDuinoVM } from '../warduino';
-import { OutOfPlaceMode, OutOfPlaceVM } from '../warduino/vm/proxy_vm';
+import { OutOfPlaceMode, OutOfPlaceVM } from '../warduino/vm/outofplace_vm';
 
 export class DeviceManagerError extends Error {
   constructor(message: string) {
