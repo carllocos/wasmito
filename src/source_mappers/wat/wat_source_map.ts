@@ -38,6 +38,10 @@ export class WATSourceMap extends SourceMap {
     }
   }
 
+  public getEnvironmentFunctions(): WASMFunction[] {
+    return this.imports;
+  }
+
   public getGlobalFromIndex(index: number): VariableInfo | undefined {
     return this.globals.find((gb) => gb.index === index);
   }

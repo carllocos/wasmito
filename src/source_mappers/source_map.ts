@@ -159,4 +159,6 @@ export abstract class SourceMap {
       return false;
     });
   }
+
+  public abstract getEnvironmentFunctions(): WASMFunction[];
 }
