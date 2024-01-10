@@ -9,6 +9,10 @@ export class ProxifyRequest extends APIRequestNoSubscription<string> {
     return `${Instruction.Proxify}\n`;
   }
 
+  description(): string {
+    return 'ProxifyRequest';
+  }
+
   parse(input: string): string {
     if (input === 'Interrupt: 65') {
       return input;

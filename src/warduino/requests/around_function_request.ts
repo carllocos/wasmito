@@ -76,6 +76,10 @@ export class AroundFunctionRequest extends APIRequestNoSubscription<AroundHookRe
     this.hooks = [];
   }
 
+  description(): string {
+    return `AroundFunction for ${this.function_idx}`;
+  }
+
   addHook(hook: Hook<any>): AroundFunctionRequest {
     if (this.hooks.length === 0) {
       this.hooks.push(hook);

@@ -15,6 +15,10 @@ export class LoadStateRequest extends APIRequestNoSubscription<string> {
     this.lastRequest = lastRequest;
   }
 
+  description(): string {
+    return 'LoadStateRequest';
+  }
+
   getData(): string {
     return this.encodedState;
   }
