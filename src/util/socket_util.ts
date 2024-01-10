@@ -1,6 +1,8 @@
 import * as portFinder from 'portfinder';
 import * as net from 'net';
-import { getGlobalLogger } from '../logger/logger';
+import { createLogger } from '../logger/logger';
+
+const logger = createLogger('SocketUtil');
 
 export async function isPortInUse(port: number): Promise<boolean> {
   return await new Promise<boolean>((resolve) => {
@@ -65,7 +67,9 @@ export async function waitForPortToBeUsed(
       });
 
       client.on('connect', () => {
-        getGlobalLogger().debug(`Port to be used took ${totalTimeWaited}ms`);
+        logger.debug(
+          `Port ${port} at ${host} is ready for usage [took ${totalTimeWaited}ms]`,
+        );
         client.destroy();
         resolve(true);
       });

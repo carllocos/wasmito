@@ -1,5 +1,4 @@
 import * as net from 'net';
-import { getGlobalLogger } from '../logger/logger';
 import { waitForPortToBeUsed } from '../util/socket_util';
 import { AbstractChannel } from './abstract_channel';
 
@@ -36,7 +35,7 @@ export class ClientSideSocket extends AbstractChannel {
   public async send(data: string): Promise<boolean> {
     return this.write(data, (err?: Error | null | undefined) => {
       if (err !== undefined && err !== null) {
-        getGlobalLogger().error(
+        this.logger.error(
           `Error occurred when writing to socket: ${err.message}`,
         );
       }
@@ -52,9 +51,7 @@ export class ClientSideSocket extends AbstractChannel {
       const addr = { port: this.port, host: this.host };
       this.connection = new net.Socket();
       this.connection.connect(addr, () => {
-        getGlobalLogger().info(
-          `ClientSideSocket: connecting to ${this.host}:${this.port}`,
-        );
+        this.logger.info(`connecting to ${this.host}:${this.port}`);
       });
 
       this.connection.on('data', (data: Buffer) => {
@@ -64,20 +61,20 @@ export class ClientSideSocket extends AbstractChannel {
         resolve(true);
       });
       this.connection.on('error', (err) => {
-        getGlobalLogger().error(`ClientSideSocket: ${err.toString()}`);
+        this.logger.error(err.toString());
         if (this.connection !== undefined) {
           resolve(false);
         }
       });
       this.connection.on('close', (hadError: boolean) => {
         if (hadError) {
-          getGlobalLogger().error('ClientSideSocket: closed with error');
+          this.logger.error('closed with error');
         } else {
-          getGlobalLogger().info('ClientSideSocket: closed');
+          this.logger.info('closed');
         }
       });
       this.connection.on('end', () => {
-        getGlobalLogger().info('ClientSideSocket: end transmission');
+        this.logger.info('end transmission');
       });
     });
   }
