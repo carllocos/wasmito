@@ -1,5 +1,8 @@
 import { makeSourceCodeCompiler } from '../../source_mappers/compilers/compiler_factory';
-import { getAbsolutePath } from '../../util/file_util';
+import {
+  createDirectoryIfUnexisting,
+  getAbsolutePath,
+} from '../../util/file_util';
 import { type PlatformBuilderConfig } from '../platform_config';
 import { PlatformBuilder } from '../platformbuilder';
 
