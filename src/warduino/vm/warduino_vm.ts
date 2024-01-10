@@ -47,9 +47,9 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   async connect(timeout?: number): Promise<boolean> {
     const opened = await this.channel.open(timeout);
     if (opened) {
-      this.logger.info('Channel opened');
+      this.logger.info('connected');
     } else {
-      this.logger.error('Channel failed to open');
+      this.logger.error('failed to connect');
     }
     return opened;
   }
@@ -57,9 +57,9 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   public async disconnect(): Promise<boolean> {
     const closed = await this.channel.close();
     if (closed) {
-      this.logger.info('Channel closed');
+      this.logger.info('disconnected');
     } else {
-      this.logger.error('Channel failed to close');
+      this.logger.error('failed to disconnect');
     }
     return closed;
   }
