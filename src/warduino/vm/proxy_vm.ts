@@ -12,11 +12,11 @@ import { type SourceMap } from '../../source_mappers/source_map';
 import { ClientSideSocket, ShareChannel } from '../../communication/index';
 import { getPath2WARDuinoSDKVMBinary } from '../../project_config';
 
-export class WARDuinoOutOfPlaceVMError extends Error {
+export class OutOfPlaceVMError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'WARDuinoOutOfPlaceVMError';
-    Error.captureStackTrace(this, WARDuinoOutOfPlaceVMError);
+    this.name = 'OutOfPlaceVMError';
+    Error.captureStackTrace(this, OutOfPlaceVMError);
   }
 }
 
@@ -25,8 +25,8 @@ export enum OutOfPlaceMode {
   RedirectOOP,
 }
 
-export class WARDuinoOutOfPlaceVM extends WARDuinoDevVM {
-  protected ErrorClass = WARDuinoOutOfPlaceVMError;
+export class OutOfPlaceVM extends WARDuinoDevVM {
+  protected ErrorClass = OutOfPlaceVMError;
   private readonly outOfPlaceMode: OutOfPlaceMode;
   public readonly targetVM: WARDuinoVM;
 
@@ -197,7 +197,7 @@ function createDeviceConfig(vmToProxy: WARDuinoVM): DeviceConfig {
 function createVMConfig(vmToProxy: WARDuinoVM): VMConfiguration {
   const sm = vmToProxy.getSourceMap();
   if (sm === undefined) {
-    throw new WARDuinoOutOfPlaceVMError(
+    throw new OutOfPlaceVMError(
       `VM to proxy called ${vmToProxy.platformConfig.deviceConfig.name} is missing a source code`,
     );
   }
@@ -220,8 +220,6 @@ function assertvalidOutOfPlaceMode(mode: OutOfPlaceMode): void {
       modeExists = false;
   }
   if (!modeExists) {
-    throw new WARDuinoOutOfPlaceVMError(
-      `given outOfPlacemode ${mode} does not exist`,
-    );
+    throw new OutOfPlaceVMError(`given outOfPlace mode ${mode} does not exist`);
   }
 }
