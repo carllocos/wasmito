@@ -2,10 +2,11 @@
  * THE FOLLOWING CODE NEEDS TO BE SERIOUSLY REFACTORED!!!
  */
 
-import { getGlobalLogger } from '../logger/logger';
+import { createLogger } from '../logger/logger';
 import { Instruction } from '../warduino/api/instructions';
 import { InspectableState } from '../warduino/requests/inspect_request';
 import { WASM, type WASMValueIndexed, type WasmState } from './wasm';
+const logger = createLogger('BinaryEncoder');
 
 function HexaEncoderSerializeUInt8(n: number): string {
   return HexaEncoderSerializeUInt(n, 1, true);
@@ -294,7 +295,7 @@ export class StateBinaryEncoder {
     if (this.wasmState.breakpoints === undefined) {
       return;
     }
-    getGlobalLogger().debug('Binary encoder: breakpoints');
+    logger.debug('breakpoints');
     const nrBytesUsedForAmountBPs = 1 * 2;
     const headerSize =
       InspectableState.breakpointState.length + nrBytesUsedForAmountBPs;
@@ -309,9 +310,7 @@ export class StateBinaryEncoder {
       }
       const bps = breakpoints.slice(0, fits).join('');
       const amountBPs = HexaEncoderSerializeUInt8(fits);
-      getGlobalLogger().debug(
-        `Binary encoder: Breakpoints amount=${breakpoints.length}`,
-      );
+      logger.debug(`Breakpoints amount=${breakpoints.length}`);
       const payload = `${InspectableState.breakpointState}${amountBPs}${bps}`;
       stateMsgs.addPayload(payload);
       breakpoints = breakpoints.slice(fits, breakpoints.length);
@@ -325,9 +324,7 @@ export class StateBinaryEncoder {
     if (this.wasmState.stack === undefined) {
       return;
     }
-    getGlobalLogger().debug(
-      `Binary encoder: Stack (length=${this.wasmState.stack.length}`,
-    );
+    logger.debug(`Stack (length=${this.wasmState.stack.length}`);
 
     let stack = this.wasmState.stack.map((v) => {
       return StateBinaryEncoder.serializeValue(v);
@@ -345,7 +342,7 @@ export class StateBinaryEncoder {
       const payload = `${InspectableState.stackState}${amountVals}${vals}`;
       stateMsgs.addPayload(payload);
       stack = stack.slice(fit, stack.length);
-      getGlobalLogger().debug(`Binary encoder: AmountStackValues ${fit}`);
+      logger.debug(`AmountStackValues ${fit}`);
     }
   }
 
@@ -359,9 +356,7 @@ export class StateBinaryEncoder {
     let elements = this.wasmState.table.elements.map(
       HexaEncoderSerializeUInt32BE,
     );
-    getGlobalLogger().debug(
-      `Binary encoder: Table (size ${this.wasmState.table.elements.length}`,
-    );
+    logger.debug(`Table (size ${this.wasmState.table.elements.length}`);
     const nrBytesUsedForAmountElements = 4 * 2;
     const headerSize =
       InspectableState.tableState.length + nrBytesUsedForAmountElements;
@@ -377,9 +372,7 @@ export class StateBinaryEncoder {
         .slice(0, fit)
         .map((e) => e.toString())
         .join(', ');
-      getGlobalLogger().debug(
-        `Binary encoder: msg: amountElements ${fit} elements ${elStr}`,
-      );
+      logger.debug(`msg: amountElements ${fit} elements ${elStr}`);
       const payload = `${InspectableState.tableState}${amountElements}${elems}`;
       stateMsgs.addPayload(payload);
       elements = elements.slice(fit, elements.length);
@@ -393,9 +386,7 @@ export class StateBinaryEncoder {
     if (this.wasmState.callstack === undefined) {
       return;
     }
-    getGlobalLogger().debug(
-      `Binary encoder: Callstack Total Frames ${this.wasmState.callstack.length}`,
-    );
+    logger.debug(`Callstack Total Frames ${this.wasmState.callstack.length}`);
 
     let frames = this.wasmState.callstack.map((f) => {
       return this.serializeFrame(f);
@@ -412,7 +403,7 @@ export class StateBinaryEncoder {
       const amountFrames = HexaEncoderSerializeUInt16BE(fit);
       const fms = frames.slice(0, fit).join('');
 
-      getGlobalLogger().debug(`Binary encoder:  amountFrames=${fit}`);
+      logger.debug(` amountFrames=${fit}`);
       const payload = `${InspectableState.callstackState}${amountFrames}${fms}`;
       stateMsgs.addPayload(payload);
       frames = frames.slice(fit, frames.length);
@@ -426,9 +417,7 @@ export class StateBinaryEncoder {
     if (this.wasmState.globals === undefined) {
       return;
     }
-    getGlobalLogger().debug(
-      `Binary encoder: Total Globals ${this.wasmState.globals.length}`,
-    );
+    logger.debug(`Total Globals ${this.wasmState.globals.length}`);
     let globals = this.wasmState.globals.map((v) => {
       return StateBinaryEncoder.serializeValue(v);
     });
@@ -447,7 +436,7 @@ export class StateBinaryEncoder {
       stateMsgs.addPayload(payload);
       globals = globals.slice(fit, globals.length);
 
-      getGlobalLogger().debug(`Binary encoder: msg: AmountGlobals ${fit}`);
+      logger.debug(`msg: AmountGlobals ${fit}`);
     }
   }
 
@@ -458,15 +447,13 @@ export class StateBinaryEncoder {
     if (this.wasmState.memory === undefined) {
       return;
     }
-    getGlobalLogger().debug('Binary encoder: Memory');
+    logger.debug('Memory');
     const sizeHeader = InspectableState.memState.length + 4 * 2 + 4 * 2;
     let bytes = Array.from(this.wasmState.memory.bytes).map((b) =>
       b.toString(16).padStart(2, '0'),
     );
 
-    getGlobalLogger().debug(
-      `Binary encoder: Total Memory Bytes ${this.wasmState.memory.bytes.length}`,
-    );
+    logger.debug(`Total Memory Bytes ${this.wasmState.memory.bytes.length}`);
     let startMemIdx = 0;
     let endMemIdx = 0;
     while (bytes.length !== 0) {
@@ -494,8 +481,8 @@ export class StateBinaryEncoder {
     if (this.wasmState.br_table === undefined) {
       return;
     }
-    getGlobalLogger().debug(
-      `Binary encoder: Branching Table (Total Labels ${this.wasmState.br_table.labels.length})`,
+    logger.debug(
+      `Branching Table (Total Labels ${this.wasmState.br_table.labels.length})`,
     );
 
     let elements = this.wasmState.br_table.labels.map(
@@ -518,9 +505,7 @@ export class StateBinaryEncoder {
       const payload = `${InspectableState.branchingTableState}${startTblIdxHexa}${endTblIdxHexa}${elems}`;
       stateMsgs.addPayload(payload);
 
-      getGlobalLogger().debug(
-        `Binary encoder: msg: startTblIdx=${startTblIdx} endTblIdx=${endTblIdx}`,
-      );
+      logger.debug(`msg: startTblIdx=${startTblIdx} endTblIdx=${endTblIdx}`);
       startTblIdx = endTblIdx + 1;
 
       elements = elements.slice(fit, elements.length);
@@ -534,7 +519,7 @@ export class StateBinaryEncoder {
       return;
     }
     const ser = this.serializePointer(this.wasmState.pc);
-    getGlobalLogger().debug(`Binary encoder: PC=${this.wasmState.pc}`);
+    logger.debug(`PC=${this.wasmState.pc}`);
     const payload = `${InspectableState.pcState}${ser}`;
     stateMsgs.addPayload(payload);
   }
@@ -550,7 +535,7 @@ export class StateBinaryEncoder {
       );
     }
 
-    getGlobalLogger().debug('Binary encoder: Allocation Msgs');
+    logger.debug('Allocation Msgs');
 
     // Globals
 
@@ -558,8 +543,8 @@ export class StateBinaryEncoder {
       this.wasmState.globals.length,
     );
 
-    getGlobalLogger().debug(
-      `Binary encoder: Allocation Msgs - Globals: total=${this.wasmState.globals.length}`,
+    logger.debug(
+      `Allocation Msgs - Globals: total=${this.wasmState.globals.length}`,
     );
     const globals = `${InspectableState.globalsState}${gblsAmountHex}`;
 
@@ -571,8 +556,8 @@ export class StateBinaryEncoder {
     );
     const tbl = `${InspectableState.tableState}${tblInitHex}${tblMaxHex}${tblSizeHex}`;
 
-    getGlobalLogger().debug(
-      `Binary encoder: Allocation Msgs: Table:  init=${this.wasmState.table.init} max=${this.wasmState.table.max} size=${this.wasmState.table.elements.length}`,
+    logger.debug(
+      `Allocation Msgs: Table:  init=${this.wasmState.table.init} max=${this.wasmState.table.max} size=${this.wasmState.table.elements.length}`,
     );
     // Memory
     const memInitHex = HexaEncoderSerializeUInt32BE(this.wasmState.memory.init);
@@ -581,8 +566,8 @@ export class StateBinaryEncoder {
       this.wasmState.memory.pages,
     );
     const mem = `${InspectableState.memState}${memMaxHex}${memInitHex}${memPagesHex}`;
-    getGlobalLogger().debug(
-      `Binary encoder: Allocation Msgs: Mem: max=${this.wasmState.memory.max} init=${this.wasmState.memory.init}  pages=${this.wasmState.memory.pages}`,
+    logger.debug(
+      `Allocation Msgs: Mem: max=${this.wasmState.memory.max} init=${this.wasmState.memory.init}  pages=${this.wasmState.memory.pages}`,
     );
     const payload = `${globals}${tbl}${mem}`;
 
@@ -637,9 +622,7 @@ export class StateBinaryEncoder {
           `Got unexisting stack Value type ${val.type} value ${val.value}`,
         );
     }
-    getGlobalLogger().debug(
-      `Binary encoder: WasmValue: type=${typeStr}(idx ${type}) val=${val.value}`,
-    );
+    logger.debug(`WasmValue: type=${typeStr}(idx ${type}) val=${val.value}`);
     if (includeType) {
       const typeHex = HexaEncoderSerializeUInt8(type);
       return `${typeHex}${v}`;
@@ -684,8 +667,9 @@ export class StateBinaryEncoder {
       rest = this.serializePointer(frame.block_key);
       resStr = `block_key=${frame.block_key}`;
     }
-    getGlobalLogger().debug(`Binary encoder:
-      Frame: type=${frame.type} sp=${frame.sp} fp=${frame.fp} ra=${frame.ra} ${resStr}`);
+    logger.debug(
+      `Frame: type=${frame.type} sp=${frame.sp} fp=${frame.fp} ra=${frame.ra} ${resStr}`,
+    );
     return `${type}${sp}${fp}${ra}${rest}`;
   }
 
@@ -697,8 +681,8 @@ export class StateBinaryEncoder {
     if (this.wasmState.callbacks === undefined) {
       return;
     }
-    getGlobalLogger().debug(
-      `Binary encoder: CallbacksMapping (Total Mappings ${this.wasmState.callbacks.length})`,
+    logger.debug(
+      `CallbacksMapping (Total Mappings ${this.wasmState.callbacks.length})`,
     );
 
     let mappings = this.wasmState.callbacks.map((f) => {
@@ -715,7 +699,7 @@ export class StateBinaryEncoder {
       }
       const amountMappings = HexaEncoderSerializeUInt32BE(fit);
       const fms = mappings.slice(0, fit).join('');
-      getGlobalLogger().debug(`Binary encoder: amountMappings=${fit}`);
+      logger.debug(`amountMappings=${fit}`);
       const payload = `${InspectableState.callbacksState}${amountMappings}${fms}`;
       stateMsgs.addPayload(payload);
       mappings = mappings.slice(fit, mappings.length);
@@ -733,9 +717,7 @@ export class StateBinaryEncoder {
       .map((tidx) => HexaEncoderSerializeUInt32BE(tidx))
       .join('');
 
-    getGlobalLogger().warn(
-      'Binary encoder: TODO check if callbackmapping serialization is correct',
-    );
+    logger.warn('TODO check if callbackmapping serialization is correct');
     const tableIndecesSize = HexaEncoderSerializeUInt32BE(tableIndeces.length);
     return `${sizeCallbackID}${callbackIDInHexa}${tableIndecesSize}${tableIndeces}`;
   }
