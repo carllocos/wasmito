@@ -10,7 +10,7 @@ export class PauseRequest extends APIRequestNoSubscription<string> {
   }
 
   parse(input: string): string {
-    if (input === 'Pause') {
+    if (input === 'PAUSE!') {
       return input;
     }
     throw new APIRequestInvalidParse('No ack for Pause');
