@@ -1,5 +1,8 @@
 import { type Hook } from '../../hooks/hook';
-import { type SourceCodeLocation } from '../../source_mappers';
+import {
+  type WASMFunction,
+  type SourceCodeLocation,
+} from '../../source_mappers';
 import { type WasmState } from '../../state/wasm';
 import { type StateRequest } from '../requests/inspect_request';
 
@@ -40,6 +43,11 @@ export interface WARDuinoAPI {
   loadWasmState: (state: WasmState, timeout?: number) => Promise<void>;
 
   resolveEvent: (timeout?: number) => Promise<void>;
+
+  registerFuncForProxyCall: (
+    funcToProxy: WASMFunction,
+    timeout?: number,
+  ) => Promise<boolean>;
 
   // Hook API
   addHookBefore: <T>(
