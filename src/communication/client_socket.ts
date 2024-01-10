@@ -23,7 +23,7 @@ export class ClientSideSocket extends AbstractChannel {
     }
   }
 
-  public async close(): Promise<boolean> {
+  public async close(timeout?: number): Promise<boolean> {
     if (this.connection !== undefined) {
       this.connection.destroy();
       this.connection = undefined;

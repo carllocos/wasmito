@@ -52,9 +52,9 @@ export class WARDuinoDevVM extends WARDuinoVM {
     this.logger = createLogger(deviceConfig.name);
   }
 
-  async close(): Promise<boolean> {
+  async close(timeout?: number): Promise<boolean> {
     this.logger.info('closing VM');
-    const closedChannel = await this.channel.close();
+    const closedChannel = await this.channel.close(timeout);
     const closedProcess = this.process?.kill() ?? true;
     this.logger.debug(
       closedChannel

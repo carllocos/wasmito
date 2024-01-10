@@ -25,7 +25,7 @@ export class NoChannel implements Channel {
     );
   }
 
-  async close(): Promise<boolean> {
+  async close(timedout?: number): Promise<boolean> {
     throw Error(
       'NoChannel has no implementation and serves only as transition channel',
     );

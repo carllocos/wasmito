@@ -130,8 +130,8 @@ export class SerialConnection implements Channel {
     }
   }
 
-  async close(): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
+  async close(timedout?: number): Promise<boolean> {
+    const p = new Promise<boolean>((resolve, reject) => {
       if (this.port === undefined) {
         resolve(true);
         return;
@@ -145,5 +145,11 @@ export class SerialConnection implements Channel {
         }
       });
     });
+
+    if (timedout === undefined) {
+      return await p;
+    } else {
+      return await timeoutPromise(p, timedout);
+    }
   }
 }
