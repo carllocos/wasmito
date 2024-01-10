@@ -74,13 +74,13 @@ export class DeviceManager {
   }
 
   async spawnOutOfPlaceVM(
-    vmToProxy: WARDuinoVM,
+    targetVM: WARDuinoVM,
     maxWaitTime?: number,
     buildOutputDir?: string,
   ): Promise<OutOfPlaceVM> {
     const vm = new OutOfPlaceVM(
       OutOfPlaceMode.RedirectOOP,
-      vmToProxy,
+      targetVM,
       buildOutputDir,
     );
     const childProcess = await vm.spawn(maxWaitTime);
