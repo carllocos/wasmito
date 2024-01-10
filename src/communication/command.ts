@@ -50,7 +50,9 @@ export class Command<T> {
       this.requestRejector !== undefined &&
       this.timeout !== undefined
     ) {
-      const errMsg = `Command timedout after ${this.timeout} ms while waiting for reply`;
+      const errMsg = `Request ${this.request.description()} timedout after ${
+        this.timeout
+      } ms while waiting for reply`;
       getGlobalLogger().error(errMsg);
       this.requestRejector(new CommandError(errMsg));
     }
