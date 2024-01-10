@@ -37,7 +37,7 @@ export abstract class PlatformBuilder {
     this.outputDirectory = outputDir;
     if (outputDir === '') {
       this.logger.info(
-        'No build output directory set. Falling back to tmp file',
+        'No build output directory set. Falling back to tmp dir',
       );
       this.outputDirectory = createTempDirectory(this.tmpDirPrefix);
     }
