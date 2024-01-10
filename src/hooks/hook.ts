@@ -11,6 +11,7 @@ export enum HookKind {
   ValueSubstitution = '02',
   StateToInspect = '03',
   ChangeRunningState = '04',
+  ProxyCall = '05',
 }
 
 export abstract class Hook<SubscriptionType> {

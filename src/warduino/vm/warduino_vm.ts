@@ -3,7 +3,11 @@ import { type Channel } from '../../communication/channel_interface';
 import { type WARDuinoAPI } from '../api/warduino_api';
 import { RunRequest } from '../requests/run_request';
 import { StepRequest } from '../requests/step_request';
-import { isSuccessfulMessage, type APIRequest } from '../api/request_interface';
+import {
+  isSuccessfulMessage,
+  type APIRequest,
+  ResponseType,
+} from '../api/request_interface';
 import { Command } from '../../communication/command';
 import { type PlatformBuilderConfig } from '../../builder/platform_config';
 import { type PlatformBuilder } from '../../builder/platformbuilder';
@@ -16,6 +20,7 @@ import { LoadStateRequestBuilder } from '../requests/load_state_request';
 import { timeoutPromise } from '../../util/promise_util';
 import { ResolveEventRequest } from '../requests/resolve_event_request';
 import {
+  type WASMFunction,
   type SourceCodeLocation,
   type SourceMap,
 } from '../../source_mappers/source_map';
@@ -24,6 +29,8 @@ import {
   MonitorMoment,
   MontiroWasmAddrRequest,
 } from '../requests/monitor_request';
+import { ProxyCallHook } from '../../hooks/hook_proxy_call';
+import { AroundFunctionRequest } from '../requests/around_function_request';
 
 export abstract class WARDuinoVM implements WARDuinoAPI {
   private _channel: Channel;
@@ -198,6 +205,32 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     timeout?: number | undefined,
   ): Promise<boolean> {
     throw new this.ErrorClass('not implemented');
+  }
+
+  async registerFuncForProxyCall(
+    funcToProxy: WASMFunction,
+    timeout?: number,
+  ): Promise<boolean> {
+    const req = new AroundFunctionRequest(funcToProxy.id).addHook(
+      new ProxyCallHook(funcToProxy.id),
+    );
+    const reply = await this.sendRequest(req, timeout);
+    if (reply.responseType === ResponseType.SuccessResponse) {
+      this.logger.info(
+        `Function ${funcToProxy.name} is registered for proxy calls`,
+      );
+      return true;
+    } else if (reply.responseType === ResponseType.ErrorResponse) {
+      this.logger.error(
+        `Function ${funcToProxy.name} could not be registered for proxy calls error_code=${reply.error_code})`,
+      );
+      return false;
+    } else {
+      this.logger.error(
+        `Received unexpected aroundRequest ack message of type ${reply.responseType} for function ${f.name}`,
+      );
+      return false;
+    }
   }
 
   async addHookBefore<T>(
