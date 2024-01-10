@@ -1,4 +1,4 @@
-import { exec } from 'child_process';
+import { type ExecException, exec } from 'child_process';
 import { createLogger, getGlobalLogger } from '../../logger/logger';
 import {
   WASMFunction,
@@ -95,17 +95,17 @@ export class WATCompiler extends SourceCodeCompiler {
     );
   }
 }
-async function runCommand(command: string): Promise<[string, string]> {
-  const resp = await new Promise<[string, string]>((resolve, reject) => {
-    getGlobalLogger().info(`Running command: ${command}`);
-    exec(command, (error, stdout, stderr) => {
-      if (error !== null) {
-        reject(error);
-      } else {
-        resolve([stdout, stderr]);
-      }
-    });
-  });
+async function runCommand(
+  command: string,
+): Promise<[string, string, ExecException | null]> {
+  const resp = await new Promise<[string, string, ExecException | null]>(
+    (resolve) => {
+      getGlobalLogger().info(`Running command: ${command}`);
+      exec(command, (error, stdout, stderr) => {
+        resolve([stdout, stderr, error]);
+      });
+    },
+  );
   return resp;
 }
 
@@ -119,9 +119,15 @@ async function compileWAT2WASM(
   const command =
     `${wat2wasm} --no-canonicalize-leb128s --disable-bulk-memory --debug-names -v -o ${wasmOutputFile} ` +
     sourcefilePath;
-  const [linesSourceMap, errorMsg] = await runCommand(command);
-  if (errorMsg !== '') {
-    const msg = `failed to compile wat2wasm reason: ${errorMsg}`;
+  const [linesSourceMap, errorMsg, error] = await runCommand(command);
+  if (errorMsg !== '' || error !== null) {
+    let msg = `Command ${command} failed reason: `;
+    if (errorMsg !== '') {
+      msg += errorMsg;
+    } else {
+      msg += `${error?.name}: ${error?.message}`;
+    }
+    logger.error(msg);
     throw new WATCompilerError(msg);
   }
   logger.info(`Saving wabt_sourcemap to filepath: ${linesInfoOutputFile}`);
@@ -154,24 +160,35 @@ async function buildWATSourceMap(
   // generate obj dump file
   const objDump = getPath2ObjDump();
   const detailsCommand = `${objDump} -x -m ${wasmFilePath}`;
-  const [outputCmdDetails, errMsgDetails] = await runCommand(detailsCommand);
-  // const sourceMap = EmptySourceMap();
+  const [outputCmdDetails, errMsgDetails, errorDetails] =
+    await runCommand(detailsCommand);
 
-  if (errMsgDetails !== '') {
-    throw new WATCompilerError(
-      `Command '${detailsCommand}' failed reason: ${errMsgDetails}`,
-    );
+  if (errMsgDetails !== '' || errorDetails !== null) {
+    let errMsg = `Command '${detailsCommand}' failed reason: `;
+    if (errMsgDetails !== '') {
+      errMsg += errMsgDetails;
+    } else {
+      errMsg += `${errorDetails?.name}: ${errorDetails?.message}`;
+    }
+    logger.error(errMsg);
+    throw new WATCompilerError(errMsg);
   }
   // save the output to a file
   logger.info(`Saving obj-dump -x sections at ${objDumpDetailsOutputFile}`);
   writeFileSync(objDumpDetailsOutputFile, outputCmdDetails);
 
   const dissembleCommand = `${objDump} -d ${wasmFilePath}`;
-  const [outputDissamble, errMsgDissamble] = await runCommand(dissembleCommand);
-  if (errMsgDissamble !== '') {
-    throw new WATCompilerError(
-      `Command '${dissembleCommand}' failed reason: ${errMsgDissamble}`,
-    );
+  const [outputDissamble, errMsgDissamble, errorDissamble] =
+    await runCommand(dissembleCommand);
+  if (errMsgDissamble !== '' || errorDissamble !== null) {
+    let errMsg = `Command '${dissembleCommand}' failed reason: `;
+    if (errMsgDissamble !== '') {
+      errMsg += errMsgDissamble;
+    } else {
+      errMsg += `${errorDissamble?.name}: ${errorDissamble?.message}`;
+    }
+    logger.error(errMsg);
+    throw new WATCompilerError(errMsg);
   }
   // save the output to a file
   logger.info(
@@ -278,11 +295,16 @@ async function createCHeaderFile(
   );
   const xxd = getPath2XXD();
   const command = `${xxd} -i ${wasmFilePath} > ${cHeaderFilePath}`;
-  const [, stderr] = await runCommand(command);
-  if (stderr !== '') {
-    throw new WATCompilerError(
-      `error occureding during conversion to C headerfile reason: ${stderr}`,
-    );
+  const [, stderr, error] = await runCommand(command);
+  if (stderr !== '' || error !== null) {
+    let errMsg = 'error during conversion to C headerfile reason:';
+    if (stderr !== '') {
+      errMsg += stderr;
+    } else {
+      errMsg += `${error?.name}: ${error?.message}`;
+    }
+    logger.error(errMsg);
+    throw new WATCompilerError(errMsg);
   }
 }
 
