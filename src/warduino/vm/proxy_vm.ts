@@ -8,11 +8,11 @@ import {
 import { WARDuinoDevVM } from './dev_vm';
 import { v4 as uuidv4 } from 'uuid';
 
-export class WARDuinoProxiedVMError extends Error {
+export class WARDuinoOutOfPlaceVMError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'WARDuinoProxiedVMError';
-    Error.captureStackTrace(this, WARDuinoProxiedVMError);
+    this.name = 'WARDuinoOutOfPlaceVMError';
+    Error.captureStackTrace(this, WARDuinoOutOfPlaceVMError);
   }
 }
 
@@ -32,7 +32,7 @@ function createDeviceConfig(vmToProxy: WARDuinoVM): DeviceConfig {
 function createVMConfig(vmToProxy: WARDuinoVM): VMConfiguration {
   const sm = vmToProxy.getSourceMap();
   if (sm === undefined) {
-    throw new WARDuinoProxiedVMError(
+    throw new WARDuinoOutOfPlaceVMError(
       `VM to proxy called ${vmToProxy.platformConfig.deviceConfig.name} is missing a source code`,
     );
   }
