@@ -3,7 +3,7 @@ import { type Channel } from './channel_interface';
 import { getGlobalLogger } from '../logger/logger';
 
 export abstract class AbstractChannel implements Channel {
-  private readonly channelName: string;
+  readonly channelName: string;
   protected connection?: net.Socket;
   private dataBuffered: string = '';
   private listeners: Array<(data: string) => void>;

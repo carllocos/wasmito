@@ -8,6 +8,8 @@ import { type Channel } from './channel_interface';
  */
 
 export class NoChannel implements Channel {
+  readonly channelName: string = 'NoChannel';
+
   write(
     data: any,
     cb?: ((err?: Error | null | undefined) => void) | undefined,
