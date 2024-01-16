@@ -3,8 +3,9 @@ import {
   type WASMFunction,
   type SourceCodeLocation,
 } from '../../source_mappers';
-import { type WasmState } from '../../state/wasm';
+import { type WASM, type WasmState } from '../../state/wasm';
 import { type StateRequest } from '../requests/inspect_request';
+import { type ProxyCallResponse } from '../requests/fun_call_request';
 
 export interface WARDuinoAPI {
   run: (timeout?: number) => Promise<boolean>;
@@ -44,6 +45,12 @@ export interface WARDuinoAPI {
     funcToProxy: WASMFunction,
     timeout?: number,
   ) => Promise<boolean>;
+
+  proxyCall: (
+    funcid: number,
+    args: WASM.Value[],
+    timeout?: number,
+  ) => Promise<ProxyCallResponse>;
 
   // Hook API
   addHookBefore: <T>(
