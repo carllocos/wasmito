@@ -46,6 +46,7 @@ export namespace WASM {
 
   export interface EncodingWasmValueOptions {
     includeType: boolean;
+    includeIndex: boolean;
   }
 
   export function encodeWasmValue(

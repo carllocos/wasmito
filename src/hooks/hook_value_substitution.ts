@@ -16,6 +16,7 @@ export class ValueSubstitution extends HookWithoutSubscription {
       hasValue = '01';
       valueEncoded = WASM.encodeWasmValue(this.value, {
         includeType: true,
+        includeIndex: false,
       });
     }
     return `${this.kind}${hasValue}${valueEncoded}`;
