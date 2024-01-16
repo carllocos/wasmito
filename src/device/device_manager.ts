@@ -60,7 +60,7 @@ export class DeviceManager {
     vmName: string,
     vmID: string,
     vmConfigArgs: VMConfigArgs,
-    maxWaitTime: number,
+    maxWaitTime?: number,
     buildOutputDir?: string,
   ): Promise<WARDuinoDevVM> {
     return this.spawnDevelopmentVMFromConfigs(
