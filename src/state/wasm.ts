@@ -27,6 +27,18 @@ export namespace WASM {
     }
   }
 
+  export function typeToNumber(wasmType: Type): number {
+    const hex = WASM.typeToHex.get(wasmType);
+    if (hex === undefined) {
+      throw Error(`Cannot convert unexisting WasmType ${wasmType} to number`);
+    }
+    const n = parseInt(hex, 16);
+    if (isNaN(n)) {
+      throw Error(`Cannot convert unexisting WasmType ${wasmType} to number`);
+    }
+    return n;
+  }
+
   export const typing = new Map<string, Type>([
     ['f32', Type.f32],
     ['f64', Type.f64],
@@ -44,6 +56,16 @@ export namespace WASM {
   export interface Value {
     type: Type;
     value: number;
+  }
+
+  export function isWasmValue(obj: any): boolean {
+    return (
+      typeof obj === 'object' &&
+      obj.type !== undefined &&
+      typing.get(obj.type) !== undefined &&
+      obj.value !== undefined &&
+      typeof obj.value === 'number'
+    );
   }
 
   export interface EncodingWasmValueOptions {
@@ -77,6 +99,17 @@ export namespace WASM {
         logger.error(`encodingWasmValue with unexisting value type`);
     }
     return encodedValue;
+  }
+
+  export function encodeWasmValues(
+    values: WASM.Value[],
+    options: EncodingWasmValueOptions,
+  ): string {
+    // nr args LEB 128 | serialize Value | ...
+    return (
+      WASM.leb128(values.length) +
+      values.map((v) => WASM.encodeWasmValue(v, options)).join('')
+    );
   }
 
   export interface Frame {
