@@ -8,6 +8,7 @@ import {
   isProxyCallSuccessfulResponse,
 } from '../../src/warduino/requests/fun_call_request';
 import { WasmValuesBuilder } from '../shared/wasm_state_builder';
+import { timeoutPromise } from '../../src/util/promise_util';
 
 /*
  * TODO: The tests prefixed with `integration:` are integration tests and therefore may need a different framework
@@ -57,10 +58,13 @@ describe('Intergation Test: Proxy Calls to a Mocked Target VM produces the right
       chipPinModeID,
       argsLine39.values,
     );
-    const proxyCallOfLine39RequestReceived = await checkIfMessageReceived(
-      proxyCallLine39.encodeRemoteCallRequest(),
-      proxyVM,
-      targetVM.mockChannel,
+    const proxyCallOfLine39RequestReceived = await timeoutPromise(
+      checkIfMessageReceived(
+        proxyCallLine39.encodeRemoteCallRequest(),
+        proxyVM,
+        targetVM.mockChannel,
+      ),
+      3000,
     );
     expect(proxyCallOfLine39RequestReceived).to.be.equal(true);
 
@@ -78,10 +82,13 @@ describe('Intergation Test: Proxy Calls to a Mocked Target VM produces the right
       argsLine44.values,
     );
 
-    const proxyCallOfLine44RequestReceived = await checkIfMessageReceived(
-      proxyCallLine44.encodeRemoteCallRequest(),
-      proxyVM,
-      targetVM.mockChannel,
+    const proxyCallOfLine44RequestReceived = await timeoutPromise(
+      checkIfMessageReceived(
+        proxyCallLine44.encodeRemoteCallRequest(),
+        proxyVM,
+        targetVM.mockChannel,
+      ),
+      3000,
     );
     expect(proxyCallOfLine44RequestReceived).to.be.equal(true);
     const closed = await deviceManager.closeVM(proxyVM, 3000);
@@ -98,10 +105,15 @@ describe('Intergation Test: Proxy Call handled by a target VM produces expected 
   it('Respond to a Proxy Call of a function that does not return a value', async () => {
     const program = './test/data/test-example-proxy-call.wat';
     const deviceManager = new DeviceManager();
-    const vm = await deviceManager.spawnDevelopmentVM('TargetVM', '1', {
-      program,
-      disableStrictModuleLoad: true,
-    });
+    const vm = await deviceManager.spawnDevelopmentVM(
+      'TargetVM',
+      '1',
+      {
+        program,
+        disableStrictModuleLoad: true,
+      },
+      3000,
+    );
 
     const chipPinModeID = 1;
     const args = new WasmValuesBuilder().addI32Value(39).addI32Value(5);
