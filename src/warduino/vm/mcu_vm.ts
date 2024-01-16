@@ -5,6 +5,7 @@ import { type Channel } from '../../communication/channel_interface';
 import { createLogger } from '../../logger/logger';
 import { timeoutPromise } from '../../util/promise_util';
 import { ClientSideSocket, SerialConnection } from '../../communication/index';
+import { type DeviceConfig } from '../../device/device_config';
 
 export class MCUWARDuinoVMError extends Error {
   constructor(message: string) {
@@ -14,16 +15,22 @@ export class MCUWARDuinoVMError extends Error {
   }
 }
 
+function createLoggerName(deviceConfig: DeviceConfig): string {
+  return `${deviceConfig.name} ${deviceConfig.id}`;
+}
+
 function createChannel(platformConfig: PlatformBuilderConfig): Channel {
   if (platformConfig.configuredForSerial()) {
     return new SerialConnection(
       platformConfig.deviceConfig.vmConfig.serialPort,
       platformConfig.baudrate,
+      `${platformConfig.deviceConfig.name} ${platformConfig.deviceConfig.id}`,
     );
   } else if (platformConfig.configuredForNetwork()) {
     return new ClientSideSocket(
       platformConfig.deviceConfig.vmConfig.toolPort,
       platformConfig.deviceConfig.vmConfig.toolHostIP,
+      createLoggerName(platformConfig.deviceConfig),
     );
   } else {
     throw new MCUWARDuinoVMError(

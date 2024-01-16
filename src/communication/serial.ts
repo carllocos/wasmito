@@ -6,6 +6,14 @@ import type winston from 'winston';
 
 // TODO remove code duplication from client-side socket
 
+function createLoggerName(prefix: string, serialPort: string): string {
+  if (prefix === '') {
+    return `(${serialPort})`;
+  } else {
+    return `${prefix} (${serialPort})`;
+  }
+}
+
 export class SerialConnection implements Channel {
   private port?: SerialPort;
   private readonly portName: string;
@@ -17,10 +25,10 @@ export class SerialConnection implements Channel {
 
   readonly channelName: string;
 
-  constructor(portName: string, baudRate: number) {
+  constructor(portName: string, baudRate: number, loggerName: string = '') {
     this.portName = portName;
     this.baudRate = baudRate;
-    this.channelName = this.portName;
+    this.channelName = createLoggerName(loggerName, this.portName);
     this.logger = createLogger(this.channelName);
     this.removedListeners = new Set();
   }
