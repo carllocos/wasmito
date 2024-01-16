@@ -12,6 +12,10 @@ import { type SourceMap } from '../../source_mappers/source_map';
 import { ClientSideSocket, ShareChannel } from '../../communication/index';
 import { getPath2WARDuinoSDKVMBinary } from '../../project_config';
 
+function createLoggerName(deviceConfig: DeviceConfig): string {
+  return `${deviceConfig.name} ${deviceConfig.id}`;
+}
+
 export class OutOfPlaceVMError extends Error {
   constructor(message: string) {
     super(message);
@@ -74,6 +78,7 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
     this.channel = new ClientSideSocket(
       this.vmConfig.toolPort,
       this.vmConfig.toolHostIP,
+      createLoggerName(this.deviceConfig),
     );
 
     const exitCode = await this.platform.compile(this.vmConfig.program);

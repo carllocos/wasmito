@@ -20,6 +20,10 @@ export class WARDuinoDevVMError extends Error {
   }
 }
 
+function createLoggerName(deviceConfig: DeviceConfig): string {
+  return `${deviceConfig.name} ${deviceConfig.id}`;
+}
+
 export class WARDuinoDevVM extends WARDuinoVM {
   protected logger: winston.Logger;
   protected process?: ChildProcess;
@@ -43,7 +47,11 @@ export class WARDuinoDevVM extends WARDuinoVM {
         deviceConfig,
       ),
       vmConfig.hasToolPort()
-        ? new ClientSideSocket(vmConfig.toolPort, vmConfig.toolHostIP)
+        ? new ClientSideSocket(
+            vmConfig.toolPort,
+            vmConfig.toolHostIP,
+            createLoggerName(deviceConfig),
+          )
         : new NoChannel(),
       buildOutputDir,
     );
@@ -98,6 +106,7 @@ export class WARDuinoDevVM extends WARDuinoVM {
     this.channel = new ClientSideSocket(
       this.vmConfig.toolPort,
       this.vmConfig.toolHostIP,
+      createLoggerName(this.deviceConfig),
     );
 
     const exitCode = await this.platform.compile(this.vmConfig.program);

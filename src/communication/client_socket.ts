@@ -2,12 +2,20 @@ import * as net from 'net';
 import { waitForPortToBeUsed } from '../util/socket_util';
 import { AbstractChannel } from './abstract_channel';
 
+function createLoggerName(prefix: string, host: string, port: number): string {
+  if (prefix === '') {
+    return `(socket ${host} ${port})`;
+  } else {
+    return `${prefix} (socket ${host}:${port})`;
+  }
+}
+
 export class ClientSideSocket extends AbstractChannel {
   private readonly port: number;
   private readonly host: string;
 
-  constructor(port: number, host: string) {
-    super(`ClientSideSocket(${host}:${port})`);
+  constructor(port: number, host: string, loggerName: string = '') {
+    super(createLoggerName(loggerName, host, port));
     this.port = port;
     this.host = host === '' || host === 'localhost' ? '127.0.0.1' : host;
   }
