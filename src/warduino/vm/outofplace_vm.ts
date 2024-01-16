@@ -198,7 +198,7 @@ function createVMConfig(vmToProxy: WARDuinoVM): VMConfiguration {
   const sm = vmToProxy.getSourceMap();
   if (sm === undefined) {
     throw new OutOfPlaceVMError(
-      `VM to proxy called ${vmToProxy.platformConfig.deviceConfig.name} is missing a source code`,
+      `VM to proxy '${vmToProxy.platformConfig.deviceConfig.name}' is missing a source code`,
     );
   }
 
