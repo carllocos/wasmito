@@ -97,11 +97,11 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
 
     const spawnedProcess = spawn(spawnCommand, processArgs);
     spawnedProcess.stdout.on('data', (data) => {
-      this.logger.debug(`${this.deviceConfig.name} (Spawned process): ${data}`);
+      this.logger.debug(`(stdout) ${data}`);
     });
 
     spawnedProcess.stderr.on('data', (data) => {
-      this.logger.error(`${this.deviceConfig.name} (Spawned process): ${data}`);
+      this.logger.error(`(stderr) ${data}`);
     });
 
     const connected = await this.connect(maxWaitTime);

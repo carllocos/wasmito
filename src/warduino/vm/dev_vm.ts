@@ -120,11 +120,11 @@ export class WARDuinoDevVM extends WARDuinoVM {
     );
     const childProcess = spawn(spawnCommand, processArgs);
     childProcess.stdout.on('data', (data) => {
-      this.logger.debug(`${this.deviceConfig.name} (Spawned process): ${data}`);
+      this.logger.debug(`(stdout) ${data}`);
     });
 
     childProcess.stderr.on('data', (data) => {
-      this.logger.error(`${this.deviceConfig.name} (Spawned process): ${data}`);
+      this.logger.error(`(stderr) ${data}`);
     });
 
     const connected = await this.connect(maxWaitTime);
