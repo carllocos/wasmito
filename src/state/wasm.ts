@@ -203,7 +203,8 @@ export namespace WASM {
 export interface WASMValueIndexed extends WASM.Value {
   idx: number;
 }
-export interface WasmState {
+
+export interface WasmStateArgs {
   pc?: number;
   breakpoints?: number[];
   stack?: WASMValueIndexed[];
@@ -214,4 +215,153 @@ export interface WasmState {
   br_table?: WASM.BRTable;
   callbacks?: WASM.CallbackMapping[];
   events?: WASM.Event[];
+}
+
+export class WasmState {
+  pc?: number;
+  breakpoints?: number[];
+  stack?: WASMValueIndexed[];
+  callstack?: WASM.Frame[];
+  globals?: WASMValueIndexed[];
+  table?: WASM.Table;
+  memory?: WASM.Memory;
+  br_table?: WASM.BRTable;
+  callbacks?: WASM.CallbackMapping[];
+  events?: WASM.Event[];
+
+  private readonly _jsonString?: string;
+
+  constructor(args: any, jsonString?: string) {
+    // TODO change to WasmStateArgs and fix mismatch types
+    this._jsonString = jsonString;
+
+    if (args.pc !== undefined) {
+      this.pc = args.pc;
+    }
+    if (args.breakpoints !== undefined) {
+      this.breakpoints = args.breakpoints;
+    }
+    if (args.stack !== undefined) {
+      this.stack = args.stack.map(
+        (sv: { idx: number; type: string; value: number }) => {
+          return {
+            idx: sv.idx,
+            type: WASM.typing.get(sv.type),
+            value: sv.value,
+          };
+        },
+      );
+    }
+
+    if (args.globals !== undefined) {
+      this.globals = args.globals.map(
+        (gv: { idx: number; type: string; value: number }) => {
+          return {
+            idx: gv.idx,
+            type: WASM.typing.get(gv.type),
+            value: gv.value,
+          };
+        },
+      );
+    }
+
+    if (args.callstack !== undefined) {
+      this.callstack = args.callstack;
+    }
+    if (args.table !== undefined) {
+      if (isNaN(args.table.max)) {
+        throw new Error(`Table max isNaN ${args.table.max}`);
+      }
+
+      if (isNaN(args.table.init)) {
+        throw new Error(`Table init isNaN ${args.table.init}`);
+      }
+      this.table = {
+        max: args.table.max,
+        init: args.table.init,
+        elements: args.table.elements.map((v: any) => {
+          if (isNaN(v)) {
+            throw new Error(`Table element isNaN ${v}`);
+          }
+          return v;
+        }),
+      };
+    }
+    if (args.memory !== undefined) {
+      if (isNaN(args.memory.pages)) {
+        throw new Error(`Memory pages isNaN ${args.memory.pages}`);
+      }
+      if (isNaN(args.memory.max)) {
+        throw new Error(`Memory max isNaN ${args.memory.max}`);
+      }
+      if (isNaN(args.memory.init)) {
+        throw new Error(`Memory init isNaN ${args.memory.init}`);
+      }
+      const memBytes = Uint8Array.from(args.memory.bytes);
+      if (memBytes === undefined) {
+        throw new Error(
+          `Memory bytes are invalid ${args.memory.bytes.toString()}`,
+        );
+      }
+      this.memory = {
+        pages: args.memory.pages,
+        max: args.memory.max,
+        init: args.memory.init,
+        bytes: memBytes,
+      };
+    }
+    if (args.br_table !== undefined) {
+      const brTableSize = parseInt(args.br_table.size, 16);
+      if (isNaN(brTableSize)) {
+        throw new Error(`Invalid BR_table size ${args.br_table.size}`);
+      }
+      this.br_table = {
+        size: brTableSize,
+        labels: args.br_table.labels.map((v: any) => {
+          if (isNaN(v)) {
+            throw new Error(`Invalid BR_table label is NaN ${v}`);
+          }
+          return v;
+        }),
+      };
+    }
+    if (args.callbacks !== undefined) {
+      this.callbacks = args.callbacks.map((cb: any) => {
+        if (isNaN(cb.callbackid)) {
+          throw new Error(`Callback id is NaN ${cb.callbackid}`);
+        }
+        return {
+          callbackid: cb.callbackid,
+          tableIndexes: cb.tableIndexes.map((i: any) => {
+            if (isNaN(i)) {
+              throw new Error(`Callback index is NaN ${i}`);
+            }
+            return i;
+          }),
+        };
+      });
+    }
+    if (args.events !== undefined) {
+      this.events = args.events.map((ev: any) => {
+        if (typeof ev.topic !== 'string') {
+          throw new Error(`event topic should be string got ${ev.topic}`);
+        }
+
+        if (typeof ev.payload !== 'string') {
+          throw new Error(`event topic should be string got ${ev.topic}`);
+        }
+        return {
+          topic: ev.topic,
+          payload: ev.payload,
+        };
+      });
+    }
+  }
+
+  asJSONString(): string {
+    if (this._jsonString === undefined) {
+      throw new Error('no jsonstring provided');
+    }
+    return this._jsonString;
+  }
 }
