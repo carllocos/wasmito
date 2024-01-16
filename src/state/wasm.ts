@@ -1,5 +1,6 @@
 import { createLogger } from '../logger/logger';
 import { encodeToHexLEB128, floatToHexString } from '../util/encoder';
+import fs from 'fs';
 
 const logger = createLogger('WASM');
 
@@ -364,4 +365,11 @@ export class WasmState {
     }
     return this._jsonString;
   }
+}
+
+export async function storeWasmStateToFile(
+  wasmState: WasmState,
+  destPath: string,
+): Promise<void> {
+  fs.writeFileSync(destPath, wasmState.asJSONString());
 }
