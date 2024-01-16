@@ -14,7 +14,7 @@ import { type PlatformBuilder } from '../../builder/platformbuilder';
 import { createPlatformBuilder } from '../../builder/platformbuilder_factory';
 import { PauseRequest } from '../requests/pause_request';
 import { ProxifyRequest } from '../requests/proxify_request';
-import { type WasmState } from '../../state/wasm';
+import { type WASM, type WasmState } from '../../state/wasm';
 import { StateRequest } from '../requests/inspect_request';
 import { LoadStateRequestBuilder } from '../requests/load_state_request';
 import { timeoutPromise } from '../../util/promise_util';
@@ -31,6 +31,10 @@ import {
 } from '../requests/monitor_request';
 import { ProxyCallHook } from '../../hooks/hook_proxy_call';
 import { AroundFunctionRequest } from '../requests/around_function_request';
+import {
+  ProxyCallRequest,
+  type ProxyCallResponse,
+} from '../requests/fun_call_request';
 
 export abstract class WARDuinoVM implements WARDuinoAPI {
   private _channel: Channel;
@@ -210,6 +214,15 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     timeout?: number | undefined,
   ): Promise<boolean> {
     throw new this.ErrorClass('not implemented');
+  }
+
+  async proxyCall(
+    funcid: number,
+    args: WASM.Value[],
+    timeout?: number | undefined,
+  ): Promise<ProxyCallResponse> {
+    const request = new ProxyCallRequest(funcid, args);
+    return await this.sendRequest(request, timeout);
   }
 
   async registerFuncForProxyCall(
