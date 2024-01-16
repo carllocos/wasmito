@@ -5,6 +5,8 @@ export enum Instruction {
   Step = '04',
   Inspect = '09',
 
+  FuncCall = '41',
+
   UpdateWasmModule = '22',
 
   AroundFunction = '50',
@@ -14,6 +16,7 @@ export enum Instruction {
 
   Proxify = '65',
   PopEvent = '73',
+  ProxyCall = '64',
 }
 
 export function getInstructionFromString(str: string): Instruction | undefined {
@@ -32,6 +35,10 @@ export function getInstructionFromString(str: string): Instruction | undefined {
       return Instruction.AroundFunction;
     case '51':
       return Instruction.MonitorWasmAddr;
+    case '64':
+      return Instruction.ProxyCall;
+    case '41':
+      return Instruction.FuncCall;
     default:
       return undefined;
   }
