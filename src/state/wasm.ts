@@ -1,5 +1,7 @@
-import { getGlobalLogger } from '../logger/logger';
+import { createLogger } from '../logger/logger';
 import { encodeToHexLEB128, floatToHexString } from '../util/encoder';
+
+const logger = createLogger('WASM');
 
 export namespace WASM {
   export enum Type {
@@ -69,10 +71,10 @@ export namespace WASM {
         encodedValue += floatToHexString(value.value);
         break;
       case Type.f64:
-        getGlobalLogger().error(`encodingWasmValue with unexisting value type`);
+        logger.error('encodingWasmValue with unsupported value type F64');
         break;
       default:
-        getGlobalLogger().error(`encodingWasmValue with unexisting value type`);
+        logger.error(`encodingWasmValue with unexisting value type`);
     }
     return encodedValue;
   }
