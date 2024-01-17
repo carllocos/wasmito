@@ -1,11 +1,7 @@
-import { VMConfiguration, type VMConfigArgs } from './vm_config';
+import { type VMConfigArgs } from './vm_config';
 import type winston from 'winston';
 import { createLogger } from '../logger/logger';
-import {
-  DeploymentMode,
-  type DeviceConfigArgs,
-  DeviceConfig,
-} from './device_config';
+import { DeploymentMode, type DeviceConfigArgs } from './device_config';
 import { WARDuinoDevVM } from '../warduino/vm/dev_vm';
 import { MCUWARDuinoVM } from '../warduino/vm/mcu_vm';
 import { type PlatformBuilderConfig } from '../builder/platform_config';
@@ -37,17 +33,20 @@ export class DeviceManager {
     maxWaitTime: number,
     buildOutputDir?: string,
   ): Promise<WARDuinoDevVM> {
-    const vmConfig = new VMConfiguration({
+    const vmConfigArgs: VMConfigArgs = {
       program,
       toolPort,
-    });
-    const deviceConfig = new DeviceConfig(deviceConfigArgs, vmConfig);
-    const devVM = new WARDuinoDevVM(deviceConfig, vmConfig, buildOutputDir);
+    };
+    const devVM = new WARDuinoDevVM(
+      deviceConfigArgs,
+      vmConfigArgs,
+      buildOutputDir,
+    );
 
     const connected = await devVM.connect(maxWaitTime);
     if (!connected) {
       this.logger.info(
-        `Failed to connect to local DevelopmentVM at port ${vmConfig.toolPort}`,
+        `Failed to connect to local DevelopmentVM at port ${vmConfigArgs.toolPort}`,
       );
       throw new DeviceManagerError('timed out connecting to DevVM process');
     }
@@ -57,18 +56,16 @@ export class DeviceManager {
   }
 
   async spawnDevelopmentVM(
-    vmName: string,
-    vmID: string,
     vmConfigArgs: VMConfigArgs,
     maxWaitTime?: number,
+    vmName?: string,
     buildOutputDir?: string,
   ): Promise<WARDuinoDevVM> {
     return this.spawnDevelopmentVMFromConfigs(
-      vmName,
-      vmID,
       DeploymentMode.DevVM,
       vmConfigArgs,
       maxWaitTime,
+      vmName,
       buildOutputDir,
     );
   }
@@ -110,11 +107,9 @@ export class DeviceManager {
 
       const config = vm?.platformConfig.deviceConfig;
       this.logger.info(
-        `Spawned process ${config?.name} (ID=${config?.id}) exit with code ${code}`,
+        `Spawned process ${config?.fullname} exit with code ${code}`,
       );
-      this.logger.debug(
-        `Removing process ${config?.name} (ID=${config?.id}) from local list`,
-      );
+      this.logger.debug(`Removing process ${config?.fullname} from local list`);
 
       this.localprocesses = this.localprocesses.filter(
         ([, p]: [WARDuinoDevVM, ChildProcess?]) => {
@@ -125,21 +120,23 @@ export class DeviceManager {
   }
 
   private async spawnDevelopmentVMFromConfigs(
-    vmHumanReadableName: string,
-    vmID: string,
     mode: DeploymentMode,
-    spawnArgs: VMConfigArgs,
+    vmConfigArgs: VMConfigArgs,
     maxWaitTime?: number,
+    vmHumanReadableName?: string,
     buildOutputDir?: string,
   ): Promise<WARDuinoDevVM> {
-    const vmConfig = new VMConfiguration(spawnArgs);
     const deviceConfigArgs: DeviceConfigArgs = {
-      name: vmHumanReadableName,
-      id: vmID,
       deploymentMode: mode,
     };
-    const deviceConfig = new DeviceConfig(deviceConfigArgs, vmConfig);
-    const devVM = new WARDuinoDevVM(deviceConfig, vmConfig, buildOutputDir);
+    if (vmHumanReadableName !== undefined) {
+      deviceConfigArgs.name = vmHumanReadableName;
+    }
+    const devVM = new WARDuinoDevVM(
+      deviceConfigArgs,
+      vmConfigArgs,
+      buildOutputDir,
+    );
     const childProcess = await devVM.spawn(maxWaitTime);
     this.registerListenersOnVMProcess(childProcess);
     this.localprocesses.push([devVM, childProcess]);
