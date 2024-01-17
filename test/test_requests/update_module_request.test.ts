@@ -5,8 +5,6 @@ import { type VMConfigArgs } from '../../src/device/vm_config';
 describe('Update Wasm Module Request', () => {
   let deviceManager: DeviceManager | undefined;
   let vm: WARDuinoDevVM | undefined;
-  const vmName = 'DevVM';
-  const vmID = '1';
   const app = './test/data/test-example.wat';
 
   before(async () => {
@@ -17,12 +15,7 @@ describe('Update Wasm Module Request', () => {
       disableStrictModuleLoad: true,
     };
 
-    vm = await deviceManager.spawnDevelopmentVM(
-      vmName,
-      vmID,
-      vmConfigArgs,
-      3000,
-    );
+    vm = await deviceManager.spawnDevelopmentVM(vmConfigArgs, 3000);
   });
 
   it('Request should resolve on DevVM', async () => {

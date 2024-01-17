@@ -106,8 +106,6 @@ describe('Intergation Test: Proxy Call handled by a target VM produces expected 
     const program = './test/data/test-example-proxy-call.wat';
     const deviceManager = new DeviceManager();
     const vm = await deviceManager.spawnDevelopmentVM(
-      'TargetVM',
-      '1',
       {
         program,
         disableStrictModuleLoad: true,

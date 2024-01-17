@@ -9,19 +9,12 @@ describe('Snapshot Request', () => {
 
   before(async () => {
     deviceManager = new DeviceManager();
-    const vmName = 'DevVM';
-    const vmID = '1';
     const vmConfigArgs: VMConfigArgs = {
       program: './test/data/test-example.wat',
       disableStrictModuleLoad: true,
     };
 
-    vm = await deviceManager.spawnDevelopmentVM(
-      vmName,
-      vmID,
-      vmConfigArgs,
-      3000,
-    );
+    vm = await deviceManager.spawnDevelopmentVM(vmConfigArgs, 3000);
   });
 
   it('Inspecting pc', async () => {

@@ -1,7 +1,6 @@
 import {
   DeploymentMode,
   type DeviceConfigArgs,
-  DeviceConfig,
 } from '../../device/device_config';
 import { DeviceManager } from '../../device/device_manager';
 import { getGlobalLogger } from '../../logger/logger';
@@ -27,7 +26,7 @@ import { type MCUWARDuinoVM } from '../../warduino/vm/mcu_vm';
 import { listAllFQBN, listAvailableBoards } from '../../builder/util_platform';
 import { Platform, PlatformBuilderConfig } from '../../builder/platform_config';
 import { BoardBaudRate } from '../../util/serial_port';
-import { type VMConfigArgs, VMConfiguration } from '../../device/vm_config';
+import { type VMConfigArgs } from '../../device/vm_config';
 
 class WriteJSON {
   private readonly maxBuffer: number;
@@ -429,27 +428,22 @@ export async function spawnHardwareVM(
     return undefined;
   }
 
-  const vmConfig = new VMConfiguration({
+  const vmConfigArgs: VMConfigArgs = {
     serialPort: boardPort,
     program: wasmApp,
-  });
+  };
 
   const deviceConfigArgs: DeviceConfigArgs = {
     name: 'm5stickc',
-    id: 'some id',
     deploymentMode: DeploymentMode.MCUVM,
   };
-
-  const deviceConfig: DeviceConfig = new DeviceConfig(
-    deviceConfigArgs,
-    vmConfig,
-  );
 
   const platformConfig = new PlatformBuilderConfig(
     Platform.Arduino,
     BoardBaudRate.BD_115200,
     targetBoard,
-    deviceConfig,
+    deviceConfigArgs,
+    vmConfigArgs,
   );
   const mcuVM = await dm.spawnHardwareVM(platformConfig, outputDir);
   const uploaded = await mcuVM.uploadSourceCode(wasmApp);
@@ -487,15 +481,8 @@ export async function runMonitorApp(
       disableStrictModuleLoad: true,
     };
 
-    const vmName = 'DevVM';
-    const vmID = '1';
-    vm = await dm.spawnDevelopmentVM(
-      vmName,
-      vmID,
-      vmConfigArgs,
-      8000,
-      outputDir,
-    );
+    const vmName = undefined;
+    vm = await dm.spawnDevelopmentVM(vmConfigArgs, 8000, vmName, outputDir);
   } else if (monitorMode === DeploymentMode.MCUVM) {
     vm = await spawnHardwareVM(dm, wasmApp, outputDir);
     await sleep(5000); // sleep to let MCU load module first
