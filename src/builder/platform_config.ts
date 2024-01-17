@@ -32,7 +32,11 @@ export class PlatformBuilderConfig {
     this.platform = platform;
     this.baudrate = baudrate;
     this.fqbn = fqbn;
-    if (deviceConfigArgs.name === undefined) {
+    if (
+      deviceConfigArgs.name === undefined ||
+      (typeof deviceConfigArgs.name === 'string' &&
+        deviceConfigArgs.name === '')
+    ) {
       deviceConfigArgs.name = this.createVMName(
         deviceConfigArgs.deploymentMode,
       );
