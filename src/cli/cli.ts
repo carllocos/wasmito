@@ -88,16 +88,14 @@ function registerDeviceManagerCommands(
     .option('--id <string>', 'a unique identifier to identify device')
     .action(async (wasmApp, options) => {
       getGlobalLogger().info(`spawning a DevVM for program ${wasmApp}`);
-      const name: string = options.name ?? 'DevVM';
-      const ID: string = options.id ?? '1';
       const vmConfigArgs: VMConfigArgs = {
         program: wasmApp,
-        toolPort: options.port ?? '',
+        toolPort: options.port,
       };
 
       const maxWaitTime = 3000; // Max waittime for connecting to the DevVM
       try {
-        await manager.spawnDevelopmentVM(name, ID, vmConfigArgs, maxWaitTime);
+        await manager.spawnDevelopmentVM(vmConfigArgs, maxWaitTime);
       } catch (err: unknown) {
         let errMsg = '';
         if (err instanceof Error) {
