@@ -55,13 +55,14 @@ export function parseLogLevel(value: string): LogLevel | undefined {
 }
 
 export function createLogger(name: string): winston.Logger {
+  const cleanedName = name.trim();
   const _logger = winston.createLogger({
     level: logLevel,
     format: winston.format.combine(
       winston.format.colorize(),
       winston.format.timestamp(),
       winston.format.printf(({ timestamp, level, message }) => {
-        return `[${timestamp} ${level}] ${name}: ${message}`;
+        return `[${timestamp} ${level}] ${cleanedName}: ${message}`;
       }),
     ),
     transports: [
