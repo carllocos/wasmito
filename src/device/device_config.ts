@@ -1,6 +1,7 @@
+import { v4 as uuidv4 } from 'uuid';
 import { createLogger } from '../logger/logger';
 import * as fs from 'fs';
-import { type VMConfiguration } from './vm_config';
+import { VMConfiguration, type VMConfigArgs } from './vm_config';
 
 const Logger = createLogger('DeviceConfiguration');
 
@@ -12,8 +13,7 @@ export enum DeploymentMode {
 }
 
 export interface DeviceConfigArgs {
-  name: string;
-  id: string;
+  name?: string;
   deploymentMode: DeploymentMode;
 }
 
@@ -23,18 +23,17 @@ export class DeviceConfig {
   private readonly _deploymentMode: DeploymentMode;
   private readonly _vmConfig: VMConfiguration;
 
-  constructor(deviceConfig: DeviceConfigArgs, vmConfig: VMConfiguration) {
+  constructor(deviceConfig: DeviceConfigArgs, vmConfigArgs: VMConfigArgs) {
     const errorMsgs = validateDeviceConfig(deviceConfig);
     if (errorMsgs.length > 0) {
       const msg = errorMsgs.join(',');
       Logger.error(`Invalid config: ${msg}`);
       throw new Error(msg);
     }
-    this._name = deviceConfig.name;
-    this._id = deviceConfig.id;
+    this._name = deviceConfig.name ?? '';
+    this._id = this.createID();
     this._deploymentMode = deviceConfig.deploymentMode;
-    this._name = deviceConfig.name;
-    this._vmConfig = vmConfig;
+    this._vmConfig = new VMConfiguration(vmConfigArgs);
   }
 
   get name(): string {
@@ -51,6 +50,14 @@ export class DeviceConfig {
 
   get vmConfig(): VMConfiguration {
     return this._vmConfig;
+  }
+
+  get fullname(): string {
+    return `${this.name} ${this.id}`;
+  }
+
+  private createID(): string {
+    return uuidv4();
   }
 }
 
@@ -75,19 +82,11 @@ export function validateDeviceConfig(value: any): string[] {
   if (typeof value !== 'object') {
     errors.push('Device config is not valid json');
   } else {
-    if (typeof value.name !== 'string') {
-      errors.push('Property "name" should be a string');
-    } else {
-      if (value.name === '') {
+    if (value.name !== undefined) {
+      if (typeof value.name !== 'string') {
+        errors.push('Property "name" should be a string');
+      } else if (value.name === '') {
         errors.push('Property "name" should not be an empty string');
-      }
-    }
-
-    if (typeof value.id !== 'string') {
-      errors.push('Property "id" should be a string');
-    } else {
-      if (value.id === '') {
-        errors.push('Property "id" should not be an empty string');
       }
     }
 
@@ -168,7 +167,6 @@ export function parseDeviceConfigs(path: any): DeviceConfigArgs[] | undefined {
   return jsonData.devices.map((config: any) => {
     const arg: DeviceConfigArgs = {
       name: config.name,
-      id: config.id,
       deploymentMode: deploymentModeFromString(
         config.deploymentMode,
       ) as DeploymentMode,
