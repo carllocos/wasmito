@@ -1,4 +1,9 @@
-import { type DeviceConfig } from '../device/device_config';
+import { type VMConfigArgs } from '../device';
+import {
+  DeploymentMode,
+  DeviceConfig,
+  type DeviceConfigArgs,
+} from '../device/device_config';
 import { BoardBaudRate } from '../util/serial_port';
 
 export interface BoardFQBN {
@@ -21,12 +26,18 @@ export class PlatformBuilderConfig {
     platform: Platform,
     baudrate: BoardBaudRate,
     fqbn: BoardFQBN,
-    deviceConfig: DeviceConfig,
+    deviceConfigArgs: DeviceConfigArgs,
+    vmConfigArgs: VMConfigArgs,
   ) {
     this.platform = platform;
     this.baudrate = baudrate;
     this.fqbn = fqbn;
-    this.deviceConfig = deviceConfig;
+    if (deviceConfigArgs.name === undefined) {
+      deviceConfigArgs.name = this.createVMName(
+        deviceConfigArgs.deploymentMode,
+      );
+    }
+    this.deviceConfig = new DeviceConfig(deviceConfigArgs, vmConfigArgs);
   }
 
   configuredForSerial(): boolean {
@@ -39,5 +50,18 @@ export class PlatformBuilderConfig {
 
   configuredForNetwork(): boolean {
     return false;
+  }
+
+  private createVMName(mode: DeploymentMode): string {
+    switch (mode) {
+      case DeploymentMode.DevVM:
+        return 'DevVM ';
+      case DeploymentMode.ProxyVM:
+        return 'OutOfPlaceVM';
+      case DeploymentMode.MCUVM:
+        return 'Board TODO';
+      default:
+        return 'VM unsupported mode';
+    }
   }
 }
