@@ -42,14 +42,6 @@ export function extractAddressInformation(addressLine: string): number {
   return addr;
 }
 
-export function getFileExtension(file: string): string {
-  const splitted = file.split('.');
-  if (splitted.length > 1) {
-    return splitted.pop() as string;
-  }
-  throw Error('Could not determine file type');
-}
-
 function extractDetailedSection(section: string, input: string): string[] {
   const lines = input.split('\n');
   let i = 0;
