@@ -51,16 +51,18 @@ function isValidTypeVMConfig(arg: any): arg is VMConfigArgs {
     (typeof arg.noDebug === 'undefined' || typeof arg.noDebug === 'boolean') &&
     (typeof arg.noSocket === 'undefined' ||
       typeof arg.noSocket === 'boolean') &&
-    (typeof arg.toolPort === 'undefined' || typeof arg.toolPort === 'number') &&
+    (typeof arg.toolPort === 'undefined' ||
+      (typeof arg.toolPort === 'number' && !isNaN(arg.toolPort))) &&
     (typeof arg.toolHostIP === 'undefined' ||
       typeof arg.toolHostIP === 'string') &&
     (typeof arg.pauseOnStart === 'undefined' ||
       typeof arg.pauseOnStart === 'boolean') &&
     (typeof arg.mockHostIP === 'undefined' ||
       typeof arg.mockHostIP === 'string') &&
-    (typeof arg.mockPort === 'undefined' || typeof arg.mockPort === 'number') &&
+    (typeof arg.mockPort === 'undefined' ||
+      (typeof arg.mockPort === 'number' && !isNaN(arg.mockPort))) &&
     (typeof arg.proxyPort === 'undefined' ||
-      typeof arg.proxyPort === 'number') &&
+      (typeof arg.proxyPort === 'number' && !isNaN(arg.proxyPort))) &&
     (typeof arg.proxyHostIP === 'undefined' ||
       typeof arg.proxyHostIP === 'string') &&
     (typeof arg.serialPort === 'undefined' ||
