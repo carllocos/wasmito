@@ -1,20 +1,17 @@
 import { type WARDuinoVM } from './warduino_vm';
-import { VMConfiguration } from '../../device/vm_config';
+import {
+  type VMConfigArgs,
+  type VMConfiguration,
+} from '../../device/vm_config';
 import {
   type DeviceConfigArgs,
-  DeviceConfig,
   DeploymentMode,
 } from '../../device/device_config';
 import { WARDuinoDevVM } from './dev_vm';
-import { v4 as uuidv4 } from 'uuid';
 import { spawn, type ChildProcess } from 'child_process';
 import { type SourceMap } from '../../source_mappers/source_map';
 import { ClientSideSocket, ShareChannel } from '../../communication/index';
 import { getPath2WARDuinoSDKVMBinary } from '../../project_config';
-
-function createLoggerName(deviceConfig: DeviceConfig): string {
-  return `${deviceConfig.name} ${deviceConfig.id}`;
-}
 
 export class OutOfPlaceVMError extends Error {
   constructor(message: string) {
@@ -78,7 +75,7 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
     this.channel = new ClientSideSocket(
       this.vmConfig.toolPort,
       this.vmConfig.toolHostIP,
-      createLoggerName(this.deviceConfig),
+      this.deviceConfig.fullname,
     );
 
     const exitCode = await this.platform.compile(this.vmConfig.program);
@@ -186,20 +183,16 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
 }
 
 // Helper functions
-function createDeviceConfig(vmToProxy: WARDuinoVM): DeviceConfig {
+function createDeviceConfig(vmToProxy: WARDuinoVM): DeviceConfigArgs {
   const targetConfig = vmToProxy.platformConfig.deviceConfig;
   const name = `${targetConfig.name} (Proxied)`;
-  const vmID = uuidv4();
-  const dc: DeviceConfigArgs = {
+  return {
     name,
-    id: vmID,
     deploymentMode: DeploymentMode.ProxyVM,
   };
-  const vmConfig = createVMConfig(vmToProxy);
-  return new DeviceConfig(dc, vmConfig);
 }
 
-function createVMConfig(vmToProxy: WARDuinoVM): VMConfiguration {
+function createVMConfig(vmToProxy: WARDuinoVM): VMConfigArgs {
   const sm = vmToProxy.getSourceMap();
   if (sm === undefined) {
     throw new OutOfPlaceVMError(
@@ -207,11 +200,11 @@ function createVMConfig(vmToProxy: WARDuinoVM): VMConfiguration {
     );
   }
 
-  return new VMConfiguration({
+  return {
     program: sm.sourceCodeFilePath,
     pauseOnStart: true,
     disableStrictModuleLoad: true,
-  });
+  };
 }
 
 function assertvalidOutOfPlaceMode(mode: OutOfPlaceMode): void {

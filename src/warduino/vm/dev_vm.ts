@@ -1,8 +1,14 @@
 import { spawn, type ChildProcess } from 'child_process';
 import { WARDuinoVM } from './warduino_vm';
-import { type VMConfiguration } from '../../device/vm_config';
+import {
+  type VMConfigArgs,
+  type VMConfiguration,
+} from '../../device/vm_config';
 import { ClientSideSocket } from '../../communication/client_socket';
-import { type DeviceConfig } from '../../device/device_config';
+import {
+  type DeviceConfigArgs,
+  type DeviceConfig,
+} from '../../device/device_config';
 import type winston from 'winston';
 import { createLogger } from '../../logger/logger';
 import { Platform, PlatformBuilderConfig } from '../../builder/platform_config';
@@ -20,44 +26,54 @@ export class WARDuinoDevVMError extends Error {
   }
 }
 
-function createLoggerName(deviceConfig: DeviceConfig): string {
-  return `${deviceConfig.name} ${deviceConfig.id}`;
+function createPlatformBuilderConfig(
+  deviceConfigArgs: DeviceConfigArgs,
+  vmConfigArgs: VMConfigArgs,
+): PlatformBuilderConfig {
+  return new PlatformBuilderConfig(
+    Platform.DevVM,
+    BoardBaudRate.NONE,
+    {
+      boardName: '',
+      fqbn: '',
+    },
+    deviceConfigArgs,
+    vmConfigArgs,
+  );
 }
 
 export class WARDuinoDevVM extends WARDuinoVM {
   protected logger: winston.Logger;
   protected process?: ChildProcess;
-  public readonly vmConfig: VMConfiguration;
-  protected readonly deviceConfig: DeviceConfig;
   protected ErrorClass = WARDuinoDevVMError;
 
   constructor(
-    deviceConfig: DeviceConfig,
-    vmConfig: VMConfiguration,
+    deviceConfigArgs: DeviceConfigArgs,
+    vmConfigArgs: VMConfigArgs,
     buildOutputDir?: string,
   ) {
     super(
-      new PlatformBuilderConfig(
-        Platform.DevVM,
-        BoardBaudRate.NONE,
-        {
-          boardName: '',
-          fqbn: '',
-        },
-        deviceConfig,
-      ),
-      vmConfig.hasToolPort()
-        ? new ClientSideSocket(
-            vmConfig.toolPort,
-            vmConfig.toolHostIP,
-            createLoggerName(deviceConfig),
-          )
-        : new NoChannel(),
+      createPlatformBuilderConfig(deviceConfigArgs, vmConfigArgs),
+      new NoChannel(),
       buildOutputDir,
     );
-    this.vmConfig = vmConfig;
-    this.deviceConfig = deviceConfig;
-    this.logger = createLogger(deviceConfig.name);
+
+    if (this.vmConfig.hasToolPort()) {
+      this.channel = new ClientSideSocket(
+        this.vmConfig.toolPort,
+        this.vmConfig.toolHostIP,
+        this.deviceConfig.fullname,
+      );
+    }
+    this.logger = createLogger(this.deviceConfig.fullname);
+  }
+
+  get vmConfig(): VMConfiguration {
+    return this.platformConfig.deviceConfig.vmConfig;
+  }
+
+  get deviceConfig(): DeviceConfig {
+    return this.platformConfig.deviceConfig;
   }
 
   async close(timeout?: number): Promise<boolean> {
@@ -106,7 +122,7 @@ export class WARDuinoDevVM extends WARDuinoVM {
     this.channel = new ClientSideSocket(
       this.vmConfig.toolPort,
       this.vmConfig.toolHostIP,
-      createLoggerName(this.deviceConfig),
+      this.deviceConfig.fullname,
     );
 
     const exitCode = await this.platform.compile(this.vmConfig.program);
