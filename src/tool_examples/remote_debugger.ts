@@ -137,15 +137,12 @@ export async function runDebugScenario(
     disableStrictModuleLoad: true,
   };
 
-  const vmName = 'DevVM';
-  const vmID = '1';
   const dc: DeviceConfigArgs = {
-    id: vmID,
-    name: vmName,
     deploymentMode: DeploymentMode.DevVM,
   };
 
   // program: wasmApp,
+  const deviceName = undefined;
   const dm = new DeviceManager();
   const em = connectToExistingProcess
     ? await dm.connectToExistingDevVM(
@@ -156,10 +153,9 @@ export async function runDebugScenario(
         outputDir,
       )
     : await dm.spawnDevelopmentVM(
-        vmName,
-        vmID,
         vmConfigArgs,
         toolPort,
+        deviceName,
         outputDir,
       );
   const sourceMap = em.getSourceMap();

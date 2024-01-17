@@ -1,14 +1,10 @@
 import { listAllFQBN, listAvailableBoards } from '../builder/util_platform';
 import { Platform, PlatformBuilderConfig } from '../builder/platform_config';
-import {
-  DeploymentMode,
-  type DeviceConfigArgs,
-  DeviceConfig,
-} from '../device/device_config';
+import { DeploymentMode, type DeviceConfigArgs } from '../device/device_config';
 import { createLogger } from '../logger/logger';
 import { DeviceManager } from '../device/device_manager';
 import { BoardBaudRate } from '../util/serial_port';
-import { VMConfiguration } from '../device';
+import { type VMConfigArgs } from '../device';
 const testCompilerLogger = createLogger('TestCompiler');
 
 async function runBuilder(): Promise<void> {
@@ -30,23 +26,22 @@ async function runBuilder(): Promise<void> {
     return;
   }
 
-  const vmConfig = new VMConfiguration({
+  const vmConfigArgs: VMConfigArgs = {
     program: 'program',
     serialPort: boardPort,
-  });
+  };
 
   const deviceConfigArgs: DeviceConfigArgs = {
     name: 'm5stickc',
-    id: 'some id',
     deploymentMode: DeploymentMode.MCUVM,
   };
-  const deviceConfig = new DeviceConfig(deviceConfigArgs, vmConfig);
 
   const platformConfig = new PlatformBuilderConfig(
     Platform.Arduino,
     BoardBaudRate.BD_115200,
     targetBoard,
-    deviceConfig,
+    deviceConfigArgs,
+    vmConfigArgs,
   );
   const sourceFilePath = './example-wat/dimmer-double-button.wat';
   const compileOutputDirectory = './example-wat/platform_arduino/';
