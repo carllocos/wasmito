@@ -4,10 +4,9 @@ import { createLogger } from '../../src/logger/logger';
 import { BoardBaudRate } from '../../src/util/serial_port';
 import {
   DeploymentMode,
-  DeviceConfig,
   type DeviceConfigArgs,
 } from '../../src/device/device_config';
-import { VMConfiguration } from '../../src/device/vm_config';
+import { type VMConfigArgs } from '../../src/device/vm_config';
 import {
   type BoardFQBN,
   Platform,
@@ -24,22 +23,18 @@ import { StateRequest } from '../../src/warduino/requests/inspect_request';
 import { type WasmState } from '../../src/state/wasm';
 import { type Hook } from '../../src/hooks/hook';
 import { WARDuinoVM } from '../../src/warduino/vm/warduino_vm';
-import { v4 as uuidv4 } from 'uuid';
 import { MockChannel } from './mock_channel';
 
 function createPlatformBuilderConfig(): PlatformBuilderConfig {
-  const id = uuidv4();
   const deviceConfigArgs: DeviceConfigArgs = {
     name: 'mock',
-    id,
     deploymentMode: DeploymentMode.DevVM,
   };
 
-  const vmConfig = new VMConfiguration({
+  const vmConfigArgs: VMConfigArgs = {
     program: 'no program',
     disableStrictModuleLoad: true,
-  });
-  const deviceConfig = new DeviceConfig(deviceConfigArgs, vmConfig);
+  };
   const fqbn: BoardFQBN = {
     boardName: 'mock',
     fqbn: 'mock',
@@ -49,7 +44,8 @@ function createPlatformBuilderConfig(): PlatformBuilderConfig {
     Platform.DevVM,
     BoardBaudRate.NONE,
     fqbn,
-    deviceConfig,
+    deviceConfigArgs,
+    vmConfigArgs,
   );
 }
 
