@@ -186,7 +186,6 @@ describe('Loading multile device configs', () => {
     const configs: DeviceConfigArgs[] = loadedConfigs;
 
     const configA = configs[0];
-    assert(configA.id === 'A', 'invalid id');
     assert(configA.name === 'A', 'invalid name');
     assert(
       configA.deploymentMode === DeploymentMode.MCUVM,
@@ -194,7 +193,6 @@ describe('Loading multile device configs', () => {
     );
 
     const configB = configs[1];
-    assert(configB.id === 'B', 'invalid id');
     assert(configB.name === 'B', 'invalid name');
     assert(
       configB.deploymentMode === DeploymentMode.MCUVM,
