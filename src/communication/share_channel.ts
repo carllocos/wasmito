@@ -144,15 +144,18 @@ export class ShareChannel implements Channel {
   }
 
   private fanOutData(data: string): void {
-    this.clients.forEach((client: net.Socket) => {
-      const cleanedData = data.endsWith('\n') ? data : `${data}\n`;
-      client.write(cleanedData, (err) => {
-        if (err !== undefined && err !== null) {
-          this.logger.error(
-            `Error occurred when writing to socket client: ${err.message}`,
-          );
-        }
+    const hexRegex = /^[0-9a-fA-F]+$/;
+    if (hexRegex.test(data)) {
+      this.clients.forEach((client: net.Socket) => {
+        const cleanedData = data.endsWith('\n') ? data : `${data}\n`;
+        client.write(cleanedData, (err) => {
+          if (err !== undefined && err !== null) {
+            this.logger.error(
+              `Error occurred when writing to socket client: ${err.message}`,
+            );
+          }
+        });
       });
-    });
+    }
   }
 }
