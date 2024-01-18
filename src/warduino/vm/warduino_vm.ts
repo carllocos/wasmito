@@ -121,6 +121,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   async snapshot(timeout?: number): Promise<WasmState> {
     const request = new StateRequest();
     request.includeAll();
+    this.logger.debug(`requesting a snapshot`);
     return this.sendRequest(request, timeout);
   }
 
