@@ -7,7 +7,7 @@ import {
   ProxyCallRequest,
   isProxyCallSuccessfulResponse,
 } from '../../src/warduino/requests/fun_call_request';
-import { WasmValuesBuilder } from '../shared/wasm_state_builder';
+import { WasmValuesBuilder } from '../../src/state/wasm_value_array_builder';
 import { timeoutPromise } from '../../src/util/promise_util';
 
 /*
