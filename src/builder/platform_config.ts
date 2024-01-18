@@ -41,6 +41,16 @@ export class PlatformBuilderConfig {
         deviceConfigArgs.deploymentMode,
       );
     }
+
+    if (baudrate !== BoardBaudRate.NONE) {
+      if (vmConfigArgs.baudrate === undefined) {
+        vmConfigArgs.baudrate = baudrate;
+      } else if (vmConfigArgs.baudrate !== baudrate) {
+        throw new Error(
+          `Baudrate of platformconfig ${baudrate} does not match baudrate of VM config ${vmConfigArgs.baudrate}`,
+        );
+      }
+    }
     this.deviceConfig = new DeviceConfig(deviceConfigArgs, vmConfigArgs);
   }
 
