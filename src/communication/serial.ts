@@ -92,10 +92,10 @@ export class SerialConnection implements Channel {
         reject(new Error('Serial port is not open.'));
       } else {
         this.port.write(data, (err) => {
-          if (err === undefined) {
-            resolve(true);
-          } else {
+          if (err !== undefined && err !== null) {
             reject(new Error(`Error sending data: ${err?.message}`));
+          } else {
+            resolve(true);
           }
         });
       }
