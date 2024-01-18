@@ -4,9 +4,9 @@ import { extractTypeInfo } from './details';
 export interface VariableInfo {
   index: number;
   name: string;
-  type: string;
+  type: string; // todo use real type
   mutable: boolean;
-  value: string;
+  value: string; // todo use real value
 }
 
 export interface FunctionInfo {
