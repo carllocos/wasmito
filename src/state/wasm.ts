@@ -107,10 +107,11 @@ export namespace WASM {
     options: EncodingWasmValueOptions,
   ): string {
     // nr args LEB 128 | serialize Value | ...
-    return (
-      WASM.leb128(values.length) +
-      values.map((v) => WASM.encodeWasmValue(v, options)).join('')
-    );
+    const sizeHex = WASM.leb128(values.length);
+    const argsHex = values
+      .map((v) => WASM.encodeWasmValue(v, options))
+      .join('');
+    return `${sizeHex}${argsHex}`;
   }
 
   export interface Frame {
