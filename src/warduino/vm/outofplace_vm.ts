@@ -193,15 +193,8 @@ function createDeviceConfig(vmToProxy: WARDuinoVM): DeviceConfigArgs {
 }
 
 function createVMConfig(vmToProxy: WARDuinoVM): VMConfigArgs {
-  const sm = vmToProxy.getSourceMap();
-  if (sm === undefined) {
-    throw new OutOfPlaceVMError(
-      `VM to proxy '${vmToProxy.platformConfig.deviceConfig.name}' is missing a source code`,
-    );
-  }
-
   return {
-    program: sm.sourceCodeFilePath,
+    program: vmToProxy.platformConfig.deviceConfig.vmConfig.program,
     pauseOnStart: true,
     disableStrictModuleLoad: true,
   };
