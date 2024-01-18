@@ -37,6 +37,9 @@ export class DeviceManager {
       program,
       toolPort,
     };
+    if (deviceConfigArgs.deploymentMode !== DeploymentMode.MCUVM) {
+      vmConfigArgs.disableStrictModuleLoad = true;
+    }
     const devVM = new WARDuinoDevVM(
       deviceConfigArgs,
       vmConfigArgs,
