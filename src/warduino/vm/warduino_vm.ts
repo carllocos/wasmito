@@ -40,7 +40,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   private _channel: Channel;
   protected abstract logger: winston.Logger;
   public readonly platformConfig: PlatformBuilderConfig;
-  protected readonly platform: PlatformBuilder;
+  public readonly platform: PlatformBuilder;
   protected abstract readonly ErrorClass: new (errorMsg: string) => Error;
 
   constructor(
