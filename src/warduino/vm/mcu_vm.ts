@@ -41,7 +41,7 @@ export class MCUWARDuinoVM extends WARDuinoVM {
   constructor(platformConfig: PlatformBuilderConfig, buildOutputDir?: string) {
     super(platformConfig, createChannel(platformConfig), buildOutputDir);
     this.logger = createLogger(
-      `MCUWARDuino ${platformConfig.deviceConfig.name} (${platformConfig.fqbn.boardName})`,
+      `MCUWARDuino ${platformConfig.deviceConfig.fullname}`,
     );
   }
 
