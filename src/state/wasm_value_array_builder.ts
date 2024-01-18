@@ -1,4 +1,4 @@
-import { WASM } from '../../src/state/wasm';
+import { WASM } from './wasm';
 
 export class WasmValuesBuilder {
   private readonly _values: WASM.Value[];
