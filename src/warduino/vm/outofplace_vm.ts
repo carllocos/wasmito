@@ -12,6 +12,7 @@ import { spawn, type ChildProcess } from 'child_process';
 import { type SourceMap } from '../../source_mappers/source_map';
 import { ClientSideSocket, ShareChannel } from '../../communication/index';
 import { getPath2WARDuinoSDKVMBinary } from '../../project_config';
+import { type WasmState } from '../../state/wasm';
 
 export class OutOfPlaceVMError extends Error {
   constructor(message: string) {
@@ -63,6 +64,12 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
   }
 
   public async spawn(maxWaitTime?: number): Promise<ChildProcess> {
+    if (this.outOfPlaceMode === OutOfPlaceMode.RedirectOOP) {
+      await this.targetVM.pause(maxWaitTime);
+    }
+    const snapshot = await this.targetVM.snapshot(maxWaitTime);
+    // TODO register event hooks
+
     if (!(await this.shareableChannel.startServer())) {
       throw new this.ErrorClass(
         'Could not start the socket server for the ShareableChannel',
@@ -70,7 +77,70 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
     }
 
     this.targetVM.channel = this.shareableChannel;
+    const spawnedProcess = await this.spawnProcess();
 
+    let success = true;
+    switch (this.outOfPlaceMode) {
+      case OutOfPlaceMode.IndepentOOP:
+        success = await this.setupForIndependentOOP(maxWaitTime);
+        break;
+      case OutOfPlaceMode.RedirectOOP:
+        success = await this.setupForRedirectOOP(snapshot, maxWaitTime);
+        break;
+    }
+
+    if (!success) {
+      const errMsg = `Failed to setup the VM in the requested out-of-place mode ${this.outOfPlaceMode}`;
+      this.logger.error(errMsg);
+      spawnedProcess.kill();
+      this.logger.error('Killing the local VM process');
+      throw new this.ErrorClass(errMsg);
+    }
+    this.process = spawnedProcess;
+    return spawnedProcess;
+  }
+
+  async setupForRedirectOOP(
+    snapshot: WasmState,
+    maxWaitTime?: number,
+  ): Promise<boolean> {
+    this.logger.debug(
+      `sending the retrieved snapshot to the local Out-of-place VM`,
+    );
+    await this.loadWasmState(snapshot, maxWaitTime);
+    const sm = this.getSourceMap() as SourceMap;
+    const primitiveFuncs = sm.getEnvironmentFunctions();
+    for (const func of primitiveFuncs) {
+      const succ = await this.registerFuncForProxyCall(func, maxWaitTime);
+      if (!succ) return succ;
+    }
+    return true;
+  }
+
+  async setupForIndependentOOP(maxWaitTime?: number): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+
+  protected override buildProcessArguments(
+    programPath: string,
+    args: VMConfiguration,
+  ): string[] {
+    const processArgs: string[] = [programPath];
+
+    processArgs.push('--socket');
+    processArgs.push(args.toolPort.toString());
+    processArgs.push('--paused');
+    processArgs.push('--disable-strict-module-load');
+    processArgs.push('--proxy');
+    this.logger.debug(
+      `using port of ShareableChannel ${this.shareableChannel.serverPort} to proxy the target VM`,
+    );
+    processArgs.push(this.shareableChannel.serverPort.toString());
+
+    return processArgs;
+  }
+
+  private async spawnProcess(maxWaitTime?: number): Promise<ChildProcess> {
     await this.assertExistanceToolPort();
     this.channel = new ClientSideSocket(
       this.vmConfig.toolPort,
@@ -116,69 +186,7 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
       throw new this.ErrorClass('timed out connecting to DevVM process');
     }
 
-    this.process = spawnedProcess;
-
-    // TODO register event hooks
-    let success = true;
-
-    switch (this.outOfPlaceMode) {
-      case OutOfPlaceMode.IndepentOOP:
-        success = await this.setupForIndependentOOP(maxWaitTime);
-        break;
-      case OutOfPlaceMode.RedirectOOP:
-        success = await this.setupForRedirectOOP(maxWaitTime);
-        break;
-    }
-
-    if (!success) {
-      const errMsg = `Failed to setup the VM in the requested out-of-place mode ${this.outOfPlaceMode}`;
-      this.logger.error(errMsg);
-      spawnedProcess.kill();
-      this.logger.error('Killing the local VM process');
-      throw new this.ErrorClass(errMsg);
-    }
     return spawnedProcess;
-  }
-
-  async setupForRedirectOOP(maxWaitTime?: number): Promise<boolean> {
-    await this.targetVM.pause(maxWaitTime);
-    this.logger.debug(`requesting a snapshot of the target VM`);
-    const snapshot = await this.targetVM.snapshot(maxWaitTime);
-    this.logger.debug(
-      `sending the retrieved snapshot to the local Out-of-place VM`,
-    );
-    await this.loadWasmState(snapshot, maxWaitTime);
-
-    const sm = this.getSourceMap() as SourceMap;
-    const primitiveFuncs = sm.getEnvironmentFunctions();
-    for (const func of primitiveFuncs) {
-      const succ = await this.registerFuncForProxyCall(func, maxWaitTime);
-      if (!succ) return succ;
-    }
-    return true;
-  }
-
-  async setupForIndependentOOP(maxWaitTime?: number): Promise<boolean> {
-    throw new Error('Method not implemented.');
-  }
-
-  protected override buildProcessArguments(
-    programPath: string,
-    args: VMConfiguration,
-  ): string[] {
-    const processArgs: string[] = [programPath];
-
-    processArgs.push('--socket');
-    processArgs.push(args.toolPort.toString());
-    processArgs.push('--paused');
-    processArgs.push('--disable-strict-module-load');
-    processArgs.push('--proxy');
-    this.logger.debug(
-      `using port of ShareableChannel ${this.shareableChannel.serverPort} to proxy the target VM`,
-    );
-    processArgs.push(this.shareableChannel.serverPort.toString());
-
-    return processArgs;
   }
 }
 
