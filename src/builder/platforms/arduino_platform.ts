@@ -247,6 +247,9 @@ export class ArduinoBoardBuilder extends PlatformBuilder {
       wasmPath,
       this.pathToArduinoSketchDir,
     );
+    if (exitCodeCompile === 0) {
+      this.platformConfig.deviceConfig.vmConfig.program = sourceFile;
+    }
 
     return exitCodeCompile;
   }

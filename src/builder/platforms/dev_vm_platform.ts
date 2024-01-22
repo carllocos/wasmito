@@ -28,6 +28,7 @@ export class DevVMPlatform extends PlatformBuilder {
     if (this.sourceMap === undefined) {
       return -1;
     } else {
+      this.platformConfig.deviceConfig.vmConfig.program = sourceFile;
       return 0;
     }
   }
