@@ -133,6 +133,10 @@ export class VMConfiguration {
     return this._program;
   }
 
+  set program(newProgram: string) {
+    this._program = newProgram;
+  }
+
   get toolPort(): number {
     if (this._toolPort === undefined) {
       throw new VMConfigurationError(
