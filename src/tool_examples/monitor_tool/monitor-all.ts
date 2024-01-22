@@ -12,7 +12,7 @@ import {
   type HookOnWasmAddrResponse,
   HookOnWasmAddrRequest,
   HoonOnWasmAddrMoment,
-} from '../../warduino/requests/monitor_request';
+} from '../../warduino/requests/hook_on_wasm_addr_request';
 import { StateRequest } from '../../warduino/requests/inspect_request';
 import { ResponseType } from '../../warduino/api/request_interface';
 import * as fs from 'fs';

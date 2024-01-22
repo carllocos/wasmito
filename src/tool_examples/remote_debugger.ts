@@ -3,7 +3,7 @@ import { getGlobalLogger } from '../logger/logger';
 import {
   type HookOnWasmAddrResponse,
   RemoveHookOnWasmAddrRequest,
-} from '../warduino/requests/monitor_request';
+} from '../warduino/requests/hook_on_wasm_addr_request';
 import { StateRequest } from '../warduino/requests/inspect_request';
 import {
   type RequestMessage,

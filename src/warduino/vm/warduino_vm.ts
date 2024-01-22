@@ -28,7 +28,7 @@ import { PauseVMHook, type Hook, InspectStateHook } from '../../hooks/index';
 import {
   HoonOnWasmAddrMoment,
   HookOnWasmAddrRequest,
-} from '../requests/monitor_request';
+} from '../requests/hook_on_wasm_addr_request';
 import { ProxyCallHook } from '../../hooks/hook_proxy_call';
 import { AroundFunctionRequest } from '../requests/around_function_request';
 import {
