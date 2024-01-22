@@ -11,7 +11,7 @@ import { AroundFunctionRequest } from '../../warduino/requests/around_function_r
 import {
   type HookOnWasmAddrResponse,
   HookOnWasmAddrRequest,
-  HoonOnWasmAddrMoment,
+  HookOnWasmAddrMoment,
 } from '../../warduino/requests/hook_on_wasm_addr_request';
 import { StateRequest } from '../../warduino/requests/inspect_request';
 import { ResponseType } from '../../warduino/api/request_interface';
@@ -272,18 +272,18 @@ function createJSONWriter(
   columnStart: number,
   columnEnd: number,
   opcode: WasmOpcode,
-  when: HoonOnWasmAddrMoment,
+  when: HookOnWasmAddrMoment,
 ): (state: WasmState) => void {
   if (Brigadier === undefined) {
     throw new Error('set Brigadier first');
   }
-  if (when === HoonOnWasmAddrMoment.HookBefore) {
+  if (when === HookOnWasmAddrMoment.HookBefore) {
     Brigadier.addBefore(address, opcode);
   } else {
     Brigadier.addAfter(address, opcode);
   }
   return (state: WasmState) => {
-    if (when === HoonOnWasmAddrMoment.HookBefore) {
+    if (when === HookOnWasmAddrMoment.HookBefore) {
       Brigadier?.writeBefore(address, linenr, columnStart, columnEnd, state);
     } else {
       Brigadier?.writeAfter(address, linenr, columnStart, columnEnd, state);
@@ -337,7 +337,7 @@ async function registerBeforeHooks(
         columnStart,
         columnEnd,
         opcode,
-        HoonOnWasmAddrMoment.HookBefore,
+        HookOnWasmAddrMoment.HookBefore,
       );
       return new HookOnWasmAddrRequest(address).before().addHook(inspectStack);
     });
@@ -369,7 +369,7 @@ async function registerAfterHooks(
         columnStart,
         columnEnd,
         opcode,
-        HoonOnWasmAddrMoment.HookAfter,
+        HookOnWasmAddrMoment.HookAfter,
       );
       return new HookOnWasmAddrRequest(address).after().addHook(inspectStack);
     });
