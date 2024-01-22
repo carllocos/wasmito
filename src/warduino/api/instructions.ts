@@ -10,7 +10,7 @@ export enum Instruction {
   UpdateWasmModule = '22',
 
   AroundFunction = '50',
-  MonitorWasmAddr = '51',
+  HookOnWasmAddr = '51',
 
   LoadSnapshot = '62',
 
@@ -34,7 +34,7 @@ export function getInstructionFromString(str: string): Instruction | undefined {
     case '50':
       return Instruction.AroundFunction;
     case '51':
-      return Instruction.MonitorWasmAddr;
+      return Instruction.HookOnWasmAddr;
     case '64':
       return Instruction.ProxyCall;
     case '41':

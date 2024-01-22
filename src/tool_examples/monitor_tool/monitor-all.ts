@@ -9,9 +9,9 @@ import { InspectStateHook } from '../../hooks/hook_inspect_state';
 import { EmptyValueSubstitution } from '../../hooks/hook_value_substitution';
 import { AroundFunctionRequest } from '../../warduino/requests/around_function_request';
 import {
-  type MonitorWasmAddrResponse,
-  MontiroWasmAddrRequest,
-  MonitorMoment,
+  type HookOnWasmAddrResponse,
+  HookOnWasmAddrRequest,
+  HoonOnWasmAddrMoment,
 } from '../../warduino/requests/monitor_request';
 import { StateRequest } from '../../warduino/requests/inspect_request';
 import { ResponseType } from '../../warduino/api/request_interface';
@@ -236,7 +236,7 @@ class BrigadierJSONWriter {
   }
 }
 
-function allSucceeded(replies: MonitorWasmAddrResponse[]): boolean {
+function allSucceeded(replies: HookOnWasmAddrResponse[]): boolean {
   let idx = 0;
   while (idx < replies.length) {
     const reply = replies[idx];
@@ -248,7 +248,7 @@ function allSucceeded(replies: MonitorWasmAddrResponse[]): boolean {
   return true;
 }
 
-function logReplies(replies: MonitorWasmAddrResponse[]): void {
+function logReplies(replies: HookOnWasmAddrResponse[]): void {
   replies.forEach((reply) => {
     if (reply.responseType === ResponseType.SuccessResponse) {
       getGlobalLogger().debug(`SucessResponse(interrupt=${reply.interrupt})`);
@@ -272,18 +272,18 @@ function createJSONWriter(
   columnStart: number,
   columnEnd: number,
   opcode: WasmOpcode,
-  when: MonitorMoment,
+  when: HoonOnWasmAddrMoment,
 ): (state: WasmState) => void {
   if (Brigadier === undefined) {
     throw new Error('set Brigadier first');
   }
-  if (when === MonitorMoment.MonitorBefore) {
+  if (when === HoonOnWasmAddrMoment.HookBefore) {
     Brigadier.addBefore(address, opcode);
   } else {
     Brigadier.addAfter(address, opcode);
   }
   return (state: WasmState) => {
-    if (when === MonitorMoment.MonitorBefore) {
+    if (when === HoonOnWasmAddrMoment.HookBefore) {
       Brigadier?.writeBefore(address, linenr, columnStart, columnEnd, state);
     } else {
       Brigadier?.writeAfter(address, linenr, columnStart, columnEnd, state);
@@ -337,9 +337,9 @@ async function registerBeforeHooks(
         columnStart,
         columnEnd,
         opcode,
-        MonitorMoment.MonitorBefore,
+        HoonOnWasmAddrMoment.HookBefore,
       );
-      return new MontiroWasmAddrRequest(address).before().addHook(inspectStack);
+      return new HookOnWasmAddrRequest(address).before().addHook(inspectStack);
     });
 
   const repliesBefore = await Promise.all(
@@ -369,9 +369,9 @@ async function registerAfterHooks(
         columnStart,
         columnEnd,
         opcode,
-        MonitorMoment.MonitorAfter,
+        HoonOnWasmAddrMoment.HookAfter,
       );
-      return new MontiroWasmAddrRequest(address).after().addHook(inspectStack);
+      return new HookOnWasmAddrRequest(address).after().addHook(inspectStack);
     });
 
   const repliesAfter = await Promise.all(
