@@ -10,19 +10,19 @@ import {
 import { type Hook } from '../../hooks/hook';
 import { Instruction } from '../api/instructions';
 
-export enum HoonOnWasmAddrMoment {
+export enum HookOnWasmAddrMoment {
   HookBefore = '01',
   HookAfter = '02',
 }
 
 export function getHookMomentFromString(
   str: string,
-): HoonOnWasmAddrMoment | undefined {
+): HookOnWasmAddrMoment | undefined {
   switch (str) {
     case '01':
-      return HoonOnWasmAddrMoment.HookBefore;
+      return HookOnWasmAddrMoment.HookBefore;
     case '02':
-      return HoonOnWasmAddrMoment.HookAfter;
+      return HookOnWasmAddrMoment.HookAfter;
     default:
       return undefined;
   }
@@ -45,7 +45,7 @@ export function createHookOnWasmAddrResponse(
 export class HookOnWasmAddrRequest extends APIRequest<HookOnWasmAddrResponse> {
   public readonly wasmAddr;
   public readonly hooks: Array<Hook<any>>;
-  private moment: HoonOnWasmAddrMoment;
+  private moment: HookOnWasmAddrMoment;
   private readonly interruptNr: Instruction;
   protected isaddRequest: boolean; // true for add, false for remove;
 
@@ -53,18 +53,18 @@ export class HookOnWasmAddrRequest extends APIRequest<HookOnWasmAddrResponse> {
     super();
     this.wasmAddr = wasmAddr;
     this.hooks = [];
-    this.moment = HoonOnWasmAddrMoment.HookBefore;
+    this.moment = HookOnWasmAddrMoment.HookBefore;
     this.interruptNr = Instruction.HookOnWasmAddr;
     this.isaddRequest = true;
   }
 
   before(): HookOnWasmAddrRequest {
-    this.moment = HoonOnWasmAddrMoment.HookBefore;
+    this.moment = HookOnWasmAddrMoment.HookBefore;
     return this;
   }
 
   after(): HookOnWasmAddrRequest {
-    this.moment = HoonOnWasmAddrMoment.HookAfter;
+    this.moment = HookOnWasmAddrMoment.HookAfter;
     return this;
   }
 
