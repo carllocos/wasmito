@@ -144,7 +144,7 @@ export class ShareChannel implements Channel {
   }
 
   private fanOutData(data: string): void {
-    const hexRegex = /^[0-9a-fA-F]+$/;
+    const hexRegex = /^(?:[0-9a-fA-F]+(?:\n)*)*$/;
     if (hexRegex.test(data)) {
       this.clients.forEach((client: net.Socket) => {
         const cleanedData = data.endsWith('\n') ? data : `${data}\n`;
