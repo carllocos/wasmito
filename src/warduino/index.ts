@@ -4,7 +4,7 @@ export * from './api/warduino_api';
 export * from './requests/around_function_request';
 export * from './requests/inspect_request';
 export * from './requests/load_state_request';
-export * from './requests/monitor_request';
+export * from './requests/hook_on_wasm_addr_request';
 export * from './requests/pause_request';
 export * from './requests/proxify_request';
 export * from './requests/resolve_event_request';
