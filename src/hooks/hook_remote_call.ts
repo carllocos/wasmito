@@ -13,4 +13,8 @@ export class RemoteCallHook extends HookWithoutSubscription {
     const target = encodeToHexLEB128(this.targetfidx);
     return `${this.kind}${target}`;
   }
+
+  description(): string {
+    return `RemoteCallHook ${this.targetfidx}`;
+  }
 }

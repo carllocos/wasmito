@@ -16,6 +16,14 @@ export class ChangeRunningStateHook extends HookWithoutSubscription {
     // format: HookKind (1 BYTE) | RunState (1 BYTE)
     return `${this.kind}${this.runState}`;
   }
+
+  description(): string {
+    if (this.runState === WARDuinoRunState.WARDuinoPause) {
+      return 'Pause VM';
+    } else {
+      return 'Run VM';
+    }
+  }
 }
 
 export class PauseVMHook extends ChangeRunningStateHook {

@@ -21,6 +21,10 @@ export class ValueSubstitution extends HookWithoutSubscription {
     }
     return `${this.kind}${hasValue}${valueEncoded}`;
   }
+
+  description(): string {
+    return `Value Substitution to ${this.value?.value}`;
+  }
 }
 
 export class EmptyValueSubstitution extends ValueSubstitution {

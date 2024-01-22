@@ -36,6 +36,8 @@ export abstract class Hook<SubscriptionType> {
     return this;
   }
 
+  abstract description(): string;
+
   abstract serializeBinary(): string;
   parseSubscriptionData?: (input: any) => SubscriptionType;
   onSubscriptionData?: (data: SubscriptionType) => void;

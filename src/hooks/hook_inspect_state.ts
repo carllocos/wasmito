@@ -22,4 +22,8 @@ export class InspectStateHook extends Hook<WasmState> {
   deserializeSubscriptionMessage(input: any): WasmState {
     return this.req.parse(input);
   }
+
+  description(): string {
+    return 'State Inspecting';
+  }
 }
