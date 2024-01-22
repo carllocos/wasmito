@@ -1,8 +1,8 @@
 import { DeviceManager } from '../device/device_manager';
 import { getGlobalLogger } from '../logger/logger';
 import {
-  type MonitorWasmAddrResponse,
-  RemoveMonitorWasmAddrRequest,
+  type HookOnWasmAddrResponse,
+  RemoveHookOnWasmAddrRequest,
 } from '../warduino/requests/monitor_request';
 import { StateRequest } from '../warduino/requests/inspect_request';
 import {
@@ -15,7 +15,7 @@ import { type WasmState } from '../state/wasm';
 import { type DeviceConfigArgs, DeploymentMode } from '../device/device_config';
 import { type VMConfigArgs } from '../device/vm_config';
 
-export function allSucceeded(replies: MonitorWasmAddrResponse[]): boolean {
+export function allSucceeded(replies: HookOnWasmAddrResponse[]): boolean {
   let idx = 0;
   while (idx < replies.length) {
     const reply = replies[idx];
@@ -116,7 +116,7 @@ export async function removeBreakpoint(
   if (opcode === undefined) {
     return false;
   }
-  const request = new RemoveMonitorWasmAddrRequest(address).before();
+  const request = new RemoveHookOnWasmAddrRequest(address).before();
 
   const reply = await em.sendRequest(request, 1000);
   logReplies([reply]);

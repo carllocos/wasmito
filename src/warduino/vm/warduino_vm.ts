@@ -26,8 +26,8 @@ import {
 } from '../../source_mappers/source_map';
 import { PauseVMHook, type Hook, InspectStateHook } from '../../hooks/index';
 import {
-  MonitorMoment,
-  MontiroWasmAddrRequest,
+  HoonOnWasmAddrMoment,
+  HookOnWasmAddrRequest,
 } from '../requests/monitor_request';
 import { ProxyCallHook } from '../../hooks/hook_proxy_call';
 import { AroundFunctionRequest } from '../requests/around_function_request';
@@ -260,7 +260,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     return this.addHook(
       sourceCodeLocation,
       hook,
-      MonitorMoment.MonitorBefore,
+      HoonOnWasmAddrMoment.HookBefore,
       timeout,
     );
   }
@@ -273,7 +273,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     return this.addHook(
       sourceCodeLocation,
       hook,
-      MonitorMoment.MonitorAfter,
+      HoonOnWasmAddrMoment.HookAfter,
       timeout,
     );
   }
@@ -281,7 +281,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   private async addHook<T>(
     sourceCodeLocation: SourceCodeLocation,
     hook: Hook<T>,
-    moment: MonitorMoment,
+    moment: HoonOnWasmAddrMoment,
     timeout?: number,
   ): Promise<boolean> {
     const sm = this.getSourceMap();
@@ -297,12 +297,12 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
       );
     }
     const addr = mappings[0].address;
-    const req = new MontiroWasmAddrRequest(addr).addHook(hook);
+    const req = new HookOnWasmAddrRequest(addr).addHook(hook);
     switch (moment) {
-      case MonitorMoment.MonitorBefore:
+      case HoonOnWasmAddrMoment.HookBefore:
         req.before();
         break;
-      case MonitorMoment.MonitorAfter:
+      case HoonOnWasmAddrMoment.HookAfter:
         req.after();
         break;
       default:

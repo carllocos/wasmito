@@ -10,42 +10,42 @@ import {
 import { type Hook } from '../../hooks/hook';
 import { Instruction } from '../api/instructions';
 
-export enum MonitorMoment {
-  MonitorBefore = '01',
-  MonitorAfter = '02',
+export enum HoonOnWasmAddrMoment {
+  HookBefore = '01',
+  HookAfter = '02',
 }
 
-export function getMonitorMomentFromString(
+export function getHookMomentFromString(
   str: string,
-): MonitorMoment | undefined {
+): HoonOnWasmAddrMoment | undefined {
   switch (str) {
     case '01':
-      return MonitorMoment.MonitorBefore;
+      return HoonOnWasmAddrMoment.HookBefore;
     case '02':
-      return MonitorMoment.MonitorAfter;
+      return HoonOnWasmAddrMoment.HookAfter;
     default:
       return undefined;
   }
 }
 
-export interface MonitorWasmAddrJSONResponse extends RequestMessage {}
+export interface HookOnWasmAddrJSONResponse extends RequestMessage {}
 
-export interface MonitorWasmAddrResponse extends MonitorWasmAddrJSONResponse {}
+export interface HookOnWasmAddrResponse extends HookOnWasmAddrJSONResponse {}
 
-function isMonitorWasmAddrResponse(response: RequestMessage): boolean {
-  return response.interrupt === Instruction.MonitorWasmAddr;
+function isHookOnWasmAddrResponse(response: RequestMessage): boolean {
+  return response.interrupt === Instruction.HookOnWasmAddr;
 }
 
-export function createMonitorWasmAddrResponse(
+export function createHookOnWasmAddrResponse(
   msg: RequestMessage,
-): MonitorWasmAddrResponse {
+): HookOnWasmAddrResponse {
   return msg;
 }
 
-export class MontiroWasmAddrRequest extends APIRequest<MonitorWasmAddrResponse> {
+export class HookOnWasmAddrRequest extends APIRequest<HookOnWasmAddrResponse> {
   public readonly wasmAddr;
   public readonly hooks: Array<Hook<any>>;
-  private moment: MonitorMoment;
+  private moment: HoonOnWasmAddrMoment;
   private readonly interruptNr: Instruction;
   protected isaddRequest: boolean; // true for add, false for remove;
 
@@ -53,22 +53,22 @@ export class MontiroWasmAddrRequest extends APIRequest<MonitorWasmAddrResponse> 
     super();
     this.wasmAddr = wasmAddr;
     this.hooks = [];
-    this.moment = MonitorMoment.MonitorBefore;
-    this.interruptNr = Instruction.MonitorWasmAddr;
+    this.moment = HoonOnWasmAddrMoment.HookBefore;
+    this.interruptNr = Instruction.HookOnWasmAddr;
     this.isaddRequest = true;
   }
 
-  before(): MontiroWasmAddrRequest {
-    this.moment = MonitorMoment.MonitorBefore;
+  before(): HookOnWasmAddrRequest {
+    this.moment = HoonOnWasmAddrMoment.HookBefore;
     return this;
   }
 
-  after(): MontiroWasmAddrRequest {
-    this.moment = MonitorMoment.MonitorAfter;
+  after(): HookOnWasmAddrRequest {
+    this.moment = HoonOnWasmAddrMoment.HookAfter;
     return this;
   }
 
-  addHook(hook: Hook<any>): MontiroWasmAddrRequest {
+  addHook(hook: Hook<any>): HookOnWasmAddrRequest {
     if (this.hooks.length === 0) {
       this.hooks.push(hook);
     } else {
@@ -80,7 +80,7 @@ export class MontiroWasmAddrRequest extends APIRequest<MonitorWasmAddrResponse> 
   }
 
   description(): string {
-    return `MonitorRequest for ${this.wasmAddr}`;
+    return `HookOnWasmAddrRequest for ${this.wasmAddr}`;
   }
 
   override getData(): string {
@@ -96,14 +96,14 @@ export class MontiroWasmAddrRequest extends APIRequest<MonitorWasmAddrResponse> 
     return `${this.interruptNr}${encodedAddr}${this.moment}${encodedAddOrRemoveOp}${encodedSchedule}${encodedHook}\n`;
   }
 
-  override parse(input: string): MonitorWasmAddrResponse {
-    const err = new APIRequestInvalidParse('No reply for MonitorWasmAddr');
+  override parse(input: string): HookOnWasmAddrResponse {
+    const err = new APIRequestInvalidParse('No reply for HookOnWasmAddr');
     const msg: RequestMessage | undefined = createRequestMessage(input);
     if (msg === undefined) {
       throw err;
     }
-    if (isMonitorWasmAddrResponse(msg)) {
-      const reply = createMonitorWasmAddrResponse(msg);
+    if (isHookOnWasmAddrResponse(msg)) {
+      const reply = createHookOnWasmAddrResponse(msg);
       if (reply === undefined) {
         throw err;
       } else {
@@ -133,13 +133,13 @@ export class MontiroWasmAddrRequest extends APIRequest<MonitorWasmAddrResponse> 
       ) {
         return;
       }
-      const monitorMoment = getMonitorMomentFromString(subContent.moment);
-      if (monitorMoment === undefined || monitorMoment !== this.moment) {
+      const hookMoment = getHookMomentFromString(subContent.moment);
+      if (hookMoment === undefined || hookMoment !== this.moment) {
         return;
       }
 
-      const monitoredAddr = parseInt(subContent.addr, 16);
-      if (isNaN(monitoredAddr) || this.wasmAddr !== monitoredAddr) {
+      const hookedAddr = parseInt(subContent.addr, 16);
+      if (isNaN(hookedAddr) || this.wasmAddr !== hookedAddr) {
         return;
       }
 
@@ -170,9 +170,10 @@ export class MontiroWasmAddrRequest extends APIRequest<MonitorWasmAddrResponse> 
   }
 }
 
-export interface RemoveAddrResponse extends MonitorWasmAddrJSONResponse {}
+export interface RemoveHookOnWasmAddrResponse
+  extends HookOnWasmAddrJSONResponse {}
 
-export class RemoveMonitorWasmAddrRequest extends MontiroWasmAddrRequest {
+export class RemoveHookOnWasmAddrRequest extends HookOnWasmAddrRequest {
   constructor(wasmAddr: number) {
     super(wasmAddr);
     this.isaddRequest = false;
