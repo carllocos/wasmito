@@ -36,7 +36,7 @@ systemSetup.setupFromFile('path to yml or json');
 // manually add devices. Manually adding can be used in combination with the setupFromFile
 const devDevice = systemSetup.addDevDevice('path to Program').name('Albert');
 
-const device = systemSetup.addOutOfPlaceDevice('path to program');
+const device = systemSetup.esp32('path to program');
 device.name('optional name').proxy('path to serial or socket');
 // or
 device.name('optional name').proxy(devDevice); // otherDevice from systemSetup
