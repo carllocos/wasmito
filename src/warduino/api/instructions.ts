@@ -11,6 +11,7 @@ export enum Instruction {
 
   AroundFunction = '50',
   HookOnWasmAddr = '51',
+  HookOnEvent = '52',
 
   LoadSnapshot = '62',
 
