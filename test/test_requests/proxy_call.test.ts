@@ -50,6 +50,8 @@ describe('Intergation Test: Proxy Calls to a Mocked Target VM produces the right
     const uploaded = await targetVM.uploadSourceCode(program);
     expect(uploaded).to.be.equal(true);
 
+    targetVM.mockResponseForAddHookOnNewEvent(true);
+    targetVM.mockResponseForAddHookOnNewEvent(true);
     await targetVM.mockSnapshot('./test/data/proxy-call-snapshot-1.json');
     const proxyVM = await deviceManager.spawnOutOfPlaceVM(targetVM, 8000);
     const chipPinModeID = 1;
