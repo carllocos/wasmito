@@ -54,11 +54,13 @@ export class MockVM extends WARDuinoVM {
   protected ErrorClass: new (errorMsg: string) => Error = Error;
   private readonly states: WasmState[];
   private readonly _mockChannel: MockChannel;
+  private readonly _mockAddHookOnNewEventResponse: boolean[];
 
   constructor(outputDir?: string) {
     super(createPlatformBuilderConfig(), new MockChannel(), outputDir);
     this._mockChannel = this.channel as MockChannel;
     this.states = [];
+    this._mockAddHookOnNewEventResponse = [];
   }
 
   /*
@@ -75,6 +77,10 @@ export class MockVM extends WARDuinoVM {
     const data: string = fs.readFileSync(filePath, 'utf8');
     const parsed: WasmState = stateRequest.parse(data);
     this.states.push(parsed);
+  }
+
+  mockResponseForAddHookOnNewEvent(response: boolean): void {
+    this._mockAddHookOnNewEventResponse.push(response);
   }
 
   /*
@@ -200,5 +206,16 @@ export class MockVM extends WARDuinoVM {
     timeout?: number | undefined,
   ): Promise<boolean> {
     throw new Error(`not implementend`);
+  }
+
+  async addHookOnNewEvent(
+    hook: Hook,
+    timeout?: number | undefined,
+  ): Promise<boolean> {
+    const response = this._mockAddHookOnNewEventResponse.shift();
+    if (response === undefined) {
+      throw new Error(`No mock response provided`);
+    }
+    return response;
   }
 }
