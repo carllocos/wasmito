@@ -190,17 +190,17 @@ export class MockVM extends WARDuinoVM {
     throw new Error(`not implementend`);
   }
 
-  async addHookBefore<T>(
+  async addHookBefore(
     sourceCodeLocation: SourceCodeLocation,
-    hook: Hook<T>,
+    hook: Hook,
     timeout?: number | undefined,
   ): Promise<boolean> {
     throw new Error(`not implementend`);
   }
 
-  async addHookAfter<T>(
+  async addHookAfter(
     sourceCodeLocation: SourceCodeLocation,
-    hook: Hook<T>,
+    hook: Hook,
     timeout?: number | undefined,
   ): Promise<boolean> {
     throw new Error(`not implementend`);

@@ -69,7 +69,7 @@ export function isAroundFunctionJSONResponse(
 
 export class AroundFunctionRequest extends APIRequestNoSubscription<AroundHookResponse> {
   public readonly function_idx;
-  public readonly hooks: Array<Hook<any>>;
+  public readonly hooks: Hook[];
   constructor(fidx: number) {
     super();
     this.function_idx = fidx;
@@ -80,7 +80,7 @@ export class AroundFunctionRequest extends APIRequestNoSubscription<AroundHookRe
     return `AroundFunction for ${this.function_idx}`;
   }
 
-  addHook(hook: Hook<any>): AroundFunctionRequest {
+  addHook(hook: Hook): AroundFunctionRequest {
     if (this.hooks.length === 0) {
       this.hooks.push(hook);
     } else {

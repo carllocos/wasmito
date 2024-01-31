@@ -252,9 +252,9 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     }
   }
 
-  async addHookBefore<T>(
+  async addHookBefore(
     sourceCodeLocation: SourceCodeLocation,
-    hook: Hook<T>,
+    hook: Hook,
     timeout?: number | undefined,
   ): Promise<boolean> {
     return this.addHook(
@@ -265,9 +265,9 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     );
   }
 
-  async addHookAfter<T>(
+  async addHookAfter(
     sourceCodeLocation: SourceCodeLocation,
-    hook: Hook<T>,
+    hook: Hook,
     timeout?: number | undefined,
   ): Promise<boolean> {
     return this.addHook(
@@ -278,9 +278,9 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     );
   }
 
-  private async addHook<T>(
+  private async addHook(
     sourceCodeLocation: SourceCodeLocation,
-    hook: Hook<T>,
+    hook: Hook,
     moment: HookOnWasmAddrMoment,
     timeout?: number,
   ): Promise<boolean> {
