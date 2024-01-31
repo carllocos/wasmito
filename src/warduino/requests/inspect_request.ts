@@ -114,6 +114,11 @@ export class StateRequest extends APIRequestNoSubscription<WasmState> {
     this.state.sort();
     const numberBytes = serializeUInt16BE(this.state.length);
     const stateToReq = this.state.join('');
+    if (stateToReq === '') {
+      throw new Error(
+        'StateInspectRequest should request at least one state kind. It is currently empty',
+      );
+    }
     return `${Instruction.Inspect}${numberBytes}${stateToReq}`;
   }
 
