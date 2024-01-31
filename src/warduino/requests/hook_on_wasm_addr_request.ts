@@ -7,7 +7,7 @@ import {
   isSubscriptionMessage,
   type RequestMessage,
 } from '../api/request_interface';
-import { type Hook } from '../../hooks/hook';
+import { HookWithSubscription, type Hook } from '../../hooks/hook';
 import { Instruction } from '../api/instructions';
 
 export enum HookOnWasmAddrMoment {
@@ -145,10 +145,7 @@ export class HookOnWasmAddrRequest extends APIRequest<HookOnWasmAddrResponse> {
 
       for (let i = 0; i < this.hooks.length; i++) {
         const hook = this.hooks[i];
-        if (
-          hook.parseSubscriptionData !== undefined &&
-          hook.onSubscriptionData !== undefined
-        ) {
+        if (hook instanceof HookWithSubscription) {
           let parsed: any;
           let successfulParse = false;
           try {
