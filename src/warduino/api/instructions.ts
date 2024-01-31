@@ -17,6 +17,9 @@ export enum Instruction {
 
   Proxify = '65',
   ProxyCall = '64',
+
+  PushEvent = '73',
+
   UpdateCallbackmapping = '75',
 }
 
