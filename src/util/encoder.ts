@@ -93,3 +93,26 @@ export function serializeUInt(
   }
   return buff.toString('hex');
 }
+
+export function encodeStringToHex(s: string): string {
+  let hexString = '';
+  for (let i = 0; i < s.length; i++) {
+    hexString += s.charCodeAt(i).toString(16).padStart(2, '0');
+  }
+  return hexString;
+}
+
+export function encodeJSONToHexString(v: any): string {
+  let obj: object = {};
+  if (typeof v === 'string') {
+    obj = JSON.parse(v);
+  } else if (typeof v === 'object') {
+    obj = v;
+  } else {
+    throw new Error(
+      'Invalid type argument: only a json string or an object can be encoded to Hexa JSON string',
+    );
+  }
+  const stringified = JSON.stringify(obj);
+  return Buffer.from(stringified, 'utf-8').toString('hex');
+}
