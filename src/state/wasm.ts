@@ -1,4 +1,5 @@
 import { createLogger } from '../logger/logger';
+import { decodeLEB128, hexStringToUint8Array } from '../util/decoder';
 import { encodeToHexLEB128, floatToHexString } from '../util/encoder';
 import fs from 'fs';
 
@@ -181,6 +182,45 @@ export namespace WASM {
   export interface Event {
     topic: string;
     payload: string;
+  }
+
+  export function decodeEventFromHexaStr(
+    eventHexaStr: string,
+  ): undefined | WASM.Event {
+    let buffer = hexStringToUint8Array(eventHexaStr);
+    if (buffer === undefined) {
+      return undefined;
+    }
+
+    const decodingSizeTopic = decodeLEB128(buffer);
+    if (decodingSizeTopic === undefined) {
+      return undefined;
+    }
+    const topicBuffer = buffer.slice(
+      decodingSizeTopic.bytesRead,
+      decodingSizeTopic.bytesRead + decodingSizeTopic.value,
+    );
+
+    const decoder = new TextDecoder('ascii');
+    const topic = decoder.decode(topicBuffer);
+
+    buffer = buffer.slice(
+      decodingSizeTopic.bytesRead + decodingSizeTopic.value,
+    );
+    const decodingSizePayload = decodeLEB128(buffer);
+    if (decodingSizePayload === undefined) {
+      return undefined;
+    }
+    const payloadBuffer = buffer.slice(
+      decodingSizePayload.bytesRead,
+      decodingSizePayload.bytesRead + decodingSizePayload.value,
+    );
+    const payload = decoder.decode(payloadBuffer);
+
+    return {
+      topic,
+      payload,
+    };
   }
 
   export function leb128(a: number): string {
