@@ -75,7 +75,7 @@ function isValidTypeVMConfig(arg: any): arg is VMConfigArgs {
 }
 
 export class VMConfiguration {
-  public _program: string;
+  private _program: string;
 
   private _toolPort?: number;
   private readonly _toolHostIP?: string;
