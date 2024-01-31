@@ -329,8 +329,12 @@ export class WasmState {
     }
     if (args.callbacks !== undefined) {
       this.callbacks = args.callbacks.map((cb: any) => {
-        if (isNaN(cb.callbackid)) {
-          throw new Error(`Callback id is NaN ${cb.callbackid}`);
+        if (typeof cb.callbackid !== 'string') {
+          throw new Error(
+            `Callback id is expected to be a string give an id of type${typeof cb.callbackid_}`,
+          );
+        } else if (cb.callbackID === '') {
+          throw new Error('Callback id should not be an empty string');
         }
         return {
           callbackid: cb.callbackid,
