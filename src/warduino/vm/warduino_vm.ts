@@ -87,6 +87,14 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     this._channel = newChannel;
   }
 
+  get sourceMap(): SourceMap {
+    const sm = this.getSourceMap();
+    if (sm === undefined) {
+      throw new this.ErrorClass('no Sourcemap set for VM');
+    }
+    return sm;
+  }
+
   get breakpoints(): SourceCodeLocation[] {
     return this._breakpoints;
   }
