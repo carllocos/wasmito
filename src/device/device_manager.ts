@@ -78,9 +78,11 @@ export class DeviceManager {
     maxWaitTime?: number,
     buildOutputDir?: string,
   ): Promise<OutOfPlaceVM> {
+    const noServerPort = undefined;
     const vm = new OutOfPlaceVM(
       OutOfPlaceMode.RedirectOOP,
       targetVM,
+      noServerPort,
       buildOutputDir,
     );
     const childProcess = await vm.spawn(maxWaitTime);
@@ -89,10 +91,48 @@ export class DeviceManager {
     return vm;
   }
 
+  async existingVMAsOutOfPlaceVM(
+    toolPort: number,
+    targetVM: WARDuinoVM,
+    serverPortForProxyCalls?: number,
+    maxWaitTime?: number,
+    buildOutputDir?: string,
+  ): Promise<OutOfPlaceVM> {
+    const vm = new OutOfPlaceVM(
+      OutOfPlaceMode.RedirectOOP,
+      targetVM,
+      serverPortForProxyCalls,
+      buildOutputDir,
+    );
+    await vm.setupForExistingVM(toolPort, maxWaitTime);
+    this.localprocesses.push([vm, undefined]);
+    return vm;
+  }
+
+  async connectToExistingMCUVM(
+    platformConfig: PlatformBuilderConfig,
+    buildOutputDir?: string,
+  ): Promise<MCUWARDuinoVM> {
+    const vm = new MCUWARDuinoVM(platformConfig, buildOutputDir);
+    const connected = await vm.connect();
+    if (!connected) {
+      throw Error('Could not connect to external MCU VM');
+    }
+    const exitCode = await vm.platform.compile(
+      platformConfig.deviceConfig.vmConfig.program,
+    );
+    if (exitCode !== 0) {
+      throw Error('Could not compile source code');
+    }
+
+    return vm;
+  }
+
   async spawnHardwareVM(
     platformConfig: PlatformBuilderConfig,
     buildOutputDir?: string,
   ): Promise<MCUWARDuinoVM> {
+    // TODO move compilation and flashing of source code to here
     return new MCUWARDuinoVM(platformConfig, buildOutputDir);
   }
 
