@@ -1,14 +1,13 @@
 import { type WasmState } from '../state/wasm';
 import { type StateRequest } from '../warduino/requests/inspect_request';
-import { Hook, HookKind } from './hook';
+import { HookKind, HookWithSubscription } from './hook';
 
-export class InspectStateHook extends Hook<WasmState> {
+export class InspectStateHook extends HookWithSubscription<WasmState> {
   private readonly req: StateRequest;
   public readonly wasmAddress?: number;
   constructor(stateRequest: StateRequest, wasmAddress?: number) {
     super(HookKind.StateToInspect);
     this.req = stateRequest;
-    this.parseSubscriptionData = this.deserializeSubscriptionMessage;
     this.wasmAddress = wasmAddress;
     if (this.wasmAddress !== undefined) {
       this.req.includePC(); // include pc is mandatory
@@ -19,11 +18,11 @@ export class InspectStateHook extends Hook<WasmState> {
     return `${this.kind}${this.req.generateInterrupt()}`;
   }
 
-  deserializeSubscriptionMessage(input: any): WasmState {
-    return this.req.parse(input);
-  }
-
   description(): string {
     return 'State Inspecting';
+  }
+
+  parseSubscriptionData(input: any): WasmState {
+    return this.req.parse(input);
   }
 }
