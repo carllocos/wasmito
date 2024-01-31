@@ -377,4 +377,16 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     const response = await this.sendRequest(req, timeout);
     return isSuccessfulMessage(response);
   }
+
+  private hasBreakpoint(loc: SourceCodeLocation): boolean {
+    const found = this._breakpoints.find((l) => {
+      return (
+        l.linenr === loc.linenr &&
+        l.columnEnd === loc.columnEnd &&
+        l.columnStart === loc.columnStart
+      );
+    });
+
+    return found !== undefined;
+  }
 }
