@@ -1,6 +1,6 @@
 import * as net from 'net';
 import { createLogger } from '../logger/logger';
-import { getFreePort } from '../util/socket_util';
+import { getFreePort, isPortInUse } from '../util/socket_util';
 import { type Channel } from './channel_interface';
 import type winston from 'winston';
 import { timeoutPromise } from '../util/promise_util';
@@ -16,20 +16,26 @@ export class ShareChannelError extends Error {
 export class ShareChannel implements Channel {
   private readonly server: net.Server;
   public readonly channelToShare: Channel;
+  private readonly _initialServerPort: number;
   private _serverPort: number;
   private readonly logger: winston.Logger;
   private clients: net.Socket[];
 
   readonly channelName: string;
 
-  constructor(channelToShare: Channel) {
+  constructor(channelToShare: Channel, serverPort?: number) {
     this.server = net.createServer(this.handleConnection.bind(this));
     this.channelToShare = channelToShare;
-    this._serverPort = -1;
+    this._initialServerPort = serverPort ?? -1;
+    this._serverPort = this._initialServerPort;
     this.clients = [];
     this.channelName = `SharedChannel for ${this.channelToShare.channelName}`;
     this.logger = createLogger(this.channelName);
   }
+
+  /*
+   * Server methods
+   */
 
   get serverPort(): number {
     return this._serverPort;
@@ -63,13 +69,23 @@ export class ShareChannel implements Channel {
   }
 
   public async startServer(): Promise<boolean> {
-    const freePort = await getFreePort();
-    if (freePort === undefined) {
-      return false;
+    let portToUse = this._initialServerPort;
+    if (portToUse !== -1) {
+      const used = await isPortInUse(this._initialServerPort);
+      if (used) {
+        this.logger.error(`Port ${this._initialServerPort} is already in use`);
+        return false;
+      }
+    } else {
+      const freePort = await getFreePort();
+      if (freePort === undefined) {
+        return false;
+      }
+      portToUse = freePort;
     }
     return new Promise<boolean>((resolve) => {
-      this.server.listen(freePort, () => {
-        this._serverPort = freePort;
+      this.server.listen(portToUse, () => {
+        this._serverPort = portToUse;
         this.logger.info(`listening on port ${this._serverPort}`);
         // TODO introduce another kind of addOnBuffer which gives buffers without decoding?
         this.channelToShare.addOnData(this.fanOutData.bind(this));
