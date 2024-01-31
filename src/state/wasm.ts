@@ -364,6 +364,13 @@ export class WasmState {
     }
   }
 
+  get callbackMappings(): WASM.CallbackMapping[] {
+    if (this.callbacks === undefined) {
+      return [];
+    }
+    return this.callbacks;
+  }
+
   asJSONString(): string {
     if (this._jsonString === undefined) {
       throw new Error('no jsonstring provided');
