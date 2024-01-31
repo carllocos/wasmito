@@ -53,15 +53,15 @@ export interface WARDuinoAPI {
   ) => Promise<ProxyCallResponse>;
 
   // Hook API
-  addHookBefore: <T>(
+  addHookBefore: (
     sourceCodeLocation: SourceCodeLocation,
-    hook: Hook<T>,
+    hook: Hook,
     timeout?: number,
   ) => Promise<boolean>;
 
-  addHookAfter: <T>(
+  addHookAfter: (
     sourceCodeLocation: SourceCodeLocation,
-    hook: Hook<T>,
+    hook: Hook,
     timeout?: number,
   ) => Promise<boolean>;
 }

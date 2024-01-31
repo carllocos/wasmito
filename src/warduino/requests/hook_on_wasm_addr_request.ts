@@ -44,7 +44,7 @@ export function createHookOnWasmAddrResponse(
 
 export class HookOnWasmAddrRequest extends APIRequest<HookOnWasmAddrResponse> {
   public readonly wasmAddr;
-  public readonly hooks: Array<Hook<any>>;
+  public readonly hooks: Hook[];
   private moment: HookOnWasmAddrMoment;
   private readonly interruptNr: Instruction;
   protected isaddRequest: boolean; // true for add, false for remove;
@@ -68,7 +68,7 @@ export class HookOnWasmAddrRequest extends APIRequest<HookOnWasmAddrResponse> {
     return this;
   }
 
-  addHook(hook: Hook<any>): HookOnWasmAddrRequest {
+  addHook(hook: Hook): HookOnWasmAddrRequest {
     if (this.hooks.length === 0) {
       this.hooks.push(hook);
     } else {
