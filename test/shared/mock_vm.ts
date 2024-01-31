@@ -69,10 +69,6 @@ export class MockVM extends WARDuinoVM {
     return this._mockChannel;
   }
 
-  // async setupMock(): Promise<boolean> {
-
-  // }
-
   async mockSnapshot(filePath: string): Promise<void> {
     const stateRequest = new StateRequest();
     stateRequest.includeAll();
