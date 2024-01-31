@@ -16,8 +16,8 @@ export enum Instruction {
   LoadSnapshot = '62',
 
   Proxify = '65',
-  PopEvent = '73',
   ProxyCall = '64',
+  UpdateCallbackmapping = '75',
 }
 
 export function getInstructionFromString(str: string): Instruction | undefined {
