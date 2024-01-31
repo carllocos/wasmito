@@ -12,7 +12,9 @@ export enum LogLevel {
   LogOff = 'off',
 }
 
-function getLogLevelFromString(levelString: string): LogLevel | undefined {
+export function getLogLevelFromString(
+  levelString: string,
+): LogLevel | undefined {
   switch (levelString) {
     case 'info':
       return LogLevel.LogInfo;
@@ -54,7 +56,7 @@ export function parseLogLevel(value: string): LogLevel | undefined {
   return undefined;
 }
 
-export function createLogger(name: string): winston.Logger {
+export function createLogger(name: string, level?: LogLevel): winston.Logger {
   const cleanedName = name.trim();
   const _logger = winston.createLogger({
     level: logLevel,
