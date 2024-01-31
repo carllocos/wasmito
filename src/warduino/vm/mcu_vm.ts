@@ -78,9 +78,11 @@ export class MCUWARDuinoVM extends WARDuinoVM {
     }
 
     const exitCodeUpload = await upload;
+    if (exitCodeUpload !== 0) {
+      return false;
+    }
 
     // open connection after flashing
-    await this.channel.open();
-    return exitCodeUpload === 0;
+    return await this.channel.open();
   }
 }
