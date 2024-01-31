@@ -80,7 +80,11 @@ export class HookOnWasmAddrRequest extends APIRequest<HookOnWasmAddrResponse> {
   }
 
   description(): string {
-    return `HookOnWasmAddrRequest for ${this.wasmAddr}`;
+    if (this.isaddRequest) {
+      return `HookOnWasmAddrRequest for ${this.wasmAddr}`;
+    } else {
+      return `RemoveHookOnWasmAddrRequest for ${this.wasmAddr}`;
+    }
   }
 
   override getData(): string {
