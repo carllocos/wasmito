@@ -43,6 +43,8 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   public readonly platform: PlatformBuilder;
   protected abstract readonly ErrorClass: new (errorMsg: string) => Error;
 
+  private _breakpoints: SourceCodeLocation[];
+
   constructor(
     platformConfig: PlatformBuilderConfig,
     communicationChannel: Channel,
@@ -51,6 +53,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     this.platformConfig = platformConfig;
     this._channel = communicationChannel;
     this.platform = createPlatformBuilder(platformConfig, buildOutputDir);
+    this._breakpoints = [];
   }
 
   abstract close(timeout?: number): Promise<boolean>;
@@ -82,6 +85,10 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   set channel(newChannel: Channel) {
     // TODO: figure out whether to update config
     this._channel = newChannel;
+  }
+
+  get breakpoints(): SourceCodeLocation[] {
+    return this._breakpoints;
   }
 
   /*
@@ -179,6 +186,21 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     stateHandler?: (state: WasmState) => void,
     timeout?: number | undefined,
   ): Promise<boolean> {
+    if (this.hasBreakpoint(sourceCodeLocation)) {
+      this.logger.warn(
+        `breakpoint was already previously set upon linenr ${sourceCodeLocation.linenr}`,
+      );
+      return true;
+    }
+
+    if (stateOnBreakpoint === undefined) {
+      if (stateHandler !== undefined) {
+        throw new this.ErrorClass(
+          'Expected `stateOnBreakpoint` to be set in order to handle it via callback `stateHandler`',
+        );
+      }
+    }
+
     const hookAdded = await this.addHookBefore(
       sourceCodeLocation,
       new PauseVMHook(),
@@ -202,6 +224,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     inspectHook.onSubscriptionData = stateHandler;
     if (await this.addHookBefore(sourceCodeLocation, inspectHook, timeout)) {
       this.logger.info(`breakpoint added upon ${sourceCodeLocation.linenr}`);
+      this._breakpoints.push(sourceCodeLocation);
       return true;
     }
     this.logger.error(
@@ -214,7 +237,40 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     sourceCodeLocation: SourceCodeLocation,
     timeout?: number | undefined,
   ): Promise<boolean> {
-    throw new this.ErrorClass('not implemented');
+    const sm = this.sourceMap;
+    const mappings = sm.getMappingsFromSourceCodeLocation(sourceCodeLocation);
+    if (mappings.length === 0) {
+      throw new this.ErrorClass(
+        `Cannot remove hook from unexisting wasm address derived from source location ${sourceCodeLocation.linenr}`,
+      );
+    }
+
+    if (!this.hasBreakpoint(sourceCodeLocation)) {
+      this.logger.info(
+        `no breakpoint was previously set upon source code location linenr ${sourceCodeLocation.linenr} so nothing to remove`,
+      );
+      return false;
+    }
+
+    const addr = mappings[0].address;
+    const request = new RemoveHookOnWasmAddrRequest(addr).before();
+
+    const response = await this.sendRequest(request, timeout);
+    const successful = isSuccessfulMessage(response);
+    if (successful) {
+      this._breakpoints = this._breakpoints.filter((l) => {
+        return (
+          l.linenr !== sourceCodeLocation.linenr ||
+          l.columnEnd !== sourceCodeLocation.columnEnd ||
+          l.columnStart !== sourceCodeLocation.columnStart
+        );
+      });
+      this.logger.info(
+        `breakpoint removed from linenr ${sourceCodeLocation.linenr}`,
+      );
+    }
+
+    return successful;
   }
 
   async proxyCall(
