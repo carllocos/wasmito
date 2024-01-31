@@ -28,6 +28,7 @@ import { PauseVMHook, type Hook, InspectStateHook } from '../../hooks/index';
 import {
   HookOnWasmAddrMoment,
   HookOnWasmAddrRequest,
+  RemoveHookOnWasmAddrRequest,
 } from '../requests/hook_on_wasm_addr_request';
 import { ProxyCallHook } from '../../hooks/hook_proxy_call';
 import { AroundFunctionRequest } from '../requests/around_function_request';
@@ -35,6 +36,10 @@ import {
   ProxyCallRequest,
   type ProxyCallResponse,
 } from '../requests/fun_call_request';
+import {
+  HookOnEventRequest,
+  isSuccessfullHookOnEventResponse,
+} from '../requests/hook_on_event_request';
 
 export abstract class WARDuinoVM implements WARDuinoAPI {
   private _channel: Channel;
