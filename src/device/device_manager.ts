@@ -80,7 +80,7 @@ export class DeviceManager {
   ): Promise<OutOfPlaceVM> {
     const noServerPort = undefined;
     const vm = new OutOfPlaceVM(
-      OutOfPlaceMode.RedirectOOP,
+      OutOfPlaceMode.RedirectIO,
       targetVM,
       noServerPort,
       buildOutputDir,
@@ -99,7 +99,7 @@ export class DeviceManager {
     buildOutputDir?: string,
   ): Promise<OutOfPlaceVM> {
     const vm = new OutOfPlaceVM(
-      OutOfPlaceMode.RedirectOOP,
+      OutOfPlaceMode.RedirectIO,
       targetVM,
       serverPortForProxyCalls,
       buildOutputDir,
