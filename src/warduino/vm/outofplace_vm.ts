@@ -177,7 +177,10 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
     return true;
   }
 
-  async setupForCopyEvents(maxWaitTime?: number): Promise<boolean> {
+  async setupForCopyEvents(
+    snapshot: WasmState,
+    maxWaitTime?: number,
+  ): Promise<boolean> {
     throw new Error('Method not implemented.');
   }
 
@@ -273,7 +276,7 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
     let success = true;
     switch (this.outOfPlaceMode) {
       case OutOfPlaceMode.CopyInput:
-        success = await this.setupForCopyEvents(maxWaitTime);
+        success = await this.setupForCopyEvents(snapshot, maxWaitTime);
         break;
       case OutOfPlaceMode.RedirectIO:
         success = await this.setupForRedirectEvents(snapshot, maxWaitTime);
