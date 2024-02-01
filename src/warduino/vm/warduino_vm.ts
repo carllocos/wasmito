@@ -392,6 +392,12 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     return isSuccessfullHookOnEventResponse(response);
   }
 
+  async addHookOnEventHandling(hook: Hook, timeout?: number): Promise<boolean> {
+    const request = new HookOnEventRequest().onEventHandling(hook);
+    const response = await this.sendRequest(request, timeout);
+    return isSuccessfullHookOnEventResponse(response);
+  }
+
   private hasBreakpoint(loc: SourceCodeLocation): boolean {
     const found = this._breakpoints.find((l) => {
       return (
