@@ -160,7 +160,7 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
     return spawnedProcess;
   }
 
-  async setupForRedirectIO(
+  async setupForRedirectEvents(
     snapshot: WasmState,
     maxWaitTime?: number,
   ): Promise<boolean> {
@@ -177,7 +177,7 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
     return true;
   }
 
-  async setupForIndependentOOP(maxWaitTime?: number): Promise<boolean> {
+  async setupForCopyEvents(maxWaitTime?: number): Promise<boolean> {
     throw new Error('Method not implemented.');
   }
 
@@ -273,10 +273,10 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
     let success = true;
     switch (this.outOfPlaceMode) {
       case OutOfPlaceMode.IndepentOOP:
-        success = await this.setupForIndependentOOP(maxWaitTime);
+        success = await this.setupForCopyEvents(maxWaitTime);
         break;
       case OutOfPlaceMode.RedirectOOP:
-        success = await this.setupForRedirectIO(snapshot, maxWaitTime);
+        success = await this.setupForRedirectEvents(snapshot, maxWaitTime);
         break;
     }
 
