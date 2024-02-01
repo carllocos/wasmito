@@ -1,4 +1,8 @@
-import { type HookWithSubscription } from '../../hooks/hook';
+import { InspectStateHook } from '../../hooks/hook_inspect_state';
+import {
+  type HookWithoutSubscription,
+  type HookWithSubscription,
+} from '../../hooks/hook';
 import { EventInspectHook } from '../../hooks/hook_event';
 import { EmptyValueSubstitution } from '../../hooks/hook_value_substitution';
 import { type WasmValuesBuilder } from '../../state';
@@ -16,6 +20,36 @@ import {
   type SubActReturn,
 } from './shared_interfaces';
 
+export function addBreakpointSubscription(
+  subscriptionID: string,
+  linenr: number,
+  timeout: number,
+): SubscriptionAction<boolean, WasmState, InspectStateHook> {
+  const act: SubscriptionAction<boolean, WasmState, InspectStateHook> = {
+    subscriptionID,
+    description: `add a bp at linenr ${linenr} and give Context once reached`,
+    doAction: async (
+      device: WARDuinoVM,
+    ): Promise<SubActReturn<boolean, WasmState, InspectStateHook>> => {
+      const state = new StateRequest().includePC();
+      const hook = new InspectStateHook(state);
+      const added = await device.addBreakpoint(
+        { linenr },
+        state,
+        hook.onSubscriptionData.bind(hook),
+      );
+      return [added, hook];
+    },
+    checkActionSuccess: async (bpAdded: boolean): Promise<boolean> => {
+      return bpAdded;
+    },
+    ifFail: {
+      timeout,
+      message: `Failed to add bp at line ${linenr}`,
+    },
+  };
+  return act;
+}
 export function addBPAndRunUntil(
   linenr: number,
   timeout: number,
@@ -102,6 +136,53 @@ export function onNewEventAction(
     },
     ifFail: {
       message: 'Failed to add hook upon event',
+      timeout,
+    },
+  };
+  return ac;
+}
+
+export function onHandledEventSubscription(
+  subscriptionId: string,
+  timeout: number,
+): SubscriptionAction<boolean, WASM.Event, EventInspectHook> {
+  const ac = {
+    subscriptionID: subscriptionId,
+    description: 'Hook into handled events',
+    doAction: async (
+      device: WARDuinoVM,
+    ): Promise<SubActReturn<boolean, WASM.Event, EventInspectHook>> => {
+      const hook: HookWithSubscription<WASM.Event> = new EventInspectHook();
+      const added = await device.addHookOnEventHandling(hook);
+      return [added, hook];
+    },
+
+    checkActionSuccess: async (hookAdded: boolean) => {
+      return hookAdded;
+    },
+    ifFail: {
+      message: 'Failed to add hook on handled events',
+      timeout,
+    },
+  };
+  return ac;
+}
+
+export function onHandledEventAction(
+  hook: HookWithoutSubscription,
+  timeout: number,
+): Action<boolean> {
+  const ac = {
+    description: 'Apply Hook on handled event',
+    doAction: async (device: WARDuinoVM): Promise<boolean> => {
+      return await device.addHookOnEventHandling(hook);
+    },
+
+    checkActionSuccess: async (hookAdded: boolean) => {
+      return hookAdded;
+    },
+    ifFail: {
+      message: 'Failed to add hook that applies on handled events',
       timeout,
     },
   };
