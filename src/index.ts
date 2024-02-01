@@ -6,3 +6,4 @@ export * from './source_mappers/index';
 export * from './state/index';
 export * from './warduino/index';
 export * from './util/index';
+export * from './debugger/index';
