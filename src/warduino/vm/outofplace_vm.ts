@@ -160,7 +160,7 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
     return spawnedProcess;
   }
 
-  async setupForRedirectOOP(
+  async setupForRedirectIO(
     snapshot: WasmState,
     maxWaitTime?: number,
   ): Promise<boolean> {
@@ -276,7 +276,7 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
         success = await this.setupForIndependentOOP(maxWaitTime);
         break;
       case OutOfPlaceMode.RedirectOOP:
-        success = await this.setupForRedirectOOP(snapshot, maxWaitTime);
+        success = await this.setupForRedirectIO(snapshot, maxWaitTime);
         break;
     }
 
