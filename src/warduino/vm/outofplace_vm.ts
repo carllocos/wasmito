@@ -26,8 +26,8 @@ export class OutOfPlaceVMError extends Error {
 }
 
 export enum OutOfPlaceMode {
-  IndepentOOP,
-  RedirectOOP,
+  CopyInput,
+  RedirectIO,
 }
 
 export class OutOfPlaceVM extends WARDuinoDevVM {
@@ -249,7 +249,7 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
   }
 
   private async setupTargetVM(maxWaitTime?: number): Promise<WasmState> {
-    if (this.outOfPlaceMode === OutOfPlaceMode.RedirectOOP) {
+    if (this.outOfPlaceMode === OutOfPlaceMode.RedirectIO) {
       await this.targetVM.pause(maxWaitTime);
     }
 
@@ -272,10 +272,10 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
   ): Promise<boolean> {
     let success = true;
     switch (this.outOfPlaceMode) {
-      case OutOfPlaceMode.IndepentOOP:
+      case OutOfPlaceMode.CopyInput:
         success = await this.setupForCopyEvents(maxWaitTime);
         break;
-      case OutOfPlaceMode.RedirectOOP:
+      case OutOfPlaceMode.RedirectIO:
         success = await this.setupForRedirectEvents(snapshot, maxWaitTime);
         break;
     }
@@ -318,8 +318,8 @@ function createVMConfig(vmToProxy: WARDuinoVM): VMConfigArgs {
 function assertvalidOutOfPlaceMode(mode: OutOfPlaceMode): void {
   let modeExists = false;
   switch (mode) {
-    case OutOfPlaceMode.IndepentOOP:
-    case OutOfPlaceMode.RedirectOOP:
+    case OutOfPlaceMode.CopyInput:
+    case OutOfPlaceMode.RedirectIO:
       modeExists = true;
       break;
     default:
