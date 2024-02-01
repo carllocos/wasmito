@@ -20,7 +20,7 @@ export interface ExpectDescription<SubscriptionType> {
   description: string;
   subscriptionID: string | number; // action number that generates subscription data
   subscriptionCheck: (value: SubscriptionType) => Promise<boolean>;
-  ifFail?: TestFailure;
+  ifFail?: TestFailure; // TODO change to ifFail?: (value: SubscriptionType) => string; where string is exception msg
 }
 
 export interface TestScenario {
@@ -169,6 +169,7 @@ export class SystemTester {
     scenario: TestScenario,
   ): Promise<TestScenarioResult> {
     this.assertVMOfDeviceIDExists(scenario);
+    // TODO move the creation of results objects to addScenario
     const actionRunResults: ActionRunResult[] =
       scenario.actions?.map((action) => {
         return {
