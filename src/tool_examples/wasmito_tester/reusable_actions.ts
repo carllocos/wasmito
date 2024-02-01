@@ -19,6 +19,7 @@ import {
   type SubscriptionAction,
   type SubActReturn,
 } from './shared_interfaces';
+import { Breakpoint } from '../../debugger/breakpoint';
 
 export function addBreakpointSubscription(
   subscriptionID: string,
@@ -31,13 +32,10 @@ export function addBreakpointSubscription(
     doAction: async (
       device: WARDuinoVM,
     ): Promise<SubActReturn<boolean, WasmState, InspectStateHook>> => {
-      const state = new StateRequest().includePC();
-      const hook = new InspectStateHook(state);
-      const added = await device.addBreakpoint(
-        { linenr },
-        state,
-        hook.onSubscriptionData.bind(hook),
-      );
+      const bp = new Breakpoint({ linenr });
+      const hook = new InspectStateHook(new StateRequest().includePC());
+      bp.onBreakpoint(hook.onSubscriptionData.bind(hook));
+      const added = await device.addBreakpoint(bp);
       return [added, hook];
     },
     checkActionSuccess: async (bpAdded: boolean): Promise<boolean> => {
@@ -58,17 +56,15 @@ export function addBPAndRunUntil(
     description: `add a bp at linenr ${linenr}, run until bp, and remove bp`,
     doAction: async (device: WARDuinoVM): Promise<boolean> => {
       return new Promise<boolean>((resolve, reject) => {
-        const onBpReached = (state: WasmState): void => {
+        const bp = new Breakpoint({
+          linenr,
+        });
+        bp.onBreakpoint((state: WasmState): void => {
           resolve(true);
-        };
+        });
+
         device
-          .addBreakpoint(
-            {
-              linenr,
-            },
-            new StateRequest().includePC(),
-            onBpReached,
-          )
+          .addBreakpoint(bp)
           .then((bpAdded) => {
             if (!bpAdded) {
               resolve(false);
@@ -101,9 +97,8 @@ export function removeBPAt(linenr: number, timeout: number): Action<boolean> {
   const act: Action<boolean> = {
     description: `remove breakpoint at line ${linenr}`,
     doAction: async (device: WARDuinoVM): Promise<boolean> => {
-      return await device.removeBreakpoint({
-        linenr,
-      });
+      const bp = new Breakpoint({ linenr });
+      return await device.removeBreakpoint(bp);
     },
     checkActionSuccess: async (v: boolean): Promise<boolean> => {
       return v;
