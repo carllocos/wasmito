@@ -301,44 +301,6 @@ export class SystemDeployer {
     }
   }
 
-  private async doRunUntilAction(
-    vm: WARDuinoVM,
-    location: RunUntilLocation,
-  ): Promise<boolean> {
-    let bpReached = new Promise<boolean>((resolve, reject) => {
-      const onBPReached = (state: WasmState): void => {
-        this._logger.error('Use real program location to determine reach');
-        vm.removeBreakpoint(location.sourceCodeLocation)
-          .then((removed) => {
-            resolve(removed);
-          })
-          .catch(reject);
-      };
-
-      const stateToRequest = new StateRequest().includePC();
-      vm.addBreakpoint(location.sourceCodeLocation, stateToRequest, onBPReached)
-        .then((added) => {
-          if (!added) {
-            resolve(false);
-          }
-        })
-        .then(async () => {
-          const running = await vm.run();
-          if (!running) {
-            resolve(false);
-          }
-        })
-        .catch((err) => {
-          reject(err);
-        });
-    });
-
-    if (location.failWith?.timeout !== undefined) {
-      bpReached = timeoutPromise(bpReached, location.failWith.timeout);
-    }
-    return await bpReached;
-  }
-
   private async applyPostDeployment(
     device: DeviceSetup,
     vm: WARDuinoVM,
