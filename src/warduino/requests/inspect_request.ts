@@ -43,6 +43,7 @@ export class InspectStack extends APIRequestNoSubscription<WasmStack> {
   }
 }
 
+// TODO split into a class that defines what you want as sate and another one that takes the first class to create a request to ask for that state
 export class StateRequest extends APIRequestNoSubscription<WasmState> {
   private state: string[] = [];
 
