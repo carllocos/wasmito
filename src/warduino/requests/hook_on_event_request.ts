@@ -149,7 +149,7 @@ export class HookOnEventRequest extends APIRequest<HookOnEventResponse> {
     return this;
   }
 
-  beforeEventHandled(hook: Hook): HookOnEventRequest {
+  onEventHandling(hook: Hook): HookOnEventRequest {
     this.hookMoment = HookOnEventMoment.beforeEventHandled;
     this.addHook(hook);
     return this;
