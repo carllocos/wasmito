@@ -1,14 +1,11 @@
-import { type WASM } from '../state/wasm';
+import { type WASM } from '../../../state/wasm';
 import {
   createSystemSetup,
   oneM5StickCDev,
   oneM5StickCMCU,
-} from './wasmito_tester/reausable_system_setups';
-import {
-  SystemTester,
-  type TestScenario,
-} from './wasmito_tester/system_tester';
-import { type PostSetupConfig } from './wasmito_tester/system_deployer';
+} from '../reausable_system_setups';
+import { SystemTester, type TestScenario } from '../system_tester';
+import { type PostSetupConfig } from '../system_deployer';
 import {
   addBPAndRunUntil,
   mockPrimitiveFuncAction,
@@ -17,11 +14,11 @@ import {
   removeBPAt,
   runVMAction,
   stepAction,
-} from './wasmito_tester/reusable_actions';
-import { type WARDuinoVM } from '../warduino/vm/warduino_vm';
-import { StateRequest } from '../warduino/requests/inspect_request';
-import { InspectStateHook } from '../hooks/hook_inspect_state';
-import { WasmValuesBuilder } from '../state/wasm_value_array_builder';
+} from '../reusable_actions';
+import { type WARDuinoVM } from '../../../warduino/vm/warduino_vm';
+import { StateRequest } from '../../../warduino/requests/inspect_request';
+import { InspectStateHook } from '../../../hooks/hook_inspect_state';
+import { WasmValuesBuilder } from '../../../state/wasm_value_array_builder';
 
 /*
  * System Setup
