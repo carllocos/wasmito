@@ -24,6 +24,7 @@ import { type WasmState } from '../../src/state/wasm';
 import { type Hook } from '../../src/hooks/hook';
 import { WARDuinoVM } from '../../src/warduino/vm/warduino_vm';
 import { MockChannel } from './mock_channel';
+import { type Breakpoint } from '../../src/debugger/breakpoint';
 
 function createPlatformBuilderConfig(): PlatformBuilderConfig {
   const deviceConfigArgs: DeviceConfigArgs = {
@@ -127,16 +128,14 @@ export class MockVM extends WARDuinoVM {
   }
 
   async addBreakpoint(
-    sourceCodeLocation: SourceCodeLocation,
-    stateOnBreakpoint?: StateRequest | undefined,
-    stateHandler?: ((state: WasmState) => void) | undefined,
+    breakpoint: Breakpoint,
     timeout?: number | undefined,
   ): Promise<boolean> {
     throw new Error(`not implementend`);
   }
 
   async removeBreakpoint(
-    sourceCodeLocation: SourceCodeLocation,
+    breakpoint: Breakpoint,
     timeout?: number | undefined,
   ): Promise<boolean> {
     throw new Error(`not implementend`);

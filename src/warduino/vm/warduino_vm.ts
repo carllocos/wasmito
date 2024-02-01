@@ -24,7 +24,6 @@ import {
   type SourceCodeLocation,
   type SourceMap,
 } from '../../source_mappers/source_map';
-import { PauseVMHook, type Hook, InspectStateHook } from '../../hooks/index';
 import {
   HookOnWasmAddrMoment,
   HookOnWasmAddrRequest,
@@ -40,6 +39,8 @@ import {
   HookOnEventRequest,
   isSuccessfullHookOnEventResponse,
 } from '../requests/hook_on_event_request';
+import { type Breakpoint } from '../../debugger';
+import { type Hook } from '../../hooks/hook';
 
 export abstract class WARDuinoVM implements WARDuinoAPI {
   private _channel: Channel;
@@ -48,7 +49,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   public readonly platform: PlatformBuilder;
   protected abstract readonly ErrorClass: new (errorMsg: string) => Error;
 
-  private _breakpoints: SourceCodeLocation[];
+  private _breakpoints: Breakpoint[];
 
   constructor(
     platformConfig: PlatformBuilderConfig,
@@ -100,7 +101,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     return sm;
   }
 
-  get breakpoints(): SourceCodeLocation[] {
+  get breakpoints(): Breakpoint[] {
     return this._breakpoints;
   }
 
@@ -194,73 +195,73 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   }
 
   async addBreakpoint(
-    sourceCodeLocation: SourceCodeLocation,
-    stateOnBreakpoint?: StateRequest,
-    stateHandler?: (state: WasmState) => void,
+    breakpoint: Breakpoint,
     timeout?: number | undefined,
   ): Promise<boolean> {
-    if (this.hasBreakpoint(sourceCodeLocation)) {
-      this.logger.warn(
-        `breakpoint was already previously set upon linenr ${sourceCodeLocation.linenr}`,
-      );
+    if (this.hasBreakpoint(breakpoint)) {
+      this.logger.warn(`breakpoint ${breakpoint.toString()} was already set`);
       return true;
     }
-
-    if (stateOnBreakpoint === undefined) {
-      if (stateHandler !== undefined) {
-        throw new this.ErrorClass(
-          'Expected `stateOnBreakpoint` to be set in order to handle it via callback `stateHandler`',
-        );
+    let successful = true;
+    for (let i = 0; i < breakpoint.hooks.length; i++) {
+      const hook = breakpoint.hooks[i];
+      successful = await this.addHookBefore(
+        breakpoint.sourceCodeLocation,
+        hook,
+        timeout,
+      );
+      if (!successful) {
+        this.logger.error(`could not add breakpoint ${breakpoint.toString()}`);
+        break;
       }
     }
 
-    const hookAdded = await this.addHookBefore(
-      sourceCodeLocation,
-      new PauseVMHook(),
-      timeout,
-    );
-    if (stateOnBreakpoint === undefined) {
-      if (stateHandler !== undefined) {
-        throw new this.ErrorClass(
-          'Expected `stateOnBreakpoint` to be set in order to handle it via callback `stateHandler`',
-        );
-      }
-      return hookAdded;
-    }
+    // if (stateOnBreakpoint === undefined) {
+    //   if (stateHandler !== undefined) {
+    //     throw new this.ErrorClass(
+    //       'Expected `stateOnBreakpoint` to be set in order to handle it via callback `stateHandler`',
+    //     );
+    //   }
+    //   return hookAdded;
+    // }
 
-    if (stateHandler === undefined) {
-      throw new this.ErrorClass(
-        'Expected `stateHandler` callback argument as handler for `stateOnBreakpoint`',
-      );
+    // if (stateHandler === undefined) {
+    //   throw new this.ErrorClass(
+    //     'Expected `stateHandler` callback argument as handler for `stateOnBreakpoint`',
+    //   );
+    // }
+    // const inspectHook = new InspectStateHook(stateOnBreakpoint);
+    // inspectHook.onSubscriptionData = stateHandler;
+    // if (await this.addHookBefore(sourceCodeLocation, inspectHook, timeout)) {
+    //   this.logger.info(`breakpoint added upon ${sourceCodeLocation.linenr}`);
+    //   this._breakpoints.push(sourceCodeLocation);
+    //   return true;
+    // }
+    if (successful) {
+      this.logger.info(`breakpoint ${breakpoint.toString()} added`);
+    } else {
+      this.logger.error(`could not add breakpoint ${breakpoint.toString()}`);
     }
-    const inspectHook = new InspectStateHook(stateOnBreakpoint);
-    inspectHook.onSubscriptionData = stateHandler;
-    if (await this.addHookBefore(sourceCodeLocation, inspectHook, timeout)) {
-      this.logger.info(`breakpoint added upon ${sourceCodeLocation.linenr}`);
-      this._breakpoints.push(sourceCodeLocation);
-      return true;
-    }
-    this.logger.error(
-      `could not add breakpoint upon ${sourceCodeLocation.linenr}`,
-    );
-    return false;
+    return successful;
   }
 
   async removeBreakpoint(
-    sourceCodeLocation: SourceCodeLocation,
+    breakpoint: Breakpoint,
     timeout?: number | undefined,
   ): Promise<boolean> {
     const sm = this.sourceMap;
-    const mappings = sm.getMappingsFromSourceCodeLocation(sourceCodeLocation);
+    const mappings = sm.getMappingsFromSourceCodeLocation(
+      breakpoint.sourceCodeLocation,
+    );
     if (mappings.length === 0) {
       throw new this.ErrorClass(
-        `Cannot remove hook from unexisting wasm address derived from source location ${sourceCodeLocation.linenr}`,
+        `Cannot breakpoint on an unexisting wasm address derived from breakpoint ${breakpoint.toString()}`,
       );
     }
 
-    if (!this.hasBreakpoint(sourceCodeLocation)) {
+    if (!this.hasBreakpoint(breakpoint)) {
       this.logger.info(
-        `no breakpoint was previously set upon source code location linenr ${sourceCodeLocation.linenr} so nothing to remove`,
+        `no breakpoint ${breakpoint.toString()} was previously set so nothing to remove`,
       );
       return false;
     }
@@ -271,16 +272,10 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     const response = await this.sendRequest(request, timeout);
     const successful = isSuccessfulMessage(response);
     if (successful) {
-      this._breakpoints = this._breakpoints.filter((l) => {
-        return (
-          l.linenr !== sourceCodeLocation.linenr ||
-          l.columnEnd !== sourceCodeLocation.columnEnd ||
-          l.columnStart !== sourceCodeLocation.columnStart
-        );
+      this._breakpoints = this._breakpoints.filter((b) => {
+        return !breakpoint.equals(b);
       });
-      this.logger.info(
-        `breakpoint removed from linenr ${sourceCodeLocation.linenr}`,
-      );
+      this.logger.info(`breakpoint ${breakpoint.toString()} removed`);
     }
 
     return successful;
@@ -398,13 +393,9 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     return isSuccessfullHookOnEventResponse(response);
   }
 
-  private hasBreakpoint(loc: SourceCodeLocation): boolean {
-    const found = this._breakpoints.find((l) => {
-      return (
-        l.linenr === loc.linenr &&
-        l.columnEnd === loc.columnEnd &&
-        l.columnStart === loc.columnStart
-      );
+  private hasBreakpoint(bp: Breakpoint): boolean {
+    const found = this._breakpoints.find((b) => {
+      return bp.equals(b);
     });
 
     return found !== undefined;
