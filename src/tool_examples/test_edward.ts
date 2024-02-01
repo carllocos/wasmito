@@ -12,6 +12,7 @@ import { type WasmState } from '../state';
 import { type WARDuinoVM } from '../warduino/vm/warduino_vm';
 import { type MCUWARDuinoVM } from '../warduino/vm/mcu_vm';
 import { StateRequest } from '../warduino/requests/inspect_request';
+import { Breakpoint } from '../debugger';
 
 export async function callLedcSetup(vm: WARDuinoVM): Promise<void> {
   const funcLEDCSetup = 5;
@@ -146,16 +147,17 @@ export async function testEventHook(
   upload: boolean,
 ): Promise<void> {
   const vm = await setupMCUVM(config, upload);
-  const added = await vm.addBreakpoint(
+  const bp = new Breakpoint(
     {
       linenr: 88,
     },
     new StateRequest().includePC(),
-    (state: WasmState) => {
-      console.log('breakpoint reached');
-      // vm.run().then(console.log).catch(console.error);
-    },
   );
+  bp.onBreakpoint((state: WasmState) => {
+    console.log('breakpoint reached');
+    // vm.run().then(console.log).catch(console.error);
+  });
+  const added = await vm.addBreakpoint(bp);
   if (!added) {
     return;
   }

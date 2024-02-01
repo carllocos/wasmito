@@ -14,6 +14,7 @@ import { type WARDuinoDevVM } from '../warduino/vm/dev_vm';
 import { type WasmState } from '../state/wasm';
 import { type DeviceConfigArgs, DeploymentMode } from '../device/device_config';
 import { type VMConfigArgs } from '../device/vm_config';
+import { Breakpoint } from '../debugger';
 
 export function allSucceeded(replies: HookOnWasmAddrResponse[]): boolean {
   let idx = 0;
@@ -68,14 +69,14 @@ export async function addBreakpoint(
     .includeGlobals()
     .includeCallstack()
     .includeEvents();
-
-  return em.addBreakpoint(
+  const bp = new Breakpoint(
     {
       linenr: lineNr,
     },
     stateOnBreakpoint,
-    onBreakPointReached,
   );
+  bp.onBreakpoint(onBreakPointReached);
+  return em.addBreakpoint(bp);
 }
 
 export function snapshotRequest(): StateRequest {
@@ -98,13 +99,14 @@ export async function addBreakpointSnapshot(
   em: WARDuinoDevVM,
   onBreakPointReached: (data: WasmState) => void,
 ): Promise<boolean> {
-  return em.addBreakpoint(
+  const bp = new Breakpoint(
     {
       linenr,
     },
     snapshotRequest(),
-    onBreakPointReached,
   );
+  bp.onBreakpoint(onBreakPointReached);
+  return em.addBreakpoint(bp);
 }
 
 export async function removeBreakpoint(
