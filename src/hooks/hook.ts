@@ -5,6 +5,7 @@ import {
   ScheduleOnce,
 } from './schedule';
 import { type LogicalClock } from './logicalclock';
+import { getGlobalLogger } from '../logger/logger';
 
 export enum HookKind {
   RemoteCall = '01',
@@ -75,6 +76,10 @@ export abstract class HookWithSubscription<SubscriptionType>
   }
 
   onSubscriptionData(value: SubscriptionType): void {
+    if (this.listeners.length === 0) {
+      const log = getGlobalLogger();
+      log.warn('There is no listener for subscription content');
+    }
     this.listeners.forEach((listener) => {
       if (!this.removedListeners.has(listener)) {
         listener(value);
