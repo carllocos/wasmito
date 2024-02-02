@@ -19,39 +19,11 @@ import {
 import { timeoutPromise } from '../../util/promise_util';
 import { BoardBaudRate } from '../../util/serial_port';
 import { type WARDuinoVM } from '../../warduino/vm/warduino_vm';
-import { Target, type Action } from './shared_interfaces';
-
-export interface PostSetupConfig {
-  pauseAfterSetup: boolean;
-  actions?: Array<Action<any>>;
-}
-
-export interface DeviceSetup {
-  name?: string;
-  program: string;
-  target: string; // must be a string from Target enum
-  id: string;
-
-  toolPort?: number; // in case we connect to an already spawned Dev vm
-
-  serialPort?: string;
-  baudrate?: number;
-  fqbn?: string;
-
-  postSetup: PostSetupConfig;
-}
-
-export interface LoggerConfig {
-  name: string;
-  level: string;
-}
-
-export interface SystemSetup {
-  setupName: string;
-  devices: DeviceSetup[];
-  rebootDevices?: boolean;
-  logger?: LoggerConfig;
-}
+import {
+  type DeviceSetup,
+  Target,
+  type SystemSetup,
+} from './shared_interfaces';
 
 export class SystemDeployer {
   private readonly setup;

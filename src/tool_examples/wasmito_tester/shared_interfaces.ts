@@ -76,3 +76,97 @@ export function isSubscriptionAction<
     (obj.ifFail === undefined || isTestFailure(obj.ifFail))
   );
 }
+
+export interface WhenSubscriptionCondition {
+  todo?: string;
+  subscriptionCheck?: (value: any) => Promise<boolean>;
+  ifFail?: TestFailure;
+}
+
+export interface ExpectDescription<SubscriptionType> {
+  description: string;
+  subscriptionID: string | number; // action number that generates subscription data
+  subscriptionCheck: (value: SubscriptionType) => Promise<boolean>;
+  ifFail?: TestFailure; // TODO change to ifFail?: (value: SubscriptionType) => string; where string is exception msg
+}
+
+export interface TestScenario {
+  skipTest?: boolean;
+  testName: string;
+  testForDeviceID: string;
+  whens?: WhenSubscriptionCondition[];
+  actions?: Array<Action<any> | SubscriptionAction<any, any, any>>;
+  expects?: Array<ExpectDescription<any>>;
+}
+
+export enum ActionRunState {
+  Failed = 'Failed',
+  Success = 'Success',
+  Cancelled = 'Cancelled',
+  TimedOut = 'Timedout',
+  Delayed = 'Delayed',
+}
+
+export interface ActionRunResult {
+  action: Action<any> | SubscriptionAction<any, any, any>;
+  result: ActionRunState;
+  failMsg?: string;
+  reasonFailure?: string;
+}
+
+export interface ExpectRunResult {
+  expect: ExpectDescription<any>;
+  result: ActionRunState;
+  failMsg?: string;
+  reasonFailure?: string;
+}
+
+export enum TestScenarioState {
+  Success = 'Success',
+  Failed = 'Failed',
+  Running = 'Running',
+}
+
+export interface TestScenarioResult {
+  scenario: TestScenario;
+  result: TestScenarioState;
+  actionRunResults: ActionRunResult[];
+  expectRunResults: ExpectRunResult[];
+}
+
+export interface SystemTest {
+  systemSetup: SystemSetup;
+  testScenarios: TestScenario[];
+}
+
+export interface PostSetupConfig {
+  pauseAfterSetup: boolean;
+  actions?: Array<Action<any>>;
+}
+
+export interface DeviceSetup {
+  name?: string;
+  program: string;
+  target: string; // must be a string from Target enum
+  id: string;
+
+  toolPort?: number; // in case we connect to an already spawned Dev vm
+
+  serialPort?: string;
+  baudrate?: number;
+  fqbn?: string;
+
+  postSetup: PostSetupConfig;
+}
+
+export interface LoggerConfig {
+  name: string;
+  level: string;
+}
+
+export interface SystemSetup {
+  setupName: string;
+  devices: DeviceSetup[];
+  rebootDevices?: boolean;
+  logger?: LoggerConfig;
+}

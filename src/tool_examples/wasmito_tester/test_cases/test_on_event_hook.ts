@@ -5,7 +5,6 @@ import {
   oneM5StickCMCU,
 } from '../reausable_system_setups';
 import { SystemTester, type TestScenario } from '../system_tester';
-import { type PostSetupConfig } from '../system_deployer';
 import {
   addBPAndRunUntil,
   mockPrimitiveFuncAction,
@@ -19,6 +18,7 @@ import { type WARDuinoVM } from '../../../warduino/vm/warduino_vm';
 import { StateRequest } from '../../../warduino/requests/inspect_request';
 import { InspectStateHook } from '../../../hooks/hook_inspect_state';
 import { WasmValuesBuilder } from '../../../state/wasm_value_array_builder';
+import { type PostSetupConfig } from '../shared_interfaces';
 
 /*
  * System Setup

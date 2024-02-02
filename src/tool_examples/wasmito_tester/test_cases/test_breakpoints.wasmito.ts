@@ -5,13 +5,13 @@ import {
   oneM5StickCMCU,
 } from '../reausable_system_setups';
 import { SystemTester, type TestScenario } from '../system_tester';
-import { type PostSetupConfig } from '../system_deployer';
 import {
   addBreakpointSubscription,
   mockPrimitiveFuncAction,
   runVMAction,
 } from '../reusable_actions';
 import { Breakpoint, BreakpointSingleStop } from '../../../debugger/breakpoint';
+import { type PostSetupConfig } from '../shared_interfaces';
 
 /*
  * System Setup
