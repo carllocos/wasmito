@@ -42,6 +42,7 @@ import {
 import { type Breakpoint } from '../../debugger';
 import { type Hook } from '../../hooks/hook';
 
+// TODO Rename to Backend
 export abstract class WARDuinoVM implements WARDuinoAPI {
   private _channel: Channel;
   protected abstract logger: winston.Logger;

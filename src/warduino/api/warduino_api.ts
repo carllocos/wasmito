@@ -61,6 +61,7 @@ export interface WARDuinoAPI {
     timeout?: number,
   ) => Promise<boolean>;
 
+  // TODO IO event
   addHookOnNewEvent: (hook: Hook, timeout?: number) => Promise<boolean>;
 
   addHookOnEventHandling: (hook: Hook, timeout?: number) => Promise<boolean>;
