@@ -31,6 +31,8 @@ export interface Action<ResultType> {
   doAction: (device: WARDuinoVM) => Promise<ResultType>;
   checkActionSuccess: (actionResult: ResultType) => Promise<boolean>;
   ifFail?: TestFailure;
+
+  delay?: number; // delay ms before run
 }
 
 export function isAction<ResultType>(obj: any): obj is Action<ResultType> {
@@ -39,6 +41,7 @@ export function isAction<ResultType>(obj: any): obj is Action<ResultType> {
     typeof obj.description === 'string' &&
     typeof obj.doAction === 'function' &&
     typeof obj.checkActionSuccess === 'function' &&
+    (obj.delay === undefined || typeof obj.delay === 'number') &&
     (obj.ifFail === undefined || isTestFailure(obj))
   );
 }
