@@ -1,8 +1,8 @@
 import {
-  type PostSetupConfig,
   type DeviceSetup,
+  type PostSetupConfig,
   type SystemSetup,
-} from './system_deployer';
+} from './shared_interfaces';
 
 export function oneM5StickCMCU(
   program: string,

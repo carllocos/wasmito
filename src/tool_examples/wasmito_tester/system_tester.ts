@@ -1,76 +1,21 @@
 import type winston from 'winston';
 import { TimeoutPromise, maybeTimeoutPromise } from '../../util/promise_util';
-import { type SystemSetup, SystemDeployer } from './system_deployer';
+import { SystemDeployer } from './system_deployer';
 import {
   type SubscriptionAction,
   type Action,
-  type TestFailure,
   isSubscriptionAction,
+  type TestScenario,
+  type TestScenarioResult,
+  ActionRunState,
+  type ActionRunResult,
+  type ExpectRunResult,
+  TestScenarioState,
+  type ExpectDescription,
+  type SystemSetup,
 } from './shared_interfaces';
 import { type WARDuinoVM } from '../../warduino';
 import { HookWithSubscription } from '../../hooks/hook';
-
-export interface WhenSubscriptionCondition {
-  todo?: string;
-  subscriptionCheck?: (value: any) => Promise<boolean>;
-  ifFail?: TestFailure;
-}
-
-export interface ExpectDescription<SubscriptionType> {
-  description: string;
-  subscriptionID: string | number; // action number that generates subscription data
-  subscriptionCheck: (value: SubscriptionType) => Promise<boolean>;
-  ifFail?: TestFailure; // TODO change to ifFail?: (value: SubscriptionType) => string; where string is exception msg
-}
-
-export interface TestScenario {
-  skipTest?: boolean;
-  testName: string;
-  testForDeviceID: string;
-  whens?: WhenSubscriptionCondition[];
-  actions?: Array<Action<any> | SubscriptionAction<any, any, any>>;
-  expects?: Array<ExpectDescription<any>>;
-}
-
-export enum ActionRunState {
-  Failed = 'Failed',
-  Success = 'Success',
-  Cancelled = 'Cancelled',
-  TimedOut = 'Timedout',
-  Delayed = 'Delayed',
-}
-
-export interface ActionRunResult {
-  action: Action<any> | SubscriptionAction<any, any, any>;
-  result: ActionRunState;
-  failMsg?: string;
-  reasonFailure?: string;
-}
-
-export interface ExpectRunResult {
-  expect: ExpectDescription<any>;
-  result: ActionRunState;
-  failMsg?: string;
-  reasonFailure?: string;
-}
-
-export enum TestScenarioState {
-  Success = 'Success',
-  Failed = 'Failed',
-  Running = 'Running',
-}
-
-export interface TestScenarioResult {
-  scenario: TestScenario;
-  result: TestScenarioState;
-  actionRunResults: ActionRunResult[];
-  expectRunResults: ExpectRunResult[];
-}
-
-export interface SystemTest {
-  systemSetup: SystemSetup;
-  testScenarios: TestScenario[];
-}
 
 export class SystemTester {
   private readonly systemDeployer: SystemDeployer;
@@ -631,3 +576,4 @@ export class SystemTester {
     this.logger.warn('Test if scenario has all required fields');
   }
 }
+export type { TestScenario };

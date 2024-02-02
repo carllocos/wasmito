@@ -5,7 +5,6 @@ import {
   oneM5StickCMCU,
 } from '../reausable_system_setups';
 import { SystemTester, type TestScenario } from '../system_tester';
-import { type PostSetupConfig } from '../system_deployer';
 import {
   addBPAndRunUntil,
   addBreakpointSubscription,
@@ -16,6 +15,7 @@ import {
 } from '../reusable_actions';
 import { EventRemoveHook } from '../../../hooks/hook_event';
 import { Breakpoint } from '../../../debugger';
+import { type PostSetupConfig } from '../shared_interfaces';
 
 /*
  * System Setup
