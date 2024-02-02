@@ -7,7 +7,10 @@ import { InspectStateHook } from '../hooks/hook_inspect_state';
 
 export class Breakpoint {
   public readonly sourceCodeLocation: SourceCodeLocation;
-  private _stateOnBreakpoint: StateRequest;
+  protected _stateOnBreakpoint: StateRequest;
+
+  private readonly pauseHook: PauseVMHook;
+  private readonly inspectHook: InspectStateHook;
 
   private readonly onBreakpointHanlders: Array<(state: WasmState) => void>;
   constructor(
@@ -18,22 +21,16 @@ export class Breakpoint {
     this._stateOnBreakpoint =
       stateOnBreakpoint ?? new StateRequest().includePC();
     this.onBreakpointHanlders = [];
+    this.pauseHook = new PauseVMHook();
+    this.inspectHook = this.prepareInspectHook();
   }
 
   get stateOnBreakpoint(): StateRequest {
     return this._stateOnBreakpoint;
   }
 
-  set stateOnBreakpoint(stateOfInterest: StateRequest) {
-    this._stateOnBreakpoint = stateOfInterest;
-  }
-
   get hooks(): Hook[] {
-    // defines the behaviour of the breakpoint once reached
-    const pause = new PauseVMHook();
-    const stateToInspect = new InspectStateHook(this._stateOnBreakpoint);
-    stateToInspect.subscribe(this.fanOutState.bind(this));
-    return [pause, stateToInspect];
+    return [this.pauseHook, this.inspectHook];
   }
 
   onBreakpoint(cb: (state: WasmState) => void): void {
@@ -63,9 +60,47 @@ export class Breakpoint {
     return s;
   }
 
-  private fanOutState(state: WasmState): void {
+  protected fanOutState(state: WasmState): void {
     this.onBreakpointHanlders.forEach((h) => {
       h(state);
     });
+  }
+
+  private prepareInspectHook(): InspectStateHook {
+    // defines the behaviour of the breakpoint once reached
+    const hook = new InspectStateHook(this._stateOnBreakpoint);
+    hook.subscribe(this.fanOutState.bind(this));
+    return hook;
+  }
+}
+
+export class BreakpointSingleStop extends Breakpoint {
+  private readonly stateToInspectHook: InspectStateHook;
+  constructor(location: SourceCodeLocation) {
+    super(location);
+    this._stateOnBreakpoint.includeAll();
+    this.stateToInspectHook = this.createStateToInspectHook();
+  }
+
+  get stateOnBreakpoint(): StateRequest {
+    const req = new StateRequest();
+    req.includeAll();
+    return req;
+  }
+
+  // set stateOnBreakpoint(stateOfInterest: StateRequest) {
+  //   throw new Error('cannot modify the state');
+  // }
+
+  get hooks(): Hook[] {
+    // once bp reached make sure to leave the running state as is
+    return [this.stateToInspectHook];
+  }
+
+  private createStateToInspectHook(): InspectStateHook {
+    const hook = new InspectStateHook(this._stateOnBreakpoint);
+    hook.scheduleOnce();
+    hook.subscribe(this.fanOutState.bind(this));
+    return hook;
   }
 }
