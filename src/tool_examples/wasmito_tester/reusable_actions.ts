@@ -23,19 +23,18 @@ import { Breakpoint } from '../../debugger/breakpoint';
 
 export function addBreakpointSubscription(
   subscriptionID: string,
-  linenr: number,
+  breakpoint: Breakpoint,
   timeout: number,
 ): SubscriptionAction<boolean, WasmState, InspectStateHook> {
   const act: SubscriptionAction<boolean, WasmState, InspectStateHook> = {
     subscriptionID,
-    description: `add a bp at linenr ${linenr} and give Context once reached`,
+    description: `add a breakpoint ${breakpoint.toString()} and give Context once reached`,
     doAction: async (
       device: WARDuinoVM,
     ): Promise<SubActReturn<boolean, WasmState, InspectStateHook>> => {
-      const bp = new Breakpoint({ linenr });
       const hook = new InspectStateHook(new StateRequest().includePC());
-      bp.onBreakpoint(hook.onSubscriptionData.bind(hook));
-      const added = await device.addBreakpoint(bp);
+      breakpoint.onBreakpoint(hook.onSubscriptionData.bind(hook));
+      const added = await device.addBreakpoint(breakpoint);
       return [added, hook];
     },
     checkActionSuccess: async (bpAdded: boolean): Promise<boolean> => {
@@ -43,7 +42,7 @@ export function addBreakpointSubscription(
     },
     ifFail: {
       timeout,
-      message: `Failed to add bp at line ${linenr}`,
+      message: `Failed to add bp ${breakpoint.toString()}`,
     },
   };
   return act;
@@ -184,8 +183,11 @@ export function onHandledEventAction(
   return ac;
 }
 
-export function runVMAction(timeout: number): Action<boolean> {
-  const act = {
+export function runVMAction(
+  timeout: number,
+  delayTime?: number,
+): Action<boolean> {
+  const act: Action<boolean> = {
     description: 'Run VM',
 
     doAction: async (device: WARDuinoVM): Promise<boolean> => {
@@ -200,6 +202,10 @@ export function runVMAction(timeout: number): Action<boolean> {
       timeout,
     },
   };
+
+  if (delayTime !== undefined) {
+    act.delay = delayTime;
+  }
   return act;
 }
 
