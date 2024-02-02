@@ -15,6 +15,7 @@ import {
   runVMAction,
 } from '../reusable_actions';
 import { EventRemoveHook } from '../../../hooks/hook_event';
+import { Breakpoint } from '../../../debugger';
 
 /*
  * System Setup
@@ -57,7 +58,11 @@ const testHookOnMCUScenario: TestScenario = {
   testForDeviceID: m5stickcMCU.id,
   actions: [
     onHandledEventSubscription('Event handled', 3000),
-    addBreakpointSubscription('breakpoint line 28', 28, 10000),
+    addBreakpointSubscription(
+      'breakpoint line 28',
+      new Breakpoint({ linenr: 28 }),
+      10000,
+    ),
     runVMAction(3000),
   ],
   expects: [
@@ -95,7 +100,11 @@ const testHookOnMCUScenario2: TestScenario = {
   actions: [
     onHandledEventSubscription('Event handling hook', 3000),
     onHandledEventAction(new EventRemoveHook(), 3000),
-    addBreakpointSubscription('breakpoint line 28', 28, 10000),
+    addBreakpointSubscription(
+      'breakpoint line 28',
+      new Breakpoint({ linenr: 28 }),
+      10000,
+    ),
     runVMAction(3000),
   ],
   expects: [
