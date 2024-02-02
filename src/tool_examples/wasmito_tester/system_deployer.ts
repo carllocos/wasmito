@@ -16,16 +16,10 @@ import {
   createLogger,
   getLogLevelFromString,
 } from '../../logger/logger';
-import { type SourceCodeLocation } from '../../source_mappers';
 import { timeoutPromise } from '../../util/promise_util';
 import { BoardBaudRate } from '../../util/serial_port';
 import { type WARDuinoVM } from '../../warduino/vm/warduino_vm';
-import { Target, type Action, type TestFailure } from './shared_interfaces';
-
-export interface RunUntilLocation {
-  sourceCodeLocation: SourceCodeLocation;
-  failWith?: TestFailure;
-}
+import { Target, type Action } from './shared_interfaces';
 
 export interface PostSetupConfig {
   pauseAfterSetup: boolean;
