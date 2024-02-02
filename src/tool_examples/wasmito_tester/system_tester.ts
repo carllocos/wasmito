@@ -37,6 +37,7 @@ export enum ActionRunState {
   Success = 'Success',
   Cancelled = 'Cancelled',
   TimedOut = 'Timedout',
+  Delayed = 'Delayed',
 }
 
 export interface ActionRunResult {
@@ -131,12 +132,13 @@ export class SystemTester {
   private reportScenarios(testScenarios: TestScenarioResult[]): void {
     for (let i = 0; i < testScenarios.length; i++) {
       const result = testScenarios[i];
-      const nameLength = result.scenario.testName.length;
-      const separator = '='.repeat(nameLength);
+      const testNameTitle = `${
+        result.scenario.testName
+      } [${result.result.toUpperCase()}]`;
+      const titleLength = testNameTitle.length;
+      const separator = '='.repeat(titleLength);
       console.log(separator);
-      console.log(
-        `${result.scenario.testName} [${result.result.toUpperCase()}]`,
-      );
+      console.log(testNameTitle);
       console.log(separator);
       console.log();
       for (let j = 0; j < result.actionRunResults.length; j++) {
@@ -144,7 +146,10 @@ export class SystemTester {
         console.log(
           `Action ${j} - ${actionResult.action.description} [${actionResult.result}]`,
         );
-        if (actionResult.result !== ActionRunState.Success) {
+        if (
+          actionResult.result !== ActionRunState.Success &&
+          actionResult.result !== ActionRunState.Delayed
+        ) {
           console.log(`\t ${actionResult.failMsg}`);
           console.log(`\t ${actionResult.reasonFailure}`);
           console.log();
@@ -200,6 +205,19 @@ export class SystemTester {
     for (let i = 0; i < actions.length; i++) {
       const actionRunResult = actionRunResults[i];
       const action = actions[i];
+      const isSubscription = isSubscriptionAction(action);
+      if (!isSubscription) {
+        const isDelayed = this.delayAction(
+          scenario,
+          action,
+          actionRunResult,
+          i,
+          vm,
+        );
+        if (isDelayed) {
+          continue;
+        }
+      }
       const [successful, hook] = await this.runAction(
         vm,
         action,
@@ -207,17 +225,11 @@ export class SystemTester {
         i,
       );
       if (!successful) {
-        this.logger.error(
-          `TestScenario '${scenario.testName}': Action #${i} failed with msg '${actionRunResult.failMsg}' and reason '${actionRunResult.reasonFailure}' `,
-        );
-        testResult.result = TestScenarioState.Failed;
-        return testResult;
+        actionRunResult.result = ActionRunState.Failed;
       } else {
-        this.logger.info(
-          `TestScenario '${scenario.testName}': Action #${i} succeeded`,
-        );
         actionRunResult.result = ActionRunState.Success;
       }
+      this.logActionSuccess(successful, scenario.testName, i, actionRunResult);
       if (isSubscriptionAction(action)) {
         if (hook === undefined) {
           throw new Error(
@@ -255,6 +267,23 @@ export class SystemTester {
     }
 
     return testResult;
+  }
+
+  private logActionSuccess(
+    successful: boolean,
+    scenarioName: string,
+    actionIndex: number,
+    actionRunResult: ActionRunResult,
+  ): void {
+    if (!successful) {
+      this.logger.error(
+        `TestScenario '${scenarioName}': Action #${actionIndex} failed with msg '${actionRunResult.failMsg}' and reason '${actionRunResult.reasonFailure}' `,
+      );
+    } else {
+      this.logger.info(
+        `TestScenario '${scenarioName}': Action #${actionIndex} succeeded`,
+      );
+    }
   }
 
   private async runAction(
@@ -308,6 +337,91 @@ export class SystemTester {
       );
       return [false, undefined];
     }
+  }
+
+  private delayAction<T>(
+    scenario: TestScenario,
+    action: Action<T>,
+    actionRunResult: ActionRunResult,
+    actionIndex: number,
+    vm: WARDuinoVM,
+  ): boolean {
+    const isDelayed = action.delay !== undefined;
+    actionRunResult.result = ActionRunState.Delayed;
+    setTimeout(() => {
+      this.runDelayedAction(scenario, action, actionRunResult, actionIndex, vm);
+    }, action.delay);
+
+    if (isDelayed) {
+      this.logger.info(
+        `TestScenario '${scenario.testName}': Action #${actionIndex} delayed for #${action.delay} ms`,
+      );
+    }
+    return isDelayed;
+  }
+
+  private runDelayedAction<T>(
+    scenario: TestScenario,
+    action: Action<T>,
+    actionRunResult: ActionRunResult,
+    actionIndex: number,
+    vm: WARDuinoVM,
+  ): void {
+    let successFul = false;
+    let errorOccurred = false;
+    const p = new Promise<boolean>((resolve, reject) => {
+      action
+        .doAction(vm)
+        .then((v) => {
+          action.checkActionSuccess(v).then(resolve).catch(reject);
+        })
+        .catch(reject);
+    });
+
+    maybeTimeoutPromise(p, action.ifFail?.timeout)
+      .then((successCheck) => {
+        if (!successCheck) {
+          this.fillRunActionResult(
+            action,
+            actionRunResult,
+            `action with index #${actionIndex} failed`,
+            `'checkActionSuccess' failed`,
+          );
+        }
+        successFul = successCheck;
+      })
+      .catch((err) => {
+        errorOccurred = true;
+        this.fillRunActionResult(
+          action,
+          actionRunResult,
+          `action with index #${actionIndex} failed`,
+          `exception caused by `,
+          err,
+        );
+      })
+      .finally(() => {
+        if (!errorOccurred) {
+          if (successFul) {
+            actionRunResult.result = ActionRunState.Success;
+          } else {
+            actionRunResult.result = ActionRunState.Failed;
+          }
+          this.logActionSuccess(
+            successFul,
+            scenario.testName,
+            actionIndex,
+            actionRunResult,
+          );
+        } else {
+          this.logActionSuccess(
+            false,
+            scenario.testName,
+            actionIndex,
+            actionRunResult,
+          );
+        }
+      });
   }
 
   private async createSubscriptionForExpect<T>(
