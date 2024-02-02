@@ -17,10 +17,8 @@ import {
   getLogLevelFromString,
 } from '../../logger/logger';
 import { type SourceCodeLocation } from '../../source_mappers';
-import { type WasmState } from '../../state/wasm';
 import { timeoutPromise } from '../../util/promise_util';
 import { BoardBaudRate } from '../../util/serial_port';
-import { StateRequest } from '../../warduino/requests/inspect_request';
 import { type WARDuinoVM } from '../../warduino/vm/warduino_vm';
 import { Target, type Action, type TestFailure } from './shared_interfaces';
 
