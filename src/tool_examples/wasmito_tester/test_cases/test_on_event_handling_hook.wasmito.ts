@@ -65,29 +65,25 @@ const testHookOnMCUScenario: TestScenario = {
     ),
     runVMAction(3000),
   ],
-  expects: [
+  expect: [
     {
-      subscriptionID: 'Event handled',
+      subscribeToID: 'Event handled',
       description: 'wait max 10000ms for a new event to occurr',
-      subscriptionCheck: async (ev: WASM.Event): Promise<boolean> => {
+      checkSubscription: async (ev: WASM.Event): Promise<boolean> => {
         return ev.topic === 'interrupt_37';
       },
-      ifFail: {
-        message: 'Did not receive event in expected time',
-        timeout: 10000,
-      },
+      ifFail: 'Did not receive event in expected time',
+      timeout: 10000,
     },
     {
-      subscriptionID: 'breakpoint line 28',
+      subscribeToID: 'breakpoint line 28',
       description:
         'wait max 10000ms breakpoint to be reached after handling event',
-      subscriptionCheck: async (state: WasmState): Promise<boolean> => {
+      checkSubscription: async (state: WasmState): Promise<boolean> => {
         return true;
       },
-      ifFail: {
-        message: 'Did not reach bp at line 28',
-        timeout: 10000,
-      },
+      ifFail: 'Did not reach bp at line 28',
+      timeout: 10000,
     },
   ],
 };
@@ -107,28 +103,25 @@ const testHookOnMCUScenario2: TestScenario = {
     ),
     runVMAction(3000),
   ],
-  expects: [
+  expect: [
     {
-      subscriptionID: 'Event handling hook',
+      subscribeToID: 'Event handling hook',
       description: 'wait max 10000ms for a new event to occurr',
-      subscriptionCheck: async (ev: WASM.Event): Promise<boolean> => {
+      checkSubscription: async (ev: WASM.Event): Promise<boolean> => {
         return ev.topic === 'interrupt_37';
       },
-      ifFail: {
-        message: 'Did not receive event in expected time',
-        timeout: 10000,
-      },
+      ifFail: 'Did not receive event in expected time',
+      timeout: 10000,
     },
     {
-      subscriptionID: 'breakpoint line 28',
       description:
         'wait max 10000ms breakpoint to be reached after handling event',
-      subscriptionCheck: async (state: WasmState): Promise<boolean> => {
+      ifFail: 'Did not reach bp at line 28',
+      timeout: 10000,
+
+      subscribeToID: 'breakpoint line 28',
+      checkSubscription: async (state: WasmState): Promise<boolean> => {
         return true;
-      },
-      ifFail: {
-        message: 'Did not reach bp at line 28',
-        timeout: 10000,
       },
     },
   ],
@@ -143,17 +136,15 @@ const testHookOnDevScenario: TestScenario = {
     onHandledEventSubscription('Event handled', 3000),
     runVMAction(3000),
   ],
-  expects: [
+  expect: [
     {
-      subscriptionID: 'Event handled',
+      subscribeToID: 'Event handled',
       description: 'wait max 10000ms for a new event to occurr',
-      subscriptionCheck: async (ev: WASM.Event): Promise<boolean> => {
+      checkSubscription: async (ev: WASM.Event): Promise<boolean> => {
         return true;
       },
-      ifFail: {
-        message: 'Did not receive event in expected time',
-        timeout: 10000,
-      },
+      ifFail: 'Did not receive event in expected time',
+      timeout: 10000,
     },
   ],
 };

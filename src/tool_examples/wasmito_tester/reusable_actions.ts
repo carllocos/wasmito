@@ -16,7 +16,7 @@ import { UpdateCallbackMappingRequest } from '../../warduino/requests/update_cal
 import { type WARDuinoVM } from '../../warduino/vm/warduino_vm';
 import {
   type Action,
-  type SubscriptionAction,
+  type SubscriptionEmitterAction,
   type SubActReturn,
 } from './shared_interfaces';
 import { Breakpoint } from '../../debugger/breakpoint';
@@ -25,11 +25,12 @@ export function addBreakpointSubscription(
   subscriptionID: string,
   breakpoint: Breakpoint,
   timeout: number,
-): SubscriptionAction<boolean, WasmState, InspectStateHook> {
-  const act: SubscriptionAction<boolean, WasmState, InspectStateHook> = {
+): SubscriptionEmitterAction<boolean, WasmState, InspectStateHook> {
+  const act: SubscriptionEmitterAction<boolean, WasmState, InspectStateHook> = {
     subscriptionID,
+    timeout,
     description: `add a breakpoint ${breakpoint.toString()} and give Context once reached`,
-    doAction: async (
+    setupSubscription: async (
       device: WARDuinoVM,
     ): Promise<SubActReturn<boolean, WasmState, InspectStateHook>> => {
       const hook = new InspectStateHook(new StateRequest().includePC());
@@ -37,16 +38,14 @@ export function addBreakpointSubscription(
       const added = await device.addBreakpoint(breakpoint);
       return [added, hook];
     },
-    checkActionSuccess: async (bpAdded: boolean): Promise<boolean> => {
+    checkSetupSuccess: async (bpAdded: boolean): Promise<boolean> => {
       return bpAdded;
     },
-    ifFail: {
-      timeout,
-      message: `Failed to add bp ${breakpoint.toString()}`,
-    },
+    ifFail: `Failed to add bp ${breakpoint.toString()}`,
   };
   return act;
 }
+
 export function addBPAndRunUntil(
   linenr: number,
   timeout: number,
@@ -84,16 +83,15 @@ export function addBPAndRunUntil(
     checkActionSuccess: async (bpAdded: boolean): Promise<boolean> => {
       return bpAdded;
     },
-    ifFail: {
-      timeout,
-      message: `Failed to add and run until bp at line ${linenr}`,
-    },
+    timeout,
+    ifFail: `Failed to add and run until bp at line ${linenr}`,
   };
   return act;
 }
 
 export function removeBPAt(linenr: number, timeout: number): Action<boolean> {
   const act: Action<boolean> = {
+    timeout,
     description: `remove breakpoint at line ${linenr}`,
     doAction: async (device: WARDuinoVM): Promise<boolean> => {
       const bp = new Breakpoint({ linenr });
@@ -102,10 +100,7 @@ export function removeBPAt(linenr: number, timeout: number): Action<boolean> {
     checkActionSuccess: async (v: boolean): Promise<boolean> => {
       return v;
     },
-    ifFail: {
-      timeout,
-      message: `Failed to remove bp at line ${linenr}`,
-    },
+    ifFail: `Failed to remove bp at line ${linenr}`,
   };
   return act;
 }
@@ -113,11 +108,11 @@ export function removeBPAt(linenr: number, timeout: number): Action<boolean> {
 export function onNewEventAction(
   subscriptionId: string,
   timeout: number,
-): SubscriptionAction<boolean, WASM.Event, EventInspectHook> {
-  const ac = {
+): SubscriptionEmitterAction<boolean, WASM.Event, EventInspectHook> {
+  const ac: SubscriptionEmitterAction<boolean, WASM.Event, EventInspectHook> = {
     subscriptionID: subscriptionId,
     description: 'Hook into new events',
-    doAction: async (
+    setupSubscription: async (
       device: WARDuinoVM,
     ): Promise<SubActReturn<boolean, WASM.Event, EventInspectHook>> => {
       const hook: HookWithSubscription<WASM.Event> = new EventInspectHook();
@@ -125,13 +120,11 @@ export function onNewEventAction(
       return [added, hook];
     },
 
-    checkActionSuccess: async (hookAdded: boolean) => {
+    checkSetupSuccess: async (hookAdded: boolean) => {
       return hookAdded;
     },
-    ifFail: {
-      message: 'Failed to add hook upon event',
-      timeout,
-    },
+    ifFail: 'Failed to add hook upon event',
+    timeout,
   };
   return ac;
 }
@@ -139,11 +132,11 @@ export function onNewEventAction(
 export function onHandledEventSubscription(
   subscriptionId: string,
   timeout: number,
-): SubscriptionAction<boolean, WASM.Event, EventInspectHook> {
-  const ac = {
+): SubscriptionEmitterAction<boolean, WASM.Event, EventInspectHook> {
+  const ac: SubscriptionEmitterAction<boolean, WASM.Event, EventInspectHook> = {
     subscriptionID: subscriptionId,
     description: 'Hook into handled events',
-    doAction: async (
+    setupSubscription: async (
       device: WARDuinoVM,
     ): Promise<SubActReturn<boolean, WASM.Event, EventInspectHook>> => {
       const hook: HookWithSubscription<WASM.Event> = new EventInspectHook();
@@ -151,13 +144,11 @@ export function onHandledEventSubscription(
       return [added, hook];
     },
 
-    checkActionSuccess: async (hookAdded: boolean) => {
+    checkSetupSuccess: async (hookAdded: boolean) => {
       return hookAdded;
     },
-    ifFail: {
-      message: 'Failed to add hook on handled events',
-      timeout,
-    },
+    ifFail: 'Failed to add hook on handled events',
+    timeout,
   };
   return ac;
 }
@@ -175,10 +166,8 @@ export function onHandledEventAction(
     checkActionSuccess: async (hookAdded: boolean) => {
       return hookAdded;
     },
-    ifFail: {
-      message: 'Failed to add hook that applies on handled events',
-      timeout,
-    },
+    ifFail: 'Failed to add hook that applies on handled events',
+    timeout,
   };
   return ac;
 }
@@ -197,10 +186,8 @@ export function runVMAction(
     checkActionSuccess: async (running: boolean): Promise<boolean> => {
       return running;
     },
-    ifFail: {
-      message: 'Failed to run device',
-      timeout,
-    },
+    ifFail: 'Failed to run device',
+    timeout,
   };
 
   if (delayTime !== undefined) {
@@ -232,10 +219,8 @@ export function mockPrimitiveFuncAction(
     ): Promise<boolean> => {
       return successfullResponse;
     },
-    ifFail: {
-      message: `failed to mock primitive function ${funcid}`,
-      timeout,
-    },
+    ifFail: `failed to mock primitive function ${funcid}`,
+    timeout,
   };
 
   return act;
@@ -257,10 +242,8 @@ export function addEventAction(
     ): Promise<boolean> => {
       return successfullResponse;
     },
-    ifFail: {
-      message: `failed to add event to device`,
-      timeout,
-    },
+    ifFail: `failed to add event to device`,
+    timeout,
   };
   return act;
 }
@@ -280,10 +263,8 @@ export function updateMappingsAction(
     ): Promise<boolean> => {
       return successfullResponse;
     },
-    ifFail: {
-      message: `failed to update callbacks mapping`,
-      timeout,
-    },
+    ifFail: `failed to update callbacks mapping`,
+    timeout,
   };
 
   return act;
@@ -301,10 +282,8 @@ export function stepAction(timeout: number): Action<boolean> {
     ): Promise<boolean> => {
       return successfullResponse;
     },
-    ifFail: {
-      message: `failed to step in VM within the ${timeout} time`,
-      timeout,
-    },
+    ifFail: `failed to step in VM within the ${timeout} time`,
+    timeout,
   };
 
   return act;
@@ -328,10 +307,8 @@ export function proxyCallAction(
     ): Promise<boolean> => {
       return response !== undefined;
     },
-    ifFail: {
-      message: `ProxyCall failed within the ${timeout} time`,
-      timeout,
-    },
+    ifFail: `ProxyCall failed within the ${timeout} time`,
+    timeout,
   };
 
   return act;

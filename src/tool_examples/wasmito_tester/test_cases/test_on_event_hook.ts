@@ -66,17 +66,15 @@ const testHookOnMCUScenario: TestScenario = {
     'Test if event is received after adding event hooks and manually pressing on button',
   testForDeviceID: m5stickcMCU.id,
   actions: [onNewEventAction('OnNewEventHook', 3000), runVMAction(3000)],
-  expects: [
+  expect: [
     {
-      subscriptionID: 'OnNewEventHook',
+      subscribeToID: 'OnNewEventHook',
       description: 'wait max 10000ms for a new event to occurr',
-      subscriptionCheck: async (ev: WASM.Event): Promise<boolean> => {
+      checkSubscription: async (ev: WASM.Event): Promise<boolean> => {
         return true;
       },
-      ifFail: {
-        message: 'Did not receive event in expected time',
-        timeout: 10000,
-      },
+      ifFail: 'Did not receive event in expected time',
+      timeout: 10000,
     },
   ],
 };
@@ -86,17 +84,15 @@ const testHookOnDevScenario: TestScenario = {
   testName: 'Test if event is received after adding event hooks on Dev VM',
   testForDeviceID: m5stickDev.id,
   actions: [onNewEventAction('OnNewEventHook', 3000), runVMAction(3000)],
-  expects: [
+  expect: [
     {
-      subscriptionID: 'OnNewEventHook',
+      subscribeToID: 'OnNewEventHook',
       description: 'Wait max 10000ms for a new event to occur on VM',
-      subscriptionCheck: async (ev: WASM.Event): Promise<boolean> => {
+      checkSubscription: async (ev: WASM.Event): Promise<boolean> => {
         return true;
       },
-      ifFail: {
-        message: 'Did not receive event in expected time',
-        timeout: 10000,
-      },
+      ifFail: 'Did not receive event in expected time',
+      timeout: 10000,
     },
   ],
 };
@@ -119,10 +115,8 @@ const testHookOnDevScenario2: TestScenario = {
       checkActionSuccess: async (added: boolean): Promise<boolean> => {
         return added;
       },
-      ifFail: {
-        message: 'Failed to add callbackmapping hook on new event',
-        timeout: 3000,
-      },
+      ifFail: 'Failed to add callbackmapping hook on new event',
+      timeout: 3000,
     },
   ],
 };
@@ -145,10 +139,8 @@ const testAddEvent: TestScenario = {
       checkActionSuccess: async (v: boolean): Promise<boolean> => {
         return v;
       },
-      ifFail: {
-        message: 'could not get callback mappings',
-        timeout: 3000,
-      },
+      ifFail: 'could not get callback mappings',
+      timeout: 3000,
     },
     // addEventAction('interrupt_1', '', 3000),
     // addEventAction('interrupt_1', '', 3000),

@@ -2,32 +2,33 @@ import type winston from 'winston';
 import { TimeoutPromise, maybeTimeoutPromise } from '../../util/promise_util';
 import { SystemDeployer } from './system_deployer';
 import {
-  type SubscriptionAction,
+  type SubscriptionEmitterAction,
   type Action,
-  isSubscriptionAction,
+  isSubscriptionEmitterAction,
   type TestScenario,
   type TestScenarioResult,
   ActionRunState,
   type ActionRunResult,
-  type ExpectRunResult,
   TestScenarioState,
-  type ExpectDescription,
   type SystemSetup,
+  type Act,
+  isDelayedAction,
+  isAction,
+  isActionThatSubscribesTo,
+  type SubscribeAction,
 } from './shared_interfaces';
 import { type WARDuinoVM } from '../../warduino';
 import { HookWithSubscription } from '../../hooks/hook';
 
 export class SystemTester {
   private readonly systemDeployer: SystemDeployer;
-  private readonly testScenarios: TestScenario[];
+  private readonly testScenarios: Array<[TestScenario, TestScenarioResult]>;
   private readonly deviceTestsMap: Map<string, TestScenario[]>;
-  private readonly scenariosRunResults: TestScenarioResult[];
 
   constructor(setup: SystemSetup) {
     this.systemDeployer = new SystemDeployer(setup);
     this.testScenarios = [];
     this.deviceTestsMap = new Map();
-    this.scenariosRunResults = [];
   }
 
   get logger(): winston.Logger {
@@ -41,14 +42,44 @@ export class SystemTester {
     this.assertNotEmptyScenario(scenario);
     this.assertValidScenarioFields(scenario);
     this.assertDeviceIDExists(scenario);
-    this.assertValidSubscriptionIDs(scenario);
+    this.assertUniqueSubscriptionIDs(scenario);
+    this.assertSubscriptionOnlyToExistingID(scenario);
     this.assertSubscriptionActionsAllHaveSubscribers(scenario);
 
-    this.testScenarios.push(scenario);
     const deviceTests = this.deviceTestsMap.get(scenario.testForDeviceID) ?? [];
     deviceTests.push(scenario);
     this.deviceTestsMap.set(scenario.testForDeviceID, deviceTests);
-    // TODO generate testrunREsutls files
+
+    this.testScenarios.push([
+      scenario,
+      this.createTestScenarioResult(scenario),
+    ]);
+  }
+
+  private createTestScenarioResult(scenario: TestScenario): TestScenarioResult {
+    const actionRunResults: ActionRunResult[] =
+      scenario.actions?.map((action) => {
+        return {
+          action,
+          result: ActionRunState.Cancelled,
+        };
+      }) ?? [];
+
+    const expectRunResults: ActionRunResult[] =
+      scenario.expect?.map((expect) => {
+        return {
+          action: expect,
+          result: ActionRunState.Cancelled,
+        };
+      }) ?? [];
+    const testResult: TestScenarioResult = {
+      scenario,
+      result: TestScenarioState.Running,
+      actionRunResults,
+      expectRunResults,
+    };
+
+    return testResult;
   }
 
   async runTests(): Promise<void> {
@@ -67,11 +98,15 @@ export class SystemTester {
     }
 
     for (let i = 0; i < this.testScenarios.length; i++) {
-      const scenario = this.testScenarios[i];
-      this.scenariosRunResults.push(await this.runTestScenario(scenario));
+      const [scenario, scenarioResult] = this.testScenarios[i];
+      await this.runTestScenario(scenario, scenarioResult);
     }
 
-    this.reportScenarios(this.scenariosRunResults);
+    this.reportScenarios(
+      this.testScenarios.map((v) => {
+        return v[1];
+      }),
+    );
   }
 
   private reportScenarios(testScenarios: TestScenarioResult[]): void {
@@ -104,7 +139,7 @@ export class SystemTester {
       for (let y = 0; y < result.expectRunResults.length; y++) {
         const expectResult = result.expectRunResults[y];
         console.log(
-          `Expect ${y} - ${expectResult.expect.description} [${expectResult.result}]`,
+          `Expect ${y} - ${expectResult.action.description} [${expectResult.result}]`,
         );
         if (expectResult.result !== ActionRunState.Success) {
           console.log(`\t ${expectResult.failMsg}`);
@@ -117,101 +152,135 @@ export class SystemTester {
 
   private async runTestScenario(
     scenario: TestScenario,
-  ): Promise<TestScenarioResult> {
+    scenarioResult: TestScenarioResult,
+  ): Promise<void> {
     this.assertVMOfDeviceIDExists(scenario);
-    // TODO move the creation of results objects to addScenario
-    const actionRunResults: ActionRunResult[] =
-      scenario.actions?.map((action) => {
-        return {
-          action,
-          result: ActionRunState.Cancelled,
-        };
-      }) ?? [];
-
-    const expectRunResults: ExpectRunResult[] =
-      scenario.expects?.map((expect) => {
-        return {
-          expect,
-          result: ActionRunState.Cancelled,
-        };
-      }) ?? [];
-    const testResult: TestScenarioResult = {
-      scenario,
-      result: TestScenarioState.Running,
-      actionRunResults,
-      expectRunResults,
-    };
-
     const vm = this.systemDeployer.deviceVM(scenario.testForDeviceID);
-
     const actionHooksMap = new Map<string, HookWithSubscription<any>>();
-    const actionHooksMapNr = new Map<number, HookWithSubscription<any>>();
-    const actions = scenario.actions ?? [];
+
+    const doExpects = await this.runActions(
+      vm,
+      scenario.testName,
+      scenario.actions ?? [],
+      scenarioResult.actionRunResults,
+      actionHooksMap,
+    );
+
+    if (!doExpects) {
+      return;
+    }
+
+    await this.runExpects(
+      vm,
+      scenario.testName,
+      scenario.expect ?? [],
+      scenarioResult.expectRunResults,
+      actionHooksMap,
+    );
+  }
+
+  private async runActions(
+    vm: WARDuinoVM,
+    scenarioName: string,
+    actions: Array<Act<any, any, any>>,
+    actionRunResults: ActionRunResult[],
+    hookMap: Map<string, HookWithSubscription<any>>,
+  ): Promise<boolean> {
     for (let i = 0; i < actions.length; i++) {
       const actionRunResult = actionRunResults[i];
       const action = actions[i];
-      const isSubscription = isSubscriptionAction(action);
-      if (!isSubscription) {
-        const isDelayed = this.delayAction(
-          scenario,
+      if (isDelayedAction(action)) {
+        actionRunResult.result = ActionRunState.Delayed;
+        this.delayAction(scenarioName, action, actionRunResult, i, vm);
+        continue;
+      }
+
+      try {
+        let success = false;
+        if (isSubscriptionEmitterAction(action)) {
+          success = await this.runActionToEmitSubscriptionValues(
+            vm,
+            action,
+            i,
+            hookMap,
+          );
+        } else if (isActionThatSubscribesTo(action)) {
+          success = await this.runActionThatSubscribesTo(
+            action,
+            actionRunResult,
+            i,
+            hookMap,
+          );
+        } else if (isAction(action)) {
+          success = await this.runAction(vm, action);
+        } else {
+          throw new Error(`Invalid type action`);
+        }
+
+        if (success) {
+          actionRunResult.result = ActionRunState.Success;
+        } else {
+          this.fillRunActionResult(
+            action,
+            actionRunResult,
+            `action with index #${i} failed`,
+            `'checkActionSuccess' failed`,
+          );
+          return false;
+        }
+      } catch (e) {
+        this.fillRunActionResult(
           action,
           actionRunResult,
-          i,
-          vm,
+          `action with index #${i} failed`,
+          `exception caused by `,
+          e,
         );
-        if (isDelayed) {
-          continue;
-        }
-      }
-      const [successful, hook] = await this.runAction(
-        vm,
-        action,
-        actionRunResult,
-        i,
-      );
-      if (!successful) {
-        actionRunResult.result = ActionRunState.Failed;
-      } else {
-        actionRunResult.result = ActionRunState.Success;
-      }
-      this.logActionSuccess(successful, scenario.testName, i, actionRunResult);
-      if (isSubscriptionAction(action)) {
-        if (hook === undefined) {
-          throw new Error(
-            'a subscription action is expected to produce a hook',
-          );
-        }
-        actionHooksMap.set(action.subscriptionID, hook);
-        actionHooksMapNr.set(i, hook);
+        return false;
       }
     }
+    return true;
+  }
 
-    const expects = scenario.expects ?? [];
-    for (let i = 0; i < expects.length; i++) {
-      const expect = expects[i];
-      const hook =
-        typeof expect.subscriptionID === 'number'
-          ? actionHooksMapNr.get(expect.subscriptionID)
-          : actionHooksMap.get(expect.subscriptionID);
-      if (hook === undefined) {
-        throw new Error(
-          `Hook cannot be undefined for subscription ID ${expect.subscriptionID}`,
-        );
-      }
-      const succeeded = await this.createSubscriptionForExpect(
-        expect,
-        hook,
-        expectRunResults[i],
-        i,
-      );
-      if (succeeded) {
-        expectRunResults[i].result = ActionRunState.Success;
-      } else {
-        break;
-      }
+  // TODO fix generic types
+  private async runActionToEmitSubscriptionValues<
+    R,
+    H,
+    S extends HookWithSubscription<H>,
+  >(
+    vm: WARDuinoVM,
+    action: SubscriptionEmitterAction<R, H, S>,
+    actionIndex: number,
+    hookMap: Map<string, HookWithSubscription<any>>,
+  ): Promise<boolean> {
+    const result = await maybeTimeoutPromise(
+      action.setupSubscription(vm),
+      action.timeout,
+    );
+    this.assertValidSubscriptionActionReturnType(actionIndex, result);
+    const valueForCheck = result[0];
+    const successfulCheck = await action.checkSetupSuccess(valueForCheck);
+    if (successfulCheck) {
+      const hook = result[1];
+      hookMap.set(action.subscriptionID, hook);
     }
+    return successfulCheck;
+  }
 
-    return testResult;
+  private async runExpects(
+    vm: WARDuinoVM,
+    scenarioName: string,
+    expects: Array<Act<any, any, any>>,
+    expectsResults: ActionRunResult[],
+    hookMap: Map<string, HookWithSubscription<any>>,
+  ): Promise<boolean> {
+    return await this.runActions(
+      vm,
+      scenarioName,
+      expects,
+      expectsResults,
+      hookMap,
+    );
   }
 
   private logActionSuccess(
@@ -231,82 +300,66 @@ export class SystemTester {
     }
   }
 
-  private async runAction(
-    vm: WARDuinoVM,
-    action: SubscriptionAction<any, any, any> | Action<any>,
+  private async runActionThatSubscribesTo<H, S extends HookWithSubscription<H>>(
+    action: SubscribeAction<H, S>,
     actionRunResult: ActionRunResult,
     actionIndex: number,
-  ): Promise<[boolean, HookWithSubscription<any> | undefined]> {
-    const isSubscription = isSubscriptionAction(action);
-    try {
-      const result = await maybeTimeoutPromise(
-        action.doAction(vm),
-        action.ifFail?.timeout,
+    hookMap: Map<string, HookWithSubscription<any>>,
+  ): Promise<boolean> {
+    const hook = hookMap.get(action.subscribeToID);
+    if (hook === undefined) {
+      throw Error(
+        `Action ${actionIndex} is attempting to subscribe to an unexisting subscriptionID '${action.subscribeToID}'`,
       );
-      let valueForCheck: any;
-      let hook: HookWithSubscription<any> | undefined;
-      if (isSubscription) {
-        if (!Array.isArray(result) || result.length !== 2) {
-          throw new Error(
-            `The return type of 'doAction' is expected to be an array of 2 elements. Current type is ${typeof result}`,
-          );
-        }
-        if (!(result[1] instanceof HookWithSubscription)) {
-          throw new Error(
-            `The 2th element of the array returned by 'doAction' is expected to be of type 'HookWithSubscription' current type is ${typeof result[1]}`,
-          );
-        }
-        valueForCheck = result[0];
-        hook = result[1];
-      } else {
-        valueForCheck = result;
-      }
-
-      const successfulCheck = await action.checkActionSuccess(valueForCheck);
-      if (!successfulCheck) {
-        this.fillRunActionResult(
-          action,
-          actionRunResult,
-          `action with index #${actionIndex} failed`,
-          `'checkActionSuccess' failed`,
-        );
-      }
-      return [successfulCheck, hook];
-    } catch (e) {
-      this.fillRunActionResult(
-        action,
-        actionRunResult,
-        `action with index #${actionIndex} failed`,
-        `exception caused by `,
-        e,
-      );
-      return [false, undefined];
     }
+    return await this.subscribeToHook(
+      action,
+      hook,
+      actionRunResult,
+      actionIndex,
+    );
+  }
+
+  private async runAction<T>(
+    vm: WARDuinoVM,
+    action: Action<T>,
+  ): Promise<boolean> {
+    const r = await action.doAction(vm);
+    return await action.checkActionSuccess(r);
   }
 
   private delayAction<T>(
-    scenario: TestScenario,
+    scenarioName: string,
     action: Action<T>,
     actionRunResult: ActionRunResult,
     actionIndex: number,
     vm: WARDuinoVM,
-  ): boolean {
+  ): void {
     const isDelayed = action.delay !== undefined;
     actionRunResult.result = ActionRunState.Delayed;
     setTimeout(() => {
-      this.runDelayedAction(scenario, action, actionRunResult, actionIndex, vm);
+      this.runDelayedAction(
+        scenarioName,
+        action,
+        actionRunResult,
+        actionIndex,
+        vm,
+      );
     }, action.delay);
 
     if (isDelayed) {
       this.logger.info(
-        `TestScenario '${scenario.testName}': Action #${actionIndex} delayed for #${action.delay} ms`,
+        `TestScenario '${scenarioName}': Action #${actionIndex} '${action.description}' delayed for #${action.delay} ms`,
+      );
+    } else {
+      this.logger.error(
+        `TestScenario '${scenarioName}': attempting to delay Action #${actionIndex} '${action.description}' which cannot be delayed without 'delay' field`,
       );
     }
-    return isDelayed;
   }
 
   private runDelayedAction<T>(
-    scenario: TestScenario,
+    scenarioName: string,
     action: Action<T>,
     actionRunResult: ActionRunResult,
     actionIndex: number,
@@ -323,7 +376,7 @@ export class SystemTester {
         .catch(reject);
     });
 
-    maybeTimeoutPromise(p, action.ifFail?.timeout)
+    maybeTimeoutPromise(p, action.timeout)
       .then((successCheck) => {
         if (!successCheck) {
           this.fillRunActionResult(
@@ -354,14 +407,14 @@ export class SystemTester {
           }
           this.logActionSuccess(
             successFul,
-            scenario.testName,
+            scenarioName,
             actionIndex,
             actionRunResult,
           );
         } else {
           this.logActionSuccess(
             false,
-            scenario.testName,
+            scenarioName,
             actionIndex,
             actionRunResult,
           );
@@ -369,17 +422,17 @@ export class SystemTester {
       });
   }
 
-  private async createSubscriptionForExpect<T>(
-    expect: ExpectDescription<T>,
-    hook: HookWithSubscription<T>,
-    expectResult: ExpectRunResult,
-    expectIdx: number,
+  // TODO fix generic types
+  private async subscribeToHook<T>(
+    action: SubscribeAction<any, any>,
+    hook: HookWithSubscription<any>,
+    runResult: ActionRunResult,
+    actionIdx: number,
   ): Promise<boolean> {
     const p = new Promise<boolean>((resolve, reject) => {
-      // const cb: ((v: T) => void) | undefined;
       const cb = (v: T): void => {
-        expect
-          .subscriptionCheck(v)
+        action
+          .checkSubscription(v)
           .then((v: boolean) => {
             if (cb !== undefined) {
               hook.unSubscribe(cb);
@@ -397,21 +450,21 @@ export class SystemTester {
       hook.subscribe(cb);
     });
     try {
-      const success = await maybeTimeoutPromise(p, expect.ifFail?.timeout);
+      const success = await maybeTimeoutPromise(p, action.timeout);
       if (!success) {
-        this.fillRunExpectResult(
-          expect,
-          expectResult,
-          `expect at index ${expectIdx} failed`,
+        this.fillRunActionResult(
+          action,
+          runResult,
+          `expect at index ${actionIdx} failed`,
           `'subscriptionCheck' returns false`,
         );
       }
       return success;
     } catch (err) {
-      this.fillRunExpectResult(
-        expect,
-        expectResult,
-        `expect at index ${expectIdx} failed`,
+      this.fillRunActionResult(
+        action,
+        runResult,
+        `expect at index ${actionIdx} failed`,
         'exception occurred',
       );
       return false;
@@ -419,7 +472,7 @@ export class SystemTester {
   }
 
   private fillRunActionResult(
-    action: SubscriptionAction<any, any, any> | Action<any>,
+    action: Act<any, any, any>,
     actionRunResult: ActionRunResult,
     fallbackFailMsg: string,
     reasonFailMsg?: string,
@@ -432,7 +485,20 @@ export class SystemTester {
       actionRunResult.result = ActionRunState.Failed;
     }
 
-    actionRunResult.failMsg = action.ifFail?.message ?? fallbackFailMsg;
+    let msg = fallbackFailMsg;
+    if (action.ifFail !== undefined) {
+      if (typeof action.ifFail === 'function') {
+        msg = action.ifFail('');
+      } else if (typeof action.ifFail === 'string') {
+        msg = action.ifFail;
+      } else {
+        this.logger.error(
+          `Action does not provide a function or a string for ifFail value`,
+        );
+      }
+    }
+
+    actionRunResult.failMsg = msg;
 
     // determine reason failure
     if (error !== undefined && error !== null) {
@@ -446,102 +512,98 @@ export class SystemTester {
     }
   }
 
-  private fillRunExpectResult(
-    expect: ExpectDescription<any>,
-    expectResult: ExpectRunResult,
-    fallbackFailMsg: string,
-    reasonFailMsg?: string,
-    error?: any,
-  ): void {
-    // determine type of failure
-    if (error instanceof TimeoutPromise) {
-      expectResult.result = ActionRunState.TimedOut;
-    } else {
-      expectResult.result = ActionRunState.Failed;
-    }
-
-    expectResult.failMsg = expect.ifFail?.message ?? fallbackFailMsg;
-
-    // determine reason failure
-    if (error !== undefined && error !== null) {
-      expectResult.reasonFailure = `caused by an exception:` + error.toString();
-      if (error instanceof Error) {
-        expectResult.reasonFailure = `${error.name}: ${error.message} with stack ${error.stack}`;
-      }
-    } else {
-      expectResult.reasonFailure = reasonFailMsg ?? '';
-    }
-  }
-
-  private assertValidSubscriptionIDs(scenario: TestScenario): void {
+  private assertUniqueSubscriptionIDs(scenario: TestScenario): void {
     // Assert that the defined actions have unique subscriptionIDs
     const encounteredSubIDs = new Set<string>();
     scenario.actions?.forEach((ac) => {
-      if (isSubscriptionAction(ac)) {
+      if (isSubscriptionEmitterAction(ac)) {
         if (encounteredSubIDs.has(ac.subscriptionID)) {
           throw new Error(
-            `'${scenario.testName}': Action for subscription cannot have duplicate subscription IDs. ID  ${ac.subscriptionID}`,
+            `'${scenario.testName}': Subscription Action cannot have duplicate subscription IDs. ID  ${ac.subscriptionID}`,
           );
         }
       }
     });
-
-    // Assert that the expects subscribe to actions that generate subcription data
-    const actions = scenario.actions ?? [];
-    const expects = scenario.expects ?? [];
-    for (let i = 0; i < expects.length; i++) {
-      const expect = expects[i];
-      const id = expect.subscriptionID;
-      if (typeof id === 'number') {
-        if (id >= actions.length || id < 0) {
+    scenario.expect?.forEach((ac) => {
+      if (isSubscriptionEmitterAction(ac)) {
+        if (encounteredSubIDs.has(ac.subscriptionID)) {
           throw new Error(
-            `'${scenario.testName}': expect uses unexisting action with index ${id}`,
-          );
-        }
-        if (isSubscriptionAction(actions[id])) {
-          throw new Error(
-            `'${scenario.testName}': expect uses action at index ${id} which does not produce subscription data`,
-          );
-        }
-      } else {
-        const foundAction = scenario.actions?.find((ac) => {
-          return isSubscriptionAction(ac) && ac.subscriptionID === id;
-        });
-        if (foundAction === undefined) {
-          throw new Error(
-            `'${scenario.testName}': expect attempts to subsribe to an action with subscriptionID=${id} but no such action was provided`,
+            `'${scenario.testName}': Subscription Action cannot have duplicate subscription IDs. ID  ${ac.subscriptionID}`,
           );
         }
       }
-    }
+    });
+  }
+
+  private assertSubscriptionOnlyToExistingID(scenario: TestScenario): void {
+    const encounteredSubIDs = new Set<string>();
+    scenario.actions?.forEach((ac) => {
+      if (isSubscriptionEmitterAction(ac)) {
+        encounteredSubIDs.add(ac.subscriptionID);
+      } else if (
+        isAction(ac) &&
+        ac.subscribeTo !== undefined &&
+        !encounteredSubIDs.has(ac.subscribeTo)
+      ) {
+        throw new Error(
+          `'${scenario.testName}': Action can only subscribe to previously introduced subscription actions. No subscription action with ID  ${ac.subscribeTo} introduced`,
+        );
+      }
+    });
+    scenario.expect?.forEach((ac) => {
+      if (isSubscriptionEmitterAction(ac)) {
+        encounteredSubIDs.add(ac.subscriptionID);
+      } else if (
+        isAction(ac) &&
+        ac.subscribeTo !== undefined &&
+        !encounteredSubIDs.has(ac.subscribeTo)
+      ) {
+        throw new Error(
+          `'${scenario.testName}': Action can only subscribe to previously introduced subscription actions. No subscription action with ID  ${ac.subscribeTo} was previously introduced`,
+        );
+      }
+    });
   }
 
   private assertSubscriptionActionsAllHaveSubscribers(
     scenario: TestScenario,
   ): void {
-    if (scenario.expects === undefined) {
-      return;
-    }
-    const actions = scenario.actions ?? [];
+    const encounteredSubIDs = new Set<string>();
+    scenario.actions?.filter(isSubscriptionEmitterAction)?.forEach((ac) => {
+      encounteredSubIDs.add(ac.subscriptionID);
+    });
+    scenario.expect?.filter(isSubscriptionEmitterAction)?.forEach((ac) => {
+      encounteredSubIDs.add(ac.subscriptionID);
+    });
 
+    const actions = scenario.actions ?? [];
     for (let i = 0; i < actions.length; i++) {
       const action = actions[i];
-      if (!isSubscriptionAction(action)) {
-        continue;
-      }
-      const found = scenario.expects?.find((e) => {
-        if (typeof e.subscriptionID === 'number') {
-          return e.subscriptionID === i;
-        } else {
-          return e.subscriptionID === action.subscriptionID;
+      if (isActionThatSubscribesTo(action)) {
+        if (encounteredSubIDs.has(action.subscribeToID)) {
+          encounteredSubIDs.delete(action.subscribeToID);
         }
-      });
-
-      if (found === undefined) {
-        throw new Error(
-          `No 'expect' subscribed to action ID ${action.subscriptionID} at index #${i}`,
-        );
       }
+    }
+
+    const expects = scenario.expect ?? [];
+    for (let i = 0; i < expects.length; i++) {
+      const expect = expects[i];
+      if (isActionThatSubscribesTo(expect)) {
+        if (encounteredSubIDs.has(expect.subscribeToID)) {
+          encounteredSubIDs.delete(expect.subscribeToID);
+        }
+      }
+    }
+
+    if (encounteredSubIDs.size !== 0) {
+      throw Error(
+        `#${
+          encounteredSubIDs.size
+        } Subscription actions encountered without subscribers: ${Array.from(
+          encounteredSubIDs,
+        ).join(', ')}  `,
+      );
     }
   }
 
@@ -565,8 +627,8 @@ export class SystemTester {
   private assertNotEmptyScenario(scenario: TestScenario): void {
     if (
       scenario.actions === undefined &&
-      scenario.whens === undefined &&
-      scenario.expects === undefined
+      scenario.when === undefined &&
+      scenario.expect === undefined
     ) {
       throw Error('Test scenario written has nothing to test');
     }
@@ -574,6 +636,22 @@ export class SystemTester {
 
   private assertValidScenarioFields(scenario: TestScenario): void {
     this.logger.warn('Test if scenario has all required fields');
+  }
+
+  private assertValidSubscriptionActionReturnType(
+    actionIndex: number,
+    result: any,
+  ): void {
+    if (!Array.isArray(result) || result.length !== 2) {
+      throw new Error(
+        `The return type of 'doAction' of SubscriptionAction #${actionIndex} is expected to be an array of 2 elements. Current type is ${typeof result}`,
+      );
+    }
+    if (!(result[1] instanceof HookWithSubscription)) {
+      throw new Error(
+        `The 2th element of the array returned by 'doAction' of SubscriptionAction #${actionIndex} is expected to be of type 'HookWithSubscription' current type is ${typeof result[1]}`,
+      );
+    }
   }
 }
 export type { TestScenario };
