@@ -47,7 +47,7 @@ systemSetup.logger = {
  */
 
 const normalBP: TestScenario = {
-  skipTest: true,
+  skipTest: false,
   testName: 'Test normal breakpoint',
   testForDeviceID: m5stickDev.id,
   actions: [
@@ -58,23 +58,21 @@ const normalBP: TestScenario = {
     ),
     runVMAction(3000, 3000),
   ],
-  expects: [
+  expect: [
     {
-      subscriptionID: 'BP line 91',
+      subscribeToID: 'BP line 91',
       description: 'wait max 10000ms for bp reach',
-      subscriptionCheck: async (state: WasmState): Promise<boolean> => {
+      checkSubscription: async (state: WasmState): Promise<boolean> => {
         return true;
       },
-      ifFail: {
-        message: 'Did not hit breakpoint',
-        timeout: 10000,
-      },
+      ifFail: 'Did not hit breakpoint',
+      timeout: 10000,
     },
   ],
 };
 
 const singleStopBp: TestScenario = {
-  skipTest: false,
+  skipTest: true,
   testName: 'Test single stop breakpoint',
   testForDeviceID: m5stickDev.id,
   actions: [
@@ -85,17 +83,15 @@ const singleStopBp: TestScenario = {
     ),
     runVMAction(3000, 3000), // wait 3 seconds before executing runVMAction
   ],
-  expects: [
+  expect: [
     {
-      subscriptionID: 'BP line 91',
+      subscribeToID: 'BP line 91',
       description: 'wait max 10000ms for bp reach',
-      subscriptionCheck: async (state: WasmState): Promise<boolean> => {
+      checkSubscription: async (state: WasmState): Promise<boolean> => {
         return true;
       },
-      ifFail: {
-        message: 'Did not hit breakpoint',
-        timeout: 10000,
-      },
+      ifFail: 'Did not hit breakpoint',
+      timeout: 10000,
     },
   ],
 };

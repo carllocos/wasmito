@@ -274,8 +274,8 @@ export class SystemDeployer {
       for (let i = 0; i < postSetup.actions.length; i++) {
         const action = postSetup.actions[i];
         let p = action.doAction(vm);
-        if (action.ifFail?.timeout !== undefined) {
-          p = timeoutPromise(p, action.ifFail.timeout);
+        if (action.timeout !== undefined) {
+          p = timeoutPromise(p, action.timeout);
         }
         try {
           const result = await p;
@@ -286,10 +286,7 @@ export class SystemDeployer {
             throw Error(errMSg);
           }
         } catch (e) {
-          let errMsg = `#${i}`;
-          if (action.ifFail?.message !== undefined) {
-            errMsg += ` '${action.ifFail.message}'`;
-          }
+          const errMsg = `#${i}`;
           this.logger.error(
             `PostDeployment on Device ${device.id}: failed on action ${errMsg}: `,
             e,
@@ -299,10 +296,5 @@ export class SystemDeployer {
       }
     }
     this.vmMap.set(device.id, vm);
-  }
-
-  private reportFailure(device: DeviceSetup, msg: string): void {
-    const errMSg = `Device ${device.id} failed with reason: ${msg}`;
-    this._logger.error(errMSg);
   }
 }
