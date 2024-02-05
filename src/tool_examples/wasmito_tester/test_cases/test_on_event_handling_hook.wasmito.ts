@@ -55,7 +55,6 @@ const testHookOnMCUScenario: TestScenario = {
   skipTest: false,
   testName:
     'Test if event is received after adding event hooks, manually pressing on button, and handled',
-  testForDeviceID: m5stickcMCU.id,
   actions: [
     onHandledEventSubscription('Event handled', 3000),
     addBreakpointSubscription(
@@ -92,7 +91,6 @@ const testHookOnMCUScenario2: TestScenario = {
   skipTest: true,
   testName:
     'Test if event is received after adding event hooks, manually pressing on button, and event is not handled due to removal',
-  testForDeviceID: m5stickcMCU.id,
   actions: [
     onHandledEventSubscription('Event handling hook', 3000),
     onHandledEventAction(new EventRemoveHook(), 3000),
@@ -131,7 +129,6 @@ const testHookOnDevScenario: TestScenario = {
   skipTest: true,
   testName:
     'Test if event is received after adding event hooks and manually pressing on button',
-  testForDeviceID: m5stickDev.id,
   actions: [
     onHandledEventSubscription('Event handled', 3000),
     runVMAction(3000),
@@ -150,7 +147,7 @@ const testHookOnDevScenario: TestScenario = {
 };
 
 const tester = new SystemTester(systemSetup);
-tester.addTestScenario(testHookOnMCUScenario);
-tester.addTestScenario(testHookOnMCUScenario2);
-tester.addTestScenario(testHookOnDevScenario);
+tester.addTestScenario(testHookOnMCUScenario, m5stickcMCU.id);
+tester.addTestScenario(testHookOnMCUScenario2, m5stickcMCU.id);
+tester.addTestScenario(testHookOnDevScenario, m5stickDev.id);
 tester.runTests().catch(console.error);

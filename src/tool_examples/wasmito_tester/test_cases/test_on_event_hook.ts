@@ -64,7 +64,6 @@ const testHookOnMCUScenario: TestScenario = {
   skipTest: true,
   testName:
     'Test if event is received after adding event hooks and manually pressing on button',
-  testForDeviceID: m5stickcMCU.id,
   actions: [onNewEventAction('OnNewEventHook', 3000), runVMAction(3000)],
   expect: [
     {
@@ -82,7 +81,6 @@ const testHookOnMCUScenario: TestScenario = {
 const testHookOnDevScenario: TestScenario = {
   skipTest: true,
   testName: 'Test if event is received after adding event hooks on Dev VM',
-  testForDeviceID: m5stickDev.id,
   actions: [onNewEventAction('OnNewEventHook', 3000), runVMAction(3000)],
   expect: [
     {
@@ -100,7 +98,6 @@ const testHookOnDevScenario: TestScenario = {
 const testHookOnDevScenario2: TestScenario = {
   skipTest: true,
   testName: 'Test whether Callbackmapping hook works onNewEvent',
-  testForDeviceID: m5stickDev.id,
   actions: [
     onNewEventAction('OnNewEventHook', 3000),
     {
@@ -127,7 +124,6 @@ const testHookOnDevScenario2: TestScenario = {
 const testAddEvent: TestScenario = {
   skipTest: true,
   testName: 'Test whether adding event works',
-  testForDeviceID: m5stickDev.id,
   actions: [
     {
       description: 'Callbacks mapping',
@@ -162,22 +158,20 @@ m5stickDev.toolPort = 8300;
 const testPrimitiveDelayVM: TestScenario = {
   skipTest: true,
   testName: 'Test delay has right argument',
-  testForDeviceID: m5stickDev.id,
   actions: [addBPAndRunUntil(113, 5000), stepAction(1000)],
 };
 
 const testRemoteCallPrimitiveDelayVM: TestScenario = {
   skipTest: false,
   testName: 'Test Remote call of primitive delay has right argument',
-  testForDeviceID: m5stickDev.id,
   actions: [proxyCallAction(0, new WasmValuesBuilder().addI32Value(100), 5000)],
 };
 
 const tester = new SystemTester(systemSetup);
-tester.addTestScenario(testHookOnMCUScenario);
-tester.addTestScenario(testHookOnDevScenario);
-tester.addTestScenario(testHookOnDevScenario2);
-tester.addTestScenario(testAddEvent);
-tester.addTestScenario(testPrimitiveDelayVM);
-tester.addTestScenario(testRemoteCallPrimitiveDelayVM);
+tester.addTestScenario(testHookOnMCUScenario, m5stickcMCU.id);
+tester.addTestScenario(testHookOnDevScenario, m5stickDev.id);
+tester.addTestScenario(testHookOnDevScenario2, m5stickDev.id);
+tester.addTestScenario(testAddEvent, m5stickDev.id);
+tester.addTestScenario(testPrimitiveDelayVM, m5stickDev.id);
+tester.addTestScenario(testRemoteCallPrimitiveDelayVM, m5stickDev.id);
 tester.runTests().catch(console.error);
