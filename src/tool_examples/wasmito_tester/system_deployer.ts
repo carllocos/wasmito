@@ -19,11 +19,7 @@ import {
 import { timeoutPromise } from '../../util/promise_util';
 import { BoardBaudRate } from '../../util/serial_port';
 import { type WARDuinoVM } from '../../warduino/vm/warduino_vm';
-import {
-  type DeviceSetup,
-  Target,
-  type SystemSetup,
-} from './shared_interfaces';
+import { type DeviceSetup, Target, type DevicesLab } from './shared_interfaces';
 
 export class SystemDeployer {
   private readonly setup;
@@ -34,7 +30,7 @@ export class SystemDeployer {
 
   private readonly vmMap: Map<string, WARDuinoVM>;
 
-  constructor(setup: SystemSetup) {
+  constructor(setup: DevicesLab) {
     this.setup = setup;
     this.vmMap = new Map();
     const loggerName = setup.logger?.name ?? 'SystemDeployer';

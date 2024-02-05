@@ -1,7 +1,7 @@
 import {
   type DeviceSetup,
   type PostSetupConfig,
-  type SystemSetup,
+  type DevicesLab,
 } from './shared_interfaces';
 
 export function oneM5StickCMCU(
@@ -44,7 +44,7 @@ export function oneM5StickCDev(
 export function createSystemSetup(
   setupName: string,
   devices: DeviceSetup[],
-): SystemSetup {
+): DevicesLab {
   return {
     setupName,
     devices,

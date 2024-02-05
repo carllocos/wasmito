@@ -219,7 +219,7 @@ export interface TestScenarioResult {
 }
 
 export interface SystemTest {
-  systemSetup: SystemSetup;
+  systemSetup: DevicesLab;
   testScenarios: TestScenario[];
 }
 
@@ -250,7 +250,7 @@ export interface LoggerConfig {
   level: string;
 }
 
-export interface SystemSetup {
+export interface DevicesLab {
   setupName: string;
   devices: DeviceSetup[];
   rebootDevices?: boolean;
