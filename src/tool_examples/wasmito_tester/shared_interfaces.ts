@@ -230,7 +230,9 @@ export interface PostSetupConfig {
 
 export interface DeviceSetup {
   name?: string;
-  program: string;
+  deviceClass?: string; // TODO
+
+  program: string; // TODO remove
   target: string; // must be a string from Target enum
   id: string;
 
