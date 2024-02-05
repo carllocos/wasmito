@@ -121,11 +121,73 @@ export type Act<V, Y, Z extends HookWithSubscription<Y>> =
 export interface TestScenario {
   skipTest?: boolean;
   testName: string;
-  testForDeviceID: string;
 
   when?: Array<Act<any, any, any>>;
   actions?: Array<Act<any, any, any>>;
   expect?: Array<Act<any, any, any>>;
+}
+
+export function isTestScenarioAction(obj: any): boolean {
+  return (
+    isAction(obj) ||
+    isActionThatSubscribesTo(obj) ||
+    isSubscriptionEmitterAction(obj)
+  );
+}
+
+export function isTestScenario(obj: any): obj is TestScenario {
+  if (typeof obj !== 'object') {
+    return false;
+  }
+
+  if (typeof obj.testName !== 'string') {
+    return false;
+  }
+
+  if (obj.skipTest !== undefined && typeof obj.skipTest !== 'boolean') {
+    return false;
+  }
+
+  if (obj.actions !== undefined) {
+    if (!(obj.actions instanceof Array)) {
+      return false;
+    }
+    const found = obj.actions.find((o: any) => {
+      return !isTestScenarioAction(o);
+    });
+
+    if (found !== undefined) {
+      return false;
+    }
+  }
+
+  if (obj.when !== undefined) {
+    if (!(obj.when instanceof Array)) {
+      return false;
+    }
+    const found = obj.when.find((o: any) => {
+      return !isTestScenarioAction(o);
+    });
+
+    if (found !== undefined) {
+      return false;
+    }
+  }
+
+  if (obj.expect !== undefined) {
+    if (!(obj.expect instanceof Array)) {
+      return false;
+    }
+    const found = obj.expect.find((o: any) => {
+      return !isTestScenarioAction(o);
+    });
+
+    if (found !== undefined) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 export enum ActionRunState {

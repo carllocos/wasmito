@@ -22,7 +22,10 @@ import { HookWithSubscription } from '../../hooks/hook';
 
 export class SystemTester {
   private readonly systemDeployer: SystemDeployer;
-  private readonly testScenarios: Array<[TestScenario, TestScenarioResult]>;
+  private readonly testScenarios: Array<
+    [string, TestScenario, TestScenarioResult]
+  >;
+
   private readonly deviceTestsMap: Map<string, TestScenario[]>;
 
   constructor(setup: SystemSetup) {
@@ -35,22 +38,23 @@ export class SystemTester {
     return this.systemDeployer.logger;
   }
 
-  addTestScenario(scenario: TestScenario): void {
+  addTestScenario(scenario: TestScenario, targetDeviceID: string): void {
     if (scenario.skipTest !== undefined && scenario.skipTest) {
       return;
     }
     this.assertNotEmptyScenario(scenario);
     this.assertValidScenarioFields(scenario);
-    this.assertDeviceIDExists(scenario);
+    this.assertDeviceIDExists(targetDeviceID);
     this.assertUniqueSubscriptionIDs(scenario);
     this.assertSubscriptionOnlyToExistingID(scenario);
     this.assertSubscriptionActionsAllHaveSubscribers(scenario);
 
-    const deviceTests = this.deviceTestsMap.get(scenario.testForDeviceID) ?? [];
+    const deviceTests = this.deviceTestsMap.get(targetDeviceID) ?? [];
     deviceTests.push(scenario);
-    this.deviceTestsMap.set(scenario.testForDeviceID, deviceTests);
+    this.deviceTestsMap.set(targetDeviceID, deviceTests);
 
     this.testScenarios.push([
+      targetDeviceID,
       scenario,
       this.createTestScenarioResult(scenario),
     ]);
@@ -98,13 +102,13 @@ export class SystemTester {
     }
 
     for (let i = 0; i < this.testScenarios.length; i++) {
-      const [scenario, scenarioResult] = this.testScenarios[i];
-      await this.runTestScenario(scenario, scenarioResult);
+      const [targetDeviceID, scenario, scenarioResult] = this.testScenarios[i];
+      await this.runTestScenario(targetDeviceID, scenario, scenarioResult);
     }
 
     this.reportScenarios(
       this.testScenarios.map((v) => {
-        return v[1];
+        return v[2];
       }),
     );
   }
@@ -151,11 +155,12 @@ export class SystemTester {
   }
 
   private async runTestScenario(
+    targetDeviceID: string,
     scenario: TestScenario,
     scenarioResult: TestScenarioResult,
   ): Promise<void> {
-    this.assertVMOfDeviceIDExists(scenario);
-    const vm = this.systemDeployer.deviceVM(scenario.testForDeviceID);
+    this.assertVMOfDeviceIDExists(targetDeviceID);
+    const vm = this.systemDeployer.deviceVM(targetDeviceID);
     const actionHooksMap = new Map<string, HookWithSubscription<any>>();
 
     const doExpects = await this.runActions(
@@ -607,19 +612,19 @@ export class SystemTester {
     }
   }
 
-  private assertDeviceIDExists(scenario: TestScenario): void {
-    const device = this.systemDeployer.device(scenario.testForDeviceID);
+  private assertDeviceIDExists(targetDeviceID: string): void {
+    const device = this.systemDeployer.device(targetDeviceID);
     if (device === undefined) {
       throw Error(
-        `Test scenario written for unexisting device with id ${scenario.testForDeviceID}`,
+        `Test scenario written for unexisting device with id ${targetDeviceID}`,
       );
     }
   }
 
-  private assertVMOfDeviceIDExists(scenario: TestScenario): void {
-    if (!this.systemDeployer.hasVMDevice(scenario.testForDeviceID)) {
+  private assertVMOfDeviceIDExists(targetDeviceID: string): void {
+    if (!this.systemDeployer.hasVMDevice(targetDeviceID)) {
       throw Error(
-        `Test scenario written device id ${scenario.testForDeviceID} has no VM assigned to it`,
+        `Test scenario written device id ${targetDeviceID} has no VM assigned to it`,
       );
     }
   }

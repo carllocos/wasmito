@@ -49,7 +49,6 @@ systemSetup.logger = {
 const normalBP: TestScenario = {
   skipTest: false,
   testName: 'Test normal breakpoint',
-  testForDeviceID: m5stickDev.id,
   actions: [
     addBreakpointSubscription(
       'BP line 91',
@@ -74,7 +73,6 @@ const normalBP: TestScenario = {
 const singleStopBp: TestScenario = {
   skipTest: true,
   testName: 'Test single stop breakpoint',
-  testForDeviceID: m5stickDev.id,
   actions: [
     addBreakpointSubscription(
       'BP line 91',
@@ -97,6 +95,6 @@ const singleStopBp: TestScenario = {
 };
 
 const tester = new SystemTester(systemSetup);
-tester.addTestScenario(normalBP);
-tester.addTestScenario(singleStopBp);
+tester.addTestScenario(normalBP, m5stickDev.id);
+tester.addTestScenario(singleStopBp, m5stickDev.id);
 tester.runTests().catch(console.error);
