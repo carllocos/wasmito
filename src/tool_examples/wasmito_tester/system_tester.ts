@@ -10,7 +10,7 @@ import {
   ActionRunState,
   type ActionRunResult,
   TestScenarioState,
-  type SystemSetup,
+  type DevicesLab,
   type Act,
   isDelayedAction,
   isAction,
@@ -28,7 +28,7 @@ export class SystemTester {
 
   private readonly deviceTestsMap: Map<string, TestScenario[]>;
 
-  constructor(setup: SystemSetup) {
+  constructor(setup: DevicesLab) {
     this.systemDeployer = new SystemDeployer(setup);
     this.testScenarios = [];
     this.deviceTestsMap = new Map();
