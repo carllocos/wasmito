@@ -24,7 +24,7 @@ import { type PostSetupConfig } from '../shared_interfaces';
 const program = './src/tool_examples/wat_examples/dimmer-double-button.wat';
 
 // hardware m5stick C
-const m5stickcMCU = oneM5StickCMCU(program, '1');
+const m5stickcMCU = oneM5StickCMCU('1');
 
 // Dev m5stick C
 const postSetupConfigM5Dev: PostSetupConfig = {
@@ -36,7 +36,7 @@ const postSetupConfigM5Dev: PostSetupConfig = {
     addBPAndRunUntil(88, 5000),
   ],
 };
-const m5stickDev = oneM5StickCDev(program, '2', postSetupConfigM5Dev);
+const m5stickDev = oneM5StickCDev('2', postSetupConfigM5Dev);
 
 const systemSetup = createSystemSetup(
   'System with M5stickCMCU and one M5StickCDev',
@@ -55,6 +55,7 @@ const testHookOnMCUScenario: TestScenario = {
   skipTest: false,
   testName:
     'Test if event is received after adding event hooks, manually pressing on button, and handled',
+  testProgram: program,
   actions: [
     onHandledEventSubscription('Event handled', 3000),
     addBreakpointSubscription(
@@ -91,6 +92,8 @@ const testHookOnMCUScenario2: TestScenario = {
   skipTest: true,
   testName:
     'Test if event is received after adding event hooks, manually pressing on button, and event is not handled due to removal',
+
+  testProgram: program,
   actions: [
     onHandledEventSubscription('Event handling hook', 3000),
     onHandledEventAction(new EventRemoveHook(), 3000),
@@ -129,6 +132,7 @@ const testHookOnDevScenario: TestScenario = {
   skipTest: true,
   testName:
     'Test if event is received after adding event hooks and manually pressing on button',
+  testProgram: program,
   actions: [
     onHandledEventSubscription('Event handled', 3000),
     runVMAction(3000),

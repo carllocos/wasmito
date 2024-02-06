@@ -19,7 +19,12 @@ import {
 import { timeoutPromise } from '../../util/promise_util';
 import { BoardBaudRate } from '../../util/serial_port';
 import { type WARDuinoVM } from '../../warduino/vm/warduino_vm';
-import { type DeviceSetup, Target, type DevicesLab } from './shared_interfaces';
+import {
+  type DeviceSetup,
+  Target,
+  type DevicesLab,
+  type TestScenario,
+} from './shared_interfaces';
 
 export class SystemDeployer {
   private readonly setup;
@@ -73,7 +78,40 @@ export class SystemDeployer {
     return vm;
   }
 
-  async deploy(ignoreDeviceIDs?: string[]): Promise<void> {
+  async deployOnDevice(
+    scenario: TestScenario,
+    deviceID: string,
+  ): Promise<void> {
+    let i = -1;
+    const device = this.setup.devices.find((d: DeviceSetup, idx: number) => {
+      if (d.id === deviceID) {
+        i = idx;
+      }
+      return d.id === deviceID;
+    });
+    if (device === undefined) {
+      throw Error(`No device found in Laboratory with ID '${deviceID}'`);
+    }
+
+    switch (device.target) {
+      case Target.mcu:
+        await this.deployMCU(scenario.testProgram, device, i);
+        break;
+      case Target.devExternal:
+      case Target.dev: {
+        const connectToExternalVM = device.target === Target.devExternal;
+        await this.deployDev(scenario.testProgram, device, connectToExternalVM);
+        break;
+      }
+      default:
+        this._logger.error(
+          `unsupported target '${device.target}' was provided for device with ID ${deviceID}`,
+        );
+        break;
+    }
+  }
+
+  async deploy(program: string, ignoreDeviceIDs?: string[]): Promise<void> {
     for (let i = 0; i < this.setup.devices.length; i++) {
       const device = this.setup.devices[i];
       if (ignoreDeviceIDs !== undefined) {
@@ -90,12 +128,12 @@ export class SystemDeployer {
 
       switch (device.target) {
         case Target.mcu:
-          await this.deployMCU(device, i);
+          await this.deployMCU(program, device, i);
           break;
         case Target.devExternal:
         case Target.dev: {
           const connectToExternalVM = device.target === Target.devExternal;
-          await this.deployDev(device, connectToExternalVM);
+          await this.deployDev(program, device, connectToExternalVM);
           break;
         }
         default:
@@ -108,10 +146,12 @@ export class SystemDeployer {
   }
 
   private async deployMCU(
+    program: string,
     device: DeviceSetup,
     indexInSetup: number,
   ): Promise<void> {
     const config = await this.automaticBuildOfPlatformConfig(
+      program,
       device,
       indexInSetup,
     );
@@ -129,11 +169,12 @@ export class SystemDeployer {
   }
 
   private async deployDev(
+    program: string,
     device: DeviceSetup,
     externalProcess: boolean,
   ): Promise<void> {
     const vmConfigArgs: VMConfigArgs = {
-      program: device.program,
+      program,
       disableStrictModuleLoad: true,
     };
     let vm: WARDuinoVM | undefined;
@@ -149,13 +190,13 @@ export class SystemDeployer {
       vm = await this.deviceManager.connectToExistingDevVM(
         deviceConfig,
         device.toolPort,
-        device.program,
+        program,
         3000,
       );
-      const exitCode = await vm.platform.compile(device.program);
+      const exitCode = await vm.platform.compile(program);
       if (exitCode !== 0) {
         throw Error(
-          `Could not compile program ${device.program} exit code ${exitCode}`,
+          `Could not compile program ${program} exit code ${exitCode}`,
         );
       }
     } else {
@@ -166,6 +207,7 @@ export class SystemDeployer {
 
   // TODO move to toolkit
   private async automaticBuildOfPlatformConfig(
+    program: string,
     device: DeviceSetup,
     idx: number,
   ): Promise<PlatformBuilderConfig> {
@@ -233,7 +275,7 @@ export class SystemDeployer {
       deploymentMode: DeploymentMode.MCUVM,
     };
     const vmConfig: VMConfigArgs = {
-      program: device.program,
+      program,
       disableStrictModuleLoad: true,
       serialPort: device.serialPort,
       baudrate: device.baudrate,

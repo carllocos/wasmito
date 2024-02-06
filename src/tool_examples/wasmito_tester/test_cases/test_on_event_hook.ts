@@ -31,7 +31,7 @@ const psM5StickCMCU: PostSetupConfig = {
   actions: [addBPAndRunUntil(88, 5000), removeBPAt(88, 3000)],
 };
 
-const m5stickcMCU = oneM5StickCMCU(program, '1', psM5StickCMCU);
+const m5stickcMCU = oneM5StickCMCU('1', psM5StickCMCU);
 m5stickcMCU.serialPort = '/dev/ttyUSB1';
 
 const postSetupConfigM5Dev: PostSetupConfig = {
@@ -45,7 +45,7 @@ const postSetupConfigM5Dev: PostSetupConfig = {
   ],
 };
 
-const m5stickDev = oneM5StickCDev(program, '2', postSetupConfigM5Dev);
+const m5stickDev = oneM5StickCDev('2', postSetupConfigM5Dev);
 
 const systemSetup = createSystemSetup(
   'System with M5stickCMCU and one M5StickCDev',
@@ -64,6 +64,7 @@ const testHookOnMCUScenario: TestScenario = {
   skipTest: true,
   testName:
     'Test if event is received after adding event hooks and manually pressing on button',
+  testProgram: program,
   actions: [onNewEventAction('OnNewEventHook', 3000), runVMAction(3000)],
   expect: [
     {
@@ -81,6 +82,7 @@ const testHookOnMCUScenario: TestScenario = {
 const testHookOnDevScenario: TestScenario = {
   skipTest: true,
   testName: 'Test if event is received after adding event hooks on Dev VM',
+  testProgram: program,
   actions: [onNewEventAction('OnNewEventHook', 3000), runVMAction(3000)],
   expect: [
     {
@@ -98,6 +100,7 @@ const testHookOnDevScenario: TestScenario = {
 const testHookOnDevScenario2: TestScenario = {
   skipTest: true,
   testName: 'Test whether Callbackmapping hook works onNewEvent',
+  testProgram: program,
   actions: [
     onNewEventAction('OnNewEventHook', 3000),
     {
@@ -124,6 +127,7 @@ const testHookOnDevScenario2: TestScenario = {
 const testAddEvent: TestScenario = {
   skipTest: true,
   testName: 'Test whether adding event works',
+  testProgram: program,
   actions: [
     {
       description: 'Callbacks mapping',
@@ -158,12 +162,14 @@ m5stickDev.toolPort = 8300;
 const testPrimitiveDelayVM: TestScenario = {
   skipTest: true,
   testName: 'Test delay has right argument',
+  testProgram: program,
   actions: [addBPAndRunUntil(113, 5000), stepAction(1000)],
 };
 
 const testRemoteCallPrimitiveDelayVM: TestScenario = {
   skipTest: false,
   testName: 'Test Remote call of primitive delay has right argument',
+  testProgram: program,
   actions: [proxyCallAction(0, new WasmValuesBuilder().addI32Value(100), 5000)],
 };
 

@@ -5,7 +5,6 @@ import {
 } from './shared_interfaces';
 
 export function oneM5StickCMCU(
-  program: string,
   id: string,
   postSetup?: PostSetupConfig,
 ): DeviceSetup {
@@ -13,7 +12,6 @@ export function oneM5StickCMCU(
     pauseAfterSetup: true,
   };
   const OneM5StickCMCU: DeviceSetup = {
-    program,
     target: 'mcu',
     name: 'mcu m5stickc',
     id,
@@ -24,7 +22,6 @@ export function oneM5StickCMCU(
 }
 
 export function oneM5StickCDev(
-  program: string,
   id: string,
   postSetup?: PostSetupConfig,
 ): DeviceSetup {
@@ -32,7 +29,6 @@ export function oneM5StickCDev(
     pauseAfterSetup: true,
   };
   const dev: DeviceSetup = {
-    program,
     target: 'dev',
     name: 'm5stickc Dev',
     id,
