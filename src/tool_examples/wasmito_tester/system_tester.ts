@@ -86,23 +86,23 @@ export class SystemTester {
     return testResult;
   }
 
-  async runTests(): Promise<void> {
+  private async setupDevice(
+    scenario: TestScenario,
+    deviceID: string,
+  ): Promise<void> {
     try {
-      const devicesToIgnore = this.systemDeployer
-        .devices()
-        .filter((dev) => {
-          return !this.deviceTestsMap.has(dev.id);
-        })
-        .map((dev) => dev.id);
-      await this.systemDeployer.deploy(devicesToIgnore);
+      await this.systemDeployer.deployOnDevice(scenario, deviceID);
     } catch (e) {
       this.logger.error('Failed during System setup');
       this.logger.debug('TODO: Close VM connections');
       throw e;
     }
+  }
 
+  async runTests(): Promise<void> {
     for (let i = 0; i < this.testScenarios.length; i++) {
       const [targetDeviceID, scenario, scenarioResult] = this.testScenarios[i];
+      await this.setupDevice(scenario, targetDeviceID);
       await this.runTestScenario(targetDeviceID, scenario, scenarioResult);
     }
 

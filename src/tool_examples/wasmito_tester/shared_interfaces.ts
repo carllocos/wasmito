@@ -121,6 +121,7 @@ export type Act<V, Y, Z extends HookWithSubscription<Y>> =
 export interface TestScenario {
   skipTest?: boolean;
   testName: string;
+  testProgram: string;
 
   when?: Array<Act<any, any, any>>;
   actions?: Array<Act<any, any, any>>;
@@ -141,6 +142,10 @@ export function isTestScenario(obj: any): obj is TestScenario {
   }
 
   if (typeof obj.testName !== 'string') {
+    return false;
+  }
+
+  if (typeof obj.testProgram !== 'string') {
     return false;
   }
 
@@ -232,7 +237,6 @@ export interface DeviceSetup {
   name?: string;
   deviceClass?: string; // TODO
 
-  program: string; // TODO remove
   target: string; // must be a string from Target enum
   id: string;
 
