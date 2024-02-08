@@ -72,7 +72,7 @@ const normalBP: TestScenario = {
 };
 
 const singleStopBp: TestScenario = {
-  skipTest: true,
+  skipTest: false,
   testName: 'Test single stop breakpoint',
   testProgram: program,
   actions: [

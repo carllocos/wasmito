@@ -25,6 +25,7 @@ import {
   type DevicesLab,
   type TestScenario,
 } from './shared_interfaces';
+import { getFileName } from '../../util';
 
 export class SystemDeployer {
   private readonly setup;
@@ -93,21 +94,35 @@ export class SystemDeployer {
       throw Error(`No device found in Laboratory with ID '${deviceID}'`);
     }
 
-    switch (device.target) {
-      case Target.mcu:
-        await this.deployMCU(scenario.testProgram, device, i);
-        break;
-      case Target.devExternal:
-      case Target.dev: {
-        const connectToExternalVM = device.target === Target.devExternal;
-        await this.deployDev(scenario.testProgram, device, connectToExternalVM);
-        break;
+    if (this.hasVMDevice(deviceID)) {
+      const vm = this.deviceVM(deviceID);
+      const fn = getFileName(scenario.testProgram);
+      if (vm.sourceMap.sourceCodeFileName === fn) {
+        console.log('TODO reboot');
+      } else {
+        console.log('TODO: update source code');
       }
-      default:
-        this._logger.error(
-          `unsupported target '${device.target}' was provided for device with ID ${deviceID}`,
-        );
-        break;
+    } else {
+      switch (device.target) {
+        case Target.mcu:
+          await this.deployMCU(scenario.testProgram, device, i);
+          break;
+        case Target.devExternal:
+        case Target.dev: {
+          const connectToExternalVM = device.target === Target.devExternal;
+          await this.deployDev(
+            scenario.testProgram,
+            device,
+            connectToExternalVM,
+          );
+          break;
+        }
+        default:
+          this._logger.error(
+            `unsupported target '${device.target}' was provided for device with ID ${deviceID}`,
+          );
+          break;
+      }
     }
   }
 
