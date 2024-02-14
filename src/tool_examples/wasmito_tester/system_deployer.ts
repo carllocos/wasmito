@@ -25,7 +25,7 @@ import {
   type DevicesLab,
   type TestScenario,
 } from './shared_interfaces';
-import { getFileName } from '../../util';
+import { getFileName } from '../../util/file_util';
 
 export class SystemDeployer {
   private readonly setup;
