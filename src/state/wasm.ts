@@ -270,6 +270,7 @@ export class WasmState {
   br_table?: WASM.BRTable;
   callbacks?: WASM.CallbackMapping[];
   events?: WASM.Event[];
+  exception?: string;
 
   private readonly _jsonString?: string;
 
@@ -401,6 +402,15 @@ export class WasmState {
           payload: ev.payload,
         };
       });
+    }
+
+    if (args.exception !== undefined) {
+      if (typeof args.exception !== 'string') {
+        throw new Error(
+          `Exception should be a string got ${typeof args.exception}`,
+        );
+      }
+      this.exception = args.exception;
     }
   }
 
