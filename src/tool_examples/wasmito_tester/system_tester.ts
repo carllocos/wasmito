@@ -200,22 +200,22 @@ export class SystemTester {
 
       try {
         let success = false;
+        let resultValue: any;
         if (isSubscriptionEmitterAction(action)) {
-          success = await this.runActionToEmitSubscriptionValues(
+          [resultValue, success] = await this.runActionToEmitSubscriptionValues(
             vm,
             action,
             i,
             hookMap,
           );
         } else if (isActionThatSubscribesTo(action)) {
-          success = await this.runActionThatSubscribesTo(
+          [resultValue, success] = await this.runActionThatSubscribesTo(
             action,
-            actionRunResult,
             i,
             hookMap,
           );
         } else if (isAction(action)) {
-          success = await this.runAction(vm, action);
+          [resultValue, success] = await this.runAction(vm, action);
         } else {
           throw new Error(`Invalid type action`);
         }
@@ -223,21 +223,19 @@ export class SystemTester {
         if (success) {
           actionRunResult.result = ActionRunState.Success;
         } else {
-          this.fillRunActionResult(
+          this.fillRunActionAsFailed(
+            resultValue,
             action,
             actionRunResult,
-            `action with index #${i} failed`,
-            `'checkActionSuccess' failed`,
+            `check on action with index #${i} is false`,
           );
           return false;
         }
       } catch (e) {
-        this.fillRunActionResult(
-          action,
-          actionRunResult,
-          `action with index #${i} failed`,
-          `exception caused by `,
+        this.fillRunActionDueToError(
           e,
+          actionRunResult,
+          `action with index #${i} failed due to exception`,
         );
         return false;
       }
@@ -245,7 +243,6 @@ export class SystemTester {
     return true;
   }
 
-  // TODO fix generic types
   private async runActionToEmitSubscriptionValues<
     R,
     H,
@@ -255,7 +252,7 @@ export class SystemTester {
     action: SubscriptionEmitterAction<R, H, S>,
     actionIndex: number,
     hookMap: Map<string, HookWithSubscription<any>>,
-  ): Promise<boolean> {
+  ): Promise<[R, boolean]> {
     const result = await maybeTimeoutPromise(
       action.setupSubscription(vm),
       action.timeout,
@@ -267,7 +264,7 @@ export class SystemTester {
       const hook = result[1];
       hookMap.set(action.subscriptionID, hook);
     }
-    return successfulCheck;
+    return [valueForCheck, successfulCheck];
   }
 
   private async runExpects(
@@ -303,32 +300,31 @@ export class SystemTester {
     }
   }
 
-  private async runActionThatSubscribesTo<H, S extends HookWithSubscription<H>>(
+  private async runActionThatSubscribesTo<
+    T,
+    H,
+    S extends HookWithSubscription<H>,
+  >(
     action: SubscribeAction<H, S>,
-    actionRunResult: ActionRunResult,
     actionIndex: number,
     hookMap: Map<string, HookWithSubscription<any>>,
-  ): Promise<boolean> {
+  ): Promise<[T, boolean]> {
     const hook = hookMap.get(action.subscribeToID);
     if (hook === undefined) {
       throw Error(
         `Action ${actionIndex} is attempting to subscribe to an unexisting subscriptionID '${action.subscribeToID}'`,
       );
     }
-    return await this.subscribeToHook(
-      action,
-      hook,
-      actionRunResult,
-      actionIndex,
-    );
+    return await this.subscribeToHook(action, hook);
   }
 
   private async runAction<T>(
     vm: WARDuinoVM,
     action: Action<T>,
-  ): Promise<boolean> {
+  ): Promise<[T, boolean]> {
     const r = await action.doAction(vm);
-    return await action.checkActionSuccess(r);
+    const s = await action.checkActionSuccess(r);
+    return [r, s];
   }
 
   private delayAction<T>(
@@ -370,10 +366,12 @@ export class SystemTester {
   ): void {
     let successFul = false;
     let errorOccurred = false;
+    let actionResult: any;
     const p = new Promise<boolean>((resolve, reject) => {
       action
         .doAction(vm)
         .then((v) => {
+          actionResult = v;
           action.checkActionSuccess(v).then(resolve).catch(reject);
         })
         .catch(reject);
@@ -382,23 +380,21 @@ export class SystemTester {
     maybeTimeoutPromise(p, action.timeout)
       .then((successCheck) => {
         if (!successCheck) {
-          this.fillRunActionResult(
+          this.fillRunActionAsFailed(
+            actionResult,
             action,
             actionRunResult,
-            `action with index #${actionIndex} failed`,
-            `'checkActionSuccess' failed`,
+            `check on action with index #${actionIndex} is false`,
           );
         }
         successFul = successCheck;
       })
       .catch((err) => {
         errorOccurred = true;
-        this.fillRunActionResult(
-          action,
-          actionRunResult,
-          `action with index #${actionIndex} failed`,
-          `exception caused by `,
+        this.fillRunActionDueToError(
           err,
+          actionRunResult,
+          `action with index #${actionIndex} failed due to exception`,
         );
       })
       .finally(() => {
@@ -425,22 +421,19 @@ export class SystemTester {
       });
   }
 
-  // TODO fix generic types
   private async subscribeToHook<T>(
     action: SubscribeAction<any, any>,
     hook: HookWithSubscription<any>,
-    runResult: ActionRunResult,
-    actionIdx: number,
-  ): Promise<boolean> {
-    const p = new Promise<boolean>((resolve, reject) => {
-      const cb = (v: T): void => {
+  ): Promise<[T, boolean]> {
+    const p = new Promise<[T, boolean]>((resolve, reject) => {
+      const cb = (r: T): void => {
         action
-          .checkSubscription(v)
+          .checkSubscription(r)
           .then((v: boolean) => {
             if (cb !== undefined) {
               hook.unSubscribe(cb);
             }
-            resolve(v);
+            resolve([r, v]);
           })
           .catch((err) => {
             if (cb !== undefined) {
@@ -452,46 +445,21 @@ export class SystemTester {
 
       hook.subscribe(cb);
     });
-    try {
-      const success = await maybeTimeoutPromise(p, action.timeout);
-      if (!success) {
-        this.fillRunActionResult(
-          action,
-          runResult,
-          `expect at index ${actionIdx} failed`,
-          `'subscriptionCheck' returns false`,
-        );
-      }
-      return success;
-    } catch (err) {
-      this.fillRunActionResult(
-        action,
-        runResult,
-        `expect at index ${actionIdx} failed`,
-        'exception occurred',
-      );
-      return false;
-    }
+    return await maybeTimeoutPromise(p, action.timeout);
   }
 
-  private fillRunActionResult(
+  private fillRunActionAsFailed(
+    actionResult: any,
     action: Act<any, any, any>,
     actionRunResult: ActionRunResult,
     fallbackFailMsg: string,
-    reasonFailMsg?: string,
-    error?: any,
   ): void {
-    // determine type of failure
-    if (error instanceof TimeoutPromise) {
-      actionRunResult.result = ActionRunState.TimedOut;
-    } else {
-      actionRunResult.result = ActionRunState.Failed;
-    }
+    actionRunResult.result = ActionRunState.Failed;
 
     let msg = fallbackFailMsg;
     if (action.ifFail !== undefined) {
       if (typeof action.ifFail === 'function') {
-        msg = action.ifFail('');
+        msg = action.ifFail(actionResult);
       } else if (typeof action.ifFail === 'string') {
         msg = action.ifFail;
       } else {
@@ -502,16 +470,28 @@ export class SystemTester {
     }
 
     actionRunResult.failMsg = msg;
+  }
 
-    // determine reason failure
+  private fillRunActionDueToError(
+    error: any,
+    actionRunResult: ActionRunResult,
+    fallbackFailMsg: string,
+  ): void {
+    // determine type of failure
+    if (error instanceof TimeoutPromise) {
+      actionRunResult.result = ActionRunState.TimedOut;
+    } else {
+      actionRunResult.result = ActionRunState.Failed;
+    }
+
     if (error !== undefined && error !== null) {
-      actionRunResult.reasonFailure =
-        `caused by an exception:` + error.toString();
       if (error instanceof Error) {
-        actionRunResult.reasonFailure = `${error.name}: ${error.message} with stack ${error.stack}`;
+        actionRunResult.failMsg = `exception occurred: ${error.name}: ${error.message} with stack ${error.stack}`;
+      } else {
+        actionRunResult.failMsg = `exception occurred: ` + error.toString();
       }
     } else {
-      actionRunResult.reasonFailure = reasonFailMsg ?? '';
+      actionRunResult.failMsg = fallbackFailMsg ?? 'exception occurred';
     }
   }
 
