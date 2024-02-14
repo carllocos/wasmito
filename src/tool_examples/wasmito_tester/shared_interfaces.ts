@@ -207,7 +207,6 @@ export interface ActionRunResult {
   action: Act<any, any, any>;
   result: ActionRunState;
   failMsg?: string;
-  reasonFailure?: string;
 }
 
 export enum TestScenarioState {

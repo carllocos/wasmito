@@ -135,7 +135,6 @@ export class SystemTester {
           actionResult.result !== ActionRunState.Delayed
         ) {
           console.log(`\t ${actionResult.failMsg}`);
-          console.log(`\t ${actionResult.reasonFailure}`);
           console.log();
         }
       }
@@ -147,7 +146,6 @@ export class SystemTester {
         );
         if (expectResult.result !== ActionRunState.Success) {
           console.log(`\t ${expectResult.failMsg}`);
-          console.log(`\t ${expectResult.reasonFailure}`);
         }
         console.log();
       }
