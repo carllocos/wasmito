@@ -41,6 +41,10 @@ import {
 } from '../requests/hook_on_event_request';
 import { type Breakpoint } from '../../debugger';
 import { type Hook } from '../../hooks/hook';
+import {
+  HookOnError,
+  isSuccessfullHookOnErrorResponse,
+} from '../requests/hook_on_error';
 
 // TODO Rename to Backend
 export abstract class WARDuinoVM implements WARDuinoAPI {
@@ -392,6 +396,12 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     const request = new HookOnEventRequest().onEventHandling(hook);
     const response = await this.sendRequest(request, timeout);
     return isSuccessfullHookOnEventResponse(response);
+  }
+
+  async addHookOnError(hook: Hook, timeout?: number): Promise<boolean> {
+    const request = new HookOnError().onError(hook);
+    const response = await this.sendRequest(request, timeout);
+    return isSuccessfullHookOnErrorResponse(response);
   }
 
   private hasBreakpoint(bp: Breakpoint): boolean {
