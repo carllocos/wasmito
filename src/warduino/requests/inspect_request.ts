@@ -18,6 +18,7 @@ export enum InspectableState {
   stackState = '08',
   callbacksState = '09',
   eventsState = '0a',
+  exceptionState = '0b',
 }
 
 export interface StackInpsectResponse {
@@ -111,6 +112,11 @@ export class StateRequest extends APIRequestNoSubscription<WasmState> {
     return this;
   }
 
+  public includeException(): StateRequest {
+    this.pushState(InspectableState.exceptionState);
+    return this;
+  }
+
   public generateInterrupt(): string {
     this.state.sort();
     const numberBytes = serializeUInt16BE(this.state.length);
@@ -200,6 +206,11 @@ export class StateRequest extends APIRequestNoSubscription<WasmState> {
         response.events === undefined
       ) {
         throw new Error('invalid state');
+      } else if (
+        s === InspectableState.exceptionState &&
+        response.exception === undefined
+      ) {
+        throw new Error('Exception State is missing');
       }
     }
   }
