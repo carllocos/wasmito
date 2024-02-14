@@ -291,7 +291,7 @@ export class SystemTester {
   ): void {
     if (!successful) {
       this.logger.error(
-        `TestScenario '${scenarioName}': Action #${actionIndex} failed with msg '${actionRunResult.failMsg}' and reason '${actionRunResult.reasonFailure}' `,
+        `TestScenario '${scenarioName}': Action #${actionIndex} failed with msg '${actionRunResult.failMsg}'`,
       );
     } else {
       this.logger.info(
