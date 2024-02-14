@@ -313,3 +313,29 @@ export function proxyCallAction(
 
   return act;
 }
+
+export function createOnErrorActionEmitter(
+  subscriptionID: string,
+  timeout: number,
+): SubscriptionEmitterAction<boolean, WasmState, InspectStateHook> {
+  const ac: SubscriptionEmitterAction<boolean, WasmState, InspectStateHook> = {
+    subscriptionID,
+    description: `Create on error emitter with id ${subscriptionID}`,
+    setupSubscription: async (
+      device: WARDuinoVM,
+    ): Promise<SubActReturn<boolean, WasmState, InspectStateHook>> => {
+      const req = new StateRequest();
+      req.includeAll();
+      const hook = new InspectStateHook(req);
+      const added = await device.addHookOnError(hook);
+      return [added, hook];
+    },
+
+    checkSetupSuccess: async (hookAdded: boolean) => {
+      return hookAdded;
+    },
+    ifFail: 'Failed to add hook on error events',
+    timeout,
+  };
+  return ac;
+}
