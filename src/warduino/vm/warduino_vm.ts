@@ -48,6 +48,7 @@ import {
 import { EventInspectHook } from '../../hooks/hook_event';
 
 // TODO Rename to Backend
+// TODO mover addbp and removebp, and breakpoint fields to BreakpointPolicies +  add getters for breakpoints there
 export abstract class WARDuinoVM implements WARDuinoAPI {
   private _channel: Channel;
   protected abstract logger: winston.Logger;
