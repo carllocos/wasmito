@@ -200,8 +200,11 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
     return processArgs;
   }
 
-  public subscribeOnNewEvent(cb: (ev: WASM.Event) => void): void {
-    this.onNewEventHook.subscribe(cb);
+  public async subscribeOnNewEvent(
+    cb: (ev: WASM.Event) => void,
+    timeout?: number,
+  ): Promise<boolean> {
+    return await this.targetVM.subscribeOnNewEvent(cb, timeout);
   }
 
   private onNewEvent(ev: WASM.Event): void {
