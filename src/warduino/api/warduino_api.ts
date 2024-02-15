@@ -6,7 +6,8 @@ import {
 import { type WASM, type WasmState } from '../../state/wasm';
 import { type StateRequest } from '../requests/inspect_request';
 import { type ProxyCallResponse } from '../requests/fun_call_request';
-import { type Breakpoint } from '../../debugger';
+import { type BreakpointPolicy } from '../../debugger/breakpoint_policies';
+import { type Breakpoint } from '../../debugger/breakpoint';
 
 export interface WARDuinoAPI {
   run: (timeout?: number) => Promise<boolean>;
@@ -14,6 +15,10 @@ export interface WARDuinoAPI {
   pause: (timeout?: number) => Promise<void>;
 
   step: (timeout?: number) => Promise<void>;
+
+  breakpointPolicy: () => BreakpointPolicy;
+
+  changeBreakpointPolicy: (p: BreakpointPolicy) => void;
 
   addBreakpoint: (breakpoint: Breakpoint, timeout?: number) => Promise<boolean>;
 

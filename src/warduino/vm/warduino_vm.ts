@@ -59,6 +59,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
 
   protected readonly onNewEventHook: EventInspectHook;
   private onNewEventHookAdded: boolean;
+  private _breakpointPolicy: BreakpointPolicy;
 
   constructor(
     platformConfig: PlatformBuilderConfig,
@@ -71,6 +72,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     this._breakpoints = [];
     this.onNewEventHook = new EventInspectHook();
     this.onNewEventHookAdded = false;
+    this._breakpointPolicy = new BreakpointDefaultPolicy(this);
   }
 
   abstract close(timeout?: number): Promise<boolean>;
@@ -120,6 +122,14 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
    *
    * WARDUINO API implementation
    */
+
+  breakpointPolicy(): BreakpointPolicy {
+    return this._breakpointPolicy;
+  }
+
+  changeBreakpointPolicy(p: BreakpointPolicy): void {
+    this._breakpointPolicy = p;
+  }
 
   public async subscribeOnNewEvent(
     cb: (ev: WASM.Event) => void,
