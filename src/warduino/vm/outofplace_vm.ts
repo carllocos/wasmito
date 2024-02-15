@@ -15,6 +15,7 @@ import { type WASM, type WasmState } from '../../state/wasm';
 import { StateRequest } from '../requests/inspect_request';
 import { UpdateCallbackMappingRequest } from '../requests/update_callbacks_request';
 import { PushEventRequest } from '../requests/inject_event_request';
+import { BreakpointFactory, BreakpointPolicy } from '../../debugger';
 
 export class OutOfPlaceVMError extends Error {
   constructor(message: string) {
@@ -37,6 +38,7 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
   private readonly shareableChannel: ShareChannel;
 
   public eventsToHandle: WASM.Event[];
+  private readonly _breakpointBuilder: BreakpointFactory;
 
   constructor(
     outOfPlaceMode: OutOfPlaceMode,
@@ -56,6 +58,17 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
     this.targetVM = targetVM;
     this.shareableChannel = new ShareChannel(this.targetVM.channel, serverPort);
     this.eventsToHandle = [];
+    this._breakpointBuilder = new BreakpointFactory(
+      BreakpointPolicy.DefaultPolicy,
+    );
+  }
+
+  get breakpointPolicy(): BreakpointPolicy {
+    return this._breakpointBuilder.policy;
+  }
+
+  set breakpointPolicy(p: BreakpointPolicy) {
+    this._breakpointBuilder.policy = p;
   }
 
   async handleEvent(eventNr: number, timeout?: number): Promise<boolean> {
