@@ -82,7 +82,7 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
       ...this.eventsToHandle.slice(eventNr + 1),
     ];
     const injectEventRequest = new PushEventRequest(ev.topic, ev.payload);
-    const handled = await this.sendRequest(injectEventRequest);
+    const handled = await this.sendRequest(injectEventRequest, timeout);
     if (!handled) {
       throw new this.ErrorClass('Could not handle event');
     }
