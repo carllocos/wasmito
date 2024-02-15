@@ -75,12 +75,13 @@ export class DeviceManager {
 
   async spawnOutOfPlaceVM(
     targetVM: WARDuinoVM,
+    outOfPlaceMode: OutOfPlaceMode,
     maxWaitTime?: number,
     buildOutputDir?: string,
   ): Promise<OutOfPlaceVM> {
     const noServerPort = undefined;
     const vm = new OutOfPlaceVM(
-      OutOfPlaceMode.RedirectIO,
+      outOfPlaceMode,
       targetVM,
       noServerPort,
       buildOutputDir,
