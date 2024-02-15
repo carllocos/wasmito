@@ -39,7 +39,11 @@ import {
   HookOnEventRequest,
   isSuccessfullHookOnEventResponse,
 } from '../requests/hook_on_event_request';
-import { type Breakpoint } from '../../debugger';
+import {
+  type BreakpointPolicy,
+  BreakpointDefaultPolicy,
+} from '../../debugger/breakpoint_policies';
+import { type Breakpoint } from '../../debugger/breakpoint';
 import { type Hook } from '../../hooks/hook';
 import {
   HookOnError,
@@ -241,45 +245,25 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
       this.logger.warn(`breakpoint ${breakpoint.toString()} was already set`);
       return true;
     }
+    const bp: Breakpoint = this.breakpointPolicy().onAddbreakPoint(breakpoint);
     let successful = true;
-    for (let i = 0; i < breakpoint.hooks.length; i++) {
-      const hook = breakpoint.hooks[i];
+    for (let i = 0; i < bp.hooks.length; i++) {
+      const hook = bp.hooks[i];
       successful = await this.addHookBefore(
-        breakpoint.sourceCodeLocation,
+        bp.sourceCodeLocation,
         hook,
         timeout,
       );
       if (!successful) {
-        this.logger.error(`could not add breakpoint ${breakpoint.toString()}`);
+        this.logger.error(`could not add breakpoint ${bp.toString()}`);
         break;
       }
     }
 
-    // if (stateOnBreakpoint === undefined) {
-    //   if (stateHandler !== undefined) {
-    //     throw new this.ErrorClass(
-    //       'Expected `stateOnBreakpoint` to be set in order to handle it via callback `stateHandler`',
-    //     );
-    //   }
-    //   return hookAdded;
-    // }
-
-    // if (stateHandler === undefined) {
-    //   throw new this.ErrorClass(
-    //     'Expected `stateHandler` callback argument as handler for `stateOnBreakpoint`',
-    //   );
-    // }
-    // const inspectHook = new InspectStateHook(stateOnBreakpoint);
-    // inspectHook.onSubscriptionData = stateHandler;
-    // if (await this.addHookBefore(sourceCodeLocation, inspectHook, timeout)) {
-    //   this.logger.info(`breakpoint added upon ${sourceCodeLocation.linenr}`);
-    //   this._breakpoints.push(sourceCodeLocation);
-    //   return true;
-    // }
     if (successful) {
-      this.logger.info(`breakpoint ${breakpoint.toString()} added`);
+      this.logger.info(`breakpoint ${bp.toString()} added`);
     } else {
-      this.logger.error(`could not add breakpoint ${breakpoint.toString()}`);
+      this.logger.error(`could not add breakpoint ${bp.toString()}`);
     }
     return successful;
   }
