@@ -75,7 +75,7 @@ export async function addBreakpoint(
     },
     stateOnBreakpoint,
   );
-  bp.onBreakpoint(onBreakPointReached);
+  bp.subscribe(onBreakPointReached);
   return em.addBreakpoint(bp);
 }
 
@@ -105,7 +105,7 @@ export async function addBreakpointSnapshot(
     },
     snapshotRequest(),
   );
-  bp.onBreakpoint(onBreakPointReached);
+  bp.subscribe(onBreakPointReached);
   return em.addBreakpoint(bp);
 }
 
