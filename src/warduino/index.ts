@@ -16,3 +16,4 @@ export * from './requests/fun_call_request';
 export * from './vm/dev_vm';
 export * from './vm/warduino_vm';
 export * from './vm/mcu_vm';
+export * from './vm/outofplace_vm';
