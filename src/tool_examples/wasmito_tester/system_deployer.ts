@@ -173,13 +173,6 @@ export class SystemDeployer {
     this.usedSerialPorts.add(config.deviceConfig.vmConfig.serialPort);
 
     const vm = await this.deviceManager.spawnHardwareVM(config);
-    const uploaded = await vm.uploadSourceCode(
-      vm.platformConfig.deviceConfig.vmConfig.program,
-    );
-    if (!uploaded) {
-      throw Error('failed to upload source code to device ');
-    }
-
     await this.applyPostDeployment(device, vm);
   }
 

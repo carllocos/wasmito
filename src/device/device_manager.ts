@@ -133,8 +133,17 @@ export class DeviceManager {
     platformConfig: PlatformBuilderConfig,
     buildOutputDir?: string,
   ): Promise<MCUWARDuinoVM> {
-    // TODO move compilation and flashing of source code to here
-    return new MCUWARDuinoVM(platformConfig, buildOutputDir);
+    const vm = new MCUWARDuinoVM(platformConfig, buildOutputDir);
+    const uploaded = await vm.uploadSourceCode(
+      platformConfig.deviceConfig.vmConfig.program,
+    );
+    if (!uploaded) {
+      throw new Error(
+        `failed to upload source code ${platformConfig.deviceConfig.vmConfig.program}`,
+      );
+    }
+
+    return vm;
   }
 
   async closeVM(vm: WARDuinoDevVM, timeout?: number): Promise<boolean> {

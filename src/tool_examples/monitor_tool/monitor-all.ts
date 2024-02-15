@@ -445,12 +445,7 @@ export async function spawnHardwareVM(
     deviceConfigArgs,
     vmConfigArgs,
   );
-  const mcuVM = await dm.spawnHardwareVM(platformConfig, outputDir);
-  const uploaded = await mcuVM.uploadSourceCode(wasmApp);
-  if (!uploaded) {
-    return undefined;
-  }
-  return mcuVM;
+  return await dm.spawnHardwareVM(platformConfig, outputDir);
 }
 
 async function sleep(ms: number): Promise<void> {
