@@ -67,4 +67,9 @@ export interface WARDuinoAPI {
   addHookOnEventHandling: (hook: Hook, timeout?: number) => Promise<boolean>;
 
   addHookOnError: (hook: Hook, timeout?: number) => Promise<boolean>;
+
+  subscribeOnNewEvent: (
+    cb: (ev: WASM.Event) => void,
+    timeout?: number,
+  ) => Promise<boolean>;
 }

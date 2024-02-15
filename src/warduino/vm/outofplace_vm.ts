@@ -12,7 +12,6 @@ import { spawn, type ChildProcess } from 'child_process';
 import { ClientSideSocket, ShareChannel } from '../../communication/index';
 import { getPath2WARDuinoSDKVMBinary } from '../../project_config';
 import { type WASM, type WasmState } from '../../state/wasm';
-import { EventInspectHook } from '../../hooks/hook_event';
 import { StateRequest } from '../requests/inspect_request';
 import { UpdateCallbackMappingRequest } from '../requests/update_callbacks_request';
 import { PushEventRequest } from '../requests/inject_event_request';
@@ -38,7 +37,6 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
   private readonly shareableChannel: ShareChannel;
 
   public eventsToHandle: WASM.Event[];
-  private readonly onNewEventHook: EventInspectHook;
 
   constructor(
     outOfPlaceMode: OutOfPlaceMode,
@@ -58,7 +56,6 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
     this.targetVM = targetVM;
     this.shareableChannel = new ShareChannel(this.targetVM.channel, serverPort);
     this.eventsToHandle = [];
-    this.onNewEventHook = new EventInspectHook();
   }
 
   private async updateCallbackMapping(): Promise<void> {
@@ -214,9 +211,8 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
   private async registerAndAssertOnNewEventHooks(
     maxWaitTime?: number,
   ): Promise<void> {
-    this.onNewEventHook.subscribe(this.onNewEvent.bind(this));
-    const addedOnNewEventHook = await this.targetVM.addHookOnNewEvent(
-      this.onNewEventHook,
+    const addedOnNewEventHook = await this.targetVM.subscribeOnNewEvent(
+      this.onNewEvent.bind(this),
       maxWaitTime,
     );
     if (!addedOnNewEventHook) {

@@ -45,6 +45,7 @@ import {
   HookOnError,
   isSuccessfullHookOnErrorResponse,
 } from '../requests/hook_on_error';
+import { EventInspectHook } from '../../hooks/hook_event';
 
 // TODO Rename to Backend
 export abstract class WARDuinoVM implements WARDuinoAPI {
@@ -56,6 +57,9 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
 
   private _breakpoints: Breakpoint[];
 
+  protected readonly onNewEventHook: EventInspectHook;
+  private onNewEventHookAdded: boolean;
+
   constructor(
     platformConfig: PlatformBuilderConfig,
     communicationChannel: Channel,
@@ -65,6 +69,8 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     this._channel = communicationChannel;
     this.platform = createPlatformBuilder(platformConfig, buildOutputDir);
     this._breakpoints = [];
+    this.onNewEventHook = new EventInspectHook();
+    this.onNewEventHookAdded = false;
   }
 
   abstract close(timeout?: number): Promise<boolean>;
@@ -114,6 +120,23 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
    *
    * WARDUINO API implementation
    */
+
+  public async subscribeOnNewEvent(
+    cb: (ev: WASM.Event) => void,
+    timeout?: number,
+  ): Promise<boolean> {
+    if (!this.onNewEventHookAdded) {
+      this.onNewEventHookAdded = await this.addHookOnNewEvent(
+        this.onNewEventHook,
+        timeout,
+      );
+    }
+
+    if (this.onNewEventHookAdded) {
+      this.onNewEventHook.subscribe(cb);
+    }
+    return this.onNewEventHookAdded;
+  }
 
   public async run(timeout?: number): Promise<boolean> {
     const request = new RunRequest();
