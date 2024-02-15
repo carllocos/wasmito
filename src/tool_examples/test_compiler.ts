@@ -26,8 +26,9 @@ async function runBuilder(): Promise<void> {
     return;
   }
 
+  const sourceFilePath = './example-wat/dimmer-double-button.wat';
   const vmConfigArgs: VMConfigArgs = {
-    program: 'program',
+    program: sourceFilePath,
     serialPort: boardPort,
   };
 
@@ -43,20 +44,13 @@ async function runBuilder(): Promise<void> {
     deviceConfigArgs,
     vmConfigArgs,
   );
-  const sourceFilePath = './example-wat/dimmer-double-button.wat';
   const compileOutputDirectory = './example-wat/platform_arduino/';
   const deviceManager = new DeviceManager();
   const mcuVM = await deviceManager.spawnHardwareVM(
     platformConfig,
     compileOutputDirectory,
   );
-  const uploaded = await mcuVM.uploadSourceCode(sourceFilePath);
-  if (uploaded) {
-    testCompilerLogger.info('Successfully updated source code');
-    await mcuVM.run();
-  } else {
-    testCompilerLogger.error('failed to update source code');
-  }
+  await mcuVM.run();
 }
 
 runBuilder()

@@ -59,51 +59,6 @@ async function callSubscribe(vm: WARDuinoVM, args?: number[]): Promise<void> {
   console.log(replySub);
 }
 
-export async function runTest(
-  config: PlatformBuilderConfig,
-  upload: boolean,
-): Promise<void> {
-  const dm = new DeviceManager();
-  const targetVM = await dm.spawnHardwareVM(config);
-  if (upload) {
-    const uploaded = await targetVM.uploadSourceCode(vmConfigArgs.program);
-    if (!uploaded) {
-      throw new Error(`failed to upload source code ${vmConfigArgs.program}`);
-    }
-  } else {
-    const connected = await targetVM.connect();
-    if (!connected) {
-      throw new Error(`failed to connect`);
-    }
-  }
-
-  const proxied = await dm.spawnOutOfPlaceVM(targetVM);
-  const running = await proxied.run();
-  console.log(running);
-}
-
-export async function runTestProxyTests(
-  config: PlatformBuilderConfig,
-  upload: boolean,
-): Promise<void> {
-  const dm = new DeviceManager();
-  const targetVM = await dm.spawnHardwareVM(config);
-  if (upload) {
-    const uploaded = await targetVM.uploadSourceCode(vmConfigArgs.program);
-    if (!uploaded) {
-      throw new Error(`failed to upload source code ${vmConfigArgs.program}`);
-    }
-  } else {
-    const connected = await targetVM.connect();
-    if (!connected) {
-      throw new Error(`failed to connect`);
-    }
-  }
-  await callSubscribe(targetVM);
-
-  console.log('here');
-}
-
 export async function runTestProxyOnDev(
   config: PlatformBuilderConfig,
   upload: boolean,
@@ -125,21 +80,11 @@ async function setupMCUVM(
   upload: boolean,
 ): Promise<MCUWARDuinoVM> {
   const dm = new DeviceManager();
-  const targetVM = await dm.spawnHardwareVM(config);
   if (upload) {
-    const uploaded = await targetVM.uploadSourceCode(vmConfigArgs.program);
-    if (!uploaded) {
-      throw new Error(`failed to upload source code ${vmConfigArgs.program}`);
-    }
+    return await dm.spawnHardwareVM(config);
   } else {
-    await targetVM.platform.compile(vmConfigArgs.program);
-    const connected = await targetVM.connect();
-    if (!connected) {
-      throw new Error(`failed to connect`);
-    }
+    throw new Error(`TODO`);
   }
-
-  return targetVM;
 }
 
 export async function testEventHook(
