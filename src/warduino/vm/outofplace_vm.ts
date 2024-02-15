@@ -71,6 +71,51 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
     this._breakpointBuilder.policy = p;
   }
 
+  /*
+   * API Overwrites
+   */
+
+  override async close(timeout?: number): Promise<boolean> {
+    if (!(await super.close(timeout))) {
+      return false;
+    }
+    if (!(await this.shareableChannel.closeServer(timeout))) {
+      return false;
+    }
+    this.targetVM.channel = this.shareableChannel.channelToShare;
+    return true;
+  }
+
+  public override async subscribeOnNewEvent(
+    cb: (ev: WASM.Event) => void,
+    timeout?: number,
+  ): Promise<boolean> {
+    return await this.targetVM.subscribeOnNewEvent(cb, timeout);
+  }
+
+  protected override buildProcessArguments(
+    programPath: string,
+    args: VMConfiguration,
+  ): string[] {
+    const processArgs: string[] = [programPath];
+
+    processArgs.push('--socket');
+    processArgs.push(args.toolPort.toString());
+    processArgs.push('--paused');
+    processArgs.push('--disable-strict-module-load');
+    processArgs.push('--proxy');
+    this.logger.debug(
+      `using port of ShareableChannel ${this.shareableChannel.serverPort} to proxy the target VM`,
+    );
+    processArgs.push(this.shareableChannel.serverPort.toString());
+
+    return processArgs;
+  }
+
+  /*
+   * Out Of Place specific new Methods
+   */
+
   async handleEvent(eventNr: number, timeout?: number): Promise<boolean> {
     if (eventNr < 0 || eventNr >= this.eventsToHandle.length) {
       return false;
@@ -86,17 +131,6 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
     if (!handled) {
       throw new this.ErrorClass('Could not handle event');
     }
-    return true;
-  }
-
-  override async close(timeout?: number): Promise<boolean> {
-    if (!(await super.close(timeout))) {
-      return false;
-    }
-    if (!(await this.shareableChannel.closeServer(timeout))) {
-      return false;
-    }
-    this.targetVM.channel = this.shareableChannel.channelToShare;
     return true;
   }
 
@@ -182,32 +216,6 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
     maxWaitTime?: number,
   ): Promise<boolean> {
     throw new Error('Method not implemented.');
-  }
-
-  protected override buildProcessArguments(
-    programPath: string,
-    args: VMConfiguration,
-  ): string[] {
-    const processArgs: string[] = [programPath];
-
-    processArgs.push('--socket');
-    processArgs.push(args.toolPort.toString());
-    processArgs.push('--paused');
-    processArgs.push('--disable-strict-module-load');
-    processArgs.push('--proxy');
-    this.logger.debug(
-      `using port of ShareableChannel ${this.shareableChannel.serverPort} to proxy the target VM`,
-    );
-    processArgs.push(this.shareableChannel.serverPort.toString());
-
-    return processArgs;
-  }
-
-  public async subscribeOnNewEvent(
-    cb: (ev: WASM.Event) => void,
-    timeout?: number,
-  ): Promise<boolean> {
-    return await this.targetVM.subscribeOnNewEvent(cb, timeout);
   }
 
   private onNewEvent(ev: WASM.Event): void {
