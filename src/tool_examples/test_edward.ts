@@ -98,7 +98,7 @@ export async function testEventHook(
     },
     new StateRequest().includePC(),
   );
-  bp.onBreakpoint((state: WasmState) => {
+  bp.subscribe((state: WasmState) => {
     console.log('breakpoint reached');
     // vm.run().then(console.log).catch(console.error);
   });

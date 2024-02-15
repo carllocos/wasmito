@@ -34,7 +34,7 @@ export function addBreakpointSubscription(
       device: WARDuinoVM,
     ): Promise<SubActReturn<boolean, WasmState, InspectStateHook>> => {
       const hook = new InspectStateHook(new StateRequest().includePC());
-      breakpoint.onBreakpoint(hook.onSubscriptionData.bind(hook));
+      breakpoint.subscribe(hook.onSubscriptionData.bind(hook));
       const added = await device.addBreakpoint(breakpoint);
       return [added, hook];
     },
@@ -57,7 +57,7 @@ export function addBPAndRunUntil(
         const bp = new Breakpoint({
           linenr,
         });
-        bp.onBreakpoint((state: WasmState): void => {
+        bp.subscribe((state: WasmState): void => {
           resolve(true);
         });
 

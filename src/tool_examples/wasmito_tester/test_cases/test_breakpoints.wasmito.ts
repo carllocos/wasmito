@@ -10,7 +10,10 @@ import {
   mockPrimitiveFuncAction,
   runVMAction,
 } from '../reusable_actions';
-import { Breakpoint, BreakpointSingleStop } from '../../../debugger/breakpoint';
+import {
+  Breakpoint,
+  BreakpointRemoveAndProceed,
+} from '../../../debugger/breakpoint';
 import { type PostSetupConfig } from '../shared_interfaces';
 
 /*
@@ -78,7 +81,7 @@ const singleStopBp: TestScenario = {
   actions: [
     addBreakpointSubscription(
       'BP line 91',
-      new BreakpointSingleStop({ linenr: 91 }),
+      new BreakpointRemoveAndProceed({ linenr: 91 }),
       3000,
     ),
     runVMAction(3000, 3000), // wait 3 seconds before executing runVMAction
