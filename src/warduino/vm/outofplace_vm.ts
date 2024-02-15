@@ -58,16 +58,6 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
     this.eventsToHandle = [];
   }
 
-  private async updateCallbackMapping(): Promise<void> {
-    const req = new StateRequest().includeCallbackMappings();
-    const state = await this.targetVM.inspect(req);
-
-    const updateReq = new UpdateCallbackMappingRequest(state.callbackMappings);
-    if (!(await this.sendRequest(updateReq))) {
-      throw new this.ErrorClass('failed to update callback mappings');
-    }
-  }
-
   async handleEvent(eventNr: number, timeout?: number): Promise<boolean> {
     if (eventNr < 0 || eventNr >= this.eventsToHandle.length) {
       return false;
@@ -296,6 +286,16 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
       this.vmConfig.toolHostIP,
       this.deviceConfig.fullname,
     );
+  }
+
+  private async updateCallbackMapping(): Promise<void> {
+    const req = new StateRequest().includeCallbackMappings();
+    const state = await this.targetVM.inspect(req);
+
+    const updateReq = new UpdateCallbackMappingRequest(state.callbackMappings);
+    if (!(await this.sendRequest(updateReq))) {
+      throw new this.ErrorClass('failed to update callback mappings');
+    }
   }
 }
 
