@@ -1,5 +1,8 @@
 import { DeviceManager } from '../../src/device/device_manager';
-import { type OutOfPlaceVM } from '../../src/warduino/vm/outofplace_vm';
+import {
+  OutOfPlaceMode,
+  type OutOfPlaceVM,
+} from '../../src/warduino/vm/outofplace_vm';
 import { expect } from 'chai';
 import { MockVM } from '../shared/mock_vm';
 import { type MockChannel } from '../shared/mock_channel';
@@ -53,7 +56,11 @@ describe('Intergation Test: Proxy Calls to a Mocked Target VM produces the right
     targetVM.mockResponseForAddHookOnNewEvent(true);
     targetVM.mockResponseForAddHookOnNewEvent(true);
     await targetVM.mockSnapshot('./test/data/proxy-call-snapshot-1.json');
-    const proxyVM = await deviceManager.spawnOutOfPlaceVM(targetVM, 8000);
+    const proxyVM = await deviceManager.spawnOutOfPlaceVM(
+      targetVM,
+      OutOfPlaceMode.RedirectIO,
+      8000,
+    );
     const chipPinModeID = 1;
     const argsLine39 = new WasmValuesBuilder().addI32Value(39).addI32Value(5);
     const proxyCallLine39 = new ProxyCallRequest(
