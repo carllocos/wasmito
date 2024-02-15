@@ -5,7 +5,8 @@ import {
   ScheduleOnce,
 } from './schedule';
 import { type LogicalClock } from './logicalclock';
-import { getGlobalLogger } from '../logger/logger';
+import { createLogger } from '../logger/logger';
+import type winston from 'winston';
 
 export enum HookKind {
   RemoteCall = '01',
@@ -19,12 +20,15 @@ export enum HookKind {
   EventRemove = '11',
 }
 
-export interface SubscriptionHook<SubscriptionType> {
+export interface ISubscription<SubscriptionType> {
   readonly subscribe: (calllback: (value: SubscriptionType) => void) => void;
   readonly unSubscribe: (calllback: (value: SubscriptionType) => void) => void;
   readonly onSubscriptionData: (data: SubscriptionType) => void;
   readonly parseSubscriptionData: (input: any) => SubscriptionType;
 }
+
+export type SubscriptionHook<SubscriptionType> =
+  ISubscription<SubscriptionType>;
 
 export abstract class Hook {
   public readonly kind: HookKind;
@@ -60,14 +64,22 @@ export abstract class HookWithSubscription<SubscriptionType>
 {
   private listeners: Array<(data: SubscriptionType) => void>;
   private readonly removedListeners: Set<(data: SubscriptionType) => void>;
+  protected logger: winston.Logger;
 
   constructor(kind: HookKind) {
     super(kind);
     this.listeners = [];
     this.removedListeners = new Set();
+    this.logger = createLogger('SubscriptionHook');
   }
 
   public subscribe(callback: (data: SubscriptionType) => void): void {
+    const found = this.listeners.find((cb) => cb === callback);
+    if (found !== undefined) {
+      this.logger.warn(`Attempting to add 2 same subscription callbacks`);
+      return;
+    }
+
     this.listeners.push(callback);
   }
 
@@ -77,8 +89,7 @@ export abstract class HookWithSubscription<SubscriptionType>
 
   onSubscriptionData(value: SubscriptionType): void {
     if (this.listeners.length === 0) {
-      const log = getGlobalLogger();
-      log.warn('There is no listener for subscription content');
+      this.logger.warn('There is no listener for subscription content');
     }
     this.listeners.forEach((listener) => {
       if (!this.removedListeners.has(listener)) {
