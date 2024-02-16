@@ -48,7 +48,7 @@ export class InspectStack extends APIRequestNoSubscription<WasmStack> {
 export class StateRequest extends APIRequestNoSubscription<WasmState> {
   private state: string[] = [];
 
-  public includeAll(): void {
+  public includeAll(): StateRequest {
     this.state = [];
     const allStates = Object.values(InspectableState) as string[];
     allStates
@@ -56,6 +56,7 @@ export class StateRequest extends APIRequestNoSubscription<WasmState> {
       .forEach((s) => {
         this.pushState(s);
       });
+    return this;
   }
 
   public isRequestEmpty(): boolean {
