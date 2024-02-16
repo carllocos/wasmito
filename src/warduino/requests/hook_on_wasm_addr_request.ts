@@ -1,4 +1,4 @@
-import { getGlobalLogger } from '../../logger/logger';
+import { createLogger } from '../../logger/logger';
 import { encodeToHexLEB128 } from '../../util/encoder';
 import {
   APIRequest,
@@ -9,6 +9,7 @@ import {
 } from '../api/request_interface';
 import { HookWithSubscription, type Hook } from '../../hooks/hook';
 import { Instruction } from '../api/instructions';
+import type winston from 'winston';
 
 export enum HookOnWasmAddrMoment {
   HookBefore = '01',
@@ -43,6 +44,7 @@ export function createHookOnWasmAddrResponse(
 }
 
 export class HookOnWasmAddrRequest extends APIRequest<HookOnWasmAddrResponse> {
+  private readonly logger: winston.Logger;
   public readonly wasmAddr;
   public readonly hooks: Hook[];
   private moment: HookOnWasmAddrMoment;
@@ -56,6 +58,7 @@ export class HookOnWasmAddrRequest extends APIRequest<HookOnWasmAddrResponse> {
     this.moment = HookOnWasmAddrMoment.HookBefore;
     this.interruptNr = Instruction.HookOnWasmAddr;
     this.isaddRequest = true;
+    this.logger = createLogger('HookOnWasmAddrRequest');
   }
 
   before(): HookOnWasmAddrRequest {
@@ -72,9 +75,7 @@ export class HookOnWasmAddrRequest extends APIRequest<HookOnWasmAddrResponse> {
     if (this.hooks.length === 0) {
       this.hooks.push(hook);
     } else {
-      getGlobalLogger().debug(
-        'Todo support multiple hooks. For now just one hook',
-      );
+      this.logger.debug('Todo support multiple hooks. For now just one hook');
     }
     return this;
   }
@@ -161,8 +162,7 @@ export class HookOnWasmAddrRequest extends APIRequest<HookOnWasmAddrResponse> {
             try {
               hook.onSubscriptionData(parsed);
             } catch (e) {
-              getGlobalLogger().info(`Hook handler threw error: `);
-              getGlobalLogger().info(e);
+              this.logger.info(`Hook handler threw error: `, e);
             }
           }
         }
