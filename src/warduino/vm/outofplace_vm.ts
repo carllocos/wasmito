@@ -140,6 +140,9 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
     await this.setupLocalVM(snapshot, maxWaitTime);
   }
 
+  // TODO for edward: still do to for events on the MCU
+  // 1. remove events that are in the queue on MCU
+  // 2. remove event from MCU queue on new event
   public async spawn(maxWaitTime?: number): Promise<ChildProcess> {
     const snapshot = await this.setupTargetVM(maxWaitTime);
     await this.assertExistanceToolPort();
