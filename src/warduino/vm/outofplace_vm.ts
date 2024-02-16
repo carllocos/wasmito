@@ -15,6 +15,12 @@ import { type WASM, type WasmState } from '../../state/wasm';
 import { StateRequest } from '../requests/inspect_request';
 import { UpdateCallbackMappingRequest } from '../requests/update_callbacks_request';
 import { PushEventRequest } from '../requests/inject_event_request';
+import {
+  type BreakpointPolicy,
+  SingleStopBreakpointPolicy,
+} from '../../debugger/breakpoint_policies';
+import { InspectStateHook } from '../../hooks/hook_inspect_state';
+import { type Breakpoint } from '../../debugger/breakpoint';
 
 export class OutOfPlaceVMError extends Error {
   constructor(message: string) {
@@ -138,6 +144,13 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
       throw new this.ErrorClass('timed out connecting to DevVM process');
     }
     await this.setupLocalVM(snapshot, maxWaitTime);
+  }
+
+  public async spawnWithSnapshot(
+    snapshot: WasmState,
+    maxWaitTime?: number,
+  ): Promise<ChildProcess> {
+    throw new this.ErrorClass('TODO');
   }
 
   // TODO for edward: still do to for events on the MCU
@@ -340,5 +353,77 @@ function assertvalidOutOfPlaceMode(mode: OutOfPlaceMode): void {
   }
   if (!modeExists) {
     throw new OutOfPlaceVMError(`given outOfPlace mode ${mode} does not exist`);
+  }
+}
+
+export class OutOfThingsTargetMonitor {
+  private readonly targetVM: WARDuinoVM;
+  private readonly _snapshots: WasmState[];
+  private readonly _bpPolicy: BreakpointPolicy;
+  private readonly _snapshotHook: InspectStateHook;
+  private onSpawnCb: ((vm: WARDuinoDevVM, p: ChildProcess) => void) | undefined;
+
+  constructor(targetVM: WARDuinoVM) {
+    this.targetVM = targetVM;
+    this._snapshots = [];
+    this._bpPolicy = new SingleStopBreakpointPolicy(targetVM);
+    this._bpPolicy.onBreakpointAdd(this.storeSnapshot.bind(this));
+    this._snapshotHook = new InspectStateHook(new StateRequest().includeAll());
+    this.targetVM.changeBreakpointPolicy(this._bpPolicy);
+    this.onSpawnCb = undefined;
+  }
+
+  async setup(): Promise<void> {
+    this.targetVM.breakpoints.forEach((bp) => {
+      bp.subscribe((state: WasmState) => {
+        if (state.isSnapshot()) {
+          this._snapshots.push(state);
+        }
+      });
+    });
+
+    if (!(await this.targetVM.addHookOnError(this._snapshotHook))) {
+      throw new Error(`Could not add hook On Error for snapshot`);
+    }
+  }
+
+  getErrorSnapshots(): WasmState[] {
+    return this._snapshots.filter((s) => {
+      return s.exception !== undefined && s.exception !== '';
+    });
+  }
+
+  onSpawn(cb: (vm: WARDuinoDevVM, p: ChildProcess) => void): void {
+    this.onSpawnCb = cb;
+  }
+
+  async spawnDevVMOnSnapshot(
+    snapshotIdx: number,
+    maxWaitTime?: number,
+    buildOutputDir?: string,
+  ): Promise<OutOfPlaceVM> {
+    if (snapshotIdx < 0 || snapshotIdx >= this._snapshots.length) {
+      throw new Error(`Invalid snapshot index given ${snapshotIdx}`);
+    }
+
+    const sn = this._snapshots[snapshotIdx];
+    const noServerPort = undefined;
+    const vm = new OutOfPlaceVM(
+      OutOfPlaceMode.CopyInput,
+      this.targetVM,
+      noServerPort,
+      buildOutputDir,
+    );
+    const childProcess = await vm.spawnWithSnapshot(sn, maxWaitTime);
+    if (this.onSpawnCb !== undefined) {
+      this.onSpawnCb(vm, childProcess);
+    }
+    return vm;
+  }
+
+  private storeSnapshot(bp: Breakpoint): void {
+    bp.subscribe((snapshot: WasmState) => {
+      this._snapshots.push(snapshot);
+    });
   }
 }
