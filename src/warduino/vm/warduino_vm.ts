@@ -27,7 +27,6 @@ import {
 import {
   HookOnWasmAddrMoment,
   HookOnWasmAddrRequest,
-  RemoveHookOnWasmAddrRequest,
 } from '../requests/hook_on_wasm_addr_request';
 import { ProxyCallHook } from '../../hooks/hook_proxy_call';
 import { AroundFunctionRequest } from '../requests/around_function_request';
@@ -60,8 +59,6 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   public readonly platform: PlatformBuilder;
   protected abstract readonly ErrorClass: new (errorMsg: string) => Error;
 
-  private _breakpoints: Breakpoint[];
-
   protected readonly onNewEventHook: EventInspectHook;
   private onNewEventHookAdded: boolean;
   private _breakpointPolicy: BreakpointPolicy;
@@ -74,7 +71,6 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     this.platformConfig = platformConfig;
     this._channel = communicationChannel;
     this.platform = createPlatformBuilder(platformConfig, buildOutputDir);
-    this._breakpoints = [];
     this.onNewEventHook = new EventInspectHook();
     this.onNewEventHookAdded = false;
     this._breakpointPolicy = new BreakpointDefaultPolicy(this);
@@ -120,7 +116,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   }
 
   get breakpoints(): Breakpoint[] {
-    return this._breakpoints;
+    return this.breakpointPolicy().breakpoints;
   }
 
   /*
@@ -132,8 +128,10 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     return this._breakpointPolicy;
   }
 
-  changeBreakpointPolicy(p: BreakpointPolicy): void {
-    this._breakpointPolicy = p;
+  changeBreakpointPolicy(newPolicy: BreakpointPolicy): void {
+    this._breakpointPolicy.deactivate();
+    newPolicy.activate(this._breakpointPolicy.breakpoints);
+    this._breakpointPolicy = newPolicy;
   }
 
   public async subscribeOnNewEvent(
@@ -241,67 +239,14 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     breakpoint: Breakpoint,
     timeout?: number | undefined,
   ): Promise<boolean> {
-    if (this.hasBreakpoint(breakpoint)) {
-      this.logger.warn(`breakpoint ${breakpoint.toString()} was already set`);
-      return true;
-    }
-    const bp: Breakpoint = this.breakpointPolicy().onAddbreakPoint(breakpoint);
-    let successful = true;
-    for (let i = 0; i < bp.hooks.length; i++) {
-      const hook = bp.hooks[i];
-      successful = await this.addHookBefore(
-        bp.sourceCodeLocation,
-        hook,
-        timeout,
-      );
-      if (!successful) {
-        this.logger.error(`could not add breakpoint ${bp.toString()}`);
-        break;
-      }
-    }
-
-    if (successful) {
-      this.logger.info(`breakpoint ${bp.toString()} added`);
-    } else {
-      this.logger.error(`could not add breakpoint ${bp.toString()}`);
-    }
-    return successful;
+    return await this.breakpointPolicy().addBreakpoint(breakpoint, timeout);
   }
 
   async removeBreakpoint(
     breakpoint: Breakpoint,
     timeout?: number | undefined,
   ): Promise<boolean> {
-    const sm = this.sourceMap;
-    const mappings = sm.getMappingsFromSourceCodeLocation(
-      breakpoint.sourceCodeLocation,
-    );
-    if (mappings.length === 0) {
-      throw new this.ErrorClass(
-        `Cannot breakpoint on an unexisting wasm address derived from breakpoint ${breakpoint.toString()}`,
-      );
-    }
-
-    if (!this.hasBreakpoint(breakpoint)) {
-      this.logger.info(
-        `no breakpoint ${breakpoint.toString()} was previously set so nothing to remove`,
-      );
-      return false;
-    }
-
-    const addr = mappings[0].address;
-    const request = new RemoveHookOnWasmAddrRequest(addr).before();
-
-    const response = await this.sendRequest(request, timeout);
-    const successful = isSuccessfulMessage(response);
-    if (successful) {
-      this._breakpoints = this._breakpoints.filter((b) => {
-        return !breakpoint.equals(b);
-      });
-      this.logger.info(`breakpoint ${breakpoint.toString()} removed`);
-    }
-
-    return successful;
+    return await this.breakpointPolicy().removeBreakpoint(breakpoint, timeout);
   }
 
   async proxyCall(
@@ -420,13 +365,5 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     const request = new HookOnError().onError(hook);
     const response = await this.sendRequest(request, timeout);
     return isSuccessfullHookOnErrorResponse(response);
-  }
-
-  private hasBreakpoint(bp: Breakpoint): boolean {
-    const found = this._breakpoints.find((b) => {
-      return bp.equals(b);
-    });
-
-    return found !== undefined;
   }
 }
