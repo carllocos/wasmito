@@ -356,7 +356,7 @@ function assertvalidOutOfPlaceMode(mode: OutOfPlaceMode): void {
   }
 }
 
-export class OutOfThingsTargetMonitor {
+export class OutOfThingsMonitor {
   private readonly targetVM: WARDuinoVM;
   private readonly _snapshots: WasmState[];
   private readonly _bpPolicy: BreakpointPolicy;
