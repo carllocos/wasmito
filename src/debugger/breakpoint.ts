@@ -9,27 +9,47 @@ import type winston from 'winston';
 
 // TODO reimplement as extension to HookWithSub? Although this is bound to an address and should be extensible to support binding to events
 export class Breakpoint implements ISubscription<WasmState> {
-  public readonly sourceCodeLocation: SourceCodeLocation;
-  protected _stateOnBreakpoint: StateRequest;
-
-  private readonly pauseHook: PauseVMHook;
-  protected readonly inspectHook: InspectStateHook;
   protected logger: winston.Logger;
+
+  public readonly sourceCodeLocation: SourceCodeLocation;
+  private _hooks: Hook[];
   private readonly removedListeners: Set<(data: WasmState) => void>;
+
+  protected readonly fanOutToListeners: (state: WasmState) => void;
 
   private listeners: Array<(state: WasmState) => void>;
   constructor(
     sourceCodeLocation: SourceCodeLocation,
     stateOnBreakpoint?: StateRequest,
   ) {
-    this.sourceCodeLocation = sourceCodeLocation;
-    this._stateOnBreakpoint =
-      stateOnBreakpoint ?? new StateRequest().includePC();
-    this.listeners = [];
-    this.pauseHook = new PauseVMHook();
-    this.inspectHook = this.prepareInspectHook();
     this.logger = createLogger('Breakpoint');
+    this.sourceCodeLocation = sourceCodeLocation;
+    this.fanOutToListeners = (state: WasmState) => {
+      this.onSubscriptionData(state);
+    };
     this.removedListeners = new Set();
+    this.listeners = [];
+    this._hooks = this.createHooks(stateOnBreakpoint);
+  }
+
+  private createHooks(sttateOnBreakpoint?: StateRequest): Hook[] {
+    const stateOnBreakpoint = sttateOnBreakpoint ?? this.createStateRequest();
+    const inspectStateHook = new InspectStateHook(stateOnBreakpoint);
+
+    // careful:
+    // do not use subscribe(this.onSubscriptionData.bind(this))
+    // it creates new function per call which can causes duplicate fan out behaviour
+    inspectStateHook.subscribe(this.fanOutToListeners);
+    return [inspectStateHook, new PauseVMHook()];
+  }
+
+  private createStateRequest(): StateRequest {
+    return new StateRequest()
+      .includePC()
+      .includeStack()
+      .includeCallstack()
+      .includeGlobals()
+      .includeEvents();
   }
 
   parseSubscriptionData(input: any): WasmState {
@@ -65,12 +85,19 @@ export class Breakpoint implements ISubscription<WasmState> {
     this.removedListeners.clear();
   }
 
-  get stateOnBreakpoint(): StateRequest {
-    return this._stateOnBreakpoint;
+  get hooks(): Hook[] {
+    return this._hooks;
   }
 
-  get hooks(): Hook[] {
-    return [this.pauseHook, this.inspectHook];
+  set hooks(newHooks: Hook[]) {
+    const inspectHook = newHooks.find((h) => h instanceof InspectStateHook);
+    if (inspectHook === undefined) {
+      throw Error(`One Inspect State Hook is at least required`);
+    }
+
+    const hook = inspectHook as InspectStateHook;
+    hook.subscribe(this.fanOutToListeners);
+    this._hooks = newHooks;
   }
 
   equals(other: Breakpoint): boolean {
@@ -95,37 +122,4 @@ export class Breakpoint implements ISubscription<WasmState> {
     s += '}';
     return s;
   }
-
-  private prepareInspectHook(): InspectStateHook {
-    // defines the behaviour of the breakpoint once reached
-    const hook = new InspectStateHook(this._stateOnBreakpoint);
-    hook.subscribe(this.onSubscriptionData.bind(this));
-    return hook;
-  }
-}
-
-export class BreakpointRemoveAndProceed extends Breakpoint {
-  constructor(location: SourceCodeLocation) {
-    super(location);
-    this._stateOnBreakpoint.includeAll();
-    this.inspectHook.scheduleOnce();
-  }
-
-  get stateOnBreakpoint(): StateRequest {
-    const req = new StateRequest();
-    req.includeAll();
-    return req;
-  }
-
-  get hooks(): Hook[] {
-    // once bp reached make sure to leave the running state as is
-    return [this.inspectHook];
-  }
-
-  // private createStateToInspectHook(): InspectStateHook {
-  //   const hook = new InspectStateHook(this._stateOnBreakpoint);
-  //   hook.scheduleOnce();
-  //   hook.subscribe(this.onSubscriptionData.bind(this));
-  //   return hook;
-  // }
 }
