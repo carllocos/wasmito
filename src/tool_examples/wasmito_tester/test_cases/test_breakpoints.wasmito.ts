@@ -10,11 +10,10 @@ import {
   mockPrimitiveFuncAction,
   runVMAction,
 } from '../reusable_actions';
-import {
-  Breakpoint,
-  BreakpointRemoveAndProceed,
-} from '../../../debugger/breakpoint';
+import { Breakpoint } from '../../../debugger/breakpoint';
 import { type PostSetupConfig } from '../shared_interfaces';
+import { RemoveAndProceedBreakpointPolicy } from '../../../debugger/breakpoint_policies';
+import { type WARDuinoVM } from '../../../warduino/vm/warduino_vm';
 
 /*
  * System Setup
@@ -79,9 +78,23 @@ const singleStopBp: TestScenario = {
   testName: 'Test single stop breakpoint',
   testProgram: program,
   actions: [
+    {
+      description: 'Change breakpoint Policy',
+      doAction: async (device: WARDuinoVM): Promise<boolean> => {
+        const policy = new RemoveAndProceedBreakpointPolicy(device);
+        device.changeBreakpointPolicy(policy);
+        return true;
+      },
+      checkActionSuccess: async (
+        successfullResponse: boolean,
+      ): Promise<boolean> => {
+        return successfullResponse;
+      },
+      ifFail: `failed to change Breakpoint Policy`,
+    },
     addBreakpointSubscription(
       'BP line 91',
-      new BreakpointRemoveAndProceed({ linenr: 91 }),
+      new Breakpoint({ linenr: 91 }),
       3000,
     ),
     runVMAction(3000, 3000), // wait 3 seconds before executing runVMAction
@@ -91,7 +104,7 @@ const singleStopBp: TestScenario = {
       subscribeToID: 'BP line 91',
       description: 'wait max 10000ms for bp reach',
       checkSubscription: async (state: WasmState): Promise<boolean> => {
-        return true;
+        return state.isSnapshot();
       },
       ifFail: 'Did not hit breakpoint',
       timeout: 10000,
