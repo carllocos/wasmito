@@ -421,6 +421,21 @@ export class WasmState {
     return this.callbacks;
   }
 
+  isSnapshot(): boolean {
+    return (
+      this.pc !== undefined &&
+      this.breakpoints !== undefined &&
+      this.stack !== undefined &&
+      this.callstack !== undefined &&
+      this.globals !== undefined &&
+      this.table !== undefined &&
+      this.memory !== undefined &&
+      this.br_table !== undefined &&
+      this.callbacks !== undefined &&
+      this.events !== undefined
+    );
+  }
+
   asJSONString(): string {
     if (this._jsonString === undefined) {
       throw new Error('no jsonstring provided');
