@@ -7,7 +7,11 @@ import { MCUWARDuinoVM } from '../warduino/vm/mcu_vm';
 import { type PlatformBuilderConfig } from '../builder/platform_config';
 import { type ChildProcess } from 'child_process';
 import { type WARDuinoVM } from '../warduino';
-import { OutOfPlaceMode, OutOfPlaceVM } from '../warduino/vm/outofplace_vm';
+import {
+  OutOfPlaceMode,
+  OutOfPlaceVM,
+  OutOfThingsMonitor,
+} from '../warduino/vm/outofplace_vm';
 
 export class DeviceManagerError extends Error {
   constructor(message: string) {
@@ -90,6 +94,15 @@ export class DeviceManager {
     this.registerListenersOnVMProcess(childProcess);
     this.localprocesses.push([vm, childProcess]);
     return vm;
+  }
+
+  createOutOfThingsMonitor(targetVM: WARDuinoVM): OutOfThingsMonitor {
+    const monitor = new OutOfThingsMonitor(targetVM);
+    monitor.onSpawn((vm: WARDuinoDevVM, childProcess: ChildProcess) => {
+      this.registerListenersOnVMProcess(childProcess);
+      this.localprocesses.push([vm, childProcess]);
+    });
+    return monitor;
   }
 
   async existingVMAsOutOfPlaceVM(
