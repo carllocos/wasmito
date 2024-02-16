@@ -29,7 +29,7 @@ export function addBreakpointSubscription(
   const act: SubscriptionEmitterAction<boolean, WasmState, InspectStateHook> = {
     subscriptionID,
     timeout,
-    description: `add a breakpoint ${breakpoint.toString()} and give Context once reached`,
+    description: `add a breakpoint ${breakpoint.toString()}`,
     setupSubscription: async (
       device: WARDuinoVM,
     ): Promise<SubActReturn<boolean, WasmState, InspectStateHook>> => {
