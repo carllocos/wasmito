@@ -2,7 +2,6 @@ import { createSystemSetup, oneM5StickCDev } from '../reausable_system_setups';
 import { SystemTester, type TestScenario } from '../system_tester';
 import { createOnErrorActionEmitter, runVMAction } from '../reusable_actions';
 import { type WasmState } from '../../../state';
-import { Target } from '../shared_interfaces';
 
 /*
  * Note on the program
@@ -59,8 +58,10 @@ const testAddHookOnError: TestScenario = {
   ],
 };
 
-m5stickDev.toolPort = 8300;
-m5stickDev.target = Target.devExternal;
+// Uncomment for test with external process
+// import { Target } from '../shared_interfaces';
+// m5stickDev.toolPort = 8300;
+// m5stickDev.target = Target.devExternal;
 const tester = new SystemTester(systemSetup);
 tester.addTestScenario(testAddHookOnError, m5stickDev.id);
 tester.runTests().catch(console.error);
