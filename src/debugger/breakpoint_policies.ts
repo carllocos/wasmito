@@ -59,6 +59,7 @@ export abstract class BreakpointPolicy {
 
     if (successful) {
       this.logger.info(`breakpoint ${breakpoint.toString()} added`);
+      this.breakpoints.push(breakpoint);
       this.informListenersOfAddBp(breakpoint);
     } else {
       this.logger.error(`could not add breakpoint ${breakpoint.toString()}`);
