@@ -329,7 +329,7 @@ function createDeviceConfig(vmToProxy: WARDuinoVM): DeviceConfigArgs {
   const name = `${targetConfig.name} (Proxied)`;
   return {
     name,
-    deploymentMode: DeploymentMode.ProxyVM,
+    deploymentMode: DeploymentMode.MCUVM,
   };
 }
 
