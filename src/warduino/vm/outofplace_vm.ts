@@ -30,9 +30,14 @@ export class OutOfPlaceVMError extends Error {
   }
 }
 
-export enum OutOfPlaceMode {
+export enum InputMode {
   CopyInput,
-  RedirectIO,
+  RedirectInput,
+}
+
+export enum OutputMode {
+  NoRedirect,
+  RedirectAllOutput,
 }
 
 export class OutOfPlaceVM extends WARDuinoDevVM {
