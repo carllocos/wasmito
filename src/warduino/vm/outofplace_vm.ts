@@ -141,7 +141,7 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
     return true;
   }
 
-  public async setupForExistingVM(
+  public async useAlreadySpawnedVM(
     toolPort: number,
     maxWaitTime?: number,
   ): Promise<void> {
