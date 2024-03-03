@@ -1,6 +1,6 @@
 import { DeviceManager } from '../../src/device/device_manager';
 import {
-  OutOfPlaceMode,
+  InputMode,
   type OutOfPlaceVM,
 } from '../../src/warduino/vm/outofplace_vm';
 import { expect } from 'chai';
@@ -58,7 +58,7 @@ describe('Intergation Test: Proxy Calls to a Mocked Target VM produces the right
     await targetVM.mockSnapshot('./test/data/proxy-call-snapshot-1.json');
     const proxyVM = await deviceManager.spawnOutOfPlaceVM(
       targetVM,
-      OutOfPlaceMode.RedirectIO,
+      InputMode.RedirectInput,
       8000,
     );
     const chipPinModeID = 1;
