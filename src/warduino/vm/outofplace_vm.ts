@@ -211,14 +211,9 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
     return spawnedProcess;
   }
 
-  async setupForRedirectEvents(
-    snapshot: WasmState,
+  async registerAllPrimitivesForProxyCall(
     maxWaitTime?: number,
   ): Promise<boolean> {
-    this.logger.debug(
-      `sending the retrieved snapshot to the local Out-of-place VM`,
-    );
-    await this.loadWasmState(snapshot, maxWaitTime);
     const sm = this.sourceMap;
     const primitiveFuncs = sm.getEnvironmentFunctions();
     for (const func of primitiveFuncs) {
