@@ -203,7 +203,7 @@ export class ArduinoBoardBuilder extends PlatformBuilder {
     );
   }
 
-  async compile(sourceFile: string): Promise<number> {
+  async compileSourceCode(sourceFile: string): Promise<number> {
     // copy Arduino template
     this.logger.info(
       `Copying Arduino template for ${this.platformConfig.deviceConfig.name} (board=${this.platformConfig.fqbn.boardName}, ID=${this.platformConfig.deviceConfig.id}) from ${this.pathToArduinoTemplateDir} to ${this.pathToArduinoSketchDir}`,
@@ -229,10 +229,22 @@ export class ArduinoBoardBuilder extends PlatformBuilder {
       this.logger.info(`Could not compile source code for file ${sourceFile}`);
       return -1;
     }
+    return 0;
+  }
+
+  async compile(sourceFile: string): Promise<number> {
+    const exitCodeSourceCodeComp = await this.compileSourceCode(sourceFile);
+    if (exitCodeSourceCodeComp !== 0) {
+      return exitCodeSourceCodeComp;
+    }
 
     this.logger.info(
       `Arduino compiling sketch ${this.pathToArduinoSketchDir} for ${this.platformConfig.deviceConfig.name} (board=${this.platformConfig.fqbn.boardName}, ID=${this.platformConfig.deviceConfig.id})`,
     );
+
+    if (this.sourceMap === undefined) {
+      return -1;
+    }
 
     let wasmPath = this.sourceMap.getWasmPath();
     const filename = getFileName(wasmPath);

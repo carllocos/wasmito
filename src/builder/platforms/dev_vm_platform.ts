@@ -14,7 +14,7 @@ export class DevVMPlatform extends PlatformBuilder {
     this.pathToSourceCodeFile = ''; // path to uncompiled source code
   }
 
-  async compile(sourceFile: string): Promise<number> {
+  async compileSourceCode(sourceFile: string): Promise<number> {
     createDirectoryIfUnexisting(this.outputDirectory);
 
     this.pathToSourceCodeFile = getAbsolutePath(sourceFile);
@@ -31,6 +31,10 @@ export class DevVMPlatform extends PlatformBuilder {
       this.platformConfig.deviceConfig.vmConfig.program = sourceFile;
       return 0;
     }
+  }
+
+  async compile(sourceFile: string): Promise<number> {
+    return await this.compileSourceCode(sourceFile);
   }
 
   async upload(): Promise<number> {
