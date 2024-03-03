@@ -12,7 +12,7 @@ import { type WasmState } from '../state';
 import { type WARDuinoVM } from '../warduino/vm/warduino_vm';
 import { type MCUWARDuinoVM } from '../warduino/vm/mcu_vm';
 import { StateRequest } from '../warduino/requests/inspect_request';
-import { Breakpoint } from '../debugger';
+import { Breakpoint } from '../debugger/breakpoint';
 
 export async function callLedcSetup(vm: WARDuinoVM): Promise<void> {
   const funcLEDCSetup = 5;

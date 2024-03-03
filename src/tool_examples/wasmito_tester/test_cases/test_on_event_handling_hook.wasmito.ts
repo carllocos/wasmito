@@ -14,8 +14,8 @@ import {
   runVMAction,
 } from '../reusable_actions';
 import { EventRemoveHook } from '../../../hooks/hook_event';
-import { Breakpoint } from '../../../debugger';
 import { type PostSetupConfig } from '../shared_interfaces';
+import { Breakpoint } from '../../../debugger/breakpoint';
 
 /*
  * System Setup

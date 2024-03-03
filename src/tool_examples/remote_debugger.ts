@@ -14,7 +14,7 @@ import { type WARDuinoDevVM } from '../warduino/vm/dev_vm';
 import { type WasmState } from '../state/wasm';
 import { type DeviceConfigArgs, DeploymentMode } from '../device/device_config';
 import { type VMConfigArgs } from '../device/vm_config';
-import { Breakpoint } from '../debugger';
+import { Breakpoint } from '../debugger/breakpoint';
 
 export function allSucceeded(replies: HookOnWasmAddrResponse[]): boolean {
   let idx = 0;
