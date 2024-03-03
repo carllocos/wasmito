@@ -223,13 +223,6 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
     return true;
   }
 
-  async setupForCopyEvents(
-    snapshot: WasmState,
-    maxWaitTime?: number,
-  ): Promise<boolean> {
-    throw new Error('Method not implemented.');
-  }
-
   private onNewEvent(ev: WASM.Event): void {
     this.eventsToHandle.push(ev);
   }
