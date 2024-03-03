@@ -9,6 +9,7 @@ import { type ChildProcess } from 'child_process';
 import { type WARDuinoVM } from '../warduino';
 import {
   InputMode,
+  type OutOfPlaceSetupConfig,
   OutOfPlaceVM,
   OutOfThingsMonitor,
   OutputMode,
@@ -26,9 +27,21 @@ export class DeviceManager {
   logger: winston.Logger;
   localprocesses: Array<[WARDuinoDevVM, ChildProcess?]>;
 
+  private readonly onNewDeviceListeners: Array<(dev: WARDuinoVM) => void>;
   constructor() {
     this.logger = createLogger('DeviceManager');
     this.localprocesses = [];
+    this.onNewDeviceListeners = [];
+  }
+
+  subscribeOnNewDevice(cb: (dev: WARDuinoVM) => void): void {
+    this.onNewDeviceListeners.push(cb);
+  }
+
+  private notifyListeners(vm: WARDuinoVM): void {
+    this.onNewDeviceListeners.forEach((cb) => {
+      cb(vm);
+    });
   }
 
   // TODO remove deviceConfigArgs
@@ -61,6 +74,7 @@ export class DeviceManager {
     }
     const noProcess = undefined;
     this.localprocesses.push([devVM, noProcess]);
+    this.notifyListeners(devVM);
     return devVM;
   }
 
@@ -86,15 +100,19 @@ export class DeviceManager {
     buildOutputDir?: string,
   ): Promise<OutOfPlaceVM> {
     const noServerPort = undefined;
-    const vm = new OutOfPlaceVM(
-      outOfPlaceMode,
-      targetVM,
-      noServerPort,
+    const vm = new OutOfPlaceVM(targetVM, noServerPort, buildOutputDir);
+    // TODO configured for edward parametrize more of config
+    const config: OutOfPlaceSetupConfig = {
+      targetInputMode,
+      pauseTarget: true,
+      localVMStartOutputMode: OutputMode.RedirectAllOutput,
+      maxWaitTime,
       buildOutputDir,
-    );
-    const childProcess = await vm.spawn(maxWaitTime);
+    };
+    const childProcess = await vm.spawnWithConfig(config);
     this.registerListenersOnVMProcess(childProcess);
     this.localprocesses.push([vm, childProcess]);
+    this.notifyListeners(vm);
     return vm;
   }
 
@@ -103,11 +121,12 @@ export class DeviceManager {
     monitor.onSpawn((vm: WARDuinoDevVM, childProcess: ChildProcess) => {
       this.registerListenersOnVMProcess(childProcess);
       this.localprocesses.push([vm, childProcess]);
+      this.notifyListeners(vm);
     });
     return monitor;
   }
 
-  async existingVMAsOutOfPlaceVM(
+  async setupAlreadySpawnedVMForOutOfPlaceVM(
     toolPort: number,
     targetVM: WARDuinoVM,
     serverPortForProxyCalls?: number,
@@ -115,13 +134,21 @@ export class DeviceManager {
     buildOutputDir?: string,
   ): Promise<OutOfPlaceVM> {
     const vm = new OutOfPlaceVM(
-      OutOfPlaceMode.RedirectIO,
       targetVM,
       serverPortForProxyCalls,
       buildOutputDir,
     );
-    await vm.setupForExistingVM(toolPort, maxWaitTime);
+    // TODO configured for edward parametrize more of config
+    const config: OutOfPlaceSetupConfig = {
+      targetInputMode: InputMode.CopyInput,
+      pauseTarget: true,
+      localVMStartOutputMode: OutputMode.RedirectAllOutput,
+      maxWaitTime,
+      buildOutputDir,
+    };
+    await vm.useAlreadySpawnedVM(toolPort, config);
     this.localprocesses.push([vm, undefined]);
+    this.notifyListeners(vm);
     return vm;
   }
 
@@ -141,6 +168,7 @@ export class DeviceManager {
       throw Error('Could not compile source code');
     }
 
+    this.notifyListeners(vm);
     return vm;
   }
 
@@ -158,6 +186,7 @@ export class DeviceManager {
       );
     }
 
+    this.notifyListeners(vm);
     return vm;
   }
 
@@ -208,6 +237,7 @@ export class DeviceManager {
     const childProcess = await devVM.spawn(maxWaitTime);
     this.registerListenersOnVMProcess(childProcess);
     this.localprocesses.push([devVM, childProcess]);
+    this.notifyListeners(devVM);
     return devVM;
   }
 }
