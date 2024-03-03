@@ -40,6 +40,20 @@ export enum OutputMode {
   RedirectAllOutput,
 }
 
+export interface OutOfPlaceSetupConfig {
+  targetInputMode: InputMode;
+  pauseTarget: boolean;
+
+  localVMStartOutputMode: OutputMode;
+  localVMStartSnapshot?: WasmState;
+
+  maxWaitTime?: number;
+  portToUseForSharedChannel?: number;
+  buildOutputDir?: string;
+}
+
+// TODO refactor to become just a regular class
+
 export class OutOfPlaceVM extends WARDuinoDevVM {
   protected ErrorClass = OutOfPlaceVMError;
   public readonly targetVM: WARDuinoVM;
