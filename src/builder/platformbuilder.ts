@@ -47,6 +47,8 @@ export abstract class PlatformBuilder {
 
   abstract compile(sourceFile: string): Promise<number>;
 
+  abstract compileSourceCode(sourceFile: string): Promise<number>;
+
   abstract upload(): Promise<number>;
 
   public getSourceMap(): SourceMap | undefined {
