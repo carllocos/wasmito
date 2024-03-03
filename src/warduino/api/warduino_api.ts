@@ -47,6 +47,8 @@ export interface WARDuinoAPI {
     timeout?: number,
   ) => Promise<boolean>;
 
+  functionsProxied: () => Set<WASMFunction>;
+
   proxyCall: (
     funcid: number,
     args: WASM.Value[],

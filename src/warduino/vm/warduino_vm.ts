@@ -62,6 +62,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   protected readonly onNewEventHook: EventInspectHook;
   private onNewEventHookAdded: boolean;
   private _breakpointPolicy: BreakpointPolicy;
+  private readonly _funcsProxied: Set<WASMFunction>;
 
   constructor(
     platformConfig: PlatformBuilderConfig,
@@ -74,6 +75,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     this.onNewEventHook = new EventInspectHook();
     this.onNewEventHookAdded = false;
     this._breakpointPolicy = new BreakpointDefaultPolicy(this);
+    this._funcsProxied = new Set();
   }
 
   abstract close(timeout?: number): Promise<boolean>;
@@ -132,6 +134,10 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     this._breakpointPolicy.deactivate();
     newPolicy.activate(this._breakpointPolicy.breakpoints);
     this._breakpointPolicy = newPolicy;
+  }
+
+  functionsProxied(): Set<WASMFunction> {
+    return this._funcsProxied;
   }
 
   public async subscribeOnNewEvent(
@@ -262,6 +268,13 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     funcToProxy: WASMFunction,
     timeout?: number,
   ): Promise<boolean> {
+    if (this._funcsProxied.has(funcToProxy)) {
+      this.logger.info(
+        `Function ${funcToProxy.name} is alread registered for proxy calls`,
+      );
+      return true;
+    }
+
     const req = new AroundFunctionRequest(funcToProxy.id).addHook(
       new ProxyCallHook(funcToProxy.id),
     );
@@ -270,6 +283,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
       this.logger.info(
         `Function ${funcToProxy.name} is registered for proxy calls`,
       );
+      this._funcsProxied.add(funcToProxy);
       return true;
     } else if (reply.responseType === ResponseType.ErrorResponse) {
       this.logger.error(
