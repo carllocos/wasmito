@@ -8,9 +8,10 @@ import { type PlatformBuilderConfig } from '../builder/platform_config';
 import { type ChildProcess } from 'child_process';
 import { type WARDuinoVM } from '../warduino';
 import {
-  OutOfPlaceMode,
+  InputMode,
   OutOfPlaceVM,
   OutOfThingsMonitor,
+  OutputMode,
 } from '../warduino/vm/outofplace_vm';
 
 export class DeviceManagerError extends Error {
@@ -80,7 +81,7 @@ export class DeviceManager {
 
   async spawnOutOfPlaceVM(
     targetVM: WARDuinoVM,
-    outOfPlaceMode: OutOfPlaceMode,
+    targetInputMode: InputMode,
     maxWaitTime?: number,
     buildOutputDir?: string,
   ): Promise<OutOfPlaceVM> {
