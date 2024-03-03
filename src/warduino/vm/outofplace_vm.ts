@@ -268,41 +268,54 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
     }
   }
 
-  private async setupTargetVM(maxWaitTime?: number): Promise<WasmState> {
-    if (this.outOfPlaceMode === OutOfPlaceMode.RedirectIO) {
+  private async setupTargetVM(
+    targetInputMode: InputMode,
+    pause: boolean,
+    requestSnapshot: boolean,
+    maxWaitTime?: number,
+  ): Promise<WasmState | undefined> {
+    if (pause) {
       await this.targetVM.pause(maxWaitTime);
     }
 
-    await this.registerAndAssertOnNewEventHooks(maxWaitTime);
+    await this.updateHooksOfTheTargetInput(targetInputMode, maxWaitTime);
 
-    const snapshot = await this.requestFirstSnapshot(maxWaitTime);
+    let snapshot: WasmState | undefined;
+    if (requestSnapshot) {
+      snapshot = await this.requestFirstSnapshot(maxWaitTime);
+    }
+
     if (!(await this.shareableChannel.startServer())) {
       throw new this.ErrorClass(
         'Could not start the socket server for the ShareableChannel',
       );
     }
     this.targetVM.channel = this.shareableChannel;
-
     return snapshot;
   }
 
   private async setupLocalVM(
     snapshot: WasmState,
+    outputMode: OutputMode,
     maxWaitTime?: number,
   ): Promise<boolean> {
+    this.logger.debug(
+      `sending the retrieved snapshot to the local Out-of-place VM`,
+    );
+    await this.loadWasmState(snapshot, maxWaitTime);
+
     let success = true;
-    switch (this.outOfPlaceMode) {
-      case OutOfPlaceMode.CopyInput:
-        success = await this.setupForCopyEvents(snapshot, maxWaitTime);
+    switch (outputMode) {
+      case OutputMode.NoRedirect:
         break;
-      case OutOfPlaceMode.RedirectIO:
-        success = await this.setupForRedirectEvents(snapshot, maxWaitTime);
+      case OutputMode.RedirectAllOutput:
+        success = await this.registerAllPrimitivesForProxyCall(maxWaitTime);
         break;
     }
 
     if (!success) {
       this.logger.error(
-        `Failed to setup the VM in the requested out-of-place mode ${this.outOfPlaceMode}`,
+        `Failed to setup the local VM to the requested output mode '${outputMode}'`,
       );
     }
     return success;
