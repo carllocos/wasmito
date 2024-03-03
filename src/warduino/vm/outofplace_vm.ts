@@ -42,7 +42,6 @@ export enum OutputMode {
 
 export class OutOfPlaceVM extends WARDuinoDevVM {
   protected ErrorClass = OutOfPlaceVMError;
-  private readonly outOfPlaceMode: OutOfPlaceMode;
   public readonly targetVM: WARDuinoVM;
 
   private readonly shareableChannel: ShareChannel;
@@ -50,7 +49,6 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
   public eventsToHandle: WASM.Event[];
 
   constructor(
-    outOfPlaceMode: OutOfPlaceMode,
     targetVM: WARDuinoVM,
     serverPort?: number,
     buildOutputDir?: string,
@@ -61,9 +59,6 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
       buildOutputDir,
     );
 
-    assertvalidOutOfPlaceMode(outOfPlaceMode);
-
-    this.outOfPlaceMode = outOfPlaceMode;
     this.targetVM = targetVM;
     this.shareableChannel = new ShareChannel(this.targetVM.channel, serverPort);
     this.eventsToHandle = [];
