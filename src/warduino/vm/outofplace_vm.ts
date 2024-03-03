@@ -21,6 +21,8 @@ import {
 } from '../../debugger/breakpoint_policies';
 import { InspectStateHook } from '../../hooks/hook_inspect_state';
 import { type Breakpoint } from '../../debugger/breakpoint';
+import type winston from 'winston';
+import { createLogger } from '../../logger/logger';
 
 export class OutOfPlaceVMError extends Error {
   constructor(message: string) {
@@ -143,35 +145,74 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
 
   public async useAlreadySpawnedVM(
     toolPort: number,
-    maxWaitTime?: number,
+    config: OutOfPlaceSetupConfig,
   ): Promise<void> {
-    const snapshot = await this.setupTargetVM();
+    assertValidOutOfPlaceSpawnArgs(config);
+
+    const requestSnapshot = config.localVMStartSnapshot === undefined;
+    const snapshot = await this.setupTargetVM(
+      config.targetInputMode,
+      config.pauseTarget,
+      requestSnapshot,
+      config.maxWaitTime,
+    );
+    if (snapshot === undefined) {
+      throw new this.ErrorClass(
+        'Failed to retrieve snapshot from target VM while setting up for OutOfPlace',
+      );
+    }
     this.vmConfig.toolPort = toolPort;
     this.createClientSideSocket();
     await this.compileSourceCode();
     this.logger.debug('Connecting to external VM...');
-    const connected = await this.connect(maxWaitTime);
+    const connected = await this.connect(config.maxWaitTime);
     if (!connected) {
       this.logger.error(
         `Failed to connect to local DevelopmentVM at port ${this.vmConfig.toolPort}`,
       );
       throw new this.ErrorClass('timed out connecting to DevVM process');
     }
-    await this.setupLocalVM(snapshot, maxWaitTime);
+    await this.setupLocalVM(
+      snapshot,
+      config.localVMStartOutputMode,
+      config.maxWaitTime,
+    );
   }
 
-  public async spawnWithSnapshot(
-    snapshot: WasmState,
-    maxWaitTime?: number,
-  ): Promise<ChildProcess> {
-    throw new this.ErrorClass('TODO');
+  public async spawn(maxWaitTime?: number): Promise<ChildProcess> {
+    throw new this.ErrorClass(
+      'Spawn is not supported for OutOfPlace use instead spawnWithConfig',
+    );
   }
 
   // TODO for edward: still do to for events on the MCU
   // 1. remove events that are in the queue on MCU
   // 2. remove event from MCU queue on new event
-  public async spawn(maxWaitTime?: number): Promise<ChildProcess> {
-    const snapshot = await this.setupTargetVM(maxWaitTime);
+  public async spawnWithConfig(
+    config: OutOfPlaceSetupConfig,
+  ): Promise<ChildProcess> {
+    assertValidOutOfPlaceSpawnArgs(config);
+
+    const requestSnapshot = config.localVMStartSnapshot === undefined;
+    const snapshot =
+      (await this.setupTargetVM(
+        config.targetInputMode,
+        config.pauseTarget,
+        requestSnapshot,
+        config.maxWaitTime,
+      )) ?? config.localVMStartSnapshot;
+    if (snapshot === undefined) {
+      if (requestSnapshot) {
+        throw new this.ErrorClass(
+          'Failed to retrieve snapshot from target VM while setting up for OutOfPlace',
+        );
+      } else {
+        throw new this.ErrorClass(
+          'Cannot setup a VM for OutOfPlace whitout a first snapshot. Either provide one via arg ol the request failed to retrieve the first snapshot',
+        );
+      }
+    }
+
     await this.assertExistanceToolPort();
     this.createClientSideSocket();
     await this.compileSourceCode();
@@ -194,9 +235,13 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
       this.logger.error(`(stderr) ${data}`);
     });
 
-    const connected = await this.connect(maxWaitTime);
+    const connected = await this.connect(config.maxWaitTime);
     if (connected) {
-      const success = await this.setupLocalVM(snapshot, maxWaitTime);
+      const success = await this.setupLocalVM(
+        snapshot,
+        config.localVMStartOutputMode,
+        config.maxWaitTime,
+      );
       if (!success) {
         spawnedProcess.kill();
         this.logger.error('Killing the local VM process');
@@ -227,9 +272,16 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
     this.eventsToHandle.push(ev);
   }
 
-  private async registerAndAssertOnNewEventHooks(
+  private async updateHooksOfTheTargetInput(
+    inputMode: InputMode,
     maxWaitTime?: number,
   ): Promise<void> {
+    if (inputMode === InputMode.RedirectInput) {
+      this.logger.error(
+        'TODO: set up the target VM to redirect input (e.g., events) for now fallback to CopyInput',
+      );
+    }
+
     const addedOnNewEventHook = await this.targetVM.subscribeOnNewEvent(
       this.onNewEvent.bind(this),
       maxWaitTime,
@@ -358,18 +410,75 @@ function createVMConfig(vmToProxy: WARDuinoVM): VMConfigArgs {
   };
 }
 
-function assertvalidOutOfPlaceMode(mode: OutOfPlaceMode): void {
+function assertValidOutOfPlaceSpawnArgs(
+  args: any,
+): args is OutOfPlaceSetupConfig {
+  if (typeof args !== 'object') {
+    throw new OutOfPlaceVMError('Spawn args are expected to be an object');
+  }
+
+  assertvalidInputMode(args.targetInputMode);
+  assertvalidOutpuMode(args.localVMStartOutputMode);
+
+  if (args.pauseTarget === undefined || typeof args.pauseTarget !== 'boolean') {
+    throw new OutOfPlaceVMError(
+      'pauseTarget is mandatory and expected to be a boolean',
+    );
+  }
+
+  const s: undefined | WasmState = args.localVMStartSnapshot;
+  if (s !== undefined) {
+    if (!s.isSnapshot()) {
+      throw new OutOfPlaceVMError('The given WasmState is not a full snapshot');
+    }
+  }
+
+  if (args.maxWaitTime !== undefined && typeof args.maxWaitTime !== 'number') {
+    throw new OutOfPlaceVMError('maxWaitTime expected to be a number');
+  }
+
+  if (
+    args.portToUseForSharedChannel !== undefined &&
+    typeof args.portToUseForSharedChannel !== 'number'
+  ) {
+    throw new OutOfPlaceVMError(
+      'portToUseForSharedChannel expected to be a number',
+    );
+  }
+
+  if (
+    args.buildOutputDir !== undefined &&
+    typeof args.buildOutputDir !== 'string'
+  ) {
+    throw new OutOfPlaceVMError('buildOutputDir expected to be a string');
+  }
+
+  return args;
+}
+
+function assertvalidInputMode(mode: InputMode): void {
   let modeExists = false;
   switch (mode) {
-    case OutOfPlaceMode.CopyInput:
-    case OutOfPlaceMode.RedirectIO:
+    case InputMode.CopyInput:
+    case InputMode.RedirectInput:
       modeExists = true;
       break;
-    default:
-      modeExists = false;
   }
   if (!modeExists) {
-    throw new OutOfPlaceVMError(`given outOfPlace mode ${mode} does not exist`);
+    throw new OutOfPlaceVMError(`given inputmode ${mode} does not exist`);
+  }
+}
+
+function assertvalidOutpuMode(mode: OutputMode): void {
+  let modeExists = false;
+  switch (mode) {
+    case OutputMode.NoRedirect:
+    case OutputMode.RedirectAllOutput:
+      modeExists = true;
+      break;
+  }
+  if (!modeExists) {
+    throw new OutOfPlaceVMError(`given outputmode ${mode} does not exist`);
   }
 }
 
