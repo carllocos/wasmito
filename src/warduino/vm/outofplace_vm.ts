@@ -482,12 +482,24 @@ function assertvalidOutpuMode(mode: OutputMode): void {
   }
 }
 
+export interface OutOfThingsSpawnConfig {
+  targetInputMode?: InputMode;
+  maxWaitTime?: number;
+  portToUseForSharedChannel?: number;
+  buildOutputDir?: string;
+}
+
 export class OutOfThingsMonitor {
-  private readonly targetVM: WARDuinoVM;
+  private readonly logger: winston.Logger;
+  public readonly targetVM: WARDuinoVM;
   private readonly _snapshots: WasmState[];
   private readonly _bpPolicy: BreakpointPolicy;
   private readonly _snapshotHook: InspectStateHook;
   private onSpawnCb: ((vm: WARDuinoDevVM, p: ChildProcess) => void) | undefined;
+  private snapshotListeners: Array<(snapshot: WasmState) => void>;
+  private readonly removedSnapshotListeners: Set<(snapshot: WasmState) => void>;
+
+  private readonly spawnedVMs: WARDuinoDevVM[];
 
   constructor(targetVM: WARDuinoVM) {
     this.targetVM = targetVM;
@@ -495,15 +507,30 @@ export class OutOfThingsMonitor {
     this._bpPolicy = new SingleStopBreakpointPolicy(targetVM);
     this._bpPolicy.onBreakpointAdd(this.storeSnapshot.bind(this));
     this._snapshotHook = new InspectStateHook(new StateRequest().includeAll());
-    this.targetVM.changeBreakpointPolicy(this._bpPolicy);
     this.onSpawnCb = undefined;
+    this.logger = createLogger(
+      `OutOfThingsMonitor of ${targetVM.platformConfig.deviceConfig.fullname}`,
+    );
+    this.snapshotListeners = [];
+    this.removedSnapshotListeners = new Set();
+    this.spawnedVMs = [];
+  }
+
+  get breakpointPolicy(): BreakpointPolicy {
+    return this.targetVM.breakpointPolicy();
+  }
+
+  get snapshots(): WasmState[] {
+    return this._snapshots;
   }
 
   async setup(): Promise<void> {
+    this.targetVM.changeBreakpointPolicy(this._bpPolicy);
     this.targetVM.breakpoints.forEach((bp) => {
       bp.subscribe((state: WasmState) => {
         if (state.isSnapshot()) {
           this._snapshots.push(state);
+          this.onNewSnapshotListeners(state);
         }
       });
     });
@@ -523,33 +550,76 @@ export class OutOfThingsMonitor {
     this.onSpawnCb = cb;
   }
 
-  async spawnDevVMOnSnapshot(
+  subscribeOnSnapshot(callback: (snapshot: WasmState) => void): void {
+    const found = this.snapshotListeners.find((cb) => cb === callback);
+    if (found !== undefined) {
+      this.logger.warn(`Attempting to add 2 same callback on a new snapshot`);
+      return;
+    }
+
+    this.snapshotListeners.push(callback);
+  }
+
+  unSubscribeOnSnapshot(callback: (snapshot: WasmState) => void): void {
+    this.removedSnapshotListeners.add(callback);
+  }
+
+  async spawnDevVM(
     snapshotIdx: number,
-    maxWaitTime?: number,
-    buildOutputDir?: string,
+    config: OutOfThingsSpawnConfig,
   ): Promise<OutOfPlaceVM> {
     if (snapshotIdx < 0 || snapshotIdx >= this._snapshots.length) {
       throw new Error(`Invalid snapshot index given ${snapshotIdx}`);
     }
 
-    const sn = this._snapshots[snapshotIdx];
-    const noServerPort = undefined;
     const vm = new OutOfPlaceVM(
-      OutOfPlaceMode.CopyInput,
       this.targetVM,
-      noServerPort,
-      buildOutputDir,
+      config.portToUseForSharedChannel,
+      config.buildOutputDir,
     );
-    const childProcess = await vm.spawnWithSnapshot(sn, maxWaitTime);
+
+    const c: OutOfPlaceSetupConfig = {
+      targetInputMode: config.targetInputMode ?? InputMode.CopyInput,
+      pauseTarget: false,
+      localVMStartOutputMode: OutputMode.NoRedirect,
+      localVMStartSnapshot: this._snapshots[snapshotIdx],
+      maxWaitTime: config.maxWaitTime,
+      portToUseForSharedChannel: config.portToUseForSharedChannel,
+      buildOutputDir: config.buildOutputDir,
+    };
+
+    const childProcess = await vm.spawnWithConfig(c);
     if (this.onSpawnCb !== undefined) {
       this.onSpawnCb(vm, childProcess);
     }
+
+    this.spawnedVMs.push(vm);
     return vm;
   }
 
   private storeSnapshot(bp: Breakpoint): void {
     bp.subscribe((snapshot: WasmState) => {
-      this._snapshots.push(snapshot);
+      if (snapshot.isSnapshot()) {
+        this._snapshots.push(snapshot);
+        this.onNewSnapshotListeners(snapshot);
+      } else {
+        this.logger.error(`Received state that was supposed to be a snapshot`);
+      }
     });
+  }
+
+  private onNewSnapshotListeners(snapshot: WasmState): void {
+    if (this.snapshotListeners.length === 0) {
+      this.logger.warn('There is no listener for subscription on snapshot');
+    }
+    this.snapshotListeners.forEach((listener) => {
+      if (!this.removedSnapshotListeners.has(listener)) {
+        listener(snapshot);
+      }
+    });
+    this.snapshotListeners = this.snapshotListeners.filter((cb) => {
+      return !this.removedSnapshotListeners.has(cb);
+    });
+    this.removedSnapshotListeners.clear();
   }
 }
