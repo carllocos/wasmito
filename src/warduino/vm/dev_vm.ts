@@ -106,11 +106,7 @@ export class WARDuinoDevVM extends WARDuinoVM {
       return false;
     }
 
-    const sourceMap = this.platform.getSourceMap();
-    if (sourceMap === undefined) {
-      throw new this.ErrorClass(`SourceMap is undefined`);
-    }
-    const wasm = await sourceMap.getWasm();
+    const wasm = await this.sourceMap.getWasm();
     const updateRequest = new UpdateWasmModuleRequest(wasm);
     await this.sendRequest(updateRequest, timeout);
     return true;
@@ -131,12 +127,9 @@ export class WARDuinoDevVM extends WARDuinoVM {
         `Could not start DevVM. Compilation exited with code: ${exitCode}`,
       );
     }
-    const sourceMap = this.platform.getSourceMap();
-    if (sourceMap === undefined) {
-      throw new this.ErrorClass(`Could not generate SourceMap`);
-    }
+
     const processArgs = this.buildProcessArguments(
-      sourceMap.wasmFilePath,
+      this.sourceMap.wasmFilePath,
       this.vmConfig,
     );
     const spawnCommand = getPath2WARDuinoSDKVMBinary();
