@@ -134,7 +134,7 @@ export class DeviceManager {
     if (!connected) {
       throw Error('Could not connect to external MCU VM');
     }
-    const exitCode = await vm.platform.compile(
+    const exitCode = await vm.platform.compileSourceCode(
       platformConfig.deviceConfig.vmConfig.program,
     );
     if (exitCode !== 0) {
