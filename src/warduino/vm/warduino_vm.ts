@@ -316,12 +316,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     moment: HookOnWasmAddrMoment,
     timeout?: number,
   ): Promise<boolean> {
-    const sm = this.getSourceMap();
-    if (sm === undefined) {
-      throw new this.ErrorClass(
-        `There is no source Mapper set for current module`,
-      );
-    }
+    const sm = this.sourceMap;
     const mappings = sm.getMappingsFromSourceCodeLocation(sourceCodeLocation);
     if (mappings.length === 0) {
       throw new this.ErrorClass(
