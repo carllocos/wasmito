@@ -20,6 +20,7 @@ import {
   type SubActReturn,
 } from './shared_interfaces';
 import { Breakpoint } from '../../debugger/breakpoint';
+import { type WASMFunction } from '../../source_mappers';
 
 export function addBreakpointSubscription(
   subscriptionID: string,
@@ -309,6 +310,114 @@ export function proxyCallAction(
     },
     ifFail: `ProxyCall failed within the ${timeout} time`,
     timeout,
+  };
+
+  return act;
+}
+
+export function registerFuncForProxyCallAction(
+  funcID: number,
+  timeout: number,
+): Action<[boolean, WASMFunction, number, Set<WASMFunction>]> {
+  const act = {
+    description: `Register func ${funcID} for ProxyCall`,
+    doAction: async (
+      device: WARDuinoVM,
+    ): Promise<[boolean, WASMFunction, number, Set<WASMFunction>]> => {
+      const func = device.sourceMap.getFunction(funcID);
+      if (func === undefined) {
+        throw new Error(
+          `Func with id ${funcID} is not part of the source code`,
+        );
+      }
+
+      const setSizePriorAdd = device.functionsProxied().size;
+      const added = await device.registerFuncForProxyCall(func, timeout);
+      return [added, func, setSizePriorAdd, device.functionsProxied()];
+    },
+    checkActionSuccess: async ([added, func, oldSize, s]: [
+      boolean,
+      WASMFunction,
+      number,
+      Set<WASMFunction>,
+    ]): Promise<boolean> => {
+      return added && oldSize + 1 === s.size && s.has(func);
+    },
+    ifFail: ([added, func, oldSize, s]: [
+      boolean,
+      WASMFunction,
+      number,
+      Set<WASMFunction>,
+    ]): string => {
+      if (!added) {
+        return `Failed to register func ${funcID} for ProxyCall`;
+      } else if (oldSize + 1 !== s.size) {
+        return `ProxyCall set should be size ${oldSize + 1} current size ${
+          s.size
+        }`;
+      } else {
+        const m = Array.from(s)
+          .map((f: WASMFunction) => {
+            return `'${f.name} (id=${f.id})'`;
+          })
+          .join(', ');
+        return `Proxies Set does not contain proxied function '${func.name} (id=${func.id})' has instead ${m}`;
+      }
+    },
+  };
+
+  return act;
+}
+
+export function unregisterFuncForProxyCallAction(
+  funcID: number,
+  timeout: number,
+): Action<[boolean, WASMFunction, number, Set<WASMFunction>]> {
+  const act = {
+    timeout,
+    description: `Unregister func ${funcID} for ProxyCall`,
+    doAction: async (
+      device: WARDuinoVM,
+    ): Promise<[boolean, WASMFunction, number, Set<WASMFunction>]> => {
+      const func = device.sourceMap.getFunction(funcID);
+      if (func === undefined) {
+        throw new Error(
+          `Func with id ${funcID} is not part of the source code`,
+        );
+      }
+      const sizePriorRemove = device.functionsProxied().size;
+      const removed = await device.unregisterFuncForProxyCall(func, timeout);
+      return [removed, func, sizePriorRemove, device.functionsProxied()];
+    },
+    checkActionSuccess: async ([unregistered, func, sizePriorRemove, s]: [
+      boolean,
+      WASMFunction,
+      number,
+      Set<WASMFunction>,
+    ]): Promise<boolean> => {
+      return unregistered && sizePriorRemove - 1 === s.size && !s.has(func);
+    },
+    ifFail: ([removed, func, oldSize, s]: [
+      boolean,
+      WASMFunction,
+      number,
+      Set<WASMFunction>,
+    ]): string => {
+      if (!removed) {
+        return `Failed to unregister func ${funcID} for ProxyCall`;
+      } else if (oldSize - 1 !== s.size) {
+        return `ProxyCall set should be size ${oldSize - 1} current size ${
+          s.size
+        }`;
+      } else {
+        const m = Array.from(s)
+          .map((f: WASMFunction) => {
+            return `'${f.name} (id=${f.id})'`;
+          })
+          .join(', ');
+        return `Proxies Set should not contain proxied function '${func.name} (id=${func.id})' has instead ${m}`;
+      }
+    },
   };
 
   return act;
