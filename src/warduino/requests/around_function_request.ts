@@ -40,7 +40,7 @@ export function createAroundFunctionResponse(
   };
   if (obj.error_code !== undefined) {
     const code = parseInt(obj.error_code);
-    if (!isNaN(code)) {
+    if (isNaN(code)) {
       return undefined;
     }
     reply.error_code = code;
