@@ -298,6 +298,38 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     }
   }
 
+  async unregisterFuncForProxyCall(
+    funcToProxy: WASMFunction,
+    timeout?: number,
+  ): Promise<boolean> {
+    const req = this._funcsProxied.get(funcToProxy);
+    if (req === undefined) {
+      this.logger.info(
+        `Function ${funcToProxy.name} is has never been registered for proxy calls`,
+      );
+      return false;
+    }
+
+    const reply = await this.sendRequest(req.removeRequest(), timeout);
+    if (reply.responseType === ResponseType.SuccessResponse) {
+      this.logger.info(
+        `Function ${funcToProxy.name} was successfully unregistered for proxy calls`,
+      );
+      this._funcsProxied.delete(funcToProxy);
+      return true;
+    } else if (reply.responseType === ResponseType.ErrorResponse) {
+      this.logger.error(
+        `Function ${funcToProxy.name} could not be unregistered for proxy calls error_code=${reply.error_code})`,
+      );
+      return false;
+    } else {
+      this.logger.error(
+        `Received unexpected aroundRequest ack message of type ${reply.responseType} for function ${funcToProxy.name}`,
+      );
+      return false;
+    }
+  }
+
   async addHookBefore(
     sourceCodeLocation: SourceCodeLocation,
     hook: Hook,

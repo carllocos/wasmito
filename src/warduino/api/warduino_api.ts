@@ -42,6 +42,11 @@ export interface WARDuinoAPI {
 
   resolveEvent: (timeout?: number) => Promise<void>;
 
+  unregisterFuncForProxyCall: (
+    funcToProxy: WASMFunction,
+    timeout?: number,
+  ) => Promise<boolean>;
+
   registerFuncForProxyCall: (
     funcToProxy: WASMFunction,
     timeout?: number,
