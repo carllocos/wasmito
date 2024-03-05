@@ -62,7 +62,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   protected readonly onNewEventHook: EventInspectHook;
   private onNewEventHookAdded: boolean;
   private _breakpointPolicy: BreakpointPolicy;
-  private readonly _funcsProxied: Set<WASMFunction>;
+  private readonly _funcsProxied: Map<WASMFunction, AroundFunctionRequest>;
 
   constructor(
     platformConfig: PlatformBuilderConfig,
@@ -75,7 +75,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     this.onNewEventHook = new EventInspectHook();
     this.onNewEventHookAdded = false;
     this._breakpointPolicy = new BreakpointDefaultPolicy(this);
-    this._funcsProxied = new Set();
+    this._funcsProxied = new Map();
   }
 
   abstract close(timeout?: number): Promise<boolean>;
@@ -137,7 +137,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   }
 
   functionsProxied(): Set<WASMFunction> {
-    return this._funcsProxied;
+    return new Set(this._funcsProxied.keys());
   }
 
   public async subscribeOnNewEvent(
@@ -283,7 +283,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
       this.logger.info(
         `Function ${funcToProxy.name} is registered for proxy calls`,
       );
-      this._funcsProxied.add(funcToProxy);
+      this._funcsProxied.set(funcToProxy, req);
       return true;
     } else if (reply.responseType === ResponseType.ErrorResponse) {
       this.logger.error(
