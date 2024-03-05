@@ -132,7 +132,8 @@ export class SystemTester {
         );
         if (
           actionResult.result !== ActionRunState.Success &&
-          actionResult.result !== ActionRunState.Delayed
+          actionResult.result !== ActionRunState.Delayed &&
+          actionResult.result !== ActionRunState.Cancelled
         ) {
           console.log(`\t ${actionResult.failMsg}`);
           console.log();
