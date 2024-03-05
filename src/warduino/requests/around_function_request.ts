@@ -70,14 +70,27 @@ export function isAroundFunctionJSONResponse(
 export class AroundFunctionRequest extends APIRequestNoSubscription<AroundHookResponse> {
   public readonly function_idx;
   public readonly hooks: Hook[];
+  private _isAddRequest: boolean;
+
   constructor(fidx: number) {
     super();
     this.function_idx = fidx;
     this.hooks = [];
+    this._isAddRequest = true;
   }
 
   description(): string {
     return `AroundFunction for ${this.function_idx}`;
+  }
+
+  removeRequest(): AroundFunctionRequest {
+    this._isAddRequest = false;
+    return this;
+  }
+
+  addRequest(): AroundFunctionRequest {
+    this._isAddRequest = true;
+    return this;
   }
 
   addHook(hook: Hook): AroundFunctionRequest {
@@ -88,14 +101,20 @@ export class AroundFunctionRequest extends APIRequestNoSubscription<AroundHookRe
         'Todo support multiple hooks. For now just one hook',
       );
     }
-    return this;
+    return this.addRequest();
   }
 
   getData(): string {
     const encodedFidx = encodeToHexLEB128(this.function_idx);
-    const encodedSchedule = this.hooks[0].schedule.serializeBinary();
-    const encodedHook = this.hooks[0].serializeBinary();
-    return `${Instruction.AroundFunction}${encodedFidx}${encodedSchedule}${encodedHook}\n`;
+    if (this._isAddRequest) {
+      const addRequest = '01';
+      const encodedSchedule = this.hooks[0].schedule.serializeBinary();
+      const encodedHook = this.hooks[0].serializeBinary();
+      return `${Instruction.AroundFunction}${encodedFidx}${addRequest}${encodedSchedule}${encodedHook}\n`;
+    } else {
+      const removeReq = '00';
+      return `${Instruction.AroundFunction}${encodedFidx}${removeReq}\n`;
+    }
   }
 
   parse(input: string): AroundHookResponse {
