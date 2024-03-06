@@ -65,6 +65,7 @@
   },
   "dependencies": {
     "@types/uuid": "^9.0.7",
+    "assemblyscript": "^0.27.24",
     "commander": "^11.0.0",
     "figlet": "^1.6.0",
     "portfinder": "^1.0.32",
