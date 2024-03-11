@@ -45,6 +45,19 @@ export abstract class PlatformBuilder {
     this.logger.info(`Using output directory: ${this.outputDirectory}`);
   }
 
+  get compiler(): SourceCodeCompiler {
+    if (this.sourceCodeCompiler === undefined) {
+      throw new PlatformBuilderError(
+        `No compiler has set for this Platform yet`,
+      );
+    }
+    return this.sourceCodeCompiler;
+  }
+
+  set compiler(c: SourceCodeCompiler) {
+    this.sourceCodeCompiler = c;
+  }
+
   abstract compile(sourceFile: string): Promise<number>;
 
   abstract compileSourceCode(sourceFile: string): Promise<number>;
