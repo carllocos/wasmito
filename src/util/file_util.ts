@@ -79,18 +79,23 @@ export async function readFileAsBuffer(filePath: string): Promise<Buffer> {
 }
 
 export function createDirectoryIfUnexisting(directoryPath: string): void {
-  if (!fs.existsSync(directoryPath)) {
+  const exists = fs.existsSync(directoryPath);
+  if (!exists) {
     fs.mkdirSync(directoryPath, { recursive: true });
   }
 }
 
+export function isAbsolutePath(inputPath: string): boolean {
+  return path.isAbsolute(inputPath);
+}
+
 export function getAbsolutePath(inputPath: string): string {
-  const isAbsolutePath = path.isAbsolute(inputPath);
-  if (isAbsolutePath) {
+  if (isAbsolutePath(inputPath)) {
     return inputPath;
   }
   return path.resolve(inputPath);
 }
+
 export async function renameFile(
   filePath: string,
   newName: string,
@@ -107,4 +112,35 @@ export async function renameFile(
       }
     });
   });
+}
+
+export function isFilePath(path: string): boolean {
+  try {
+    const stats = fs.statSync(path);
+    return stats.isFile();
+  } catch (error) {
+    return false;
+  }
+}
+
+export function isDirectoryPath(path: string): boolean {
+  try {
+    const stats = fs.statSync(path);
+    return stats.isDirectory();
+  } catch (error) {
+    return false;
+  }
+}
+
+export async function readFileAsJSON(filePath: string): Promise<any> {
+  const content: Buffer = await fs.promises.readFile(filePath);
+  return JSON.parse(content.toString());
+}
+
+export function pathJoin(dirPath: string, otherPath: string): string {
+  return path.join(dirPath, otherPath);
+}
+
+export function getDirectory(filePath: string): string {
+  return path.dirname(filePath);
 }
