@@ -24,7 +24,10 @@ import { type SourceMap } from '../../source_mappers/source_map';
 import path from 'path';
 import { type MCUWARDuinoVM } from '../../warduino/vm/mcu_vm';
 import { listAllFQBN, listAvailableBoards } from '../../builder/util_platform';
-import { Platform, PlatformBuilderConfig } from '../../builder/platform_config';
+import {
+  PlatformTarget,
+  PlatformBuilderConfig,
+} from '../../builder/platform_config';
 import { BoardBaudRate } from '../../util/serial_port';
 import { type VMConfigArgs } from '../../device/vm_config';
 
@@ -439,7 +442,7 @@ export async function spawnHardwareVM(
   };
 
   const platformConfig = new PlatformBuilderConfig(
-    Platform.Arduino,
+    PlatformTarget.Arduino,
     BoardBaudRate.BD_115200,
     targetBoard,
     deviceConfigArgs,

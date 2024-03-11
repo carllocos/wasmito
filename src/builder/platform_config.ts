@@ -11,25 +11,25 @@ export interface BoardFQBN {
   fqbn: string;
 }
 
-export enum Platform {
+export enum PlatformTarget {
   Arduino,
   DevVM,
 }
 
 export class PlatformBuilderConfig {
-  public readonly platform: Platform;
+  public readonly target: PlatformTarget;
   public readonly deviceConfig: DeviceConfig;
   public readonly baudrate: BoardBaudRate;
   public readonly fqbn: BoardFQBN;
 
   constructor(
-    platform: Platform,
+    target: PlatformTarget,
     baudrate: BoardBaudRate,
     fqbn: BoardFQBN,
     deviceConfigArgs: DeviceConfigArgs,
     vmConfigArgs: VMConfigArgs,
   ) {
-    this.platform = platform;
+    this.target = target;
     this.baudrate = baudrate;
     this.fqbn = fqbn;
     if (
@@ -56,7 +56,7 @@ export class PlatformBuilderConfig {
 
   configuredForSerial(): boolean {
     return (
-      this.platform !== Platform.DevVM &&
+      this.target !== PlatformTarget.DevVM &&
       this.deviceConfig.vmConfig.hasSerialPort() &&
       this.baudrate !== BoardBaudRate.NONE
     );
