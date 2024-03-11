@@ -31,6 +31,7 @@ import {
 import { writeFileSync } from 'fs';
 import { type WasmType } from '../../state/opcode_type';
 import { parseOpcodesFromDissambledOutput } from '../parsers/dissambled';
+import { runCommand } from '../../util/process_command';
 
 const logger = createLogger('WATCompiler');
 
@@ -94,19 +95,6 @@ export class WATCompiler extends SourceCodeCompiler {
       lineInfoPairs,
     );
   }
-}
-async function runCommand(
-  command: string,
-): Promise<[string, string, ExecException | null]> {
-  const resp = await new Promise<[string, string, ExecException | null]>(
-    (resolve) => {
-      getGlobalLogger().info(`Running command: ${command}`);
-      exec(command, (error, stdout, stderr) => {
-        resolve([stdout, stderr, error]);
-      });
-    },
-  );
-  return resp;
 }
 
 async function compileWAT2WASM(
