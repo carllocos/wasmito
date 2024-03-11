@@ -1,6 +1,6 @@
 import { getGlobalLogger } from '../logger/logger';
 import { PlatformTarget, type PlatformBuilderConfig } from './platform_config';
-import { type Platform } from './platformbuilder';
+import { type Platform } from './platform';
 import { ArduinoBoardBuilder } from './platforms/arduino_platform';
 import { DevVMPlatform } from './platforms/dev_vm_platform';
 
