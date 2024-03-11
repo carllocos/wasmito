@@ -1,5 +1,8 @@
 import { listAllFQBN, listAvailableBoards } from '../builder/util_platform';
-import { Platform, PlatformBuilderConfig } from '../builder/platform_config';
+import {
+  PlatformTarget,
+  PlatformBuilderConfig,
+} from '../builder/platform_config';
 import { DeploymentMode, type DeviceConfigArgs } from '../device/device_config';
 import { createLogger } from '../logger/logger';
 import { DeviceManager } from '../device/device_manager';

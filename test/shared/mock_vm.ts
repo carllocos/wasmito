@@ -9,7 +9,7 @@ import {
 import { type VMConfigArgs } from '../../src/device/vm_config';
 import {
   type BoardFQBN,
-  Platform,
+  PlatformTarget,
   PlatformBuilderConfig,
 } from '../../src/builder/platform_config';
 import { type APIRequest } from '../../src/warduino/api/request_interface';
@@ -42,7 +42,7 @@ function createPlatformBuilderConfig(): PlatformBuilderConfig {
   };
 
   return new PlatformBuilderConfig(
-    Platform.DevVM,
+    PlatformTarget.DevVM,
     BoardBaudRate.NONE,
     fqbn,
     deviceConfigArgs,

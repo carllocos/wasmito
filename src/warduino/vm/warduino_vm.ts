@@ -10,7 +10,7 @@ import {
 } from '../api/request_interface';
 import { Command } from '../../communication/command';
 import { type PlatformBuilderConfig } from '../../builder/platform_config';
-import { type PlatformBuilder } from '../../builder/platformbuilder';
+import { type Platform } from '../../builder/platformbuilder';
 import { createPlatformBuilder } from '../../builder/platformbuilder_factory';
 import { PauseRequest } from '../requests/pause_request';
 import { ProxifyRequest } from '../requests/proxify_request';
@@ -56,7 +56,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   private _channel: Channel;
   protected abstract logger: winston.Logger;
   public readonly platformConfig: PlatformBuilderConfig;
-  public readonly platform: PlatformBuilder;
+  public readonly platform: Platform;
   protected abstract readonly ErrorClass: new (errorMsg: string) => Error;
 
   protected readonly onNewEventHook: EventInspectHook;

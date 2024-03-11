@@ -1,7 +1,7 @@
 import { exec, spawn } from 'child_process';
 import { createLogger } from '../../logger/logger';
 import { type PlatformBuilderConfig, type BoardFQBN } from '../platform_config';
-import { PlatformBuilder } from '../platformbuilder';
+import { Platform } from '../platformbuilder';
 import {
   copyRecursive,
   createDirectoryIfUnexisting,
@@ -185,7 +185,7 @@ export async function ArduinoClean(outputDir: string): Promise<number> {
   });
 }
 
-export class ArduinoBoardBuilder extends PlatformBuilder {
+export class ArduinoBoardBuilder extends Platform {
   private readonly pathToArduinoTemplateDir: string;
   private readonly pathToArduinoSketchDir: string;
   private readonly pathToArduinoWasmBinaryDir: string;

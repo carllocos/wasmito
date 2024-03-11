@@ -11,7 +11,10 @@ import {
 } from '../../device/device_config';
 import type winston from 'winston';
 import { createLogger } from '../../logger/logger';
-import { Platform, PlatformBuilderConfig } from '../../builder/platform_config';
+import {
+  PlatformTarget,
+  PlatformBuilderConfig,
+} from '../../builder/platform_config';
 import { UpdateWasmModuleRequest } from '../requests/update_module_request';
 import { getPath2WARDuinoSDKVMBinary } from '../../project_config';
 import { getFreePort, isPortInUse } from '../../util/socket_util';
@@ -31,7 +34,7 @@ function createPlatformBuilderConfig(
   vmConfigArgs: VMConfigArgs,
 ): PlatformBuilderConfig {
   return new PlatformBuilderConfig(
-    Platform.DevVM,
+    PlatformTarget.DevVM,
     BoardBaudRate.NONE,
     {
       boardName: '',

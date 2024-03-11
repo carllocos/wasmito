@@ -1,6 +1,6 @@
 import {
   type BoardFQBN,
-  Platform,
+  PlatformTarget,
   PlatformBuilderConfig,
 } from '../builder/platform_config';
 import { DeviceManager } from '../device/device_manager';

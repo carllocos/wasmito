@@ -1,7 +1,7 @@
 import type winston from 'winston';
 import {
   type BoardFQBN,
-  Platform,
+  PlatformTarget,
   PlatformBuilderConfig,
 } from '../../builder/platform_config';
 import { listAllFQBN, listAvailableBoards } from '../../builder/util_platform';
@@ -289,7 +289,7 @@ export class SystemDeployer {
       baudrate: device.baudrate,
     };
     return new PlatformBuilderConfig(
-      Platform.Arduino,
+      PlatformTarget.Arduino,
       device.baudrate,
       boardFQBN,
       deviceConfig,

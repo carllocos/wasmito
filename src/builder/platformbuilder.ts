@@ -6,15 +6,15 @@ import { createTempDirectory, getAbsolutePath } from '../util/file_util';
 import { type SourceCodeCompiler } from '../source_mappers/compilers/compiler';
 import { type SourceMap } from '../source_mappers/source_map';
 
-export class PlatformBuilderError extends Error {
+export class PlatformError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'PlatformBuilderError';
-    Error.captureStackTrace(this, PlatformBuilderError);
+    this.name = 'PlatformError';
+    Error.captureStackTrace(this, PlatformError);
   }
 }
 
-export abstract class PlatformBuilder {
+export abstract class Platform {
   protected readonly logger: winston.Logger;
   protected readonly platformConfig: PlatformBuilderConfig;
   protected readonly sdkPath: string;
@@ -30,7 +30,7 @@ export abstract class PlatformBuilder {
 
     this.sdkPath = getPath2WARDuinoSDK() ?? '';
     if (this.sdkPath === '') {
-      throw new PlatformBuilderError(
+      throw new PlatformError(
         'WARDuinoSDK has not been set. Configure the path via the global configuration `project_config.ts` file or `WARUINO_SDK` env variable',
       );
     }
@@ -47,9 +47,7 @@ export abstract class PlatformBuilder {
 
   get compiler(): SourceCodeCompiler {
     if (this.sourceCodeCompiler === undefined) {
-      throw new PlatformBuilderError(
-        `No compiler has set for this Platform yet`,
-      );
+      throw new PlatformError(`No compiler has set for this Platform yet`);
     }
     return this.sourceCodeCompiler;
   }

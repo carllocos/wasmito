@@ -4,9 +4,9 @@ import {
   getAbsolutePath,
 } from '../../util/file_util';
 import { type PlatformBuilderConfig } from '../platform_config';
-import { PlatformBuilder } from '../platformbuilder';
+import { Platform } from '../platformbuilder';
 
-export class DevVMPlatform extends PlatformBuilder {
+export class DevVMPlatform extends Platform {
   private pathToSourceCodeFile: string;
 
   constructor(config: PlatformBuilderConfig, outputDir: string = '') {

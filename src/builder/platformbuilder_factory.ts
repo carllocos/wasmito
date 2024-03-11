@@ -1,6 +1,6 @@
 import { getGlobalLogger } from '../logger/logger';
-import { type PlatformBuilder } from './platformbuilder';
-import { Platform, type PlatformBuilderConfig } from './platform_config';
+import { PlatformTarget, type PlatformBuilderConfig } from './platform_config';
+import { type Platform } from './platformbuilder';
 import { ArduinoBoardBuilder } from './platforms/arduino_platform';
 import { DevVMPlatform } from './platforms/dev_vm_platform';
 
@@ -15,14 +15,14 @@ export class BoardBuilderFactoryError extends Error {
 export function createPlatformBuilder(
   platformConfig: PlatformBuilderConfig,
   outputDir: string = '',
-): PlatformBuilder {
-  switch (platformConfig.platform) {
-    case Platform.Arduino:
+): Platform {
+  switch (platformConfig.target) {
+    case PlatformTarget.Arduino:
       getGlobalLogger().info(
         `Creating Arduino Board Builder for ${platformConfig.deviceConfig.name}`,
       );
       return new ArduinoBoardBuilder(platformConfig, outputDir);
-    case Platform.DevVM:
+    case PlatformTarget.DevVM:
       getGlobalLogger().info(
         `Creating Development VM for ${platformConfig.deviceConfig.name}`,
       );
