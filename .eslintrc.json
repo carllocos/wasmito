@@ -21,6 +21,7 @@
     "rules": {
         "@typescript-eslint/no-namespace": "off",
         "@typescript-eslint/return-await": "off",
+        "@typescript-eslint/restrict-template-expressions": "off",
         "prettier/prettier": [
             "error",
             {
