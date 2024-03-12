@@ -1,10 +1,9 @@
-import { type VMConfigArgs } from './vm_config';
+// import { type VMConfigArgs } from './vm_config';
 import type winston from 'winston';
 import { createLogger } from '../logger/logger';
-import { DeploymentMode, type DeviceConfigArgs } from './device_config';
+// import { DeploymentMode, type DeviceIdentity } from './device_config';
 import { WARDuinoDevVM } from '../warduino/vm/dev_vm';
 import { MCUWARDuinoVM } from '../warduino/vm/mcu_vm';
-import { type PlatformBuilderConfig } from '../builder/platform_config';
 import { type ChildProcess } from 'child_process';
 import { type WARDuinoVM } from '../warduino';
 import {
@@ -14,6 +13,9 @@ import {
   OutOfThingsMonitor,
   OutputMode,
 } from '../warduino/vm/outofplace_vm';
+// import { type ProgLangSelectionArgs } from '../source_mappers/compilers/prog_language_selection';
+import { type DevVMPlatform, type ArduinoBoardBuilder } from '../builder';
+import { NoChannel } from '../communication/no_channel';
 
 export class DeviceManagerError extends Error {
   constructor(message: string) {
@@ -46,29 +48,34 @@ export class DeviceManager {
 
   // TODO remove deviceConfigArgs
   async connectToExistingDevVM(
-    deviceConfigArgs: DeviceConfigArgs,
-    toolPort: number,
-    program: string,
+    platform: DevVMPlatform,
+    // selectedLanguage: ProgLangSelectionArgs,
+    // deviceConfigArgs: DeviceIdentity,
+    // toolPort: number,
+    // program: string,
     maxWaitTime: number,
-    buildOutputDir?: string,
+    // buildOutputDir?: string,
   ): Promise<WARDuinoDevVM> {
-    const vmConfigArgs: VMConfigArgs = {
-      program,
-      toolPort,
-    };
-    if (deviceConfigArgs.deploymentMode !== DeploymentMode.MCUVM) {
-      vmConfigArgs.disableStrictModuleLoad = true;
-    }
-    const devVM = new WARDuinoDevVM(
-      deviceConfigArgs,
-      vmConfigArgs,
-      buildOutputDir,
-    );
+    // const vmConfigArgs: VMConfigArgs = {
+    //   program,
+    //   toolPort,
+    // };
+    // if (deviceConfigArgs.deploymentMode !== DeploymentMode.MCUVM) {
+    //   vmConfigArgs.disableStrictModuleLoad = true;
+    // }
 
+    const devVM = new WARDuinoDevVM(platform);
+    devVM.platform = platform;
+    // selectedLanguage,
+    // deviceConfigArgs,
+    // vmConfigArgs,
+    // buildOutputDir,
+
+    // await devVM.platform.createCompiler();
     const connected = await devVM.connect(maxWaitTime);
     if (!connected) {
       this.logger.info(
-        `Failed to connect to local DevelopmentVM at port ${vmConfigArgs.toolPort}`,
+        `Failed to connect to local DevelopmentVM at port ${platform.config.vmConfig.toolPort}`,
       );
       throw new DeviceManagerError('timed out connecting to DevVM process');
     }
@@ -79,18 +86,19 @@ export class DeviceManager {
   }
 
   async spawnDevelopmentVM(
-    vmConfigArgs: VMConfigArgs,
+    platform: DevVMPlatform,
+    sourceCodeCompilationArgs: any,
     maxWaitTime?: number,
-    vmName?: string,
-    buildOutputDir?: string,
   ): Promise<WARDuinoDevVM> {
-    return this.spawnDevelopmentVMFromConfigs(
-      DeploymentMode.DevVM,
-      vmConfigArgs,
+    const devVM = new WARDuinoDevVM(platform);
+    const childProcess = await devVM.spawn(
+      sourceCodeCompilationArgs,
       maxWaitTime,
-      vmName,
-      buildOutputDir,
     );
+    this.registerListenersOnVMProcess(childProcess);
+    this.localprocesses.push([devVM, childProcess]);
+    this.notifyListeners(devVM);
+    return devVM;
   }
 
   async spawnOutOfPlaceVM(
@@ -100,7 +108,7 @@ export class DeviceManager {
     buildOutputDir?: string,
   ): Promise<OutOfPlaceVM> {
     const noServerPort = undefined;
-    const vm = new OutOfPlaceVM(targetVM, noServerPort, buildOutputDir);
+    const vm = new OutOfPlaceVM(targetVM, noServerPort);
     // TODO configured for edward parametrize more of config
     const config: OutOfPlaceSetupConfig = {
       targetInputMode,
@@ -133,11 +141,7 @@ export class DeviceManager {
     maxWaitTime?: number,
     buildOutputDir?: string,
   ): Promise<OutOfPlaceVM> {
-    const vm = new OutOfPlaceVM(
-      targetVM,
-      serverPortForProxyCalls,
-      buildOutputDir,
-    );
+    const vm = new OutOfPlaceVM(targetVM, serverPortForProxyCalls);
     // TODO configured for edward parametrize more of config
     const config: OutOfPlaceSetupConfig = {
       targetInputMode: InputMode.CopyInput,
@@ -153,16 +157,15 @@ export class DeviceManager {
   }
 
   async connectToExistingMCUVM(
-    platformConfig: PlatformBuilderConfig,
-    buildOutputDir?: string,
+    platform: ArduinoBoardBuilder,
   ): Promise<MCUWARDuinoVM> {
-    const vm = new MCUWARDuinoVM(platformConfig, buildOutputDir);
+    const vm = new MCUWARDuinoVM(platform, new NoChannel());
     const connected = await vm.connect();
     if (!connected) {
       throw Error('Could not connect to external MCU VM');
     }
     const exitCode = await vm.platform.compileSourceCode(
-      platformConfig.deviceConfig.vmConfig.program,
+      'TODO provide sourcePath',
     );
     if (exitCode !== 0) {
       throw Error('Could not compile source code');
@@ -173,16 +176,14 @@ export class DeviceManager {
   }
 
   async spawnHardwareVM(
-    platformConfig: PlatformBuilderConfig,
-    buildOutputDir?: string,
+    platform: ArduinoBoardBuilder,
+    sourceCodeCompilationArgs: any,
   ): Promise<MCUWARDuinoVM> {
-    const vm = new MCUWARDuinoVM(platformConfig, buildOutputDir);
-    const uploaded = await vm.uploadSourceCode(
-      platformConfig.deviceConfig.vmConfig.program,
-    );
+    const vm = new MCUWARDuinoVM(platform);
+    const uploaded = await vm.uploadSourceCode(sourceCodeCompilationArgs);
     if (!uploaded) {
       throw new Error(
-        `failed to upload source code ${platformConfig.deviceConfig.vmConfig.program}`,
+        `failed to upload source code ${platform.config.deviceIdentity.name}`,
       );
     }
 
@@ -202,11 +203,11 @@ export class DeviceManager {
         },
       )?.[0];
 
-      const config = vm?.platformConfig.deviceConfig;
+      const config = vm?.deviceIdentity;
       this.logger.info(
-        `Spawned process ${config?.fullname} exit with code ${code}`,
+        `Spawned process ${config?.name} exit with code ${code}`,
       );
-      this.logger.debug(`Removing process ${config?.fullname} from local list`);
+      this.logger.debug(`Removing process ${config?.name} from local list`);
 
       this.localprocesses = this.localprocesses.filter(
         ([, p]: [WARDuinoDevVM, ChildProcess?]) => {
@@ -214,30 +215,5 @@ export class DeviceManager {
         },
       );
     });
-  }
-
-  private async spawnDevelopmentVMFromConfigs(
-    mode: DeploymentMode,
-    vmConfigArgs: VMConfigArgs,
-    maxWaitTime?: number,
-    vmHumanReadableName?: string,
-    buildOutputDir?: string,
-  ): Promise<WARDuinoDevVM> {
-    const deviceConfigArgs: DeviceConfigArgs = {
-      deploymentMode: mode,
-    };
-    if (vmHumanReadableName !== undefined) {
-      deviceConfigArgs.name = vmHumanReadableName;
-    }
-    const devVM = new WARDuinoDevVM(
-      deviceConfigArgs,
-      vmConfigArgs,
-      buildOutputDir,
-    );
-    const childProcess = await devVM.spawn(maxWaitTime);
-    this.registerListenersOnVMProcess(childProcess);
-    this.localprocesses.push([devVM, childProcess]);
-    this.notifyListeners(devVM);
-    return devVM;
   }
 }

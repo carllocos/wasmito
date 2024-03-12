@@ -1,137 +1,148 @@
-import {
-  type BoardFQBN,
-  PlatformTarget,
-  PlatformBuilderConfig,
-} from '../builder/platform_config';
-import { DeviceManager } from '../device/device_manager';
-import { DeploymentMode, type DeviceConfigArgs } from '../device/device_config';
-import { BoardBaudRate } from '../util/serial_port';
-import { type VMConfigArgs } from '../device/vm_config';
-import { WasmValuesBuilder } from '../state/wasm_value_array_builder';
-import { type WasmState } from '../state';
-import { type WARDuinoVM } from '../warduino/vm/warduino_vm';
-import { type MCUWARDuinoVM } from '../warduino/vm/mcu_vm';
-import { StateRequest } from '../warduino/requests/inspect_request';
-import { Breakpoint } from '../debugger/breakpoint';
+// import {
+//   type BoardFQBN,
+//   PlatformTarget,
+//   PlatformConfig,
+// } from '../builder/platform_config';
+// import { DeviceManager } from '../device/device_manager';
+// import { DeploymentMode, type DeviceIdentity } from '../device/device_config';
+// import { BoardBaudRate } from '../util/serial_port';
+// import { type VMConfigArgs } from '../device/vm_config';
+// import { WasmValuesBuilder } from '../state/wasm_value_array_builder';
+// import { type WasmState } from '../state';
+// import { type WARDuinoVM } from '../warduino/vm/warduino_vm';
+// import { type MCUWARDuinoVM } from '../warduino/vm/mcu_vm';
+// import { StateRequest } from '../warduino/requests/inspect_request';
+// import { Breakpoint } from '../debugger/breakpoint';
+// import {
+//   type ProgLangSelectionArgs,
+//   TargetLanguage,
+// } from '../source_mappers/compilers/prog_language_selection';
 
-export async function callLedcSetup(vm: WARDuinoVM): Promise<void> {
-  const funcLEDCSetup = 5;
-  const argsLEDCSetup = new WasmValuesBuilder();
-  argsLEDCSetup.addI32Value(0).addI32Value(5000).addI32Value(12);
-  const reply = await vm.proxyCall(funcLEDCSetup, argsLEDCSetup.values);
-  console.log(reply);
-}
+// export async function callLedcSetup(vm: WARDuinoVM): Promise<void> {
+//   const funcLEDCSetup = 5;
+//   const argsLEDCSetup = new WasmValuesBuilder();
+//   argsLEDCSetup.addI32Value(0).addI32Value(5000).addI32Value(12);
+//   const reply = await vm.proxyCall(funcLEDCSetup, argsLEDCSetup.values);
+//   console.log(reply);
+// }
 
-export async function callLedCAttachPin(vm: WARDuinoVM): Promise<void> {
-  const funcLEDCAttachPin = 6;
-  const argsLEDCAttachPin = new WasmValuesBuilder();
-  argsLEDCAttachPin.addI32Value(10);
-  argsLEDCAttachPin.addI32Value(0);
-  const reply = await vm.proxyCall(funcLEDCAttachPin, argsLEDCAttachPin.values);
-  console.log(reply);
-}
+// export async function callLedCAttachPin(vm: WARDuinoVM): Promise<void> {
+//   const funcLEDCAttachPin = 6;
+//   const argsLEDCAttachPin = new WasmValuesBuilder();
+//   argsLEDCAttachPin.addI32Value(10);
+//   argsLEDCAttachPin.addI32Value(0);
+//   const reply = await vm.proxyCall(funcLEDCAttachPin, argsLEDCAttachPin.values);
+//   console.log(reply);
+// }
 
-export async function callPinMode(vm: WARDuinoVM): Promise<void> {
-  const funcPinMode = 1;
-  const argsPinMode = new WasmValuesBuilder();
-  argsPinMode.addI32Value(39);
-  argsPinMode.addI32Value(5);
-  const reply = await vm.proxyCall(funcPinMode, argsPinMode.values);
-  console.log(reply);
-}
+// export async function callPinMode(vm: WARDuinoVM): Promise<void> {
+//   const funcPinMode = 1;
+//   const argsPinMode = new WasmValuesBuilder();
+//   argsPinMode.addI32Value(39);
+//   argsPinMode.addI32Value(5);
+//   const reply = await vm.proxyCall(funcPinMode, argsPinMode.values);
+//   console.log(reply);
+// }
 
-async function callSubscribe(vm: WARDuinoVM, args?: number[]): Promise<void> {
-  const funcSub = 4;
-  const argsSub = new WasmValuesBuilder();
-  if (args === undefined) {
-    argsSub.addI32Value(39);
-    argsSub.addI32Value(1);
-    argsSub.addI32Value(2);
-  } else if (args.length !== 3) {
-    throw new Error('expected 3 args');
-  } else {
-    argsSub.addI32Value(args[0]);
-    argsSub.addI32Value(args[1]);
-    argsSub.addI32Value(args[2]);
-  }
+// async function callSubscribe(vm: WARDuinoVM, args?: number[]): Promise<void> {
+//   const funcSub = 4;
+//   const argsSub = new WasmValuesBuilder();
+//   if (args === undefined) {
+//     argsSub.addI32Value(39);
+//     argsSub.addI32Value(1);
+//     argsSub.addI32Value(2);
+//   } else if (args.length !== 3) {
+//     throw new Error('expected 3 args');
+//   } else {
+//     argsSub.addI32Value(args[0]);
+//     argsSub.addI32Value(args[1]);
+//     argsSub.addI32Value(args[2]);
+//   }
 
-  const replySub = await vm.proxyCall(funcSub, argsSub.values);
-  console.log(replySub);
-}
+//   const replySub = await vm.proxyCall(funcSub, argsSub.values);
+//   console.log(replySub);
+// }
 
-export async function runTestProxyOnDev(
-  config: PlatformBuilderConfig,
-  upload: boolean,
-): Promise<void> {
-  const dm = new DeviceManager();
-  const targetVM = await dm.connectToExistingDevVM(
-    {
-      deploymentMode: DeploymentMode.DevVM,
-    },
-    8000,
-    config.deviceConfig.vmConfig.program,
-    5000,
-  );
-  await callSubscribe(targetVM);
-}
+// export async function runTestProxyOnDev(
+//   config: PlatformConfig,
+//   upload: boolean,
+// ): Promise<void> {
+//   const dm = new DeviceManager();
+//   const targetVM = await dm.connectToExistingDevVM(
+//     config.selectedLanguage,
+//     {
+//       deploymentMode: DeploymentMode.DevVM,
+//     },
+//     8000,
+//     config.deviceConfig.vmConfig.program,
+//     5000,
+//   );
+//   await callSubscribe(targetVM);
+// }
 
-async function setupMCUVM(
-  config: PlatformBuilderConfig,
-  upload: boolean,
-): Promise<MCUWARDuinoVM> {
-  const dm = new DeviceManager();
-  if (upload) {
-    return await dm.spawnHardwareVM(config);
-  } else {
-    throw new Error(`TODO`);
-  }
-}
+// async function setupMCUVM(
+//   config: PlatformConfig,
+//   upload: boolean,
+// ): Promise<MCUWARDuinoVM> {
+//   const dm = new DeviceManager();
+//   if (upload) {
+//     return await dm.spawnHardwareVM(config);
+//   } else {
+//     throw new Error(`TODO`);
+//   }
+// }
 
-export async function testEventHook(
-  config: PlatformBuilderConfig,
-  upload: boolean,
-): Promise<void> {
-  const vm = await setupMCUVM(config, upload);
-  const bp = new Breakpoint(
-    {
-      linenr: 88,
-    },
-    new StateRequest().includePC(),
-  );
-  bp.subscribe((state: WasmState) => {
-    console.log('breakpoint reached');
-    // vm.run().then(console.log).catch(console.error);
-  });
-  const added = await vm.addBreakpoint(bp);
-  if (!added) {
-    return;
-  }
-  await vm.run();
-  // await callSubscribe(vm);
-  console.log('here');
-}
+// export async function testEventHook(
+//   config: PlatformConfig,
+//   upload: boolean,
+// ): Promise<void> {
+//   const vm = await setupMCUVM(config, upload);
+//   const bp = new Breakpoint(
+//     {
+//       linenr: 88,
+//     },
+//     new StateRequest().includePC(),
+//   );
+//   bp.subscribe((state: WasmState) => {
+//     console.log('breakpoint reached');
+//     // vm.run().then(console.log).catch(console.error);
+//   });
+//   const added = await vm.addBreakpoint(bp);
+//   if (!added) {
+//     return;
+//   }
+//   await vm.run();
+//   // await callSubscribe(vm);
+//   console.log('here');
+// }
 
-const vmConfigArgs: VMConfigArgs = {
-  program: './src/tool_examples/wat_examples/dimmer-double-button.wat',
-  serialPort: '/dev/ttyUSB0',
-};
+// const vmConfigArgs: VMConfigArgs = {
+//   program: './src/tool_examples/wat_examples/dimmer-double-button.wat',
+//   serialPort: '/dev/ttyUSB0',
+// };
 
-const deviceConfigArgs: DeviceConfigArgs = {
-  name: 'M5stickC',
-  deploymentMode: DeploymentMode.MCUVM,
-};
-const boardFQN: BoardFQBN = {
-  fqbn: 'esp32:esp32:m5stick-c',
-  boardName: deviceConfigArgs.name as string,
-};
-const config = new PlatformBuilderConfig(
-  Platform.Arduino,
-  BoardBaudRate.BD_115200,
-  boardFQN,
-  deviceConfigArgs,
-  vmConfigArgs,
-);
+// const selectLang: ProgLangSelectionArgs = {
+//   targetLanguage: TargetLanguage.WAT,
+//   compilerArgs: vmConfigArgs.program,
+// };
 
-const updateSourceCode = true;
+// const deviceConfigArgs: DeviceIdentity = {
+//   name: 'M5stickC',
+//   deploymentMode: DeploymentMode.MCUVM,
+// };
+// const boardFQN: BoardFQBN = {
+//   fqbn: 'esp32:esp32:m5stick-c',
+//   boardName: deviceConfigArgs.name as string,
+// };
+// const config = new PlatformConfig(
+//   PlatformTarget.Arduino,
+//   BoardBaudRate.BD_115200,
+//   boardFQN,
+//   selectLang,
+//   deviceConfigArgs,
+//   vmConfigArgs,
+// );
 
-testEventHook(config, updateSourceCode).then(console.log).catch(console.error);
+// const updateSourceCode = true;
+
+// testEventHook(config, updateSourceCode).then(console.log).catch(console.error);

@@ -1,10 +1,11 @@
 import type winston from 'winston';
 import { createLogger } from '../logger/logger';
 import { getPath2WARDuinoSDK, readProjectName } from '../project_config';
-import { type PlatformBuilderConfig } from './platform_config';
+import { type PlatformConfig } from './platform_config';
 import { createTempDirectory, getAbsolutePath } from '../util/file_util';
 import { type SourceCodeCompiler } from '../source_mappers/compilers/compiler';
 import { type SourceMap } from '../source_mappers/source_map';
+import { type ProgLangSelectionArgs } from '../source_mappers/compilers/prog_language_selection';
 
 export class PlatformError extends Error {
   constructor(message: string) {
@@ -16,17 +17,17 @@ export class PlatformError extends Error {
 
 export abstract class Platform {
   protected readonly logger: winston.Logger;
-  protected readonly platformConfig: PlatformBuilderConfig;
+  public readonly config: PlatformConfig;
   protected readonly sdkPath: string;
   protected readonly tmpDirPrefix: string;
   protected readonly outputDirectory: string;
-  protected sourceCodeCompiler?: SourceCodeCompiler;
-  protected sourceMap?: SourceMap;
+  protected _sourceCodeCompiler?: SourceCodeCompiler;
+  protected _sourceMap?: SourceMap;
 
-  constructor(config: PlatformBuilderConfig, outputDir: string = '') {
-    this.platformConfig = config;
+  constructor(config: PlatformConfig, outputDir: string = '') {
+    this.config = config;
     this.tmpDirPrefix = `${readProjectName().replace(/\s+/g, '-')}-`;
-    this.logger = createLogger(`PlatformBuilder ${config.deviceConfig.name}`);
+    this.logger = createLogger(`PlatformBuilder ${config.deviceIdentity.name}`);
 
     this.sdkPath = getPath2WARDuinoSDK() ?? '';
     if (this.sdkPath === '') {
@@ -45,24 +46,41 @@ export abstract class Platform {
     this.logger.info(`Using output directory: ${this.outputDirectory}`);
   }
 
+  get sourceMap(): SourceMap {
+    if (this._sourceMap === undefined) {
+      throw new Error(
+        `No SourceMap available for the platform. Compile some source code first`,
+      );
+    }
+    return this._sourceMap;
+  }
+
+  get compilationOutputPath(): string {
+    return this.outputDirectory;
+  }
+
   get compiler(): SourceCodeCompiler {
-    if (this.sourceCodeCompiler === undefined) {
+    if (this._sourceCodeCompiler === undefined) {
       throw new PlatformError(`No compiler has set for this Platform yet`);
     }
-    return this.sourceCodeCompiler;
+    return this._sourceCodeCompiler;
   }
 
   set compiler(c: SourceCodeCompiler) {
-    this.sourceCodeCompiler = c;
+    this._sourceCodeCompiler = c;
   }
 
-  abstract compile(sourceFile: string): Promise<number>;
+  abstract createCompiler(
+    selectedLanguage: ProgLangSelectionArgs,
+  ): Promise<void>;
 
-  abstract compileSourceCode(sourceFile: string): Promise<number>;
+  abstract buildForPlatform(sourceCodeCompilationArgs: any): Promise<number>;
+
+  abstract compileSourceCode(sourceCodeCompilationArgs: any): Promise<number>;
 
   abstract upload(): Promise<number>;
 
   public getSourceMap(): SourceMap | undefined {
-    return this.sourceMap;
+    return this._sourceMap;
   }
 }

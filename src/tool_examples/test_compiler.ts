@@ -1,13 +1,14 @@
 import { listAllFQBN, listAvailableBoards } from '../builder/util_platform';
-import {
-  PlatformTarget,
-  PlatformBuilderConfig,
-} from '../builder/platform_config';
-import { DeploymentMode, type DeviceConfigArgs } from '../device/device_config';
 import { createLogger } from '../logger/logger';
 import { DeviceManager } from '../device/device_manager';
 import { BoardBaudRate } from '../util/serial_port';
-import { type VMConfigArgs } from '../device';
+import {
+  type ProgLangSelectionArgs,
+  TargetLanguage,
+} from '../source_mappers/compilers/prog_language_selection';
+import { type WATCompilerArgs } from '../source_mappers';
+import { createArduinoPlatform } from '../builder/platformbuilder_factory';
+
 const testCompilerLogger = createLogger('TestCompiler');
 
 async function runBuilder(): Promise<void> {
@@ -29,29 +30,32 @@ async function runBuilder(): Promise<void> {
     return;
   }
 
-  const sourceFilePath = './example-wat/dimmer-double-button.wat';
-  const vmConfigArgs: VMConfigArgs = {
-    program: sourceFilePath,
-    serialPort: boardPort,
+  const sourceFilePath =
+    './src/tool_examples/wat_examples/dimmer-double-button.wat';
+  const selectedLang: ProgLangSelectionArgs = {
+    targetLanguage: TargetLanguage.WAT,
+  };
+  const sourceCodeCompilerArgs: WATCompilerArgs = {
+    sourceCodePath: sourceFilePath,
   };
 
-  const deviceConfigArgs: DeviceConfigArgs = {
-    name: 'm5stickc',
-    deploymentMode: DeploymentMode.MCUVM,
-  };
-
-  const platformConfig = new PlatformBuilderConfig(
-    Platform.Arduino,
-    BoardBaudRate.BD_115200,
-    targetBoard,
-    deviceConfigArgs,
-    vmConfigArgs,
-  );
   const compileOutputDirectory = './example-wat/platform_arduino/';
+  const platform = await createArduinoPlatform(
+    {
+      vmConfig: {
+        baudrate: BoardBaudRate.BD_115200,
+        fqbn: targetBoard,
+        serialPort: boardPort,
+      },
+      selectedLanguage: selectedLang,
+    },
+    compileOutputDirectory,
+  );
+
   const deviceManager = new DeviceManager();
   const mcuVM = await deviceManager.spawnHardwareVM(
-    platformConfig,
-    compileOutputDirectory,
+    platform,
+    sourceCodeCompilerArgs,
   );
   await mcuVM.run();
 }

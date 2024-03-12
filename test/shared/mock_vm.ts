@@ -1,17 +1,13 @@
 import * as fs from 'fs';
 import { type Logger } from 'winston';
 import { createLogger } from '../../src/logger/logger';
-import { BoardBaudRate } from '../../src/util/serial_port';
-import {
-  DeploymentMode,
-  type DeviceConfigArgs,
-} from '../../src/device/device_config';
-import { type VMConfigArgs } from '../../src/device/vm_config';
-import {
-  type BoardFQBN,
-  PlatformTarget,
-  PlatformBuilderConfig,
-} from '../../src/builder/platform_config';
+// import { BoardBaudRate } from '../../src/util/serial_port';
+// import { type VMConfigArgs } from '../../src/device/vm_config';
+// import {
+//   type BoardFQBN,
+//   PlatformTarget,
+//   PlatformConfig,
+// } from '../../src/builder/platform_config';
 import { type APIRequest } from '../../src/warduino/api/request_interface';
 import { type Command } from '../../src/communication/command';
 import {
@@ -25,30 +21,35 @@ import { type Hook } from '../../src/hooks/hook';
 import { WARDuinoVM } from '../../src/warduino/vm/warduino_vm';
 import { MockChannel } from './mock_channel';
 import { type Breakpoint } from '../../src/debugger/breakpoint';
+import { type Platform } from '../../src';
+// import { type ProgLangSelectionArgs } from '../../src/source_mappers/compilers/prog_language_selection';
 
-function createPlatformBuilderConfig(): PlatformBuilderConfig {
-  const deviceConfigArgs: DeviceConfigArgs = {
-    name: 'mock',
-    deploymentMode: DeploymentMode.DevVM,
-  };
+// function createPlatformBuilderConfig(
+//   selectLang: ProgLangSelectionArgs,
+// ): PlatformConfig {
+//   const deviceConfigArgs: DeviceIdentityArgs = {
+//     name: 'mock',
+//     deploymentMode: DeploymentMode.DevVM,
+//   };
 
-  const vmConfigArgs: VMConfigArgs = {
-    program: 'no program',
-    disableStrictModuleLoad: true,
-  };
-  const fqbn: BoardFQBN = {
-    boardName: 'mock',
-    fqbn: 'mock',
-  };
+//   const vmConfigArgs: VMConfigArgs = {
+//     program: 'no program',
+//     disableStrictModuleLoad: true,
+//   };
+//   const fqbn: BoardFQBN = {
+//     boardName: 'mock',
+//     fqbn: 'mock',
+//   };
 
-  return new PlatformBuilderConfig(
-    PlatformTarget.DevVM,
-    BoardBaudRate.NONE,
-    fqbn,
-    deviceConfigArgs,
-    vmConfigArgs,
-  );
-}
+//   return new PlatformConfig(
+//     PlatformTarget.DevVM,
+//     BoardBaudRate.NONE,
+//     fqbn,
+//     selectLang,
+//     deviceConfigArgs,
+//     vmConfigArgs,
+//   );
+// }
 
 export class MockVM extends WARDuinoVM {
   protected logger: Logger = createLogger('MockVM');
@@ -57,8 +58,8 @@ export class MockVM extends WARDuinoVM {
   private readonly _mockChannel: MockChannel;
   private readonly _mockAddHookOnNewEventResponse: boolean[];
 
-  constructor(outputDir?: string) {
-    super(createPlatformBuilderConfig(), new MockChannel(), outputDir);
+  constructor(platform: Platform) {
+    super(platform, new MockChannel());
     this._mockChannel = this.channel as MockChannel;
     this.states = [];
     this._mockAddHookOnNewEventResponse = [];
@@ -146,10 +147,12 @@ export class MockVM extends WARDuinoVM {
   }
 
   async uploadSourceCode(
-    sourceCodePath: string,
+    sourceCodeCompilerArgs: any,
     timeout?: number | undefined,
   ): Promise<boolean> {
-    const exitCode = await this.platform.compile(sourceCodePath);
+    const exitCode = await this.platform.buildForPlatform(
+      sourceCodeCompilerArgs,
+    );
     if (exitCode !== 0) {
       return false;
     }

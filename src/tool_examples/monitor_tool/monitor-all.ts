@@ -1,7 +1,3 @@
-import {
-  DeploymentMode,
-  type DeviceConfigArgs,
-} from '../../device/device_config';
 import { DeviceManager } from '../../device/device_manager';
 import { getGlobalLogger } from '../../logger/logger';
 import { type WasmState } from '../../state/wasm';
@@ -22,14 +18,19 @@ import { exit } from 'process';
 import { type WARDuinoVM } from '../../warduino/vm/warduino_vm';
 import { type SourceMap } from '../../source_mappers/source_map';
 import path from 'path';
-import { type MCUWARDuinoVM } from '../../warduino/vm/mcu_vm';
-import { listAllFQBN, listAvailableBoards } from '../../builder/util_platform';
-import {
-  PlatformTarget,
-  PlatformBuilderConfig,
-} from '../../builder/platform_config';
 import { BoardBaudRate } from '../../util/serial_port';
-import { type VMConfigArgs } from '../../device/vm_config';
+import { TargetLanguage } from '../../source_mappers/compilers/prog_language_selection';
+import {
+  createArduinoPlatform,
+  createDevPlatform,
+} from '../../builder/platformbuilder_factory';
+import { PlatformTarget } from '../../builder/platform_config';
+import { type WATCompilerArgs } from '../../source_mappers/compilers/wat_compilers';
+// type PlatformConfigArgs,
+// createPlatformBuilder,
+// DevVMPlatform,
+// import { makeSourceCodeCompiler } from '../../source_mappers';
+// import { program } from 'commander';
 
 class WriteJSON {
   private readonly maxBuffer: number;
@@ -393,63 +394,63 @@ async function registerAllHooks(
   em: WARDuinoVM,
   registerSubstitue: boolean,
 ): Promise<boolean> {
-  const sourceMap = em.getSourceMap();
-  if (sourceMap === undefined) {
-    return false;
-  }
-
   let s1 = true;
   if (registerSubstitue) {
-    s1 = await registerSubstitueValueHook(em, sourceMap);
+    s1 = await registerSubstitueValueHook(em, em.sourceMap);
   }
 
-  const s2 = await registerBeforeHooks(em, sourceMap);
-  const s3 = await registerAfterHooks(em, sourceMap);
+  const s2 = await registerBeforeHooks(em, em.sourceMap);
+  const s3 = await registerAfterHooks(em, em.sourceMap);
   return s1 && s2 && s3;
 }
 
-export async function spawnHardwareVM(
-  dm: DeviceManager,
-  wasmApp: string,
-  outputDir: string,
-): Promise<MCUWARDuinoVM | undefined> {
-  const boards = await listAvailableBoards();
-  if (boards.length === 0) {
-    getGlobalLogger().error('No connected board detected');
-    return;
-  }
-  const boardPort = boards[0];
-  getGlobalLogger().info(`Using Board Port ${boardPort}`);
-  const fqbns = await listAllFQBN();
-  const targetBoardName = 'M5Stick-C';
-  const targetBoard = fqbns.find((board) => {
-    return board.boardName.includes(targetBoardName);
-  });
+// export async function spawnHardwareVM(
+//   dm: DeviceManager,
+//   wasmApp: string,
+//   outputDir: string,
+// ): Promise<MCUWARDuinoVM | undefined> {
+//   const boards = await listAvailableBoards();
+//   if (boards.length === 0) {
+//     getGlobalLogger().error('No connected board detected');
+//     return;
+//   }
+//   const boardPort = boards[0];
+//   getGlobalLogger().info(`Using Board Port ${boardPort}`);
+//   const fqbns = await listAllFQBN();
+//   const targetBoardName = 'M5Stick-C';
+//   const targetBoard = fqbns.find((board) => {
+//     return board.boardName.includes(targetBoardName);
+//   });
 
-  if (targetBoard === undefined) {
-    getGlobalLogger().error(`No board found with name ${targetBoardName}`);
-    return undefined;
-  }
+//   if (targetBoard === undefined) {
+//     getGlobalLogger().error(`No board found with name ${targetBoardName}`);
+//     return undefined;
+//   }
 
-  const vmConfigArgs: VMConfigArgs = {
-    serialPort: boardPort,
-    program: wasmApp,
-  };
+//   const vmConfigArgs: VMConfigArgs = {
+//     serialPort: boardPort,
+//     program: wasmApp,
+//   };
 
-  const deviceConfigArgs: DeviceConfigArgs = {
-    name: 'm5stickc',
-    deploymentMode: DeploymentMode.MCUVM,
-  };
+//   const deviceConfigArgs: DeviceIdentity = {
+//     name: 'm5stickc',
+//     deploymentMode: DeploymentMode.MCUVM,
+//   };
 
-  const platformConfig = new PlatformBuilderConfig(
-    PlatformTarget.Arduino,
-    BoardBaudRate.BD_115200,
-    targetBoard,
-    deviceConfigArgs,
-    vmConfigArgs,
-  );
-  return await dm.spawnHardwareVM(platformConfig, outputDir);
-}
+//   const sl: ProgLangSelectionArgs = {
+//     targetLanguage: TargetLanguage.WAT,
+//     compilerArgs: wasmApp,
+//   };
+//   const platformConfig = new PlatformConfig(
+//     PlatformTarget.Arduino,
+//     BoardBaudRate.BD_115200,
+//     targetBoard,
+//     sl,
+//     deviceConfigArgs,
+//     vmConfigArgs,
+//   );
+//   return await dm.spawnHardwareVM(platformConfig, outputDir);
+// }
 
 async function sleep(ms: number): Promise<void> {
   await new Promise((resolve) => {
@@ -462,7 +463,7 @@ export async function runMonitorApp(
   monitorTime: number,
   outputDir: string,
   nameOutputFile: string,
-  monitorMode: DeploymentMode,
+  monitorMode: PlatformTarget,
 ): Promise<boolean> {
   const bufferSizePriorWrite = 500;
   const JSONWriter = new WriteJSON(
@@ -473,16 +474,32 @@ export async function runMonitorApp(
 
   const dm = new DeviceManager();
   let vm: WARDuinoVM | undefined;
-  if (monitorMode === DeploymentMode.DevVM) {
-    const vmConfigArgs: VMConfigArgs = {
-      program: wasmApp,
-      disableStrictModuleLoad: true,
-    };
+  const compilationArgs: WATCompilerArgs = {
+    sourceCodePath: wasmApp,
+  };
 
-    const vmName = undefined;
-    vm = await dm.spawnDevelopmentVM(vmConfigArgs, 8000, vmName, outputDir);
-  } else if (monitorMode === DeploymentMode.MCUVM) {
-    vm = await spawnHardwareVM(dm, wasmApp, outputDir);
+  if (monitorMode === PlatformTarget.DevVM) {
+    const platform = await createDevPlatform({
+      selectedLanguage: {
+        targetLanguage: TargetLanguage.WAT,
+      },
+    });
+    vm = await dm.spawnDevelopmentVM(platform, compilationArgs, 8000);
+  } else if (monitorMode === PlatformTarget.Arduino) {
+    const platform = await createArduinoPlatform({
+      selectedLanguage: {
+        targetLanguage: TargetLanguage.WAT,
+      },
+      vmConfig: {
+        baudrate: BoardBaudRate.BD_115200,
+        serialPort: '/dev/ttyUSB0',
+        fqbn: {
+          boardName: '',
+          fqbn: 'esp32:esp32:m5stick-c',
+        },
+      },
+    });
+    vm = await dm.spawnHardwareVM(platform, compilationArgs);
     await sleep(5000); // sleep to let MCU load module first
   } else {
     getGlobalLogger().error(`unsupported mode ${monitorMode}`);
@@ -494,7 +511,7 @@ export async function runMonitorApp(
 
   const registered = await registerAllHooks(
     vm,
-    monitorMode === DeploymentMode.DevVM,
+    monitorMode === PlatformTarget.DevVM,
   );
   if (!registered) {
     return false;
@@ -508,7 +525,7 @@ export async function runMonitorApp(
   return true;
 }
 
-const app = './example-wat/dimmer-double-button.wat';
+const app = './src/tool_examples/wat_examples/dimmer-double-button.wat';
 const recordTime = 30; // seconds
 const outputDir = './example-wat/';
 const nameMonitorOutputFile = 'monitor_m5stickc.json';
@@ -517,7 +534,7 @@ runMonitorApp(
   recordTime,
   outputDir,
   nameMonitorOutputFile,
-  DeploymentMode.DevVM,
+  PlatformTarget.Arduino,
 )
   .then((_) => {})
   .catch(console.error);

@@ -194,3 +194,11 @@ export function getPath2ObjDump(): string {
 export function getPath2XXD(): string {
   return 'xxd';
 }
+
+export function getPath2AssemblyScriptCompiler(): string {
+  return 'asc';
+}
+
+export function getPath2NPX(): string {
+  return 'npx';
+}

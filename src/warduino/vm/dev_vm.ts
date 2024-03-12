@@ -1,25 +1,21 @@
 import { spawn, type ChildProcess } from 'child_process';
 import { WARDuinoVM } from './warduino_vm';
 import {
-  type VMConfigArgs,
+  // type VMConfigArgs,
   type VMConfiguration,
 } from '../../device/vm_config';
 import { ClientSideSocket } from '../../communication/client_socket';
-import {
-  type DeviceConfigArgs,
-  type DeviceConfig,
-} from '../../device/device_config';
 import type winston from 'winston';
 import { createLogger } from '../../logger/logger';
-import {
-  PlatformTarget,
-  PlatformBuilderConfig,
-} from '../../builder/platform_config';
+// import { PlatformTarget, PlatformConfig } from '../../builder/platform_config';
 import { UpdateWasmModuleRequest } from '../requests/update_module_request';
 import { getPath2WARDuinoSDKVMBinary } from '../../project_config';
 import { getFreePort, isPortInUse } from '../../util/socket_util';
 import { NoChannel } from '../../communication/no_channel';
-import { BoardBaudRate } from '../../util/serial_port';
+// import { BoardBaudRate } from '../../util/serial_port';
+// import { type ProgLangSelectionArgs } from '../../source_mappers/compilers/prog_language_selection';
+import { type Channel } from '../../communication';
+import { type DevVMPlatform } from '../../builder';
 
 export class WARDuinoDevVMError extends Error {
   constructor(message: string) {
@@ -29,55 +25,46 @@ export class WARDuinoDevVMError extends Error {
   }
 }
 
-function createPlatformBuilderConfig(
-  deviceConfigArgs: DeviceConfigArgs,
-  vmConfigArgs: VMConfigArgs,
-): PlatformBuilderConfig {
-  return new PlatformBuilderConfig(
-    PlatformTarget.DevVM,
-    BoardBaudRate.NONE,
-    {
-      boardName: '',
-      fqbn: '',
-    },
-    deviceConfigArgs,
-    vmConfigArgs,
-  );
-}
-
 export class WARDuinoDevVM extends WARDuinoVM {
   protected logger: winston.Logger;
   protected process?: ChildProcess;
   protected ErrorClass = WARDuinoDevVMError;
 
-  constructor(
-    deviceConfigArgs: DeviceConfigArgs,
-    vmConfigArgs: VMConfigArgs,
-    buildOutputDir?: string,
-  ) {
+  constructor(platform: DevVMPlatform, channel?: Channel) {
+    // buildOutputDir?: string, // vmConfigArgs: VMConfigArgs, // deviceConfigArgs: DeviceIdentity,
     super(
-      createPlatformBuilderConfig(deviceConfigArgs, vmConfigArgs),
-      new NoChannel(),
-      buildOutputDir,
+      // createPlatformBuilderConfig(
+      //   selectedLanguage,
+      //   deviceConfigArgs,
+      //   vmConfigArgs,
+      // ),
+      platform,
+      channel ?? new NoChannel(),
+      // buildOutputDir,
     );
 
-    if (this.vmConfig.hasToolPort()) {
-      this.channel = new ClientSideSocket(
-        this.vmConfig.toolPort,
-        this.vmConfig.toolHostIP,
-        this.deviceConfig.fullname,
-      );
-    }
-    this.logger = createLogger(this.deviceConfig.fullname);
+    // if (this.vmConfig.hasToolPort()) {
+    //   this.channel = new ClientSideSocket(
+    //     this.vmConfig.toolPort,
+    //     this.vmConfig.toolHostIP,
+    //     this.deviceConfig.fullname,
+    //   );
+    // }
+    this.logger = createLogger(
+      `WARDuinoDevVM ${platform.config.deviceIdentity.fullname}`,
+    );
+    this.logger.error(
+      `TODO reassing channel to be client-side socket as comment above`,
+    );
   }
 
-  get vmConfig(): VMConfiguration {
-    return this.platformConfig.deviceConfig.vmConfig;
-  }
+  // get vmConfig(): VMConfiguration {
+  //   return this.platformConfig.deviceConfig.vmConfig;
+  // }
 
-  get deviceConfig(): DeviceConfig {
-    return this.platformConfig.deviceConfig;
-  }
+  // get deviceConfig(): DeviceConfig {
+  //   return this.platformConfig.deviceConfig;
+  // }
 
   async close(timeout?: number): Promise<boolean> {
     this.logger.info('closing VM');
@@ -101,10 +88,12 @@ export class WARDuinoDevVM extends WARDuinoVM {
   }
 
   public async uploadSourceCode(
-    sourceCodePath: string,
+    sourceCodeCompilerArgs: any,
     timeout?: number,
   ): Promise<boolean> {
-    const exitCode = await this.platform.compile(sourceCodePath);
+    const exitCode = await this.platform.buildForPlatform(
+      sourceCodeCompilerArgs,
+    );
     if (exitCode !== 0) {
       return false;
     }
@@ -115,16 +104,23 @@ export class WARDuinoDevVM extends WARDuinoVM {
     return true;
   }
 
-  public async spawn(maxWaitTime?: number): Promise<ChildProcess> {
+  public async spawn(
+    sourceCodeCompilationArgs: any,
+    maxWaitTime?: number,
+  ): Promise<ChildProcess> {
     await this.assertExistanceToolPort();
+    const vmConfig = this.platform.config.vmConfig;
 
     this.channel = new ClientSideSocket(
-      this.vmConfig.toolPort,
-      this.vmConfig.toolHostIP,
-      this.deviceConfig.fullname,
+      vmConfig.toolPort,
+      vmConfig.toolHostIP,
+      this.deviceIdentity.fullname,
     );
+    // await this.platform.createCompiler();
 
-    const exitCode = await this.platform.compile(this.vmConfig.program);
+    const exitCode = await this.platform.buildForPlatform(
+      sourceCodeCompilationArgs,
+    );
     if (exitCode !== 0) {
       throw new this.ErrorClass(
         `Could not start DevVM. Compilation exited with code: ${exitCode}`,
@@ -133,7 +129,7 @@ export class WARDuinoDevVM extends WARDuinoVM {
 
     const processArgs = this.buildProcessArguments(
       this.sourceMap.wasmFilePath,
-      this.vmConfig,
+      this.platform.config.vmConfig,
     );
     const spawnCommand = getPath2WARDuinoSDKVMBinary();
     this.logger.info(
@@ -151,7 +147,7 @@ export class WARDuinoDevVM extends WARDuinoVM {
     const connected = await this.connect(maxWaitTime);
     if (!connected) {
       this.logger.error(
-        `Failed to connect to local DevelopmentVM at port ${this.vmConfig.toolPort}`,
+        `Failed to connect to local DevelopmentVM at port ${this.platform.config.vmConfig.toolPort}`,
       );
       this.logger.error('Killing local DevelopmentVM process');
       childProcess.kill();
@@ -183,10 +179,10 @@ export class WARDuinoDevVM extends WARDuinoVM {
   }
 
   protected async assertExistanceToolPort(): Promise<void> {
-    if (this.vmConfig.hasToolPort()) {
-      if (await isPortInUse(this.vmConfig.toolPort)) {
+    if (this.platform.config.vmConfig.hasToolPort()) {
+      if (await isPortInUse(this.platform.config.vmConfig.toolPort)) {
         throw new this.ErrorClass(
-          `Cannot spawn a DevelopmentVM on Port ${this.vmConfig.toolPort} as it is already in use`,
+          `Cannot spawn a DevelopmentVM on Port ${this.platform.config.vmConfig.toolPort} as it is already in use`,
         );
       }
     } else {
@@ -200,7 +196,7 @@ export class WARDuinoDevVM extends WARDuinoVM {
       this.logger.info(
         `No toolPort provided so will start using port ${openPort}`,
       );
-      this.vmConfig.toolPort = openPort;
+      this.platform.config.vmConfig.toolPort = openPort;
     }
   }
 }

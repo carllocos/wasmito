@@ -1,7 +1,7 @@
 import { exec, spawn } from 'child_process';
 import { createLogger } from '../../logger/logger';
-import { type PlatformBuilderConfig, type BoardFQBN } from '../platform_config';
-import { Platform } from '../platformbuilder';
+import { type PlatformConfig, type BoardFQBN } from '../platform_config';
+import { Platform } from '../platform';
 import {
   copyRecursive,
   createDirectoryIfUnexisting,
@@ -11,6 +11,7 @@ import {
 } from '../../util/file_util';
 import { makeSourceCodeCompiler } from '../../source_mappers/compilers/compiler_factory';
 import path from 'path';
+import { type ProgLangSelectionArgs } from '../../source_mappers/compilers/prog_language_selection';
 
 const arduinoLogger = createLogger('Arduino');
 
@@ -190,7 +191,7 @@ export class ArduinoBoardBuilder extends Platform {
   private readonly pathToArduinoSketchDir: string;
   private readonly pathToArduinoWasmBinaryDir: string;
 
-  constructor(config: PlatformBuilderConfig, outputDir: string = '') {
+  constructor(config: PlatformConfig, outputDir: string = '') {
     super(config, outputDir);
     this.pathToArduinoTemplateDir = getAbsolutePath(
       path.join(this.sdkPath, 'platforms/Arduino'),
@@ -203,10 +204,10 @@ export class ArduinoBoardBuilder extends Platform {
     );
   }
 
-  async compileSourceCode(sourceFile: string): Promise<number> {
+  async createCompiler(selectedLanguage: ProgLangSelectionArgs): Promise<void> {
     // copy Arduino template
     this.logger.info(
-      `Copying Arduino template for ${this.platformConfig.deviceConfig.name} (board=${this.platformConfig.fqbn.boardName}, ID=${this.platformConfig.deviceConfig.id}) from ${this.pathToArduinoTemplateDir} to ${this.pathToArduinoSketchDir}`,
+      `Copying Arduino template for ${this.config.deviceIdentity.name} (board=${this.config.vmConfig.fqbn.boardName}, ID=${this.config.deviceIdentity.id}) from ${this.pathToArduinoTemplateDir} to ${this.pathToArduinoSketchDir}`,
     );
     await copyRecursive(
       `${this.pathToArduinoTemplateDir}/*`,
@@ -215,38 +216,42 @@ export class ArduinoBoardBuilder extends Platform {
 
     const exitCodeClean = await ArduinoClean(this.pathToArduinoSketchDir);
     if (exitCodeClean !== 0) {
-      return exitCodeClean;
+      throw new Error(`Failed to perform ArduinoClean`);
     }
 
     // compile the source code
     createDirectoryIfUnexisting(this.pathToArduinoWasmBinaryDir);
-    this.sourceCodeCompiler = makeSourceCodeCompiler(
-      sourceFile,
+    this._sourceCodeCompiler = await makeSourceCodeCompiler(
+      selectedLanguage,
       this.pathToArduinoWasmBinaryDir,
     );
-    this.sourceMap = await this.sourceCodeCompiler.compile(sourceFile);
-    if (this.sourceMap === undefined) {
-      this.logger.info(`Could not compile source code for file ${sourceFile}`);
+  }
+
+  async compileSourceCode(compilationArgs: any): Promise<number> {
+    this._sourceMap = await this.compiler.compile(compilationArgs);
+    if (this._sourceMap === undefined) {
+      this.logger.info(`Could not compile source code for file`);
       return -1;
     }
     return 0;
   }
 
-  async compile(sourceFile: string): Promise<number> {
-    const exitCodeSourceCodeComp = await this.compileSourceCode(sourceFile);
+  async buildForPlatform(compilerArgs: any): Promise<number> {
+    const exitCodeSourceCodeComp = await this.compileSourceCode(compilerArgs);
     if (exitCodeSourceCodeComp !== 0) {
       return exitCodeSourceCodeComp;
     }
 
+    const di = this.config.deviceIdentity;
     this.logger.info(
-      `Arduino compiling sketch ${this.pathToArduinoSketchDir} for ${this.platformConfig.deviceConfig.name} (board=${this.platformConfig.fqbn.boardName}, ID=${this.platformConfig.deviceConfig.id})`,
+      `Arduino compiling sketch ${this.pathToArduinoSketchDir} for ${di.name} (board=${this.config.vmConfig.fqbn.boardName}, ID=${di.id})`,
     );
 
-    if (this.sourceMap === undefined) {
+    if (this._sourceMap === undefined) {
       return -1;
     }
 
-    let wasmPath = this.sourceMap.getWasmPath();
+    let wasmPath = this._sourceMap.getWasmPath();
     const filename = getFileName(wasmPath);
     if (filename === 'upload.wasm') {
       // special case where the output file has the same name as the file used to flash.
@@ -255,12 +260,12 @@ export class ArduinoBoardBuilder extends Platform {
     }
 
     const exitCodeCompile = await ArduinoCompile(
-      this.platformConfig.fqbn.fqbn,
+      this.config.vmConfig.fqbn.fqbn,
       wasmPath,
       this.pathToArduinoSketchDir,
     );
     if (exitCodeCompile === 0) {
-      this.platformConfig.deviceConfig.vmConfig.program = sourceFile;
+      this.config.vmConfig.program = this._sourceMap.getWasmPath();
     }
 
     return exitCodeCompile;
@@ -268,12 +273,12 @@ export class ArduinoBoardBuilder extends Platform {
 
   async upload(): Promise<number> {
     this.logger.info(
-      `Arduino flashing sketch ${this.pathToArduinoSketchDir} for ${this.platformConfig.deviceConfig.name} (board=${this.platformConfig.fqbn.boardName}, ID=${this.platformConfig.deviceConfig.id})`,
+      `Arduino flashing sketch ${this.pathToArduinoSketchDir} for ${this.config.deviceIdentity.name} (board=${this.config.vmConfig.fqbn.boardName}, ID=${this.config.deviceIdentity.id})`,
     );
     return await ArduinoFlash(
       this.pathToArduinoSketchDir,
-      this.platformConfig.deviceConfig.vmConfig.serialPort,
-      this.platformConfig.fqbn.fqbn,
+      this.config.vmConfig.serialPort,
+      this.config.vmConfig.fqbn.fqbn,
     );
   }
 }

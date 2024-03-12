@@ -1,6 +1,8 @@
 import { DeviceManager } from '../../src/device/device_manager';
 import { type WARDuinoDevVM } from '../../src/warduino/vm/dev_vm';
-import { type VMConfigArgs } from '../../src';
+import { TargetLanguage } from '../../src/source_mappers/compilers/prog_language_selection';
+import { createDevPlatform } from '../../src/builder/platformbuilder_factory';
+import { type WATCompilerArgs } from '../../src/source_mappers/compilers/wat_compilers';
 
 describe('Snapshot Request', () => {
   let deviceManager: DeviceManager | undefined;
@@ -8,12 +10,20 @@ describe('Snapshot Request', () => {
 
   before(async () => {
     deviceManager = new DeviceManager();
-    const vmConfigArgs: VMConfigArgs = {
-      program: './test/data/test-example.wat',
-      disableStrictModuleLoad: true,
+    const program = './test/data/test-example.wat';
+    const platform = await createDevPlatform({
+      selectedLanguage: {
+        targetLanguage: TargetLanguage.WAT,
+      },
+    });
+    const compilationArgs: WATCompilerArgs = {
+      sourceCodePath: program,
     };
-
-    vm = await deviceManager.spawnDevelopmentVM(vmConfigArgs, 5000);
+    vm = await deviceManager.spawnDevelopmentVM(
+      platform,
+      compilationArgs,
+      5000,
+    );
   });
 
   it('Request should resolve on DevVM', async () => {

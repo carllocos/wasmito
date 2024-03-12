@@ -1,65 +1,98 @@
 import { v4 as uuidv4 } from 'uuid';
 import { createLogger } from '../logger/logger';
 import * as fs from 'fs';
-import { VMConfiguration, type VMConfigArgs } from './vm_config';
 
 const Logger = createLogger('DeviceConfiguration');
 
-export enum DeploymentMode {
+export enum DeploymentMode { // TODO remove
   DevVM = 'DevVM',
   MCUVM = 'MCUVM',
   ProxyVM = 'ProxyVM',
   MirrorVM = 'MirrorVM',
 }
 
-export interface DeviceConfigArgs {
+export interface DeviceIdentityArgs {
   name?: string;
   deploymentMode: DeploymentMode;
 }
 
-export class DeviceConfig {
-  private readonly _name: string;
+export class DeviceIdentity {
   private readonly _id: string;
-  private readonly _deploymentMode: DeploymentMode;
-  private readonly _vmConfig: VMConfiguration;
+  private _deviceName: string;
+  private readonly _anonymous: string;
 
-  constructor(deviceConfig: DeviceConfigArgs, vmConfigArgs: VMConfigArgs) {
-    const errorMsgs = validateDeviceConfig(deviceConfig);
-    if (errorMsgs.length > 0) {
-      const msg = errorMsgs.join(',');
-      Logger.error(`Invalid config: ${msg}`);
-      throw new Error(msg);
-    }
-    this._name = deviceConfig.name ?? '';
+  constructor(args: DeviceIdentityArgs) {
+    this._anonymous = 'anonymous';
     this._id = this.createID();
-    this._deploymentMode = deviceConfig.deploymentMode;
-    this._vmConfig = new VMConfiguration(vmConfigArgs);
-  }
-
-  get name(): string {
-    return this._name;
-  }
-
-  get id(): string {
-    return this._id;
-  }
-
-  get deploymentMode(): string {
-    return this._deploymentMode;
-  }
-
-  get vmConfig(): VMConfiguration {
-    return this._vmConfig;
+    if (args.name !== undefined && typeof args.name !== 'string') {
+      throw new Error(
+        `device name is expected to be a string. Given ${args.name}`,
+      );
+    }
+    this._deviceName = args.name ?? this._anonymous;
   }
 
   get fullname(): string {
     return `${this.name} ${this.id}`;
   }
 
+  get name(): string {
+    return this._deviceName;
+  }
+
+  set name(n: string) {
+    this._deviceName = n;
+  }
+
+  hasName(): boolean {
+    return this._anonymous !== this.name;
+  }
+
+  get id(): string {
+    return this._id;
+  }
+
   private createID(): string {
     return uuidv4();
   }
+
+  // private createVMName(mode: DeploymentMode): string {
+  //   switch (mode) {
+  //     case DeploymentMode.DevVM:
+  //       return 'DevVM ';
+  //     case DeploymentMode.ProxyVM:
+  //       return 'OutOfPlaceVM';
+  //     case DeploymentMode.MCUVM:
+  //       return 'Board TODO';
+  //     default:
+  //       return 'VM unsupported mode';
+  //   }
+  // }
 }
+
+// export class DeviceConfig {
+//   private readonly _vmConfig: VMConfiguration;
+//   private readonly _id: DeviceIdentity;
+
+//   constructor(deviceIdentity: DeviceIdentity, vmConfigArgs: VMConfigArgs) {
+//     const errorMsgs = validateDeviceConfig(deviceIdentity);
+//     if (errorMsgs.length > 0) {
+//       const msg = errorMsgs.join(',');
+//       Logger.error(`Invalid config: ${msg}`);
+//       throw new Error(msg);
+//     }
+//     this._vmConfig = new VMConfiguration(vmConfigArgs);
+//     this._id = deviceIdentity;
+//   }
+
+//   get id(): DeviceIdentity {
+//     return this._id;
+//   }
+
+//   get vmConfig(): VMConfiguration {
+//     return this._vmConfig;
+//   }
+// }
 
 export function deploymentModeFromString(
   val: string,
@@ -113,7 +146,7 @@ export function isValidDeviceConfig(value: any): boolean {
   return errors.length === 0;
 }
 
-export function parseDeviceConfig(config: any): DeviceConfigArgs | undefined {
+export function parseDeviceConfig(config: any): DeviceIdentityArgs | undefined {
   const errors = validateDeviceConfig(config);
   if (errors.length > 0) {
     Logger.error(`Invalid device config: ${errors.join(', ')}`);
@@ -141,7 +174,9 @@ export function isValidDevicesConfig(value: any): string[] {
   return errors;
 }
 
-export function parseDeviceConfigs(path: any): DeviceConfigArgs[] | undefined {
+export function parseDeviceConfigs(
+  path: any,
+): DeviceIdentityArgs[] | undefined {
   let fileContent: any;
   try {
     fileContent = fs.readFileSync(path, 'utf-8');
@@ -165,7 +200,7 @@ export function parseDeviceConfigs(path: any): DeviceConfigArgs[] | undefined {
     return undefined;
   }
   return jsonData.devices.map((config: any) => {
-    const arg: DeviceConfigArgs = {
+    const arg: DeviceIdentityArgs = {
       name: config.name,
       deploymentMode: deploymentModeFromString(
         config.deploymentMode,

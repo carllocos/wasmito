@@ -1,8 +1,14 @@
-import { convertToBoardBaudRate, isSerialPort } from '../util/serial_port';
+import { assertValidFQBN, type BoardFQBN } from '../builder/platform_config';
+import { getFileExtension, isFilePath } from '../util/file_util';
+import {
+  type BoardBaudRate,
+  isSerialPort,
+  isValidBoardBaudRate,
+} from '../util/serial_port';
 import { isLocalHost, isValidIP } from '../util/socket_util';
 
 export interface VMConfigArgs {
-  program: string;
+  program?: string;
 
   /*
    * The following fields are optional configurations
@@ -31,51 +37,52 @@ export interface VMConfigArgs {
 
   // config needed for serial communication
   serialPort?: string;
-  baudrate?: number;
+  baudrate?: BoardBaudRate;
+  fqbn?: BoardFQBN;
 
   // config to disable strict module load
   disableStrictModuleLoad?: boolean;
 }
 
-function isValidTypeVMConfig(arg: any): arg is VMConfigArgs {
-  if (typeof arg !== 'object' || arg === null) {
-    return false;
-  }
+// function isValidTypeVMConfig(arg: any): arg is VMConfigArgs {
+//   if (typeof arg !== 'object' || arg === null) {
+//     return false;
+//   }
 
-  if (typeof arg.program !== 'string') {
-    return false;
-  }
+//   if (typeof arg.program !== 'string') {
+//     return false;
+//   }
 
-  return (
-    (typeof arg.loop === 'undefined' || typeof arg.loop === 'boolean') &&
-    (typeof arg.noDebug === 'undefined' || typeof arg.noDebug === 'boolean') &&
-    (typeof arg.noSocket === 'undefined' ||
-      typeof arg.noSocket === 'boolean') &&
-    (typeof arg.toolPort === 'undefined' ||
-      (typeof arg.toolPort === 'number' && !isNaN(arg.toolPort))) &&
-    (typeof arg.toolHostIP === 'undefined' ||
-      typeof arg.toolHostIP === 'string') &&
-    (typeof arg.pauseOnStart === 'undefined' ||
-      typeof arg.pauseOnStart === 'boolean') &&
-    (typeof arg.mockHostIP === 'undefined' ||
-      typeof arg.mockHostIP === 'string') &&
-    (typeof arg.mockPort === 'undefined' ||
-      (typeof arg.mockPort === 'number' && !isNaN(arg.mockPort))) &&
-    (typeof arg.proxyPort === 'undefined' ||
-      (typeof arg.proxyPort === 'number' && !isNaN(arg.proxyPort))) &&
-    (typeof arg.proxyHostIP === 'undefined' ||
-      typeof arg.proxyHostIP === 'string') &&
-    (typeof arg.serialPort === 'undefined' ||
-      typeof arg.serialPort === 'string') &&
-    (typeof arg.baudrate === 'undefined' || typeof arg.baudrate === 'number') &&
-    (typeof arg.mode === 'undefined' || typeof arg.mode === 'string') &&
-    (typeof arg.disableStrictModuleLoad === 'undefined' ||
-      typeof arg.disableStrictModuleLoad === 'boolean')
-  );
-}
+//   return (
+//     (typeof arg.loop === 'undefined' || typeof arg.loop === 'boolean') &&
+//     (typeof arg.noDebug === 'undefined' || typeof arg.noDebug === 'boolean') &&
+//     (typeof arg.noSocket === 'undefined' ||
+//       typeof arg.noSocket === 'boolean') &&
+//     (typeof arg.toolPort === 'undefined' ||
+//       (typeof arg.toolPort === 'number' && !isNaN(arg.toolPort))) &&
+//     (typeof arg.toolHostIP === 'undefined' ||
+//       typeof arg.toolHostIP === 'string') &&
+//     (typeof arg.pauseOnStart === 'undefined' ||
+//       typeof arg.pauseOnStart === 'boolean') &&
+//     (typeof arg.mockHostIP === 'undefined' ||
+//       typeof arg.mockHostIP === 'string') &&
+//     (typeof arg.mockPort === 'undefined' ||
+//       (typeof arg.mockPort === 'number' && !isNaN(arg.mockPort))) &&
+//     (typeof arg.proxyPort === 'undefined' ||
+//       (typeof arg.proxyPort === 'number' && !isNaN(arg.proxyPort))) &&
+//     (typeof arg.proxyHostIP === 'undefined' ||
+//       typeof arg.proxyHostIP === 'string') &&
+//     (typeof arg.serialPort === 'undefined' ||
+//       typeof arg.serialPort === 'string') &&
+//     (typeof arg.baudrate === 'undefined' || typeof arg.baudrate === 'number') &&
+//     (typeof arg.mode === 'undefined' || typeof arg.mode === 'string') &&
+//     (typeof arg.disableStrictModuleLoad === 'undefined' ||
+//       typeof arg.disableStrictModuleLoad === 'boolean')
+//   );
+// }
 
 export class VMConfiguration {
-  private _program: string;
+  private _program?: string;
 
   private _toolPort?: number;
   private readonly _toolHostIP?: string;
@@ -98,17 +105,9 @@ export class VMConfiguration {
   private readonly loop?: boolean;
   private readonly noDebug?: boolean;
   private readonly noSocket?: boolean;
+  private readonly _fqbn?: BoardFQBN;
 
-  constructor(args: any) {
-    if (!isValidTypeVMConfig(args)) {
-      throw new VMConfigurationError('invalid spawn arguments');
-    }
-    const errors = this.checkValidityArgs(args);
-    if (errors.length > 0) {
-      const msg = errors.join(', ');
-      throw new VMConfigurationError(`invalid spawn arguments. Reason ${msg}`);
-    }
-
+  constructor(args: VMConfigArgs) {
     this._program = args.program;
 
     this._toolPort = args.toolPort;
@@ -126,10 +125,14 @@ export class VMConfiguration {
     this._baudrate = args.baudrate;
 
     this._mode = args.mode ?? 'interpret';
-    this._disableStrictModuleLoad = args.disableStrictModuleLoad ?? false;
+    this._disableStrictModuleLoad = args.disableStrictModuleLoad ?? true;
+    this._fqbn = args.fqbn;
   }
 
   get program(): string {
+    if (this._program === undefined) {
+      throw new Error(`program has not been set`);
+    }
     return this._program;
   }
 
@@ -222,6 +225,13 @@ export class VMConfiguration {
     return this._baudrate;
   }
 
+  get fqbn(): BoardFQBN {
+    if (this._fqbn === undefined) {
+      throw new VMConfigurationError('FQBN is not set yet');
+    }
+    return this._fqbn;
+  }
+
   get disableStrictModuleLoad(): boolean {
     return this._disableStrictModuleLoad;
   }
@@ -238,77 +248,159 @@ export class VMConfiguration {
     return this._toolHostIP !== undefined;
   }
 
-  private checkValidityArgs(args: VMConfigArgs): string[] {
-    const errors: string[] = [];
-    if (args.program === '') {
-      errors.push('Property "program" should not be an empty string');
-    }
-
-    if (args.toolHostIP !== undefined) {
-      if (!isLocalHost(args.toolHostIP)) {
-        if (!isValidIP(args.toolHostIP)) {
-          errors.push(
-            'Property "toolHostIP" is not a valid socket ip address. Expected `localhost` or an ipv4 address',
-          );
-        }
-      }
-
-      if (args.toolPort === undefined) {
-        errors.push('Property "toolPort" is missing');
-      }
-    }
-
-    if (args.proxyHostIP !== undefined) {
-      if (!isLocalHost(args.proxyHostIP)) {
-        if (!isValidIP(args.proxyHostIP)) {
-          errors.push(
-            'Property "proxyHostIP" is not a valid socket ip address. Expected `localhost` or an ipv4 address',
-          );
-        }
-      }
-
-      if (args.proxyPort === undefined) {
-        errors.push('Property "proxyPort" is missing');
-      }
-    } else if (args.proxyPort !== undefined) {
-      errors.push('Property "proxyHostIP" is mising');
-    }
-
-    if (args.mockHostIP !== undefined) {
-      if (!isLocalHost(args.mockHostIP)) {
-        if (!isValidIP(args.mockHostIP)) {
-          errors.push(
-            'Property "mockHostIP" is not a valid socket ip address. Expected `localhost` or an ipv4 address',
-          );
-        }
-      }
-
-      if (args.mockPort === undefined) {
-        errors.push('Property "mockPort" is missing');
-      }
-    } else if (args.mockPort !== undefined) {
-      errors.push('Property "mockHostIP" is mising');
-    }
-
-    if (args.serialPort !== undefined) {
-      if (!isSerialPort(args.serialPort)) {
-        errors.push('Property "serialPort" should be a valid serial port');
-      }
-
-      if (args.baudrate !== undefined) {
-        const br = convertToBoardBaudRate(args.baudrate);
-        if (br === undefined) {
-          errors.push('Property "baudrate" provides an invalid baudrate');
-        }
-      } else {
-        errors.push('Property "baudrate" is mising');
-      }
-    } else if (args.baudrate !== undefined) {
-      errors.push('Property "serialPort" is mising');
-    }
-
-    return errors;
+  public hasBaudRate(): boolean {
+    return this._baudrate !== undefined;
   }
+
+  static async fromArgs(args: any): Promise<VMConfiguration> {
+    const a = await createValidVMConfigArgs(args);
+    return new VMConfiguration(a);
+  }
+}
+
+async function createValidVMConfigArgs(args: any): Promise<VMConfigArgs> {
+  if (typeof args !== 'object') {
+    throw new VMConfigurationError('args is expected to be an object');
+  }
+
+  const program = args.program;
+  if (program !== undefined) {
+    if (typeof program !== 'string') {
+      throw new VMConfigurationError(
+        `Property "program" should be a string. Given ${program}`,
+      );
+    } else if (!isFilePath(program)) {
+      throw new VMConfigurationError(
+        `Property "program" does not point to a program path. Given ${program}`,
+      );
+    } else if (getFileExtension(program) !== 'wasm') {
+      throw new VMConfigurationError(
+        `Property "program" should point to a wasm given program does not end with wasm extension ${program}`,
+      );
+    }
+  }
+
+  let toolHostIP = args.toolHostIP;
+  const toolPort = args.toolPort;
+  if (toolHostIP !== undefined) {
+    if (!isLocalHost(toolHostIP)) {
+      if (!isValidIP(toolHostIP)) {
+        throw new VMConfigurationError(
+          `Property "toolHostIP" is not a valid socket ip address. Expected 'localhost' or an ipv4 address. Given ${toolHostIP}`,
+        );
+      }
+    }
+
+    if (typeof toolPort !== 'number') {
+      throw new VMConfigurationError(
+        `Property "toolPort" is mandatory when providing toolHostIP and should be a number. Given ${toolPort}`,
+      );
+    }
+  } else if (toolPort !== undefined) {
+    toolHostIP = 'localhost';
+  }
+
+  const proxyHostIP = args.proxyHostIP;
+  const proxyPort = args.proxyPort;
+  if (proxyHostIP !== undefined) {
+    if (!isLocalHost(proxyHostIP)) {
+      if (!isValidIP(proxyHostIP)) {
+        throw new VMConfigurationError(
+          `Property "proxyHostIP" is not a valid socket ip address. Expected 'localhost' or an ipv4 address. Given ${proxyHostIP}`,
+        );
+      }
+    }
+
+    if (typeof proxyPort !== 'number') {
+      throw new VMConfigurationError(
+        `Property "proxyPort" is mandatory when providing proxyHostIP and should be a number. Given ${proxyPort}`,
+      );
+    }
+  } else if (proxyPort !== undefined) {
+    throw new VMConfigurationError(`Property "proxyHostIP" is mising`);
+  }
+
+  const mockHostIP = args.mockHostIP;
+  const mockPort = args.mockPort;
+  if (mockHostIP !== undefined) {
+    if (!isLocalHost(mockHostIP)) {
+      if (!isValidIP(mockHostIP)) {
+        throw new VMConfigurationError(
+          `Property "mockHostIP" is not a valid socket ip address. Expected 'localhost' or an ipv4 address. Given ${mockHostIP}`,
+        );
+      }
+    }
+
+    if (typeof mockPort !== 'number') {
+      throw new VMConfigurationError(
+        `Property "mockPort" is mandatory when mockHostIP and should be a number. Given ${mockPort}`,
+      );
+    }
+  } else if (mockPort !== undefined) {
+    throw new VMConfigurationError('Property "mockHostIP" is mising');
+  }
+
+  const serialPort = args.serialPort;
+  const baudrate = args.baudrate;
+  let fqbn = args.fqbn;
+  if (serialPort !== undefined) {
+    if (!isSerialPort(serialPort)) {
+      throw new VMConfigurationError(
+        'Property "serialPort" should be a valid serial port',
+      );
+    }
+    if (!isValidBoardBaudRate(baudrate)) {
+      throw new VMConfigurationError(
+        `Property "baudrate" provides an invalid baudrate. Given ${baudrate}`,
+      );
+    }
+
+    fqbn = await assertValidFQBN(fqbn);
+  } else if (baudrate !== undefined) {
+    throw new VMConfigurationError('Property "serialPort" is mising');
+  } else if (fqbn !== undefined) {
+    throw new VMConfigurationError(
+      'Property "serialPort" and "baudrate" is mising',
+    );
+  }
+
+  const pauseOnStart = args.pauseOnStart;
+  if (pauseOnStart !== undefined && typeof pauseOnStart !== 'boolean') {
+    throw new VMConfigurationError(
+      'Property "pauseOnStart" should be a boolean',
+    );
+  }
+
+  const disableStrictModuleLoad = args.disableStrictModuleLoad;
+  if (
+    disableStrictModuleLoad !== undefined &&
+    typeof disableStrictModuleLoad !== 'boolean'
+  ) {
+    throw new VMConfigurationError(
+      'Property "disableStrictModule" should be a boolean',
+    );
+  }
+
+  const c: VMConfigArgs = {
+    program,
+    toolPort,
+    toolHostIP,
+    pauseOnStart,
+
+    mockHostIP,
+    mockPort,
+
+    proxyHostIP,
+    proxyPort,
+
+    serialPort,
+    baudrate,
+    fqbn,
+
+    disableStrictModuleLoad,
+  };
+
+  return c;
 }
 
 export class VMConfigurationError extends Error {

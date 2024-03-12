@@ -16,6 +16,9 @@ export function convertToBoardBaudRate(
       return undefined;
   }
 }
+export function isValidBoardBaudRate(value: any): value is BoardBaudRate {
+  return Object.values(BoardBaudRate).includes(value);
+}
 
 export function isSerialPort(str: string): boolean {
   const unixPattern = /^(\/dev\/ttyS\w+|\/dev\/ttyUSB\w+)$/i;

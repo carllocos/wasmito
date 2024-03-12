@@ -1,21 +1,28 @@
 import { getGlobalLogger } from '../../logger/logger';
-import { getFileExtension } from '../../util/file_util';
+import { AssemblyScriptCompiler } from './assemblyscript_compiler';
 import { type SourceCodeCompiler } from './compiler';
+import {
+  TargetLanguage,
+  type ProgLangSelectionArgs,
+} from './prog_language_selection';
 import { WATCompiler } from './wat_compilers';
 
-export function makeSourceCodeCompiler(
-  sourceCodePath: string,
+export async function makeSourceCodeCompiler(
+  compilerSelection: ProgLangSelectionArgs, // may point to the source code or compiler configuration
   compilationOutput: string,
-): SourceCodeCompiler {
-  const fileType = getFileExtension(sourceCodePath);
-  switch (fileType) {
-    case 'wast':
-    case 'wat':
-      getGlobalLogger().info(`using WATCompiler for ${sourceCodePath}`);
-      return new WATCompiler(compilationOutput);
+): Promise<SourceCodeCompiler> {
+  switch (compilerSelection.targetLanguage) {
+    case TargetLanguage.WAT:
+      return await WATCompiler.createCompiler(compilationOutput);
+    case TargetLanguage.AssemblyScript:
+      return await AssemblyScriptCompiler.createCompiler(
+        compilationOutput,
+        compilerSelection.compilerArgs,
+      );
     default:
       getGlobalLogger().error(
-        `Did not found source code Compiler for ${sourceCodePath}`,
+        'Did not found source code Compiler for language with extension',
+        compilerSelection.targetLanguage,
       );
       throw new Error('Unsupported source code extension');
   }

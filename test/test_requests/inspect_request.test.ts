@@ -1,20 +1,30 @@
 import { DeviceManager } from '../../src/device/device_manager';
 import { type WARDuinoDevVM } from '../../src/warduino/vm/dev_vm';
 import { StateRequest } from '../../src/warduino/requests/inspect_request';
-import { type VMConfigArgs } from '../../src/device/vm_config';
+import { TargetLanguage } from '../../src/source_mappers/compilers/prog_language_selection';
+import { createDevPlatform } from '../../src/builder/platformbuilder_factory';
+import { type WATCompilerArgs } from '../../src';
 
 describe('Snapshot Request', () => {
   let deviceManager: DeviceManager | undefined;
   let vm: WARDuinoDevVM | undefined;
+  const program = './test/data/test-example.wat';
 
   before(async () => {
     deviceManager = new DeviceManager();
-    const vmConfigArgs: VMConfigArgs = {
-      program: './test/data/test-example.wat',
-      disableStrictModuleLoad: true,
+    const platform = await createDevPlatform({
+      selectedLanguage: {
+        targetLanguage: TargetLanguage.WAT,
+      },
+    });
+    const compilationArgs: WATCompilerArgs = {
+      sourceCodePath: program,
     };
-
-    vm = await deviceManager.spawnDevelopmentVM(vmConfigArgs, 3000);
+    vm = await deviceManager.spawnDevelopmentVM(
+      platform,
+      compilationArgs,
+      3000,
+    );
   });
 
   it('Inspecting pc', async () => {
