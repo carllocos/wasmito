@@ -1,5 +1,4 @@
-import { type ExecException, exec } from 'child_process';
-import { createLogger, getGlobalLogger } from '../../logger/logger';
+import { createLogger } from '../../logger/logger';
 import {
   WASMFunction,
   type SourceMap,
@@ -14,7 +13,9 @@ import {
 import { WATSourceMap } from '../wat/wat_source_map';
 import {
   getAbsolutePath,
+  getFileExtension,
   getFileName,
+  isFilePath,
   removeFileExtension,
 } from '../../util/file_util';
 import path from 'path';
@@ -43,19 +44,87 @@ export class WATCompilerError extends Error {
   }
 }
 
+export interface WATCompilerArgs {
+  sourceCodePath: string;
+  wasmOutputPath?: string;
+}
+
+function createAndAssertWATCompilerArgs(args: any): WATCompilerArgs {
+  if (typeof args !== 'object') {
+    throw new WATCompilerError('expected to be passed as an object');
+  }
+
+  let sp = args.sourceCodePath;
+  if (sp === undefined || typeof sp !== 'string') {
+    throw new WATCompilerError(
+      'sourceCodePath is mandatory and expected to be passed a string',
+    );
+  }
+
+  const fileType = getFileExtension(sp);
+  if (fileType === undefined) {
+    throw new WATCompilerError(
+      "sourceCodePath has no file extension. Should end with 'wat' or 'wast'",
+    );
+  } else if (fileType !== 'wat' && fileType !== 'wast') {
+    throw new WATCompilerError(
+      `sourceCodePath has an invalid file extension expected 'wat' or 'wast' given ${fileType}`,
+    );
+  }
+  sp = getAbsolutePath(sp);
+  if (!isFilePath(sp)) {
+    throw new WATCompilerError(
+      `sourceCodePath points to an unexisting file ${sp}`,
+    );
+  }
+
+  const wasmOut = args.wasmOutputFilePath;
+  if (wasmOut !== undefined) {
+    if (typeof wasmOut !== 'string') {
+      throw new WATCompilerError(
+        'wasmOutputFilePath is expected to be a string',
+      );
+    }
+
+    const fileTypeOut = getFileExtension(wasmOut);
+    if (fileTypeOut === undefined) {
+      throw new WATCompilerError(
+        "wasmOutputFilePath has no file extension. Should end with 'wasm'",
+      );
+    } else if (fileTypeOut !== 'wasm') {
+      throw new WATCompilerError(
+        `wasmOutputFilePath has an invalid file extension expected 'wasm' given ${fileTypeOut}`,
+      );
+    }
+  }
+  return {
+    sourceCodePath: sp,
+    wasmOutputPath: wasmOut,
+  };
+}
+
 export class WATCompiler extends SourceCodeCompiler {
   private readonly compilationOutputDir: string;
 
   constructor(compilationOutputDir: string) {
     super();
     this.compilationOutputDir = getAbsolutePath(compilationOutputDir);
+    logger.info(
+      `WATCompiler selected compiling to output ${this.compilationOutputDir}`,
+    );
   }
 
-  async compile(
-    sourceCodeFilePath: string,
-    wasmOutputFile?: string,
-  ): Promise<SourceMap> {
-    const fileName = getFileName(wasmOutputFile ?? sourceCodeFilePath);
+  static override async createCompiler(
+    compilerOutputPath: string,
+    compilerArgs?: any,
+  ): Promise<WATCompiler> {
+    return new WATCompiler(compilerOutputPath);
+  }
+
+  async compile(compilationArgs: WATCompilerArgs): Promise<SourceMap> {
+    const args = createAndAssertWATCompilerArgs(compilationArgs);
+    const sourceCodePath = args.sourceCodePath;
+    const fileName = getFileName(args.wasmOutputPath ?? sourceCodePath);
     const noExtension = removeFileExtension(fileName);
 
     const wasmOutputFilePath = path.join(
@@ -68,7 +137,7 @@ export class WATCompiler extends SourceCodeCompiler {
       `${noExtension}.wabt_map`,
     );
     const lineInfoPairs = await compileWAT2WASM(
-      sourceCodeFilePath,
+      sourceCodePath,
       wasmOutputFilePath,
       sourceMapFileOutput,
     );
@@ -88,7 +157,7 @@ export class WATCompiler extends SourceCodeCompiler {
       `${noExtension}.diss`,
     );
     return await buildWATSourceMap(
-      sourceCodeFilePath,
+      sourceCodePath,
       wasmOutputFilePath,
       objDumpDetailsOutputFile,
       objDumpDissembleOutputFile,

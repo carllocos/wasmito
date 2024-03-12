@@ -9,9 +9,9 @@ import {
   ResponseType,
 } from '../api/request_interface';
 import { Command } from '../../communication/command';
-import { type PlatformBuilderConfig } from '../../builder/platform_config';
+// import { type PlatformConfig } from '../../builder/platform_config';
 import { type Platform } from '../../builder/platform';
-import { createPlatformBuilder } from '../../builder/platformbuilder_factory';
+// import { createPlatformBuilder } from '../../builder/platformbuilder_factory';
 import { PauseRequest } from '../requests/pause_request';
 import { ProxifyRequest } from '../requests/proxify_request';
 import { type WASM, type WasmState } from '../../state/wasm';
@@ -49,15 +49,18 @@ import {
   isSuccessfullHookOnErrorResponse,
 } from '../requests/hook_on_error';
 import { EventInspectHook } from '../../hooks/hook_event';
+import { type DeviceIdentity } from '../../device';
 
 // TODO Rename to Backend
 // TODO mover addbp and removebp, and breakpoint fields to BreakpointPolicies +  add getters for breakpoints there
 export abstract class WARDuinoVM implements WARDuinoAPI {
   private _channel: Channel;
   protected abstract logger: winston.Logger;
-  public readonly platformConfig: PlatformBuilderConfig;
-  public readonly platform: Platform;
+  // public readonly platformConfig: PlatformBuilderConfig;
+  private _platform: Platform;
   protected abstract readonly ErrorClass: new (errorMsg: string) => Error;
+
+  private readonly _sourceMap?: SourceMap;
 
   protected readonly onNewEventHook: EventInspectHook;
   private onNewEventHookAdded: boolean;
@@ -65,17 +68,34 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   private readonly _funcsProxied: Map<WASMFunction, AroundFunctionRequest>;
 
   constructor(
-    platformConfig: PlatformBuilderConfig,
+    platform: Platform,
+    // platformConfig: PlatformBuilderConfig,
     communicationChannel: Channel,
-    buildOutputDir?: string,
+    // buildOutputDir?: string,
   ) {
-    this.platformConfig = platformConfig;
+    this._platform = platform;
+    // this.platformConfig = platformConfig;
     this._channel = communicationChannel;
-    this.platform = createPlatformBuilder(platformConfig, buildOutputDir);
+    // this.platform = createPlatformBuilder(platformConfig, buildOutputDir);
     this.onNewEventHook = new EventInspectHook();
     this.onNewEventHookAdded = false;
     this._breakpointPolicy = new BreakpointDefaultPolicy(this);
     this._funcsProxied = new Map();
+  }
+
+  get platform(): Platform {
+    if (this._platform === undefined) {
+      throw new this.ErrorClass(`No Platform has been set yet`);
+    }
+    return this._platform;
+  }
+
+  set platform(p: Platform) {
+    this._platform = p;
+  }
+
+  get deviceIdentity(): DeviceIdentity {
+    return this.platform.config.deviceIdentity;
   }
 
   abstract close(timeout?: number): Promise<boolean>;
@@ -110,11 +130,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   }
 
   get sourceMap(): SourceMap {
-    const sm = this.getSourceMap();
-    if (sm === undefined) {
-      throw new this.ErrorClass('no Sourcemap set for VM');
-    }
-    return sm;
+    return this.platform.sourceMap;
   }
 
   get breakpoints(): Breakpoint[] {
@@ -194,7 +210,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   }
 
   abstract uploadSourceCode(
-    sourceCodePath: string,
+    sourceCodeCompilerArgs: any,
     timeout?: number,
   ): Promise<boolean>;
 
@@ -237,9 +253,9 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     this.logger.info('VM in proxy mode');
   }
 
-  public getSourceMap(): SourceMap | undefined {
-    return this.platform.getSourceMap();
-  }
+  // public getSourceMap(): SourceMap | undefined {
+  //   return this.platform.getSourceMap();
+  // }
 
   async addBreakpoint(
     breakpoint: Breakpoint,

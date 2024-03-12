@@ -1,5 +1,5 @@
 import {
-  type DeviceConfigArgs,
+  type DeviceIdentityArgs,
   isValidDevicesConfig,
   parseDeviceConfigs,
   validateDeviceConfig,
@@ -183,7 +183,7 @@ describe('Loading multile device configs', () => {
       `parsing correct input configs should yield 2 configs`,
     );
 
-    const configs: DeviceConfigArgs[] = loadedConfigs;
+    const configs: DeviceIdentityArgs[] = loadedConfigs;
 
     const configA = configs[0];
     assert(configA.name === 'A', 'invalid name');

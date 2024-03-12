@@ -1,40 +1,38 @@
 import { makeSourceCodeCompiler } from '../../source_mappers/compilers/compiler_factory';
-import {
-  createDirectoryIfUnexisting,
-  getAbsolutePath,
-} from '../../util/file_util';
-import { type PlatformBuilderConfig } from '../platform_config';
+import { type ProgLangSelectionArgs } from '../../source_mappers/compilers/prog_language_selection';
+import { createDirectoryIfUnexisting } from '../../util/file_util';
+import { type PlatformConfig } from '../platform_config';
 import { Platform } from '../platform';
 
 export class DevVMPlatform extends Platform {
-  private pathToSourceCodeFile: string;
+  // private readonly pathToSourceCodeFile: string;
 
-  constructor(config: PlatformBuilderConfig, outputDir: string = '') {
+  constructor(config: PlatformConfig, outputDir: string = '') {
     super(config, outputDir);
-    this.pathToSourceCodeFile = ''; // path to uncompiled source code
+    // this.pathToSourceCodeFile = ''; // path to uncompiled source code
   }
 
-  async compileSourceCode(sourceFile: string): Promise<number> {
+  async createCompiler(selectedLanguage: ProgLangSelectionArgs): Promise<void> {
     createDirectoryIfUnexisting(this.outputDirectory);
 
-    this.pathToSourceCodeFile = getAbsolutePath(sourceFile);
-    this.sourceCodeCompiler = makeSourceCodeCompiler(
-      this.pathToSourceCodeFile,
+    this._sourceCodeCompiler = await makeSourceCodeCompiler(
+      selectedLanguage,
       this.outputDirectory,
     );
-    this.sourceMap = await this.sourceCodeCompiler.compile(
-      this.pathToSourceCodeFile,
-    );
-    if (this.sourceMap === undefined) {
+  }
+
+  async compileSourceCode(sourceCodeCompilationArgs: any): Promise<number> {
+    this._sourceMap = await this.compiler.compile(sourceCodeCompilationArgs);
+    if (this._sourceMap === undefined) {
       return -1;
     } else {
-      this.platformConfig.deviceConfig.vmConfig.program = sourceFile;
+      this.config.vmConfig.program = this._sourceMap.getWasmPath();
       return 0;
     }
   }
 
-  async compile(sourceFile: string): Promise<number> {
-    return await this.compileSourceCode(sourceFile);
+  async buildForPlatform(sourceCodeCompilationArgs: any): Promise<number> {
+    return await this.compileSourceCode(sourceCodeCompilationArgs);
   }
 
   async upload(): Promise<number> {

@@ -1,12 +1,8 @@
 import { type WARDuinoVM } from './warduino_vm';
 import {
-  type VMConfigArgs,
+  // type VMConfigArgs,
   type VMConfiguration,
 } from '../../device/vm_config';
-import {
-  type DeviceConfigArgs,
-  DeploymentMode,
-} from '../../device/device_config';
 import { WARDuinoDevVM } from './dev_vm';
 import { spawn, type ChildProcess } from 'child_process';
 import { ClientSideSocket, ShareChannel } from '../../communication/index';
@@ -23,6 +19,7 @@ import { InspectStateHook } from '../../hooks/hook_inspect_state';
 import { type Breakpoint } from '../../debugger/breakpoint';
 import type winston from 'winston';
 import { createLogger } from '../../logger/logger';
+import { type DevVMPlatform } from '../../builder';
 
 export class OutOfPlaceVMError extends Error {
   constructor(message: string) {
@@ -67,12 +64,12 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
   constructor(
     targetVM: WARDuinoVM,
     serverPort?: number,
-    buildOutputDir?: string,
+    // buildOutputDir?: string,
   ) {
     super(
+      // targetVM.platformConfig.selectedLanguage,
       createDeviceConfig(targetVM),
-      createVMConfig(targetVM),
-      buildOutputDir,
+      // buildOutputDir,
     );
 
     this.targetVM = targetVM;
@@ -161,14 +158,14 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
         'Failed to retrieve snapshot from target VM while setting up for OutOfPlace',
       );
     }
-    this.vmConfig.toolPort = toolPort;
+    this.platform.config.vmConfig.toolPort = toolPort;
     this.createClientSideSocket();
     await this.compileSourceCode();
     this.logger.debug('Connecting to external VM...');
     const connected = await this.connect(config.maxWaitTime);
     if (!connected) {
       this.logger.error(
-        `Failed to connect to local DevelopmentVM at port ${this.vmConfig.toolPort}`,
+        `Failed to connect to local DevelopmentVM at port ${this.platform.config.vmConfig.toolPort}`,
       );
       throw new this.ErrorClass('timed out connecting to DevVM process');
     }
@@ -219,7 +216,7 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
 
     const processArgs = this.buildProcessArguments(
       this.sourceMap.wasmFilePath,
-      this.vmConfig,
+      this.platform.config.vmConfig,
     );
     const spawnCommand = getPath2WARDuinoSDKVMBinary();
     this.logger.info(
@@ -248,7 +245,7 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
       }
     } else {
       this.logger.error(
-        `Failed to connect to local DevelopmentVM at port ${this.vmConfig.toolPort}`,
+        `Failed to connect to local DevelopmentVM at port ${this.platform.config.vmConfig.toolPort}`,
       );
       throw new this.ErrorClass('timed out connecting to DevVM process');
     }
@@ -307,7 +304,7 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
 
   private async compileSourceCode(): Promise<void> {
     const exitCode = await this.platform.compileSourceCode(
-      this.vmConfig.program,
+      this.platform.config.vmConfig.program,
     );
     if (exitCode !== 0) {
       throw new this.ErrorClass(
@@ -374,10 +371,11 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
   }
 
   private createClientSideSocket(): void {
+    const vmConfig = this.platform.config.vmConfig;
     this.channel = new ClientSideSocket(
-      this.vmConfig.toolPort,
-      this.vmConfig.toolHostIP,
-      this.deviceConfig.fullname,
+      vmConfig.toolPort,
+      vmConfig.toolHostIP,
+      this.deviceIdentity.fullname,
     );
   }
 
@@ -393,22 +391,20 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
 }
 
 // Helper functions
-function createDeviceConfig(vmToProxy: WARDuinoVM): DeviceConfigArgs {
-  const targetConfig = vmToProxy.platformConfig.deviceConfig;
-  const name = `${targetConfig.name} (Proxied)`;
-  return {
-    name,
-    deploymentMode: DeploymentMode.MCUVM,
-  };
+function createDeviceConfig(vmToProxy: WARDuinoVM): DevVMPlatform {
+  throw new Error('TODO create platform for OOT');
+  // const targetConfig = vmToProxy.deviceIdentity;
+  // const name = `${targetConfig.name} (Proxied)`;
+  // return await createDevPlatform();
 }
 
-function createVMConfig(vmToProxy: WARDuinoVM): VMConfigArgs {
-  return {
-    program: vmToProxy.platformConfig.deviceConfig.vmConfig.program,
-    pauseOnStart: true,
-    disableStrictModuleLoad: true,
-  };
-}
+// function createVMConfig(vmToProxy: WARDuinoVM): VMConfigArgs {
+//   return {
+//     program: vmToProxy.platformConfig.deviceConfig.vmConfig.program,
+//     pauseOnStart: true,
+//     disableStrictModuleLoad: true,
+//   };
+// }
 
 function assertValidOutOfPlaceSpawnArgs(
   args: any,
@@ -509,7 +505,7 @@ export class OutOfThingsMonitor {
     this._snapshotHook = new InspectStateHook(new StateRequest().includeAll());
     this.onSpawnCb = undefined;
     this.logger = createLogger(
-      `OutOfThingsMonitor of ${targetVM.platformConfig.deviceConfig.fullname}`,
+      `OutOfThingsMonitor of ${targetVM.deviceIdentity.fullname}`,
     );
     this.snapshotListeners = [];
     this.removedSnapshotListeners = new Set();
@@ -575,7 +571,7 @@ export class OutOfThingsMonitor {
     const vm = new OutOfPlaceVM(
       this.targetVM,
       config.portToUseForSharedChannel,
-      config.buildOutputDir,
+      // config.buildOutputDir,
     );
 
     const c: OutOfPlaceSetupConfig = {

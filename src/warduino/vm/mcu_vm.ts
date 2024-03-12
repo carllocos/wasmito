@@ -1,10 +1,15 @@
 import { type Logger } from 'winston';
-import { type PlatformBuilderConfig } from '../../builder/platform_config';
+// import { type PlatformConfig } from '../../builder/platform_config';
 import { WARDuinoVM } from './warduino_vm';
 import { type Channel } from '../../communication/channel_interface';
 import { createLogger } from '../../logger/logger';
 import { timeoutPromise } from '../../util/promise_util';
-import { ClientSideSocket, SerialConnection } from '../../communication/index';
+// import { ClientSideSocket, SerialConnection } from '../../communication/index';
+import { ClientSideSocket } from '../../communication/client_socket';
+import { SerialConnection } from '../../communication/serial';
+import { type PlatformConfig } from '../../builder/platform_config';
+import { type Platform } from '../../builder/platform';
+import { NoChannel } from '../../communication/no_channel';
 
 export class MCUWARDuinoVMError extends Error {
   constructor(message: string) {
@@ -14,18 +19,18 @@ export class MCUWARDuinoVMError extends Error {
   }
 }
 
-function createChannel(platformConfig: PlatformBuilderConfig): Channel {
+function createChannel(platformConfig: PlatformConfig): Channel {
   if (platformConfig.configuredForSerial()) {
     return new SerialConnection(
-      platformConfig.deviceConfig.vmConfig.serialPort,
-      platformConfig.baudrate,
-      platformConfig.deviceConfig.fullname,
+      platformConfig.vmConfig.serialPort,
+      platformConfig.vmConfig.baudrate,
+      platformConfig.deviceIdentity.fullname,
     );
   } else if (platformConfig.configuredForNetwork()) {
     return new ClientSideSocket(
-      platformConfig.deviceConfig.vmConfig.toolPort,
-      platformConfig.deviceConfig.vmConfig.toolHostIP,
-      platformConfig.deviceConfig.fullname,
+      platformConfig.vmConfig.toolPort,
+      platformConfig.vmConfig.toolHostIP,
+      platformConfig.deviceIdentity.fullname,
     );
   } else {
     throw new MCUWARDuinoVMError(
@@ -38,11 +43,15 @@ export class MCUWARDuinoVM extends WARDuinoVM {
   protected logger: Logger;
   protected ErrorClass = MCUWARDuinoVMError;
 
-  constructor(platformConfig: PlatformBuilderConfig, buildOutputDir?: string) {
-    super(platformConfig, createChannel(platformConfig), buildOutputDir);
+  constructor(platform: Platform, channel?: Channel) {
+    super(platform, channel ?? new NoChannel());
     this.logger = createLogger(
-      `MCUWARDuino ${platformConfig.deviceConfig.fullname}`,
+      `MCUWARDuino ${platform.config.deviceIdentity.fullname}`,
     );
+
+    if (channel === undefined) {
+      this.channel = createChannel(this.platform.config);
+    }
   }
 
   async close(timedout?: number): Promise<boolean> {
@@ -57,10 +66,12 @@ export class MCUWARDuinoVM extends WARDuinoVM {
   }
 
   async uploadSourceCode(
-    sourceCodePath: string,
+    sourceCodeCompilerArgs: any,
     timeout?: number | undefined,
   ): Promise<boolean> {
-    const exitCode = await this.platform.compile(sourceCodePath);
+    const exitCode = await this.platform.buildForPlatform(
+      sourceCodeCompilerArgs,
+    );
     if (exitCode !== 0) {
       return false;
     }

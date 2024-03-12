@@ -12,9 +12,10 @@ import {
 import { type WATSourceMap } from '../source_mappers/wat/wat_source_map';
 import { type WARDuinoDevVM } from '../warduino/vm/dev_vm';
 import { type WasmState } from '../state/wasm';
-import { type DeviceConfigArgs, DeploymentMode } from '../device/device_config';
-import { type VMConfigArgs } from '../device/vm_config';
 import { Breakpoint } from '../debugger/breakpoint';
+import { TargetLanguage } from '../source_mappers/compilers/prog_language_selection';
+import { createDevPlatform } from '../builder/platformbuilder_factory';
+import { type WATCompilerArgs } from '../source_mappers/compilers/wat_compilers';
 
 export function allSucceeded(replies: HookOnWasmAddrResponse[]): boolean {
   let idx = 0;
@@ -133,37 +134,25 @@ export async function runDebugScenario(
   const toolPort = 8000;
   const maxWaitTime = 3000;
 
-  const vmConfigArgs: VMConfigArgs = {
-    program: wasmApp,
-    toolPort,
-    disableStrictModuleLoad: true,
+  const sourceCodeCompilerArgs: WATCompilerArgs = {
+    sourceCodePath: wasmApp,
   };
+  const platform = await createDevPlatform(
+    {
+      selectedLanguage: {
+        targetLanguage: TargetLanguage.WAT,
+      },
+      vmConfig: {
+        toolPort,
+      },
+    },
+    outputDir,
+  );
 
-  const dc: DeviceConfigArgs = {
-    deploymentMode: DeploymentMode.DevVM,
-  };
-
-  // program: wasmApp,
-  const deviceName = undefined;
   const dm = new DeviceManager();
   const em = connectToExistingProcess
-    ? await dm.connectToExistingDevVM(
-        dc,
-        toolPort,
-        wasmApp,
-        maxWaitTime,
-        outputDir,
-      )
-    : await dm.spawnDevelopmentVM(
-        vmConfigArgs,
-        toolPort,
-        deviceName,
-        outputDir,
-      );
-  const sourceMap = em.getSourceMap();
-  if (sourceMap === undefined) {
-    return;
-  }
+    ? await dm.connectToExistingDevVM(platform, maxWaitTime)
+    : await dm.spawnDevelopmentVM(platform, sourceCodeCompilerArgs);
   const funcCallHardwareSetup = 29;
   if (
     !(await addBreakpoint(
@@ -204,7 +193,7 @@ export async function runDebugScenario(
   return em;
 }
 
-const app = './example-wat/dim-using-temperature.wat';
+const app = './src/tool_examples/wat_examples/dimmer-double-button.wat';
 const output = './example-wat/';
 const connectToExistingProcess = false;
 runDebugScenario(app, connectToExistingProcess, output)

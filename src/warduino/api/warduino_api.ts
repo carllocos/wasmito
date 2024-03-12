@@ -30,7 +30,7 @@ export interface WARDuinoAPI {
   proxify: (timeout?: number) => Promise<void>;
 
   uploadSourceCode: (
-    sourceCodePath: string,
+    sourceCodeCompilationArgs: any,
     timeout?: number,
   ) => Promise<boolean>;
 

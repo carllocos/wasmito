@@ -7,7 +7,7 @@ import {
 } from '../project_config';
 import { DeviceManager } from '../device/device_manager';
 import {
-  type DeviceConfigArgs,
+  type DeviceIdentityArgs,
   parseDeviceConfigs,
 } from '../device/device_config';
 import {
@@ -16,7 +16,6 @@ import {
   setLogLevel,
   getGlobalLogger,
 } from '../logger/logger';
-import { type VMConfigArgs } from '../device';
 
 export function startCLI(): void {
   const projectName = readProjectName();
@@ -56,7 +55,7 @@ export function startCLI(): void {
   setLogLevel(logLevel);
 
   if (options.devicesConfig !== undefined) {
-    const configs: DeviceConfigArgs[] | undefined = parseDeviceConfigs(
+    const configs: DeviceIdentityArgs[] | undefined = parseDeviceConfigs(
       options.devicesConfig,
     );
     if (configs === undefined) {
@@ -88,14 +87,14 @@ function registerDeviceManagerCommands(
     .option('--id <string>', 'a unique identifier to identify device')
     .action(async (wasmApp, options) => {
       getGlobalLogger().info(`spawning a DevVM for program ${wasmApp}`);
-      const vmConfigArgs: VMConfigArgs = {
-        program: wasmApp,
-        toolPort: options.port,
-      };
+      // const vmConfigArgs: VMConfigArgs = {
+      //   program: wasmApp,
+      //   toolPort: options.port,
+      // };
 
-      const maxWaitTime = 3000; // Max waittime for connecting to the DevVM
+      // const maxWaitTime = 3000; // Max waittime for connecting to the DevVM
       try {
-        await manager.spawnDevelopmentVM(vmConfigArgs, maxWaitTime);
+        // await manager.spawnDevelopmentVM(vmConfigArgs, maxWaitTime);
       } catch (err: unknown) {
         let errMsg = '';
         if (err instanceof Error) {
