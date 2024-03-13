@@ -591,13 +591,6 @@ export class OutOfThingsMonitor {
     if (snapshotIdx < 0 || snapshotIdx >= this._snapshots.length) {
       throw new Error(`Invalid snapshot index given ${snapshotIdx}`);
     }
-
-    const vm = new OutOfPlaceVM(
-      this.targetVM,
-      config.portToUseForSharedChannel,
-      // config.buildOutputDir,
-    );
-
     const c: OutOfPlaceSetupConfig = {
       targetInputMode: config.targetInputMode ?? InputMode.CopyInput,
       pauseTarget: false,
@@ -607,6 +600,8 @@ export class OutOfThingsMonitor {
       portToUseForSharedChannel: config.portToUseForSharedChannel,
       buildOutputDir: config.buildOutputDir,
     };
+
+    const vm = await OutOfPlaceVM.createVM(this.targetVM, c);
 
     const childProcess = await vm.spawnWithConfig(c);
     if (this.onSpawnCb !== undefined) {
