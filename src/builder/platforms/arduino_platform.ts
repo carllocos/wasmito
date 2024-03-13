@@ -12,6 +12,7 @@ import {
 import { makeSourceCodeCompiler } from '../../source_mappers/compilers/compiler_factory';
 import path from 'path';
 import { type ProgLangSelectionArgs } from '../../source_mappers/compilers/prog_language_selection';
+import { maybeTimeoutPromise } from '../../util/promise_util';
 
 const arduinoLogger = createLogger('Arduino');
 
@@ -227,8 +228,14 @@ export class ArduinoBoardBuilder extends Platform {
     );
   }
 
-  async compileSourceCode(compilationArgs: any): Promise<number> {
-    this._sourceMap = await this.compiler.compile(compilationArgs);
+  async compileSourceCode(
+    compilationArgs: any,
+    maxWaitTime?: number,
+  ): Promise<number> {
+    this._sourceMap = await maybeTimeoutPromise(
+      this.compiler.compile(compilationArgs),
+      maxWaitTime,
+    );
     if (this._sourceMap === undefined) {
       this.logger.info(`Could not compile source code for file`);
       return -1;
@@ -236,8 +243,14 @@ export class ArduinoBoardBuilder extends Platform {
     return 0;
   }
 
-  async buildForPlatform(compilerArgs: any): Promise<number> {
-    const exitCodeSourceCodeComp = await this.compileSourceCode(compilerArgs);
+  async buildForPlatform(
+    compilerArgs: any,
+    maxWaitTime?: number,
+  ): Promise<number> {
+    const exitCodeSourceCodeComp = await this.compileSourceCode(
+      compilerArgs,
+      maxWaitTime,
+    );
     if (exitCodeSourceCodeComp !== 0) {
       return exitCodeSourceCodeComp;
     }

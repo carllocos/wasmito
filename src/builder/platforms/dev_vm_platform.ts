@@ -3,6 +3,7 @@ import { type ProgLangSelectionArgs } from '../../source_mappers/compilers/prog_
 import { createDirectoryIfUnexisting } from '../../util/file_util';
 import { type PlatformConfig } from '../platform_config';
 import { Platform } from '../platform';
+import { maybeTimeoutPromise } from '../../util/promise_util';
 
 export class DevVMPlatform extends Platform {
   // private readonly pathToSourceCodeFile: string;
@@ -21,8 +22,14 @@ export class DevVMPlatform extends Platform {
     );
   }
 
-  async compileSourceCode(sourceCodeCompilationArgs: any): Promise<number> {
-    this._sourceMap = await this.compiler.compile(sourceCodeCompilationArgs);
+  async compileSourceCode(
+    sourceCodeCompilationArgs: any,
+    maxWaitTime?: number,
+  ): Promise<number> {
+    this._sourceMap = await maybeTimeoutPromise(
+      this.compiler.compile(sourceCodeCompilationArgs),
+      maxWaitTime,
+    );
     if (this._sourceMap === undefined) {
       return -1;
     } else {
@@ -31,8 +38,11 @@ export class DevVMPlatform extends Platform {
     }
   }
 
-  async buildForPlatform(sourceCodeCompilationArgs: any): Promise<number> {
-    return await this.compileSourceCode(sourceCodeCompilationArgs);
+  async buildForPlatform(
+    sourceCodeCompilationArgs: any,
+    maxWaitTime?: number,
+  ): Promise<number> {
+    return await this.compileSourceCode(sourceCodeCompilationArgs, maxWaitTime);
   }
 
   async upload(): Promise<number> {

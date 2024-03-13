@@ -74,9 +74,15 @@ export abstract class Platform {
     selectedLanguage: ProgLangSelectionArgs,
   ): Promise<void>;
 
-  abstract buildForPlatform(sourceCodeCompilationArgs: any): Promise<number>;
+  abstract buildForPlatform(
+    sourceCodeCompilationArgs: any,
+    maxWaitTime?: number,
+  ): Promise<number>;
 
-  abstract compileSourceCode(sourceCodeCompilationArgs: any): Promise<number>;
+  abstract compileSourceCode(
+    sourceCodeCompilationArgs: any,
+    maxWaitTime?: number,
+  ): Promise<number>;
 
   abstract upload(): Promise<number>;
 
