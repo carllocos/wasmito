@@ -415,21 +415,6 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
 }
 
 // Helper functions
-function createDeviceConfig(vmToProxy: WARDuinoVM): DevVMPlatform {
-  throw new Error('TODO create platform for OOT');
-  // const targetConfig = vmToProxy.deviceIdentity;
-  // const name = `${targetConfig.name} (Proxied)`;
-  // return await createDevPlatform();
-}
-
-// function createVMConfig(vmToProxy: WARDuinoVM): VMConfigArgs {
-//   return {
-//     program: vmToProxy.platformConfig.deviceConfig.vmConfig.program,
-//     pauseOnStart: true,
-//     disableStrictModuleLoad: true,
-//   };
-// }
-
 function assertValidOutOfPlaceSpawnArgs(
   args: any,
 ): args is OutOfPlaceSetupConfig {
