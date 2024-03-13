@@ -4,16 +4,8 @@ import * as fs from 'fs';
 
 const Logger = createLogger('DeviceConfiguration');
 
-export enum DeploymentMode { // TODO remove
-  DevVM = 'DevVM',
-  MCUVM = 'MCUVM',
-  ProxyVM = 'ProxyVM',
-  MirrorVM = 'MirrorVM',
-}
-
 export interface DeviceIdentityArgs {
   name?: string;
-  deploymentMode: DeploymentMode;
 }
 
 export class DeviceIdentity {
@@ -55,58 +47,6 @@ export class DeviceIdentity {
   private createID(): string {
     return uuidv4();
   }
-
-  // private createVMName(mode: DeploymentMode): string {
-  //   switch (mode) {
-  //     case DeploymentMode.DevVM:
-  //       return 'DevVM ';
-  //     case DeploymentMode.ProxyVM:
-  //       return 'OutOfPlaceVM';
-  //     case DeploymentMode.MCUVM:
-  //       return 'Board TODO';
-  //     default:
-  //       return 'VM unsupported mode';
-  //   }
-  // }
-}
-
-// export class DeviceConfig {
-//   private readonly _vmConfig: VMConfiguration;
-//   private readonly _id: DeviceIdentity;
-
-//   constructor(deviceIdentity: DeviceIdentity, vmConfigArgs: VMConfigArgs) {
-//     const errorMsgs = validateDeviceConfig(deviceIdentity);
-//     if (errorMsgs.length > 0) {
-//       const msg = errorMsgs.join(',');
-//       Logger.error(`Invalid config: ${msg}`);
-//       throw new Error(msg);
-//     }
-//     this._vmConfig = new VMConfiguration(vmConfigArgs);
-//     this._id = deviceIdentity;
-//   }
-
-//   get id(): DeviceIdentity {
-//     return this._id;
-//   }
-
-//   get vmConfig(): VMConfiguration {
-//     return this._vmConfig;
-//   }
-// }
-
-export function deploymentModeFromString(
-  val: string,
-): DeploymentMode | undefined {
-  const modes: DeploymentMode[] = Object.values(DeploymentMode);
-
-  const lowerCase = val.toLowerCase();
-  for (const mode of modes) {
-    if (mode.toLowerCase() === lowerCase) {
-      return mode;
-    }
-  }
-
-  return undefined;
 }
 
 export function validateDeviceConfig(value: any): string[] {
@@ -120,20 +60,6 @@ export function validateDeviceConfig(value: any): string[] {
         errors.push('Property "name" should be a string');
       } else if (value.name === '') {
         errors.push('Property "name" should not be an empty string');
-      }
-    }
-
-    if (typeof value.deploymentMode !== 'string') {
-      errors.push(
-        'Property "deploymentMode" has invalid type should be a string',
-      );
-    } else {
-      if (deploymentModeFromString(value.deploymentMode) === undefined) {
-        errors.push(
-          `Property "deploymentMode" is not a valid DeviceMode (choices ${Object.values(
-            DeploymentMode,
-          ).toString()}) given ${value.deploymentMode}`,
-        );
       }
     }
   }
@@ -202,9 +128,6 @@ export function parseDeviceConfigs(
   return jsonData.devices.map((config: any) => {
     const arg: DeviceIdentityArgs = {
       name: config.name,
-      deploymentMode: deploymentModeFromString(
-        config.deploymentMode,
-      ) as DeploymentMode,
     };
     return arg;
   });
