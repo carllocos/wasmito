@@ -327,9 +327,13 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
   }
 
   private async compileSourceCode(): Promise<void> {
-    const exitCode = await this.platform.compileSourceCode(
-      this.platform.config.vmConfig.program,
-    );
+    const args = this.targetVM.platform.compiler.latestSourceCodeCompilerArgs;
+    if (args === undefined) {
+      throw new this.ErrorClass(
+        'The Source code on the target VM has no yet been compiler so there is no way of starting DevVM',
+      );
+    }
+    const exitCode = await this.platform.compileSourceCode(args);
     if (exitCode !== 0) {
       throw new this.ErrorClass(
         `Could not start DevVM. Compilation exited with code: ${exitCode}`,
