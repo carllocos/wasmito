@@ -3,59 +3,24 @@ import {
   isValidDevicesConfig,
   parseDeviceConfigs,
   validateDeviceConfig,
-  DeploymentMode,
 } from '../../src/device/device_config';
 import assert from 'assert';
 
 describe('Loading device config with invalid input', () => {
-  it('Empty input config should give error', () => {
-    const config: any = {};
-    const errorsMsgs: string[] = validateDeviceConfig(config);
-    assert(
-      errorsMsgs.length > 0,
-      'The error messages list should have one or more items',
-    );
-  });
-
-  it('Input config with non-expected entries should give error', () => {
-    const config: any = {};
-    config.unExistingField = 'value';
-    const errorsMsgs: string[] = validateDeviceConfig(config);
-    assert(
-      errorsMsgs.length > 0,
-      'The error messages list should have one or more items',
-    );
-  });
-
-  it('Input config with only `name` property should give error', () => {
+  it('Input config with only `name` property should not give an error', () => {
     const config: any = {};
     config.name = 'device name';
     const errorsMsgs: string[] = validateDeviceConfig(config);
-    assert(
-      errorsMsgs.length > 0,
-      'The error messages list should have one or more items',
-    );
+    assert(errorsMsgs.length === 0, 'The error messages list should be empty');
   });
 
-  it('Input config with only `id` property should give error', () => {
+  it('Input config with only `id` property should not give error', () => {
     const config: any = {};
     config.id = 'some id';
     const errorsMsgs: string[] = validateDeviceConfig(config);
     assert(
-      errorsMsgs.length > 0,
-      'The error messages list should have one or more items',
-    );
-  });
-
-  it('Input config with unsupported `deploymentMode` value should give error', () => {
-    const config: any = {};
-    config.name = 'some Name';
-    config.id = 'some id';
-    config.deploymentMode = 'Unexsting deployment mode';
-    const errorsMsgs: string[] = validateDeviceConfig(config);
-    assert(
-      errorsMsgs.length > 0,
-      'The error messages list should have one or more items',
+      errorsMsgs.length === 0,
+      'The error messages list should have be empty',
     );
   });
 });
@@ -80,7 +45,6 @@ describe('Loading device config with valid input', () => {
     const config: any = {};
     config.name = 'some Name';
     config.id = 'some id';
-    config.deploymentMode = 'dEvVm'; // mix (non)-capital
 
     let errorsMsgs: string[] = validateDeviceConfig(config);
     assert(
@@ -90,7 +54,6 @@ describe('Loading device config with valid input', () => {
       )}`,
     );
 
-    config.deploymentMode = 'mcUvm';
     errorsMsgs = validateDeviceConfig(config);
     assert(
       errorsMsgs.length === 0,
@@ -99,7 +62,6 @@ describe('Loading device config with valid input', () => {
       )}`,
     );
 
-    config.deploymentMode = 'ProXyVm';
     errorsMsgs = validateDeviceConfig(config);
     assert(
       errorsMsgs.length === 0,
@@ -108,7 +70,6 @@ describe('Loading device config with valid input', () => {
       )}`,
     );
 
-    config.deploymentMode = 'MIRRORVM';
     errorsMsgs = validateDeviceConfig(config);
     assert(
       errorsMsgs.length === 0,
@@ -133,13 +94,11 @@ describe('Loading multile device configs', () => {
     const valid: any = {
       name: 'a',
       id: 'b',
-      deploymentMode: 'mcuvm',
     };
 
     const invalid: any = {
-      name: 'a',
+      name: 2,
       id: 'b',
-      deploymentMode: 'UNEXISTING DEPLOYMENT MODE',
     };
 
     let configs: any = { devices: [valid, invalid] };
@@ -161,13 +120,11 @@ describe('Loading multile device configs', () => {
     const validMCU: any = {
       name: 'a',
       id: 'b',
-      deploymentMode: 'mcuvm',
     };
 
     const validDevVM: any = {
       name: 'a',
       id: 'b',
-      deploymentMode: 'devvm',
     };
 
     const configs: any = { devices: [validMCU, validDevVM] };
@@ -187,16 +144,8 @@ describe('Loading multile device configs', () => {
 
     const configA = configs[0];
     assert(configA.name === 'A', 'invalid name');
-    assert(
-      configA.deploymentMode === DeploymentMode.MCUVM,
-      'invalid deployment mode',
-    );
 
     const configB = configs[1];
     assert(configB.name === 'B', 'invalid name');
-    assert(
-      configB.deploymentMode === DeploymentMode.MCUVM,
-      'invalid deployment mode',
-    );
   });
 });

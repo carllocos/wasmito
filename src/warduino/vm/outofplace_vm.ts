@@ -19,7 +19,6 @@ import { InspectStateHook } from '../../hooks/hook_inspect_state';
 import { type Breakpoint } from '../../debugger/breakpoint';
 import type winston from 'winston';
 import { createLogger } from '../../logger/logger';
-import { DeploymentMode } from '../../device';
 import { type DevVMPlatform } from '../../builder/platforms/dev_vm_platform';
 import { createDevPlatform } from '../../builder/platformbuilder_factory';
 
@@ -90,7 +89,6 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
         vmConfig: {},
         deviceIdentity: {
           name: `${vmToProxy.platform.config.deviceIdentity.name} (Proxied)`,
-          deploymentMode: DeploymentMode.DevVM, // Line is unimportant and will be removed
         },
       },
       setupConfig.buildOutputDir,
