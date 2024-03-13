@@ -36,7 +36,7 @@ export async function assertValidFQBN(arg: any): Promise<BoardFQBN> {
     return board.fqbn === fqbn;
   });
   if (targetBoard === undefined) {
-    throw new Error(`No board found with fqbn ${device.fqbn}`);
+    throw new Error(`No board found with fqbn ${fqbn}`);
   }
   if (boardName === '') {
     boardName = targetBoard.boardName;
