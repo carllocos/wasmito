@@ -19,7 +19,9 @@ import { InspectStateHook } from '../../hooks/hook_inspect_state';
 import { type Breakpoint } from '../../debugger/breakpoint';
 import type winston from 'winston';
 import { createLogger } from '../../logger/logger';
-import { type DevVMPlatform } from '../../builder';
+import { DeploymentMode } from '../../device';
+import { type DevVMPlatform } from '../../builder/platforms/dev_vm_platform';
+import { createDevPlatform } from '../../builder/platformbuilder_factory';
 
 export class OutOfPlaceVMError extends Error {
   constructor(message: string) {
@@ -61,20 +63,39 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
 
   public eventsToHandle: WASM.Event[];
 
-  constructor(
+  private constructor(
+    platform: DevVMPlatform,
     targetVM: WARDuinoVM,
-    serverPort?: number,
-    // buildOutputDir?: string,
+    shareableChannel: ShareChannel,
   ) {
-    super(
-      // targetVM.platformConfig.selectedLanguage,
-      createDeviceConfig(targetVM),
-      // buildOutputDir,
-    );
-
+    super(platform, shareableChannel);
     this.targetVM = targetVM;
-    this.shareableChannel = new ShareChannel(this.targetVM.channel, serverPort);
+    this.shareableChannel = shareableChannel;
     this.eventsToHandle = [];
+  }
+
+  static async createVM(
+    vmToProxy: WARDuinoVM,
+    setupConfig: OutOfPlaceSetupConfig,
+  ): Promise<OutOfPlaceVM> {
+    const channel = new ShareChannel(
+      vmToProxy.channel,
+      setupConfig.portToUseForSharedChannel,
+    );
+    const platform = await createDevPlatform(
+      {
+        selectedLanguage: {
+          targetLanguage: vmToProxy.platform.compiler.targetLanguage,
+        },
+        vmConfig: {},
+        deviceIdentity: {
+          name: `${vmToProxy.platform.config.deviceIdentity.name} (Proxied)`,
+          deploymentMode: DeploymentMode.DevVM, // Line is unimportant and will be removed
+        },
+      },
+      setupConfig.buildOutputDir,
+    );
+    return new OutOfPlaceVM(platform, vmToProxy, channel);
   }
 
   /*
