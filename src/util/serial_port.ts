@@ -20,7 +20,8 @@ export function isValidBoardBaudRate(value: any): value is BoardBaudRate {
   return Object.values(BoardBaudRate).includes(value);
 }
 
-export function isSerialPort(str: string): boolean {
+export function isSerialPort(port: string): boolean {
+  // TODO use env OS info
   const unixPattern = /^(\/dev\/ttyS\w+|\/dev\/ttyUSB\w+)$/i;
-  return unixPattern.test(str);
+  return unixPattern.test(port) || port.startsWith('/dev/cu.usbserial-');
 }
