@@ -107,19 +107,17 @@ export class DeviceManager {
     maxWaitTime?: number,
     buildOutputDir?: string,
   ): Promise<OutOfPlaceVM> {
-    const noServerPort = undefined;
-    const vm = new OutOfPlaceVM(targetVM, noServerPort);
-    // TODO configured for edward parametrize more of config
-    const config: OutOfPlaceSetupConfig = {
+    const setupConfig: OutOfPlaceSetupConfig = {
       targetInputMode,
       pauseTarget: true,
       localVMStartOutputMode: OutputMode.RedirectAllOutput,
       maxWaitTime,
       buildOutputDir,
     };
-    const childProcess = await vm.spawnWithConfig(config);
-    this.registerListenersOnVMProcess(childProcess);
-    this.localprocesses.push([vm, childProcess]);
+    const vm = await OutOfPlaceVM.createVM(targetVM, setupConfig);
+    const vmProcess = await vm.spawnWithConfig(setupConfig);
+    this.registerListenersOnVMProcess(vmProcess);
+    this.localprocesses.push([vm, vmProcess]);
     this.notifyListeners(vm);
     return vm;
   }
@@ -141,16 +139,17 @@ export class DeviceManager {
     maxWaitTime?: number,
     buildOutputDir?: string,
   ): Promise<OutOfPlaceVM> {
-    const vm = new OutOfPlaceVM(targetVM, serverPortForProxyCalls);
-    // TODO configured for edward parametrize more of config
-    const config: OutOfPlaceSetupConfig = {
+    const setupConfig: OutOfPlaceSetupConfig = {
       targetInputMode: InputMode.CopyInput,
       pauseTarget: true,
       localVMStartOutputMode: OutputMode.RedirectAllOutput,
       maxWaitTime,
       buildOutputDir,
+      portToUseForSharedChannel: serverPortForProxyCalls,
     };
-    await vm.useAlreadySpawnedVM(toolPort, config);
+    const vm = await OutOfPlaceVM.createVM(targetVM, setupConfig);
+    // TODO configured for edward parametrize more of config
+    await vm.useAlreadySpawnedVM(toolPort, setupConfig);
     this.localprocesses.push([vm, undefined]);
     this.notifyListeners(vm);
     return vm;
