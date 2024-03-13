@@ -152,6 +152,7 @@ export class MockVM extends WARDuinoVM {
   ): Promise<boolean> {
     const exitCode = await this.platform.buildForPlatform(
       sourceCodeCompilerArgs,
+      timeout,
     );
     if (exitCode !== 0) {
       return false;
