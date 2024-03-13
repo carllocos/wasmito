@@ -335,10 +335,6 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
         `Could not start DevVM. Compilation exited with code: ${exitCode}`,
       );
     }
-    const sourceMap = this.platform.getSourceMap();
-    if (sourceMap === undefined) {
-      throw new this.ErrorClass(`Could not generate SourceMap`);
-    }
   }
 
   private async setupTargetVM(
