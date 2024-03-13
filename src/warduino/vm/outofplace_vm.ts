@@ -197,7 +197,10 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
     );
   }
 
-  public async spawn(maxWaitTime?: number): Promise<ChildProcess> {
+  public async spawn(
+    sourceCodeCompilationArgs: any,
+    maxWaitTime?: number,
+  ): Promise<ChildProcess> {
     throw new this.ErrorClass(
       'Spawn is not supported for OutOfPlace use instead spawnWithConfig',
     );
