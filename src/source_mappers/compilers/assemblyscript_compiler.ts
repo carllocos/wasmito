@@ -21,6 +21,7 @@ import { runCommand } from '../../util/process_command';
 import * as fs from 'fs';
 import { AssemblyScriptSourceMap } from '../assemblyscript/assembly_script_source_map';
 import { type MappingItem, SourceMapConsumer } from 'source-map';
+import { TargetLanguage } from './prog_language_selection';
 // import { SourceCodeLocation } from '../source_map';
 
 const logger = createLogger('AssemblyScriptCompiler');
@@ -287,6 +288,7 @@ function parseDebugASConfigTarget(
 }
 
 export class AssemblyScriptCompiler extends SourceCodeCompiler {
+  public targetLanguage: TargetLanguage;
   public readonly config: ASConfig;
   private readonly _outputDir: string;
 
@@ -294,7 +296,12 @@ export class AssemblyScriptCompiler extends SourceCodeCompiler {
     super();
     this.config = compilerConfig;
     this._outputDir = outputDir;
+    this.targetLanguage = TargetLanguage.AssemblyScript;
     logger.info(`AssemblyScriptCompiler selected`);
+  }
+
+  get latestSourceCodeCompilerArgs(): any {
+    throw new Error('Method not implemented.');
   }
 
   async compile(

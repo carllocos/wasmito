@@ -33,6 +33,7 @@ import { writeFileSync } from 'fs';
 import { type WasmType } from '../../state/opcode_type';
 import { parseOpcodesFromDissambledOutput } from '../parsers/dissambled';
 import { runCommand } from '../../util/process_command';
+import { TargetLanguage } from './prog_language_selection';
 
 const logger = createLogger('WATCompiler');
 
@@ -104,7 +105,10 @@ function createAndAssertWATCompilerArgs(args: any): WATCompilerArgs {
 }
 
 export class WATCompiler extends SourceCodeCompiler {
+  public readonly targetLanguage: TargetLanguage;
+
   private readonly compilationOutputDir: string;
+  private _latestWATCompileArgs?: WATCompilerArgs;
 
   constructor(compilationOutputDir: string) {
     super();
@@ -112,6 +116,11 @@ export class WATCompiler extends SourceCodeCompiler {
     logger.info(
       `WATCompiler selected compiling to output ${this.compilationOutputDir}`,
     );
+    this.targetLanguage = TargetLanguage.WAT;
+  }
+
+  get latestSourceCodeCompilerArgs(): WATCompilerArgs | undefined {
+    return this._latestWATCompileArgs;
   }
 
   static override async createCompiler(
@@ -156,13 +165,15 @@ export class WATCompiler extends SourceCodeCompiler {
       this.compilationOutputDir,
       `${noExtension}.diss`,
     );
-    return await buildWATSourceMap(
+    const sm = await buildWATSourceMap(
       sourceCodePath,
       wasmOutputFilePath,
       objDumpDetailsOutputFile,
       objDumpDissembleOutputFile,
       lineInfoPairs,
     );
+    this._latestWATCompileArgs = args;
+    return sm;
   }
 }
 
