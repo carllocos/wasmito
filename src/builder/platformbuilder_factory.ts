@@ -14,24 +14,6 @@ export class BoardBuilderFactoryError extends Error {
     Error.captureStackTrace(this, BoardBuilderFactoryError);
   }
 }
-// export async function createPlatformBuilder<T>(
-//   target: PlatformTarget,
-//   configArgs: PlatformConfigArgs,
-//   outputDir?: string,
-// ): Promise<T extends Platform> {
-//   configArgs.target = target;
-//   const config: PlatformConfig = await PlatformConfig.fromConfigArgs(
-//     configArgs.targetArgs,
-//   );
-//   switch (config.target) {
-//     case PlatformTarget.Arduino:
-//       getGlobalLogger().info(`Creating ArduinoPlatform`);
-//       return new ArduinoBoardBuilder(config, outputDir);
-//     case PlatformTarget.DevVM:
-//       getGlobalLogger().info(`Creating Development VM`);
-//       return new DevVMPlatform(config, outputDir);
-//   }
-// }
 
 export interface FactoryArgs {
   vmConfig?: VMConfigArgs;
@@ -51,10 +33,6 @@ export async function createDevPlatform(
   const platform = new DevVMPlatform(config, outputDir);
   if (args.selectedLanguage !== undefined) {
     await platform.createCompiler(args.selectedLanguage);
-    // platform.compiler = await makeSourceCodeCompiler(
-    //   args.selectedLanguage,
-    //   platform.compilationOutputPath,
-    // );
   }
   return platform;
 }
@@ -71,10 +49,6 @@ export async function createArduinoPlatform(
   const platform = new ArduinoBoardBuilder(config, outputDir);
   if (args.selectedLanguage !== undefined) {
     await platform.createCompiler(args.selectedLanguage);
-    // platform.compiler = await makeSourceCodeCompiler(
-    //   args.selectedLanguage,
-    //   platform.compilationOutputPath,
-    // );
   }
   return platform;
 }
