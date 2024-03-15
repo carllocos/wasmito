@@ -37,6 +37,8 @@ export class SystemDeployer {
 
   private readonly vmMap: Map<string, WARDuinoVM>;
 
+  public MAX_WAIT_TIME_DevVM_SPAWN: number;
+
   constructor(setup: DevicesLab) {
     this.setup = setup;
     this.vmMap = new Map();
@@ -52,6 +54,7 @@ export class SystemDeployer {
     this.usedSerialPorts = new Set();
     this.deviceManager = new DeviceManager();
     this.assertUniqueID();
+    this.MAX_WAIT_TIME_DevVM_SPAWN = 3000;
   }
 
   get logger(): winston.Logger {
