@@ -14,14 +14,22 @@ import {
   runVMAction,
 } from '../reusable_actions';
 import { EventRemoveHook } from '../../../hooks/hook_event';
-import { type PostSetupConfig } from '../shared_interfaces';
+import { type TestProgram, type PostSetupConfig } from '../shared_interfaces';
 import { Breakpoint } from '../../../debugger/breakpoint';
+import { TargetLanguage } from '../../../source_mappers/compilers/prog_language_selection';
+import { type WATCompilerArgs } from '../../../source_mappers/compilers/wat_compilers';
 
 /*
  * System Setup
  */
 
-const program = './src/tool_examples/wat_examples/dimmer-double-button.wat';
+const watArgs: WATCompilerArgs = {
+  sourceCodePath: './src/tool_examples/wat_examples/dimmer-double-button.wat',
+};
+const program: TestProgram = {
+  targetLanguage: TargetLanguage.WAT,
+  sourceCodeCompilationArgs: watArgs,
+};
 
 // hardware m5stick C
 const m5stickcMCU = oneM5StickCMCU('1');

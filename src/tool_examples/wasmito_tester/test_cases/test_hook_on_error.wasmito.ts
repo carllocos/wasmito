@@ -2,6 +2,9 @@ import { createSystemSetup, oneM5StickCDev } from '../reausable_system_setups';
 import { SystemTester, type TestScenario } from '../system_tester';
 import { createOnErrorActionEmitter, runVMAction } from '../reusable_actions';
 import { type WasmState } from '../../../state';
+import { type TestProgram } from '../shared_interfaces';
+import { TargetLanguage } from '../../../source_mappers/compilers/prog_language_selection';
+import { type WATCompilerArgs } from '../../../source_mappers/compilers/wat_compilers';
 
 /*
  * Note on the program
@@ -9,7 +12,14 @@ import { type WasmState } from '../../../state';
  * The lack of the primitive functions will cause the DevVM to triger an error when the unexisting primitive function needs to be called.
  * The triggered error is exactly what we are testing here.
  */
-const program = './src/tool_examples/wat_examples/dimmer-double-button.wat';
+
+const watArgs: WATCompilerArgs = {
+  sourceCodePath: './src/tool_examples/wat_examples/dimmer-double-button.wat',
+};
+const program: TestProgram = {
+  targetLanguage: TargetLanguage.WAT,
+  sourceCodeCompilationArgs: watArgs,
+};
 
 /*
  * System Setup
