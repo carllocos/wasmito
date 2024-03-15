@@ -99,13 +99,9 @@ export class SystemDeployer {
     }
 
     if (this.hasVMDevice(deviceID)) {
-      const vm = this.deviceVM(deviceID);
-      const fn = getFileName(scenario.testProgram);
-      if (vm.sourceMap.sourceCodeFileName === fn) {
-        console.log('TODO reboot');
-      } else {
-        console.log('TODO: update source code');
-      }
+      // const vm = this.deviceVM(deviceID);
+      // const fn = getFileName(scenario.testProgram);
+      console.log('Todo: reuse same device if poossible');
     } else {
       switch (device.target) {
         case Target.mcu:
