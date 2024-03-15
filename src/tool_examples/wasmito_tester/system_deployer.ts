@@ -24,6 +24,7 @@ import {
   Target,
   type DevicesLab,
   type TestScenario,
+  type TestProgram,
 } from './shared_interfaces';
 import { getFileName } from '../../util/file_util';
 
@@ -161,9 +162,8 @@ export class SystemDeployer {
   }
 
   private async deployMCU(
-    program: string,
+    program: TestProgram,
     device: DeviceSetup,
-    indexInSetup: number,
   ): Promise<void> {
     const config = await this.automaticBuildOfPlatformConfig(
       program,
@@ -178,7 +178,7 @@ export class SystemDeployer {
   }
 
   private async deployDev(
-    program: string,
+    testProgram: TestProgram,
     device: DeviceSetup,
     externalProcess: boolean,
   ): Promise<void> {

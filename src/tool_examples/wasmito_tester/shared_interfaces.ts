@@ -1,4 +1,5 @@
 import { type HookWithSubscription } from '../../hooks/hook';
+import { type TargetLanguage } from '../../source_mappers/compilers/prog_language_selection';
 import { type WARDuinoVM } from '../../warduino/vm/warduino_vm';
 
 export enum Target {
@@ -118,11 +119,15 @@ export type Act<V, Y, Z extends HookWithSubscription<Y>> =
   | SubscriptionEmitterAction<V, Y, Z>
   | SubscribeAction<Y, Z>;
 
+export interface TestProgram {
+  targetLanguage: TargetLanguage;
+  sourceCodeCompilationArgs: any;
+}
+
 export interface TestScenario {
   skipTest?: boolean;
   testName: string;
-  testProgram: string;
-
+  testProgram: TestProgram;
   when?: Array<Act<any, any, any>>;
   actions?: Array<Act<any, any, any>>;
   expect?: Array<Act<any, any, any>>;
