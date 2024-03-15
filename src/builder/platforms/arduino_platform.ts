@@ -210,8 +210,8 @@ export class ArduinoBoardBuilder extends Platform {
     this.logger.info(
       `Copying Arduino template for ${this.config.deviceIdentity.name} (board=${this.config.vmConfig.fqbn.boardName}, ID=${this.config.deviceIdentity.id}) from ${this.pathToArduinoTemplateDir} to ${this.pathToArduinoSketchDir}`,
     );
-    await copyRecursive(
-      `${this.pathToArduinoTemplateDir}/*`,
+    copyRecursive(
+      `${this.pathToArduinoTemplateDir}/`,
       this.pathToArduinoSketchDir,
     );
 

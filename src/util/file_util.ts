@@ -1,7 +1,6 @@
 import os from 'os';
 import * as path from 'path';
 import fs from 'fs';
-import { exec } from 'child_process';
 import { getGlobalLogger } from '../logger/logger';
 
 export function replaceFileExtension(
@@ -46,24 +45,22 @@ export function createTempDirectory(prefix: string): string {
   return tempDir;
 }
 
-export async function copyRecursive(
-  source: string,
-  destination: string,
-): Promise<void> {
-  await new Promise<void>((resolve, reject) => {
-    const command = `mkdir -p ${destination} && cp -r ${source} ${destination}`;
+export function copyRecursive(source: string, target: string): void {
+  getGlobalLogger().debug(`Copying ${source} to ${target}`);
+  if (!fs.existsSync(target)) {
+    fs.mkdirSync(target);
+  }
 
-    exec(command, (error, stdout, stderr) => {
-      if (error !== null) {
-        getGlobalLogger().error(
-          `CopyRecursive: Error copying template files from ${source} to ${destination}. Error message: ${error.message}`,
-        );
-        reject(error);
-      } else {
-        resolve();
-      }
-    });
-  });
+  const files = fs.readdirSync(source);
+  for (const file of files) {
+    const sourcePath = path.join(source, file);
+    const targetPath = path.join(target, file);
+    if (fs.lstatSync(sourcePath).isDirectory()) {
+      copyRecursive(sourcePath, targetPath);
+    } else {
+      fs.copyFileSync(sourcePath, targetPath);
+    }
+  }
 }
 
 export async function readFileAsBuffer(filePath: string): Promise<Buffer> {
