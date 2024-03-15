@@ -1,23 +1,12 @@
 import type winston from 'winston';
-import {
-  // type BoardFQBN,
-  // PlatformTarget,
-  type PlatformConfig,
-} from '../../builder/platform_config';
-import { listAllFQBN, listAvailableBoards } from '../../builder/util_platform';
-// import {
-//   DeploymentMode,
-//   type DeviceIdentityArgs,
-// } from '../../device/device_config';
+import { type BoardFQBN } from '../../builder/platform_config';
 import { DeviceManager } from '../../device/device_manager';
-// import { type VMConfigArgs } from '../../device/vm_config';
 import {
   LogLevel,
   createLogger,
   getLogLevelFromString,
 } from '../../logger/logger';
 import { timeoutPromise } from '../../util/promise_util';
-import { BoardBaudRate } from '../../util/serial_port';
 import { type WARDuinoVM } from '../../warduino/vm/warduino_vm';
 import {
   type DeviceSetup,
@@ -26,7 +15,10 @@ import {
   type TestScenario,
   type TestProgram,
 } from './shared_interfaces';
-import { getFileName } from '../../util/file_util';
+import {
+  autoBuildArduinoPlatform,
+  createDevPlatform,
+} from '../../builder/platformbuilder_factory';
 
 export class SystemDeployer {
   private readonly setup;
@@ -87,11 +79,7 @@ export class SystemDeployer {
     scenario: TestScenario,
     deviceID: string,
   ): Promise<void> {
-    let i = -1;
     const device = this.setup.devices.find((d: DeviceSetup, idx: number) => {
-      if (d.id === deviceID) {
-        i = idx;
-      }
       return d.id === deviceID;
     });
     if (device === undefined) {
@@ -105,7 +93,7 @@ export class SystemDeployer {
     } else {
       switch (device.target) {
         case Target.mcu:
-          await this.deployMCU(scenario.testProgram, device, i);
+          await this.deployMCU(scenario.testProgram, device);
           break;
         case Target.devExternal:
         case Target.dev: {
@@ -126,54 +114,40 @@ export class SystemDeployer {
     }
   }
 
-  async deploy(program: string, ignoreDeviceIDs?: string[]): Promise<void> {
-    for (let i = 0; i < this.setup.devices.length; i++) {
-      const device = this.setup.devices[i];
-      if (ignoreDeviceIDs !== undefined) {
-        const found = ignoreDeviceIDs.find((idToIngore) => {
-          return idToIngore === device.id;
-        });
-        if (found !== undefined) {
-          this.logger.info(
-            `Deployment cancelled for device with id ${device.id}`,
-          );
-          continue;
-        }
-      }
-
-      switch (device.target) {
-        case Target.mcu:
-          await this.deployMCU(program, device, i);
-          break;
-        case Target.devExternal:
-        case Target.dev: {
-          const connectToExternalVM = device.target === Target.devExternal;
-          await this.deployDev(program, device, connectToExternalVM);
-          break;
-        }
-        default:
-          this._logger.error(
-            `unsupported target '${device.target}' was provided for device at index ${i}`,
-          );
-          break;
-      }
-    }
-  }
-
   private async deployMCU(
     program: TestProgram,
     device: DeviceSetup,
   ): Promise<void> {
-    const config = await this.automaticBuildOfPlatformConfig(
-      program,
-      device,
-      indexInSetup,
-    );
-    this.usedSerialPorts.add(config.vmConfig.serialPort);
+    let fqbn: BoardFQBN | undefined;
+    if (device.fqbn !== undefined) {
+      fqbn = {
+        boardName: '',
+        fqbn: device.fqbn,
+      };
+    }
 
-    throw new Error('TODO');
-    // const vm = await this.deviceManager.spawnHardwareVM(config);
-    // await this.applyPostDeployment(device, vm);
+    const platform = await autoBuildArduinoPlatform(
+      {
+        selectedLanguage: {
+          targetLanguage: program.targetLanguage,
+        },
+        deviceIdentity: {
+          name: device.name,
+        },
+        vmConfig: {
+          serialPort: device.serialPort,
+          baudrate: device.baudrate,
+          fqbn,
+        },
+      },
+      this.usedSerialPorts,
+    );
+    const vm = await this.deviceManager.spawnHardwareVM(
+      platform,
+      program.sourceCodeCompilationArgs,
+    );
+    this.usedSerialPorts.add(platform.config.vmConfig.serialPort);
+    await this.applyPostDeployment(device, vm);
   }
 
   private async deployDev(
@@ -181,122 +155,42 @@ export class SystemDeployer {
     device: DeviceSetup,
     externalProcess: boolean,
   ): Promise<void> {
-    throw new Error('TODO');
-    // const vmConfigArgs: VMConfigArgs = {
-    //   program,
-    //   disableStrictModuleLoad: true,
-    // };
-    // let vm: WARDuinoVM | undefined;
-    // if (externalProcess) {
-    //   const deviceConfig: DeviceIdentity = {
-    //     deploymentMode: DeploymentMode.DevVM,
-    //   };
-    //   if (device.toolPort === undefined) {
-    //     throw Error(
-    //       `Device with id ${device.id}: cannot connect to external VM without 'toolPort' field in DeviceSetup`,
-    //     );
-    //   }
-    //   vm = await this.deviceManager.connectToExistingDevVM(
-    //     deviceConfig,
-    //     device.toolPort,
-    //     program,
-    //     3000,
-    //   );
-    //   const exitCode = await vm.platform.compile(program);
-    //   if (exitCode !== 0) {
-    //     throw Error(
-    //       `Could not compile program ${program} exit code ${exitCode}`,
-    //     );
-    //   }
-    // } else {
-    //   vm = await this.deviceManager.spawnDevelopmentVM(vmConfigArgs);
-    // }
-    // await this.applyPostDeployment(device, vm);
-  }
-
-  // TODO move to toolkit
-  private async automaticBuildOfPlatformConfig(
-    program: string,
-    device: DeviceSetup,
-    idx: number,
-  ): Promise<PlatformConfig> {
-    const serialPort: string = device.serialPort ?? '';
-    if (serialPort === '') {
-      this._logger.info(
-        'No serial port set so searching for a serial port to use',
+    if (externalProcess && device.toolPort === undefined) {
+      throw Error(
+        `Device with id ${device.id}: cannot connect to external VM without 'toolPort' field in DeviceSetup`,
       );
-      const boards = await listAvailableBoards();
-      let boardIdx = 0;
-      while (boardIdx < boards.length) {
-        const portCandidate = boards[0];
-        if (this.usedSerialPorts.has(portCandidate)) {
-          boardIdx++;
-        } else {
-          device.serialPort = portCandidate;
-          this.usedSerialPorts.add(portCandidate);
-          break;
-        }
-      }
-      if (boards.length === 0 || boardIdx >= boards.length) {
-        let errMsg = '';
-        if (boards.length === 0) {
-          errMsg = 'no serialPort provided nor a connected board detected';
-        } else {
-          errMsg =
-            'No free serial port detected. All available serial ports already in use';
-        }
-        this._logger.error(errMsg);
-        throw new Error(errMsg);
-      }
     }
-    if (device.baudrate === undefined) {
-      this._logger.info(
-        `No baudrate set using default ${BoardBaudRate.BD_115200}`,
-      );
-      device.baudrate = BoardBaudRate.BD_115200;
-    }
-
-    if (device.fqbn === undefined) {
-      this._logger.error(`No FQBN provided for device at position ${idx}`);
-      throw new Error(`No FQBN provided for device at position ${idx}`);
-    }
-
-    const fqbns = await listAllFQBN();
-    const targetBoard = fqbns.find((board) => {
-      return board.fqbn === device.fqbn;
+    const platform = await createDevPlatform({
+      selectedLanguage: {
+        targetLanguage: testProgram.targetLanguage,
+      },
+      vmConfig: {
+        toolPort: device.toolPort,
+      },
     });
-    if (targetBoard === undefined) {
-      const errMsg = `No board found with fqbn ${device.fqbn}`;
-      this._logger.error(errMsg);
-      throw new Error(errMsg);
-    }
-    device.fqbn = targetBoard.fqbn;
-    if (targetBoard.boardName !== '') {
-      device.name = targetBoard.boardName;
-    }
 
-    throw new Error('TODO');
-    // const boardFQBN: BoardFQBN = {
-    //   boardName: targetBoard.boardName,
-    //   fqbn: targetBoard.fqbn,
-    // };
+    const vm = externalProcess
+      ? await this.deviceManager.connectToExistingDevVM(
+          platform,
+          this.MAX_WAIT_TIME_DevVM_SPAWN,
+        )
+      : await this.deviceManager.spawnDevelopmentVM(
+          platform,
+          testProgram.sourceCodeCompilationArgs,
+          this.MAX_WAIT_TIME_DevVM_SPAWN,
+        );
 
-    // const deviceConfig: DeviceIdentity = {
-    //   deploymentMode: DeploymentMode.MCUVM,
-    // };
-    // const vmConfig: VMConfigArgs = {
-    //   program,
-    //   disableStrictModuleLoad: true,
-    //   serialPort: device.serialPort,
-    //   baudrate: device.baudrate,
-    // };
-    // return new PlatformConfig(
-    //   PlatformTarget.Arduino,
-    //   device.baudrate,
-    //   boardFQBN,
-    //   deviceConfig,
-    //   vmConfig,
-    // );
+    if (externalProcess) {
+      const exitCode = await vm.platform.compileSourceCode(
+        testProgram.sourceCodeCompilationArgs,
+      );
+      if (exitCode !== 0) {
+        throw Error(
+          `Could not compile program ${testProgram.sourceCodeCompilationArgs} exit code ${exitCode}`,
+        );
+      }
+    }
+    await this.applyPostDeployment(device, vm);
   }
 
   private assertUniqueID(): void {
