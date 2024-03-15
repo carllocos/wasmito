@@ -10,8 +10,17 @@ import {
 } from '../../../warduino/requests/around_function_request';
 import { type WARDuinoVM } from '../../../warduino/vm/warduino_vm';
 import { ResponseType } from '../../../warduino/api/request_interface';
+import { type TestProgram } from '../shared_interfaces';
+import { TargetLanguage } from '../../../source_mappers/compilers/prog_language_selection';
+import { type WATCompilerArgs } from '../../../source_mappers/compilers/wat_compilers';
 
-const program = './src/tool_examples/wat_examples/dimmer-double-button.wat';
+const watArgs: WATCompilerArgs = {
+  sourceCodePath: './src/tool_examples/wat_examples/dimmer-double-button.wat',
+};
+const program: TestProgram = {
+  targetLanguage: TargetLanguage.WAT,
+  sourceCodeCompilationArgs: watArgs,
+};
 
 /*
  * System Setup

@@ -18,13 +18,22 @@ import { type WARDuinoVM } from '../../../warduino/vm/warduino_vm';
 import { StateRequest } from '../../../warduino/requests/inspect_request';
 import { InspectStateHook } from '../../../hooks/hook_inspect_state';
 import { WasmValuesBuilder } from '../../../state/wasm_value_array_builder';
-import { type PostSetupConfig } from '../shared_interfaces';
+import { type TestProgram, type PostSetupConfig } from '../shared_interfaces';
+import { TargetLanguage } from '../../../source_mappers/compilers/prog_language_selection';
+import { type WATCompilerArgs } from '../../../source_mappers/compilers/wat_compilers';
 
 /*
  * System Setup
  */
 
-const program = './src/tool_examples/wat_examples/dimmer-double-button.wat';
+const watArgs: WATCompilerArgs = {
+  sourceCodePath: './src/tool_examples/wat_examples/dimmer-double-button.wat',
+};
+
+const program: TestProgram = {
+  targetLanguage: TargetLanguage.WAT,
+  sourceCodeCompilationArgs: watArgs,
+};
 
 const psM5StickCMCU: PostSetupConfig = {
   pauseAfterSetup: true,
