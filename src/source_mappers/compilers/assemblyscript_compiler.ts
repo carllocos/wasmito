@@ -3,6 +3,7 @@ import { createLogger } from '../../logger/logger';
 import {
   createDirectoryIfUnexisting,
   isFilePath,
+  getDirectory,
   getAbsolutePath,
 } from '../../util/file_util';
 import {
