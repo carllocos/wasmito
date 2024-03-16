@@ -77,69 +77,8 @@ export class AssemblyScriptCompiler extends SourceCodeCompiler {
   }
 
   async compile(
-    pathToASConfig: string,
-    wasmOutputFile?: string | undefined,
+    compilerArgs: AssemblyScriptCompilerArgs,
   ): Promise<AssemblyScriptSourceMap> {
-    await buildAssemblyScriptFromConfig(this.config);
-    const content = await fs.promises.readFile(this.config.sourceMappersPath);
-    const sourceMapStr = JSON.parse(content.toString());
-    const [sources, mappings] = await SourceMapConsumer.with(
-      sourceMapStr,
-      null,
-      (consumer) => {
-        const mps: MappingItem[] = [];
-        consumer.eachMapping((mapping: MappingItem) => {
-          mps.push(mapping);
-        });
-        return [consumer.sources, mps];
-      },
-    );
-
-    const sourceAbsPath = [];
-    for (let i = 0; i < sources.length; i++) {
-      let source = sources[i];
-      if (source.startsWith(`${this.config.prefixFileName}/`)) {
-        logger.debug(`Removing prefix from AssemblyScript source '${source}'`);
-        source = source.slice(
-          this.config.prefixFileName.length + 1,
-          source.length,
-        );
-      }
-
-      if (!isAbsolutePath(source)) {
-        logger.debug(`Creating absolute path for source '${source}`);
-        source = pathJoin(this.config.srcRootPath, source);
-      }
-      if (isFilePath(source)) {
-        sourceAbsPath.push(source);
-      } else {
-        logger.debug(
-          `Ignoring source '${source}' for source maps as such file does not exist`,
-        );
-      }
-    }
-
-    if (sourceAbsPath.length === 0) {
-      throw new Error(
-        `No source found in the sourcemap that satifies the conditions. All sources  ${sources.join(
-          ', ',
-        )}`,
-      );
-    }
-
-    const sm = new AssemblyScriptSourceMap(
-      this.config,
-      sourceAbsPath,
-      mappings,
-    );
-    await sm.createAST();
-    return sm;
-  }
-
-  static override async createCompiler(
-    compilerArgs: any,
-    compilerOutputDir: string,
-  ): Promise<AssemblyScriptCompiler> {
     const paths: AssemblyScriptCompilerArgs =
       parseAssemblyScriptArgs(compilerArgs);
 
