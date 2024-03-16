@@ -160,9 +160,7 @@ export class AssemblyScriptCompiler extends SourceCodeCompiler {
   }
 }
 
-export async function buildAssemblyScriptFromConfig(
-  config: ASConfig,
-): Promise<void> {
+export async function runNPXCommand(config: ASConfig): Promise<void> {
   logger.info(`Compiling AssemblyScript`);
   const npx = getPath2NPX();
   const asc = getPath2AssemblyScriptCompiler();
