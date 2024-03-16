@@ -16,7 +16,7 @@ export class DevVMPlatform extends Platform {
   async createCompiler(selectedLanguage: ProgLangSelectionArgs): Promise<void> {
     createDirectoryIfUnexisting(this.outputDirectory);
 
-    this._sourceCodeCompiler = await makeSourceCodeCompiler(
+    this._sourceCodeCompiler = makeSourceCodeCompiler(
       selectedLanguage,
       this.outputDirectory,
     );

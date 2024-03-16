@@ -222,7 +222,7 @@ export class ArduinoBoardBuilder extends Platform {
 
     // compile the source code
     createDirectoryIfUnexisting(this.pathToArduinoWasmBinaryDir);
-    this._sourceCodeCompiler = await makeSourceCodeCompiler(
+    this._sourceCodeCompiler = makeSourceCodeCompiler(
       selectedLanguage,
       this.pathToArduinoWasmBinaryDir,
     );

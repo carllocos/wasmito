@@ -7,13 +7,13 @@ import {
 } from './prog_language_selection';
 import { WATCompiler } from './wat_compilers';
 
-export async function makeSourceCodeCompiler(
+export function makeSourceCodeCompiler(
   compilerSelection: ProgLangSelectionArgs, // may point to the source code or compiler configuration
   compilationOutput: string,
-): Promise<SourceCodeCompiler> {
+): SourceCodeCompiler {
   switch (compilerSelection.targetLanguage) {
     case TargetLanguage.WAT:
-      return await WATCompiler.createCompiler(compilationOutput);
+      return new WATCompiler(compilationOutput);
     case TargetLanguage.AssemblyScript:
       return new AssemblyScriptCompiler(compilationOutput);
     default:

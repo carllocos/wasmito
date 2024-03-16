@@ -123,13 +123,6 @@ export class WATCompiler extends SourceCodeCompiler {
     return this._latestWATCompileArgs;
   }
 
-  static override async createCompiler(
-    compilerOutputPath: string,
-    compilerArgs?: any,
-  ): Promise<WATCompiler> {
-    return new WATCompiler(compilerOutputPath);
-  }
-
   async compile(compilationArgs: WATCompilerArgs): Promise<SourceMap> {
     const args = createAndAssertWATCompilerArgs(compilationArgs);
     const sourceCodePath = args.sourceCodePath;
