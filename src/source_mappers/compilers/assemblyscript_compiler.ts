@@ -61,13 +61,12 @@ function parseAssemblyScriptArgs(args: any): AssemblyScriptCompilerArgs {
 
 export class AssemblyScriptCompiler extends SourceCodeCompiler {
   public targetLanguage: TargetLanguage;
-  public readonly config: ASConfig;
+  public config?: ASConfig;
   private readonly _outputDir: string;
 
-  constructor(compilerConfig: ASConfig, outputDir: string) {
+  constructor(outputDir: string) {
     super();
-    this.config = compilerConfig;
-    this._outputDir = outputDir;
+    this._outputDir = getAbsolutePath(outputDir);
     this.targetLanguage = TargetLanguage.AssemblyScript;
     logger.info(`AssemblyScriptCompiler selected`);
   }
