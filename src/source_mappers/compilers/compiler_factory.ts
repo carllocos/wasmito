@@ -15,10 +15,7 @@ export async function makeSourceCodeCompiler(
     case TargetLanguage.WAT:
       return await WATCompiler.createCompiler(compilationOutput);
     case TargetLanguage.AssemblyScript:
-      return await AssemblyScriptCompiler.createCompiler(
-        compilationOutput,
-        compilerSelection.compilerArgs,
-      );
+      return new AssemblyScriptCompiler(compilationOutput);
     default:
       getGlobalLogger().error(
         'Did not found source code Compiler for language with extension',
