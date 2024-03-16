@@ -80,21 +80,23 @@ export class AssemblyScriptCompiler extends SourceCodeCompiler {
   ): Promise<AssemblyScriptSourceMap> {
     const paths: AssemblyScriptCompilerArgs =
       parseAssemblyScriptArgs(compilerArgs);
-
-    const newConfigPath = pathJoin(compilerOutputDir, 'asconfig.json');
-    const config = await ASConfig.createASConfig(
-      paths.pathToSrcRoot,
+    const config = await parseASConfigFromPath(
       paths.pathToASConfig,
-      newConfigPath,
-      compilerOutputDir,
+      paths.pathToSrcRoot,
+      this._outputDir,
     );
 
-    createDirectoryIfUnexisting(compilerOutputDir);
+    // create the needed directories where AS will output content
+    createDirectoryIfUnexisting(this._outputDir);
     createDirectoryIfUnexisting(getDirectory(config.debugTarget.outFile));
     createDirectoryIfUnexisting(getDirectory(config.debugTarget.textFile));
-
+    // store a copy of the json config
     config.storeToJSONFile();
-    return new AssemblyScriptCompiler(config, compilerOutputDir);
+    await runNPXCommand(config);
+
+    const sm = await AssemblyScriptSourceMap.fromSourceMapPath(config);
+    this.config = config;
+    return sm;
   }
 }
 
