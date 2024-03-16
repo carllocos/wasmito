@@ -112,8 +112,7 @@ export async function autoBuildArduinoPlatform(
     getGlobalLogger().error(errMsg);
     throw new Error(errMsg);
   }
-  device.fqbn = targetBoard.fqbn;
-  if (targetBoard.boardName !== '') {
+  if (boardFqbn.boardName === undefined || boardFqbn.boardName !== '') {
     boardFqbn.boardName = targetBoard.boardName;
   }
 
