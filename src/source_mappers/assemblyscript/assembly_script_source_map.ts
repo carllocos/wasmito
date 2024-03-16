@@ -1,6 +1,5 @@
 import fs from 'fs';
-import { type MappingItem } from 'source-map';
-import { type ASConfig } from '../compilers/assemblyscript_compiler';
+import { type MappingItem, SourceMapConsumer } from 'source-map';
 import { type VariableInfo } from '../parsers/obj-dump_parser';
 import {
   type SourceCodeMapping,
@@ -8,15 +7,18 @@ import {
   type WASMFunction,
 } from '../source_map';
 import { type WasmOpcode } from '../wat/opcodes';
-
+import { isAbsolutePath, isFilePath, pathJoin } from '../../util/file_util';
 // import * as TreeSitter from 'tree-sitter';
 // import * as TypeScript from 'tree-sitter-typescript';
 import Parser = require('tree-sitter');
-import { isAbsolutePath } from '../../util/file_util';
+import { createLogger } from '../../logger/logger';
+import { type ASConfig } from './asconfig';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const typescript = require('tree-sitter-typescript');
 
 export type ASMapping = MappingItem;
+
+const logger = createLogger('AssemblyScriptSourceMap');
 
 export class AssemblyScriptSourceMap extends SourceMap {
   private readonly _asConfig: ASConfig;
@@ -75,5 +77,56 @@ export class AssemblyScriptSourceMap extends SourceMap {
       const tree = parser.parse(sourceCode);
       this._sourceTreeMap.set(source, tree);
     }
+  }
+
+  static async fromSourceMapPath(
+    config: ASConfig,
+  ): Promise<AssemblyScriptSourceMap> {
+    const content = await fs.promises.readFile(config.sourceMappersPath);
+    const sourceMapStr = JSON.parse(content.toString());
+    const [sources, mappings] = await SourceMapConsumer.with(
+      sourceMapStr,
+      null,
+      (consumer) => {
+        const mps: MappingItem[] = [];
+        consumer.eachMapping((mapping: MappingItem) => {
+          mps.push(mapping);
+        });
+        return [consumer.sources, mps];
+      },
+    );
+
+    const sourceAbsPath = [];
+    for (let i = 0; i < sources.length; i++) {
+      let source = sources[i];
+      if (source.startsWith(`${config.prefixFileName}/`)) {
+        logger.debug(`Removing prefix from AssemblyScript source '${source}'`);
+        source = source.slice(config.prefixFileName.length + 1, source.length);
+      }
+
+      if (!isAbsolutePath(source)) {
+        logger.debug(`Creating absolute path for source '${source}`);
+        source = pathJoin(config.srcRootPath, source);
+      }
+      if (isFilePath(source)) {
+        sourceAbsPath.push(source);
+      } else {
+        logger.debug(
+          `Ignoring source '${source}' for source maps as such file does not exist`,
+        );
+      }
+    }
+
+    if (sourceAbsPath.length === 0) {
+      throw new Error(
+        `No source found in the sourcemap that satifies the conditions. All sources  ${sources.join(
+          ', ',
+        )}`,
+      );
+    }
+
+    const sm = new AssemblyScriptSourceMap(config, sourceAbsPath, mappings);
+    await sm.createAST();
+    return sm;
   }
 }
