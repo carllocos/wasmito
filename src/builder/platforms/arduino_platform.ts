@@ -13,6 +13,7 @@ import { makeSourceCodeCompiler } from '../../source_mappers/compilers/compiler_
 import path from 'path';
 import { type ProgLangSelectionArgs } from '../../source_mappers/compilers/prog_language_selection';
 import { maybeTimeoutPromise } from '../../util/promise_util';
+import { isSerialPort } from '../../util/serial_port';
 
 const arduinoLogger = createLogger('Arduino');
 
@@ -46,14 +47,9 @@ export async function ArduinoListBoards(): Promise<string[]> {
     .splice(1, lines.length)
     .map((line) => {
       const vals = line.split(' ');
-      if (vals[1] === 'serial') {
-        return vals[0];
-      }
-      return '';
+      return vals[0];
     })
-    .filter((ports) => {
-      return ports !== '';
-    });
+    .filter(isSerialPort);
 }
 
 export async function ArduinoListBoardsFQBNs(): Promise<BoardFQBN[]> {
