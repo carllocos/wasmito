@@ -44,43 +44,6 @@ export interface VMConfigArgs {
   disableStrictModuleLoad?: boolean;
 }
 
-// function isValidTypeVMConfig(arg: any): arg is VMConfigArgs {
-//   if (typeof arg !== 'object' || arg === null) {
-//     return false;
-//   }
-
-//   if (typeof arg.program !== 'string') {
-//     return false;
-//   }
-
-//   return (
-//     (typeof arg.loop === 'undefined' || typeof arg.loop === 'boolean') &&
-//     (typeof arg.noDebug === 'undefined' || typeof arg.noDebug === 'boolean') &&
-//     (typeof arg.noSocket === 'undefined' ||
-//       typeof arg.noSocket === 'boolean') &&
-//     (typeof arg.toolPort === 'undefined' ||
-//       (typeof arg.toolPort === 'number' && !isNaN(arg.toolPort))) &&
-//     (typeof arg.toolHostIP === 'undefined' ||
-//       typeof arg.toolHostIP === 'string') &&
-//     (typeof arg.pauseOnStart === 'undefined' ||
-//       typeof arg.pauseOnStart === 'boolean') &&
-//     (typeof arg.mockHostIP === 'undefined' ||
-//       typeof arg.mockHostIP === 'string') &&
-//     (typeof arg.mockPort === 'undefined' ||
-//       (typeof arg.mockPort === 'number' && !isNaN(arg.mockPort))) &&
-//     (typeof arg.proxyPort === 'undefined' ||
-//       (typeof arg.proxyPort === 'number' && !isNaN(arg.proxyPort))) &&
-//     (typeof arg.proxyHostIP === 'undefined' ||
-//       typeof arg.proxyHostIP === 'string') &&
-//     (typeof arg.serialPort === 'undefined' ||
-//       typeof arg.serialPort === 'string') &&
-//     (typeof arg.baudrate === 'undefined' || typeof arg.baudrate === 'number') &&
-//     (typeof arg.mode === 'undefined' || typeof arg.mode === 'string') &&
-//     (typeof arg.disableStrictModuleLoad === 'undefined' ||
-//       typeof arg.disableStrictModuleLoad === 'boolean')
-//   );
-// }
-
 export class VMConfiguration {
   private _program?: string;
 

@@ -5,7 +5,6 @@ import {
 import { type VMConfigArgs, VMConfiguration } from '../device/vm_config';
 import { type ProgLangSelectionArgs } from '../source_mappers/compilers/prog_language_selection';
 import { listAllFQBN } from './util_platform';
-// import { BoardBaudRate } from '../util/serial_port';
 
 export interface BoardFQBN {
   boardName: string;
@@ -70,14 +69,10 @@ export interface PlatformConfigArgs {
 export class PlatformConfig {
   public readonly target: PlatformTarget;
   public readonly vmConfig: VMConfiguration;
-  // public readonly baudrate: BoardBaudRate;
-  // public readonly fqbn: BoardFQBN;
   public readonly deviceIdentity: DeviceIdentity;
 
   constructor(
     target: PlatformTarget,
-    // baudrate: BoardBaudRate,
-    // fqbn: BoardFQBN,
     deviceIdentity: DeviceIdentity,
     vmConfig: VMConfiguration,
   ) {
@@ -88,8 +83,6 @@ export class PlatformConfig {
     if (!deviceIdentity.hasName()) {
       deviceIdentity.name = this.generateDeviceName();
     }
-    // this.baudrate = baudrate;
-    // this.fqbn = fqbn;
   }
 
   configuredForSerial(): boolean {
@@ -99,17 +92,6 @@ export class PlatformConfig {
       this.vmConfig.hasBaudRate()
     );
   }
-
-  // get selectedLanguage(): ProgLangSelectionArgs {
-  //   if (this._selectedLanguage === undefined) {
-  //     throw new Error('No programming language yet selected');
-  //   }
-  //   return this._selectedLanguage;
-  // }
-
-  // set selectedLanguage(sl: ProgLangSelectionArgs) {
-  //   this._selectedLanguage = sl;
-  // }
 
   configuredForNetwork(): boolean {
     return false;
