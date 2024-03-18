@@ -52,6 +52,14 @@ export enum PlatformTarget {
   DevVM = 'DevVM',
 }
 
+export function isPlatformTarget(target: string): target is PlatformTarget {
+  return (
+    Object.values(PlatformTarget).find((t) => {
+      return t === target;
+    }) !== undefined
+  );
+}
+
 export interface PlatformConfigArgs {
   target: PlatformTarget;
   vmConfig?: VMConfigArgs;
@@ -126,7 +134,7 @@ async function createPlatformConfig(
   if (typeof args !== 'object') {
     throw new Error('args is expected to be an object');
   }
-  if (!isValidPlatformTarget(target)) {
+  if (!isPlatformTarget(target)) {
     throw new Error('Expected a valid platformtarget');
   }
 
@@ -135,25 +143,3 @@ async function createPlatformConfig(
 
   return new PlatformConfig(target, id, vmConfig);
 }
-
-function isValidPlatformTarget(target: any): target is PlatformTarget {
-  return target === PlatformTarget.Arduino || target === PlatformTarget.DevVM;
-}
-
-// function createPlatformBuilderConfig(
-//   selectedLanguage: ProgLangSelectionArgs,
-//   deviceConfigArgs: DeviceIdentityArgs,
-//   vmConfigArgs: VMConfigArgs,
-// ): PlatformConfig {
-//   return new PlatformConfig(
-//     PlatformTarget.DevVM,
-//     BoardBaudRate.NONE,
-//     {
-//       boardName: '',
-//       fqbn: '',
-//     },
-//     selectedLanguage,
-//     deviceConfigArgs,
-//     vmConfigArgs,
-//   );
-// }
