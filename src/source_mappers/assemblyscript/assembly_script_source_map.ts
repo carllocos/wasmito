@@ -14,7 +14,7 @@ import Parser = require('tree-sitter');
 import { createLogger } from '../../logger/logger';
 import { type ASConfig } from './asconfig';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const typescript = require('tree-sitter-typescript');
+// const typescript = require('tree-sitter-typescript');
 
 export type ASMapping = MappingItem;
 
@@ -69,7 +69,7 @@ export class AssemblyScriptSourceMap extends SourceMap {
 
   async createAST(): Promise<void> {
     const parser = new Parser();
-    parser.setLanguage(typescript.typescript);
+    // parser.setLanguage(typescript);
     for (let i = 0; i < this._sources.length; i++) {
       const source = this._sources[i];
       const content = await fs.promises.readFile(source);
