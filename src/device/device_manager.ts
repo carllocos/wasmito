@@ -1,7 +1,5 @@
-// import { type VMConfigArgs } from './vm_config';
 import type winston from 'winston';
 import { createLogger } from '../logger/logger';
-// import { DeploymentMode, type DeviceIdentity } from './device_config';
 import { WARDuinoDevVM } from '../warduino/vm/dev_vm';
 import { MCUWARDuinoVM } from '../warduino/vm/mcu_vm';
 import { type ChildProcess } from 'child_process';
@@ -13,7 +11,6 @@ import {
   OutOfThingsMonitor,
   OutputMode,
 } from '../warduino/vm/outofplace_vm';
-// import { type ProgLangSelectionArgs } from '../source_mappers/compilers/prog_language_selection';
 import { type DevVMPlatform, type ArduinoBoardBuilder } from '../builder';
 import { NoChannel } from '../communication/no_channel';
 
@@ -49,29 +46,11 @@ export class DeviceManager {
   // TODO remove deviceConfigArgs
   async connectToExistingDevVM(
     platform: DevVMPlatform,
-    // selectedLanguage: ProgLangSelectionArgs,
-    // deviceConfigArgs: DeviceIdentity,
-    // toolPort: number,
-    // program: string,
     maxWaitTime: number,
-    // buildOutputDir?: string,
   ): Promise<WARDuinoDevVM> {
-    // const vmConfigArgs: VMConfigArgs = {
-    //   program,
-    //   toolPort,
-    // };
-    // if (deviceConfigArgs.deploymentMode !== DeploymentMode.MCUVM) {
-    //   vmConfigArgs.disableStrictModuleLoad = true;
-    // }
-
     const devVM = new WARDuinoDevVM(platform);
     devVM.platform = platform;
-    // selectedLanguage,
-    // deviceConfigArgs,
-    // vmConfigArgs,
-    // buildOutputDir,
 
-    // await devVM.platform.createCompiler();
     const connected = await devVM.connect(maxWaitTime);
     if (!connected) {
       this.logger.info(
