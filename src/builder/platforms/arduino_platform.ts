@@ -79,15 +79,16 @@ export async function ArduinoCompile(
   fqbn: string,
   wasmBinaryPath: string,
   outputDir: string,
+  paused: boolean,
 ): Promise<number> {
   return await new Promise<number>((resolve, reject) => {
-    const compile = spawn(
-      'make',
-      ['compile', `FQBN=${fqbn}`, `BINARY=${wasmBinaryPath}`, 'PAUSED=true'],
-      {
-        cwd: outputDir,
-      },
-    );
+    const makeArgs = ['compile', `FQBN=${fqbn}`, `BINARY=${wasmBinaryPath}`];
+    if (paused) {
+      makeArgs.push('PAUSED');
+    }
+    const compile = spawn('make', makeArgs, {
+      cwd: outputDir,
+    });
 
     compile.stdout.on('data', (data) => {
       arduinoLogger.debug(data.toString());
@@ -272,6 +273,7 @@ export class ArduinoBoardBuilder extends Platform {
       this.config.vmConfig.fqbn.fqbn,
       wasmPath,
       this.pathToArduinoSketchDir,
+      this.config.vmConfig.pauseOnStart,
     );
     if (exitCodeCompile === 0) {
       this.config.vmConfig.program = this._sourceMap.getWasmPath();
