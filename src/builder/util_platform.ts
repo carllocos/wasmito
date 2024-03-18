@@ -5,6 +5,7 @@ import {
 } from './platforms/arduino_platform';
 
 export async function listAvailableBoards(): Promise<string[]> {
+  // TODO reimplement to use list of serial port OSX because ArduinoListBoards uses WiFi
   return await ArduinoListBoards();
 }
 
