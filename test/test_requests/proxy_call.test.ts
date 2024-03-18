@@ -13,7 +13,8 @@ import {
 import { WasmValuesBuilder } from '../../src/state/wasm_value_array_builder';
 import { timeoutPromise } from '../../src/util/promise_util';
 import { TargetLanguage } from '../../src/source_mappers/compilers/prog_language_selection';
-import { type WATCompilerArgs, createDevPlatform } from '../../src';
+import { createDevPlatform } from '../../src/builder/platformbuilder_factory';
+import { type WATCompilerArgs } from '../../src/source_mappers/compilers/wat_compilers';
 
 /*
  * TODO: The tests prefixed with `integration:` are integration tests and therefore may need a different framework
