@@ -1,5 +1,10 @@
 import { type WasmType } from '../state/opcode_type';
-import { getFileName, readFileAsBuffer } from '../util/file_util';
+import {
+  getAbsolutePath,
+  getFileName,
+  isAbsolutePath,
+  readFileAsBuffer,
+} from '../util/file_util';
 import { type VariableInfo } from './parsers/obj-dump_parser';
 import { type WasmOpcode } from './wat/opcodes';
 
@@ -89,16 +94,23 @@ export class WASMFunction {
 }
 
 export abstract class SourceMap {
-  private readonly _filepath: string;
-  private readonly _filename: string;
+  private readonly _sources: string[];
+  private readonly _filenames: string[];
   public readonly wasmFilePath: string;
   private wasmBuffer?: Buffer;
 
-  constructor(filepath: string, wasmFilePath: string) {
-    this._filepath = filepath;
-    this._filename = getFileName(filepath);
+  constructor(sources: string[], wasmFilePath: string) {
+    this._sources = sources.map(getAbsolutePath);
+    this._sources.forEach((s) => {
+      if (!isAbsolutePath(s)) {
+        throw new Error(`source '${s}' is expected to be an absolute path`);
+      }
+    });
+    this._filenames = this._sources.map(getFileName);
     this.wasmFilePath = wasmFilePath;
   }
+
+  public abstract getSources(): string[];
 
   public abstract getFunction(id: number): WASMFunction | undefined;
 
@@ -121,12 +133,18 @@ export abstract class SourceMap {
     return this.wasmFilePath;
   }
 
+  get sources(): string[] {
+    return this._sources;
+  }
+
   get sourceCodeFilePath(): string {
-    return this._filepath;
+    // TODO remove
+    return this.sources[0];
   }
 
   get sourceCodeFileName(): string {
-    return this._filename;
+    // TODO remove
+    return this.sources[0];
   }
 
   async getWasm(): Promise<Buffer> {
