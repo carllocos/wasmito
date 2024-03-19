@@ -141,3 +141,9 @@ export function pathJoin(dirPath: string, otherPath: string): string {
 export function getDirectory(filePath: string): string {
   return path.dirname(filePath);
 }
+
+export function removeFile(filePath: string): void {
+  if (fs.existsSync(filePath)) {
+    fs.unlinkSync(filePath);
+  }
+}
