@@ -16,6 +16,7 @@ import {
   getFileExtension,
   getFileName,
   isFilePath,
+  removeFile,
   removeFileExtension,
 } from '../../util/file_util';
 import path from 'path';
@@ -133,11 +134,18 @@ export class WATCompiler extends SourceCodeCompiler {
       this.compilationOutputDir,
       `${noExtension}.wasm`,
     );
+    if (isFilePath(wasmOutputFilePath)) {
+      removeFile(wasmOutputFilePath);
+    }
 
     const sourceMapFileOutput = path.join(
       this.compilationOutputDir,
       `${noExtension}.wabt_map`,
     );
+    if (isFilePath(sourceMapFileOutput)) {
+      removeFile(sourceMapFileOutput);
+    }
+
     const lineInfoPairs = await compileWAT2WASM(
       sourceCodePath,
       wasmOutputFilePath,
@@ -147,6 +155,9 @@ export class WATCompiler extends SourceCodeCompiler {
       this.compilationOutputDir,
       `${noExtension}.h`,
     );
+    if (isFilePath(headerFilePath)) {
+      removeFile(headerFilePath);
+    }
 
     await createCHeaderFile(wasmOutputFilePath, headerFilePath);
 
@@ -154,10 +165,16 @@ export class WATCompiler extends SourceCodeCompiler {
       this.compilationOutputDir,
       `${noExtension}.details`,
     );
+    if (isFilePath(objDumpDetailsOutputFile)) {
+      removeFile(objDumpDetailsOutputFile);
+    }
     const objDumpDissembleOutputFile = path.join(
       this.compilationOutputDir,
       `${noExtension}.diss`,
     );
+    if (isFilePath(objDumpDissembleOutputFile)) {
+      removeFile(objDumpDissembleOutputFile);
+    }
     const sm = await buildWATSourceMap(
       sourceCodePath,
       wasmOutputFilePath,
