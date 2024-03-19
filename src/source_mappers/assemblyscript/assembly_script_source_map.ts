@@ -24,21 +24,19 @@ export class AssemblyScriptSourceMap extends SourceMap {
   private readonly _asConfig: ASConfig;
   private readonly _mappings: ASMapping[];
   private readonly _sourceMappings: SourceCodeMapping[];
-  private readonly _sources: string[];
   private readonly _sourceTreeMap: Map<string, Parser.Tree>;
 
   constructor(asConfig: ASConfig, sources: string[], mappings: ASMapping[]) {
-    super(asConfig.configPath, asConfig.wasmPath);
+    super(sources, asConfig.wasmPath);
     this._asConfig = asConfig;
-    this._sources = sources.map((s) => {
-      if (!isAbsolutePath(s)) {
-        throw new Error(`source '${s}' is expected to be an absolute path`);
-      }
-      return s;
-    });
     this._mappings = mappings;
     this._sourceMappings = [];
     this._sourceTreeMap = new Map();
+  }
+
+  public getSources(): string[] {
+    // TODO fix
+    return [this.sourceCodeFilePath];
   }
 
   public getFunction(id: number): WASMFunction | undefined {
@@ -70,8 +68,8 @@ export class AssemblyScriptSourceMap extends SourceMap {
   async createAST(): Promise<void> {
     const parser = new Parser();
     // parser.setLanguage(typescript);
-    for (let i = 0; i < this._sources.length; i++) {
-      const source = this._sources[i];
+    for (let i = 0; i < this.sources.length; i++) {
+      const source = this.sources[i];
       const content = await fs.promises.readFile(source);
       const sourceCode = content.toString();
       const tree = parser.parse(sourceCode);

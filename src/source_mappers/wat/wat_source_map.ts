@@ -20,10 +20,15 @@ export class WATSourceMap extends SourceMap {
     functions: WASMFunction[],
     imported: WASMFunction[],
   ) {
-    super(sourcePath, wasmPath);
+    super([sourcePath], wasmPath);
     this.functions = functions;
     this.imports = imported;
     this.globals = globals;
+  }
+
+  public getSources(): string[] {
+    // TODO fix
+    return [this.sourceCodeFilePath];
   }
 
   public getFunction(id: number): WASMFunction | undefined {
