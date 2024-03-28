@@ -201,3 +201,69 @@ export function getImportInfos(input: string): FunctionInfo[] {
   });
   return imports;
 }
+
+export function getLocalTypesFromDissambleOutput(
+  input: string,
+): Map<number, VariableInfo[]> {
+  const lines = input.split('\n');
+  const funcs = new Map<number, VariableInfo[]>();
+  let f: number = -1;
+  let funLocals: VariableInfo[] = [];
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const funRegex = /func\[(\d+)\] <([^>]+)>/;
+    const match = line.match(funRegex);
+    if (match !== null) {
+      const newfunIdx = Number(match[1]); // new function found
+      if (isNaN(newfunIdx)) {
+        throw new Error(`provided a non number as function ID ${match[1]}`);
+      }
+      if (f !== -1) {
+        funcs.set(f, funLocals);
+        funLocals = [];
+      }
+      f = newfunIdx;
+      continue;
+    }
+
+    const localRegex = /local\[(\d+)\] type=([^\s]+)/;
+    const matchLocal = line.match(localRegex);
+    if (matchLocal !== null) {
+      const localIdx = Number(matchLocal[1]);
+      if (isNaN(localIdx)) {
+        throw new Error(`provided a non number as local ID ${matchLocal[1]}`);
+      }
+      const typeLocal = matchLocal[2];
+      funLocals.push({
+        name: `local ${localIdx}`,
+        type: typeLocal,
+        index: localIdx,
+        mutable: true,
+        value: '0',
+      });
+    }
+
+    const regexLocalRange = /local\[(\d+)\.\.(\d+)\] type=([^\s]+)/;
+    const matchRange = line.match(regexLocalRange);
+    if (matchRange !== null) {
+      const start = Number(matchRange[1]);
+      const end = Number(matchRange[2]);
+      if (isNaN(start) || isNaN(end)) {
+        throw new Error(
+          `provided a non number as start ${matchRange[1]}local ID or end local ID${matchRange[2]}`,
+        );
+      }
+      for (let i = start; i <= end; i++) {
+        const type = matchRange[3];
+        funLocals.push({
+          name: `local ${i}`,
+          type,
+          index: i,
+          mutable: true,
+          value: '0',
+        });
+      }
+    }
+  }
+  return funcs;
+}
