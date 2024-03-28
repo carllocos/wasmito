@@ -1,6 +1,6 @@
 import { type WasmType } from '../../state/opcode_type';
 import { type WASM } from '../../state/wasm';
-import { type WasmOpcode } from '../wat/opcodes';
+import { type WasmOpcode } from './wasm_instruction';
 
 export interface WasmLocal {
   index: number;

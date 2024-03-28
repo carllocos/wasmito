@@ -3,7 +3,7 @@ import {
   WasmOpcode,
   WasmOpcodeHasImmediate,
   wasmOpcodeFromNr,
-} from '../wat/opcodes';
+} from '../wasm/wasm_instruction';
 
 export interface ParsedOpcode {
   address: number;

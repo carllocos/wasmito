@@ -5,7 +5,7 @@ export * from './compilers/prog_language_selection';
 export * from './parsers/details';
 export * from './parsers/dissambled';
 export * from './parsers/obj-dump_parser';
-export * from './wat/opcodes';
+export * from './wasm/wasm_instruction';
 export * from './wasm/wasm_function';
 export * from './wasm/wasm_module';
 export * from './wasm/wasm_module_parser';
