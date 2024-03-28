@@ -20,7 +20,7 @@ import {
   type SubActReturn,
 } from './shared_interfaces';
 import { Breakpoint } from '../../debugger/breakpoint';
-import { type WASMFunction } from '../../source_mappers';
+import { type WASMFunction } from '../../source_mappers/wasm/wasm_function';
 
 export function addBreakpointSubscription(
   subscriptionID: string,

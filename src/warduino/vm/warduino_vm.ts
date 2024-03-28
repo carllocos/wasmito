@@ -20,7 +20,6 @@ import { LoadStateRequestBuilder } from '../requests/load_state_request';
 import { timeoutPromise } from '../../util/promise_util';
 import { ResolveEventRequest } from '../requests/resolve_event_request';
 import {
-  type WASMFunction,
   type SourceCodeLocation,
   type SourceMap,
 } from '../../source_mappers/source_map';
@@ -50,6 +49,7 @@ import {
 } from '../requests/hook_on_error';
 import { EventInspectHook } from '../../hooks/hook_event';
 import { type DeviceIdentity } from '../../device';
+import { type WASMFunction } from '../../source_mappers/wasm/wasm_function';
 
 // TODO Rename to Backend
 // TODO mover addbp and removebp, and breakpoint fields to BreakpointPolicies +  add getters for breakpoints there
