@@ -12,7 +12,7 @@ import {
   OutputMode,
 } from '../warduino/vm/outofplace_vm';
 import { type DevVMPlatform, type ArduinoBoardBuilder } from '../builder';
-import { NoChannel } from '../communication/no_channel';
+import { SerialConnection } from '../communication/serial';
 
 export class DeviceManagerError extends Error {
   constructor(message: string) {
@@ -136,14 +136,18 @@ export class DeviceManager {
 
   async connectToExistingMCUVM(
     platform: ArduinoBoardBuilder,
+    sourceCodeCompilationArgs: any,
   ): Promise<MCUWARDuinoVM> {
-    const vm = new MCUWARDuinoVM(platform, new NoChannel());
+    const sp = platform.config.vmConfig.serialPort;
+    const br = platform.config.vmConfig.baudrate;
+    const channel = new SerialConnection(sp, br);
+    const vm = new MCUWARDuinoVM(platform, channel);
     const connected = await vm.connect();
     if (!connected) {
       throw Error('Could not connect to external MCU VM');
     }
     const exitCode = await vm.platform.compileSourceCode(
-      'TODO provide sourcePath',
+      sourceCodeCompilationArgs,
     );
     if (exitCode !== 0) {
       throw Error('Could not compile source code');
