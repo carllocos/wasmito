@@ -5,7 +5,12 @@ export class WasmOpcode {
   public readonly name: string;
   public immediate?: number;
   private type: WasmType;
-  private readonly labels: string[];
+  public labels: string[];
+
+  public startAddress?: number;
+  public endAddress?: number;
+  private _subInstructions: WasmOpcode[];
+  private _allSubInstructions: WasmOpcode[];
 
   constructor(
     opcodeName: string,
@@ -26,6 +31,23 @@ export class WasmOpcode {
     this.type = t;
     this.labels = opcodeLabels ?? [];
     this.immediate = immediate;
+    this._subInstructions = [];
+    this._allSubInstructions = [];
+  }
+
+  get subInstructions(): WasmOpcode[] {
+    return this._subInstructions;
+  }
+
+  set subInstructions(ins: WasmOpcode[]) {
+    this._subInstructions = ins;
+    this._allSubInstructions = this._subInstructions.flatMap(
+      (i) => i.subInstructions,
+    );
+  }
+
+  get allSubInstructions(): WasmOpcode[] {
+    return this._allSubInstructions;
   }
 
   public changeType(type: WasmType): void {
