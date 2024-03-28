@@ -97,18 +97,9 @@ export class WasmModule {
       const fun = this.functions[i];
       if (fun.startAddress <= addr && addr <= fun.endAddress) {
         for (const inst of fun.body) {
-          if (inst.startAddress === addr) {
-            return inst;
-          } else {
-            if (inst.endAddress === undefined) {
-              throw new Error(`No endAddress provided for ${inst.getArgs}`);
-            }
-
-            if (addr < inst.endAddress) {
-              return inst.subInstructions.find((subInst) => {
-                return subInst.startAddress === addr;
-              });
-            }
+          const found = this.searchInstruction(inst, addr);
+          if (found !== undefined) {
+            return found;
           }
         }
       }
@@ -150,6 +141,36 @@ export class WasmModule {
         i.changeType(fun.type);
       }
     });
+  }
+
+  private searchInstruction(
+    inst: WasmInstruction,
+    wasmAddr: number,
+  ): WasmInstruction | undefined {
+    const startAddress = inst.startAddress;
+    const endAddress = inst.endAddress;
+    if (startAddress === undefined || endAddress === undefined) {
+      throw new Error(`Instruction has no startAddres and/or endAddress set`);
+    }
+
+    if (startAddress <= wasmAddr && wasmAddr <= endAddress) {
+      if (inst.allSubInstructions.length > 0) {
+        for (const subInstr of inst.allSubInstructions) {
+          const f = this.searchInstruction(subInstr, wasmAddr);
+          if (f !== undefined) {
+            return f;
+          }
+        }
+        if (startAddress !== wasmAddr && endAddress !== wasmAddr) {
+          throw new Error(
+            'Case where addr is within instr but no subinstruction found',
+          );
+        }
+      }
+      return inst;
+    }
+
+    return undefined;
   }
 }
 
