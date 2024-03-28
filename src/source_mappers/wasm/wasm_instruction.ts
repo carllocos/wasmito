@@ -60,7 +60,7 @@ export class WasmInstruction {
     return this.type;
   }
 
-  public getLabels(): string[] {
+  public getArgs(): string[] {
     return this.args;
   }
 }

@@ -100,11 +100,11 @@ class BrigadierJSONWriter {
   }
 
   public addBefore(addr: number, opcode: WasmInstruction): void {
-    this.befores.set(addr, [addr, opcode, opcode.getLabels().join(' '), []]);
+    this.befores.set(addr, [addr, opcode, opcode.getArgs().join(' '), []]);
   }
 
   public addAfter(addr: number, opcode: WasmInstruction): void {
-    this.after.set(addr, [opcode, opcode.getLabels().join(' ')]);
+    this.after.set(addr, [opcode, opcode.getArgs().join(' ')]);
   }
 
   public writeBefore(
