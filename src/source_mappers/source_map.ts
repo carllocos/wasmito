@@ -5,7 +5,7 @@ import {
 } from '../util/file_util';
 import { type WASMFunction } from './wasm/wasm_function';
 import { WasmModule } from './wasm/wasm_module';
-import { type WasmOpcode } from './wasm/wasm_instruction';
+import { type WasmInstruction } from './wasm/wasm_instruction';
 
 export interface SourceCodeMapping {
   source: string;
@@ -13,7 +13,7 @@ export interface SourceCodeMapping {
   linenr: number;
   columnStart: number;
   columnEnd: number;
-  opcode: WasmOpcode;
+  opcode: WasmInstruction;
 }
 
 export interface SourceCodeLocation {

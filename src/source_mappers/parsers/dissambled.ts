@@ -1,13 +1,13 @@
 import * as fs from 'fs';
 import {
-  WasmOpcode,
+  WasmInstruction,
   WasmOpcodeHasImmediate,
   wasmOpcodeFromNr,
 } from '../wasm/wasm_instruction';
 
 export interface ParsedOpcode {
   address: number;
-  opcode: WasmOpcode;
+  opcode: WasmInstruction;
 }
 
 export interface ParsedFunctionBody {
@@ -126,7 +126,7 @@ export function parseOpcodesFromDissambledOutput(
       const op = opcodesWaitingForEnd[opcodesWaitingForEnd.length - 1];
       parsedOpcodeLabels.unshift(`${keyword}_${op}`);
     }
-    const opcode = new WasmOpcode(
+    const opcode = new WasmInstruction(
       opcodeName,
       opcodeNr,
       immediate,

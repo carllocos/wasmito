@@ -14,7 +14,7 @@ import {
   getLocalTypesFromDissambleOutput,
 } from '../parsers/obj-dump_parser';
 import { getPath2ObjDump } from '../../project_config';
-import { isCallInstruction, type WasmOpcode } from './wasm_instruction';
+import { isCallInstruction, type WasmInstruction } from './wasm_instruction';
 
 const logger = createLogger('WasmModule');
 export interface WasmGlobal {
@@ -36,8 +36,8 @@ export class WasmModule {
   public readonly functions: WASMFunction[];
   private readonly ast: object;
   public readonly wasmBuffer: Buffer;
-  private readonly _instructions: WasmOpcode[];
-  private readonly _globalInstructions: WasmOpcode[];
+  private readonly _instructions: WasmInstruction[];
+  private readonly _globalInstructions: WasmInstruction[];
   private readonly _sections: Section[];
 
   constructor(wasmPath: string) {
@@ -55,7 +55,7 @@ export class WasmModule {
     this.correctCallInstructionsTypes();
   }
 
-  get instructions(): WasmOpcode[] {
+  get instructions(): WasmInstruction[] {
     return this._instructions;
   }
 
@@ -71,7 +71,7 @@ export class WasmModule {
     });
   }
 
-  instructionFromAddress(addr: number): WasmOpcode | undefined {
+  instructionFromAddress(addr: number): WasmInstruction | undefined {
     const sect = this.sectionFromAddress(addr);
     if (sect !== undefined) {
       // addr points to section which has no instruction
@@ -141,7 +141,7 @@ export class WasmModule {
   }
 
   private correctCallInstructionsTypes(): void {
-    this.instructions.forEach((i: WasmOpcode) => {
+    this.instructions.forEach((i: WasmInstruction) => {
       if (isCallInstruction(i)) {
         const fun = this.functions.find((f) => f.id === i.funIdx);
         if (fun === undefined) {
@@ -257,7 +257,7 @@ function createImportedFunctions(mod: ParsedModule): WASMFunction[] {
 function retrieveAllInstructions(
   mod: ParsedModule,
   functions: WASMFunction[],
-): WasmOpcode[] {
+): WasmInstruction[] {
   const globalInstructions = retrieveGlobalInstructions(mod);
   const funcBodies = functions.flatMap((f) => {
     return f.allInstructions;
@@ -265,7 +265,7 @@ function retrieveAllInstructions(
   return globalInstructions.concat(funcBodies);
 }
 
-function retrieveGlobalInstructions(mod: ParsedModule): WasmOpcode[] {
+function retrieveGlobalInstructions(mod: ParsedModule): WasmInstruction[] {
   return mod.globals.flatMap((g) => {
     return g.init.flatMap((i) => [i].concat(i.allSubInstructions));
   });

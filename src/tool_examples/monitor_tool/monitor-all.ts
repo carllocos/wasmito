@@ -12,7 +12,7 @@ import {
 import { StateRequest } from '../../warduino/requests/inspect_request';
 import { ResponseType } from '../../warduino/api/request_interface';
 import * as fs from 'fs';
-import { type WasmOpcode } from '../../source_mappers/wasm/wasm_instruction';
+import { type WasmInstruction } from '../../source_mappers/wasm/wasm_instruction';
 import { PlaceholderType } from '../../state/opcode_type';
 import { exit } from 'process';
 import { type WARDuinoVM } from '../../warduino/vm/warduino_vm';
@@ -86,8 +86,12 @@ class WriteJSON {
 
 class BrigadierJSONWriter {
   private readonly writer: WriteJSON;
-  private readonly befores: Map<number, [number, WasmOpcode, string, number[]]>;
-  private readonly after: Map<number, [WasmOpcode, string]>;
+  private readonly befores: Map<
+    number,
+    [number, WasmInstruction, string, number[]]
+  >;
+
+  private readonly after: Map<number, [WasmInstruction, string]>;
 
   constructor(writer: WriteJSON) {
     this.writer = writer;
@@ -95,11 +99,11 @@ class BrigadierJSONWriter {
     this.after = new Map();
   }
 
-  public addBefore(addr: number, opcode: WasmOpcode): void {
+  public addBefore(addr: number, opcode: WasmInstruction): void {
     this.befores.set(addr, [addr, opcode, opcode.getLabels().join(' '), []]);
   }
 
-  public addAfter(addr: number, opcode: WasmOpcode): void {
+  public addAfter(addr: number, opcode: WasmInstruction): void {
     this.after.set(addr, [opcode, opcode.getLabels().join(' ')]);
   }
 
@@ -275,7 +279,7 @@ function createJSONWriter(
   linenr: number,
   columnStart: number,
   columnEnd: number,
-  opcode: WasmOpcode,
+  opcode: WasmInstruction,
   when: HookOnWasmAddrMoment,
 ): (state: WasmState) => void {
   if (Brigadier === undefined) {
