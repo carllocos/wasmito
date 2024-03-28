@@ -1,7 +1,7 @@
 import { PlaceholderType, WasmType } from '../../state/opcode_type';
 
 export class WasmOpcode {
-  public readonly nr: WASMOpcodeNumber;
+  public readonly opcodeNr: WASMOpcodeNumber;
   public readonly name: string;
   public immediate?: number;
   private type: WasmType;
@@ -14,12 +14,12 @@ export class WasmOpcode {
     opcodeLabels?: string[],
   ) {
     this.name = opcodeName;
-    this.nr = opcodeNr;
+    this.opcodeNr = opcodeNr;
     const op = wasmOpcodeFromNr(opcodeNr);
     if (op === undefined) {
       throw Error(`invalid opcode ${opcodeName}`);
     }
-    const t = typeFromWasmOpcode(this.nr);
+    const t = typeFromWasmOpcode(this.opcodeNr);
     if (t === undefined) {
       throw Error(`unexsting opcode type for ${opcodeName}`);
     }
