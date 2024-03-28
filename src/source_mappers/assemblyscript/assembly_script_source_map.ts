@@ -64,8 +64,8 @@ export class AssemblyScriptSourceMap extends SourceMap {
     const m = this._mappings.find((m: MappingItem) => {
       return m.generatedColumn === wasmAddr;
     });
-    if (m === undefined) {
-      return m;
+    if (m?.source === undefined || m?.source === null) {
+      return undefined;
     }
     const src = this._sourceToAbsPathSource.get(m.source);
     if (src === undefined) {
