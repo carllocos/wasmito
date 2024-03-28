@@ -1,15 +1,7 @@
 import { createLogger } from '../../logger/logger';
-import {
-  WASMFunction,
-  type SourceMap,
-  type SourceCodeMapping,
-} from '../source_map';
+import { type SourceMap } from '../source_map';
 import { SourceCodeCompiler } from './compiler';
-import {
-  getPath2ObjDump,
-  getPath2WAT2WASM,
-  getPath2XXD,
-} from '../../project_config';
+import { getPath2WAT2WASM, getPath2XXD } from '../../project_config';
 import { WATSourceMap } from '../wat/wat_source_map';
 import {
   getAbsolutePath,
@@ -22,17 +14,10 @@ import {
 import path from 'path';
 import {
   extractAddressInformation,
-  getFunctionInfos,
-  getGlobalInfos,
-  getImportInfos,
-  getTypeInfos,
   type LineInfoPairs,
   type LineInfo,
-  type FunctionInfo,
 } from '../parsers/obj-dump_parser';
 import { writeFileSync } from 'fs';
-import { type WasmType } from '../../state/opcode_type';
-import { parseOpcodesFromDissambledOutput } from '../parsers/dissambled';
 import { runCommand } from '../../util/process_command';
 import { TargetLanguage } from './prog_language_selection';
 
@@ -175,12 +160,10 @@ export class WATCompiler extends SourceCodeCompiler {
     if (isFilePath(objDumpDissembleOutputFile)) {
       removeFile(objDumpDissembleOutputFile);
     }
-    const sm = await buildWATSourceMap(
+    const sm = new WATSourceMap(
+      lineInfoPairs,
       sourceCodePath,
       wasmOutputFilePath,
-      objDumpDetailsOutputFile,
-      objDumpDissembleOutputFile,
-      lineInfoPairs,
     );
     this._latestWATCompileArgs = args;
     return sm;
@@ -211,157 +194,6 @@ async function compileWAT2WASM(
   logger.info(`Saving wabt_sourcemap to filepath: ${linesInfoOutputFile}`);
   writeFileSync(linesInfoOutputFile, linesSourceMap);
   return makeLineInfoPairs(linesSourceMap);
-}
-
-function fromFunctionInfoToWASMFunc(
-  fun: FunctionInfo,
-  types: Map<number, WasmType>,
-): WASMFunction {
-  const funcType = types.get(fun.type);
-  if (funcType === undefined) {
-    throw new WATCompilerError(
-      `Could not find type ${fun.type} for function ${fun.name}`,
-    );
-  } else {
-    const opcodes: SourceCodeMapping[] = [];
-    return new WASMFunction(fun.name, fun.index, opcodes, funcType, fun.locals);
-  }
-}
-
-async function buildWATSourceMap(
-  watFilePath: string,
-  wasmFilePath: string,
-  objDumpDetailsOutputFile: string,
-  objDumpDissambleOutputFile: string,
-  lines: LineInfoPairs[],
-): Promise<WATSourceMap> {
-  // generate obj dump file
-  const objDump = getPath2ObjDump();
-  const detailsCommand = `${objDump} -x -m ${wasmFilePath}`;
-  const [outputCmdDetails, errMsgDetails, errorDetails] =
-    await runCommand(detailsCommand);
-
-  if (errMsgDetails !== '' || errorDetails !== null) {
-    let errMsg = `Command '${detailsCommand}' failed reason: `;
-    if (errMsgDetails !== '') {
-      errMsg += errMsgDetails;
-    } else {
-      errMsg += `${errorDetails?.name}: ${errorDetails?.message}`;
-    }
-    logger.error(errMsg);
-    throw new WATCompilerError(errMsg);
-  }
-  // save the output to a file
-  logger.info(`Saving obj-dump -x sections at ${objDumpDetailsOutputFile}`);
-  writeFileSync(objDumpDetailsOutputFile, outputCmdDetails);
-
-  const dissembleCommand = `${objDump} -d ${wasmFilePath}`;
-  const [outputDissamble, errMsgDissamble, errorDissamble] =
-    await runCommand(dissembleCommand);
-  if (errMsgDissamble !== '' || errorDissamble !== null) {
-    let errMsg = `Command '${dissembleCommand}' failed reason: `;
-    if (errMsgDissamble !== '') {
-      errMsg += errMsgDissamble;
-    } else {
-      errMsg += `${errorDissamble?.name}: ${errorDissamble?.message}`;
-    }
-    logger.error(errMsg);
-    throw new WATCompilerError(errMsg);
-  }
-  // save the output to a file
-  logger.info(
-    `Saving obj-dump -d dissamble output at ${objDumpDissambleOutputFile}`,
-  );
-  writeFileSync(objDumpDissambleOutputFile, outputDissamble);
-
-  const opcodes = parseOpcodesFromDissambledOutput(outputDissamble);
-  if (opcodes === undefined) {
-    throw new WATCompilerError(`Could not parse opcodes`);
-  }
-  const moduleTypes = getTypeInfos(outputCmdDetails);
-  const importedFuncs = getImportInfos(outputCmdDetails).map((fun) => {
-    return fromFunctionInfoToWASMFunc(fun, moduleTypes);
-  });
-  const lineMappings = new Map<number, LineInfoPairs>();
-  lines.forEach((lineMapping) => {
-    lineMappings.set(lineMapping.lineAddress, lineMapping);
-  });
-  const functions = getFunctionInfos(outputCmdDetails)
-    .map((fun) => {
-      return fromFunctionInfoToWASMFunc(fun, moduleTypes);
-    })
-    .map((fun) => {
-      const funcOpcodes = opcodes.get(fun.id);
-      if (funcOpcodes === undefined) {
-        throw new WATCompilerError(`Could not parse opcodes`);
-      }
-      const opcodesWithLineNrs = funcOpcodes.opcodes.map((opcode) => {
-        const mapping = lineMappings.get(opcode.address);
-        if (mapping === undefined) {
-          throw new WATCompilerError(`Could not parse opcodes`);
-        }
-        return {
-          address: opcode.address,
-          linenr: mapping.lineInfo.line,
-          columnStart: mapping.lineInfo.columnStart,
-          columnEnd: mapping.lineInfo.columnEnd,
-          opcode: opcode.opcode,
-        };
-      });
-
-      return new WASMFunction(
-        fun.name,
-        fun.id,
-        opcodesWithLineNrs,
-        fun.type,
-        fun.locals,
-      );
-    });
-
-  // fix the missing types of opcodes
-  functions.forEach((fun) => {
-    const funsCalled = fun.mappings
-      .filter((op) => {
-        return op.opcode.name.includes('call');
-      })
-      .map((op) => {
-        const funcNr = op.opcode.immediate;
-        if (funcNr === undefined) {
-          throw new Error(`found Nr not provided in opcode ${op.opcode.name}`);
-        }
-
-        return { opcode: op.opcode, funCalled: funcNr };
-      });
-
-    for (const callOpcode of funsCalled) {
-      let func: WASMFunction | undefined;
-      if (callOpcode.funCalled >= importedFuncs.length) {
-        func = functions.find((f) => {
-          return f.id === callOpcode.funCalled;
-        });
-      } else {
-        func = importedFuncs.find((f) => {
-          return f.id === callOpcode.funCalled;
-        });
-      }
-      if (func === undefined) {
-        throw new Error(
-          `fun called with ID ${callOpcode.funCalled} is not part of the defined or imported funcs`,
-        );
-      }
-      callOpcode.opcode.changeType(func.type);
-    }
-  });
-
-  const globalInfos = getGlobalInfos(outputCmdDetails);
-  return new WATSourceMap(
-    watFilePath,
-    wasmFilePath,
-    Array.from(moduleTypes.values()),
-    globalInfos,
-    functions,
-    importedFuncs,
-  );
 }
 
 async function createCHeaderFile(
