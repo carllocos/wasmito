@@ -72,9 +72,7 @@ export abstract class BreakpointPolicy {
     timeout?: number,
   ): Promise<boolean> {
     const sm = this.vm.sourceMap;
-    const mappings = sm.getMappingsFromSourceCodeLocation(
-      breakpoint.sourceCodeLocation,
-    );
+    const mappings = sm.generatedPositionFor(breakpoint.sourceCodeLocation);
     if (mappings.length === 0) {
       throw new Error(
         `Cannot remove breakpoint on an unexisting wasm address derived from breakpoint ${breakpoint.toString()}`,

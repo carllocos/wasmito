@@ -33,7 +33,7 @@ export class DevVMPlatform extends Platform {
     if (this._sourceMap === undefined) {
       return -1;
     } else {
-      this.config.vmConfig.program = this._sourceMap.getWasmPath();
+      this.config.vmConfig.program = this._sourceMap.wasm.wasmPath;
       return 0;
     }
   }
