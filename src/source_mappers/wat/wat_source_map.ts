@@ -81,7 +81,7 @@ export class WATSourceMap extends SourceMap {
             linenr: l.lineInfo.line,
             columnStart: l.lineInfo.columnStart,
             columnEnd: l.lineInfo.columnEnd,
-            opcode: inst,
+            instruction: inst,
           });
         }
       }

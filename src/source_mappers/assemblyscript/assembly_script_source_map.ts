@@ -77,7 +77,10 @@ export class AssemblyScriptSourceMap extends SourceMap {
       linenr: m.originalLine,
       columnStart: m.originalColumn,
       columnEnd: m.originalColumn,
-      opcode: new WasmInstruction('unreachable', WASMOpcodeNumber.Unreachable),
+      instruction: new WasmInstruction(
+        'unreachable',
+        WASMOpcodeNumber.Unreachable,
+      ),
     };
   }
 

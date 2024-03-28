@@ -347,7 +347,7 @@ async function registerBeforeHooks(
       }
       return m;
     })
-    .map(({ address, linenr, columnStart, columnEnd, opcode }) => {
+    .map(({ address, linenr, columnStart, columnEnd, instruction: opcode }) => {
       const inspectStackRequest = new StateRequest().includeStack().includePC();
       const inspectStack = new InspectStateHook(inspectStackRequest);
       inspectStack.onSubscriptionData = createJSONWriter(
@@ -390,7 +390,7 @@ async function registerAfterHooks(
       }
       return m;
     })
-    .map(({ address, linenr, columnStart, columnEnd, opcode }) => {
+    .map(({ address, linenr, columnStart, columnEnd, instruction: opcode }) => {
       const inspectStackRequest = new StateRequest().includeStack().includePC();
       const inspectStack = new InspectStateHook(inspectStackRequest);
       inspectStack.onSubscriptionData = createJSONWriter(
