@@ -11,7 +11,6 @@ import { createLogger } from '../../src/logger/logger';
 import { type APIRequest } from '../../src/warduino/api/request_interface';
 import { type Command } from '../../src/communication/command';
 import {
-  type WASMFunction,
   type SourceCodeLocation,
   type SourceMap,
 } from '../../src/source_mappers/source_map';
@@ -22,6 +21,7 @@ import { WARDuinoVM } from '../../src/warduino/vm/warduino_vm';
 import { MockChannel } from './mock_channel';
 import { type Breakpoint } from '../../src/debugger/breakpoint';
 import { type Platform } from '../../src';
+import { type WASMFunction } from '../../src/source_mappers/wasm/wasm_function';
 // import { type ProgLangSelectionArgs } from '../../src/source_mappers/compilers/prog_language_selection';
 
 // function createPlatformBuilderConfig(
