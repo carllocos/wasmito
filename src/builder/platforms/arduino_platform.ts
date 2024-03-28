@@ -84,7 +84,7 @@ export async function ArduinoCompile(
   return await new Promise<number>((resolve, reject) => {
     const makeArgs = ['compile', `FQBN=${fqbn}`, `BINARY=${wasmBinaryPath}`];
     if (paused) {
-      makeArgs.push('PAUSED');
+      makeArgs.push('PAUSED=true');
     }
     const compile = spawn('make', makeArgs, {
       cwd: outputDir,
