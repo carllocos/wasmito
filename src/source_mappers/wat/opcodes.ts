@@ -65,6 +65,69 @@ export class WasmOpcode {
   }
 }
 
+export class IfInstruction extends WasmOpcode {
+  public readonly label: string;
+  public readonly testInstructions: WasmOpcode[];
+  public readonly alternateInstructions: WasmOpcode[];
+  public readonly consequentInstructions: WasmOpcode[];
+  public readonly resultType?: string;
+
+  constructor(
+    label: string,
+    test: WasmOpcode[],
+    alternate: WasmOpcode[],
+    consequent: WasmOpcode[],
+    result?: string,
+  ) {
+    super('if', WASMOpcodeNumber.If);
+    this.label = label;
+    this.testInstructions = test;
+    this.alternateInstructions = alternate;
+    this.consequentInstructions = consequent;
+    this.resultType = result;
+    this.subInstructions = test.concat(alternate, consequent);
+  }
+}
+
+export class BlockInstruction extends WasmOpcode {
+  public readonly label: string;
+  constructor(blockLabel: string, subInstructions: WasmOpcode[]) {
+    super('block', WASMOpcodeNumber.Block);
+    this.label = blockLabel;
+    this.subInstructions = subInstructions;
+  }
+}
+
+export class CallInstruction extends WasmOpcode {
+  public readonly funIdx: number;
+  constructor(funName: string, funIdx: number) {
+    super('call', WASMOpcodeNumber.Block);
+    this.labels = [funName];
+    this.funIdx = funIdx;
+  }
+}
+
+export function isCallInstruction(inst: WasmOpcode): inst is CallInstruction {
+  return (
+    inst.opcodeNr === WASMOpcodeNumber.Call && inst instanceof CallInstruction
+  );
+}
+
+export class LoopInstruction extends WasmOpcode {
+  public readonly label: string;
+  public readonly resultType?: string;
+  constructor(
+    loopLabel: string,
+    subInstructions: WasmOpcode[],
+    resultType?: string,
+  ) {
+    super('loop', WASMOpcodeNumber.Loop);
+    this.label = loopLabel;
+    this.subInstructions = subInstructions;
+    this.resultType = resultType;
+  }
+}
+
 export function typeFromWasmOpcode(
   opcode: WASMOpcodeNumber,
 ): WasmType | undefined {
