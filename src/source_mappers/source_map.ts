@@ -13,7 +13,7 @@ export interface SourceCodeMapping {
   linenr: number;
   columnStart: number;
   columnEnd: number;
-  opcode: WasmInstruction;
+  instruction: WasmInstruction;
 }
 
 export interface SourceCodeLocation {
