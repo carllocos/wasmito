@@ -101,7 +101,7 @@ export class WasmModule {
             return inst;
           } else {
             if (inst.endAddress === undefined) {
-              throw new Error(`No endAddress provided for ${inst.getLabels}`);
+              throw new Error(`No endAddress provided for ${inst.getArgs}`);
             }
 
             if (addr < inst.endAddress) {
