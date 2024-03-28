@@ -99,12 +99,17 @@ class BrigadierJSONWriter {
     this.after = new Map();
   }
 
-  public addBefore(addr: number, opcode: WasmInstruction): void {
-    this.befores.set(addr, [addr, opcode, opcode.getArgs().join(' '), []]);
+  public addBefore(addr: number, instruction: WasmInstruction): void {
+    this.befores.set(addr, [
+      addr,
+      instruction,
+      instruction.getArgs().join(' '),
+      [],
+    ]);
   }
 
-  public addAfter(addr: number, opcode: WasmInstruction): void {
-    this.after.set(addr, [opcode, opcode.getArgs().join(' ')]);
+  public addAfter(addr: number, instruction: WasmInstruction): void {
+    this.after.set(addr, [instruction, instruction.getArgs().join(' ')]);
   }
 
   public writeBefore(
@@ -279,16 +284,16 @@ function createJSONWriter(
   linenr: number,
   columnStart: number,
   columnEnd: number,
-  opcode: WasmInstruction,
+  instruction: WasmInstruction,
   when: HookOnWasmAddrMoment,
 ): (state: WasmState) => void {
   if (Brigadier === undefined) {
     throw new Error('set Brigadier first');
   }
   if (when === HookOnWasmAddrMoment.HookBefore) {
-    Brigadier.addBefore(address, opcode);
+    Brigadier.addBefore(address, instruction);
   } else {
-    Brigadier.addAfter(address, opcode);
+    Brigadier.addAfter(address, instruction);
   }
   return (state: WasmState) => {
     if (when === HookOnWasmAddrMoment.HookBefore) {

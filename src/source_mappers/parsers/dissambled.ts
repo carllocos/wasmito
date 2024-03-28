@@ -5,26 +5,26 @@ import {
   wasmOpcodeFromNr,
 } from '../wasm/wasm_instruction';
 
-export interface ParsedOpcode {
+export interface ParsedInstruction {
   address: number;
-  opcode: WasmInstruction;
+  instruction: WasmInstruction;
 }
 
 export interface ParsedFunctionBody {
   funName: string;
-  opcodes: ParsedOpcode[];
+  instructions: ParsedInstruction[];
 }
 
 /*
  * Parser for output generated from `wasm-objdump -d` command
  */
 
-export function parseOpcodesFromDissambledOutput(
+export function parseInstructionsFromDissambledOutput(
   input: string,
 ): Map<number, ParsedFunctionBody> | undefined {
   const lines = input.split('\n');
   const opcodes = new Map<number, ParsedFunctionBody>();
-  let funcOpcodes: ParsedOpcode[] = [];
+  let funcOpcodes: ParsedInstruction[] = [];
   const opcodesThatNeedEnd: string[] = ['loop', 'block', 'if'];
   const opcodesWaitingForEnd: string[] = [];
 
@@ -135,7 +135,7 @@ export function parseOpcodesFromDissambledOutput(
 
     funcOpcodes.push({
       address,
-      opcode: instruction,
+      instruction,
     });
 
     if (keyword === 'end') {
@@ -152,7 +152,7 @@ export function parseOpcodesFromDissambledOutput(
           funcName = `func_${funcId}`;
         }
 
-        opcodes.set(funcId, { funName: funcName, opcodes: funcOpcodes });
+        opcodes.set(funcId, { funName: funcName, instructions: funcOpcodes });
         inFunction = false;
         funcOpcodes = [];
       }
@@ -161,7 +161,7 @@ export function parseOpcodesFromDissambledOutput(
   return opcodes;
 }
 
-export async function parseOpcodesFromFile(
+export async function parseInstructionsFromFile(
   filepath: string,
 ): Promise<Map<number, ParsedFunctionBody> | undefined> {
   return await new Promise((resolve) => {
@@ -170,7 +170,7 @@ export async function parseOpcodesFromFile(
         console.error(`Error reading the file`);
         resolve(undefined);
       } else {
-        resolve(parseOpcodesFromDissambledOutput(data));
+        resolve(parseInstructionsFromDissambledOutput(data));
       }
     });
   });

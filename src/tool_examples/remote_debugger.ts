@@ -115,8 +115,8 @@ export async function removeBreakpoint(
   sourceMap: WATSourceMap,
   em: WARDuinoDevVM,
 ): Promise<boolean> {
-  const opcode = sourceMap.wasm.instructionFromAddress(address);
-  if (opcode === undefined) {
+  const instruction = sourceMap.wasm.instructionFromAddress(address);
+  if (instruction === undefined) {
     return false;
   }
   const request = new RemoveHookOnWasmAddrRequest(address).before();
