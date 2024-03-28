@@ -330,8 +330,19 @@ async function registerBeforeHooks(
   em: WARDuinoVM,
   sourceMap: SourceMap,
 ): Promise<boolean> {
-  const opcodesBeforeRequests = sourceMap
-    .mappings()
+  const opcodesBeforeRequests = sourceMap.wasm.instructions
+    .map((inst) => {
+      if (inst.startAddress === undefined) {
+        throw new Error(`Start address should not be undefined`);
+      }
+      const m = sourceMap.getOriginalPositionFor(inst.startAddress);
+      if (m === undefined) {
+        throw new Error(
+          `address ${inst.startAddress} should have an original Position`,
+        );
+      }
+      return m;
+    })
     .map(({ address, linenr, columnStart, columnEnd, opcode }) => {
       const inspectStackRequest = new StateRequest().includeStack().includePC();
       const inspectStack = new InspectStateHook(inspectStackRequest);
@@ -362,8 +373,19 @@ async function registerAfterHooks(
   em: WARDuinoVM,
   sourceMap: SourceMap,
 ): Promise<boolean> {
-  const opcodesAfterRequests = sourceMap
-    .mappings()
+  const opcodesAfterRequests = sourceMap.wasm.instructions
+    .map((inst) => {
+      if (inst.startAddress === undefined) {
+        throw new Error(`Start address should not be undefined`);
+      }
+      const m = sourceMap.getOriginalPositionFor(inst.startAddress);
+      if (m === undefined) {
+        throw new Error(
+          `address ${inst.startAddress} should have an original Position`,
+        );
+      }
+      return m;
+    })
     .map(({ address, linenr, columnStart, columnEnd, opcode }) => {
       const inspectStackRequest = new StateRequest().includeStack().includePC();
       const inspectStack = new InspectStateHook(inspectStackRequest);
