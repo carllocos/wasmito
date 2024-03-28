@@ -379,7 +379,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     timeout?: number,
   ): Promise<boolean> {
     const sm = this.sourceMap;
-    const mappings = sm.getMappingsFromSourceCodeLocation(sourceCodeLocation);
+    const mappings = sm.generatedPositionFor(sourceCodeLocation);
     if (mappings.length === 0) {
       throw new this.ErrorClass(
         `Cannot set hook upon unexisting wasm address derived from source location ${sourceCodeLocation.linenr}`,
