@@ -1,14 +1,14 @@
-import { type WasmType } from '../state/opcode_type';
 import {
   getAbsolutePath,
   getFileName,
   isAbsolutePath,
-  readFileAsBuffer,
 } from '../util/file_util';
-import { type VariableInfo } from './parsers/obj-dump_parser';
+import { type WASMFunction } from './wasm/wasm_function';
+import { WasmModule } from './wasm/wasm_module';
 import { type WasmOpcode } from './wat/opcodes';
 
 export interface SourceCodeMapping {
+  source: string;
   address: number;
   linenr: number;
   columnStart: number;
@@ -22,82 +22,14 @@ export interface SourceCodeLocation {
   columnEnd?: number;
 }
 
-export class WASMFunction {
-  public readonly name: string;
-  public readonly id: number;
-  public readonly mappings: SourceCodeMapping[];
-
-  public readonly type: WasmType;
-  private smallestAddress?: number;
-  private greatestAddress?: number;
-  public readonly locals: VariableInfo[];
-
-  constructor(
-    name: string,
-    id: number,
-    opcodes: SourceCodeMapping[],
-    funcType: WasmType,
-    locals: VariableInfo[],
-  ) {
-    this.name = name;
-    this.id = id;
-    this.mappings = opcodes;
-    this.type = funcType;
-    this.locals = locals;
-    this.findSmallestAndGreatesAddress(opcodes);
-  }
-
-  private findSmallestAndGreatesAddress(
-    opcodes: Array<{ address: number; opcode: WasmOpcode }>,
-  ): void {
-    if (opcodes.length === 0) {
-      return;
-    }
-
-    let smallest = opcodes[0].address;
-    let greatest = opcodes[0].address;
-    for (let i = 0; i < opcodes.length; i++) {
-      if (opcodes[i].address < smallest) {
-        smallest = opcodes[i].address;
-      }
-      if (opcodes[i].address > greatest) {
-        greatest = opcodes[i].address;
-      }
-    }
-
-    this.smallestAddress = smallest;
-    this.greatestAddress = greatest;
-  }
-
-  public getOpcode(address: number): WasmOpcode | undefined {
-    if (
-      this.smallestAddress === undefined ||
-      this.greatestAddress === undefined ||
-      address < this.smallestAddress ||
-      address > this.greatestAddress
-    ) {
-      return undefined;
-    }
-
-    const op = this.mappings.find((op) => {
-      return op.address === address;
-    });
-    if (op === undefined) {
-      return undefined;
-    }
-    return op.opcode;
-  }
-
-  public getSourceCodeLocations(): SourceCodeMapping[] {
-    return this.mappings;
-  }
-}
-
+// TODO Move to LangaugeAdaptor which will consist of
+// 1. SourceMap Or Dwarf
+// 2. AST or something in the kind
+// 3. Mapper to VM apps
 export abstract class SourceMap {
   private readonly _sources: string[];
   private readonly _filenames: string[];
-  public readonly wasmFilePath: string;
-  private wasmBuffer?: Buffer;
+  private readonly _wasmModule: WasmModule;
 
   constructor(sources: string[], wasmFilePath: string) {
     this._sources = sources.map(getAbsolutePath);
@@ -107,76 +39,28 @@ export abstract class SourceMap {
       }
     });
     this._filenames = this._sources.map(getFileName);
-    this.wasmFilePath = wasmFilePath;
+    this._wasmModule = new WasmModule(wasmFilePath);
   }
 
-  public abstract getSources(): string[];
-
-  public abstract getFunction(id: number): WASMFunction | undefined;
-
-  public abstract mappings(): SourceCodeMapping[];
-
-  public getSourceCodeMappingFromAddress(
-    wasmAddr: number,
-  ): SourceCodeMapping | undefined {
-    const location = this.mappings().find((location: SourceCodeMapping) => {
-      return location.address === wasmAddr;
-    });
-    return location;
-  }
-
-  public abstract getPrevSourceCodeMappingFromAddress(
-    wasmAddr: number,
-  ): SourceCodeMapping | undefined;
-
-  getWasmPath(): string {
-    return this.wasmFilePath;
+  get wasm(): WasmModule {
+    return this._wasmModule;
   }
 
   get sources(): string[] {
     return this._sources;
   }
 
-  get sourceCodeFilePath(): string {
-    // TODO remove
-    return this.sources[0];
+  get sourcesNames(): string[] {
+    return this._filenames;
   }
 
-  get sourceCodeFileName(): string {
-    // TODO remove
-    return this.sources[0];
-  }
+  public abstract getFunction(id: number): WASMFunction | undefined;
 
-  async getWasm(): Promise<Buffer> {
-    if (this.wasmBuffer === undefined) {
-      this.wasmBuffer = await readFileAsBuffer(this.wasmFilePath);
-    }
-    return this.wasmBuffer;
-  }
+  abstract getOriginalPositionFor(
+    wasmAddr: number,
+  ): SourceCodeMapping | undefined;
 
-  public abstract getOpcode(address: number): WasmOpcode | undefined;
-
-  public abstract getGlobalFromIndex(index: number): VariableInfo | undefined;
-
-  public getMappingsFromSourceCodeLocation(
+  public abstract generatedPositionFor(
     location: SourceCodeLocation,
-  ): SourceCodeMapping[] {
-    return this.mappings().filter((mapping: SourceCodeMapping) => {
-      if (mapping.linenr === location.linenr) {
-        let equalStart = true;
-        if (location.columnStart !== undefined) {
-          equalStart = mapping.columnStart <= location.columnStart;
-        }
-
-        let equalEnd = true;
-        if (location.columnEnd !== undefined) {
-          equalEnd = mapping.columnEnd >= location.columnEnd;
-        }
-        return equalStart && equalEnd;
-      }
-      return false;
-    });
-  }
-
-  public abstract getEnvironmentFunctions(): WASMFunction[];
+  ): SourceCodeMapping[];
 }
