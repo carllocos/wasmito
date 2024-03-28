@@ -237,7 +237,7 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
     await this.compileSourceCode();
 
     const processArgs = this.buildProcessArguments(
-      this.sourceMap.wasmFilePath,
+      this.sourceMap.wasm.wasmPath,
       this.platform.config.vmConfig,
     );
     const spawnCommand = getPath2WARDuinoSDKVMBinary();
@@ -279,7 +279,7 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
     maxWaitTime?: number,
   ): Promise<boolean> {
     const sm = this.sourceMap;
-    const primitiveFuncs = sm.getEnvironmentFunctions();
+    const primitiveFuncs = sm.wasm.imports;
     for (const func of primitiveFuncs) {
       const succ = await this.registerFuncForProxyCall(func, maxWaitTime);
       if (!succ) return succ;

@@ -261,7 +261,7 @@ export class ArduinoBoardBuilder extends Platform {
       return -1;
     }
 
-    let wasmPath = this._sourceMap.getWasmPath();
+    let wasmPath = this._sourceMap.wasm.wasmPath;
     const filename = getFileName(wasmPath);
     if (filename === 'upload.wasm') {
       // special case where the output file has the same name as the file used to flash.
@@ -276,7 +276,7 @@ export class ArduinoBoardBuilder extends Platform {
       this.config.vmConfig.pauseOnStart,
     );
     if (exitCodeCompile === 0) {
-      this.config.vmConfig.program = this._sourceMap.getWasmPath();
+      this.config.vmConfig.program = this._sourceMap.wasm.wasmPath;
     }
 
     return exitCodeCompile;

@@ -115,7 +115,7 @@ export async function removeBreakpoint(
   sourceMap: WATSourceMap,
   em: WARDuinoDevVM,
 ): Promise<boolean> {
-  const opcode = sourceMap.getOpcode(address);
+  const opcode = sourceMap.wasm.instructionFromAddress(address);
   if (opcode === undefined) {
     return false;
   }

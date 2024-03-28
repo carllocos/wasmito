@@ -98,7 +98,7 @@ export class WARDuinoDevVM extends WARDuinoVM {
       return false;
     }
 
-    const wasm = await this.sourceMap.getWasm();
+    const wasm = this.sourceMap.wasm.wasmBuffer;
     const updateRequest = new UpdateWasmModuleRequest(wasm);
     await this.sendRequest(updateRequest, timeout);
     return true;
@@ -128,7 +128,7 @@ export class WARDuinoDevVM extends WARDuinoVM {
     }
 
     const processArgs = this.buildProcessArguments(
-      this.sourceMap.wasmFilePath,
+      this.sourceMap.wasm.wasmPath,
       this.platform.config.vmConfig,
     );
     const spawnCommand = getPath2WARDuinoSDKVMBinary();
