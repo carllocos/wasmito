@@ -41,9 +41,12 @@ export class WasmInstruction {
 
   set subInstructions(ins: WasmInstruction[]) {
     this._subInstructions = ins;
-    this._allSubInstructions = this._subInstructions.flatMap(
-      (i) => i.subInstructions,
-    );
+    let allSubIns: WasmInstruction[] = [];
+    for (const i of this._subInstructions) {
+      allSubIns.push(i);
+      allSubIns = allSubIns.concat(i.allSubInstructions);
+    }
+    this._allSubInstructions = allSubIns;
   }
 
   get allSubInstructions(): WasmInstruction[] {
