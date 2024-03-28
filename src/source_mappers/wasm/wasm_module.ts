@@ -14,7 +14,7 @@ import {
   getLocalTypesFromDissambleOutput,
 } from '../parsers/obj-dump_parser';
 import { getPath2ObjDump } from '../../project_config';
-import { isCallInstruction, type WasmOpcode } from '../wat/opcodes';
+import { isCallInstruction, type WasmOpcode } from './wasm_instruction';
 
 const logger = createLogger('WasmModule');
 export interface WasmGlobal {
