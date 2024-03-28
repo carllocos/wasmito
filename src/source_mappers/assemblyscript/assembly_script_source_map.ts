@@ -1,18 +1,21 @@
 import fs from 'fs';
-import { type MappingItem, SourceMapConsumer } from 'source-map';
-import { type VariableInfo } from '../parsers/obj-dump_parser';
+import { SourceMapConsumer, type MappingItem } from 'source-map';
 import {
   type SourceCodeMapping,
   SourceMap,
-  type WASMFunction,
+  type SourceCodeLocation,
 } from '../source_map';
-import { type WasmOpcode } from '../wat/opcodes';
+import { WASMOpcodeNumber, WasmOpcode } from '../wat/opcodes';
 import { isAbsolutePath, isFilePath, pathJoin } from '../../util/file_util';
 // import * as TreeSitter from 'tree-sitter';
 // import * as TypeScript from 'tree-sitter-typescript';
 import Parser = require('tree-sitter');
 import { createLogger } from '../../logger/logger';
 import { type ASConfig } from './asconfig';
+import { getPath2AssemblyScriptLib } from '../../project_config';
+import path = require('path');
+import { type WASMFunction } from '../wasm/wasm_function';
+
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 // const typescript = require('tree-sitter-typescript');
 
@@ -25,47 +28,68 @@ export class AssemblyScriptSourceMap extends SourceMap {
   private readonly _mappings: ASMapping[];
   private readonly _sourceMappings: SourceCodeMapping[];
   private readonly _sourceTreeMap: Map<string, Parser.Tree>;
+  private readonly _sourceToAbsPathSource: Map<string, string>;
 
-  constructor(asConfig: ASConfig, sources: string[], mappings: ASMapping[]) {
-    super(sources, asConfig.wasmPath);
+  constructor(
+    asConfig: ASConfig,
+    absolutePathSources: string[],
+    sources: string[],
+    mappings: ASMapping[],
+  ) {
+    super(absolutePathSources, asConfig.wasmPath);
+    if (absolutePathSources.length !== sources.length) {
+      throw new Error(
+        `Both absolutePathSources and sources should have the same length. Given ${absolutePathSources} and ${sources}`,
+      );
+    }
     this._asConfig = asConfig;
     this._mappings = mappings;
     this._sourceMappings = [];
     this._sourceTreeMap = new Map();
+    this._sourceToAbsPathSource = new Map();
+    for (let i = 0; i < sources.length; i++) {
+      this._sourceToAbsPathSource.set(sources[i], absolutePathSources[i]);
+    }
   }
 
-  public getSources(): string[] {
-    // TODO fix
-    return [this.sourceCodeFilePath];
+  public generatedPositionFor(
+    location: SourceCodeLocation,
+  ): SourceCodeMapping[] {
+    throw new Error('Method not implemented.');
+  }
+
+  public override getOriginalPositionFor(
+    wasmAddr: number,
+  ): SourceCodeMapping | undefined {
+    const m = this._mappings.find((m: MappingItem) => {
+      return m.generatedColumn === wasmAddr;
+    });
+    if (m === undefined) {
+      return m;
+    }
+    const src = this._sourceToAbsPathSource.get(m.source);
+    if (src === undefined) {
+      throw new Error(`No absolutePath set for Source ${m.source}`);
+    }
+    return {
+      source: src,
+      address: m.generatedColumn,
+      linenr: m.originalLine,
+      columnStart: m.originalColumn,
+      columnEnd: m.originalColumn,
+      opcode: new WasmOpcode('unreachable', WASMOpcodeNumber.Unreachable),
+    };
   }
 
   public getFunction(id: number): WASMFunction | undefined {
     throw new Error('Method not implemented.');
   }
 
-  public mappings(): SourceCodeMapping[] {
-    return this._sourceMappings;
+  async buildComplemtaryContext(): Promise<void> {
+    await this.createAST();
   }
 
-  public getPrevSourceCodeMappingFromAddress(
-    wasmAddr: number,
-  ): SourceCodeMapping | undefined {
-    throw new Error('Method not implemented.');
-  }
-
-  public getOpcode(address: number): WasmOpcode | undefined {
-    throw new Error('Method not implemented.');
-  }
-
-  public getGlobalFromIndex(index: number): VariableInfo | undefined {
-    throw new Error('Method not implemented.');
-  }
-
-  public getEnvironmentFunctions(): WASMFunction[] {
-    throw new Error('Method not implemented.');
-  }
-
-  async createAST(): Promise<void> {
+  private async createAST(): Promise<void> {
     const parser = new Parser();
     // parser.setLanguage(typescript);
     for (let i = 0; i < this.sources.length; i++) {
@@ -82,7 +106,7 @@ export class AssemblyScriptSourceMap extends SourceMap {
   ): Promise<AssemblyScriptSourceMap> {
     const content = await fs.promises.readFile(config.sourceMappersPath);
     const sourceMapStr = JSON.parse(content.toString());
-    const [sources, mappings] = await SourceMapConsumer.with(
+    const [sources, mappings, sourceRoot] = await SourceMapConsumer.with(
       sourceMapStr,
       null,
       (consumer) => {
@@ -90,26 +114,36 @@ export class AssemblyScriptSourceMap extends SourceMap {
         consumer.eachMapping((mapping: MappingItem) => {
           mps.push(mapping);
         });
-        return [consumer.sources, mps];
+        const c = consumer as any; // TODO sourceRoot update types info
+        const sourceRoot = c.sourceRoot as string;
+        return [consumer.sources, mps, sourceRoot];
       },
     );
 
     const sourceAbsPath = [];
     for (let i = 0; i < sources.length; i++) {
       let source = sources[i];
-      if (source.startsWith(`${config.prefixFileName}/`)) {
-        logger.debug(`Removing prefix from AssemblyScript source '${source}'`);
-        source = source.slice(config.prefixFileName.length + 1, source.length);
+      if (source.startsWith(sourceRoot)) {
+        logger.debug(
+          `Removing sourceRoot '${sourceRoot}' from AssemblyScript source '${source}'`,
+        );
+        source = source.slice(sourceRoot.length + 1, source.length);
       }
 
       if (!isAbsolutePath(source)) {
-        logger.debug(`Creating absolute path for source '${source}`);
-        source = pathJoin(config.srcRootPath, source);
+        if (isAssemblyScriptCommonLib(source)) {
+          source = gerenateAssemblyScriptCommonPath();
+        } else if (isWARDuinoGlueCode(source)) {
+          source = gerenateWARDuinoASPath(config.srcRootPath);
+        } else {
+          logger.debug(`Creating absolute path for source '${source}`);
+          source = pathJoin(config.srcRootPath, source);
+        }
       }
       if (isFilePath(source)) {
         sourceAbsPath.push(source);
       } else {
-        logger.debug(
+        logger.warn(
           `Ignoring source '${source}' for source maps as such file does not exist`,
         );
       }
@@ -123,8 +157,40 @@ export class AssemblyScriptSourceMap extends SourceMap {
       );
     }
 
-    const sm = new AssemblyScriptSourceMap(config, sourceAbsPath, mappings);
-    await sm.createAST();
+    const sm = new AssemblyScriptSourceMap(
+      config,
+      sourceAbsPath,
+      sources,
+      mappings,
+    );
+    await sm.buildComplemtaryContext();
     return sm;
   }
+}
+
+function gerenateAssemblyScriptCommonPath(): string {
+  const p = getPath2AssemblyScriptLib();
+  const path2Source = path.join(p, '/std/assembly/rt/common.ts');
+  if (!isFilePath(path2Source)) {
+    throw new Error(`the generated AS common.ts does not exist ${path2Source}`);
+  }
+  return path2Source;
+}
+
+function isAssemblyScriptCommonLib(source: string): boolean {
+  const assemblyScriptLibCommon = '~lib/rt/common.ts';
+  return source === assemblyScriptLibCommon;
+}
+
+function isWARDuinoGlueCode(source: string): boolean {
+  const glueCodePath = '~lib/as-warduino/assembly/index.ts';
+  return source === glueCodePath;
+}
+
+function gerenateWARDuinoASPath(pathToSrcRoot: string): string {
+  const glueCodePath = pathJoin(
+    pathToSrcRoot,
+    'node_modules/as-warduino/assembly/index.ts',
+  );
+  return glueCodePath;
 }
