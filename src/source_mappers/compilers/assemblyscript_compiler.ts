@@ -64,6 +64,7 @@ export class AssemblyScriptCompiler extends SourceCodeCompiler {
   public targetLanguage: TargetLanguage;
   public config?: ASConfig;
   private readonly _outputDir: string;
+  private _lastCompileArgs?: AssemblyScriptCompilerArgs;
 
   constructor(outputDir: string) {
     super();
@@ -73,7 +74,7 @@ export class AssemblyScriptCompiler extends SourceCodeCompiler {
   }
 
   get latestSourceCodeCompilerArgs(): any {
-    throw new Error('Method not implemented.');
+    return this._lastCompileArgs;
   }
 
   async compile(
@@ -97,6 +98,7 @@ export class AssemblyScriptCompiler extends SourceCodeCompiler {
 
     const sm = await AssemblyScriptSourceMap.fromSourceMapPath(config);
     this.config = config;
+    this._lastCompileArgs = compilerArgs;
     return sm;
   }
 }
