@@ -50,17 +50,17 @@ export class WASMFunction {
     return this._allInstructions;
   }
 
-  private findSmallestAndGreatesAddress(opcodes: WasmInstruction[]): void {
-    if (opcodes.length === 0) {
+  private findSmallestAndGreatesAddress(instructions: WasmInstruction[]): void {
+    if (instructions.length === 0) {
       return;
     }
-    let smallest = opcodes[0].startAddress;
-    let greatest = opcodes[0].startAddress;
+    let smallest = instructions[0].startAddress;
+    let greatest = instructions[0].startAddress;
     if (smallest === undefined || greatest === undefined) {
       throw new Error(`Opcode is missing startAddress`);
     }
-    for (let i = 0; i < opcodes.length; i++) {
-      const sa = opcodes[i].startAddress;
+    for (let i = 0; i < instructions.length; i++) {
+      const sa = instructions[i].startAddress;
       if (sa === undefined) {
         throw new Error(`Opcode is missing startAddress`);
       }

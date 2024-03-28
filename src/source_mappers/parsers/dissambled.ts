@@ -126,7 +126,7 @@ export function parseOpcodesFromDissambledOutput(
       const op = opcodesWaitingForEnd[opcodesWaitingForEnd.length - 1];
       parsedOpcodeLabels.unshift(`${keyword}_${op}`);
     }
-    const opcode = new WasmInstruction(
+    const instruction = new WasmInstruction(
       opcodeName,
       opcodeNr,
       immediate,
@@ -135,7 +135,7 @@ export function parseOpcodesFromDissambledOutput(
 
     funcOpcodes.push({
       address,
-      opcode,
+      opcode: instruction,
     });
 
     if (keyword === 'end') {
