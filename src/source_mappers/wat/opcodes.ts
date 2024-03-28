@@ -191,7 +191,7 @@ export function typeFromWasmOpcode(
     case WASMOpcodeNumber.GEUnsinged:
     case WASMOpcodeNumber.F32Add:
     case WASMOpcodeNumber.F32Sub:
-    case WASMOpcodeNumber.F32Mult:
+    case WASMOpcodeNumber.F32Mul:
     case WASMOpcodeNumber.F32Div:
     case WASMOpcodeNumber.F32Min:
     case WASMOpcodeNumber.F32Max:
@@ -287,7 +287,7 @@ export enum WASMOpcodeNumber {
 
   F32Add = 0x92,
   F32Sub = 0x93,
-  F32Mult = 0x94,
+  F32Mul = 0x94,
   F32Div = 0x95,
   F32Min = 0x96,
   F32Max = 0x97,
@@ -437,7 +437,7 @@ export function wasmOpcodeFromNr(
     case 0x93:
       return WASMOpcodeNumber.F32Sub;
     case 0x94:
-      return WASMOpcodeNumber.F32Mult;
+      return WASMOpcodeNumber.F32Mul;
     case 0x95:
       return WASMOpcodeNumber.F32Div;
     case 0x96:
