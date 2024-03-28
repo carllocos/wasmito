@@ -5,7 +5,6 @@ import {
   SourceMap,
   type SourceCodeLocation,
 } from '../source_map';
-import { WASMOpcodeNumber, WasmInstruction } from '../wasm/wasm_instruction';
 import { isAbsolutePath, isFilePath, pathJoin } from '../../util/file_util';
 // import * as TreeSitter from 'tree-sitter';
 // import * as TypeScript from 'tree-sitter-typescript';
