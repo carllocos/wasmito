@@ -85,7 +85,15 @@ export class AssemblyScriptSourceMap extends SourceMap {
   }
 
   public getFunction(id: number): WASMFunction | undefined {
-    throw new Error('Method not implemented.');
+    if (id >= this.wasm.imports.length) {
+      return this.wasm.functions.find((f) => {
+        return f.id === id;
+      });
+    } else {
+      return this.wasm.imports.find((f) => {
+        return f.id === id;
+      });
+    }
   }
 
   async buildComplemtaryContext(): Promise<void> {
