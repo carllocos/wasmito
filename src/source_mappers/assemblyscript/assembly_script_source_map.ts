@@ -5,7 +5,7 @@ import {
   SourceMap,
   type SourceCodeLocation,
 } from '../source_map';
-import { WASMOpcodeNumber, WasmOpcode } from '../wasm/wasm_instruction';
+import { WASMOpcodeNumber, WasmInstruction } from '../wasm/wasm_instruction';
 import { isAbsolutePath, isFilePath, pathJoin } from '../../util/file_util';
 // import * as TreeSitter from 'tree-sitter';
 // import * as TypeScript from 'tree-sitter-typescript';
@@ -77,7 +77,7 @@ export class AssemblyScriptSourceMap extends SourceMap {
       linenr: m.originalLine,
       columnStart: m.originalColumn,
       columnEnd: m.originalColumn,
-      opcode: new WasmOpcode('unreachable', WASMOpcodeNumber.Unreachable),
+      opcode: new WasmInstruction('unreachable', WASMOpcodeNumber.Unreachable),
     };
   }
 

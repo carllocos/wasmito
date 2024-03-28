@@ -7,7 +7,7 @@ import {
   IfInstruction,
   LoopInstruction,
   WASMOpcodeNumber,
-  WasmOpcode,
+  WasmInstruction,
 } from './wasm_instruction';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const decode = require('@webassemblyjs/wasm-parser');
@@ -101,7 +101,7 @@ interface Func {
   type: 'Func';
   name: FuncName;
   signature: FuncSignature;
-  body: WasmOpcode[];
+  body: WasmInstruction[];
   bodySize: number;
 }
 
@@ -132,7 +132,7 @@ export interface GlobalType {
 export interface ParsedGlobal {
   type: 'Global';
   globalType: GlobalType;
-  init: WasmOpcode[];
+  init: WasmInstruction[];
   name: undefined | string;
   loc: WasmSourceLocation;
 }
@@ -224,7 +224,7 @@ function assertFuncSignature(obj: any): asserts obj is FuncSignature {
   }
 }
 
-function parseInstruction(obj: any): WasmOpcode | undefined {
+function parseInstruction(obj: any): WasmInstruction | undefined {
   if (
     typeof obj !== 'object' ||
     typeof obj.type !== 'string' ||
@@ -232,19 +232,19 @@ function parseInstruction(obj: any): WasmOpcode | undefined {
   ) {
     throw new Error(`obj doest not satisfy the WasmInstruction Interface`);
   }
-  let op: WasmOpcode | undefined;
+  let op: WasmInstruction | undefined;
   switch (obj.id) {
     case 'unreachable': {
       const args = obj.args;
       if (args.length > 0) {
         throw new Error(`Handle case where args is not zero length ${args}`);
       }
-      op = new WasmOpcode('unreachable', WASMOpcodeNumber.Unreachable);
+      op = new WasmInstruction('unreachable', WASMOpcodeNumber.Unreachable);
       break;
     }
     case 'get_local': {
       assertWasmSourceCodeLocation(obj.loc);
-      op = new WasmOpcode(
+      op = new WasmInstruction(
         'get_local',
         WASMOpcodeNumber.Get_local,
         obj.args[0].value,
@@ -252,8 +252,8 @@ function parseInstruction(obj: any): WasmOpcode | undefined {
       break;
     }
     case 'set_local': {
-      op = new WasmOpcode('set_local', WASMOpcodeNumber.Set_local);
-      op.labels = obj.args.map((a: any) => {
+      op = new WasmInstruction('set_local', WASMOpcodeNumber.Set_local);
+      op.args = obj.args.map((a: any) => {
         return a.name;
       });
       break;
@@ -270,13 +270,13 @@ function parseInstruction(obj: any): WasmOpcode | undefined {
         assertInstructionArg(a);
         return a.value;
       });
-      op = new WasmOpcode('end', WASMOpcodeNumber.End);
-      op.labels = labels;
+      op = new WasmInstruction('end', WASMOpcodeNumber.End);
+      op.args = labels;
       break;
     }
     case 'const': {
       const opName = obj.object + '.const';
-      op = new WasmOpcode(opName, wasmOpcodeFromStr(opName));
+      op = new WasmInstruction(opName, wasmOpcodeFromStr(opName));
       break;
     }
     case 'get_global': {
@@ -285,7 +285,7 @@ function parseInstruction(obj: any): WasmOpcode | undefined {
           `Handle case where args has more than one element ${obj.args}`,
         );
       }
-      op = new WasmOpcode(
+      op = new WasmInstruction(
         'get_global',
         WASMOpcodeNumber.Get_global,
         obj.args[0].value,
@@ -298,7 +298,7 @@ function parseInstruction(obj: any): WasmOpcode | undefined {
           `Handle case where args has more than one element ${obj.args}`,
         );
       }
-      op = new WasmOpcode(
+      op = new WasmInstruction(
         'set_global',
         WASMOpcodeNumber.Set_global,
         obj.args[0].value,
@@ -306,7 +306,7 @@ function parseInstruction(obj: any): WasmOpcode | undefined {
       break;
     }
     case 'drop': {
-      op = new WasmOpcode('drop', WASMOpcodeNumber.Drop);
+      op = new WasmInstruction('drop', WASMOpcodeNumber.Drop);
       break;
     }
     case 'local': {
@@ -314,55 +314,55 @@ function parseInstruction(obj: any): WasmOpcode | undefined {
     }
     case 'sub': {
       const opcode = obj.object + '.sub';
-      op = new WasmOpcode(opcode, wasmOpcodeFromStr(opcode));
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
       break;
     }
     case 'div': {
       const opcode = obj.object + '.div';
-      op = new WasmOpcode(opcode, wasmOpcodeFromStr(opcode));
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
       break;
     }
     case 'convert_s/i32': {
       const opcode = obj.object + '.convert_s/i32';
-      op = new WasmOpcode(opcode, wasmOpcodeFromStr(opcode));
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
       break;
     }
     case 'mul': {
       const opcode = obj.object + '.mul';
-      op = new WasmOpcode(opcode, wasmOpcodeFromStr(opcode));
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
       break;
     }
     case 'add': {
       const opName = obj.object + '.add';
-      op = new WasmOpcode(opName, wasmOpcodeFromStr(opName));
+      op = new WasmInstruction(opName, wasmOpcodeFromStr(opName));
       break;
     }
     case 'trunc_s/f32': {
       const opcode = obj.object + '.trunc_s/f32';
-      op = new WasmOpcode(opcode, wasmOpcodeFromStr(opcode));
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
       break;
     }
     case 'return': {
-      op = new WasmOpcode('return', WASMOpcodeNumber.Return);
+      op = new WasmInstruction('return', WASMOpcodeNumber.Return);
       break;
     }
     case 'block': {
       const label = obj.label.value;
-      const opcodes: WasmOpcode[] = obj.instr
+      const opcodes: WasmInstruction[] = obj.instr
         .map((o: any) => {
           return parseInstruction(o);
         })
-        .filter((i: WasmOpcode | undefined) => i !== undefined);
+        .filter((i: WasmInstruction | undefined) => i !== undefined);
       op = new BlockInstruction(label, opcodes);
       break;
     }
     case 'loop': {
       const label = obj.label.value;
-      const opcodes: WasmOpcode[] = obj.instr
+      const opcodes: WasmInstruction[] = obj.instr
         .map((o: any) => {
           return parseInstruction(o);
         })
-        .filter((i: WasmOpcode | undefined) => i !== undefined);
+        .filter((i: WasmInstruction | undefined) => i !== undefined);
       if (obj.resulttype !== null) {
         logger.error(`Account for resulttype field`);
         throw new Error(`Account for the resulttype ${obj.resulttype}`);
@@ -378,21 +378,21 @@ function parseInstruction(obj: any): WasmOpcode | undefined {
         throw new Error(`Account for the result ${obj.result}`);
       }
 
-      const test: WasmOpcode[] = obj.test
+      const test: WasmInstruction[] = obj.test
         .map((o: any) => {
           return parseInstruction(o);
         })
-        .filter((i: WasmOpcode | undefined) => i !== undefined);
-      const alternate: WasmOpcode[] = obj.alternate
+        .filter((i: WasmInstruction | undefined) => i !== undefined);
+      const alternate: WasmInstruction[] = obj.alternate
         .map((o: any) => {
           return parseInstruction(o);
         })
-        .filter((i: WasmOpcode | undefined) => i !== undefined);
-      const consequent: WasmOpcode[] = obj.consequent
+        .filter((i: WasmInstruction | undefined) => i !== undefined);
+      const consequent: WasmInstruction[] = obj.consequent
         .map((o: any) => {
           return parseInstruction(o);
         })
-        .filter((i: WasmOpcode | undefined) => i !== undefined);
+        .filter((i: WasmInstruction | undefined) => i !== undefined);
       op = new IfInstruction(label, test, alternate, consequent, result);
       break;
     }
@@ -402,7 +402,7 @@ function parseInstruction(obj: any): WasmOpcode | undefined {
           `Handle case where args has more than one element ${obj.args}`,
         );
       }
-      op = new WasmOpcode('br', WASMOpcodeNumber.Br, obj.args[0].value);
+      op = new WasmInstruction('br', WASMOpcodeNumber.Br, obj.args[0].value);
       break;
     }
     case 'gt_s': {
@@ -412,7 +412,7 @@ function parseInstruction(obj: any): WasmOpcode | undefined {
           `Handle case where args has more than one element ${obj.args}`,
         );
       }
-      op = new WasmOpcode(opcode, WASMOpcodeNumber.GTSigned);
+      op = new WasmInstruction(opcode, WASMOpcodeNumber.GTSigned);
       break;
     }
     case 'lt_s': {
@@ -422,7 +422,7 @@ function parseInstruction(obj: any): WasmOpcode | undefined {
           `Handle case where args has more than one element ${obj.args}`,
         );
       }
-      op = new WasmOpcode(opcode, WASMOpcodeNumber.I32LTSigned);
+      op = new WasmInstruction(opcode, WASMOpcodeNumber.I32LTSigned);
       break;
     }
     default:
@@ -538,11 +538,11 @@ function assertWasmGlobal(obj: any): ParsedGlobal {
       `Obj.init expected to be an array to satisfy WasmGlobal Interface`,
     );
   }
-  const init: WasmOpcode[] = obj.init
+  const init: WasmInstruction[] = obj.init
     .map((i: any) => {
       return parseInstruction(i);
     })
-    .filter((i: WasmOpcode | undefined) => i !== undefined);
+    .filter((i: WasmInstruction | undefined) => i !== undefined);
   const loc = obj.loc;
   assertWasmSourceCodeLocation(loc);
   const globalType = obj.globalType;

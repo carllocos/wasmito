@@ -1,6 +1,6 @@
 import { type WasmType } from '../../state/opcode_type';
 import { type WASM } from '../../state/wasm';
-import { type WasmOpcode } from './wasm_instruction';
+import { type WasmInstruction } from './wasm_instruction';
 
 export interface WasmLocal {
   index: number;
@@ -21,13 +21,13 @@ export class WASMFunction {
 
   public startAddress: number;
   public endAddress: number;
-  public readonly body: WasmOpcode[];
-  private readonly _allInstructions: WasmOpcode[];
+  public readonly body: WasmInstruction[];
+  private readonly _allInstructions: WasmInstruction[];
 
   constructor(
     name: string,
     id: number,
-    instructions: WasmOpcode[],
+    instructions: WasmInstruction[],
     funcType: WasmType,
     locals: WasmLocal[],
   ) {
@@ -46,11 +46,11 @@ export class WASMFunction {
     );
   }
 
-  get allInstructions(): WasmOpcode[] {
+  get allInstructions(): WasmInstruction[] {
     return this._allInstructions;
   }
 
-  private findSmallestAndGreatesAddress(opcodes: WasmOpcode[]): void {
+  private findSmallestAndGreatesAddress(opcodes: WasmInstruction[]): void {
     if (opcodes.length === 0) {
       return;
     }

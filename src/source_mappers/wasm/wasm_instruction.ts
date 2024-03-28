@@ -1,16 +1,16 @@
 import { PlaceholderType, WasmType } from '../../state/opcode_type';
 
-export class WasmOpcode {
+export class WasmInstruction {
   public readonly opcodeNr: WASMOpcodeNumber;
   public readonly name: string;
   public immediate?: number;
   private type: WasmType;
-  public labels: string[];
+  public args: string[];
 
   public startAddress?: number;
   public endAddress?: number;
-  private _subInstructions: WasmOpcode[];
-  private _allSubInstructions: WasmOpcode[];
+  private _subInstructions: WasmInstruction[];
+  private _allSubInstructions: WasmInstruction[];
 
   constructor(
     opcodeName: string,
@@ -29,24 +29,24 @@ export class WasmOpcode {
       throw Error(`unexsting opcode type for ${opcodeName}`);
     }
     this.type = t;
-    this.labels = opcodeLabels ?? [];
+    this.args = opcodeLabels ?? [];
     this.immediate = immediate;
     this._subInstructions = [];
     this._allSubInstructions = [];
   }
 
-  get subInstructions(): WasmOpcode[] {
+  get subInstructions(): WasmInstruction[] {
     return this._subInstructions;
   }
 
-  set subInstructions(ins: WasmOpcode[]) {
+  set subInstructions(ins: WasmInstruction[]) {
     this._subInstructions = ins;
     this._allSubInstructions = this._subInstructions.flatMap(
       (i) => i.subInstructions,
     );
   }
 
-  get allSubInstructions(): WasmOpcode[] {
+  get allSubInstructions(): WasmInstruction[] {
     return this._allSubInstructions;
   }
 
@@ -61,22 +61,22 @@ export class WasmOpcode {
   }
 
   public getLabels(): string[] {
-    return this.labels;
+    return this.args;
   }
 }
 
-export class IfInstruction extends WasmOpcode {
+export class IfInstruction extends WasmInstruction {
   public readonly label: string;
-  public readonly testInstructions: WasmOpcode[];
-  public readonly alternateInstructions: WasmOpcode[];
-  public readonly consequentInstructions: WasmOpcode[];
+  public readonly testInstructions: WasmInstruction[];
+  public readonly alternateInstructions: WasmInstruction[];
+  public readonly consequentInstructions: WasmInstruction[];
   public readonly resultType?: string;
 
   constructor(
     label: string,
-    test: WasmOpcode[],
-    alternate: WasmOpcode[],
-    consequent: WasmOpcode[],
+    test: WasmInstruction[],
+    alternate: WasmInstruction[],
+    consequent: WasmInstruction[],
     result?: string,
   ) {
     super('if', WASMOpcodeNumber.If);
@@ -89,36 +89,38 @@ export class IfInstruction extends WasmOpcode {
   }
 }
 
-export class BlockInstruction extends WasmOpcode {
+export class BlockInstruction extends WasmInstruction {
   public readonly label: string;
-  constructor(blockLabel: string, subInstructions: WasmOpcode[]) {
+  constructor(blockLabel: string, subInstructions: WasmInstruction[]) {
     super('block', WASMOpcodeNumber.Block);
     this.label = blockLabel;
     this.subInstructions = subInstructions;
   }
 }
 
-export class CallInstruction extends WasmOpcode {
+export class CallInstruction extends WasmInstruction {
   public readonly funIdx: number;
   constructor(funName: string, funIdx: number) {
     super('call', WASMOpcodeNumber.Block);
-    this.labels = [funName];
+    this.args = [funName];
     this.funIdx = funIdx;
   }
 }
 
-export function isCallInstruction(inst: WasmOpcode): inst is CallInstruction {
+export function isCallInstruction(
+  inst: WasmInstruction,
+): inst is CallInstruction {
   return (
     inst.opcodeNr === WASMOpcodeNumber.Call && inst instanceof CallInstruction
   );
 }
 
-export class LoopInstruction extends WasmOpcode {
+export class LoopInstruction extends WasmInstruction {
   public readonly label: string;
   public readonly resultType?: string;
   constructor(
     loopLabel: string,
-    subInstructions: WasmOpcode[],
+    subInstructions: WasmInstruction[],
     resultType?: string,
   ) {
     super('loop', WASMOpcodeNumber.Loop);
