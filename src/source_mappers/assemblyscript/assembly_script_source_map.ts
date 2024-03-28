@@ -71,16 +71,17 @@ export class AssemblyScriptSourceMap extends SourceMap {
     if (src === undefined) {
       throw new Error(`No absolutePath set for Source ${m.source}`);
     }
+    const instruction = this.wasm.instructionFromAddress(wasmAddr);
+    if (instruction === undefined) {
+      return undefined;
+    }
     return {
       source: src,
       address: m.generatedColumn,
       linenr: m.originalLine,
       columnStart: m.originalColumn,
       columnEnd: m.originalColumn,
-      instruction: new WasmInstruction(
-        'unreachable',
-        WASMOpcodeNumber.Unreachable,
-      ),
+      instruction,
     };
   }
 
