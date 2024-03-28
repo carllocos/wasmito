@@ -6,5 +6,8 @@ export * from './parsers/details';
 export * from './parsers/dissambled';
 export * from './parsers/obj-dump_parser';
 export * from './wat/opcodes';
+export * from './wasm/wasm_function';
+export * from './wasm/wasm_module';
+export * from './wasm/wasm_module_parser';
 export * from './wat/wat_source_map';
 export * from './source_map';
