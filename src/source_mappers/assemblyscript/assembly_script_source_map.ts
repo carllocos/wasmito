@@ -53,7 +53,46 @@ export class AssemblyScriptSourceMap extends SourceMap {
   public generatedPositionFor(
     location: SourceCodeLocation,
   ): SourceCodeMapping[] {
-    throw new Error('Method not implemented.');
+    const positions: SourceCodeMapping[] = [];
+    for (const s of this._mappings) {
+      if (s.originalLine !== location.linenr) {
+        continue;
+      }
+
+      const colStart = location.columnStart;
+      if (colStart !== undefined) {
+        if (colStart > s.originalColumn) {
+          continue;
+        }
+      }
+
+      const colEnd = location.columnEnd;
+      if (colEnd !== undefined) {
+        logger.warn(
+          `Ignoring columEnd ${colEnd} as sourceMap has only column field`,
+        );
+      }
+
+      const instruction = this.wasm.instructionFromAddress(s.generatedColumn);
+      if (instruction === undefined) {
+        logger.error(
+          `Skipping a wasm instruction unncesserily. TODO remove wasm instruction from mapping`,
+        );
+        throw new Error(
+          `Skipping a wasm instruction unncesserily. TODO remove wasm instruction from mapping`,
+        );
+      }
+      const m: SourceCodeMapping = {
+        source: s.source,
+        address: s.generatedColumn,
+        linenr: location.linenr,
+        columnStart: s.originalColumn,
+        columnEnd: s.originalColumn,
+        instruction,
+      };
+      positions.push(m);
+    }
+    return positions;
   }
 
   public override getOriginalPositionFor(
