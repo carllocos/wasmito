@@ -154,10 +154,16 @@ export class AssemblyScriptSourceMap extends SourceMap {
       }
 
       if (!isAbsolutePath(source)) {
-        if (isAssemblyScriptCommonLib(source)) {
-          source = gerenateAssemblyScriptCommonPath();
-        } else if (isWARDuinoGlueCode(source)) {
-          source = gerenateWARDuinoASPath(config.srcRootPath);
+        // The order of the two following checks is crucial
+        if (isLibDependency(source)) {
+          if (isWARDuinoGlueCode(source)) {
+            source = gerenateWARDuinoASPath(config.srcRootPath);
+          } else if (isAssemblyScriptLib(source)) {
+            source = gerenateAssemblyScriptCommonPath(source);
+          } else {
+            logger.error(`encountered a path to an unknown lib '${source}'`);
+            throw new Error(`encountered a path to an unknown lib '${source}'`);
+          }
         } else {
           logger.debug(`Creating absolute path for source '${source}`);
           source = pathJoin(config.srcRootPath, source);
@@ -191,23 +197,30 @@ export class AssemblyScriptSourceMap extends SourceMap {
   }
 }
 
-function gerenateAssemblyScriptCommonPath(): string {
+function isLibDependency(source: string): boolean {
+  const libPrefix = '~lib/';
+  return source.startsWith(libPrefix);
+}
+
+function gerenateAssemblyScriptCommonPath(src: string): string {
+  const libPrefix = '~lib/';
+  const s = src.replace(libPrefix, '');
   const p = getPath2AssemblyScriptLib();
-  const path2Source = path.join(p, '/std/assembly/rt/common.ts');
+  const path2Source = path.join(p, `/std/assembly/${s}`);
   if (!isFilePath(path2Source)) {
     throw new Error(`the generated AS common.ts does not exist ${path2Source}`);
   }
   return path2Source;
 }
 
-function isAssemblyScriptCommonLib(source: string): boolean {
-  const assemblyScriptLibCommon = '~lib/rt/common.ts';
-  return source === assemblyScriptLibCommon;
+function isAssemblyScriptLib(source: string): boolean {
+  const assemblyScriptLibCommon = '~lib/';
+  return source.startsWith(assemblyScriptLibCommon);
 }
 
 function isWARDuinoGlueCode(source: string): boolean {
-  const glueCodePath = '~lib/as-warduino/assembly/index.ts';
-  return source === glueCodePath;
+  const glueCodePath = '~lib/as-warduino/';
+  return source.startsWith(glueCodePath);
 }
 
 function gerenateWARDuinoASPath(pathToSrcRoot: string): string {
