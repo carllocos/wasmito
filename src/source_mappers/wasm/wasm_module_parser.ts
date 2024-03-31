@@ -716,9 +716,6 @@ function assertLoc(obj: any): obj is Location {
     typeof obj.line === 'number' &&
     typeof obj.column === 'number'
   ) {
-    if (obj.column === 278) {
-      console.log('here');
-    }
     return true;
   } else {
     throw new Error('Object does not satisfy the Loc interface');
