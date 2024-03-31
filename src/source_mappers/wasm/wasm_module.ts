@@ -96,15 +96,68 @@ export class WasmModule {
     for (let i = 0; i < this.functions.length; i++) {
       const fun = this.functions[i];
       if (fun.startAddress <= addr && addr <= fun.endAddress) {
-        for (const inst of fun.body) {
-          const found = this.searchInstruction(inst, addr);
-          if (found !== undefined) {
-            return found;
-          }
-        }
+        return this.searchInFunBody(fun.body, addr);
       }
     }
     return undefined;
+  }
+
+  private searchInFunBody(
+    body: WasmInstruction[],
+    addr: number,
+  ): WasmInstruction | undefined {
+    for (let i = 0; i < body.length; i++) {
+      const inst = body[i];
+      const found = this.searchInstruction(inst, addr);
+      if (found === undefined) {
+        continue;
+      }
+
+      return this.correctPotentialInstruction(body, found, addr);
+    }
+
+    return undefined;
+  }
+
+  private correctPotentialInstruction(
+    funBody: WasmInstruction[],
+    instrFound: WasmInstruction,
+    addr: number,
+  ): WasmInstruction {
+    /*
+     * There is an edge case where addr can be the same as the end addr of an instruction
+     * and the start address of the next instruction.
+     * if so we return the next instr
+     */
+
+    if (instrFound.endAddress === addr) {
+      // search for next instruction if it exists
+      const candidateInstr = funBody.filter((i) => {
+        const sa = i.startAddress;
+        const ea = i.endAddress;
+        if (ea === undefined || sa === undefined) {
+          throw new Error(`Start or endAddress not provided`);
+        }
+        return sa <= addr && addr <= ea;
+      });
+
+      for (let j = 0; j < candidateInstr.length; j++) {
+        const instr = candidateInstr[j];
+        if (instr.startAddress === addr) {
+          return instr;
+        }
+        const subInstr = instr.allSubInstructions.find((i) => {
+          return i.startAddress === addr;
+        });
+
+        if (subInstr !== undefined) {
+          return subInstr;
+        }
+      }
+      return instrFound;
+    }
+
+    return instrFound;
   }
 
   public getGlobalFromIndex(index: number): WasmGlobal | undefined {
@@ -162,8 +215,8 @@ export class WasmModule {
           }
         }
         if (startAddress !== wasmAddr && endAddress !== wasmAddr) {
-          throw new Error(
-            'Case where addr is within instr but no subinstruction found',
+          logger.debug(
+            `Case where addr is within instr (opcodeNr=${inst.opcodeNr}) but no subinstruction found`,
           );
         }
       }
