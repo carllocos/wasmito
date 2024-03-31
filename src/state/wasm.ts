@@ -285,15 +285,34 @@ export class WasmState {
       this.breakpoints = args.breakpoints;
     }
     if (args.stack !== undefined) {
-      this.stack = args.stack.map(
-        (sv: { idx: number; type: string; value: number }) => {
-          return {
-            idx: sv.idx,
-            type: WASM.typing.get(sv.type),
-            value: sv.value,
-          };
-        },
-      );
+      this.stack = args.stack.map((sv: any) => {
+        if (typeof sv !== 'object') {
+          throw new Error(`Stack value type expected to be a string`);
+        }
+        if (typeof sv.idx !== 'number') {
+          throw new Error(`Stack value idx is expected to be a number`);
+        }
+
+        if (typeof sv.type !== 'string') {
+          throw new Error(`Stack value type expected to be a string`);
+        }
+
+        const t = WASM.typing.get(sv.type.toLowerCase());
+        if (t === undefined) {
+          throw new Error(
+            `Stack value type received inexisting type ${sv.type}`,
+          );
+        }
+        const v = sv.value;
+        if (typeof v !== 'number') {
+          throw new Error(`Stack value expected to be a number got ${v}`);
+        }
+        return {
+          idx: sv.idx,
+          type: t,
+          value: sv.value,
+        };
+      });
     }
 
     if (args.globals !== undefined) {
