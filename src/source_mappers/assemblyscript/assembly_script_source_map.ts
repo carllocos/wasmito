@@ -26,7 +26,6 @@ const logger = createLogger('AssemblyScriptSourceMap');
 export class AssemblyScriptSourceMap extends SourceMap {
   private readonly _asConfig: ASConfig;
   private readonly _mappings: ASMapping[];
-  private readonly _sourceMappings: SourceCodeMapping[];
   private readonly _sourceTreeMap: Map<string, Parser.Tree>;
   private readonly _sourceToAbsPathSource: Map<string, string>;
 
@@ -44,7 +43,6 @@ export class AssemblyScriptSourceMap extends SourceMap {
     }
     this._asConfig = asConfig;
     this._mappings = mappings;
-    this._sourceMappings = [];
     this._sourceTreeMap = new Map();
     this._sourceToAbsPathSource = new Map();
     for (let i = 0; i < sources.length; i++) {
