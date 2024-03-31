@@ -14,6 +14,7 @@ import { type ASConfig } from './asconfig';
 import { getPath2AssemblyScriptLib } from '../../project_config';
 import path = require('path');
 import { type WASMFunction } from '../wasm/wasm_function';
+import { type WasmInstruction } from '../wasm/wasm_instruction';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 // const typescript = require('tree-sitter-typescript');
@@ -60,9 +61,20 @@ export class AssemblyScriptSourceMap extends SourceMap {
   public override getOriginalPositionFor(
     wasmAddr: number,
   ): SourceCodeMapping | undefined {
-    const m = this._mappings.find((m: MappingItem) => {
+    let m = this._mappings.find((m: MappingItem) => {
       return m.generatedColumn === wasmAddr;
     });
+
+    let instruction: WasmInstruction | undefined;
+    if (m === undefined) {
+      instruction = this.wasm.instructionFromAddress(wasmAddr);
+      if (instruction === undefined) {
+        return undefined;
+      }
+      m = this._mappings.find((mi: MappingItem) => {
+        return mi.generatedColumn === instruction?.startAddress;
+      });
+    }
     if (m?.source === undefined || m?.source === null) {
       return undefined;
     }
@@ -70,7 +82,7 @@ export class AssemblyScriptSourceMap extends SourceMap {
     if (src === undefined) {
       throw new Error(`No absolutePath set for Source ${m.source}`);
     }
-    const instruction = this.wasm.instructionFromAddress(wasmAddr);
+    instruction = this.wasm.instructionFromAddress(wasmAddr);
     if (instruction === undefined) {
       return undefined;
     }
