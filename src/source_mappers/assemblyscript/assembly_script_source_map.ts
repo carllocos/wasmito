@@ -143,6 +143,35 @@ export class AssemblyScriptSourceMap extends SourceMap {
       },
     );
 
+    const cleanedMappings = mappings.filter((m: MappingItem) => {
+      const hasOriginalLine =
+        m.originalLine !== undefined && m.originalLine !== null;
+      const hasOriginalColumnNr =
+        m.originalColumn !== undefined && m.originalColumn !== null;
+      return hasOriginalLine && hasOriginalColumnNr;
+    });
+    if (mappings.length !== cleanedMappings.length) {
+      logger.debug(
+        `We removed ${mappings.length - cleanedMappings.length} entries from the sourcemap as it has no originalLineNr nor originalColumnNr`,
+      );
+    }
+
+    cleanedMappings.forEach((m: MappingItem) => {
+      // case where either source, line number, column nr, is not avaialable should not occur
+      // throw error just in case
+      if (m.originalLine === undefined || m.originalColumn === undefined) {
+        throw new Error(`Found an empty originalLine nr for mapping`);
+      }
+
+      if (m.originalColumn === undefined || m.originalColumn === undefined) {
+        throw new Error(`Found an empty originalColumn nr for mapping`);
+      }
+
+      if (m.source === undefined || m.source === undefined) {
+        throw new Error(`Found an empty source for mapping`);
+      }
+    });
+
     const sourceAbsPath = [];
     for (let i = 0; i < sources.length; i++) {
       let source = sources[i];
@@ -190,7 +219,7 @@ export class AssemblyScriptSourceMap extends SourceMap {
       config,
       sourceAbsPath,
       sources,
-      mappings,
+      cleanedMappings,
     );
     await sm.buildComplemtaryContext();
     return sm;
