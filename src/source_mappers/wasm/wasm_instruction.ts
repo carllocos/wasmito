@@ -203,7 +203,7 @@ export function typeFromWasmOpcode(
     case WASMOpcodeNumber.F32CopySign:
       return new WasmType(2, 1);
 
-    // unary operators
+    // unary operators that produce one result
     case WASMOpcodeNumber.I32Wrap_I64:
     case WASMOpcodeNumber.I32Trunc_s_F32:
     case WASMOpcodeNumber.I32Trunc_u_F32:
