@@ -1,3 +1,4 @@
+import { type WASM } from '../../state';
 import { PlaceholderType, WasmType } from '../../state/opcode_type';
 
 export class WasmInstruction {
@@ -73,14 +74,14 @@ export class IfInstruction extends WasmInstruction {
   public readonly testInstructions: WasmInstruction[];
   public readonly alternateInstructions: WasmInstruction[];
   public readonly consequentInstructions: WasmInstruction[];
-  public readonly resultType?: string;
+  public readonly resultType?: WASM.Type;
 
   constructor(
     label: string,
     test: WasmInstruction[],
     alternate: WasmInstruction[],
     consequent: WasmInstruction[],
-    result?: string,
+    result?: WASM.Type,
   ) {
     super('if', WASMOpcodeNumber.If);
     this.label = label;
