@@ -430,6 +430,96 @@ function parseInstruction(obj: any): WasmInstruction | undefined {
       op = new WasmInstruction(opcode, WASMOpcodeNumber.I32LTSigned);
       break;
     }
+    case 'abs': {
+      const opcode = obj.object + '.abs';
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
+      break;
+    }
+    case 'ne': {
+      const opcode = obj.object + '.ne';
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
+      break;
+    }
+    case 'eq': {
+      const opcode = obj.object + '.eq';
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
+      break;
+    }
+    case 'eqz': {
+      const opcode = obj.object + '.eqz';
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
+      break;
+    }
+    case 'trunc': {
+      const opcode = obj.object + '.trunc';
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
+      break;
+    }
+    case 'copysign': {
+      const opcode = obj.object + '.copysign';
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
+      break;
+    }
+    case 'reinterpret/f64': {
+      const opcode = obj.object + '.reinterpret/f64';
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
+      break;
+    }
+    case 'reinterpret/i64': {
+      const opcode = obj.object + '.reinterpret/i64';
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
+      break;
+    }
+    case 'shr_u': {
+      const opcode = obj.object + '.shr_u';
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
+      break;
+    }
+    case 'and': {
+      const opcode = obj.object + '.and';
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
+      break;
+    }
+    case 'or': {
+      const opcode = obj.object + '.or';
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
+      break;
+    }
+    case 'shl': {
+      const opcode = obj.object + '.shl';
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
+      break;
+    }
+    case 'le_u': {
+      const opcode = obj.object + '.le_u';
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
+      break;
+    }
+    case 'ge_u': {
+      const opcode = obj.object + '.ge_u';
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
+      break;
+    }
+    case 'clz': {
+      const opcode = obj.object + '.clz';
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
+      break;
+    }
+    case 'convert_u/i32': {
+      const opcode = obj.object + '.convert_u/i32';
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
+      break;
+    }
+    case 'lt': {
+      const opcode = obj.object + '.lt';
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
+      break;
+    }
+    case 'gt': {
+      const opcode = obj.object + '.gt';
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
+      break;
+    }
     default:
       throw new Error(`Unsupported Wasm instruction ${obj.id}`);
   }
@@ -812,10 +902,47 @@ export function wasmOpcodeFromStr(opcode: string): WASMOpcodeNumber {
     case 'f64.const': // f64.const
       return WASMOpcodeNumber.F64Const;
 
+    case 'i64.add':
+      return WASMOpcodeNumber.I64Add;
+    case 'i64.sub':
+      return WASMOpcodeNumber.I64Sub;
+    case 'i64.clz':
+      return WASMOpcodeNumber.I64CLZ;
+    case 'i64.ctz':
+      return WASMOpcodeNumber.I64CTZ;
+    case 'i64.popctn':
+      return WASMOpcodeNumber.I64POPCNT;
+    case 'i64.eq':
+      return WASMOpcodeNumber.I64Eq;
+    case 'i64.ne':
+      return WASMOpcodeNumber.I64Neq;
+    case 'i64.and':
+      return WASMOpcodeNumber.I64And;
+    case 'i64.or':
+      return WASMOpcodeNumber.I64Or;
+    case 'i64.shl':
+      return WASMOpcodeNumber.I64SHL;
+    case 'i64.shr_u':
+      return WASMOpcodeNumber.I64SHR_Unsigned;
+    case 'i64.le_u':
+      return WASMOpcodeNumber.I64LEUnsigned;
+    case 'i64.ge_u':
+      return WASMOpcodeNumber.I64GEUnsigned;
+    case 'i64.reinterpret/f64':
+      return WASMOpcodeNumber.I64Reinterpret_F64;
+
     case 'i32.add':
       return WASMOpcodeNumber.I32Add;
     case 'i32.sub':
       return WASMOpcodeNumber.I32Sub;
+    case 'i32.eqz':
+      return WASMOpcodeNumber.I32Eqz;
+    case 'i32.clz':
+      return WASMOpcodeNumber.I32CLZ;
+    case 'i32.ctz':
+      return WASMOpcodeNumber.I32CTZ;
+    case 'i32.popctn':
+      return WASMOpcodeNumber.I32POPCNT;
 
     case 'f32.add':
       return WASMOpcodeNumber.F32Add;
@@ -825,6 +952,35 @@ export function wasmOpcodeFromStr(opcode: string): WASMOpcodeNumber {
       return WASMOpcodeNumber.F32Mul;
     case 'f32.div':
       return WASMOpcodeNumber.F32Div;
+    case 'f32.abs':
+      return WASMOpcodeNumber.F32Abs;
+    case 'f32.lt':
+      return WASMOpcodeNumber.F32LT;
+    case 'f32.gt':
+      return WASMOpcodeNumber.F32GT;
+
+    case 'f64.add':
+      return WASMOpcodeNumber.F64Add;
+    case 'f64.sub':
+      return WASMOpcodeNumber.F64Sub;
+    case 'f64.mul':
+      return WASMOpcodeNumber.F64Mul;
+    case 'f64.div':
+      return WASMOpcodeNumber.F64Div;
+    case 'f64.abs':
+      return WASMOpcodeNumber.F64Abs;
+    case 'f64.eq':
+      return WASMOpcodeNumber.F64Eq;
+    case 'f64.ne':
+      return WASMOpcodeNumber.F64Neq;
+    case 'f64.trunc':
+      return WASMOpcodeNumber.F64Trunc;
+    case 'f64.copysign':
+      return WASMOpcodeNumber.F64CopySing;
+    case 'f64.convert_u/i32':
+      return WASMOpcodeNumber.F64Convert_u_I32;
+    case 'f64.reinterpret/i64':
+      return WASMOpcodeNumber.F64Reinterpret_I64;
 
     case 'i32.trunc_s/f32':
       return WASMOpcodeNumber.I32Trunc_s_F32;
