@@ -9,6 +9,7 @@ import {
   WASMOpcodeNumber,
   WasmInstruction,
 } from './wasm_instruction';
+import { WASM } from '../../state/wasm';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const decode = require('@webassemblyjs/wasm-parser');
 const logger = createLogger('WasmParser');
@@ -372,10 +373,14 @@ function parseInstruction(obj: any): WasmInstruction | undefined {
     }
     case 'if': {
       const label = obj.testLabel.value;
-      const result = undefined;
+      let result: WASM.Type | undefined;
       if (obj.result !== null) {
-        logger.error(`Account for result field`);
-        throw new Error(`Account for the result ${obj.result}`);
+        result = WASM.typing.get(obj.result);
+        if (result === undefined) {
+          throw new Error(
+            `If expression returns an unsupported type ${obj.result}`,
+          );
+        }
       }
 
       const test: WasmInstruction[] = obj.test
