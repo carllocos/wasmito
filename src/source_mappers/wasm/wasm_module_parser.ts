@@ -520,6 +520,11 @@ function parseInstruction(obj: any): WasmInstruction | undefined {
       op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
       break;
     }
+    case 'demote/f64': {
+      const opcode = obj.object + '.demote/f64';
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
+      break;
+    }
     default:
       throw new Error(`Unsupported Wasm instruction ${obj.id}`);
   }
@@ -893,6 +898,7 @@ export function wasmOpcodeFromStr(opcode: string): WASMOpcodeNumber {
       return WASMOpcodeNumber.Set_local;
     case 'get_global': // get_global
       return WASMOpcodeNumber.Get_global;
+
     case 'i32.const': // i32.const
       return WASMOpcodeNumber.I32Const;
     case 'i64.const': // i64.const
@@ -958,6 +964,8 @@ export function wasmOpcodeFromStr(opcode: string): WASMOpcodeNumber {
       return WASMOpcodeNumber.F32LT;
     case 'f32.gt':
       return WASMOpcodeNumber.F32GT;
+    case 'f32.demote/f64':
+      return WASMOpcodeNumber.F32Demote_F64;
 
     case 'f64.add':
       return WASMOpcodeNumber.F64Add;
