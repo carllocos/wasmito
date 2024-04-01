@@ -259,6 +259,33 @@ export interface WasmStateArgs {
   events?: WASM.Event[];
 }
 
+function parseWasmValueIndex(sv: any): WASMValueIndexed {
+  if (typeof sv !== 'object') {
+    throw new Error(`Stack value type expected to be a string`);
+  }
+  if (typeof sv.idx !== 'number') {
+    throw new Error(`Stack value idx is expected to be a number`);
+  }
+
+  if (typeof sv.type !== 'string') {
+    throw new Error(`Stack value type expected to be a string`);
+  }
+
+  const t = WASM.typing.get(sv.type.toLowerCase());
+  if (t === undefined) {
+    throw new Error(`Stack value type received inexisting type ${sv.type}`);
+  }
+  const v = sv.value;
+  if (typeof v !== 'number') {
+    throw new Error(`Stack value expected to be a number got ${v}`);
+  }
+  return {
+    idx: sv.idx,
+    type: t,
+    value: v,
+  };
+}
+
 export class WasmState {
   pc?: number;
   breakpoints?: number[];
@@ -285,46 +312,11 @@ export class WasmState {
       this.breakpoints = args.breakpoints;
     }
     if (args.stack !== undefined) {
-      this.stack = args.stack.map((sv: any) => {
-        if (typeof sv !== 'object') {
-          throw new Error(`Stack value type expected to be a string`);
-        }
-        if (typeof sv.idx !== 'number') {
-          throw new Error(`Stack value idx is expected to be a number`);
-        }
-
-        if (typeof sv.type !== 'string') {
-          throw new Error(`Stack value type expected to be a string`);
-        }
-
-        const t = WASM.typing.get(sv.type.toLowerCase());
-        if (t === undefined) {
-          throw new Error(
-            `Stack value type received inexisting type ${sv.type}`,
-          );
-        }
-        const v = sv.value;
-        if (typeof v !== 'number') {
-          throw new Error(`Stack value expected to be a number got ${v}`);
-        }
-        return {
-          idx: sv.idx,
-          type: t,
-          value: sv.value,
-        };
-      });
+      this.stack = args.stack.map(parseWasmValueIndex);
     }
 
     if (args.globals !== undefined) {
-      this.globals = args.globals.map(
-        (gv: { idx: number; type: string; value: number }) => {
-          return {
-            idx: gv.idx,
-            type: WASM.typing.get(gv.type),
-            value: gv.value,
-          };
-        },
-      );
+      this.globals = args.globals.map(parseWasmValueIndex);
     }
 
     if (args.callstack !== undefined) {
