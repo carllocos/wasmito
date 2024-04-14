@@ -26,9 +26,10 @@
     "build": "npm run build:cjs",
     "cli": "npm run build && LogLevel=debug node './dist/cjs/src/cli/cli.cjs'",
     "submodules": "bash install.sh",
-    "build:cjs": "rm -rf dist/cjs && tsc --project tsconfig.json && npx convert-extension cjs dist/cjs/",
+    "build:cjs": "rm -rf dist/cjs && tsc --project tsconfig.json && npx convert-extension cjs dist/cjs/ && npm run copyAssets",
     "build:esm": "rm -rf dist/esm  && tsc --project tsconfig-esm.json",
     "cleanNotUsed": "rm -rf dist/cjs && rm -rf dist/esm && rm -rf dist/types",
+    "copyAssets": "cp ./src/source_mappers/language-parsers/tree-sitter-typescript.wasm dist/cjs/src/source_mappers/language-parsers/",
     "prepack": "npm run build"
   },
   "repository": {
