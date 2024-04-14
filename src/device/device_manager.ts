@@ -13,6 +13,7 @@ import {
 } from '../warduino/vm/outofplace_vm';
 import { type DevVMPlatform, type ArduinoBoardBuilder } from '../builder';
 import { SerialConnection } from '../communication/serial';
+import { ClientSideSocket } from '../communication/client_socket';
 
 export class DeviceManagerError extends Error {
   constructor(message: string) {
@@ -43,13 +44,16 @@ export class DeviceManager {
     });
   }
 
-  // TODO remove deviceConfigArgs
   async connectToExistingDevVM(
     platform: DevVMPlatform,
+    sourceCodeCompilationArgs: any,
     maxWaitTime: number,
   ): Promise<WARDuinoDevVM> {
-    const devVM = new WARDuinoDevVM(platform);
-    devVM.platform = platform;
+    const tp = platform.config.vmConfig.toolPort;
+    const th = platform.config.vmConfig.toolHostIP;
+    const n = platform.config.deviceIdentity.fullname;
+    const channel = new ClientSideSocket(tp, th, n);
+    const devVM = new WARDuinoDevVM(platform, channel);
 
     const connected = await devVM.connect(maxWaitTime);
     if (!connected) {
@@ -57,6 +61,13 @@ export class DeviceManager {
         `Failed to connect to local DevelopmentVM at port ${platform.config.vmConfig.toolPort}`,
       );
       throw new DeviceManagerError('timed out connecting to DevVM process');
+    }
+    const exitCode = await devVM.platform.compileSourceCode(
+      sourceCodeCompilationArgs,
+      maxWaitTime,
+    );
+    if (exitCode !== 0) {
+      throw Error('Could not compile source code');
     }
     const noProcess = undefined;
     this.localprocesses.push([devVM, noProcess]);
