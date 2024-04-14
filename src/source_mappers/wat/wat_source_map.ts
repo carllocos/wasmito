@@ -11,6 +11,14 @@ import { type WASMFunction } from '../wasm/wasm_function';
 // 2. AST or something in the kind
 // 3. Mapper to VM apps
 export class WATSourceMap extends SourceMap {
+  public nextSourceCodeLocation(
+    source: string,
+    currentLineNr: number,
+    currentColumnStart: number,
+  ): SourceCodeMapping[] {
+    throw new Error('Method not implemented.');
+  }
+
   private readonly lineNrToInfo: Map<number, SourceCodeMapping[]>;
   private readonly _sourceCodePath: string;
   private readonly _mappings: SourceCodeMapping[];
