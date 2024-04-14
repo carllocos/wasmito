@@ -169,6 +169,18 @@ export function typeFromWasmOpcode(
     case WASMOpcodeNumber.Get_local:
       return new WasmType(0, 1);
 
+    // binary operators that do not produce a result
+    case WASMOpcodeNumber.I32Store:
+    case WASMOpcodeNumber.I64Store:
+    case WASMOpcodeNumber.F32Store:
+    case WASMOpcodeNumber.F64Store:
+    case WASMOpcodeNumber.I32Store8:
+    case WASMOpcodeNumber.I32Store16:
+    case WASMOpcodeNumber.I64Store8:
+    case WASMOpcodeNumber.I64Store16:
+    case WASMOpcodeNumber.I64Store32:
+      return new WasmType(2, 0);
+
     // binary operators that produce one result
     case WASMOpcodeNumber.I32Add:
     case WASMOpcodeNumber.I32Sub:
@@ -323,6 +335,16 @@ export enum WASMOpcodeNumber {
   Tee_local = 0x22, // tee_local
   Get_global = 0x23, // get_global
   Set_global = 0x24, // set_global
+
+  I32Store = 0x36,
+  I64Store = 0x37,
+  F32Store = 0x38,
+  F64Store = 0x39,
+  I32Store8 = 0x3a,
+  I32Store16 = 0x3b,
+  I64Store8 = 0x3c,
+  I64Store16 = 0x3d,
+  I64Store32 = 0x3e,
 
   I32Const = 0x41, // i32.const
   I64Const = 0x42, // i64.const
