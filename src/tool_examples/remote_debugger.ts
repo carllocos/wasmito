@@ -151,7 +151,11 @@ export async function runDebugScenario(
 
   const dm = new DeviceManager();
   const em = connectToExistingProcess
-    ? await dm.connectToExistingDevVM(platform, maxWaitTime)
+    ? await dm.connectToExistingDevVM(
+        platform,
+        sourceCodeCompilerArgs,
+        maxWaitTime,
+      )
     : await dm.spawnDevelopmentVM(platform, sourceCodeCompilerArgs);
   const funcCallHardwareSetup = 29;
   if (
