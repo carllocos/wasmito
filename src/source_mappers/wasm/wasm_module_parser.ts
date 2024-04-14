@@ -525,6 +525,16 @@ function parseInstruction(obj: any): WasmInstruction | undefined {
       op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
       break;
     }
+    case 'store': {
+      const opcode = obj.object + '.store';
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
+      break;
+    }
+    case 'store8': {
+      const opcode = obj.object + '.store8';
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
+      break;
+    }
     default:
       throw new Error(`Unsupported Wasm instruction ${obj.id}`);
   }
@@ -899,6 +909,33 @@ export function wasmOpcodeFromStr(opcode: string): WASMOpcodeNumber {
     case 'get_global': // get_global
       return WASMOpcodeNumber.Get_global;
 
+    case 'u32.store':
+    case 'i32.store':
+      return WASMOpcodeNumber.I32Store;
+    case 'u32.store8':
+    case 'i32.store8':
+      return WASMOpcodeNumber.I32Store8;
+    case 'u32.store16':
+    case 'i32.store16':
+      return WASMOpcodeNumber.I32Store16;
+    case 'f32.store':
+      return WASMOpcodeNumber.F32Store;
+    case 'f64.store':
+      return WASMOpcodeNumber.F64Store;
+
+    case 'u64.store':
+    case 'i64.store':
+      return WASMOpcodeNumber.I64Store;
+    case 'u64.store8':
+    case 'i64.store8':
+      return WASMOpcodeNumber.I64Store8;
+    case 'u64.store16':
+    case 'i64.store16':
+      return WASMOpcodeNumber.I64Store16;
+    case 'u64.store32':
+    case 'i64.store32':
+      return WASMOpcodeNumber.I64Store32;
+
     case 'i32.const': // i32.const
       return WASMOpcodeNumber.I32Const;
     case 'i64.const': // i64.const
@@ -937,6 +974,8 @@ export function wasmOpcodeFromStr(opcode: string): WASMOpcodeNumber {
     case 'i64.reinterpret/f64':
       return WASMOpcodeNumber.I64Reinterpret_F64;
 
+    case 'i32.and':
+      return WASMOpcodeNumber.I32And;
     case 'i32.add':
       return WASMOpcodeNumber.I32Add;
     case 'i32.sub':
