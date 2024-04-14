@@ -172,6 +172,7 @@ export class SystemDeployer {
     const vm = externalProcess
       ? await this.deviceManager.connectToExistingDevVM(
           platform,
+          {}, // TODO fix to use compilerArgs
           this.MAX_WAIT_TIME_DevVM_SPAWN,
         )
       : await this.deviceManager.spawnDevelopmentVM(
