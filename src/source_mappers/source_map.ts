@@ -63,4 +63,10 @@ export abstract class SourceMap {
   public abstract generatedPositionFor(
     location: SourceCodeLocation,
   ): SourceCodeMapping[];
+
+  public abstract nextSourceCodeLocation(
+    source: string,
+    currentLineNr: number,
+    currentColumnStart: number,
+  ): SourceCodeMapping[];
 }
