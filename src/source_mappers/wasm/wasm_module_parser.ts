@@ -682,6 +682,10 @@ function parseGlobals(fields: any): ParsedGlobal[] {
 }
 
 function parseLocalNames(localNames: any): LocalName[] {
+  if (localNames === undefined) {
+    logger.debug(`No local names for module`);
+    return [];
+  }
   const locals: LocalName[] = localNames.map((n: any) => {
     if (n.type !== 'LocalNameMetadata') {
       logger.warn(`encountered a localName of unexpected type ${n.type}`);
