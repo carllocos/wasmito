@@ -31,31 +31,16 @@ export class WARDuinoDevVM extends WARDuinoVM {
   protected ErrorClass = WARDuinoDevVMError;
 
   constructor(platform: DevVMPlatform, channel?: Channel) {
-    // buildOutputDir?: string, // vmConfigArgs: VMConfigArgs, // deviceConfigArgs: DeviceIdentity,
-    super(
-      // createPlatformBuilderConfig(
-      //   selectedLanguage,
-      //   deviceConfigArgs,
-      //   vmConfigArgs,
-      // ),
-      platform,
-      channel ?? new NoChannel(),
-      // buildOutputDir,
-    );
+    super(platform, channel ?? new NoChannel());
 
-    // if (this.vmConfig.hasToolPort()) {
-    //   this.channel = new ClientSideSocket(
-    //     this.vmConfig.toolPort,
-    //     this.vmConfig.toolHostIP,
-    //     this.deviceConfig.fullname,
-    //   );
-    // }
     this.logger = createLogger(
       `WARDuinoDevVM ${platform.config.deviceIdentity.fullname}`,
     );
-    this.logger.error(
-      `TODO reassing channel to be client-side socket as comment above`,
-    );
+    if (this.channel instanceof NoChannel) {
+      this.logger.error(
+        `TODO reassing channel to be client-side socket as comment above`,
+      );
+    }
   }
 
   // get vmConfig(): VMConfiguration {
