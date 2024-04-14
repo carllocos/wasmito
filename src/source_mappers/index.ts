@@ -10,5 +10,6 @@ export * from './wasm/wasm_instruction';
 export * from './wasm/wasm_function';
 export * from './wasm/wasm_module';
 export * from './wasm/wasm_module_parser';
+export * from './wasm/wasm_opcode';
 export * from './wat/wat_source_map';
 export * from './source_map';

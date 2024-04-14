@@ -1,9 +1,6 @@
 import * as fs from 'fs';
-import {
-  WasmInstruction,
-  WasmOpcodeHasImmediate,
-  wasmOpcodeFromNr,
-} from '../wasm/wasm_instruction';
+import { WasmInstruction } from '../wasm/wasm_instruction';
+import { WasmOpcodeHasImmediate, wasmOpcodeFromNr } from '../wasm/wasm_opcode';
 
 export interface ParsedInstruction {
   address: number;
