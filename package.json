@@ -72,9 +72,8 @@
     "portfinder": "^1.0.32",
     "serialport": "^12.0.0",
     "source-map": "^0.7.4",
-    "tree-sitter": "^0.21.0",
-    "tree-sitter-typescript": "^0.20.5",
     "uuid": "^9.0.1",
+    "web-tree-sitter": "^0.22.2",
     "winston": "^3.11.0",
     "yarn": "^1.22.19"
   }
