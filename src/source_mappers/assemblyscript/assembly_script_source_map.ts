@@ -6,9 +6,6 @@ import {
   type SourceCodeLocation,
 } from '../source_map';
 import { isAbsolutePath, isFilePath, pathJoin } from '../../util/file_util';
-// import * as TreeSitter from 'tree-sitter';
-// import * as TypeScript from 'tree-sitter-typescript';
-import Parser = require('tree-sitter');
 import { createLogger } from '../../logger/logger';
 import { type ASConfig } from './asconfig';
 import { getPath2AssemblyScriptLib } from '../../project_config';
@@ -16,8 +13,14 @@ import path = require('path');
 import { type WASMFunction } from '../wasm/wasm_function';
 import { type WasmInstruction } from '../wasm/wasm_instruction';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-// const typescript = require('tree-sitter-typescript');
+import type Parser from 'web-tree-sitter';
+import {
+  createTypeScriptParser,
+  stepOverNode,
+  searchNode,
+  // printNodeInfo,
+  // mostSpecialisedNode,
+} from '../language-parsers/tree-sitter-parser';
 
 export type ASMapping = MappingItem;
 
@@ -54,11 +57,14 @@ export class AssemblyScriptSourceMap extends SourceMap {
     location: SourceCodeLocation,
   ): SourceCodeMapping[] {
     const positions: SourceCodeMapping[] = [];
-    for (const s of this._mappings) {
-      if (s.originalLine !== location.linenr) {
-        continue;
-      }
+    const candidates = this._mappings.filter((m) => {
+      return m.originalLine === location.linenr;
+    });
 
+    for (const s of candidates) {
+      // if (s.originalLine !== location.linenr) {
+      //   continue;
+      // }
       const colStart = location.columnStart;
       if (colStart !== undefined) {
         if (colStart > s.originalColumn) {
@@ -133,6 +139,103 @@ export class AssemblyScriptSourceMap extends SourceMap {
     };
   }
 
+  public override nextSourceCodeLocation(
+    source: string,
+    currentLineNr: number,
+    currentColumnStart: number,
+  ): SourceCodeMapping[] {
+    const tree = this._sourceTreeMap.get(source);
+    if (tree === undefined) {
+      return [];
+    }
+
+    const row = currentLineNr - 1;
+    const col = currentColumnStart;
+    const parentNode = searchNode(tree.rootNode, row, col);
+    if (parentNode === undefined) {
+      return [];
+    }
+    // split into getParentnode & getMostSpecialisedNode
+    // use most specialised node to find mapping
+    // if no mappings found for most specialised node
+    // then go to a parent node and so on
+    // the stop condition is once the parentNode is reached of the start
+    // printNodeInfo(parentNode, `ParentNode found for row=${row} col=${col}`);
+    // const specifNode = mostSpecialisedNode(parentNode, row, col);
+    // printNodeInfo(
+    //   parentNode,
+    //   `MostSpecificNode found for row${row} col=${col}`,
+    // );
+    return this.nextLocations(parentNode);
+    // return this.nextLocations(specifNode);
+  }
+
+  private nextLocations(node: Parser.SyntaxNode): SourceCodeMapping[] {
+    let workingNodes = stepOverNode(node);
+    const mappings: SourceCodeMapping[] = [];
+    while (workingNodes.length > 0) {
+      const node = workingNodes.pop();
+      if (node === undefined) {
+        throw new Error(
+          `An array that is not zero should have an element to pop`,
+        );
+      }
+      const lineNr = node.startPosition.row + 1;
+      const colStart = node.startPosition.column;
+      const colEnd = node.endPosition.column;
+
+      let positions = this.generatedPositionFor({
+        linenr: lineNr,
+        columnStart: colStart,
+        columnEnd: colEnd,
+      });
+
+      if (positions.length === 0) {
+        // printNodeInfo(
+        //   node,
+        //   `Skipping Node since no mappings found for {lineNr:${lineNr},colStart:${colStart},colEnd:${colEnd}}`,
+        // );
+        const toAdd = stepOverNode(node);
+        workingNodes = workingNodes.concat(toAdd);
+        continue;
+      }
+
+      if (positions.length > 1) {
+        logger.warn(
+          `Multiple mappings found for after lineNr=${lineNr} & >=colStart=${colStart}`,
+        );
+        positions = positions.sort((p1, p2) => {
+          return p1.columnStart - p2.columnStart;
+        });
+      }
+      const pos = positions[0];
+      if (pos.linenr !== lineNr) {
+        logger.warn(
+          `The found SourceLocation linenr ${pos.linenr} does not match the linenr of the AST node ${lineNr}`,
+        );
+      }
+      if (pos.columnStart !== colStart) {
+        logger.error(
+          `The found SourceLocation columnStart ${pos.columnStart} does not match the columnStart of the AST node ${colStart}`,
+        );
+      }
+      const alreadAddedy = mappings.find((m) => {
+        return (
+          m.address === pos.address &&
+          m.linenr === pos.linenr &&
+          m.columnStart === pos.columnStart &&
+          m.columnEnd === pos.columnEnd &&
+          m.source === pos.source
+        );
+      });
+      if (alreadAddedy === undefined) {
+        pos.columnEnd = colEnd;
+        mappings.push(pos);
+      }
+    }
+    return mappings;
+  }
+
   public getFunction(id: number): WASMFunction | undefined {
     if (id >= this.wasm.imports.length) {
       return this.wasm.functions.find((f) => {
@@ -146,12 +249,14 @@ export class AssemblyScriptSourceMap extends SourceMap {
   }
 
   async buildComplemtaryContext(): Promise<void> {
-    await this.createAST();
+    // const parser = await createLanguageParser(
+    //   './src/source_mappers/language-parsers/tree-sitter-typescript.wasm',
+    // );
+    const parser = await createTypeScriptParser();
+    await this.createAST(parser);
   }
 
-  private async createAST(): Promise<void> {
-    const parser = new Parser();
-    // parser.setLanguage(typescript);
+  private async createAST(parser: Parser): Promise<void> {
     for (let i = 0; i < this.sources.length; i++) {
       const source = this.sources[i];
       const content = await fs.promises.readFile(source);
