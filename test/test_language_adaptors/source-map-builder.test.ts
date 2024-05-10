@@ -20,4 +20,15 @@ describe('SourceMap builder', () => {
     expect(stdout).to.equal('');
     expect(stderr).to.not.equal('');
   });
+
+  it('Valid WasmAddr yields zero exitCode, empty stderr, and non-empty stdout', async () => {
+    const invalidWasmAddress = 289;
+    const [exitCode, stdout, stderr] = await addr2line(
+      wasmPath,
+      invalidWasmAddress,
+    );
+    expect(exitCode).to.equal(0);
+    expect(stdout).to.not.equal('');
+    expect(stderr).to.equal('');
+  });
 });
