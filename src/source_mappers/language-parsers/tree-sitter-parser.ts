@@ -25,6 +25,12 @@ export async function createTypeScriptParser(): Promise<Parser> {
   return createLanguageParser(pathToLanguage);
 }
 
+export async function createRustParser(): Promise<Parser> {
+  const d = __dirname;
+  const pathToLanguage = path.join(d, './tree-sitter-rust.wasm');
+  return createLanguageParser(pathToLanguage);
+}
+
 export function printNodeInfo(
   node: Parser.SyntaxNode,
   title: string = 'NodeInfo',
