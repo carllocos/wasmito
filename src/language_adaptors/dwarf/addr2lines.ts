@@ -47,7 +47,7 @@ function getProducer(wasmFilePath: string): string {
   return 'todo';
 }
 
-async function createMappingForAddr(
+export async function createMappingForAddr(
   wasmFilePath: string,
   addr: number,
 ): Promise<MappingItem | undefined> {
@@ -60,7 +60,7 @@ async function createMappingForAddr(
   return undefined;
 }
 
-async function addr2line(
+export async function addr2line(
   wasmFilePath: string,
   addr: number,
 ): Promise<[number, string, string]> {
