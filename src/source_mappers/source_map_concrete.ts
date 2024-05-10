@@ -1,3 +1,5 @@
+// TODO merge: assemblyscript Sourcemap and WATSourceMap into here
+// TODO rename class
 import fs from 'fs';
 import { SourceMapConsumer, type MappingItem } from 'source-map';
 import {
