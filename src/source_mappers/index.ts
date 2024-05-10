@@ -13,3 +13,4 @@ export * from './wasm/wasm_module_parser';
 export * from './wasm/wasm_opcode';
 export * from './wat/wat_source_map';
 export * from './source_map';
+export * from './source_map_concrete';
