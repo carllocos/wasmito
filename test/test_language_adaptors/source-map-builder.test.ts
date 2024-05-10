@@ -7,7 +7,7 @@ import { addr2line } from '../../src/language_adaptors/dwarf/addr2lines';
  * Until DWARF library is fully intergated
  */
 
-describe('SourceMap builder', () => {
+describe('addr2line command', () => {
   const wasmPath = './test/data/rust_examples/blink/main.wasm';
 
   it('Invalid WasmAddr yields non-zero exitCode', async () => {
