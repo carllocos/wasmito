@@ -65,7 +65,7 @@ export async function addr2line(
   addr: number,
 ): Promise<[number, string, string]> {
   return new Promise<[number, string, string]>((resolve, reject) => {
-    const hexAddr = addr.toString(16);
+    const hexAddr = `0x${addr.toString(16)}`;
     const command = ['wasm-tools', 'addr2line', wasmFilePath, hexAddr];
     const process = spawn(command[0], command.slice(1), { stdio: 'pipe' });
     let stdout = '';
