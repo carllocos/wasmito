@@ -2,9 +2,9 @@ import { expect } from 'chai';
 import { addr2line } from '../../src/language_adaptors/dwarf/addr2lines';
 
 /*
- * The following test suite is intented to test the generation of the sourcemap.
- * The generation of SourceMaps happens temporarily via the wasmt-tools addr2line command.
- * Until DWARF library is fully intergated
+ * Until DWARF library is fully intergated, the generation of SourceMaps happens temporarily
+ * via the `wasm-tools addr2line` command.
+ * The following test suite tests the `wasm-tools addr2line command`
  */
 
 describe('addr2line command', () => {
