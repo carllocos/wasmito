@@ -313,7 +313,7 @@ export class SourceMapConcrete extends SourceMap {
       }
     });
 
-    const sourcesAbsPath = [];
+    const sourcesAbsPath: string[] = [];
     for (let i = 0; i < sources.length; i++) {
       let source = sources[i];
       if (source.startsWith(sourceRoot)) {
