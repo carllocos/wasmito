@@ -1,8 +1,10 @@
 import { getGlobalLogger } from '../../logger/logger';
 import { AssemblyScriptCompiler } from './assemblyscript_compiler';
 import { type SourceCodeCompiler } from './compiler';
+import { DefaultCompiler } from './default_compiler';
 import {
   TargetLanguage,
+  isTargetLanguage,
   type ProgLangSelectionArgs,
 } from './prog_language_selection';
 import { WATCompiler } from './wat_compilers';
@@ -17,10 +19,21 @@ export function makeSourceCodeCompiler(
     case TargetLanguage.AssemblyScript:
       return new AssemblyScriptCompiler(compilationOutput);
     default:
-      getGlobalLogger().error(
-        'Did not found source code Compiler for language with extension',
-        compilerSelection.targetLanguage,
-      );
-      throw new Error('Unsupported source code extension');
+      if (isTargetLanguage(compilerSelection.targetLanguage)) {
+        getGlobalLogger().info(
+          `No compiler present for language with extension ${compilerSelection.targetLanguage} => deactivate compiler use`,
+        );
+        return new DefaultCompiler(
+          compilerSelection.targetLanguage,
+          compilationOutput,
+        );
+      } else {
+        getGlobalLogger().error(
+          'Did not found source code Compiler for language with extension',
+          compilerSelection.targetLanguage,
+          ` => deactivate compiler use`,
+        );
+        throw new Error('Unsupported source code extension');
+      }
   }
 }
