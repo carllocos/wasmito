@@ -10,7 +10,6 @@ import { isAbsolutePath, isFilePath, pathJoin } from '../../util/file_util';
 import { createLogger } from '../../logger/logger';
 import { type ASConfig } from './asconfig';
 import { getPath2AssemblyScriptLib } from '../../project_config';
-import path = require('path');
 import { type WASMFunction } from '../wasm/wasm_function';
 import { type WasmInstruction } from '../wasm/wasm_instruction';
 
@@ -378,7 +377,7 @@ function gerenateAssemblyScriptCommonPath(src: string): string {
   const libPrefix = '~lib/';
   const s = src.replace(libPrefix, '');
   const p = getPath2AssemblyScriptLib();
-  const path2Source = path.join(p, `/std/assembly/${s}`);
+  const path2Source = pathJoin(p, `/std/assembly/${s}`);
   if (!isFilePath(path2Source)) {
     throw new Error(`the generated AS common.ts does not exist ${path2Source}`);
   }
