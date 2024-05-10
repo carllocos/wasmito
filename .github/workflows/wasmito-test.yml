@@ -1,6 +1,6 @@
 name: wasmito Tests
 
-on: [ push ]
+on: [push]
 
 jobs:
   test-wasmito:
@@ -16,8 +16,16 @@ jobs:
 
       - name: Build submodules
         run: |
-            echo "Running installation script"
-            bash ./install.sh
+          echo "Running installation script"
+          bash ./install.sh
+
+      - name: Install Rust
+        run: |
+          curl https://sh.rustup.rs -sSf | sh
+
+      - name: Install wasm-tools
+        run: |
+          cargo install wasm-tools
 
       - name: Setup Node.js
         uses: actions/setup-node@v2
