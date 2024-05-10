@@ -1,3 +1,4 @@
+// TODO merge assemblyscript Sourcemap into concrete sourcemap
 import fs from 'fs';
 import { SourceMapConsumer, type MappingItem } from 'source-map';
 import {
