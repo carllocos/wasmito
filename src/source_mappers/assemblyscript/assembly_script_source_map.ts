@@ -315,7 +315,7 @@ export class AssemblyScriptSourceMap extends SourceMap {
       }
     });
 
-    const sourceAbsPath = [];
+    const sourceAbsPath: string[] = [];
     for (let i = 0; i < sources.length; i++) {
       let source = sources[i];
       if (source.startsWith(sourceRoot)) {
