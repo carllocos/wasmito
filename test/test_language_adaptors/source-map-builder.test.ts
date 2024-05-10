@@ -10,7 +10,7 @@ import { addr2line } from '../../src/language_adaptors/dwarf/addr2lines';
 describe('SourceMap builder', () => {
   const wasmPath = './test/data/rust_examples/blink/main.wasm';
 
-  it('Inspecting pc', async () => {
+  it('Invalid WasmAddr yields non-zero exitCode', async () => {
     const invalidWasmAddress = 0;
     const [exitCode, stdout, stderr] = await addr2line(
       wasmPath,
