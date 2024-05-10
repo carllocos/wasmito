@@ -14,18 +14,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Build submodules
+      - name: Install Rust on Ubuntu-latest
+        if: matrix.os == 'ubuntu-latest'
         run: |
-          echo "Running installation script"
-          bash ./install.sh
+          sudo apt-get install -y rustc
 
-      - name: Install Rust
+      - name: Install Rust on macos-latest
+        if: matrix.os == 'macos-latest'
         run: |
-          curl https://sh.rustup.rs -sSf | sh
+          brew install rust
 
       - name: Install wasm-tools
         run: |
           cargo install wasm-tools
+
+      - name: Build submodules
+        run: |
+          echo "Running installation script"
+          bash ./install.sh
 
       - name: Setup Node.js
         uses: actions/setup-node@v2
