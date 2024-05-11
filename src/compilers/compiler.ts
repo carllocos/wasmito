@@ -1,4 +1,4 @@
-import { type OldSourceMap } from '../source_mappers/source_map';
+import { type OldSourceMap } from '../source_mappers/old_source_map';
 import { type TargetLanguage } from './prog_language_selection';
 
 /*

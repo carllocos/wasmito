@@ -16,7 +16,7 @@ import { type WasmInstruction } from '../../webassembly/wasm/wasm_instruction';
 import { PlaceholderType } from '../../webassembly/wasm/opcode_type';
 import { exit } from 'process';
 import { type WARDuinoVM } from '../../warduino/vm/warduino_vm';
-import { type OldSourceMap } from '../../source_mappers/source_map';
+import { type OldSourceMap } from '../../source_mappers/old_source_map';
 import path from 'path';
 import { BoardBaudRate } from '../../util/serial_port';
 import { TargetLanguage } from '../../compilers/prog_language_selection';

@@ -22,7 +22,7 @@ import { ResolveEventRequest } from '../requests/resolve_event_request';
 import {
   type SourceCodeLocation,
   type OldSourceMap,
-} from '../../source_mappers/source_map';
+} from '../../source_mappers/old_source_map';
 import {
   HookOnWasmAddrMoment,
   HookOnWasmAddrRequest,
