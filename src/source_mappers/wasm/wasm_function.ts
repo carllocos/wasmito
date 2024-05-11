@@ -1,5 +1,5 @@
-import { type WasmType } from '../../state/opcode_type';
-import { type WASM } from '../../state/wasm';
+import { type WasmType } from '../../webassembly/opcode_type';
+import { type WASM } from '../../webassembly/wasm';
 import { type WasmInstruction } from './wasm_instruction';
 
 export interface WasmLocal {

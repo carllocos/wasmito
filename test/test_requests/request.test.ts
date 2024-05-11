@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { InspectStack } from '../../src/warduino/requests/inspect_request';
-import { type WasmStack } from '../../src/state/wasm_stack';
+import { type WasmStack } from '../../src/webassembly/wasm_stack';
 
 describe('Inspect Request Test Suite', () => {
   it('InspectStack throws exception for invalid line', () => {

@@ -1,4 +1,4 @@
-import { type WasmState } from '../state/wasm';
+import { type WasmState } from '../webassembly/wasm';
 import { type StateRequest } from '../warduino/requests/inspect_request';
 import { HookKind, HookWithSubscription } from './hook';
 

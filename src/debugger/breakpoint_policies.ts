@@ -3,7 +3,7 @@ import { RemoveHookOnWasmAddrRequest } from '../warduino/requests/hook_on_wasm_a
 import { type Breakpoint } from './breakpoint';
 import { createLogger } from '../logger/logger';
 import { InspectStateHook } from '../hooks/hook_inspect_state';
-import { type WasmState } from '../state';
+import { type WasmState } from '../webassembly';
 import { type WARDuinoVM } from '../warduino/vm/warduino_vm';
 import { isSuccessfulMessage } from '../warduino/api/request_interface';
 import { StateRequest } from '../warduino/requests/inspect_request';

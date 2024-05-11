@@ -5,8 +5,8 @@ import {
 } from '../../hooks/hook';
 import { EventInspectHook } from '../../hooks/hook_event';
 import { EmptyValueSubstitution } from '../../hooks/hook_value_substitution';
-import { type WasmValuesBuilder } from '../../state';
-import { type WASM, type WasmState } from '../../state/wasm';
+import { type WasmValuesBuilder } from '../../webassembly';
+import { type WASM, type WasmState } from '../../webassembly/wasm';
 import { type ProxyCallResponse } from '../../warduino';
 import { ResponseType } from '../../warduino/api/request_interface';
 import { AroundFunctionRequest } from '../../warduino/requests/around_function_request';

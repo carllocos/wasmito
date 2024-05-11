@@ -3,7 +3,7 @@ export * from './hooks/index';
 export * from './communication/index';
 export * from './device/index';
 export * from './source_mappers/index';
-export * from './state/index';
+export * from './webassembly/index';
 export * from './warduino/index';
 export * from './util/index';
 export * from './debugger/index';

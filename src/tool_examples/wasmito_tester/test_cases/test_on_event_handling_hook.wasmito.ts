@@ -1,4 +1,4 @@
-import { type WasmState, type WASM } from '../../../state/wasm';
+import { type WasmState, type WASM } from '../../../webassembly/wasm';
 import {
   createSystemSetup,
   oneM5StickCDev,

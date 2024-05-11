@@ -14,7 +14,7 @@ import { type Platform } from '../../builder/platform';
 // import { createPlatformBuilder } from '../../builder/platformbuilder_factory';
 import { PauseRequest } from '../requests/pause_request';
 import { ProxifyRequest } from '../requests/proxify_request';
-import { type WASM, type WasmState } from '../../state/wasm';
+import { type WASM, type WasmState } from '../../webassembly/wasm';
 import { StateRequest } from '../requests/inspect_request';
 import { LoadStateRequestBuilder } from '../requests/load_state_request';
 import { timeoutPromise } from '../../util/promise_util';

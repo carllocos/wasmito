@@ -7,7 +7,7 @@ import { WARDuinoDevVM } from './dev_vm';
 import { spawn, type ChildProcess } from 'child_process';
 import { ClientSideSocket, ShareChannel } from '../../communication/index';
 import { getPath2WARDuinoSDKVMBinary } from '../../project_config';
-import { type WASM, type WasmState } from '../../state/wasm';
+import { type WASM, type WasmState } from '../../webassembly/wasm';
 import { StateRequest } from '../requests/inspect_request';
 import { UpdateCallbackMappingRequest } from '../requests/update_callbacks_request';
 import { PushEventRequest } from '../requests/inject_event_request';

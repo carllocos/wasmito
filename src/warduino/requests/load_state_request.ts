@@ -1,5 +1,5 @@
-import { StateBinaryEncoder } from '../../state/old_binary_state_serializer';
-import { type WasmState } from '../../state/wasm';
+import { StateBinaryEncoder } from '../../webassembly/old_binary_state_serializer';
+import { type WasmState } from '../../webassembly/wasm';
 import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,

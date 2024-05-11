@@ -1,6 +1,6 @@
 import { DeviceManager } from '../../device/device_manager';
 import { getGlobalLogger } from '../../logger/logger';
-import { type WasmState } from '../../state/wasm';
+import { type WasmState } from '../../webassembly/wasm';
 import { InspectStateHook } from '../../hooks/hook_inspect_state';
 import { EmptyValueSubstitution } from '../../hooks/hook_value_substitution';
 import { AroundFunctionRequest } from '../../warduino/requests/around_function_request';
@@ -13,7 +13,7 @@ import { StateRequest } from '../../warduino/requests/inspect_request';
 import { ResponseType } from '../../warduino/api/request_interface';
 import * as fs from 'fs';
 import { type WasmInstruction } from '../../source_mappers/wasm/wasm_instruction';
-import { PlaceholderType } from '../../state/opcode_type';
+import { PlaceholderType } from '../../webassembly/opcode_type';
 import { exit } from 'process';
 import { type WARDuinoVM } from '../../warduino/vm/warduino_vm';
 import { type SourceMap } from '../../source_mappers/source_map';

@@ -1,4 +1,4 @@
-import { PlaceholderType, WasmType } from '../../state/opcode_type';
+import { PlaceholderType, WasmType } from '../../webassembly/opcode_type';
 
 export enum WASMOpcodeNumber {
   Unreachable = 0x00,

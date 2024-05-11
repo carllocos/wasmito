@@ -1,4 +1,4 @@
-import { WASM } from '../state/wasm';
+import { WASM } from '../webassembly/wasm';
 import { HookWithoutSubscription, HookKind } from './hook';
 
 export class ValueSubstitution extends HookWithoutSubscription {

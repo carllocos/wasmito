@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 import { createLogger } from '../../logger/logger';
-import { WasmType } from '../../state/opcode_type';
+import { WasmType } from '../../webassembly/opcode_type';
 import {
   BlockInstruction,
   CallInstruction,
@@ -8,7 +8,7 @@ import {
   LoopInstruction,
   WasmInstruction,
 } from './wasm_instruction';
-import { WASM } from '../../state/wasm';
+import { WASM } from '../../webassembly/wasm';
 import { WASMOpcodeNumber, wasmOpcodeFromStr } from './wasm_opcode';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const decode = require('@webassemblyjs/wasm-parser');
