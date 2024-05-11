@@ -7,9 +7,9 @@ import {
   IfInstruction,
   LoopInstruction,
   WasmInstruction,
-} from './wasm_instruction';
+} from '../wasm/wasm_instruction';
 import { WASM } from '../wasm';
-import { WASMOpcodeNumber, wasmOpcodeFromStr } from './wasm_opcode';
+import { WASMOpcodeNumber, wasmOpcodeFromStr } from '../wasm/wasm_opcode';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const decode = require('@webassemblyjs/wasm-parser');
 const logger = createLogger('WasmParser');

@@ -6,7 +6,7 @@ import {
   type ParsedModule,
   parseWasmModule,
   type Section,
-} from './wasm_module_parser';
+} from '../parsers/wasm_module_parser';
 import { execSync } from 'child_process';
 import {
   type VariableInfo,
