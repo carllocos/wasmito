@@ -8,13 +8,14 @@ import {
 } from '../util/file_util';
 import { getPath2AssemblyScriptCompiler, getPath2NPX } from '../project_config';
 import { runCommand } from '../util/process_command';
-import { AssemblyScriptSourceMap } from '../source_mappers/assemblyscript/assembly_script_source_map';
+import { SourceMapFromASConfigPath } from '../source_mappers/assemblyscript/assembly_script_source_map';
 import { TargetLanguage } from './prog_language_selection';
 import {
   type ASConfig,
   ASConfigError,
   parseASConfigFromPath,
 } from '../source_mappers/assemblyscript/asconfig';
+import { LanguageAdaptor } from '../language_adaptors/language_adaptor';
 
 const logger = createLogger('AssemblyScriptCompiler');
 
@@ -76,7 +77,7 @@ export class AssemblyScriptCompiler extends SourceCodeCompiler {
 
   async compile(
     compilerArgs: AssemblyScriptCompilerArgs,
-  ): Promise<AssemblyScriptSourceMap> {
+  ): Promise<LanguageAdaptor> {
     const paths: AssemblyScriptCompilerArgs =
       parseAssemblyScriptArgs(compilerArgs);
     const config = await parseASConfigFromPath(
@@ -93,10 +94,10 @@ export class AssemblyScriptCompiler extends SourceCodeCompiler {
     config.storeToJSONFile();
     await runNPXCommand(config);
 
-    const sm = await AssemblyScriptSourceMap.fromSourceMapPath(config);
+    const sm = await SourceMapFromASConfigPath(config);
     this.config = config;
     this._lastCompileArgs = compilerArgs;
-    return sm;
+    return new LanguageAdaptor(sm);
   }
 }
 

@@ -1,8 +1,7 @@
 import { createLogger } from '../logger/logger';
-import { type OldSourceMap } from '../source_mappers/old_source_map';
 import { SourceCodeCompiler } from './compiler';
 import { getPath2WAT2WASM, getPath2XXD } from '../project_config';
-import { WATSourceMap } from '../source_mappers/wat/wat_source_map';
+import { createSourceMapForWAT } from '../source_mappers/wat/wat_source_map';
 import {
   getAbsolutePath,
   getFileExtension,
@@ -20,6 +19,7 @@ import {
 import { writeFileSync } from 'fs';
 import { runCommand } from '../util/process_command';
 import { TargetLanguage } from './prog_language_selection';
+import { LanguageAdaptor } from '../language_adaptors/language_adaptor';
 
 const logger = createLogger('WATCompiler');
 
@@ -109,7 +109,7 @@ export class WATCompiler extends SourceCodeCompiler {
     return this._latestWATCompileArgs;
   }
 
-  async compile(compilationArgs: WATCompilerArgs): Promise<OldSourceMap> {
+  async compile(compilationArgs: WATCompilerArgs): Promise<LanguageAdaptor> {
     const args = createAndAssertWATCompilerArgs(compilationArgs);
     const sourceCodePath = args.sourceCodePath;
     const fileName = getFileName(args.wasmOutputPath ?? sourceCodePath);
@@ -160,13 +160,13 @@ export class WATCompiler extends SourceCodeCompiler {
     if (isFilePath(objDumpDissembleOutputFile)) {
       removeFile(objDumpDissembleOutputFile);
     }
-    const sm = new WATSourceMap(
+    const sm = createSourceMapForWAT(
       lineInfoPairs,
       sourceCodePath,
       wasmOutputFilePath,
     );
     this._latestWATCompileArgs = args;
-    return sm;
+    return new LanguageAdaptor(sm);
   }
 }
 

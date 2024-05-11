@@ -4,7 +4,8 @@ import {
   isTargetLanguage,
   type TargetLanguage,
 } from './prog_language_selection';
-import { SourceMapConcrete } from '../source_mappers/source_map_concrete';
+import { SourceMap } from '../source_mappers/source_map';
+import { LanguageAdaptor } from '../language_adaptors/language_adaptor';
 
 export interface DefaultCompileArgs {
   pathToSrcRoot: string;
@@ -48,17 +49,17 @@ export class DefaultCompiler extends SourceCodeCompiler {
     return this._lastCompileArgs;
   }
 
-  async compile(compilerArgs: DefaultCompileArgs): Promise<SourceMapConcrete> {
+  async compile(compilerArgs: DefaultCompileArgs): Promise<LanguageAdaptor> {
     if (!isDefaultCompileArgs(compilerArgs)) {
       throw new Error(`Invalid compile args`);
     }
 
-    const sm = await SourceMapConcrete.fromSourceMapPath(
+    const sm = await SourceMap.fromSourceMapPath(
       compilerArgs.pathToSrcRoot,
       compilerArgs.pathToSourceMap,
       compilerArgs.pathToWasm,
     );
     this._lastCompileArgs = compilerArgs;
-    return sm;
+    return new LanguageAdaptor(sm);
   }
 }
