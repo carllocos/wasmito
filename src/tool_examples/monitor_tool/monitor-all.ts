@@ -13,7 +13,7 @@ import { StateRequest } from '../../warduino/requests/inspect_request';
 import { ResponseType } from '../../warduino/api/request_interface';
 import * as fs from 'fs';
 import { type WasmInstruction } from '../../webassembly/wasm/wasm_instruction';
-import { PlaceholderType } from '../../webassembly/opcode_type';
+import { PlaceholderType } from '../../webassembly/wasm/opcode_type';
 import { exit } from 'process';
 import { type WARDuinoVM } from '../../warduino/vm/warduino_vm';
 import { type SourceMap } from '../../source_mappers/source_map';

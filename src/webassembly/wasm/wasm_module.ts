@@ -1,5 +1,5 @@
 import { createLogger } from '../../logger/logger';
-import { WasmType } from '../opcode_type';
+import { WasmType } from './opcode_type';
 import { WASM } from '../wasm';
 import { WASMFunction, type WasmLocal } from './wasm_function';
 import {
