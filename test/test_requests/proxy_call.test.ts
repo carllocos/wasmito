@@ -12,9 +12,9 @@ import {
 } from '../../src/warduino/requests/fun_call_request';
 import { WasmValuesBuilder } from '../../src/webassembly/wasm_value_array_builder';
 import { timeoutPromise } from '../../src/util/promise_util';
-import { TargetLanguage } from '../../src/source_mappers/compilers/prog_language_selection';
+import { TargetLanguage } from '../../src/compilers/prog_language_selection';
 import { createDevPlatform } from '../../src/builder/platformbuilder_factory';
-import { type WATCompilerArgs } from '../../src/source_mappers/compilers/wat_compilers';
+import { type WATCompilerArgs } from '../../src/compilers/wat_compilers';
 
 /*
  * TODO: The tests prefixed with `integration:` are integration tests and therefore may need a different framework

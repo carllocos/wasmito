@@ -1,8 +1,8 @@
 import { DeviceManager } from '../../src/device/device_manager';
 import { type WARDuinoDevVM } from '../../src/warduino/vm/dev_vm';
-import { TargetLanguage } from '../../src/source_mappers/compilers/prog_language_selection';
+import { TargetLanguage } from '../../src/compilers/prog_language_selection';
 import { createDevPlatform } from '../../src/builder/platformbuilder_factory';
-import { type WATCompilerArgs } from '../../src/source_mappers/compilers/wat_compilers';
+import { type WATCompilerArgs } from '../../src/compilers/wat_compilers';
 
 describe('Snapshot Request', () => {
   let deviceManager: DeviceManager | undefined;

@@ -19,13 +19,13 @@ import { type WARDuinoVM } from '../../warduino/vm/warduino_vm';
 import { type SourceMap } from '../../source_mappers/source_map';
 import path from 'path';
 import { BoardBaudRate } from '../../util/serial_port';
-import { TargetLanguage } from '../../source_mappers/compilers/prog_language_selection';
+import { TargetLanguage } from '../../compilers/prog_language_selection';
 import {
   createArduinoPlatform,
   createDevPlatform,
 } from '../../builder/platformbuilder_factory';
 import { PlatformTarget } from '../../builder/platform_config';
-import { type WATCompilerArgs } from '../../source_mappers/compilers/wat_compilers';
+import { type WATCompilerArgs } from '../../compilers/wat_compilers';
 // type PlatformConfigArgs,
 // createPlatformBuilder,
 // DevVMPlatform,

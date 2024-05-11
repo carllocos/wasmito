@@ -1,4 +1,4 @@
-import { getGlobalLogger } from '../../logger/logger';
+import { getGlobalLogger } from '../logger/logger';
 import { AssemblyScriptCompiler } from './assemblyscript_compiler';
 import { type SourceCodeCompiler } from './compiler';
 import { DefaultCompiler } from './default_compiler';

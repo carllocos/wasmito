@@ -3,9 +3,9 @@ import { createLogger } from '../logger/logger';
 import { getPath2WARDuinoSDK, readProjectName } from '../project_config';
 import { type PlatformConfig } from './platform_config';
 import { createTempDirectory, getAbsolutePath } from '../util/file_util';
-import { type SourceCodeCompiler } from '../source_mappers/compilers/compiler';
+import { type SourceCodeCompiler } from '../compilers/compiler';
 import { type SourceMap } from '../source_mappers/source_map';
-import { type ProgLangSelectionArgs } from '../source_mappers/compilers/prog_language_selection';
+import { type ProgLangSelectionArgs } from '../compilers/prog_language_selection';
 
 export class PlatformError extends Error {
   constructor(message: string) {

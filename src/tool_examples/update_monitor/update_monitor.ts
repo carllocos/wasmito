@@ -1,7 +1,7 @@
 import { type WARDuinoVM } from '../../warduino';
 import * as fs from 'fs';
 import * as path from 'path';
-import { type WATCompilerArgs } from '../../source_mappers/compilers/wat_compilers';
+import { type WATCompilerArgs } from '../../compilers/wat_compilers';
 import { createArduinoPlatform, createDevPlatform } from '../../builder';
 import { TargetLanguage } from '../../source_mappers';
 import { DeviceManager } from '../../device';

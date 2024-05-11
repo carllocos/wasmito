@@ -1,8 +1,8 @@
-import { createLogger } from '../../logger/logger';
-import { type SourceMap } from '../source_map';
+import { createLogger } from '../logger/logger';
+import { type SourceMap } from '../source_mappers/source_map';
 import { SourceCodeCompiler } from './compiler';
-import { getPath2WAT2WASM, getPath2XXD } from '../../project_config';
-import { WATSourceMap } from '../wat/wat_source_map';
+import { getPath2WAT2WASM, getPath2XXD } from '../project_config';
+import { WATSourceMap } from '../source_mappers/wat/wat_source_map';
 import {
   getAbsolutePath,
   getFileExtension,
@@ -10,15 +10,15 @@ import {
   isFilePath,
   removeFile,
   removeFileExtension,
-} from '../../util/file_util';
+} from '../util/file_util';
 import path from 'path';
 import {
   extractAddressInformation,
   type LineInfoPairs,
   type LineInfo,
-} from '../parsers/obj-dump_parser';
+} from '../source_mappers/parsers/obj-dump_parser';
 import { writeFileSync } from 'fs';
-import { runCommand } from '../../util/process_command';
+import { runCommand } from '../util/process_command';
 import { TargetLanguage } from './prog_language_selection';
 
 const logger = createLogger('WATCompiler');
