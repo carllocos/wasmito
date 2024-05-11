@@ -77,7 +77,6 @@ export async function createMappingForAddr(
 function extractLineColInfo(
   cmdStdOutput: string,
 ): undefined | [string, string, number, number, number] {
-  console.log(`stdout: ${cmdStdOutput}`);
   // stdout is of the has one of the following forms
   // 1. 0xaddres: name-source-location path/to/sourcefile.rs:linenr:colnr\n
   // 2. 0xaddres: name-source-location path/to/sourcefile.rs:linenr\n
