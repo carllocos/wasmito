@@ -1,3 +1,4 @@
+export * from './compilers/index';
 export * from './builder/index';
 export * from './hooks/index';
 export * from './communication/index';
@@ -8,3 +9,4 @@ export * from './warduino/index';
 export * from './util/index';
 export * from './debugger/index';
 export * from './language_adaptors/index';
+export * from './language-ast-parsers/index';
