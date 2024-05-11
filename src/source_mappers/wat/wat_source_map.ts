@@ -1,5 +1,5 @@
 // TODO merge WATSourcemap into concrete sourcemap
-import { type LineInfoPairs } from '../parsers/obj-dump_parser';
+import { type LineInfoPairs } from '../../webassembly/parsers/obj-dump_parser';
 import {
   type SourceCodeMapping,
   SourceMap,

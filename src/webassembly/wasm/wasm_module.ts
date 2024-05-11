@@ -12,7 +12,7 @@ import {
   type VariableInfo,
   getGlobalInfos,
   getLocalTypesFromDissambleOutput,
-} from '../../source_mappers/parsers/obj-dump_parser';
+} from '../parsers/obj-dump_parser';
 import { getPath2ObjDump } from '../../project_config';
 import { isCallInstruction, type WasmInstruction } from './wasm_instruction';
 

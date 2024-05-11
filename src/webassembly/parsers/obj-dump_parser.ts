@@ -1,4 +1,4 @@
-import { type WasmType } from '../../webassembly/opcode_type';
+import { type WasmType } from '../opcode_type';
 import { extractTypeInfo } from './details';
 
 export interface VariableInfo {

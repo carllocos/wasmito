@@ -16,7 +16,7 @@ import {
   extractAddressInformation,
   type LineInfoPairs,
   type LineInfo,
-} from '../source_mappers/parsers/obj-dump_parser';
+} from '../webassembly/parsers/obj-dump_parser';
 import { writeFileSync } from 'fs';
 import { runCommand } from '../util/process_command';
 import { TargetLanguage } from './prog_language_selection';

@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { WasmType } from '../../webassembly/opcode_type';
+import { WasmType } from '../opcode_type';
 
 /*
  * Parser for output generated from `wasm-objdump -x` command
