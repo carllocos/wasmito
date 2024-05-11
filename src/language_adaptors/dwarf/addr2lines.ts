@@ -55,9 +55,80 @@ export async function createMappingForAddr(
   if (exitCode !== 0 || stderr !== '') {
     return undefined;
   }
-  console.log(`stdout: ${stdout}`);
 
-  return undefined;
+  const info = extractLineColInfo(stdout);
+  if (info === undefined) {
+    return undefined;
+  }
+
+  const [source, name, generatedColumn, originalLine, originalColumn] = info;
+  const generatedLine = 0;
+  return {
+    source,
+    generatedLine,
+    generatedColumn,
+    originalColumn,
+    originalLine,
+    name,
+  };
+}
+
+function extractLineColInfo(
+  cmdStdOutput: string,
+): undefined | [string, string, number, number, number] {
+  console.log(`stdout: ${cmdStdOutput}`);
+  // stdout is of the has one of the following forms
+  // 1. 0xaddres: name-source-location path/to/sourcefile.rs:linenr:colnr\n
+  // 2. 0xaddres: name-source-location path/to/sourcefile.rs:linenr\n
+  // 3. OtherAddress0xaddres: name-source-location path/to/sourcefile.rs:linenr\n
+  // 3 is related to DWARF information and can be ignored
+
+  const pattern = /^(0x[0-9a-fA-F]+):(.*rs):(\d+):?(\d+)?\n$/;
+  const matched = cmdStdOutput.match(pattern);
+  if (matched === null || matched === undefined) {
+    throw new Error(`ignored line ${cmdStdOutput}`);
+    // return undefined;
+  }
+
+  const addr = Number(matched[1]);
+  if (isNaN(addr)) {
+    throw new Error(
+      `WasmAddr is supposed to be convetable to a number given ${matched[1]}`,
+    );
+  }
+
+  const nameAndSourceFile = matched[2].split(' ');
+
+  const sourceFile = nameAndSourceFile.pop();
+  if (sourceFile === undefined) {
+    throw new Error(
+      `Encountered a sourcelocation for which no sourceFile can be derived ${matched[2]}`,
+    );
+  }
+
+  const name = nameAndSourceFile.join(' ').trim();
+
+  const linenr = Number(matched[3]);
+  if (isNaN(linenr)) {
+    throw new Error(
+      `linenr is supposed to be convetable to a number given ${matched[3]}`,
+    );
+  }
+
+  let colnr = 0;
+  if (matched[4] !== undefined) {
+    colnr = Number(matched[4]);
+    if (isNaN(colnr)) {
+      throw new Error(
+        `colnr is supposed to be convetable to a number given ${matched[4]}`,
+      );
+    }
+  } else {
+    console.debug(
+      `originalColnumber is undefined so fallback to colnumber equal to 0`,
+    );
+  }
+  return [sourceFile, name, addr, linenr, colnr];
 }
 
 export async function addr2line(
