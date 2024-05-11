@@ -1,0 +1,24 @@
+import { expect } from 'chai';
+import { createMappingForAddr } from '../../src/language_adaptors/dwarf/addr2lines';
+
+/*
+ * Until DWARF library is fully intergated, the generation of SourceMaps happens temporarily
+ * via the `wasm-tools addr2line` command.
+ * The following test suite tests the creation of such SourceMap
+ */
+
+describe('SourceMap building', () => {
+  const wasmPath = './test/data/rust_examples/blink/main.wasm';
+
+  it('Invalid WasmAddr results in undefined mapping', async () => {
+    const invalidWasmAddress = 1;
+    const mapping = await createMappingForAddr(wasmPath, invalidWasmAddress);
+    expect(mapping).equal(undefined);
+  });
+
+  it('Valid WasmAddr results in a mapping', async () => {
+    const invalidWasmAddress = 289;
+    const mapping = await createMappingForAddr(wasmPath, invalidWasmAddress);
+    expect(mapping).not.equal(undefined);
+  });
+});
