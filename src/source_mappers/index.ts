@@ -2,7 +2,7 @@ export * from '../compilers/compiler';
 export * from '../compilers/compiler_factory';
 export * from '../compilers/wat_compilers';
 export * from '../compilers/prog_language_selection';
-export * from '../language-parsers/tree-sitter-parser';
+export * from '../language-ast-parsers/tree-sitter-parser';
 export * from '../webassembly/parsers/details';
 export * from '../webassembly/parsers/dissambled';
 export * from '../webassembly/parsers/obj-dump_parser';
