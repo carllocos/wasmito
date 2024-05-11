@@ -1,8 +1,5 @@
 import { type BoardFQBN } from './platform_config';
-import {
-  ArduinoListBoards,
-  ArduinoListBoardsFQBNs,
-} from './platforms/arduino_platform';
+import { ArduinoListBoards, ArduinoListBoardsFQBNs } from './arduino_platform';
 
 export async function listAvailableBoards(): Promise<string[]> {
   // TODO reimplement to use list of serial port OSX because ArduinoListBoards uses WiFi

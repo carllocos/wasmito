@@ -10,7 +10,7 @@ import {
 } from '../api/request_interface';
 import { Command } from '../../communication/command';
 // import { type PlatformConfig } from '../../builder/platform_config';
-import { type Platform } from '../../builder/platform';
+import { type Platform } from '../../platforms/platform';
 // import { createPlatformBuilder } from '../../builder/platformbuilder_factory';
 import { PauseRequest } from '../requests/pause_request';
 import { ProxifyRequest } from '../requests/proxify_request';

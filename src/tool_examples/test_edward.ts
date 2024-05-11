@@ -11,7 +11,7 @@ import {
   type FactoryArgs,
   createArduinoPlatform,
   type ArduinoBoardBuilder,
-} from '../builder';
+} from '../platforms';
 import { type WATCompilerArgs } from '../source_mappers';
 
 export async function callLedcSetup(vm: WARDuinoVM): Promise<void> {

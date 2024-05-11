@@ -1,5 +1,5 @@
 import type winston from 'winston';
-import { type BoardFQBN } from '../../builder/platform_config';
+import { type BoardFQBN } from '../../platforms/platform_config';
 import { DeviceManager } from '../../device/device_manager';
 import {
   LogLevel,
@@ -18,7 +18,7 @@ import {
 import {
   autoBuildArduinoPlatform,
   createDevPlatform,
-} from '../../builder/platformbuilder_factory';
+} from '../../platforms/platformbuilder_factory';
 
 export class SystemDeployer {
   private readonly setup;

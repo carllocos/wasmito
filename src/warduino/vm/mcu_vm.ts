@@ -7,8 +7,8 @@ import { timeoutPromise } from '../../util/promise_util';
 // import { ClientSideSocket, SerialConnection } from '../../communication/index';
 import { ClientSideSocket } from '../../communication/client_socket';
 import { SerialConnection } from '../../communication/serial';
-import { type PlatformConfig } from '../../builder/platform_config';
-import { type Platform } from '../../builder/platform';
+import { type PlatformConfig } from '../../platforms/platform_config';
+import { type Platform } from '../../platforms/platform';
 import { NoChannel } from '../../communication/no_channel';
 
 export class MCUWARDuinoVMError extends Error {

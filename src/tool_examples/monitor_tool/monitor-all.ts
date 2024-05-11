@@ -23,8 +23,8 @@ import { TargetLanguage } from '../../compilers/prog_language_selection';
 import {
   createArduinoPlatform,
   createDevPlatform,
-} from '../../builder/platformbuilder_factory';
-import { PlatformTarget } from '../../builder/platform_config';
+} from '../../platforms/platformbuilder_factory';
+import { PlatformTarget } from '../../platforms/platform_config';
 import { type WATCompilerArgs } from '../../compilers/wat_compilers';
 // type PlatformConfigArgs,
 // createPlatformBuilder,
