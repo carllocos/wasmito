@@ -26,14 +26,15 @@ export class DevVMPlatform extends Platform {
     sourceCodeCompilationArgs: any,
     maxWaitTime?: number,
   ): Promise<number> {
-    this._sourceMap = await maybeTimeoutPromise(
+    this._languageAdaptor = await maybeTimeoutPromise(
       this.compiler.compile(sourceCodeCompilationArgs),
       maxWaitTime,
     );
-    if (this._sourceMap === undefined) {
+    if (this._languageAdaptor === undefined) {
       return -1;
     } else {
-      this.config.vmConfig.program = this._sourceMap.wasm.wasmPath;
+      this.config.vmConfig.program =
+        this._languageAdaptor.sourceMap.wasm.wasmPath;
       return 0;
     }
   }

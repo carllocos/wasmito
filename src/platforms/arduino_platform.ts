@@ -229,11 +229,11 @@ export class ArduinoBoardBuilder extends Platform {
     compilationArgs: any,
     maxWaitTime?: number,
   ): Promise<number> {
-    this._sourceMap = await maybeTimeoutPromise(
+    this._languageAdaptor = await maybeTimeoutPromise(
       this.compiler.compile(compilationArgs),
       maxWaitTime,
     );
-    if (this._sourceMap === undefined) {
+    if (this._languageAdaptor === undefined) {
       this.logger.info(`Could not compile source code for file`);
       return -1;
     }
@@ -257,11 +257,11 @@ export class ArduinoBoardBuilder extends Platform {
       `Arduino compiling sketch ${this.pathToArduinoSketchDir} for ${di.name} (board=${this.config.vmConfig.fqbn.boardName}, ID=${di.id})`,
     );
 
-    if (this._sourceMap === undefined) {
+    if (this._languageAdaptor === undefined) {
       return -1;
     }
 
-    let wasmPath = this._sourceMap.wasm.wasmPath;
+    let wasmPath = this._languageAdaptor.sourceMap.wasm.wasmPath;
     const filename = getFileName(wasmPath);
     if (filename === 'upload.wasm') {
       // special case where the output file has the same name as the file used to flash.
@@ -276,7 +276,8 @@ export class ArduinoBoardBuilder extends Platform {
       this.config.vmConfig.pauseOnStart,
     );
     if (exitCodeCompile === 0) {
-      this.config.vmConfig.program = this._sourceMap.wasm.wasmPath;
+      this.config.vmConfig.program =
+        this._languageAdaptor.sourceMap.wasm.wasmPath;
     }
 
     return exitCodeCompile;

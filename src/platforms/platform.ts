@@ -4,8 +4,9 @@ import { getPath2WARDuinoSDK, readProjectName } from '../project_config';
 import { type PlatformConfig } from './platform_config';
 import { createTempDirectory, getAbsolutePath } from '../util/file_util';
 import { type SourceCodeCompiler } from '../compilers/compiler';
-import { type OldSourceMap } from '../source_mappers/old_source_map';
 import { type ProgLangSelectionArgs } from '../compilers/prog_language_selection';
+import { type LanguageAdaptor } from '../language_adaptors/language_adaptor';
+import { type SourceMap } from '../source_mappers/source_map';
 
 export class PlatformError extends Error {
   constructor(message: string) {
@@ -22,7 +23,7 @@ export abstract class Platform {
   protected readonly tmpDirPrefix: string;
   protected readonly outputDirectory: string;
   protected _sourceCodeCompiler?: SourceCodeCompiler;
-  protected _sourceMap?: OldSourceMap;
+  protected _languageAdaptor?: LanguageAdaptor;
 
   constructor(config: PlatformConfig, outputDir: string = '') {
     this.config = config;
@@ -46,13 +47,13 @@ export abstract class Platform {
     this.logger.info(`Using output directory: ${this.outputDirectory}`);
   }
 
-  get sourceMap(): OldSourceMap {
-    if (this._sourceMap === undefined) {
+  get sourceMap(): SourceMap {
+    if (this._languageAdaptor === undefined) {
       throw new Error(
         `No SourceMap available for the platform. Compile some source code first`,
       );
     }
-    return this._sourceMap;
+    return this._languageAdaptor.sourceMap;
   }
 
   get compilationOutputPath(): string {
@@ -86,7 +87,7 @@ export abstract class Platform {
 
   abstract upload(): Promise<number>;
 
-  public getSourceMap(): OldSourceMap | undefined {
-    return this._sourceMap;
+  public getSourceMap(): SourceMap | undefined {
+    return this._languageAdaptor?.sourceMap;
   }
 }
