@@ -1,6 +1,6 @@
 import { createLogger } from '../../logger/logger';
-import { WasmType } from '../../webassembly/opcode_type';
-import { WASM } from '../../webassembly/wasm';
+import { WasmType } from '../opcode_type';
+import { WASM } from '../wasm';
 import { WASMFunction, type WasmLocal } from './wasm_function';
 import {
   type ParsedModule,
@@ -12,7 +12,7 @@ import {
   type VariableInfo,
   getGlobalInfos,
   getLocalTypesFromDissambleOutput,
-} from '../parsers/obj-dump_parser';
+} from '../../source_mappers/parsers/obj-dump_parser';
 import { getPath2ObjDump } from '../../project_config';
 import { isCallInstruction, type WasmInstruction } from './wasm_instruction';
 

@@ -21,7 +21,7 @@ import { WARDuinoVM } from '../../src/warduino/vm/warduino_vm';
 import { MockChannel } from './mock_channel';
 import { type Breakpoint } from '../../src/debugger/breakpoint';
 import { type Platform } from '../../src';
-import { type WASMFunction } from '../../src/source_mappers/wasm/wasm_function';
+import { type WASMFunction } from '../../src/webassembly/wasm/wasm_function';
 // import { type ProgLangSelectionArgs } from '../../src/source_mappers/compilers/prog_language_selection';
 
 // function createPlatformBuilderConfig(

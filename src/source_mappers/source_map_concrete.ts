@@ -9,8 +9,8 @@ import {
 } from './source_map';
 import { isAbsolutePath, isFilePath, pathJoin } from '../util/file_util';
 import { createLogger } from '../logger/logger';
-import { type WASMFunction } from './wasm/wasm_function';
-import { type WasmInstruction } from './wasm/wasm_instruction';
+import { type WASMFunction } from '../webassembly/wasm/wasm_function';
+import { type WasmInstruction } from '../webassembly/wasm/wasm_instruction';
 
 import type Parser from 'web-tree-sitter';
 import {

@@ -5,7 +5,7 @@ import {
   SourceMap,
   type SourceCodeLocation,
 } from '../source_map';
-import { type WASMFunction } from '../wasm/wasm_function';
+import { type WASMFunction } from '../../webassembly/wasm/wasm_function';
 
 // TODO Move to LangaugeAdaptor which will consist of
 // 1. SourceMap Or Dwarf

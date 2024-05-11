@@ -49,7 +49,7 @@ import {
 } from '../requests/hook_on_error';
 import { EventInspectHook } from '../../hooks/hook_event';
 import { type DeviceIdentity } from '../../device';
-import { type WASMFunction } from '../../source_mappers/wasm/wasm_function';
+import { type WASMFunction } from '../../webassembly/wasm/wasm_function';
 
 // TODO Rename to Backend
 // TODO mover addbp and removebp, and breakpoint fields to BreakpointPolicies +  add getters for breakpoints there

@@ -10,8 +10,8 @@ import { isAbsolutePath, isFilePath, pathJoin } from '../../util/file_util';
 import { createLogger } from '../../logger/logger';
 import { type ASConfig } from './asconfig';
 import { getPath2AssemblyScriptLib } from '../../project_config';
-import { type WASMFunction } from '../wasm/wasm_function';
-import { type WasmInstruction } from '../wasm/wasm_instruction';
+import { type WASMFunction } from '../../webassembly/wasm/wasm_function';
+import { type WasmInstruction } from '../../webassembly/wasm/wasm_instruction';
 
 import type Parser from 'web-tree-sitter';
 import {
