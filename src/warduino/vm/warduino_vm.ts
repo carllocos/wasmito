@@ -50,6 +50,7 @@ import {
 import { EventInspectHook } from '../../hooks/hook_event';
 import { type DeviceIdentity } from '../../device';
 import { type WASMFunction } from '../../webassembly/wasm/wasm_function';
+import { type SourceMap } from '../../source_mappers/source_map';
 
 // TODO Rename to Backend
 // TODO mover addbp and removebp, and breakpoint fields to BreakpointPolicies +  add getters for breakpoints there
@@ -129,7 +130,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     this._channel = newChannel;
   }
 
-  get sourceMap(): OldSourceMap {
+  get sourceMap(): SourceMap {
     return this.platform.sourceMap;
   }
 
