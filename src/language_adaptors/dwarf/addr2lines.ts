@@ -35,7 +35,8 @@ export async function buildSourceMap(wasmFilePath: string): Promise<SourceMap> {
 }
 
 function getAddressRangeOffset(wasmFilePath: string): number[] {
-  const endAddr = 255;
+  // TODO fix ranges
+  const endAddr = 406;
   const wasmAddresses: number[] = [];
   for (let addr = 0; addr < endAddr; addr++) {
     wasmAddresses.push(addr);
