@@ -1,6 +1,7 @@
 import { type MappingItem } from 'source-map';
 
 import { spawn } from 'child_process';
+import { readLanguageMetadata } from './metadata_wasm';
 
 /*
  * This source file will construct a sourcemap for a given file using the wasm-tools addr2line command
@@ -11,10 +12,8 @@ export interface SourceMap {
 }
 
 export async function buildSourceMap(wasmFilePath: string): Promise<SourceMap> {
+  const producer = await getProducer(wasmFilePath);
   const wasmAddresses = getAddressRangeOffset(wasmFilePath);
-
-  const producer = getProducer(wasmFilePath);
-
   const mappingsResults = await Promise.all(
     wasmAddresses.map(async (addr: number) => {
       return createMappingForAddr(wasmFilePath, addr);
@@ -44,8 +43,9 @@ function getAddressRangeOffset(wasmFilePath: string): number[] {
   return wasmAddresses;
 }
 
-function getProducer(wasmFilePath: string): string {
-  return 'todo';
+async function getProducer(wasmFilePath: string): Promise<string> {
+  const languageUsed = await readLanguageMetadata(wasmFilePath);
+  return languageUsed ?? '';
 }
 
 export async function createMappingForAddr(
