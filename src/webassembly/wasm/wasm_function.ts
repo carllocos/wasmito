@@ -1,4 +1,4 @@
-import { type WasmType } from '../opcode_type';
+import { type WasmType } from './opcode_type';
 import { type WASM } from '../wasm';
 import { type WasmInstruction } from './wasm_instruction';
 

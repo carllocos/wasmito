@@ -1,5 +1,5 @@
 import { type WASM } from '..';
-import { PlaceholderType, WasmType } from '../opcode_type';
+import { PlaceholderType, WasmType } from './opcode_type';
 import {
   WASMOpcodeNumber,
   typeFromWasmOpcode,

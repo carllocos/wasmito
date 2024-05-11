@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 import { createLogger } from '../../logger/logger';
-import { WasmType } from '../opcode_type';
+import { WasmType } from '../wasm/opcode_type';
 import {
   BlockInstruction,
   CallInstruction,
