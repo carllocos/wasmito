@@ -1,7 +1,9 @@
+import { type SourceMap } from '../source_mappers/source_map';
+
 export class LanguageAdaptor {
-  private readonly _sourceFiles: string[];
-  constructor(sourceFiles: string[]) {
-    this._sourceFiles = sourceFiles;
+  public readonly sourceMap: SourceMap;
+  constructor(sourceMap: SourceMap) {
+    this.sourceMap = sourceMap;
   }
 
   // following method should be move to AST class
