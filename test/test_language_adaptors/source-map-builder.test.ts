@@ -1,5 +1,8 @@
 import { expect } from 'chai';
-import { createMappingForAddr } from '../../src/language_adaptors/dwarf/addr2lines';
+import {
+  buildSourceMap,
+  createMappingForAddr,
+} from '../../src/language_adaptors/dwarf/addr2lines';
 
 /*
  * Until DWARF library is fully intergated, the generation of SourceMaps happens temporarily
@@ -20,5 +23,16 @@ describe('MappingItem building', () => {
     const invalidWasmAddress = 289;
     const mapping = await createMappingForAddr(wasmPath, invalidWasmAddress);
     expect(mapping).not.equal(undefined);
+  });
+});
+
+describe('SourceMap building', () => {
+  const wasmPath = './test/data/rust_examples/blink/main.wasm';
+
+  it('building sourcemap', async () => {
+    const mapping = await buildSourceMap(wasmPath);
+    expect(mapping).not.equal(undefined);
+    expect(mapping.factory).equal('Rust');
+    expect(mapping.mappings.length).not.equal(0);
   });
 });
