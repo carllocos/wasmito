@@ -6,7 +6,7 @@ import { type WARDuinoVM } from '../warduino/vm/warduino_vm';
 import { type MCUWARDuinoVM } from '../warduino/vm/mcu_vm';
 import { StateRequest } from '../warduino/requests/inspect_request';
 import { Breakpoint } from '../debugger/breakpoint';
-import { TargetLanguage } from '../source_mappers/compilers/prog_language_selection';
+import { TargetLanguage } from '../compilers/prog_language_selection';
 import {
   type FactoryArgs,
   createArduinoPlatform,

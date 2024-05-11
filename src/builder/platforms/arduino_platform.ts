@@ -9,9 +9,9 @@ import {
   getFileName,
   renameFile,
 } from '../../util/file_util';
-import { makeSourceCodeCompiler } from '../../source_mappers/compilers/compiler_factory';
+import { makeSourceCodeCompiler } from '../../compilers/compiler_factory';
 import path from 'path';
-import { type ProgLangSelectionArgs } from '../../source_mappers/compilers/prog_language_selection';
+import { type ProgLangSelectionArgs } from '../../compilers/prog_language_selection';
 import { maybeTimeoutPromise } from '../../util/promise_util';
 import { isSerialPort } from '../../util/serial_port';
 

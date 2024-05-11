@@ -3,8 +3,8 @@ import { SystemTester, type TestScenario } from '../system_tester';
 import { createOnErrorActionEmitter, runVMAction } from '../reusable_actions';
 import { type WasmState } from '../../../webassembly';
 import { type TestProgram } from '../shared_interfaces';
-import { TargetLanguage } from '../../../source_mappers/compilers/prog_language_selection';
-import { type WATCompilerArgs } from '../../../source_mappers/compilers/wat_compilers';
+import { TargetLanguage } from '../../../compilers/prog_language_selection';
+import { type WATCompilerArgs } from '../../../compilers/wat_compilers';
 
 /*
  * Note on the program

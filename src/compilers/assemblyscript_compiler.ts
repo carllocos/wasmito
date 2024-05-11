@@ -1,23 +1,20 @@
 import { SourceCodeCompiler } from './compiler';
-import { createLogger } from '../../logger/logger';
+import { createLogger } from '../logger/logger';
 import {
   createDirectoryIfUnexisting,
   isFilePath,
   getDirectory,
   getAbsolutePath,
-} from '../../util/file_util';
-import {
-  getPath2AssemblyScriptCompiler,
-  getPath2NPX,
-} from '../../project_config';
-import { runCommand } from '../../util/process_command';
-import { AssemblyScriptSourceMap } from '../assemblyscript/assembly_script_source_map';
+} from '../util/file_util';
+import { getPath2AssemblyScriptCompiler, getPath2NPX } from '../project_config';
+import { runCommand } from '../util/process_command';
+import { AssemblyScriptSourceMap } from '../source_mappers/assemblyscript/assembly_script_source_map';
 import { TargetLanguage } from './prog_language_selection';
 import {
   type ASConfig,
   ASConfigError,
   parseASConfigFromPath,
-} from '../assemblyscript/asconfig';
+} from '../source_mappers/assemblyscript/asconfig';
 
 const logger = createLogger('AssemblyScriptCompiler');
 

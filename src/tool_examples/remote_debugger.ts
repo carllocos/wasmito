@@ -13,9 +13,9 @@ import { type WATSourceMap } from '../source_mappers/wat/wat_source_map';
 import { type WARDuinoDevVM } from '../warduino/vm/dev_vm';
 import { type WasmState } from '../webassembly/wasm';
 import { Breakpoint } from '../debugger/breakpoint';
-import { TargetLanguage } from '../source_mappers/compilers/prog_language_selection';
+import { TargetLanguage } from '../compilers/prog_language_selection';
 import { createDevPlatform } from '../builder/platformbuilder_factory';
-import { type WATCompilerArgs } from '../source_mappers/compilers/wat_compilers';
+import { type WATCompilerArgs } from '../compilers/wat_compilers';
 
 export function allSucceeded(replies: HookOnWasmAddrResponse[]): boolean {
   let idx = 0;

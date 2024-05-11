@@ -3,7 +3,7 @@ import {
   type DeviceIdentityArgs,
 } from '../device/device_config';
 import { type VMConfigArgs, VMConfiguration } from '../device/vm_config';
-import { type ProgLangSelectionArgs } from '../source_mappers/compilers/prog_language_selection';
+import { type ProgLangSelectionArgs } from '../compilers/prog_language_selection';
 import { listAllFQBN } from './util_platform';
 
 export interface BoardFQBN {

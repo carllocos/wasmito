@@ -1,7 +1,7 @@
 import { type DeviceIdentityArgs } from '../device/device_config';
 import { type VMConfigArgs } from '../device/vm_config';
 import { getGlobalLogger } from '../logger/logger';
-import { type ProgLangSelectionArgs } from '../source_mappers/compilers/prog_language_selection';
+import { type ProgLangSelectionArgs } from '../compilers/prog_language_selection';
 import { BoardBaudRate } from '../util/serial_port';
 import {
   type BoardFQBN,

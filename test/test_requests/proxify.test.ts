@@ -1,7 +1,7 @@
 import { createDevPlatform } from '../../src/builder/platformbuilder_factory';
 import { DeviceManager } from '../../src/device/device_manager';
-import { TargetLanguage } from '../../src/source_mappers/compilers/prog_language_selection';
-import { type WATCompilerArgs } from '../../src/source_mappers/compilers/wat_compilers';
+import { TargetLanguage } from '../../src/compilers/prog_language_selection';
+import { type WATCompilerArgs } from '../../src/compilers/wat_compilers';
 import { type WARDuinoDevVM } from '../../src/warduino/vm/dev_vm';
 
 describe('Proxify Request', () => {

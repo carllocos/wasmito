@@ -1,10 +1,10 @@
 import { SourceCodeCompiler } from './compiler';
-import { getAbsolutePath } from '../../util/file_util';
+import { getAbsolutePath } from '../util/file_util';
 import {
   isTargetLanguage,
   type TargetLanguage,
 } from './prog_language_selection';
-import { SourceMapConcrete } from '../source_map_concrete';
+import { SourceMapConcrete } from '../source_mappers/source_map_concrete';
 
 export interface DefaultCompileArgs {
   pathToSrcRoot: string;

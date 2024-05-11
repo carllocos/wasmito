@@ -19,8 +19,8 @@ import { StateRequest } from '../../../warduino/requests/inspect_request';
 import { InspectStateHook } from '../../../hooks/hook_inspect_state';
 import { WasmValuesBuilder } from '../../../webassembly/wasm_value_array_builder';
 import { type TestProgram, type PostSetupConfig } from '../shared_interfaces';
-import { TargetLanguage } from '../../../source_mappers/compilers/prog_language_selection';
-import { type WATCompilerArgs } from '../../../source_mappers/compilers/wat_compilers';
+import { TargetLanguage } from '../../../compilers/prog_language_selection';
+import { type WATCompilerArgs } from '../../../compilers/wat_compilers';
 
 /*
  * System Setup

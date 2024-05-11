@@ -5,7 +5,7 @@ import { BoardBaudRate } from '../util/serial_port';
 import {
   type ProgLangSelectionArgs,
   TargetLanguage,
-} from '../source_mappers/compilers/prog_language_selection';
+} from '../compilers/prog_language_selection';
 import { type WATCompilerArgs } from '../source_mappers';
 import { createArduinoPlatform } from '../builder/platformbuilder_factory';
 

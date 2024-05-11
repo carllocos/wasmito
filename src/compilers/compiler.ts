@@ -1,4 +1,4 @@
-import { type SourceMap } from '../source_map';
+import { type SourceMap } from '../source_mappers/source_map';
 import { type TargetLanguage } from './prog_language_selection';
 
 /*

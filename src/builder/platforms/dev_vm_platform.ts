@@ -1,5 +1,5 @@
-import { makeSourceCodeCompiler } from '../../source_mappers/compilers/compiler_factory';
-import { type ProgLangSelectionArgs } from '../../source_mappers/compilers/prog_language_selection';
+import { makeSourceCodeCompiler } from '../../compilers/compiler_factory';
+import { type ProgLangSelectionArgs } from '../../compilers/prog_language_selection';
 import { createDirectoryIfUnexisting } from '../../util/file_util';
 import { type PlatformConfig } from '../platform_config';
 import { Platform } from '../platform';

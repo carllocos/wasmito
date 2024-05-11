@@ -1,5 +1,5 @@
 import { type HookWithSubscription } from '../../hooks/hook';
-import { type TargetLanguage } from '../../source_mappers/compilers/prog_language_selection';
+import { type TargetLanguage } from '../../compilers/prog_language_selection';
 import { type WARDuinoVM } from '../../warduino/vm/warduino_vm';
 
 export enum Target {
