@@ -20,7 +20,7 @@ import {
   printNodeInfo,
   // printNodeInfo,
   // mostSpecialisedNode,
-} from '../language-parsers/tree-sitter-parser';
+} from '../language-ast-parsers/tree-sitter-parser';
 
 const logger = createLogger('SourceMapConcrete');
 
