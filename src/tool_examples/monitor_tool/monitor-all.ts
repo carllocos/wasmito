@@ -16,7 +16,6 @@ import { type WasmInstruction } from '../../webassembly/wasm/wasm_instruction';
 import { PlaceholderType } from '../../webassembly/wasm/opcode_type';
 import { exit } from 'process';
 import { type WARDuinoVM } from '../../warduino/vm/warduino_vm';
-import { type OldSourceMap } from '../../source_mappers/old_source_map';
 import path from 'path';
 import { BoardBaudRate } from '../../util/serial_port';
 import { TargetLanguage } from '../../compilers/prog_language_selection';
@@ -26,6 +25,7 @@ import {
 } from '../../platforms/platformbuilder_factory';
 import { PlatformTarget } from '../../platforms/platform_config';
 import { type WATCompilerArgs } from '../../compilers/wat_compilers';
+import { type SourceMap } from '../../source_mappers/source_map';
 // type PlatformConfigArgs,
 // createPlatformBuilder,
 // DevVMPlatform,
@@ -306,7 +306,7 @@ function createJSONWriter(
 
 async function registerSubstitueValueHook(
   em: WARDuinoVM,
-  sourceMap: OldSourceMap,
+  sourceMap: SourceMap,
 ): Promise<boolean> {
   const chipLedCSetup = sourceMap.getFunction(5);
   const chipLedCAttachPin = sourceMap.getFunction(6);
@@ -337,7 +337,7 @@ async function registerSubstitueValueHook(
 
 async function registerBeforeHooks(
   em: WARDuinoVM,
-  sourceMap: OldSourceMap,
+  sourceMap: SourceMap,
 ): Promise<boolean> {
   const opcodesBeforeRequests = sourceMap.wasm.instructions
     .map((inst) => {
@@ -352,7 +352,15 @@ async function registerBeforeHooks(
       }
       return m;
     })
-    .map(({ address, linenr, columnStart, columnEnd, instruction: opcode }) => {
+    .map(({ generatedColumn, originalLine, originalColumn }) => {
+      const address = generatedColumn;
+      const linenr = originalLine;
+      const columnStart = originalColumn;
+      const columnEnd = columnStart;
+      const opcode = sourceMap.wasm.instructionFromAddress(address); // TODO create opcodenr to string
+      if (opcode === undefined) {
+        throw new Error(`Instruction not found for addr ${address}`);
+      }
       const inspectStackRequest = new StateRequest().includeStack().includePC();
       const inspectStack = new InspectStateHook(inspectStackRequest);
       inspectStack.onSubscriptionData = createJSONWriter(
@@ -380,7 +388,7 @@ async function registerBeforeHooks(
 
 async function registerAfterHooks(
   em: WARDuinoVM,
-  sourceMap: OldSourceMap,
+  sourceMap: SourceMap,
 ): Promise<boolean> {
   const opcodesAfterRequests = sourceMap.wasm.instructions
     .map((inst) => {
@@ -395,7 +403,15 @@ async function registerAfterHooks(
       }
       return m;
     })
-    .map(({ address, linenr, columnStart, columnEnd, instruction: opcode }) => {
+    .map(({ generatedColumn, originalLine, originalColumn }) => {
+      const address = generatedColumn;
+      const linenr = originalLine;
+      const columnStart = originalColumn;
+      const columnEnd = columnStart;
+      const opcode = sourceMap.wasm.instructionFromAddress(address); // TODO create opcodenr to string
+      if (opcode === undefined) {
+        throw new Error(`Instruction not found for addr ${address}`);
+      }
       const inspectStackRequest = new StateRequest().includeStack().includePC();
       const inspectStack = new InspectStateHook(inspectStackRequest);
       inspectStack.onSubscriptionData = createJSONWriter(

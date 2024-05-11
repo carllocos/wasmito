@@ -12,7 +12,7 @@ import {
   createArduinoPlatform,
   type ArduinoBoardBuilder,
 } from '../platforms';
-import { type WATCompilerArgs } from '../source_mappers';
+import { type WATCompilerArgs } from '../compilers/wat_compilers';
 
 export async function callLedcSetup(vm: WARDuinoVM): Promise<void> {
   const funcLEDCSetup = 5;

@@ -9,13 +9,13 @@ import {
   type RequestMessage,
   ResponseType,
 } from '../warduino/api/request_interface';
-import { type WATSourceMap } from '../source_mappers/wat/wat_source_map';
 import { type WARDuinoDevVM } from '../warduino/vm/dev_vm';
 import { type WasmState } from '../webassembly/wasm';
 import { Breakpoint } from '../debugger/breakpoint';
 import { TargetLanguage } from '../compilers/prog_language_selection';
 import { createDevPlatform } from '../platforms/platformbuilder_factory';
 import { type WATCompilerArgs } from '../compilers/wat_compilers';
+import { type SourceMap } from '../source_mappers/source_map';
 
 export function allSucceeded(replies: HookOnWasmAddrResponse[]): boolean {
   let idx = 0;
@@ -112,7 +112,7 @@ export async function addBreakpointSnapshot(
 
 export async function removeBreakpoint(
   address: number,
-  sourceMap: WATSourceMap,
+  sourceMap: SourceMap,
   em: WARDuinoDevVM,
 ): Promise<boolean> {
   const instruction = sourceMap.wasm.instructionFromAddress(address);
