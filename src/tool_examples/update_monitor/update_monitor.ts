@@ -2,7 +2,7 @@ import { type WARDuinoVM } from '../../warduino';
 import * as fs from 'fs';
 import * as path from 'path';
 import { type WATCompilerArgs } from '../../compilers/wat_compilers';
-import { createArduinoPlatform, createDevPlatform } from '../../builder';
+import { createArduinoPlatform, createDevPlatform } from '../../platforms';
 import { TargetLanguage } from '../../source_mappers';
 import { DeviceManager } from '../../device';
 import { createLogger } from '../../logger/logger';

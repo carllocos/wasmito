@@ -14,7 +14,7 @@ import { type WARDuinoDevVM } from '../warduino/vm/dev_vm';
 import { type WasmState } from '../webassembly/wasm';
 import { Breakpoint } from '../debugger/breakpoint';
 import { TargetLanguage } from '../compilers/prog_language_selection';
-import { createDevPlatform } from '../builder/platformbuilder_factory';
+import { createDevPlatform } from '../platforms/platformbuilder_factory';
 import { type WATCompilerArgs } from '../compilers/wat_compilers';
 
 export function allSucceeded(replies: HookOnWasmAddrResponse[]): boolean {

@@ -1,9 +1,9 @@
-import { makeSourceCodeCompiler } from '../../compilers/compiler_factory';
-import { type ProgLangSelectionArgs } from '../../compilers/prog_language_selection';
-import { createDirectoryIfUnexisting } from '../../util/file_util';
-import { type PlatformConfig } from '../platform_config';
-import { Platform } from '../platform';
-import { maybeTimeoutPromise } from '../../util/promise_util';
+import { makeSourceCodeCompiler } from '../compilers/compiler_factory';
+import { type ProgLangSelectionArgs } from '../compilers/prog_language_selection';
+import { createDirectoryIfUnexisting } from '../util/file_util';
+import { type PlatformConfig } from './platform_config';
+import { Platform } from './platform';
+import { maybeTimeoutPromise } from '../util/promise_util';
 
 export class DevVMPlatform extends Platform {
   // private readonly pathToSourceCodeFile: string;

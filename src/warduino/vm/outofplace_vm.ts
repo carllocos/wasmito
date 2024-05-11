@@ -19,8 +19,8 @@ import { InspectStateHook } from '../../hooks/hook_inspect_state';
 import { type Breakpoint } from '../../debugger/breakpoint';
 import type winston from 'winston';
 import { createLogger } from '../../logger/logger';
-import { type DevVMPlatform } from '../../builder/platforms/dev_vm_platform';
-import { createDevPlatform } from '../../builder/platformbuilder_factory';
+import { type DevVMPlatform } from '../../platforms/dev_vm_platform';
+import { createDevPlatform } from '../../platforms/platformbuilder_factory';
 
 export class OutOfPlaceVMError extends Error {
   constructor(message: string) {

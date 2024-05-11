@@ -8,8 +8,8 @@ import {
   PlatformConfig,
   PlatformTarget,
 } from './platform_config';
-import { ArduinoBoardBuilder } from './platforms/arduino_platform';
-import { DevVMPlatform } from './platforms/dev_vm_platform';
+import { ArduinoBoardBuilder } from './arduino_platform';
+import { DevVMPlatform } from './dev_vm_platform';
 import { listAllFQBN, listAvailableBoards } from './util_platform';
 
 export class BoardBuilderFactoryError extends Error {

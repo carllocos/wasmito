@@ -15,7 +15,7 @@ import { NoChannel } from '../../communication/no_channel';
 // import { BoardBaudRate } from '../../util/serial_port';
 // import { type ProgLangSelectionArgs } from '../../source_mappers/compilers/prog_language_selection';
 import { type Channel } from '../../communication';
-import { type DevVMPlatform } from '../../builder';
+import { type DevVMPlatform } from '../../platforms';
 
 export class WARDuinoDevVMError extends Error {
   constructor(message: string) {

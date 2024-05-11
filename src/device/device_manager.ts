@@ -11,7 +11,7 @@ import {
   OutOfThingsMonitor,
   OutputMode,
 } from '../warduino/vm/outofplace_vm';
-import { type DevVMPlatform, type ArduinoBoardBuilder } from '../builder';
+import { type DevVMPlatform, type ArduinoBoardBuilder } from '../platforms';
 import { SerialConnection } from '../communication/serial';
 import { ClientSideSocket } from '../communication/client_socket';
 

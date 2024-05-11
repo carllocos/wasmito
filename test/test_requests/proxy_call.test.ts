@@ -13,7 +13,7 @@ import {
 import { WasmValuesBuilder } from '../../src/webassembly/wasm_value_array_builder';
 import { timeoutPromise } from '../../src/util/promise_util';
 import { TargetLanguage } from '../../src/compilers/prog_language_selection';
-import { createDevPlatform } from '../../src/builder/platformbuilder_factory';
+import { createDevPlatform } from '../../src/platforms/platformbuilder_factory';
 import { type WATCompilerArgs } from '../../src/compilers/wat_compilers';
 
 /*

@@ -1,5 +1,5 @@
 export * from './compilers/index';
-export * from './builder/index';
+export * from './platforms/index';
 export * from './hooks/index';
 export * from './communication/index';
 export * from './device/index';

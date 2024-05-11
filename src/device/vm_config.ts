@@ -1,4 +1,4 @@
-import { assertValidFQBN, type BoardFQBN } from '../builder/platform_config';
+import { assertValidFQBN, type BoardFQBN } from '../platforms/platform_config';
 import { getFileExtension, isFilePath } from '../util/file_util';
 import {
   type BoardBaudRate,

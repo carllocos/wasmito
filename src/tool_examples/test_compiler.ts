@@ -1,4 +1,4 @@
-import { listAllFQBN, listAvailableBoards } from '../builder/util_platform';
+import { listAllFQBN, listAvailableBoards } from '../platforms/util_platform';
 import { createLogger } from '../logger/logger';
 import { DeviceManager } from '../device/device_manager';
 import { BoardBaudRate } from '../util/serial_port';
@@ -7,7 +7,7 @@ import {
   TargetLanguage,
 } from '../compilers/prog_language_selection';
 import { type WATCompilerArgs } from '../source_mappers';
-import { createArduinoPlatform } from '../builder/platformbuilder_factory';
+import { createArduinoPlatform } from '../platforms/platformbuilder_factory';
 
 const testCompilerLogger = createLogger('TestCompiler');
 

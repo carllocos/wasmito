@@ -2,7 +2,7 @@ import { DeviceManager } from '../../src/device/device_manager';
 import { type WARDuinoDevVM } from '../../src/warduino/vm/dev_vm';
 import { StateRequest } from '../../src/warduino/requests/inspect_request';
 import { TargetLanguage } from '../../src/compilers/prog_language_selection';
-import { createDevPlatform } from '../../src/builder/platformbuilder_factory';
+import { createDevPlatform } from '../../src/platforms/platformbuilder_factory';
 import { type WATCompilerArgs } from '../../src';
 
 describe('Snapshot Request', () => {
