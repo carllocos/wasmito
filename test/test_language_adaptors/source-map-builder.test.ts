@@ -7,7 +7,7 @@ import { createMappingForAddr } from '../../src/language_adaptors/dwarf/addr2lin
  * The following test suite tests the creation of such SourceMap
  */
 
-describe('SourceMap building', () => {
+describe('MappingItem building', () => {
   const wasmPath = './test/data/rust_examples/blink/main.wasm';
 
   it('Invalid WasmAddr results in undefined mapping', async () => {
