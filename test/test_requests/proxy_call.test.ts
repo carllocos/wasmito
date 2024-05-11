@@ -10,7 +10,7 @@ import {
   ProxyCallRequest,
   isProxyCallSuccessfulResponse,
 } from '../../src/warduino/requests/fun_call_request';
-import { WasmValuesBuilder } from '../../src/state/wasm_value_array_builder';
+import { WasmValuesBuilder } from '../../src/webassembly/wasm_value_array_builder';
 import { timeoutPromise } from '../../src/util/promise_util';
 import { TargetLanguage } from '../../src/source_mappers/compilers/prog_language_selection';
 import { createDevPlatform } from '../../src/builder/platformbuilder_factory';

@@ -1,5 +1,5 @@
-import { type WASM } from '../../state';
-import { PlaceholderType, WasmType } from '../../state/opcode_type';
+import { type WASM } from '../../webassembly';
+import { PlaceholderType, WasmType } from '../../webassembly/opcode_type';
 import {
   WASMOpcodeNumber,
   typeFromWasmOpcode,

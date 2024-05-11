@@ -11,7 +11,7 @@ import {
 } from '../warduino/api/request_interface';
 import { type WATSourceMap } from '../source_mappers/wat/wat_source_map';
 import { type WARDuinoDevVM } from '../warduino/vm/dev_vm';
-import { type WasmState } from '../state/wasm';
+import { type WasmState } from '../webassembly/wasm';
 import { Breakpoint } from '../debugger/breakpoint';
 import { TargetLanguage } from '../source_mappers/compilers/prog_language_selection';
 import { createDevPlatform } from '../builder/platformbuilder_factory';

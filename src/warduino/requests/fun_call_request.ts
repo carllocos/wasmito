@@ -1,5 +1,5 @@
 import { createLogger } from '../../logger/logger';
-import { WASM } from '../../state/wasm';
+import { WASM } from '../../webassembly/wasm';
 import { Instruction, getInstructionFromString } from '../api/instructions';
 import {
   APIRequestInvalidParse,

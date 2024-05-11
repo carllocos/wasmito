@@ -1,4 +1,4 @@
-import { type WASM } from '../../state';
+import { type WASM } from '../../webassembly';
 import {
   encodeJSONToHexString,
   encodeStringToHex,

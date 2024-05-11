@@ -15,7 +15,7 @@ import {
   type SourceMap,
 } from '../../src/source_mappers/source_map';
 import { StateRequest } from '../../src/warduino/requests/inspect_request';
-import { type WasmState } from '../../src/state/wasm';
+import { type WasmState } from '../../src/webassembly/wasm';
 import { type Hook } from '../../src/hooks/hook';
 import { WARDuinoVM } from '../../src/warduino/vm/warduino_vm';
 import { MockChannel } from './mock_channel';

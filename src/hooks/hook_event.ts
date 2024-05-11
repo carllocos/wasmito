@@ -1,4 +1,4 @@
-import { WASM } from '../state/wasm';
+import { WASM } from '../webassembly/wasm';
 import { isHexaString } from '../util/decoder';
 import { APIRequestInvalidParse } from '../warduino/api/request_interface';
 import {

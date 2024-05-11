@@ -1,7 +1,7 @@
 import { DeviceManager } from '../device/device_manager';
 import { BoardBaudRate } from '../util/serial_port';
-import { WasmValuesBuilder } from '../state/wasm_value_array_builder';
-import { type WasmState } from '../state';
+import { WasmValuesBuilder } from '../webassembly/wasm_value_array_builder';
+import { type WasmState } from '../webassembly';
 import { type WARDuinoVM } from '../warduino/vm/warduino_vm';
 import { type MCUWARDuinoVM } from '../warduino/vm/mcu_vm';
 import { StateRequest } from '../warduino/requests/inspect_request';

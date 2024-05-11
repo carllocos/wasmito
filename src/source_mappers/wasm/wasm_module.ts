@@ -1,6 +1,6 @@
 import { createLogger } from '../../logger/logger';
-import { WasmType } from '../../state/opcode_type';
-import { WASM } from '../../state/wasm';
+import { WasmType } from '../../webassembly/opcode_type';
+import { WASM } from '../../webassembly/wasm';
 import { WASMFunction, type WasmLocal } from './wasm_function';
 import {
   type ParsedModule,
