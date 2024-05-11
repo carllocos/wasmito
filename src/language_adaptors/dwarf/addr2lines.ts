@@ -86,8 +86,10 @@ function extractLineColInfo(
   const pattern = /^(0x[0-9a-fA-F]+):(.*rs):(\d+):?(\d+)?\n$/;
   const matched = cmdStdOutput.match(pattern);
   if (matched === null || matched === undefined) {
+    if (cmdStdOutput.includes('no dwarf frames found')) {
+      return undefined;
+    }
     throw new Error(`ignored line ${cmdStdOutput}`);
-    // return undefined;
   }
 
   const addr = Number(matched[1]);
