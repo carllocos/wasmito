@@ -12,7 +12,7 @@ import { type APIRequest } from '../../src/warduino/api/request_interface';
 import { type Command } from '../../src/communication/command';
 import {
   type SourceCodeLocation,
-  type SourceMap,
+  type OldSourceMap,
 } from '../../src/source_mappers/source_map';
 import { StateRequest } from '../../src/warduino/requests/inspect_request';
 import { type WasmState } from '../../src/webassembly/wasm';
@@ -108,7 +108,7 @@ export class MockVM extends WARDuinoVM {
     return command.execute();
   }
 
-  public getSourceMap(): SourceMap | undefined {
+  public getSourceMap(): OldSourceMap | undefined {
     return this.platform.getSourceMap();
   }
 

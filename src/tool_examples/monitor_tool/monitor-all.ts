@@ -16,7 +16,7 @@ import { type WasmInstruction } from '../../webassembly/wasm/wasm_instruction';
 import { PlaceholderType } from '../../webassembly/wasm/opcode_type';
 import { exit } from 'process';
 import { type WARDuinoVM } from '../../warduino/vm/warduino_vm';
-import { type SourceMap } from '../../source_mappers/source_map';
+import { type OldSourceMap } from '../../source_mappers/source_map';
 import path from 'path';
 import { BoardBaudRate } from '../../util/serial_port';
 import { TargetLanguage } from '../../compilers/prog_language_selection';
@@ -306,7 +306,7 @@ function createJSONWriter(
 
 async function registerSubstitueValueHook(
   em: WARDuinoVM,
-  sourceMap: SourceMap,
+  sourceMap: OldSourceMap,
 ): Promise<boolean> {
   const chipLedCSetup = sourceMap.getFunction(5);
   const chipLedCAttachPin = sourceMap.getFunction(6);
@@ -337,7 +337,7 @@ async function registerSubstitueValueHook(
 
 async function registerBeforeHooks(
   em: WARDuinoVM,
-  sourceMap: SourceMap,
+  sourceMap: OldSourceMap,
 ): Promise<boolean> {
   const opcodesBeforeRequests = sourceMap.wasm.instructions
     .map((inst) => {
@@ -380,7 +380,7 @@ async function registerBeforeHooks(
 
 async function registerAfterHooks(
   em: WARDuinoVM,
-  sourceMap: SourceMap,
+  sourceMap: OldSourceMap,
 ): Promise<boolean> {
   const opcodesAfterRequests = sourceMap.wasm.instructions
     .map((inst) => {

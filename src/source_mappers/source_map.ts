@@ -26,7 +26,7 @@ export interface SourceCodeLocation {
 // 1. SourceMap Or Dwarf
 // 2. AST or something in the kind
 // 3. Mapper to VM apps
-export abstract class SourceMap {
+export abstract class OldSourceMap {
   private readonly _sources: string[];
   private readonly _filenames: string[];
   private readonly _wasmModule: WasmModule;

@@ -21,7 +21,7 @@ import { timeoutPromise } from '../../util/promise_util';
 import { ResolveEventRequest } from '../requests/resolve_event_request';
 import {
   type SourceCodeLocation,
-  type SourceMap,
+  type OldSourceMap,
 } from '../../source_mappers/source_map';
 import {
   HookOnWasmAddrMoment,
@@ -60,7 +60,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   private _platform: Platform;
   protected abstract readonly ErrorClass: new (errorMsg: string) => Error;
 
-  private readonly _sourceMap?: SourceMap;
+  private readonly _sourceMap?: OldSourceMap;
 
   protected readonly onNewEventHook: EventInspectHook;
   private onNewEventHookAdded: boolean;
@@ -129,7 +129,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     this._channel = newChannel;
   }
 
-  get sourceMap(): SourceMap {
+  get sourceMap(): OldSourceMap {
     return this.platform.sourceMap;
   }
 

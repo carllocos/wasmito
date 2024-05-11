@@ -2,7 +2,7 @@
 import { type LineInfoPairs } from '../../webassembly/parsers/obj-dump_parser';
 import {
   type SourceCodeMapping,
-  SourceMap,
+  OldSourceMap,
   type SourceCodeLocation,
 } from '../source_map';
 import { type WASMFunction } from '../../webassembly/wasm/wasm_function';
@@ -11,7 +11,7 @@ import { type WASMFunction } from '../../webassembly/wasm/wasm_function';
 // 1. SourceMap Or Dwarf
 // 2. AST or something in the kind
 // 3. Mapper to VM apps
-export class WATSourceMap extends SourceMap {
+export class WATSourceMap extends OldSourceMap {
   public nextSourceCodeLocation(
     source: string,
     currentLineNr: number,
