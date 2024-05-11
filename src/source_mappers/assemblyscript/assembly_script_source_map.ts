@@ -3,7 +3,7 @@ import fs from 'fs';
 import { SourceMapConsumer, type MappingItem } from 'source-map';
 import {
   type SourceCodeMapping,
-  SourceMap,
+  OldSourceMap,
   type SourceCodeLocation,
 } from '../source_map';
 import { isAbsolutePath, isFilePath, pathJoin } from '../../util/file_util';
@@ -26,7 +26,7 @@ export type ASMapping = MappingItem;
 
 const logger = createLogger('AssemblyScriptSourceMap');
 
-export class AssemblyScriptSourceMap extends SourceMap {
+export class AssemblyScriptSourceMap extends OldSourceMap {
   private readonly _asConfig: ASConfig;
   private readonly _mappings: ASMapping[];
   private readonly _sourceTreeMap: Map<string, Parser.Tree>;

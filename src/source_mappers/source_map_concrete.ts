@@ -4,7 +4,7 @@ import fs from 'fs';
 import { SourceMapConsumer, type MappingItem } from 'source-map';
 import {
   type SourceCodeMapping,
-  SourceMap,
+  OldSourceMap,
   type SourceCodeLocation,
 } from './source_map';
 import { isAbsolutePath, isFilePath, pathJoin } from '../util/file_util';
@@ -24,7 +24,7 @@ import {
 
 const logger = createLogger('SourceMapConcrete');
 
-export class SourceMapConcrete extends SourceMap {
+export class SourceMapConcrete extends OldSourceMap {
   private readonly _sourceTreeMap: Map<string, Parser.Tree>;
   private readonly _sourceToAbsPathSource: Map<string, string>;
   private readonly _mappings: MappingItem[];

@@ -1,4 +1,4 @@
-import { type SourceMap } from '../source_mappers/source_map';
+import { type OldSourceMap } from '../source_mappers/source_map';
 import { type TargetLanguage } from './prog_language_selection';
 
 /*
@@ -13,7 +13,7 @@ export abstract class SourceCodeCompiler {
 
   abstract get latestSourceCodeCompilerArgs(): undefined | any;
 
-  abstract compile(compilationArgs: any): Promise<SourceMap>;
+  abstract compile(compilationArgs: any): Promise<OldSourceMap>;
 
   protected static async createCompiler(
     compilerOutputPath: string,

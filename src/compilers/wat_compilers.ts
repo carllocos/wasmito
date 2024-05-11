@@ -1,5 +1,5 @@
 import { createLogger } from '../logger/logger';
-import { type SourceMap } from '../source_mappers/source_map';
+import { type OldSourceMap } from '../source_mappers/source_map';
 import { SourceCodeCompiler } from './compiler';
 import { getPath2WAT2WASM, getPath2XXD } from '../project_config';
 import { WATSourceMap } from '../source_mappers/wat/wat_source_map';
@@ -109,7 +109,7 @@ export class WATCompiler extends SourceCodeCompiler {
     return this._latestWATCompileArgs;
   }
 
-  async compile(compilationArgs: WATCompilerArgs): Promise<SourceMap> {
+  async compile(compilationArgs: WATCompilerArgs): Promise<OldSourceMap> {
     const args = createAndAssertWATCompilerArgs(compilationArgs);
     const sourceCodePath = args.sourceCodePath;
     const fileName = getFileName(args.wasmOutputPath ?? sourceCodePath);
