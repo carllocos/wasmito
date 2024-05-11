@@ -5,7 +5,7 @@ import { type StateRequest } from '../requests/inspect_request';
 import { type ProxyCallResponse } from '../requests/fun_call_request';
 import { type BreakpointPolicy } from '../../debugger/breakpoint_policies';
 import { type Breakpoint } from '../../debugger/breakpoint';
-import { type WASMFunction } from '../../source_mappers/wasm/wasm_function';
+import { type WASMFunction } from '../../webassembly/wasm/wasm_function';
 
 export interface WARDuinoAPI {
   run: (timeout?: number) => Promise<boolean>;

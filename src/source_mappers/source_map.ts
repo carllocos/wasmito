@@ -3,9 +3,9 @@ import {
   getFileName,
   isAbsolutePath,
 } from '../util/file_util';
-import { type WASMFunction } from './wasm/wasm_function';
-import { WasmModule } from './wasm/wasm_module';
-import { type WasmInstruction } from './wasm/wasm_instruction';
+import { type WASMFunction } from '../webassembly/wasm/wasm_function';
+import { WasmModule } from '../webassembly/wasm/wasm_module';
+import { type WasmInstruction } from '../webassembly/wasm/wasm_instruction';
 
 export interface SourceCodeMapping {
   source: string;
