@@ -6,7 +6,7 @@ import {
   type SourceCodeMapping,
   OldSourceMap,
   type SourceCodeLocation,
-} from './source_map';
+} from './old_source_map';
 import { isAbsolutePath, isFilePath, pathJoin } from '../util/file_util';
 import { createLogger } from '../logger/logger';
 import { type WASMFunction } from '../webassembly/wasm/wasm_function';

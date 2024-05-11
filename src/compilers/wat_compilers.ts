@@ -1,5 +1,5 @@
 import { createLogger } from '../logger/logger';
-import { type OldSourceMap } from '../source_mappers/source_map';
+import { type OldSourceMap } from '../source_mappers/old_source_map';
 import { SourceCodeCompiler } from './compiler';
 import { getPath2WAT2WASM, getPath2XXD } from '../project_config';
 import { WATSourceMap } from '../source_mappers/wat/wat_source_map';

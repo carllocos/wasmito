@@ -4,7 +4,7 @@ import { getPath2WARDuinoSDK, readProjectName } from '../project_config';
 import { type PlatformConfig } from './platform_config';
 import { createTempDirectory, getAbsolutePath } from '../util/file_util';
 import { type SourceCodeCompiler } from '../compilers/compiler';
-import { type OldSourceMap } from '../source_mappers/source_map';
+import { type OldSourceMap } from '../source_mappers/old_source_map';
 import { type ProgLangSelectionArgs } from '../compilers/prog_language_selection';
 
 export class PlatformError extends Error {

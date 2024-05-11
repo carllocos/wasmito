@@ -13,7 +13,7 @@ import { type Command } from '../../src/communication/command';
 import {
   type SourceCodeLocation,
   type OldSourceMap,
-} from '../../src/source_mappers/source_map';
+} from '../../src/source_mappers/old_source_map';
 import { StateRequest } from '../../src/warduino/requests/inspect_request';
 import { type WasmState } from '../../src/webassembly/wasm';
 import { type Hook } from '../../src/hooks/hook';

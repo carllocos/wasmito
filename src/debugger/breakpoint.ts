@@ -1,4 +1,4 @@
-import { type SourceCodeLocation } from '../source_mappers/source_map';
+import { type SourceCodeLocation } from '../source_mappers/old_source_map';
 import { type WasmState } from '../webassembly';
 import { StateRequest } from '../warduino/requests/inspect_request';
 import { PauseVMHook } from '../hooks/hook_run_pause';

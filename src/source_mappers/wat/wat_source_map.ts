@@ -4,7 +4,7 @@ import {
   type SourceCodeMapping,
   OldSourceMap,
   type SourceCodeLocation,
-} from '../source_map';
+} from '../old_source_map';
 import { type WASMFunction } from '../../webassembly/wasm/wasm_function';
 
 // TODO Move to LangaugeAdaptor which will consist of
