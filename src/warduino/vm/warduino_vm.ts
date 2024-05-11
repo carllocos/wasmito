@@ -386,7 +386,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
         `Cannot set hook upon unexisting wasm address derived from source location ${sourceCodeLocation.linenr}`,
       );
     }
-    const addr = mappings[0].address;
+    const addr = mappings[0].generatedColumn;
     const req = new HookOnWasmAddrRequest(addr).addHook(hook);
     switch (moment) {
       case HookOnWasmAddrMoment.HookBefore:

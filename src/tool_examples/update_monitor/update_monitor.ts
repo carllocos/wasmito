@@ -3,10 +3,10 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { type WATCompilerArgs } from '../../compilers/wat_compilers';
 import { createArduinoPlatform, createDevPlatform } from '../../platforms';
-import { TargetLanguage } from '../../source_mappers';
 import { DeviceManager } from '../../device';
 import { createLogger } from '../../logger/logger';
 import { BoardBaudRate } from '../../util';
+import { TargetLanguage } from '../../compilers/prog_language_selection';
 
 const logger = createLogger('SourceCodeWatcher');
 

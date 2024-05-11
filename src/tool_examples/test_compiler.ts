@@ -6,8 +6,8 @@ import {
   type ProgLangSelectionArgs,
   TargetLanguage,
 } from '../compilers/prog_language_selection';
-import { type WATCompilerArgs } from '../source_mappers';
 import { createArduinoPlatform } from '../platforms/platformbuilder_factory';
+import { type WATCompilerArgs } from '../compilers/wat_compilers';
 
 const testCompilerLogger = createLogger('TestCompiler');
 
