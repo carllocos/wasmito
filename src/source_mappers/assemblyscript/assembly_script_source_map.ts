@@ -20,7 +20,7 @@ import {
   searchNode,
   // printNodeInfo,
   // mostSpecialisedNode,
-} from '../language-parsers/tree-sitter-parser';
+} from '../../language-parsers/tree-sitter-parser';
 
 export type ASMapping = MappingItem;
 
