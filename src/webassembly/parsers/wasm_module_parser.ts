@@ -418,7 +418,7 @@ function parseInstruction(obj: any): WasmInstruction | undefined {
           `Handle case where args has more than one element ${obj.args}`,
         );
       }
-      op = new WasmInstruction(opcode, WASMOpcodeNumber.I32GTSigned);
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
       break;
     }
     case 'lt_s': {

@@ -500,6 +500,8 @@ export function wasmOpcodeFromStr(opcode: string): WASMOpcodeNumber {
       return WASMOpcodeNumber.I32CTZ;
     case 'i32.popctn':
       return WASMOpcodeNumber.I32POPCNT;
+    case 'i32.gt_s':
+      return WASMOpcodeNumber.I32GTSigned;
 
     case 'f32.add':
       return WASMOpcodeNumber.F32Add;
