@@ -3,6 +3,7 @@ import { isAbsolutePath, isFilePath, pathJoin } from '../util/file_util';
 import { SourceMap } from './source_map';
 import { type MappingItem, SourceMapConsumer } from 'source-map';
 import { createLogger } from '../logger/logger';
+import { addr2line, getProducer } from '../dwarf/addr2lines';
 
 const logger = createLogger('SourceMapBuilder');
 
@@ -102,5 +103,66 @@ export async function SourceMapfromSourceMapSpec(
 export async function SourceMapfromDWARFWasm(
   wasmFilePath: string,
 ): Promise<SourceMap> {
-  throw new Error('TODO fromDWARF');
+  const producer = await getProducer(wasmFilePath);
+  const wasmAddresses = getAddressRangeOffset(wasmFilePath);
+  const mappingsResults = await Promise.all(
+    wasmAddresses.map(async (addr: number) => {
+      return createMappingForAddr(wasmFilePath, addr);
+    }),
+  );
+
+  const mappings: MappingItem[] = [];
+  for (const m of mappingsResults) {
+    if (m !== undefined) {
+      mappings.push(m);
+    }
+  }
+
+  if (mappings.length === 0) {
+    throw new Error(`No mapping found for the given wasmFile ${wasmFilePath}`);
+  }
+
+  const pathToSourceMap = ''; // no path to sourceMapSpec
+
+  // convert to set to remove duplicates
+  const sources = Array.from(new Set(mappings.map((m) => m.source)));
+
+  return new SourceMap(
+    pathToSourceMap,
+    wasmFilePath,
+    sources,
+    sources,
+    mappings,
+  );
+}
+
+export async function createMappingForAddr(
+  wasmFilePath: string,
+  addr: number,
+): Promise<MappingItem | undefined> {
+  const info = await addr2line(wasmFilePath, addr);
+  if (info === undefined) {
+    return undefined;
+  }
+
+  const [source, name, generatedColumn, originalLine, originalColumn] = info;
+  const generatedLine = 0;
+  return {
+    source,
+    generatedLine,
+    generatedColumn,
+    originalColumn,
+    originalLine,
+    name,
+  };
+}
+
+function getAddressRangeOffset(wasmFilePath: string): number[] {
+  // TODO fix ranges
+  const endAddr = 406;
+  const wasmAddresses: number[] = [];
+  for (let addr = 0; addr < endAddr; addr++) {
+    wasmAddresses.push(addr);
+  }
+  return wasmAddresses;
 }
