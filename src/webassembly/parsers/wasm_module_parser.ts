@@ -411,6 +411,19 @@ function parseInstruction(obj: any): WasmInstruction | undefined {
       op = new WasmInstruction('br', WASMOpcodeNumber.Br, obj.args[0].value);
       break;
     }
+    case 'br_if': {
+      if (obj.args.length > 1) {
+        throw new Error(
+          `Handle case where 'br_if' args has more than one element ${obj.args}`,
+        );
+      }
+      op = new WasmInstruction(
+        'br_if',
+        WASMOpcodeNumber.Br_if,
+        obj.args[0].value,
+      );
+      break;
+    }
     case 'gt_s': {
       const opcode = obj.object + '.gt_s';
       if (obj.args.length > 1) {
@@ -516,6 +529,11 @@ function parseInstruction(obj: any): WasmInstruction | undefined {
       op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
       break;
     }
+    case 'lt_u': {
+      const opcode = obj.object + '.lt_u';
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
+      break;
+    }
     case 'gt': {
       const opcode = obj.object + '.gt';
       op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
@@ -541,9 +559,27 @@ function parseInstruction(obj: any): WasmInstruction | undefined {
       op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
       break;
     }
+    case 'store16': {
+      const opcode = obj.object + '.store16';
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
+      break;
+    }
     case 'load': {
       const opcode = obj.object + '.load';
       op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
+      break;
+    }
+    case 'tee_local': {
+      if (obj.args.length > 1) {
+        throw new Error(
+          `Handle case where 'tee_local' args has more than one element ${obj.args}`,
+        );
+      }
+      op = new WasmInstruction(
+        'tee_local',
+        WASMOpcodeNumber.Tee_local,
+        obj.args[0].value,
+      );
       break;
     }
     default:

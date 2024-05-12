@@ -502,6 +502,12 @@ export function wasmOpcodeFromStr(opcode: string): WASMOpcodeNumber {
       return WASMOpcodeNumber.I32POPCNT;
     case 'i32.gt_s':
       return WASMOpcodeNumber.I32GTSigned;
+    case 'i32.gt_u':
+      return WASMOpcodeNumber.I32GTUnsigned;
+    case 'i32.lt_u':
+      return WASMOpcodeNumber.I32LTUnsigned;
+    case 'i32.lt_s':
+      return WASMOpcodeNumber.I32LTSigned;
 
     case 'f32.add':
       return WASMOpcodeNumber.F32Add;
