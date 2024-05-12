@@ -1,14 +1,8 @@
 import { spawn } from 'child_process';
-import { readLanguageMetadata } from './metadata_wasm';
 
 /*
  * This source file runs `wasm-tools addr2line` command and decodes result
  */
-
-export async function getProducer(wasmFilePath: string): Promise<string> {
-  const languageUsed = await readLanguageMetadata(wasmFilePath);
-  return languageUsed ?? '';
-}
 
 export async function addr2line(
   wasmFilePath: string,

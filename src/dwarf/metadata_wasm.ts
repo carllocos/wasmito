@@ -1,5 +1,15 @@
 import { spawn } from 'child_process';
 
+/*
+ * This file defines functions read metada of a wasm file through
+ * command `wasm-tools metadata show`
+ */
+
+export async function getProducer(wasmFilePath: string): Promise<string> {
+  const languageUsed = await readLanguageMetadata(wasmFilePath);
+  return languageUsed ?? '';
+}
+
 export async function readLanguageMetadata(
   wasmFilePath: string,
 ): Promise<string | undefined> {
