@@ -4,7 +4,7 @@ import { SourceMap } from './source_map';
 import { type MappingItem, SourceMapConsumer } from 'source-map';
 import { createLogger } from '../logger/logger';
 import { addr2line } from '../dwarf/addr2lines';
-import { getProducer } from '../dwarf/metadata_wasm';
+// import { getProducer } from '../dwarf/metadata_wasm';
 
 const logger = createLogger('SourceMapBuilder');
 
@@ -104,7 +104,7 @@ export async function SourceMapfromSourceMapSpec(
 export async function SourceMapfromDWARFWasm(
   wasmFilePath: string,
 ): Promise<SourceMap> {
-  const producer = await getProducer(wasmFilePath);
+  // const producer = await getProducer(wasmFilePath);
   const wasmAddresses = getAddressRangeOffset(wasmFilePath);
   const mappingsResults = await Promise.all(
     wasmAddresses.map(async (addr: number) => {
