@@ -10,7 +10,6 @@ import { createLogger } from '../../src/logger/logger';
 // } from '../../src/builder/platform_config';
 import { type APIRequest } from '../../src/warduino/api/request_interface';
 import { type Command } from '../../src/communication/command';
-import { type SourceCodeLocation } from '../../src/source_mappers/old_source_map';
 import { StateRequest } from '../../src/warduino/requests/inspect_request';
 import { type WasmState } from '../../src/webassembly/wasm';
 import { type Hook } from '../../src/hooks/hook';
@@ -19,7 +18,10 @@ import { MockChannel } from './mock_channel';
 import { type Breakpoint } from '../../src/debugger/breakpoint';
 import { type WASMFunction } from '../../src/webassembly/wasm/wasm_function';
 import { type Platform } from '../../src/platforms/platform';
-import { type SourceMap } from '../../src/source_mappers/source_map';
+import {
+  type SourceCodeLocation,
+  type SourceMap,
+} from '../../src/source_mappers/source_map';
 // import { type ProgLangSelectionArgs } from '../../src/source_mappers/compilers/prog_language_selection';
 
 // function createPlatformBuilderConfig(

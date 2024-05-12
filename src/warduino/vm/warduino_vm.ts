@@ -20,10 +20,6 @@ import { LoadStateRequestBuilder } from '../requests/load_state_request';
 import { timeoutPromise } from '../../util/promise_util';
 import { ResolveEventRequest } from '../requests/resolve_event_request';
 import {
-  type SourceCodeLocation,
-  type OldSourceMap,
-} from '../../source_mappers/old_source_map';
-import {
   HookOnWasmAddrMoment,
   HookOnWasmAddrRequest,
 } from '../requests/hook_on_wasm_addr_request';
@@ -50,7 +46,10 @@ import {
 import { EventInspectHook } from '../../hooks/hook_event';
 import { type DeviceIdentity } from '../../device';
 import { type WASMFunction } from '../../webassembly/wasm/wasm_function';
-import { type SourceMap } from '../../source_mappers/source_map';
+import {
+  type SourceCodeLocation,
+  type SourceMap,
+} from '../../source_mappers/source_map';
 
 // TODO Rename to Backend
 // TODO mover addbp and removebp, and breakpoint fields to BreakpointPolicies +  add getters for breakpoints there
@@ -60,8 +59,6 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   // public readonly platformConfig: PlatformBuilderConfig;
   private _platform: Platform;
   protected abstract readonly ErrorClass: new (errorMsg: string) => Error;
-
-  private readonly _sourceMap?: OldSourceMap;
 
   protected readonly onNewEventHook: EventInspectHook;
   private onNewEventHookAdded: boolean;

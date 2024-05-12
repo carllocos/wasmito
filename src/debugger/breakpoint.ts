@@ -1,4 +1,3 @@
-import { type SourceCodeLocation } from '../source_mappers/old_source_map';
 import { type WasmState } from '../webassembly';
 import { StateRequest } from '../warduino/requests/inspect_request';
 import { PauseVMHook } from '../hooks/hook_run_pause';
@@ -6,6 +5,7 @@ import { type ISubscription, type Hook } from '../hooks/hook';
 import { InspectStateHook } from '../hooks/hook_inspect_state';
 import { createLogger } from '../logger/logger';
 import type winston from 'winston';
+import { type SourceCodeLocation } from '../source_mappers/source_map';
 
 // TODO reimplement as extension to HookWithSub? Although this is bound to an address and should be extensible to support binding to events
 export class Breakpoint implements ISubscription<WasmState> {
