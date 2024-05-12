@@ -1,77 +1,28 @@
-import { type MappingItem } from 'source-map';
-
 import { spawn } from 'child_process';
 import { readLanguageMetadata } from './metadata_wasm';
 
 /*
- * This source file will construct a sourcemap for a given file using the wasm-tools addr2line command
+ * This source file runs `wasm-tools addr2line` command and decodes result
  */
-export interface SourceMap {
-  factory: string;
-  mappings: MappingItem[];
-}
 
-export async function buildSourceMap(wasmFilePath: string): Promise<SourceMap> {
-  const producer = await getProducer(wasmFilePath);
-  const wasmAddresses = getAddressRangeOffset(wasmFilePath);
-  const mappingsResults = await Promise.all(
-    wasmAddresses.map(async (addr: number) => {
-      return createMappingForAddr(wasmFilePath, addr);
-    }),
-  );
-
-  const mappings: MappingItem[] = [];
-  for (const m of mappingsResults) {
-    if (m !== undefined) {
-      mappings.push(m);
-    }
-  }
-
-  return {
-    factory: producer,
-    mappings,
-  };
-}
-
-function getAddressRangeOffset(wasmFilePath: string): number[] {
-  // TODO fix ranges
-  const endAddr = 406;
-  const wasmAddresses: number[] = [];
-  for (let addr = 0; addr < endAddr; addr++) {
-    wasmAddresses.push(addr);
-  }
-  return wasmAddresses;
-}
-
-async function getProducer(wasmFilePath: string): Promise<string> {
+export async function getProducer(wasmFilePath: string): Promise<string> {
   const languageUsed = await readLanguageMetadata(wasmFilePath);
   return languageUsed ?? '';
 }
 
-export async function createMappingForAddr(
+export async function addr2line(
   wasmFilePath: string,
   addr: number,
-): Promise<MappingItem | undefined> {
-  const [exitCode, stdout, stderr] = await addr2line(wasmFilePath, addr);
+): Promise<undefined | [string, string, number, number, number]> {
+  const [exitCode, stdout, stderr] = await runAddr2lineCommand(
+    wasmFilePath,
+    addr,
+  );
   if (exitCode !== 0 || stderr !== '') {
     return undefined;
   }
 
-  const info = extractLineColInfo(stdout);
-  if (info === undefined) {
-    return undefined;
-  }
-
-  const [source, name, generatedColumn, originalLine, originalColumn] = info;
-  const generatedLine = 0;
-  return {
-    source,
-    generatedLine,
-    generatedColumn,
-    originalColumn,
-    originalLine,
-    name,
-  };
+  return extractLineColInfo(stdout);
 }
 
 function extractLineColInfo(
@@ -133,7 +84,7 @@ function extractLineColInfo(
   return [sourceFile, name, addr, linenr, colnr];
 }
 
-export async function addr2line(
+export async function runAddr2lineCommand(
   wasmFilePath: string,
   addr: number,
 ): Promise<[number, string, string]> {

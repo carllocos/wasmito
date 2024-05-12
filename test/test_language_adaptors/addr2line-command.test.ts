@@ -12,23 +12,14 @@ describe('addr2line command', () => {
 
   it('Invalid WasmAddr yields non-zero exitCode', async () => {
     const invalidWasmAddress = 0;
-    const [exitCode, stdout, stderr] = await addr2line(
-      wasmPath,
-      invalidWasmAddress,
-    );
-    expect(exitCode).to.not.equal(0);
-    expect(stdout).to.equal('');
-    expect(stderr).to.not.equal('');
+    const decodedLine = await addr2line(wasmPath, invalidWasmAddress);
+    expect(decodedLine).equal(undefined);
   });
 
   it('Valid WasmAddr yields zero exitCode, empty stderr, and non-empty stdout', async () => {
     const invalidWasmAddress = 289;
-    const [exitCode, stdout, stderr] = await addr2line(
-      wasmPath,
-      invalidWasmAddress,
-    );
-    expect(exitCode).to.equal(0);
-    expect(stdout).to.not.equal('');
-    expect(stderr).to.equal('');
+    const decodedLine = await addr2line(wasmPath, invalidWasmAddress);
+    expect(decodedLine).to.not.equal(undefined);
+    expect(decodedLine?.length).equal(5);
   });
 });
