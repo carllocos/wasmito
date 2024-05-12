@@ -6,11 +6,8 @@ import { Platform } from './platform';
 import { maybeTimeoutPromise } from '../util/promise_util';
 
 export class DevVMPlatform extends Platform {
-  // private readonly pathToSourceCodeFile: string;
-
   constructor(config: PlatformConfig, outputDir: string = '') {
     super(config, outputDir);
-    // this.pathToSourceCodeFile = ''; // path to uncompiled source code
   }
 
   async createCompiler(selectedLanguage: ProgLangSelectionArgs): Promise<void> {
