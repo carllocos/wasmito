@@ -141,20 +141,19 @@ export async function createMappingForAddr(
   wasmFilePath: string,
   addr: number,
 ): Promise<MappingItem | undefined> {
-  const info = await addr2line(wasmFilePath, addr);
-  if (info === undefined) {
+  const output = await addr2line(wasmFilePath, addr);
+  if (output === undefined) {
     return undefined;
   }
 
-  const [source, name, generatedColumn, originalLine, originalColumn] = info;
   const generatedLine = 0;
   return {
-    source,
+    source: output.sourceFile,
     generatedLine,
-    generatedColumn,
-    originalColumn,
-    originalLine,
-    name,
+    generatedColumn: output.address,
+    originalColumn: output.colnr,
+    originalLine: output.linenr,
+    name: output.name,
   };
 }
 
