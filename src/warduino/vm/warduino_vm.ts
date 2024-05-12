@@ -9,9 +9,7 @@ import {
   ResponseType,
 } from '../api/request_interface';
 import { Command } from '../../communication/command';
-// import { type PlatformConfig } from '../../builder/platform_config';
 import { type Platform } from '../../platforms/platform';
-// import { createPlatformBuilder } from '../../builder/platformbuilder_factory';
 import { PauseRequest } from '../requests/pause_request';
 import { ProxifyRequest } from '../requests/proxify_request';
 import { type WASM, type WasmState } from '../../webassembly/wasm';
@@ -52,11 +50,9 @@ import {
 } from '../../source_mappers/source_map';
 
 // TODO Rename to Backend
-// TODO mover addbp and removebp, and breakpoint fields to BreakpointPolicies +  add getters for breakpoints there
 export abstract class WARDuinoVM implements WARDuinoAPI {
   private _channel: Channel;
   protected abstract logger: winston.Logger;
-  // public readonly platformConfig: PlatformBuilderConfig;
   private _platform: Platform;
   protected abstract readonly ErrorClass: new (errorMsg: string) => Error;
 
@@ -65,16 +61,9 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   private _breakpointPolicy: BreakpointPolicy;
   private readonly _funcsProxied: Map<WASMFunction, AroundFunctionRequest>;
 
-  constructor(
-    platform: Platform,
-    // platformConfig: PlatformBuilderConfig,
-    communicationChannel: Channel,
-    // buildOutputDir?: string,
-  ) {
+  constructor(platform: Platform, communicationChannel: Channel) {
     this._platform = platform;
-    // this.platformConfig = platformConfig;
     this._channel = communicationChannel;
-    // this.platform = createPlatformBuilder(platformConfig, buildOutputDir);
     this.onNewEventHook = new EventInspectHook();
     this.onNewEventHookAdded = false;
     this._breakpointPolicy = new BreakpointDefaultPolicy(this);
@@ -250,10 +239,6 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     await this.sendRequest(request, timeout);
     this.logger.info('VM in proxy mode');
   }
-
-  // public getSourceMap(): SourceMap | undefined {
-  //   return this.platform.getSourceMap();
-  // }
 
   async addBreakpoint(
     breakpoint: Breakpoint,

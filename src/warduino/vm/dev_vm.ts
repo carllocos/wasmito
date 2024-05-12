@@ -1,19 +1,13 @@
 import { spawn, type ChildProcess } from 'child_process';
 import { WARDuinoVM } from './warduino_vm';
-import {
-  // type VMConfigArgs,
-  type VMConfiguration,
-} from '../../device/vm_config';
+import { type VMConfiguration } from '../../device/vm_config';
 import { ClientSideSocket } from '../../communication/client_socket';
 import type winston from 'winston';
 import { createLogger } from '../../logger/logger';
-// import { PlatformTarget, PlatformConfig } from '../../builder/platform_config';
 import { UpdateWasmModuleRequest } from '../requests/update_module_request';
 import { getPath2WARDuinoSDKVMBinary } from '../../project_config';
 import { getFreePort, isPortInUse } from '../../util/socket_util';
 import { NoChannel } from '../../communication/no_channel';
-// import { BoardBaudRate } from '../../util/serial_port';
-// import { type ProgLangSelectionArgs } from '../../source_mappers/compilers/prog_language_selection';
 import { type Channel } from '../../communication';
 import { type DevVMPlatform } from '../../platforms';
 
@@ -42,14 +36,6 @@ export class WARDuinoDevVM extends WARDuinoVM {
       );
     }
   }
-
-  // get vmConfig(): VMConfiguration {
-  //   return this.platformConfig.deviceConfig.vmConfig;
-  // }
-
-  // get deviceConfig(): DeviceConfig {
-  //   return this.platformConfig.deviceConfig;
-  // }
 
   async close(timeout?: number): Promise<boolean> {
     this.logger.info('closing VM');
@@ -101,7 +87,6 @@ export class WARDuinoDevVM extends WARDuinoVM {
       vmConfig.toolHostIP,
       this.deviceIdentity.fullname,
     );
-    // await this.platform.createCompiler();
 
     const exitCode = await this.platform.buildForPlatform(
       sourceCodeCompilationArgs,

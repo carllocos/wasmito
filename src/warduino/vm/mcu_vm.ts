@@ -1,10 +1,8 @@
 import { type Logger } from 'winston';
-// import { type PlatformConfig } from '../../builder/platform_config';
 import { WARDuinoVM } from './warduino_vm';
 import { type Channel } from '../../communication/channel_interface';
 import { createLogger } from '../../logger/logger';
 import { timeoutPromise } from '../../util/promise_util';
-// import { ClientSideSocket, SerialConnection } from '../../communication/index';
 import { ClientSideSocket } from '../../communication/client_socket';
 import { SerialConnection } from '../../communication/serial';
 import { type PlatformConfig } from '../../platforms/platform_config';
