@@ -4,10 +4,25 @@ import { spawn } from 'child_process';
  * This source file runs `wasm-tools addr2line` command and decodes result
  */
 
+/*
+ * TODO
+ * From the documentation of `wasm-tools addr2line` we have the following sentence that needs to be accounted for:
+ * "Each address may have multiple lines printed for it indicating that the address is an inlined function into another function.
+ *  Frames are printed innermost or youngest first."
+ */
+
+export interface Addr2LineOutput {
+  sourceFile: string;
+  name: string;
+  linenr: number;
+  colnr: number;
+  address: number;
+}
+
 export async function addr2line(
   wasmFilePath: string,
   addr: number,
-): Promise<undefined | [string, string, number, number, number]> {
+): Promise<undefined | Addr2LineOutput> {
   const [exitCode, stdout, stderr] = await runAddr2lineCommand(
     wasmFilePath,
     addr,
@@ -19,9 +34,7 @@ export async function addr2line(
   return extractLineColInfo(stdout);
 }
 
-function extractLineColInfo(
-  cmdStdOutput: string,
-): undefined | [string, string, number, number, number] {
+function extractLineColInfo(cmdStdOutput: string): undefined | Addr2LineOutput {
   // stdout is of the has one of the following forms
   // 1. 0xaddres: name-source-location path/to/sourcefile.rs:linenr:colnr\n
   // 2. 0xaddres: name-source-location path/to/sourcefile.rs:linenr\n
@@ -37,8 +50,8 @@ function extractLineColInfo(
     throw new Error(`ignored line ${cmdStdOutput}`);
   }
 
-  const addr = Number(matched[1]);
-  if (isNaN(addr)) {
+  const address = Number(matched[1]);
+  if (isNaN(address)) {
     throw new Error(
       `WasmAddr is supposed to be convetable to a number given ${matched[1]}`,
     );
@@ -75,7 +88,7 @@ function extractLineColInfo(
       `originalColnumber is undefined so fallback to colnumber equal to 0`,
     );
   }
-  return [sourceFile, name, addr, linenr, colnr];
+  return { sourceFile, name, address, linenr, colnr };
 }
 
 export async function runAddr2lineCommand(

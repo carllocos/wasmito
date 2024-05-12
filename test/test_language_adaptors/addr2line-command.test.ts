@@ -20,6 +20,5 @@ describe('addr2line command', () => {
     const invalidWasmAddress = 289;
     const decodedLine = await addr2line(wasmPath, invalidWasmAddress);
     expect(decodedLine).to.not.equal(undefined);
-    expect(decodedLine?.length).equal(5);
   });
 });
