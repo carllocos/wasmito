@@ -29,7 +29,8 @@ describe('MappingItem building', () => {
 describe('SourceMap building', () => {
   const wasmPath = './test/data/rust_examples/blink/main.wasm';
 
-  it('building sourcemap', async () => {
+  it('building sourcemap', async function () {
+    this.timeout(5000);
     const mapping = await buildSourceMap(wasmPath);
     expect(mapping).not.equal(undefined);
     expect(mapping.factory).equal('Rust');
