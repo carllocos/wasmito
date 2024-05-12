@@ -9,7 +9,7 @@ import { LanguageAdaptor } from '../language_adaptors/language_adaptor';
 
 export interface DefaultCompileArgs {
   pathToSrcRoot: string;
-  pathToSourceMap: string;
+  pathToSourceMap?: string;
   pathToWasm: string;
 }
 
@@ -18,13 +18,13 @@ function isDefaultCompileArgs(obj: any): obj is DefaultCompileArgs {
   if (
     typeof obj === 'object' &&
     'pathToSrcRoot' in obj &&
-    'pathToSourceMap' in obj &&
     'pathToWasm' in obj
   ) {
     // Check if each property is of type string
     return (
       typeof obj.pathToSrcRoot === 'string' &&
-      typeof obj.pathToSourceMap === 'string' &&
+      (obj.pathToSourceMap === undefined ||
+        typeof obj.pathToSourceMap === 'string') &&
       typeof obj.pathToWasm === 'string'
     );
   }
