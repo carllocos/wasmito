@@ -521,6 +521,11 @@ function parseInstruction(obj: any): WasmInstruction | undefined {
       op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
       break;
     }
+    case 'gt_u': {
+      const opcode = obj.object + '.gt_u';
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
+      break;
+    }
     case 'demote/f64': {
       const opcode = obj.object + '.demote/f64';
       op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
@@ -533,6 +538,11 @@ function parseInstruction(obj: any): WasmInstruction | undefined {
     }
     case 'store8': {
       const opcode = obj.object + '.store8';
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
+      break;
+    }
+    case 'load': {
+      const opcode = obj.object + '.load';
       op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
       break;
     }
