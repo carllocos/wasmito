@@ -405,7 +405,7 @@ function parseInstruction(obj: any): WasmInstruction | undefined {
     case 'br': {
       if (obj.args.length > 1) {
         throw new Error(
-          `Handle case where args has more than one element ${obj.args}`,
+          `Handle case where 'br' args has more than one element ${obj.args}`,
         );
       }
       op = new WasmInstruction('br', WASMOpcodeNumber.Br, obj.args[0].value);
