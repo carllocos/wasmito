@@ -1,8 +1,5 @@
 import { type WARDuinoVM } from './warduino_vm';
-import {
-  // type VMConfigArgs,
-  type VMConfiguration,
-} from '../../device/vm_config';
+import { type VMConfiguration } from '../../device/vm_config';
 import { WARDuinoDevVM } from './dev_vm';
 import { spawn, type ChildProcess } from 'child_process';
 import { ClientSideSocket, ShareChannel } from '../../communication/index';

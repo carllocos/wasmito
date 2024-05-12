@@ -1,13 +1,6 @@
 import * as fs from 'fs';
 import { type Logger } from 'winston';
 import { createLogger } from '../../src/logger/logger';
-// import { BoardBaudRate } from '../../src/util/serial_port';
-// import { type VMConfigArgs } from '../../src/device/vm_config';
-// import {
-//   type BoardFQBN,
-//   PlatformTarget,
-//   PlatformConfig,
-// } from '../../src/builder/platform_config';
 import { type APIRequest } from '../../src/warduino/api/request_interface';
 import { type Command } from '../../src/communication/command';
 import { StateRequest } from '../../src/warduino/requests/inspect_request';
@@ -22,34 +15,6 @@ import {
   type SourceCodeLocation,
   type SourceMap,
 } from '../../src/source_mappers/source_map';
-// import { type ProgLangSelectionArgs } from '../../src/source_mappers/compilers/prog_language_selection';
-
-// function createPlatformBuilderConfig(
-//   selectLang: ProgLangSelectionArgs,
-// ): PlatformConfig {
-//   const deviceConfigArgs: DeviceIdentityArgs = {
-//     name: 'mock',
-//     deploymentMode: DeploymentMode.DevVM,
-//   };
-
-//   const vmConfigArgs: VMConfigArgs = {
-//     program: 'no program',
-//     disableStrictModuleLoad: true,
-//   };
-//   const fqbn: BoardFQBN = {
-//     boardName: 'mock',
-//     fqbn: 'mock',
-//   };
-
-//   return new PlatformConfig(
-//     PlatformTarget.DevVM,
-//     BoardBaudRate.NONE,
-//     fqbn,
-//     selectLang,
-//     deviceConfigArgs,
-//     vmConfigArgs,
-//   );
-// }
 
 export class MockVM extends WARDuinoVM {
   protected logger: Logger = createLogger('MockVM');
