@@ -4,6 +4,7 @@ import { SourceMap } from './source_map';
 import { type MappingItem, SourceMapConsumer } from 'source-map';
 import { createLogger } from '../logger/logger';
 import { addr2line } from '../dwarf/addr2lines';
+import { wasmToolsObjdump } from '../dwarf/objdump';
 // import { getProducer } from '../dwarf/metadata_wasm';
 
 const logger = createLogger('SourceMapBuilder');
@@ -105,7 +106,7 @@ export async function SourceMapfromDWARFWasm(
   wasmFilePath: string,
 ): Promise<SourceMap> {
   // const producer = await getProducer(wasmFilePath);
-  const wasmAddresses = getAddressRangeOffset(wasmFilePath);
+  const wasmAddresses = await getAddressRangeOffset(wasmFilePath);
   const mappingsResults = await Promise.all(
     wasmAddresses.map(async (addr: number) => {
       return createMappingForAddr(wasmFilePath, addr);
@@ -157,11 +158,22 @@ export async function createMappingForAddr(
   };
 }
 
-function getAddressRangeOffset(wasmFilePath: string): number[] {
-  // TODO fix ranges
-  const endAddr = 406;
+async function getAddressRangeOffset(wasmFilePath: string): Promise<number[]> {
+  const objDump = await wasmToolsObjdump(wasmFilePath);
+  const codeSection = objDump?.find(
+    (dumpLine) => dumpLine.sectionName === 'code',
+  );
+  if (codeSection === undefined) {
+    if (objDump === undefined) {
+      throw new Error(`Objdump failed on file '${wasmFilePath}'`);
+    } else {
+      throw new Error(`No code section found in Objdump'`);
+    }
+  }
+  const startAddr = codeSection.startWasmAddress;
+  const endAddr = codeSection.endWasmAddress;
   const wasmAddresses: number[] = [];
-  for (let addr = 0; addr < endAddr; addr++) {
+  for (let addr = startAddr; addr <= endAddr; addr++) {
     wasmAddresses.push(addr);
   }
   return wasmAddresses;
