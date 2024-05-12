@@ -22,6 +22,21 @@ export enum WASMOpcodeNumber {
   Get_global = 0x23, // get_global
   Set_global = 0x24, // set_global
 
+  I32Load = 0x28,
+  I64Load = 0x29,
+  F32Load = 0x2a,
+  F64Load = 0x2b,
+  I32Load8Signed = 0x2c,
+  I32Load8Unsigned = 0x2d,
+  I32Load16Signed = 0x2e,
+  I32Load16Unsigned = 0x2f,
+  I64Load8Signed = 0x30,
+  I64Load8Unsigned = 0x31,
+  I64Load16Signed = 0x32,
+  I64Load16Unsigned = 0x33,
+  I64Load32Signed = 0x34,
+  I64Load32Unsigned = 0x35,
+
   I32Store = 0x36,
   I64Store = 0x37,
   F32Store = 0x38,
@@ -352,6 +367,20 @@ export function typeFromWasmOpcode(
     case WASMOpcodeNumber.I64CLZ:
     case WASMOpcodeNumber.I64CTZ:
     case WASMOpcodeNumber.I64POPCNT:
+    case WASMOpcodeNumber.I32Load:
+    case WASMOpcodeNumber.I64Load:
+    case WASMOpcodeNumber.F32Load:
+    case WASMOpcodeNumber.F64Load:
+    case WASMOpcodeNumber.I32Load8Signed:
+    case WASMOpcodeNumber.I32Load8Unsigned:
+    case WASMOpcodeNumber.I32Load16Signed:
+    case WASMOpcodeNumber.I32Load16Unsigned:
+    case WASMOpcodeNumber.I64Load8Signed:
+    case WASMOpcodeNumber.I64Load8Unsigned:
+    case WASMOpcodeNumber.I64Load16Signed:
+    case WASMOpcodeNumber.I64Load16Unsigned:
+    case WASMOpcodeNumber.I64Load32Signed:
+    case WASMOpcodeNumber.I64Load32Unsigned:
       return new WasmType(1, 1);
     default:
       return undefined;
@@ -516,6 +545,37 @@ export function wasmOpcodeFromStr(opcode: string): WASMOpcodeNumber {
       return WASMOpcodeNumber.I32Trunc_s_F32;
     case 'f32.convert_s/i32':
       return WASMOpcodeNumber.F32Convert_s_I32;
+
+    case 'u32.load':
+    case 'i32.load':
+      return WASMOpcodeNumber.I32Load;
+    // case :
+    // return WASMOpcodeNumber.I64Load;
+    // case :
+
+    // return WASMOpcodeNumber.F32Load;
+    // case :
+    // return WASMOpcodeNumber.F64Load;
+    // case :
+    // return WASMOpcodeNumber.I32Load8Signed;
+    // case :
+    // return WASMOpcodeNumber.I32Load8Unsigned;
+    // case :
+    // return WASMOpcodeNumber.I32Load16Signed;
+    // case :
+    // return WASMOpcodeNumber.I32Load16Unsigned;
+    // case :
+    // return WASMOpcodeNumber.I64Load8Signed;
+    // case :
+    // return WASMOpcodeNumber.I64Load8Unsigned;
+    // case :
+    // return WASMOpcodeNumber.I64Load16Signed;
+    // case :
+    // return WASMOpcodeNumber.I64Load16Unsigned;
+    // case :
+    // return WASMOpcodeNumber.I64Load32Signed;
+    // case :
+    // return WASMOpcodeNumber.I64Load32Unsigned;
     default:
       throw new Error(`unsupported opcode ${opcode}`);
   }
