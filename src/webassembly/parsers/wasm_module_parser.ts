@@ -77,6 +77,7 @@ export enum SectionType {
   Export,
   Element,
   Custom,
+  Data,
 }
 
 export interface Section {
@@ -760,6 +761,9 @@ function parseSections(sections: any): Section[] {
         break;
       case 'custom':
         sectionType = SectionType.Custom;
+        break;
+      case 'data':
+        sectionType = SectionType.Data;
         break;
       default:
         throw new Error(`Cannot parse unsupported section ${sec.section}`);
