@@ -12,6 +12,26 @@ export interface SourceCodeLocation {
   columnEnd?: number;
 }
 
+export interface SourceCodeMapping {
+  source: string;
+  address: number;
+  linenr: number;
+  colnr: number;
+  name: string;
+}
+
+export function mappingItemToSourceCodeMapping(
+  m: MappingItem,
+): SourceCodeMapping {
+  return {
+    source: m.source,
+    address: m.generatedColumn,
+    linenr: m.originalLine,
+    colnr: m.originalColumn,
+    name: m.name,
+  };
+}
+
 export class SourceMap {
   private readonly _sourceToAbsPathSource: Map<string, string>;
   private readonly _sources: string[];
