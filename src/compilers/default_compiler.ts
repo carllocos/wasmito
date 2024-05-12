@@ -54,12 +54,17 @@ export class DefaultCompiler extends SourceCodeCompiler {
       throw new Error(`Invalid compile args`);
     }
 
-    const sm = await SourceMap.fromSourceMapPath(
-      compilerArgs.pathToSrcRoot,
-      compilerArgs.pathToSourceMap,
-      compilerArgs.pathToWasm,
-    );
     this._lastCompileArgs = compilerArgs;
-    return new LanguageAdaptor(sm);
+    if (compilerArgs.pathToSourceMap !== undefined) {
+      const sm = await SourceMap.fromSourceMapPath(
+        compilerArgs.pathToSrcRoot,
+        compilerArgs.pathToSourceMap,
+        compilerArgs.pathToWasm,
+      );
+      return new LanguageAdaptor(sm);
+    } else {
+      const sm = await SourceMap.fromDWARF(compilerArgs.pathToWasm);
+      return new LanguageAdaptor(sm);
+    }
   }
 }

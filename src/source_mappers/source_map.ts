@@ -300,4 +300,8 @@ export class SourceMap {
     );
     return sm;
   }
+
+  static async fromDWARF(wasmFilePath: string): Promise<SourceMap> {
+    throw new Error('TODO fromDWARF');
+  }
 }
