@@ -57,12 +57,12 @@ export enum WASMOpcodeNumber {
   I32Ne = 0x47,
   I32LTSigned = 0x48,
   I32LTUnsigned = 0x49,
-  GTSigned = 0x4a,
-  GTUnsigned = 0x4b,
-  LESigned = 0x4c,
-  LE_Unsigned = 0x4d,
-  GESigned = 0x4e,
-  GEUnsinged = 0x4f,
+  I32GTSigned = 0x4a,
+  I32GTUnsigned = 0x4b,
+  I32LESigned = 0x4c,
+  I32LEUnsigned = 0x4d,
+  I32GESigned = 0x4e,
+  I32GEUnsinged = 0x4f,
 
   I32CLZ = 0x67,
   I32CTZ = 0x68,
@@ -260,12 +260,12 @@ export function typeFromWasmOpcode(
     case WASMOpcodeNumber.I32Ne:
     case WASMOpcodeNumber.I32LTSigned:
     case WASMOpcodeNumber.I32LTUnsigned:
-    case WASMOpcodeNumber.GTSigned:
-    case WASMOpcodeNumber.GTUnsigned:
-    case WASMOpcodeNumber.LESigned:
-    case WASMOpcodeNumber.LE_Unsigned:
-    case WASMOpcodeNumber.GESigned:
-    case WASMOpcodeNumber.GEUnsinged:
+    case WASMOpcodeNumber.I32GTSigned:
+    case WASMOpcodeNumber.I32GTUnsigned:
+    case WASMOpcodeNumber.I32LESigned:
+    case WASMOpcodeNumber.I32LEUnsigned:
+    case WASMOpcodeNumber.I32GESigned:
+    case WASMOpcodeNumber.I32GEUnsinged:
     case WASMOpcodeNumber.F32Add:
     case WASMOpcodeNumber.F32Sub:
     case WASMOpcodeNumber.F32Mul:
