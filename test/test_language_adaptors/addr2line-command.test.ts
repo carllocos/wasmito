@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { addr2line } from '../../src/language_adaptors/dwarf/addr2lines';
+import { addr2line } from '../../src/dwarf/addr2lines';
 
 /*
  * Until DWARF library is fully intergated, the generation of SourceMaps happens temporarily

@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import {
   buildSourceMap,
   createMappingForAddr,
-} from '../../src/language_adaptors/dwarf/addr2lines';
+} from '../../src/dwarf/addr2lines';
 
 /*
  * Until DWARF library is fully intergated, the generation of SourceMaps happens temporarily
