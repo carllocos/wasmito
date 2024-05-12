@@ -33,7 +33,5 @@ describe('SourceMap building', () => {
     this.timeout(5000);
     const mapping = await SourceMapfromDWARFWasm(wasmPath);
     expect(mapping).not.equal(undefined);
-    // expect(mapping.factory).equal('Rust');
-    // expect(mapping.mappings.length).not.equal(0);
   });
 });
