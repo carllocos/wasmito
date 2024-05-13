@@ -8,6 +8,6 @@ export * from './webassembly/index';
 export * from './warduino/index';
 export * from './util/index';
 export * from './debugger/index';
-export * from './dwarf/index';
+export * from './wasm-tools/index';
 export * from './language_adaptors/index';
 export * from './language-ast-parsers/index';

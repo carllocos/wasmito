@@ -3,8 +3,8 @@ import { isAbsolutePath, isFilePath, pathJoin } from '../util/file_util';
 import { SourceMap } from './source_map';
 import { type MappingItem, SourceMapConsumer } from 'source-map';
 import { createLogger } from '../logger/logger';
-import { addr2line } from '../dwarf/addr2lines';
-import { wasmToolsObjdump } from '../dwarf/objdump';
+import { addr2line } from '../wasm-tools/addr2lines';
+import { wasmToolsObjdump } from '../wasm-tools/objdump';
 // import { getProducer } from '../dwarf/metadata_wasm';
 
 const logger = createLogger('SourceMapBuilder');
