@@ -158,7 +158,7 @@ export class SourceMap {
   //   return positions;
   // }
 
-  public getOriginalPositionFor(wasmAddr: number): MappingItem | undefined {
+  public getOriginalPositionFor(wasmAddr: number): MappingItem[] {
     const maps = this._mappings
       .filter((m: MappingItem) => {
         return m.generatedColumn === wasmAddr;
@@ -176,11 +176,8 @@ export class SourceMap {
       throw new Error(
         `More than one possible mapping found #${maps.length} mappings`,
       );
-    } else if (maps.length === 0) {
-      return undefined;
-    } else {
-      return maps[0];
     }
+    return maps;
   }
 
   // AS getOriginalPositionFor

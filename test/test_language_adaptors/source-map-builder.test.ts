@@ -1,3 +1,4 @@
+import assert from 'assert';
 import { expect } from 'chai';
 import {
   SourceMapfromDWARFWasm,
@@ -47,9 +48,12 @@ describe('SourceMap entries', () => {
   });
 
   it('start wasmaddress has a mapping', () => {
+    assert(sourceMap !== undefined);
     const startWasmAddress = 486;
-    const loc = sourceMap?.getOriginalPositionFor(startWasmAddress);
-    expect(loc).to.not.equal(undefined);
-    expect(loc?.originalLine).to.equal(43);
+    const mappings = sourceMap.getOriginalPositionFor(startWasmAddress);
+    expect(mappings.length).to.not.equal(0);
+    for (const loc of mappings) {
+      expect(loc.originalLine).to.equal(43);
+    }
   });
 });
