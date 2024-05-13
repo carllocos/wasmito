@@ -16,13 +16,13 @@ describe('MappingItem building', () => {
   it('Invalid WasmAddr results in undefined mapping', async () => {
     const invalidWasmAddress = 1;
     const mapping = await createMappingForAddr(wasmPath, invalidWasmAddress);
-    expect(mapping).equal(undefined);
+    expect(mapping.length).equal(0);
   });
 
   it('Valid WasmAddr results in a mapping', async () => {
     const invalidWasmAddress = 289;
     const mapping = await createMappingForAddr(wasmPath, invalidWasmAddress);
-    expect(mapping).not.equal(undefined);
+    expect(mapping.length).not.equal(0);
   });
 });
 
