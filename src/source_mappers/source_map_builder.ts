@@ -113,10 +113,10 @@ export async function SourceMapfromDWARFWasm(
     }),
   );
 
-  const mappings: MappingItem[] = [];
+  let mappings: MappingItem[] = [];
   for (const m of mappingsResults) {
     if (m !== undefined) {
-      mappings.push(m);
+      mappings = mappings.concat(m);
     }
   }
 
@@ -141,21 +141,19 @@ export async function SourceMapfromDWARFWasm(
 export async function createMappingForAddr(
   wasmFilePath: string,
   addr: number,
-): Promise<MappingItem | undefined> {
+): Promise<MappingItem[]> {
   const output = await addr2line(wasmFilePath, addr);
-  if (output === undefined) {
-    return undefined;
-  }
-
-  const generatedLine = 0;
-  return {
-    source: output.sourceFile,
-    generatedLine,
-    generatedColumn: output.address,
-    originalColumn: output.colnr,
-    originalLine: output.linenr,
-    name: output.name,
-  };
+  return output.map((l) => {
+    const generatedLine = 0;
+    return {
+      source: l.sourceFile,
+      generatedLine,
+      generatedColumn: l.address,
+      originalColumn: l.colnr,
+      originalLine: l.linenr,
+      name: l.name,
+    };
+  });
 }
 
 async function getAddressRangeOffset(wasmFilePath: string): Promise<number[]> {
