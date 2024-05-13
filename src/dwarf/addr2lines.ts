@@ -22,13 +22,13 @@ export interface Addr2LineOutput {
 export async function addr2line(
   wasmFilePath: string,
   addr: number,
-): Promise<undefined | Addr2LineOutput> {
+): Promise<Addr2LineOutput[]> {
   const [exitCode, stdout, stderr] = await runAddr2lineCommand(
     wasmFilePath,
     addr,
   );
   if (exitCode !== 0 || stderr !== '') {
-    return undefined;
+    return [];
   }
 
   return extractLineColInfo(stdout);
