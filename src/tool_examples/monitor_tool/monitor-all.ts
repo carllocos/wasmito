@@ -345,14 +345,15 @@ async function registerBeforeHooks(
         throw new Error(`Start address should not be undefined`);
       }
       const m = sourceMap.getOriginalPositionFor(inst.startAddress);
-      if (m === undefined) {
+      if (m.length === 0) {
         throw new Error(
           `address ${inst.startAddress} should have an original Position`,
         );
       }
       return m;
     })
-    .map(({ generatedColumn, originalLine, originalColumn }) => {
+    .map((mappings) => {
+      const { generatedColumn, originalLine, originalColumn } = mappings[0];
       const address = generatedColumn;
       const linenr = originalLine;
       const columnStart = originalColumn;
@@ -396,14 +397,15 @@ async function registerAfterHooks(
         throw new Error(`Start address should not be undefined`);
       }
       const m = sourceMap.getOriginalPositionFor(inst.startAddress);
-      if (m === undefined) {
+      if (m.length === 0) {
         throw new Error(
           `address ${inst.startAddress} should have an original Position`,
         );
       }
       return m;
     })
-    .map(({ generatedColumn, originalLine, originalColumn }) => {
+    .map((mappings) => {
+      const { generatedColumn, originalLine, originalColumn } = mappings[0];
       const address = generatedColumn;
       const linenr = originalLine;
       const columnStart = originalColumn;
