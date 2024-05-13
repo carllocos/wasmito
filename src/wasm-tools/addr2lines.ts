@@ -98,10 +98,6 @@ function extractLineColInfo(cmdStdOutput: string): Addr2LineOutput[] {
           `colnr is supposed to be convetable to a number given ${colnrStr}`,
         );
       }
-    } else {
-      console.debug(
-        `originalColnumber is undefined so fallback to colnumber equal to 0`,
-      );
     }
 
     const nameAndSourceFile = matched[1];
