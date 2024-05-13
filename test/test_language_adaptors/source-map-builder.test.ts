@@ -3,6 +3,7 @@ import {
   SourceMapfromDWARFWasm,
   createMappingForAddr,
 } from '../../src/source_mappers/source_map_builder';
+import { type SourceMap } from '../../src/source_mappers/source_map';
 
 /*
  * Until DWARF library is fully intergated, the generation of SourceMaps happens temporarily
@@ -33,5 +34,22 @@ describe('SourceMap building', () => {
     this.timeout(5000);
     const mapping = await SourceMapfromDWARFWasm(wasmPath);
     expect(mapping).not.equal(undefined);
+  });
+});
+
+describe('SourceMap entries', () => {
+  const wasmPath = './test/data/rust_examples/blink/main.wasm';
+  let sourceMap: SourceMap | undefined;
+  before('Build SourceMap', async function () {
+    this.timeout(5000);
+    sourceMap = await SourceMapfromDWARFWasm(wasmPath);
+    expect(sourceMap).to.not.equal(undefined);
+  });
+
+  it('start wasmaddress has a mapping', () => {
+    const startWasmAddress = 486;
+    const loc = sourceMap?.getOriginalPositionFor(startWasmAddress);
+    expect(loc).to.not.equal(undefined);
+    expect(loc?.originalLine).to.equal(43);
   });
 });
