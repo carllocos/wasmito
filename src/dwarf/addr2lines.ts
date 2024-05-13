@@ -34,61 +34,87 @@ export async function addr2line(
   return extractLineColInfo(stdout);
 }
 
-function extractLineColInfo(cmdStdOutput: string): undefined | Addr2LineOutput {
-  // stdout is of the has one of the following forms
-  // 1. 0xaddres: name-source-location path/to/sourcefile.rs:linenr:colnr\n
-  // 2. 0xaddres: name-source-location path/to/sourcefile.rs:linenr\n
-  // 3. OtherAddress0xaddres: name-source-location path/to/sourcefile.rs:linenr\n
-  // 3 is related to DWARF information and can be ignored
+function extractLineColInfo(cmdStdOutput: string): Addr2LineOutput[] {
+  // stdout has one of the following forms
+  // form 1. 0xaddres: name-source-location path/to/sourcefile.rs:linenr:colnr\n
+  // form 2. 0xaddres: name-source-location path/to/sourcefile.rs:linenr\n
+  // form 3. OtherAddress0xaddres: name-source-location path/to/sourcefile.rs:linenr\n
+  // form 3 is related to DWARF information and can be ignored
+  // form 4. as 2 or 1 where the part after the hexa address is repeated
+  // form 5. 0xaddr: no dwarf frames found for 0xaddr
+  // form 6. 0xaddr: name-source-location\n
 
-  const pattern = /^(0x[0-9a-fA-F]+):(.*rs):(\d+):?(\d+)?\n$/;
-  const matched = cmdStdOutput.match(pattern);
-  if (matched === null || matched === undefined) {
-    if (cmdStdOutput.includes('no dwarf frames found')) {
-      return undefined;
-    }
-    throw new Error(`ignored line ${cmdStdOutput}`);
+  const matchAddress = cmdStdOutput.match(/^(0x[0-9a-fA-F]+):(.*)/);
+  if (matchAddress === null || matchAddress === undefined) {
+    throw new Error(`No prefix wasmAddress found in line ${cmdStdOutput}`);
   }
 
-  const address = Number(matched[1]);
+  const address = Number(matchAddress[1]);
   if (isNaN(address)) {
     throw new Error(
-      `WasmAddr is supposed to be convetable to a number given ${matched[1]}`,
+      `WasmAddr is supposed to be convetable to a number given ${matchAddress[1]}`,
     );
   }
 
-  const nameAndSourceFile = matched[2].split(' ');
+  const restStr = cmdStdOutput.slice(matchAddress[1].length + 1);
 
-  const sourceFile = nameAndSourceFile.pop();
-  if (sourceFile === undefined) {
-    throw new Error(
-      `Encountered a sourcelocation for which no sourceFile can be derived ${matched[2]}`,
-    );
-  }
+  // if contents contains more than 1 item then we have form 4
+  const contents = restStr
+    .split('\n')
+    .map((c) => c.trim())
+    .filter((c) => c !== '');
+  const outputs: Addr2LineOutput[] = [];
 
-  const name = nameAndSourceFile.join(' ').trim();
+  for (const c of contents) {
+    let linenrStr = '';
+    let colnrStr = '';
+    let matched = c.match(/(.*):(\d+):(\d+)$/);
+    if (matched !== null) {
+      // case of form1
+      colnrStr = matched[3];
+    } else {
+      // case of form2
+      matched = c.match(/(.*):(\d+)$/);
+      if (matched === null) {
+        // case of form5 or form6
+        continue;
+      }
+    }
 
-  const linenr = Number(matched[3]);
-  if (isNaN(linenr)) {
-    throw new Error(
-      `linenr is supposed to be convetable to a number given ${matched[3]}`,
-    );
-  }
+    linenrStr = matched[2];
 
-  let colnr = 0;
-  if (matched[4] !== undefined) {
-    colnr = Number(matched[4]);
-    if (isNaN(colnr)) {
+    const linenr = Number(linenrStr);
+    if (isNaN(linenr)) {
       throw new Error(
-        `colnr is supposed to be convetable to a number given ${matched[4]}`,
+        `linenr is supposed to be convetable to a number given ${linenrStr}`,
       );
     }
-  } else {
-    console.debug(
-      `originalColnumber is undefined so fallback to colnumber equal to 0`,
-    );
+
+    let colnr = 0;
+    if (colnrStr !== '') {
+      colnr = Number(colnrStr);
+      if (isNaN(colnr)) {
+        throw new Error(
+          `colnr is supposed to be convetable to a number given ${colnrStr}`,
+        );
+      }
+    } else {
+      console.debug(
+        `originalColnumber is undefined so fallback to colnumber equal to 0`,
+      );
+    }
+
+    const nameAndSourceFile = matched[1];
+    const matchedNameAndSrcFile = nameAndSourceFile.match(/(.*) (\/.*)$/);
+    if (matchedNameAndSrcFile === null) {
+      throw new Error(`no name nor sourcefile found for content '${c}'`);
+    }
+    const name = matchedNameAndSrcFile[1].trim();
+    const sourceFile = matchedNameAndSrcFile[2].trim();
+
+    outputs.push({ sourceFile, name, address, linenr, colnr });
   }
-  return { sourceFile, name, address, linenr, colnr };
+  return outputs;
 }
 
 export async function runAddr2lineCommand(
