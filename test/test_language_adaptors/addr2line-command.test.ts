@@ -10,15 +10,15 @@ import { addr2line } from '../../src/dwarf/addr2lines';
 describe('addr2line command', () => {
   const wasmPath = './test/data/rust_examples/blink/main.wasm';
 
-  it('Invalid WasmAddr yields non-zero exitCode', async () => {
+  it('Invalid WasmAddr yields an empty array result', async () => {
     const invalidWasmAddress = 0;
     const decodedLine = await addr2line(wasmPath, invalidWasmAddress);
-    expect(decodedLine).equal(undefined);
+    expect(decodedLine.length).equal(0);
   });
 
-  it('Valid WasmAddr yields zero exitCode, empty stderr, and non-empty stdout', async () => {
+  it('Valid WasmAddr yields a non empty array result', async () => {
     const invalidWasmAddress = 289;
     const decodedLine = await addr2line(wasmPath, invalidWasmAddress);
-    expect(decodedLine).to.not.equal(undefined);
+    expect(decodedLine.length).to.not.equal(0);
   });
 });
