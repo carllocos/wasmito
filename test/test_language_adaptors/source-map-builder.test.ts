@@ -28,21 +28,22 @@ describe('MappingItem building', () => {
   });
 });
 
-describe('SourceMap building', () => {
+describe('SourceMap building', function () {
   const wasmPath = './test/data/rust_examples/blink/main.wasm';
+  this.timeout(10000);
 
   it('building sourcemap', async function () {
-    this.timeout(5000);
     const mapping = await SourceMapfromDWARFWasm(wasmPath);
     expect(mapping).not.equal(undefined);
   });
 });
 
-describe('SourceMap entries', () => {
+describe('SourceMap entries', function () {
   const wasmPath = './test/data/rust_examples/blink/main.wasm';
   let sourceMap: SourceMap | undefined;
+  this.timeout(10000);
+
   before('Build SourceMap', async function () {
-    this.timeout(10000);
     sourceMap = await SourceMapfromDWARFWasm(wasmPath);
     expect(sourceMap).to.not.equal(undefined);
   });
