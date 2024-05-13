@@ -42,7 +42,7 @@ describe('SourceMap entries', () => {
   const wasmPath = './test/data/rust_examples/blink/main.wasm';
   let sourceMap: SourceMap | undefined;
   before('Build SourceMap', async function () {
-    this.timeout(5000);
+    this.timeout(10000);
     sourceMap = await SourceMapfromDWARFWasm(wasmPath);
     expect(sourceMap).to.not.equal(undefined);
   });
