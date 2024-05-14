@@ -24,7 +24,7 @@ export class AgnosticAST {
     return this._tree;
   }
 
-  async constructTree(): Promise<void> {
+  async buildAST(): Promise<void> {
     this._parser = await buildASTParser(this.targetLanguage);
     const content = await fs.promises.readFile(this.source);
     const sourceCode = content.toString();
@@ -41,17 +41,6 @@ export class AgnosticAST {
   //     return this.wasm.imports.find((f) => {
   //       return f.id === id;
   //     });
-  //   }
-  // }
-
-  // following method should be move to AST class and belongs to WAT
-  // private async createAST(parser: Parser): Promise<void> {
-  //   for (let i = 0; i < this.sources.length; i++) {
-  //     const source = this.sources[i];
-  //     const content = await fs.promises.readFile(source);
-  //     const sourceCode = content.toString();
-  //     const tree = parser.parse(sourceCode);
-  //     this._sourceTreeMap.set(source, tree);
   //   }
   // }
 
@@ -174,16 +163,5 @@ export class AgnosticAST {
   //   // );
   //   const parser = await createTypeScriptParser();
   //   await this.createAST(parser);
-  // }
-
-  // next method belongs to AST AssemblyScript
-  // private async createAST(parser: Parser): Promise<void> {
-  //   for (let i = 0; i < this.sources.length; i++) {
-  //     const source = this.sources[i];
-  //     const content = await fs.promises.readFile(source);
-  //     const sourceCode = content.toString();
-  //     const tree = parser.parse(sourceCode);
-  //     this._sourceTreeMap.set(source, tree);
-  //   }
   // }
 }
