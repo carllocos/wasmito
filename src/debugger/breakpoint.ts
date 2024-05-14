@@ -111,7 +111,7 @@ export class Breakpoint implements ISubscription<WasmState> {
 
   toString(): string {
     const loc = this.sourceCodeLocation;
-    let s = `{linenr: ${loc.linenr}`;
+    let s = `{source: '${loc.source}', linenr: ${loc.linenr}`;
     if (loc.columnStart !== undefined) {
       s += ` ,columnStart ${loc.columnStart}`;
     }
