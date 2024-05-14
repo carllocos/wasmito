@@ -4,7 +4,7 @@ import { createLanguageParser } from './tree-sitter-parser';
 
 function buildWasmParserName(targetLanguage: string): string {
   const d = __dirname;
-  return pathJoin(d, `./tree-sitter-${targetLanguage}.wasm`);
+  return pathJoin(d, `./parsers/tree-sitter-${targetLanguage}.wasm`);
 }
 
 export async function buildASTParser(targetLanguage: string): Promise<Parser> {

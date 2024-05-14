@@ -29,7 +29,7 @@
     "build:cjs": "rm -rf dist/cjs && tsc --project tsconfig.json && npx convert-extension cjs dist/cjs/ && npm run copyAssets",
     "build:esm": "rm -rf dist/esm  && tsc --project tsconfig-esm.json",
     "cleanNotUsed": "rm -rf dist/cjs && rm -rf dist/esm && rm -rf dist/types",
-    "copyAssets": "cp ./src/tree-sitter/tree-sitter-typescript.wasm dist/cjs/src/tree-sitter/ && cp ./src/tree-sitter/tree-sitter-rust.wasm dist/cjs/src/tree-sitter/",
+    "copyAssets": "cp -r ./src/tree-sitter/parsers/ dist/cjs/src/tree-sitter/",
     "prepack": "npm run build"
   },
   "repository": {
