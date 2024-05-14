@@ -5,7 +5,10 @@ import { type ISubscription, type Hook } from '../hooks/hook';
 import { InspectStateHook } from '../hooks/hook_inspect_state';
 import { createLogger } from '../logger/logger';
 import type winston from 'winston';
-import { type SourceCodeLocation } from '../source_mappers/source_map';
+import {
+  equalSourceCodeLocations,
+  type SourceCodeLocation,
+} from '../source_mappers/source_map';
 
 // TODO reimplement as extension to HookWithSub? Although this is bound to an address and should be extensible to support binding to events
 export class Breakpoint implements ISubscription<WasmState> {
@@ -103,11 +106,7 @@ export class Breakpoint implements ISubscription<WasmState> {
   equals(other: Breakpoint): boolean {
     const thisLoc = this.sourceCodeLocation;
     const otherLoc = other.sourceCodeLocation;
-    return (
-      thisLoc.linenr === otherLoc.linenr &&
-      thisLoc.columnEnd === otherLoc.columnEnd &&
-      thisLoc.columnStart === otherLoc.columnStart
-    );
+    return equalSourceCodeLocations(thisLoc, otherLoc);
   }
 
   toString(): string {
