@@ -147,3 +147,9 @@ export function removeFile(filePath: string): void {
     fs.unlinkSync(filePath);
   }
 }
+
+export function pathsEqual(p1: string, p2: string): boolean {
+  const rp1 = path.resolve(p1);
+  const rp2 = path.resolve(p2);
+  return rp1 === rp2;
+}
