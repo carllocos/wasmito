@@ -11,7 +11,9 @@ export async function buildASTParser(targetLanguage: string): Promise<Parser> {
   const tl = targetLanguage.toLowerCase();
   const pathToLanguageParser = buildWasmParserName(tl);
   if (!isFilePath(pathToLanguageParser)) {
-    throw new Error(`No AST parser found for language ${tl}`);
+    throw new Error(
+      `No AST parser found for language ${tl}. Path to parser ${pathToLanguageParser}`,
+    );
   }
   return createLanguageParser(pathToLanguageParser);
 }
