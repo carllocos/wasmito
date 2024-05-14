@@ -70,12 +70,7 @@ export async function addBreakpoint(
     .includeGlobals()
     .includeCallstack()
     .includeEvents();
-  const bp = new Breakpoint(
-    {
-      linenr: lineNr,
-    },
-    stateOnBreakpoint,
-  );
+  const bp = new Breakpoint({ source: '', linenr: lineNr }, stateOnBreakpoint);
   bp.subscribe(onBreakPointReached);
   return em.addBreakpoint(bp);
 }
@@ -100,12 +95,7 @@ export async function addBreakpointSnapshot(
   em: WARDuinoDevVM,
   onBreakPointReached: (data: WasmState) => void,
 ): Promise<boolean> {
-  const bp = new Breakpoint(
-    {
-      linenr,
-    },
-    snapshotRequest(),
-  );
+  const bp = new Breakpoint({ source: '', linenr }, snapshotRequest());
   bp.subscribe(onBreakPointReached);
   return em.addBreakpoint(bp);
 }

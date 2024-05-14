@@ -55,9 +55,7 @@ export function addBPAndRunUntil(
     description: `add a bp at linenr ${linenr}, run until bp, and remove bp`,
     doAction: async (device: WARDuinoVM): Promise<boolean> => {
       return new Promise<boolean>((resolve, reject) => {
-        const bp = new Breakpoint({
-          linenr,
-        });
+        const bp = new Breakpoint({ source: '', linenr });
         bp.subscribe((state: WasmState): void => {
           resolve(true);
         });
@@ -95,7 +93,7 @@ export function removeBPAt(linenr: number, timeout: number): Action<boolean> {
     timeout,
     description: `remove breakpoint at line ${linenr}`,
     doAction: async (device: WARDuinoVM): Promise<boolean> => {
-      const bp = new Breakpoint({ linenr });
+      const bp = new Breakpoint({ source: '', linenr });
       return await device.removeBreakpoint(bp);
     },
     checkActionSuccess: async (v: boolean): Promise<boolean> => {
