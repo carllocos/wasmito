@@ -68,7 +68,7 @@ const testHookOnMCUScenario: TestScenario = {
     onHandledEventSubscription('Event handled', 3000),
     addBreakpointSubscription(
       'breakpoint line 28',
-      new Breakpoint({ linenr: 28 }),
+      new Breakpoint({ source: '', linenr: 28 }),
       10000,
     ),
     runVMAction(3000),
@@ -107,7 +107,7 @@ const testHookOnMCUScenario2: TestScenario = {
     onHandledEventAction(new EventRemoveHook(), 3000),
     addBreakpointSubscription(
       'breakpoint line 28',
-      new Breakpoint({ linenr: 28 }),
+      new Breakpoint({ source: '', linenr: 28 }),
       10000,
     ),
     runVMAction(3000),
