@@ -1,5 +1,4 @@
 import Parser from 'web-tree-sitter';
-import path from 'path';
 
 let parserInitiallised: boolean = false;
 export async function initParser(): Promise<void> {
@@ -17,18 +16,6 @@ export async function createLanguageParser(
   const lang = await Parser.Language.load(languageWasmParser);
   parser.setLanguage(lang);
   return parser;
-}
-
-export async function createTypeScriptParser(): Promise<Parser> {
-  const d = __dirname;
-  const pathToLanguage = path.join(d, './tree-sitter-typescript.wasm');
-  return createLanguageParser(pathToLanguage);
-}
-
-export async function createRustParser(): Promise<Parser> {
-  const d = __dirname;
-  const pathToLanguage = path.join(d, './tree-sitter-rust.wasm');
-  return createLanguageParser(pathToLanguage);
 }
 
 export function printNodeInfo(
