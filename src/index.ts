@@ -10,4 +10,5 @@ export * from './util/index';
 export * from './debugger/index';
 export * from './wasm-tools/index';
 export * from './language_adaptors/index';
+export * from './ast/index';
 export * from './tree-sitter/index';
