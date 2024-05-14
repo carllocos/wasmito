@@ -7,6 +7,7 @@ import { type WASMFunction } from '../webassembly/wasm/wasm_function';
 const logger = createLogger('SourceMap');
 
 export interface SourceCodeLocation {
+  source: string;
   linenr: number;
   columnStart?: number;
   columnEnd?: number;
