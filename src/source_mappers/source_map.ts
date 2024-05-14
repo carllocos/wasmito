@@ -3,6 +3,7 @@ import { type MappingItem } from 'source-map';
 import { createLogger } from '../logger/logger';
 import { WasmModule } from '../webassembly/wasm/wasm_module';
 import { type WASMFunction } from '../webassembly/wasm/wasm_function';
+import { pathsEqual } from '../util/file_util';
 
 const logger = createLogger('SourceMap');
 
@@ -11,6 +12,18 @@ export interface SourceCodeLocation {
   linenr: number;
   columnStart?: number;
   columnEnd?: number;
+}
+
+export function equalSourceCodeLocations(
+  loc1: SourceCodeLocation,
+  loc2: SourceCodeLocation,
+): boolean {
+  return (
+    loc1.linenr === loc2.linenr &&
+    loc1.columnEnd === loc2.columnEnd &&
+    loc1.columnStart === loc2.columnStart &&
+    pathsEqual(loc1.source, loc2.source)
+  );
 }
 
 export interface SourceCodeMapping {
