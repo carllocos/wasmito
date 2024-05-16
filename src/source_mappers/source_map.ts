@@ -105,22 +105,11 @@ export class SourceMap {
       `#${candidates.length} candidates for SourceLoc {${location.linenr}, ${location.columnStart}}`,
     );
 
-    for (const s of candidates) {
+    for (const c of candidates) {
       const colStart = location.columnStart;
-      if (colStart !== undefined) {
-        if (colStart > s.originalColumn) {
-          continue;
-        }
+      if (colStart === c.originalColumn) {
+        positions.push(c);
       }
-
-      const colEnd = location.columnEnd;
-      if (colEnd !== undefined) {
-        logger.warn(
-          `Ignoring columEnd ${colEnd} as sourceMap has only column field`,
-        );
-      }
-
-      positions.push(s);
     }
     return positions;
   }
