@@ -18,7 +18,7 @@ export class AgnosticAST {
   constructor(source: string, targetLanguage: string) {
     this.source = source;
     if (!isFilePath(source)) {
-      throw new Error(`Give source file does not exist ${source}`);
+      throw new Error(`Given source file does not exist ${source}`);
     }
     this.targetLanguage = targetLanguage;
   }
