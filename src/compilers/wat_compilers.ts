@@ -166,7 +166,9 @@ export class WATCompiler extends SourceCodeCompiler {
       wasmOutputFilePath,
     );
     this._latestWATCompileArgs = args;
-    return new LanguageAdaptor(sm);
+    const langAdaptor = new LanguageAdaptor(sm);
+    await langAdaptor.buildComplementaryContext();
+    return langAdaptor;
   }
 }
 

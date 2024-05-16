@@ -64,10 +64,14 @@ export class DefaultCompiler extends SourceCodeCompiler {
         compilerArgs.pathToSourceMap,
         compilerArgs.pathToWasm,
       );
-      return new LanguageAdaptor(sm);
+      const langAdaptor = new LanguageAdaptor(sm);
+      await langAdaptor.buildComplementaryContext();
+      return langAdaptor;
     } else {
       const sm = await SourceMapfromDWARFWasm(compilerArgs.pathToWasm);
-      return new LanguageAdaptor(sm);
+      const langAdaptor = new LanguageAdaptor(sm);
+      await langAdaptor.buildComplementaryContext();
+      return langAdaptor;
     }
   }
 }
