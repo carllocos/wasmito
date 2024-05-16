@@ -2,6 +2,10 @@ import fs from 'fs';
 import type Parser from 'web-tree-sitter';
 import { buildASTParser } from '../tree-sitter/tree-sitter-factory';
 import { isFilePath } from '../util/file_util';
+import {
+  mostSpecialisedNode,
+  sourceLocationToNodePosition,
+} from '../tree-sitter/tree-sitter-parser';
 
 export class AgnosticAST {
   public readonly source: string;
@@ -22,6 +26,14 @@ export class AgnosticAST {
       throw new Error(`No AST available first construct it`);
     }
     return this._tree;
+  }
+
+  mostSpecialisedNode(
+    lineNr: number,
+    colnr: number,
+  ): Parser.SyntaxNode | undefined {
+    const pos = sourceLocationToNodePosition(lineNr, colnr);
+    return mostSpecialisedNode(this.ast, pos);
   }
 
   async buildAST(): Promise<void> {
