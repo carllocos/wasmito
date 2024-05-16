@@ -50,11 +50,11 @@ describe('SourceMap entries', function () {
 
   it('start wasmaddress has a mapping', () => {
     assert(sourceMap !== undefined);
-    const startWasmAddress = 486;
+    const startWasmAddress = 493;
     const mappings = sourceMap.getOriginalPositionFor(startWasmAddress);
     expect(mappings.length).to.not.equal(0);
     for (const loc of mappings) {
-      expect(loc.originalLine).to.equal(43);
+      expect(loc.originalLine).to.equal(44);
     }
   });
 });
