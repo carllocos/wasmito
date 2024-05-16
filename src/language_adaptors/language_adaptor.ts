@@ -1,8 +1,40 @@
+import { AgnosticAST } from '../ast/angostic-ast';
+import { isFilePath } from '../util/file_util';
+import { createLogger } from '../logger/logger';
 import { type SourceMap } from '../source_mappers/source_map';
+
+const logger = createLogger('LanguageAdaptor');
 
 export class LanguageAdaptor {
   public readonly sourceMap: SourceMap;
+  private readonly _asts: Map<string, AgnosticAST>;
   constructor(sourceMap: SourceMap) {
     this.sourceMap = sourceMap;
+    this._asts = new Map();
+  }
+
+  async buildComplementaryContext(): Promise<void> {
+    const availableSources: string[] = [];
+    for (const s of this.sourceMap.sources) {
+      if (!isFilePath(s)) {
+        logger.info(
+          `Will not create an AST for source file ${s} as such filepath does not exist `,
+        );
+        continue;
+      }
+      availableSources.push(s);
+    }
+
+    for (const s of availableSources) {
+      const ast = new AgnosticAST(s, this.sourceMap.targetLanguage);
+      // todo: remove tmp if introduced due to the lack of wat parser
+      if (
+        this.sourceMap.targetLanguage !== 'wat' &&
+        this.sourceMap.targetLanguage !== 'wast'
+      ) {
+        await ast.buildAST();
+      }
+      this._asts.set(s, ast);
+    }
   }
 }
