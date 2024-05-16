@@ -36,19 +36,19 @@ describe('Rust Blink App AST Building and Operations on AST', () => {
 
   it('MostSpecialidNode on Source loc (45,5) should be the "const" of the declaration', () => {
     const n = blinkAST.mostSpecialisedNode(45, 5);
-    expect(n).to.not.equal(undefined);
     expect(n?.text).to.equal('const');
+    expect(n?.childCount).equal(0);
   });
 
   it('MostSpecialisedNode on Source loc (45,22) should be the assigned "10" to the LED const', () => {
     const n = blinkAST.mostSpecialisedNode(45, 22);
-    expect(n).to.not.equal(undefined);
     expect(n?.text).to.equal('10');
+    expect(n?.childCount).equal(0);
   });
 
   it('MostSpecialisedNode on Source loc (55,31) should be the "old_delta" parameter of the lambda', () => {
     const n = blinkAST.mostSpecialisedNode(55, 31);
-    expect(n).to.not.equal(undefined);
     expect(n?.text).to.equal('old_delta');
+    expect(n?.childCount).equal(0);
   });
 });
