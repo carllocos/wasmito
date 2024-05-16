@@ -46,6 +46,16 @@ export function mappingItemToSourceCodeMapping(
   };
 }
 
+export function mappingItemToString(m: MappingItem): string {
+  return `{
+    source:${m.source},
+    address: ${m.generatedColumn},
+    linenr: ${m.originalLine},
+    colnr: ${m.originalColumn},
+    name: ${m.name},
+  }`;
+}
+
 export class SourceMap {
   private readonly _sourceToAbsPathSource: Map<string, string>;
   private readonly _sources: string[];
