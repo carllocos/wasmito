@@ -8,6 +8,7 @@ import {
 } from '../../src/language_adaptors/language_adaptor';
 import { SourceMapfromDWARFWasm } from '../../src/source_mappers/source_map_builder';
 import { AgnosticNodeFromWasmAddress } from '../../src/language_adaptors/agnostic_node';
+import { DebugAgnosticOperations } from '../../src/language_adaptors/debug_tree_operations';
 
 const rustExamplesPath = path.resolve('./test/data/rust_examples/');
 
@@ -32,6 +33,8 @@ describe('Rust Language Adaptor for Blink App', function () {
       langAdaptor.asts,
       startWasmAddr,
     );
-    expect(node).to.not.equal(undefined);
+    assert(node !== undefined);
+    const nextNode = DebugAgnosticOperations.stepIn(langAdaptor, node);
+    expect(nextNode?.node?.text).to.equal('pin_mode_lib');
   });
 });
