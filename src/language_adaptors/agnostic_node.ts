@@ -15,7 +15,7 @@ export interface ASTNodeSourceLocation {
 }
 
 export interface AgnosticNode {
-  node?: Parser.SyntaxNode;
+  node?: Parser.SyntaxNode; // TODO maybe make mandatory?
   m: SourceCodeMapping;
 }
 
