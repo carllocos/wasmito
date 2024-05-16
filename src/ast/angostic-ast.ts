@@ -28,11 +28,19 @@ export class AgnosticAST {
     return this._tree;
   }
 
+  /**
+   * Method that searches for a node in the AST that has the smalles range wheren SourceCodeLocation (lineNr,colNr) fits
+   * a.k.a. the most specific node
+   * @param lineNr line nr of the source code location
+   * @param colNr columnh nr of the source Code location
+   * @returns the most specific node or undefined if none is found
+   */
+
   mostSpecialisedNode(
     lineNr: number,
-    colnr: number,
+    colNr: number,
   ): Parser.SyntaxNode | undefined {
-    const pos = sourceLocationToNodePosition(lineNr, colnr);
+    const pos = sourceLocationToNodePosition(lineNr, colNr);
     return mostSpecialisedNode(this.ast, pos);
   }
 
