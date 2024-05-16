@@ -47,6 +47,15 @@ export abstract class Platform {
     this.logger.info(`Using output directory: ${this.outputDirectory}`);
   }
 
+  get languageAdaptor(): LanguageAdaptor {
+    if (this._languageAdaptor === undefined) {
+      throw new Error(
+        `No LanguageAdaptor available for the platform. Compile some source code first`,
+      );
+    }
+    return this._languageAdaptor;
+  }
+
   get sourceMap(): SourceMap {
     if (this._languageAdaptor === undefined) {
       throw new Error(

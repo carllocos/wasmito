@@ -48,6 +48,7 @@ import {
   type SourceCodeLocation,
   type SourceMap,
 } from '../../source_mappers/source_map';
+import { type LanguageAdaptor } from '../../language_adaptors';
 
 // TODO Rename to Backend
 export abstract class WARDuinoVM implements WARDuinoAPI {
@@ -114,6 +115,10 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   set channel(newChannel: Channel) {
     // TODO: figure out whether to update config
     this._channel = newChannel;
+  }
+
+  get languageAdaptor(): LanguageAdaptor {
+    return this.platform.languageAdaptor;
   }
 
   get sourceMap(): SourceMap {
