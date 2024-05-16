@@ -74,11 +74,10 @@ function searchNodeHelper(
 }
 
 export function searchNode(
-  node: Parser.SyntaxNode,
-  row: number,
-  col: number,
+  tree: Parser.Tree,
+  pos: NodePosition,
 ): Parser.SyntaxNode | undefined {
-  return searchNodeHelper(node, row, col);
+  return searchNodeHelper(tree.rootNode, pos.row, pos.col);
 }
 
 export function mostSpecialisedNode(
