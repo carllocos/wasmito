@@ -1,5 +1,20 @@
 import Parser from 'web-tree-sitter';
 
+export interface NodePosition {
+  row: number;
+  col: number;
+}
+
+export function sourceLocationToNodePosition(
+  linenr: number,
+  colnr: number,
+): NodePosition {
+  return {
+    row: linenr - 1,
+    col: colnr - 1,
+  };
+}
+
 let parserInitiallised: boolean = false;
 export async function initParser(): Promise<void> {
   if (!parserInitiallised) {
