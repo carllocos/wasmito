@@ -82,21 +82,48 @@ export function searchNode(
 }
 
 export function mostSpecialisedNode(
+  tree: Parser.Tree,
+  pos: NodePosition,
+): Parser.SyntaxNode | undefined {
+  return mostSpecialisedNodeHelper(tree.rootNode, pos);
+}
+
+function mostSpecialisedNodeHelper(
   node: Parser.SyntaxNode,
-  row: number,
-  col: number,
-): Parser.SyntaxNode {
+  pos: NodePosition,
+): Parser.SyntaxNode | undefined {
   for (const child of node.children) {
-    if (
-      child.startPosition.row === row &&
-      child.startPosition.column <= col &&
-      child.endPosition.row === row &&
-      col <= child.endPosition.column
-    ) {
-      return mostSpecialisedNode(child, row, col);
+    if (isPositionOnNodeSpan(child, pos)) {
+      const nodeFoud = mostSpecialisedNodeHelper(child, pos);
+      if (nodeFoud !== undefined) {
+        return nodeFoud;
+      }
     }
   }
-  return node;
+  if (isPositionOnSameNodeLine(node, pos)) {
+    return node;
+  } else {
+    return undefined;
+  }
+}
+
+function isPositionOnSameNodeLine(
+  node: Parser.SyntaxNode,
+  pos: NodePosition,
+): boolean {
+  return (
+    node.startPosition.row === pos.row &&
+    node.startPosition.column <= pos.col &&
+    node.endPosition.row === pos.row &&
+    pos.col <= node.endPosition.column
+  );
+}
+
+function isPositionOnNodeSpan(
+  node: Parser.SyntaxNode,
+  pos: NodePosition,
+): boolean {
+  return node.startPosition.row <= pos.row && pos.row <= node.endPosition.row;
 }
 
 // const grammarTypesToSkip = new Set<string>([';', ')']);
