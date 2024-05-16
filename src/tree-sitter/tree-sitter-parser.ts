@@ -125,6 +125,18 @@ function isPositionOnNodeSpan(
   return node.startPosition.row <= pos.row && pos.row <= node.endPosition.row;
 }
 
+export function isNode(n: Parser.SyntaxNode | null): n is Parser.SyntaxNode {
+  return n !== null;
+}
+
+export function firstLeafChild(n: Parser.SyntaxNode): Parser.SyntaxNode {
+  if (isNode(n.firstChild)) {
+    return firstLeafChild(n.firstChild);
+  }
+  // n has no childref so is leaf
+  return n;
+}
+
 // const grammarTypesToSkip = new Set<string>([';', ')']);
 
 function findLeaf(node: Parser.SyntaxNode): Parser.SyntaxNode {
