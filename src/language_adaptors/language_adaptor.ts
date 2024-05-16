@@ -5,6 +5,14 @@ import { type SourceMap } from '../source_mappers/source_map';
 
 const logger = createLogger('LanguageAdaptor');
 
+export async function constructLanguageAdaptor(
+  sourceMap: SourceMap,
+): Promise<LanguageAdaptor> {
+  const la = new LanguageAdaptor(sourceMap);
+  await la.buildComplementaryContext();
+  return la;
+}
+
 export class LanguageAdaptor {
   public readonly sourceMap: SourceMap;
   private readonly _asts: Map<string, AgnosticAST>;
