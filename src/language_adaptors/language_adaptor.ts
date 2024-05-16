@@ -21,6 +21,10 @@ export class LanguageAdaptor {
     this._asts = new Map();
   }
 
+  get asts(): Map<string, AgnosticAST> {
+    return this._asts;
+  }
+
   async buildComplementaryContext(): Promise<void> {
     const availableSources: string[] = [];
     for (const s of this.sourceMap.sources) {
