@@ -97,7 +97,9 @@ export class AssemblyScriptCompiler extends SourceCodeCompiler {
     const sm = await SourceMapFromASConfigPath(config);
     this.config = config;
     this._lastCompileArgs = compilerArgs;
-    return new LanguageAdaptor(sm);
+    const la = new LanguageAdaptor(sm);
+    await la.buildComplementaryContext();
+    return la;
   }
 }
 
