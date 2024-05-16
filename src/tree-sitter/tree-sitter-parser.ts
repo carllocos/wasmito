@@ -15,6 +15,13 @@ export function sourceLocationToNodePosition(
   };
 }
 
+export function nodePositionToSourceLocation(
+  row: number,
+  col: number,
+): [number, number] {
+  return [row + 1, col + 1];
+}
+
 let parserInitiallised: boolean = false;
 export async function initParser(): Promise<void> {
   if (!parserInitiallised) {
