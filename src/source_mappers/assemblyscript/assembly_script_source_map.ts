@@ -102,6 +102,7 @@ export async function SourceMapFromASConfigPath(
   }
 
   const sm = new SourceMap(
+    'typescript',
     config.sourceMappersPath,
     config.wasmPath,
     sourceAbsPath,

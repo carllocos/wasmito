@@ -53,14 +53,17 @@ export class SourceMap {
   private readonly _pathToSourceMap: string;
   private readonly _wasmPath: string;
   public readonly wasm: WasmModule;
+  public readonly targetLanguage: string;
 
   constructor(
+    targetLanguage: string,
     pathToSourceMap: string,
     wasmPath: string,
     absolutePathSources: string[],
     sources: string[],
     mappings: MappingItem[],
   ) {
+    this.targetLanguage = targetLanguage;
     this._pathToSourceMap = pathToSourceMap;
     this._wasmPath = wasmPath;
     this._sourceToAbsPathSource = new Map();
