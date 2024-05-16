@@ -19,7 +19,10 @@ import {
 import { writeFileSync } from 'fs';
 import { runCommand } from '../util/process_command';
 import { TargetLanguage } from './prog_language_selection';
-import { LanguageAdaptor } from '../language_adaptors/language_adaptor';
+import {
+  type LanguageAdaptor,
+  constructLanguageAdaptor,
+} from '../language_adaptors/language_adaptor';
 
 const logger = createLogger('WATCompiler');
 
@@ -166,9 +169,7 @@ export class WATCompiler extends SourceCodeCompiler {
       wasmOutputFilePath,
     );
     this._latestWATCompileArgs = args;
-    const langAdaptor = new LanguageAdaptor(sm);
-    await langAdaptor.buildComplementaryContext();
-    return langAdaptor;
+    return await constructLanguageAdaptor(sm);
   }
 }
 

@@ -4,7 +4,10 @@ import {
   isTargetLanguage,
   type TargetLanguage,
 } from './prog_language_selection';
-import { LanguageAdaptor } from '../language_adaptors/language_adaptor';
+import {
+  type LanguageAdaptor,
+  constructLanguageAdaptor,
+} from '../language_adaptors/language_adaptor';
 import {
   SourceMapfromDWARFWasm,
   SourceMapfromSourceMapSpec,
@@ -58,20 +61,14 @@ export class DefaultCompiler extends SourceCodeCompiler {
     }
 
     this._lastCompileArgs = compilerArgs;
-    if (compilerArgs.pathToSourceMap !== undefined) {
-      const sm = await SourceMapfromSourceMapSpec(
-        compilerArgs.pathToSrcRoot,
-        compilerArgs.pathToSourceMap,
-        compilerArgs.pathToWasm,
-      );
-      const langAdaptor = new LanguageAdaptor(sm);
-      await langAdaptor.buildComplementaryContext();
-      return langAdaptor;
-    } else {
-      const sm = await SourceMapfromDWARFWasm(compilerArgs.pathToWasm);
-      const langAdaptor = new LanguageAdaptor(sm);
-      await langAdaptor.buildComplementaryContext();
-      return langAdaptor;
-    }
+    const sm =
+      compilerArgs.pathToSourceMap === undefined
+        ? SourceMapfromDWARFWasm(compilerArgs.pathToWasm)
+        : SourceMapfromSourceMapSpec(
+            compilerArgs.pathToSrcRoot,
+            compilerArgs.pathToSourceMap,
+            compilerArgs.pathToWasm,
+          );
+    return await constructLanguageAdaptor(await sm);
   }
 }

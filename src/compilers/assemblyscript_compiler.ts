@@ -15,7 +15,10 @@ import {
   ASConfigError,
   parseASConfigFromPath,
 } from '../source_mappers/assemblyscript/asconfig';
-import { LanguageAdaptor } from '../language_adaptors/language_adaptor';
+import {
+  type LanguageAdaptor,
+  constructLanguageAdaptor,
+} from '../language_adaptors/language_adaptor';
 
 const logger = createLogger('AssemblyScriptCompiler');
 
@@ -97,9 +100,7 @@ export class AssemblyScriptCompiler extends SourceCodeCompiler {
     const sm = await SourceMapFromASConfigPath(config);
     this.config = config;
     this._lastCompileArgs = compilerArgs;
-    const la = new LanguageAdaptor(sm);
-    await la.buildComplementaryContext();
-    return la;
+    return await constructLanguageAdaptor(sm);
   }
 }
 
