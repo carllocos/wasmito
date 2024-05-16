@@ -3,6 +3,8 @@ import type Parser from 'web-tree-sitter';
 import { buildASTParser } from '../tree-sitter/tree-sitter-factory';
 import { isFilePath } from '../util/file_util';
 import {
+  firstLeafChild,
+  isNode,
   mostSpecialisedNode,
   sourceLocationToNodePosition,
 } from '../tree-sitter/tree-sitter-parser';
@@ -42,6 +44,40 @@ export class AgnosticAST {
   ): Parser.SyntaxNode | undefined {
     const pos = sourceLocationToNodePosition(lineNr, colNr);
     return mostSpecialisedNode(this.ast, pos);
+  }
+
+  /**
+   * Method that returns the sibling of the mostspecificnode associated with position (lineNr, colNr).
+   * If no sibling is available it will go to the next sibling of the parent and return the most inner child
+   *
+   * Method assumes that current source location (lineNr, colNr) does not change the control flow.
+   * AND
+   * Method assumes that the control flow follows the tree
+   * @param lineNr
+   * @param colNr
+   * @returns
+   */
+
+  nextNode(lineNr: number, colNr: number): Parser.SyntaxNode | undefined {
+    const currentNode = this.mostSpecialisedNode(lineNr, colNr);
+    if (currentNode === undefined) {
+      return undefined;
+    }
+    const sibling = currentNode.nextSibling;
+    if (isNode(sibling)) {
+      return firstLeafChild(sibling);
+    }
+
+    let parent = currentNode.parent;
+    while (isNode(parent)) {
+      const parentSibling = parent.nextSibling;
+      if (isNode(parentSibling)) {
+        return firstLeafChild(parentSibling);
+      }
+      parent = parent.parent;
+    }
+
+    return undefined;
   }
 
   async buildAST(): Promise<void> {
