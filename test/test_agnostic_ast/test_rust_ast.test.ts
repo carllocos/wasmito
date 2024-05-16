@@ -3,6 +3,7 @@ import { expect } from 'chai';
 import path from 'path';
 import { pathJoin } from '../../src/util/file_util';
 import { AgnosticAST } from '../../src/ast/angostic-ast';
+import { sourceLocationToNodePosition } from '../../src/tree-sitter/tree-sitter-parser';
 
 const rustExamplesPath = path.resolve('./test/data/rust_examples/');
 
@@ -50,5 +51,29 @@ describe('Rust Blink App AST Building and Operations on AST', () => {
     const n = blinkAST.mostSpecialisedNode(55, 31);
     expect(n?.text).to.equal('old_delta');
     expect(n?.childCount).equal(0);
+  });
+
+  it('NextNode for Source loc (45,22) should be the the ";" at the end of the line', () => {
+    const n = blinkAST.nextNode(45, 22);
+    expect(n?.text).equal(';');
+    const expectedPos = sourceLocationToNodePosition(45, 24);
+    expect(n?.startPosition.row).equal(expectedPos.row);
+    expect(n?.startPosition.column).equal(expectedPos.col);
+  });
+
+  it('NextNode for Source loc (45,24) should be the the "const" at source loc (46,5)', () => {
+    const n = blinkAST.nextNode(45, 24);
+    expect(n?.text).equal('const');
+    const expectedPos = sourceLocationToNodePosition(46, 5);
+    expect(n?.startPosition.row).equal(expectedPos.row);
+    expect(n?.startPosition.column).equal(expectedPos.col);
+  });
+
+  it('NextNode for Source loc (52,19) should be the the "," at source loc (52,21)', () => {
+    const n = blinkAST.nextNode(52, 19);
+    expect(n?.text).equal(',');
+    const expectedPos = sourceLocationToNodePosition(52, 21);
+    expect(n?.startPosition.row).equal(expectedPos.row);
+    expect(n?.startPosition.column).equal(expectedPos.col);
   });
 });
