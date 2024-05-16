@@ -17,8 +17,35 @@ export interface ASTNodeSourceLocation {
 export interface AgnosticNode {
   node?: Parser.SyntaxNode;
   m: SourceCodeMapping;
-  startPosition?: ASTNodeSourceLocation;
-  endPosition?: ASTNodeSourceLocation;
+}
+
+export function getStartPosition(n: AgnosticNode): ASTNodeSourceLocation {
+  return getPositionHelper(n.node?.startPosition, n.m);
+}
+
+export function getEndPosition(n: AgnosticNode): ASTNodeSourceLocation {
+  return getPositionHelper(n.node?.endPosition, n.m);
+}
+
+function getPositionHelper(
+  point: Parser.Point | undefined,
+  m: SourceCodeMapping,
+): ASTNodeSourceLocation {
+  if (point === undefined) {
+    return {
+      linenr: m.linenr,
+      colnr: m.colnr,
+    };
+  } else {
+    const [linenr, colnr] = nodePositionToSourceLocation(
+      point.row,
+      point.column,
+    );
+    return {
+      linenr,
+      colnr,
+    };
+  }
 }
 
 export function AgnosticNodeFromWasmAddress(
@@ -48,26 +75,9 @@ export function AgnosticNodeFromWasmAddress(
 
   if (nodesFound.length === 1) {
     const [nodeFound, mappingFound] = nodesFound[0];
-    const [ls, cs] = nodePositionToSourceLocation(
-      nodeFound.startPosition.row,
-      nodeFound.startPosition.column,
-    );
-
-    const [le, ce] = nodePositionToSourceLocation(
-      nodeFound.endPosition.row,
-      nodeFound.endPosition.column,
-    );
     return {
       node: nodeFound,
       m: mappingItemToSourceCodeMapping(mappingFound),
-      startPosition: {
-        linenr: ls,
-        colnr: cs,
-      },
-      endPosition: {
-        linenr: le,
-        colnr: ce,
-      },
     };
   } else if (nodesFound.length > 1) {
     const positionsStr = positions.map(mappingItemToString).join(', ');
