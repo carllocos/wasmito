@@ -90,7 +90,7 @@ function extractLineColInfo(cmdStdOutput: string): Addr2LineOutput[] {
       );
     }
 
-    let colnr = 0;
+    let colnr = 1;
     if (colnrStr !== '') {
       colnr = Number(colnrStr);
       if (isNaN(colnr)) {
