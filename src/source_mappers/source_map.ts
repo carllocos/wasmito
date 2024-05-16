@@ -6,6 +6,7 @@ import { pathsEqual } from '../util/file_util';
 
 const logger = createLogger('SourceMap');
 
+// TODO Sourcelocation will be gone and replaced by ASTMapping of adaptor.
 export interface SourceCodeLocation {
   source: string;
   linenr: number;
@@ -25,6 +26,8 @@ export function equalSourceCodeLocations(
   );
 }
 
+// alias of MappingItem
+// Todo rename to AddrLineMapping
 export interface SourceCodeMapping {
   source: string;
   address: number;
