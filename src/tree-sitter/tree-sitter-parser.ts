@@ -114,7 +114,7 @@ function isPositionOnSameNodeLine(
     node.startPosition.row === pos.row &&
     node.startPosition.column <= pos.col &&
     node.endPosition.row === pos.row &&
-    pos.col <= node.endPosition.column
+    pos.col < node.endPosition.column
   );
 }
 
