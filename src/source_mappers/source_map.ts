@@ -101,6 +101,9 @@ export class SourceMap {
     const candidates = this._mappings.filter((m) => {
       return m.originalLine === location.linenr;
     });
+    logger.debug(
+      `#${candidates.length} candidates for SourceLoc {${location.linenr}, ${location.columnStart}}`,
+    );
 
     for (const s of candidates) {
       const colStart = location.columnStart;
