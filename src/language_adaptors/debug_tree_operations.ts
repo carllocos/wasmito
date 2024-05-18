@@ -1,5 +1,5 @@
 import type Parser from 'web-tree-sitter';
-import { type AgnosticNode } from './agnostic_node';
+import { AgnosticNode } from './agnostic_node';
 import { type LanguageAdaptor } from './language_adaptor';
 import { type AgnosticAST } from '../ast';
 import { type MappingItem } from 'source-map';
@@ -33,18 +33,21 @@ function stepOver(
     return undefined;
   }
   const asts = langAdaptor.asts;
-  const ast = asts.get(agnosticNode.m.source);
+  const ast = asts.get(agnosticNode.source);
   if (ast === undefined) {
     return undefined;
   }
 
-  let nextNode = ast.nextNode(agnosticNode.m.linenr, agnosticNode.m.colnr);
+  let nextNode = ast.nextNode(
+    agnosticNode.startPosition.linenr,
+    agnosticNode.startPosition.colnr,
+  );
   while (nextNode !== undefined) {
     const nextAgnosticNode = buildAgnosticNode(
       langAdaptor.asts,
       nextNode,
       langAdaptor.sourceMap,
-      agnosticNode.m.source,
+      agnosticNode.source,
     );
     if (nextAgnosticNode !== undefined) {
       return nextAgnosticNode;
@@ -117,10 +120,9 @@ function buildAgnosticNode(
       if (itemWithSmallestAddr === undefined) {
         throw new Error(`Item with SmallestAddress should not be undefined`);
       }
-      return {
-        node,
-        m: mappingItemToSourceCodeMapping(itemWithSmallestAddr),
-      };
+      const an = new AgnosticNode(node);
+      an.addMapping(mappingItemToSourceCodeMapping(itemWithSmallestAddr));
+      return an;
     }
   }
   return undefined;
