@@ -25,7 +25,7 @@ export interface AgnosticDebugOperations {
   ) => AgnosticNode | undefined;
 }
 
-function stepIn(
+function stepOver(
   langAdaptor: LanguageAdaptor,
   agnosticNode: AgnosticNode,
 ): AgnosticNode | undefined {
@@ -57,6 +57,13 @@ function stepIn(
   }
 
   return undefined;
+}
+
+function stepIn(
+  langAdaptor: LanguageAdaptor,
+  agnosticNode: AgnosticNode,
+): AgnosticNode | undefined {
+  throw new Error('StepOver TODO');
 }
 
 function buildAgnosticNode(
@@ -117,13 +124,6 @@ function buildAgnosticNode(
     }
   }
   return undefined;
-}
-
-function stepOver(
-  langAdaptor: LanguageAdaptor,
-  node: AgnosticNode,
-): AgnosticNode | undefined {
-  throw new Error('StepOver TODO');
 }
 
 export const DebugAgnosticOperations: AgnosticDebugOperations = {
