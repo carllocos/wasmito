@@ -14,29 +14,49 @@ export interface ASTNodeSourceLocation {
   colnr: number;
 }
 
-export interface AgnosticNode {
-  node?: Parser.SyntaxNode; // TODO maybe make mandatory?
-  m: SourceCodeMapping;
-}
+export class AgnosticNode {
+  private readonly _node: Parser.SyntaxNode;
+  private readonly _mappings: Map<number, SourceCodeMapping>;
 
-export function getStartPosition(n: AgnosticNode): ASTNodeSourceLocation {
-  return getPositionHelper(n.node?.startPosition, n.m);
-}
+  private readonly _addresses: number[];
+  private readonly _startPosition: ASTNodeSourceLocation;
+  private readonly _endPosition: ASTNodeSourceLocation;
+  private readonly _source: string;
 
-export function getEndPosition(n: AgnosticNode): ASTNodeSourceLocation {
-  return getPositionHelper(n.node?.endPosition, n.m);
-}
+  constructor(node: Parser.SyntaxNode) {
+    this._node = node;
+    this._mappings = new Map();
+    this._addresses = [];
+    this._startPosition = this.getPositionHelper(this._node.startPosition);
+    this._endPosition = this.getPositionHelper(this._node.endPosition);
+    this._source = 'TODO';
+  }
 
-function getPositionHelper(
-  point: Parser.Point | undefined,
-  m: SourceCodeMapping,
-): ASTNodeSourceLocation {
-  if (point === undefined) {
-    return {
-      linenr: m.linenr,
-      colnr: m.colnr,
-    };
-  } else {
+  get node(): Parser.SyntaxNode {
+    return this._node;
+  }
+
+  get startPosition(): ASTNodeSourceLocation {
+    return this._startPosition;
+  }
+
+  get endPosition(): ASTNodeSourceLocation {
+    return this._endPosition;
+  }
+
+  get source(): string {
+    return this._source;
+  }
+
+  addMapping(m: SourceCodeMapping): void {
+    if (!this._mappings.has(m.address)) {
+      this._mappings.set(m.address, m);
+      this._addresses.push(m.address);
+      this._addresses.sort((addr1, addr2) => addr1 - addr2);
+    }
+  }
+
+  getPositionHelper(point: Parser.Point): ASTNodeSourceLocation {
     const [linenr, colnr] = nodePositionToSourceLocation(
       point.row,
       point.column,
@@ -75,10 +95,9 @@ export function AgnosticNodeFromWasmAddress(
 
   if (nodesFound.length === 1) {
     const [nodeFound, mappingFound] = nodesFound[0];
-    return {
-      node: nodeFound,
-      m: mappingItemToSourceCodeMapping(mappingFound),
-    };
+    const an = new AgnosticNode(nodeFound);
+    an.addMapping(mappingItemToSourceCodeMapping(mappingFound));
+    return an;
   } else if (nodesFound.length > 1) {
     const positionsStr = positions.map(mappingItemToString).join(', ');
     throw new Error(
