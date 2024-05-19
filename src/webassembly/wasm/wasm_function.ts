@@ -68,12 +68,11 @@ export class WASMFunction {
     let smallest = instructions[0].startAddress;
     let greatest = instructions[0].startAddress;
     for (let i = 0; i < instructions.length; i++) {
-      const sa = instructions[i].startAddress;
-      if (sa < smallest) {
-        smallest = sa;
+      if (instructions[i].startAddress < smallest) {
+        smallest = instructions[i].startAddress;
       }
-      if (sa > greatest) {
-        greatest = sa;
+      if (instructions[i].startAddress > greatest) {
+        greatest = instructions[i].startAddress;
       }
     }
     this.startAddress = smallest;
