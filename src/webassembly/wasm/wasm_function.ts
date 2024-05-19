@@ -67,20 +67,8 @@ export class WASMFunction {
     }
     let smallest = instructions[0].startAddress;
     let greatest = instructions[0].startAddress;
-    if (smallest === undefined || greatest === undefined) {
-      throw new Error(`Instruction is missing startAddress`);
-    }
     for (let i = 0; i < instructions.length; i++) {
       const sa = instructions[i].startAddress;
-      if (sa === undefined) {
-        throw new Error(`Instruction is missing startAddress`);
-      }
-      if (smallest === undefined) {
-        throw new Error(`Instruction is missing startAddress`);
-      }
-      if (greatest === undefined) {
-        throw new Error(`Instruction is missing startAddress`);
-      }
       if (sa < smallest) {
         smallest = sa;
       }
