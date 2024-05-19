@@ -80,12 +80,7 @@ export class WasmModule {
 
     // addr may point to a global declaration instruction
     const globalInstruction = this._globalInstructions.find((i) => {
-      const sa = i.startAddress;
-      const ea = i.endAddress;
-      if (sa === undefined || ea === undefined) {
-        throw new Error('undefined start or end address');
-      }
-      return sa <= addr && addr <= ea;
+      return i.startAddress <= addr && addr <= i.endAddress;
     });
 
     if (globalInstruction !== undefined) {
@@ -135,9 +130,6 @@ export class WasmModule {
       const candidateInstr = funBody.filter((i) => {
         const sa = i.startAddress;
         const ea = i.endAddress;
-        if (ea === undefined || sa === undefined) {
-          throw new Error(`Start or endAddress not provided`);
-        }
         return sa <= addr && addr <= ea;
       });
 
@@ -202,10 +194,6 @@ export class WasmModule {
   ): WasmInstruction | undefined {
     const startAddress = inst.startAddress;
     const endAddress = inst.endAddress;
-    if (startAddress === undefined || endAddress === undefined) {
-      throw new Error(`Instruction has no startAddres and/or endAddress set`);
-    }
-
     if (startAddress <= wasmAddr && wasmAddr <= endAddress) {
       if (inst.allSubInstructions.length > 0) {
         for (const subInstr of inst.allSubInstructions) {
