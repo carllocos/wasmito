@@ -35,13 +35,19 @@ export class WASMFunction {
     this.id = id;
     this.type = funcType;
     this.locals = locals;
-    this.startAddress = 0;
-    this.endAddress = 0;
     this.body = instructions;
     this.fullName = '';
     this._allInstructions = this.getAllInstructions(instructions);
     this._allInstructions.sort((i1, i2) => i1.startAddress - i2.startAddress);
-    this.findSmallestAndGreatesAddress(instructions);
+
+    if (this._allInstructions.length > 0) {
+      this.startAddress = this._allInstructions[0].startAddress;
+      this.endAddress =
+        this._allInstructions[this._allInstructions.length - 1].endAddress;
+    } else {
+      this.startAddress = 0;
+      this.endAddress = 0;
+    }
   }
 
   get allInstructions(): WasmInstruction[] {
@@ -59,23 +65,5 @@ export class WASMFunction {
     }
 
     return allInts;
-  }
-
-  private findSmallestAndGreatesAddress(instructions: WasmInstruction[]): void {
-    if (instructions.length === 0) {
-      return;
-    }
-    let smallest = instructions[0].startAddress;
-    let greatest = instructions[0].startAddress;
-    for (let i = 0; i < instructions.length; i++) {
-      if (instructions[i].startAddress < smallest) {
-        smallest = instructions[i].startAddress;
-      }
-      if (instructions[i].startAddress > greatest) {
-        greatest = instructions[i].startAddress;
-      }
-    }
-    this.startAddress = smallest;
-    this.endAddress = greatest;
   }
 }
