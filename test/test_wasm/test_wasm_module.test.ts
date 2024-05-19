@@ -19,7 +19,7 @@ describe('WasmModule Parser', function () {
     expect(mod.instructions).to.not.equal(0);
     for (const i of mod.instructions) {
       expect(i.startAddress).to.not.equal(undefined);
-      expect(i.startAddress).to.not.equal(undefined);
+      expect(i.endAddress).to.not.equal(undefined);
     }
   });
 });
