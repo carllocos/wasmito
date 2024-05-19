@@ -22,4 +22,37 @@ describe('WasmModule Parser', function () {
       expect(i.endAddress).to.not.equal(undefined);
     }
   });
+
+  it('function 4 has 34 instructions', () => {
+    const func = mod.getFunction(4);
+    expect(func).to.not.equal(undefined);
+    expect(func?.allInstructions.length).to.be.equal(35);
+  });
+
+  it('functions smallest address is start address first instruction', () => {
+    for (const func of mod.functions) {
+      expect(func.allInstructions).to.not.equal(0);
+      const firstInstr = func.allInstructions[0];
+      expect(firstInstr.startAddress).to.equal(func.startAddress);
+    }
+  });
+
+  it('functions greatest address is end address last instruction', () => {
+    for (const func of mod.functions) {
+      const lastInstr = func.allInstructions[func.allInstructions.length - 1];
+      expect(lastInstr.endAddress).to.equal(func.endAddress);
+    }
+  });
+
+  it('function 7 has 104 instructions', () => {
+    const func = mod.getFunction(7);
+    expect(func).to.not.equal(undefined);
+    expect(func?.allInstructions.length).to.be.equal(104);
+  });
+
+  it('function 8 has 95 instructions', () => {
+    const func = mod.getFunction(8);
+    expect(func).to.not.equal(undefined);
+    expect(func?.allInstructions.length).to.be.equal(95);
+  });
 });
