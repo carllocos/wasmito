@@ -38,16 +38,27 @@ export class WASMFunction {
     this.startAddress = 0;
     this.endAddress = 0;
     this.body = instructions;
-    this.findSmallestAndGreatesAddress(instructions);
     this.fullName = '';
-
-    this._allInstructions = this.body.flatMap((i) =>
-      [i].concat(i.subInstructions),
-    );
+    this._allInstructions = this.getAllInstructions(instructions);
+    this._allInstructions.sort((i1, i2) => i1.startAddress - i2.startAddress);
+    this.findSmallestAndGreatesAddress(instructions);
   }
 
   get allInstructions(): WasmInstruction[] {
     return this._allInstructions;
+  }
+
+  getAllInstructions(ints: WasmInstruction[]): WasmInstruction[] {
+    let allInts: WasmInstruction[] = [];
+
+    for (const i of ints) {
+      allInts.push(i);
+      if (i.subInstructions.length !== 0) {
+        allInts = allInts.concat(this.getAllInstructions(i.subInstructions));
+      }
+    }
+
+    return allInts;
   }
 
   private findSmallestAndGreatesAddress(instructions: WasmInstruction[]): void {
