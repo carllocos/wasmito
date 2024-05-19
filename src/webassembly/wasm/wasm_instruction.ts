@@ -13,8 +13,8 @@ export class WasmInstruction {
   private type: WasmType;
   public args: string[];
 
-  public startAddress?: number;
-  public endAddress?: number;
+  public startAddress: number;
+  public endAddress: number;
   private _subInstructions: WasmInstruction[];
   private _allSubInstructions: WasmInstruction[];
 
@@ -24,6 +24,8 @@ export class WasmInstruction {
     immediate?: number,
     opcodeLabels?: string[],
   ) {
+    this.startAddress = 0;
+    this.endAddress = 0;
     this.name = opcodeName;
     this.opcodeNr = opcodeNr;
     const op = wasmOpcodeFromNr(opcodeNr);
