@@ -189,7 +189,7 @@ export class BlockInstruction extends WasmInstruction {
 export class CallInstruction extends WasmInstruction {
   public readonly funIdx: number;
   constructor(funName: string, funIdx: number) {
-    super('call', WASMOpcodeNumber.Block);
+    super('call', WASMOpcodeNumber.Call);
     this.args = [funName];
     this.funIdx = funIdx;
   }
