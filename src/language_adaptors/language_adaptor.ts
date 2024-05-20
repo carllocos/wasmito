@@ -3,6 +3,7 @@ import { isFilePath } from '../util/file_util';
 import { createLogger } from '../logger/logger';
 import { type SourceMap } from '../source_mappers/source_map';
 import { type AgnosticASTMap } from './agnostic_node';
+import { WasmControlFlowGraph } from '../cfg/wasm_cfg';
 
 const logger = createLogger('LanguageAdaptor');
 
@@ -17,9 +18,12 @@ export async function constructLanguageAdaptor(
 export class LanguageAdaptor {
   public readonly sourceMap: SourceMap;
   private readonly _asts: AgnosticASTMap;
+  private readonly _cfg: WasmControlFlowGraph;
+
   constructor(sourceMap: SourceMap) {
     this.sourceMap = sourceMap;
     this._asts = new Map();
+    this._cfg = new WasmControlFlowGraph(sourceMap.wasm);
   }
 
   get asts(): AgnosticASTMap {
