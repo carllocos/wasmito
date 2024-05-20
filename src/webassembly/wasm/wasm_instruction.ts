@@ -172,6 +172,36 @@ export class IfInstruction extends WasmInstruction {
     this.testInstructions = test;
     this.alternateInstructions = alternate;
     this.consequentInstructions = consequent;
+
+    if (this.consequentInstructions.length === 0) {
+      throw new Error(
+        `An IfInstruction should have at the very least consequence Instructions`,
+      );
+    }
+    this.consequentInstructions.sort(
+      (i1, i2) => i1.startAddress - i2.startAddress,
+    );
+    const lastConseInstr =
+      this.consequentInstructions[this.consequentInstructions.length - 1];
+    if (lastConseInstr.opcodeNr !== WASMOpcodeNumber.End) {
+      throw new Error(
+        `The Last instruction of the if-consequence is expected to be an 'end' instruction got ${lastConseInstr.name}'`,
+      );
+    }
+
+    this.alternateInstructions.sort(
+      (i1, i2) => i1.startAddress - i2.startAddress,
+    );
+    if (this.alternateInstructions.length > 0) {
+      const lastAltInstr =
+        this.alternateInstructions[this.alternateInstructions.length - 1];
+      if (lastConseInstr.opcodeNr !== WASMOpcodeNumber.End) {
+        throw new Error(
+          `The Last instruction of the if-alternative is expected to be an 'end' instruction got ${lastAltInstr.name}'`,
+        );
+      }
+    }
+
     this.resultType = result;
     this.subInstructions = test.concat(alternate, consequent);
   }
@@ -183,6 +213,18 @@ export class BlockInstruction extends WasmInstruction {
     super('block', WASMOpcodeNumber.Block);
     this.label = blockLabel;
     this.subInstructions = subInstructions;
+    this.subInstructions.sort((i1, i2) => i1.startAddress - i2.startAddress);
+    if (this.subInstructions.length === 0) {
+      throw new Error(
+        `Block instr is expected to have at least one subisntruction`,
+      );
+    }
+    const lastInstr = this.subInstructions[this.subInstructions.length - 1];
+    if (lastInstr.opcodeNr !== WASMOpcodeNumber.End) {
+      throw new Error(
+        `Last instruction of block instruction is expected to be an 'end' isntruction got ${lastInstr.name}'`,
+      );
+    }
   }
 }
 
@@ -215,5 +257,18 @@ export class LoopInstruction extends WasmInstruction {
     this.label = loopLabel;
     this.subInstructions = subInstructions;
     this.resultType = resultType;
+    this.subInstructions.sort((i1, i2) => i1.startAddress - i2.startAddress);
+
+    if (this.subInstructions.length === 0) {
+      throw new Error(
+        `Loop instr is expected to have at least one subinstruction`,
+      );
+    }
+    const lastInstr = this.subInstructions[this.subInstructions.length - 1];
+    if (lastInstr.opcodeNr !== WASMOpcodeNumber.End) {
+      throw new Error(
+        `Last instruction of Loop subInstructions is expected to be an 'end' instruction got ${lastInstr.name}'`,
+      );
+    }
   }
 }
