@@ -1,18 +1,16 @@
-import {
-  type WASMFunction,
-  isIfInstruction,
-  isBranchIf,
-  isBranch,
-  WASMOpcodeNumber,
-  isReturnBranch,
-  isLoopInstruction,
-} from '../webassembly';
+import { type WASMFunction } from '../webassembly/wasm/wasm_function';
 import {
   type WasmInstruction,
   isControlFlowInstruction,
   isWasmInstructionBlockBased,
+  isBranch,
+  isBranchIf,
+  isLoopInstruction,
+  isReturnBranch,
+  isIfInstruction,
 } from '../webassembly/wasm/wasm_instruction';
 import { type WasmModule } from '../webassembly/wasm/wasm_module';
+import { WASMOpcodeNumber } from '../webassembly/wasm/wasm_opcode';
 import { controlFlowGraphToDot } from './serialize_wasm_cfg';
 
 export interface CFGEdge {
