@@ -68,9 +68,11 @@ export class AgnosticNode {
   }
 }
 
+export type AgnosticASTMap = Map<string, AgnosticAST>;
+
 export function AgnosticNodeFromWasmAddress(
   sourceMap: SourceMap,
-  asts: Map<string, AgnosticAST>,
+  asts: AgnosticASTMap,
   addr: number,
 ): AgnosticNode | undefined {
   // trick to remove duplicates via set

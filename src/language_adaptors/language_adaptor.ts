@@ -2,6 +2,7 @@ import { AgnosticAST } from '../ast/angostic-ast';
 import { isFilePath } from '../util/file_util';
 import { createLogger } from '../logger/logger';
 import { type SourceMap } from '../source_mappers/source_map';
+import { type AgnosticASTMap } from './agnostic_node';
 
 const logger = createLogger('LanguageAdaptor');
 
@@ -15,13 +16,13 @@ export async function constructLanguageAdaptor(
 
 export class LanguageAdaptor {
   public readonly sourceMap: SourceMap;
-  private readonly _asts: Map<string, AgnosticAST>;
+  private readonly _asts: AgnosticASTMap;
   constructor(sourceMap: SourceMap) {
     this.sourceMap = sourceMap;
     this._asts = new Map();
   }
 
-  get asts(): Map<string, AgnosticAST> {
+  get asts(): AgnosticASTMap {
     return this._asts;
   }
 
