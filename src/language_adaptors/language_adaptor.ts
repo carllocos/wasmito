@@ -26,6 +26,10 @@ export class LanguageAdaptor {
   }
 
   async buildComplementaryContext(): Promise<void> {
+    await this.buildASTS();
+  }
+
+  private async buildASTS(): Promise<void> {
     const availableSources: string[] = [];
     for (const s of this.sourceMap.sources) {
       if (!isFilePath(s)) {
