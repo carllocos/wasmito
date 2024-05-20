@@ -376,7 +376,7 @@ function buildCFGNodesHelper(
     if (isIfInstruction(instr)) {
       buildCFGNodesHelper(
         g,
-        instr.consequentInstructions,
+        instr.consequence,
         newScopes,
         instr.startAddress,
         endBlockAddr,
@@ -384,7 +384,7 @@ function buildCFGNodesHelper(
       if (instr.hasAlternativeBlock()) {
         buildCFGNodesHelper(
           g,
-          instr.alternateInstructions,
+          instr.alternative,
           newScopes,
           instr.startAddress,
           endBlockAddr,
