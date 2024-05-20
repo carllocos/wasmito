@@ -179,7 +179,7 @@ export class WasmModule {
   private correctCallInstructionsTypes(): void {
     this.instructions.forEach((i: WasmInstruction) => {
       if (isCallInstruction(i)) {
-        const fun = this.functions.find((f) => f.id === i.funIdx);
+        const fun = this.getFunction(i.funIdx);
         if (fun === undefined) {
           throw new Error(`Fun not found with id ${i.funIdx}`);
         }
