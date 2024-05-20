@@ -40,6 +40,18 @@ export class WasmControlFlowGraph {
     this.buildGraphs();
   }
 
+  getCFG(funID: number): [CFGNode, Graph] | undefined {
+    return this._cfgs.get(funID);
+  }
+
+  getCFGStrict(funID: number): [CFGNode, Graph] {
+    const r = this.getCFG(funID);
+    if (r === undefined) {
+      throw new Error(`no CFG found for fun ${funID}`);
+    }
+    return r;
+  }
+
   serializeToDot(funId?: number): Array<[number, string]> {
     let funcs = this._wasm.functions;
     if (funId !== undefined) {
