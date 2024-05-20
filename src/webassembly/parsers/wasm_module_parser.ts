@@ -3,9 +3,12 @@ import { createLogger } from '../../logger/logger';
 import { WasmType } from '../wasm/opcode_type';
 import {
   BlockInstruction,
+  Branch,
+  BranchIf,
   CallInstruction,
   IfInstruction,
   LoopInstruction,
+  ReturnBranch,
   WasmInstruction,
 } from '../wasm/wasm_instruction';
 import { WASM } from '../wasm';
@@ -354,7 +357,7 @@ function parseInstruction(obj: any): WasmInstruction | undefined {
       break;
     }
     case 'return': {
-      op = new WasmInstruction('return', WASMOpcodeNumber.Return);
+      op = new ReturnBranch();
       break;
     }
     case 'block': {
@@ -417,7 +420,7 @@ function parseInstruction(obj: any): WasmInstruction | undefined {
           `Handle case where 'br' args has more than one element ${obj.args}`,
         );
       }
-      op = new WasmInstruction('br', WASMOpcodeNumber.Br, obj.args[0].value);
+      op = new Branch(obj.args[0].value);
       break;
     }
     case 'br_if': {
@@ -426,11 +429,7 @@ function parseInstruction(obj: any): WasmInstruction | undefined {
           `Handle case where 'br_if' args has more than one element ${obj.args}`,
         );
       }
-      op = new WasmInstruction(
-        'br_if',
-        WASMOpcodeNumber.Br_if,
-        obj.args[0].value,
-      );
+      op = new BranchIf(obj.args[0].value);
       break;
     }
     case 'gt_s': {
