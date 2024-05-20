@@ -757,6 +757,10 @@ function parseLocalNames(localNames: any): LocalName[] {
 }
 
 function parseFunctionNames(functionNames: any): MetaDataFunctionName[] {
+  if (functionNames === undefined) {
+    logger.debug(`No function names for module`);
+    return [];
+  }
   const funcs: MetaDataFunctionName[] = functionNames.map((n: any) => {
     if (n.type !== 'FunctionNameMetadata') {
       logger.warn(`encountered a functionName of unexpected type ${n.type}`);
