@@ -28,6 +28,46 @@ export interface CFGNode {
   edges: CFGEdge[];
 }
 
+export type Graph = Map<number, CFGNode>;
+
+export class WasmControlFlowGraph {
+  private readonly _wasm: WasmModule;
+  private readonly _cfgs: Map<number, [CFGNode, Graph]>;
+
+  constructor(wasm: WasmModule) {
+    this._wasm = wasm;
+    this._cfgs = new Map();
+    this.buildGraphs();
+  }
+
+  serializeToDot(funId?: number): Array<[number, string]> {
+    let funcs = this._wasm.functions;
+    if (funId !== undefined) {
+      const f = this._wasm.getFunction(funId);
+      if (f === undefined) {
+        throw new Error(`No function found with id ${funId}`);
+      }
+      funcs = [f];
+    }
+    const results: Array<[number, string]> = [];
+    for (const f of funcs) {
+      const res = this._cfgs.get(f.id);
+      if (res === undefined) {
+        throw new Error(`No graph found for funcID ${f.id}`);
+      }
+      const g = res[1];
+      results.push([f.id, controlFlowGraphToDot(g, `function ${f.id}`)]);
+    }
+    return results;
+  }
+
+  private buildGraphs(): void {
+    for (const f of this._wasm.functions) {
+      this._cfgs.set(f.id, buildCFGForFunc(f));
+    }
+  }
+}
+
 function lastInstruction(n: CFGNode): WasmInstruction {
   return n.instructions[n.instructions.length - 1];
 }
@@ -88,44 +128,6 @@ export function getEdgeNodes(g: Graph, n: CFGNode): CFGNode[] {
   return edgeNodes;
 }
 
-export class WasmControlFlowGraph {
-  private readonly _wasm: WasmModule;
-  private readonly _cfgs: Map<number, [CFGNode, Graph]>;
-
-  constructor(wasm: WasmModule) {
-    this._wasm = wasm;
-    this._cfgs = new Map();
-    this.buildGraphs();
-  }
-
-  serializeToDot(funId?: number): Array<[number, string]> {
-    let funcs = this._wasm.functions;
-    if (funId !== undefined) {
-      const f = this._wasm.getFunction(funId);
-      if (f === undefined) {
-        throw new Error(`No function found with id ${funId}`);
-      }
-      funcs = [f];
-    }
-    const results: Array<[number, string]> = [];
-    for (const f of funcs) {
-      const res = this._cfgs.get(f.id);
-      if (res === undefined) {
-        throw new Error(`No graph found for funcID ${f.id}`);
-      }
-      const g = res[1];
-      results.push([f.id, controlFlowGraphToDot(g, `function ${f.id}`)]);
-    }
-    return results;
-  }
-
-  private buildGraphs(): void {
-    for (const f of this._wasm.functions) {
-      this._cfgs.set(f.id, buildCFGForFunc(f));
-    }
-  }
-}
-
 export function buildControlFlowGraphFunction(
   wasm: WasmModule,
   funcID: number,
@@ -143,8 +145,6 @@ export function buildControlFlowGraphFunction(
   const graph = buildCFGForFunc(fun);
   return graph;
 }
-
-export type Graph = Map<number, CFGNode>;
 
 export function getNode(g: Graph, addr: number): CFGNode {
   const n = g.get(addr);
