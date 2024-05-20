@@ -76,6 +76,17 @@ export class WasmInstruction {
   }
 }
 
+export function instructionToString(
+  inst: WasmInstruction,
+  index?: number,
+): string {
+  let str = `'(startAddr ${inst.startAddress}, endAddr ${inst.endAddress}) ${inst.name} ${inst.immediate} ${inst.args}'`;
+  if (index !== undefined) {
+    str = `idx ${index} ` + str;
+  }
+  return str;
+}
+
 export class BranchIf extends WasmInstruction {
   private readonly _branchTarget: number;
   constructor(branchTarget: number, opcodeLabels?: string[]) {

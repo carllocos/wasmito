@@ -8,6 +8,7 @@ import {
   isLoopInstruction,
   isReturnBranch,
   isIfInstruction,
+  instructionToString,
 } from '../webassembly/wasm/wasm_instruction';
 import { type WasmModule } from '../webassembly/wasm/wasm_module';
 import { WASMOpcodeNumber } from '../webassembly/wasm/wasm_opcode';
@@ -232,12 +233,12 @@ function createNode(
 
 export function nodeToStr(n: CFGNode): string {
   const s = `${n.changesFlow ? 'Control' : 'Data'} node id=${n.nodeID}`;
-  const istrs = n.instructions.map((i) => instrToString(i)).join(', ');
+  const istrs = n.instructions.map((i) => instructionToString(i)).join(', ');
   const idxs = n.instructionsIndexes.map((i) => `${i}`).join(', ');
   const edgesStr = n.edges
     .map((e) => {
-      const s1 = instrToString(e.instrFrom);
-      const s2 = instrToString(e.instrTo);
+      const s1 = instructionToString(e.instrFrom);
+      const s2 = instructionToString(e.instrTo);
       return `${s1} -> ${s2}`;
     })
     .join(', ');
@@ -292,14 +293,6 @@ function buildCFGForFunc(fun: WASMFunction): [CFGNode, Graph] {
   ]);
   const entryNode = getNode(g, fun.allInstructions[0].startAddress);
   return [entryNode, g];
-}
-
-function instrToString(inst: WasmInstruction, index?: number): string {
-  let str = `'(startAddr ${inst.startAddress}, endAddr ${inst.endAddress}) ${inst.name} ${inst.immediate} ${inst.args}'`;
-  if (index !== undefined) {
-    str = `idx ${index} ` + str;
-  }
-  return str;
 }
 
 interface BlockScope {
