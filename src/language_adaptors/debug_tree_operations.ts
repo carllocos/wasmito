@@ -1,7 +1,6 @@
 import type Parser from 'web-tree-sitter';
-import { AgnosticNode } from './agnostic_node';
+import { type AgnosticASTMap, AgnosticNode } from './agnostic_node';
 import { type LanguageAdaptor } from './language_adaptor';
-import { type AgnosticAST } from '../ast';
 import { type MappingItem } from 'source-map';
 import { createLogger } from '../logger/logger';
 import {
@@ -70,7 +69,7 @@ function stepIn(
 }
 
 function buildAgnosticNode(
-  asts: Map<string, AgnosticAST>,
+  asts: AgnosticASTMap,
   node: Parser.SyntaxNode,
   sourceMap: SourceMap,
   source: string,
