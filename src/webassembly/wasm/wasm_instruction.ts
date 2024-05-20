@@ -156,8 +156,8 @@ export function isReturnBranch(inst: WasmInstruction): inst is ReturnBranch {
 export class IfInstruction extends WasmInstruction {
   public readonly label: string;
   public readonly testInstructions: WasmInstruction[];
-  public readonly alternateInstructions: WasmInstruction[];
-  public readonly consequentInstructions: WasmInstruction[];
+  public readonly alternative: WasmInstruction[];
+  public readonly consequence: WasmInstruction[];
   public readonly resultType?: WASM.Type;
 
   constructor(
@@ -170,31 +170,25 @@ export class IfInstruction extends WasmInstruction {
     super('if', WASMOpcodeNumber.If);
     this.label = label;
     this.testInstructions = test;
-    this.alternateInstructions = alternate;
-    this.consequentInstructions = consequent;
+    this.alternative = alternate;
+    this.consequence = consequent;
 
-    if (this.consequentInstructions.length === 0) {
+    if (this.consequence.length === 0) {
       throw new Error(
         `An IfInstruction should have at the very least consequence Instructions`,
       );
     }
-    this.consequentInstructions.sort(
-      (i1, i2) => i1.startAddress - i2.startAddress,
-    );
-    const lastConseInstr =
-      this.consequentInstructions[this.consequentInstructions.length - 1];
+    this.consequence.sort((i1, i2) => i1.startAddress - i2.startAddress);
+    const lastConseInstr = this.consequence[this.consequence.length - 1];
     if (lastConseInstr.opcodeNr !== WASMOpcodeNumber.End) {
       throw new Error(
         `The Last instruction of the if-consequence is expected to be an 'end' instruction got ${lastConseInstr.name}'`,
       );
     }
 
-    this.alternateInstructions.sort(
-      (i1, i2) => i1.startAddress - i2.startAddress,
-    );
-    if (this.alternateInstructions.length > 0) {
-      const lastAltInstr =
-        this.alternateInstructions[this.alternateInstructions.length - 1];
+    this.alternative.sort((i1, i2) => i1.startAddress - i2.startAddress);
+    if (this.alternative.length > 0) {
+      const lastAltInstr = this.alternative[this.alternative.length - 1];
       if (lastConseInstr.opcodeNr !== WASMOpcodeNumber.End) {
         throw new Error(
           `The Last instruction of the if-alternative is expected to be an 'end' instruction got ${lastAltInstr.name}'`,
@@ -207,7 +201,7 @@ export class IfInstruction extends WasmInstruction {
   }
 
   hasAlternativeBlock(): boolean {
-    return this.alternateInstructions.length > 0;
+    return this.alternative.length > 0;
   }
 }
 
