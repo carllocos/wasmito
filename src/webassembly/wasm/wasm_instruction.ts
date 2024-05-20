@@ -205,6 +205,14 @@ export class IfInstruction extends WasmInstruction {
     this.resultType = result;
     this.subInstructions = test.concat(alternate, consequent);
   }
+
+  hasAlternativeBlock(): boolean {
+    return this.alternateInstructions.length > 0;
+  }
+}
+
+export function isIfInstruction(inst: WasmInstruction): inst is IfInstruction {
+  return inst.opcodeNr === WASMOpcodeNumber.If && inst instanceof IfInstruction;
 }
 
 export class BlockInstruction extends WasmInstruction {
@@ -245,6 +253,10 @@ export function isCallInstruction(
   );
 }
 
+export function isCallIndirect(inst: WasmInstruction): boolean {
+  return inst.opcodeNr === WASMOpcodeNumber.Call_indirect;
+}
+
 export class LoopInstruction extends WasmInstruction {
   public readonly label: string;
   public readonly resultType?: string;
@@ -270,5 +282,34 @@ export class LoopInstruction extends WasmInstruction {
         `Last instruction of Loop subInstructions is expected to be an 'end' instruction got ${lastInstr.name}'`,
       );
     }
+  }
+}
+
+export function isLoopInstruction(i: WasmInstruction): i is LoopInstruction {
+  return i.opcodeNr === WASMOpcodeNumber.Loop && i instanceof LoopInstruction;
+}
+
+export function isControlFlowInstruction(instr: WasmInstruction): boolean {
+  switch (instr.opcodeNr) {
+    case WASMOpcodeNumber.Br:
+    case WASMOpcodeNumber.Br_if:
+    case WASMOpcodeNumber.Br_table:
+    case WASMOpcodeNumber.Return:
+    case WASMOpcodeNumber.Call:
+    case WASMOpcodeNumber.Call_indirect:
+      return true;
+    default:
+      return false;
+  }
+}
+
+export function isWasmInstructionBlockBased(instr: WasmInstruction): boolean {
+  switch (instr.opcodeNr) {
+    case WASMOpcodeNumber.Block:
+    case WASMOpcodeNumber.Loop:
+    case WASMOpcodeNumber.If:
+      return true;
+    default:
+      return false;
   }
 }
