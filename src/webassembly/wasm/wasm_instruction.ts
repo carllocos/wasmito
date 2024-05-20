@@ -76,6 +76,83 @@ export class WasmInstruction {
   }
 }
 
+export class BranchIf extends WasmInstruction {
+  private readonly _branchTarget: number;
+  constructor(branchTarget: number, opcodeLabels?: string[]) {
+    super('br_if', WASMOpcodeNumber.Br_if, branchTarget, opcodeLabels);
+    if (this.immediate === undefined || typeof this.immediate !== 'number') {
+      throw new Error(
+        `immediate on br_if should be a number given ${this.immediate}`,
+      );
+    }
+    this._branchTarget = branchTarget;
+  }
+
+  get brachTarget(): number {
+    return this._branchTarget;
+  }
+}
+
+export function isBranchIf(inst: WasmInstruction): inst is BranchIf {
+  return inst.opcodeNr === WASMOpcodeNumber.Br_if && inst instanceof BranchIf;
+}
+
+export class Branch extends WasmInstruction {
+  private readonly _branchTarget: number;
+  constructor(branchTarget: number, opcodeLabels?: string[]) {
+    super('br', WASMOpcodeNumber.Br, branchTarget, opcodeLabels);
+    if (this.immediate === undefined || typeof this.immediate !== 'number') {
+      throw new Error(
+        `immediate on br should be a number given ${this.immediate}`,
+      );
+    }
+    this._branchTarget = branchTarget;
+  }
+
+  get brachTarget(): number {
+    return this._branchTarget;
+  }
+}
+
+export function isBranch(inst: WasmInstruction): inst is Branch {
+  return inst.opcodeNr === WASMOpcodeNumber.Br && inst instanceof Branch;
+}
+
+export class BranchTable extends WasmInstruction {
+  private readonly _branchTarget: number;
+  constructor(branchTarget: number, opcodeLabels?: string[]) {
+    super('br_table', WASMOpcodeNumber.Br_table, branchTarget, opcodeLabels);
+    if (this.immediate === undefined || typeof this.immediate !== 'number') {
+      throw new Error(
+        `immediate on br_table should be a number given ${this.immediate}`,
+      );
+    }
+    this._branchTarget = branchTarget;
+  }
+
+  get brachTarget(): number {
+    return this._branchTarget;
+  }
+}
+
+export function isBranchTable(inst: WasmInstruction): inst is BranchTable {
+  return (
+    inst.opcodeNr === WASMOpcodeNumber.Br_table && inst instanceof BranchTable
+  );
+}
+
+export class ReturnBranch extends WasmInstruction {
+  constructor() {
+    super('return', WASMOpcodeNumber.Return);
+  }
+}
+
+export function isReturnBranch(inst: WasmInstruction): inst is ReturnBranch {
+  return (
+    inst.opcodeNr === WASMOpcodeNumber.Return && inst instanceof ReturnBranch
+  );
+}
+
 export class IfInstruction extends WasmInstruction {
   public readonly label: string;
   public readonly testInstructions: WasmInstruction[];
