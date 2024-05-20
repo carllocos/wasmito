@@ -199,9 +199,18 @@ function checkFuncName(obj: any): asserts obj is FuncName {
   if (
     typeof obj !== 'object' ||
     typeof obj.type !== 'string' ||
-    typeof obj.value !== 'string' ||
-    typeof obj.numeric !== 'string'
+    typeof obj.value !== 'string'
   ) {
+    if (obj.numeric !== undefined && typeof obj.numeric === 'string') {
+      return;
+    } else if (
+      obj.numeric === undefined &&
+      obj.raw !== undefined &&
+      obj.raw === ''
+    ) {
+      obj.numeric = obj.value;
+      return;
+    }
     throw new Error('Object does not satisfy the FuncName interface');
   }
 }
