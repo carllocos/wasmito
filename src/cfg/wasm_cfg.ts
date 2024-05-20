@@ -177,8 +177,6 @@ function addEdge(g: Graph, n1Address: number, n2Address: number): void {
     );
   }
 
-  const fs = instrToString(instrFrom);
-  const ts = instrToString(instrTo);
   const edgeAlreadyPresent = n1.edges.find((e) => {
     return (
       e.instrFrom.startAddress === instrFrom.startAddress &&
@@ -186,15 +184,10 @@ function addEdge(g: Graph, n1Address: number, n2Address: number): void {
     );
   });
   if (edgeAlreadyPresent === undefined) {
-    console.log(`add edge from ${fs} -> ${ts}`);
     n1.edges.push({
       instrFrom,
       instrTo,
     });
-  } else {
-    console.log(
-      `add edge from ${fs} -> ${ts} cancelled as edge already present`,
-    );
   }
 }
 
@@ -227,7 +220,7 @@ function createNode(
   };
 }
 
-function nodeToStr(n: CFGNode): string {
+export function nodeToStr(n: CFGNode): string {
   const s = `${n.changesFlow ? 'Control' : 'Data'} node id=${n.nodeID}`;
   const istrs = n.instructions.map((i) => instrToString(i)).join(', ');
   const idxs = n.instructionsIndexes.map((i) => `${i}`).join(', ');
@@ -243,7 +236,6 @@ function nodeToStr(n: CFGNode): string {
 }
 
 function mergeNodes(g: Graph, n1Address: number, n2Address: number): void {
-  console.log(`merging nodes from addr1 ${n1Address} and ${n2Address}`);
   const n1 = getNode(g, n1Address);
   const n2 = getNode(g, n2Address);
   if (n1.changesFlow) {
@@ -258,15 +250,8 @@ function mergeNodes(g: Graph, n1Address: number, n2Address: number): void {
   }
 
   if (n1.nodeID === n2.nodeID) {
-    console.error(`Attempting to merge the same nodes`);
-    const n1s = nodeToStr(n1);
-    const n2s = nodeToStr(n2);
-    console.error(`Node 1 ${n1s}`);
-    console.error(`Node 2 ${n2s}`);
     throw new Error(`Attempting to merge the same node`);
   }
-  console.log(`nodeFrom ${nodeToStr(n1)}`);
-  console.log(`nodeTo ${nodeToStr(n2)}`);
 
   const edges = n1.edges.concat(n2.edges);
   const indexes = n1.instructionsIndexes.concat(n2.instructionsIndexes);
@@ -278,8 +263,6 @@ function mergeNodes(g: Graph, n1Address: number, n2Address: number): void {
     const instr = mergedNode.instructions[i];
     g.set(instr.startAddress, mergedNode);
   }
-
-  console.log(`MergedNode ${nodeToStr(mergedNode)}`);
 }
 
 function buildCFGForFunc(fun: WASMFunction): [CFGNode, Graph] {
@@ -291,7 +274,6 @@ function buildCFGForFunc(fun: WASMFunction): [CFGNode, Graph] {
     const n = createNode(i, instrChangesFlow, [instr], [i], []);
     g.set(instr.startAddress, n);
   }
-  console.log(`Building CFG for function ${fun.id}`);
   buildCFGNodesHelper(g, fun.body, [
     {
       startBlockInstruction: fun.body[0],
@@ -324,7 +306,6 @@ function buildCFGNodesHelper(
 ): void {
   for (let i = 0; i < instructions.length; i++) {
     const instr = instructions[i];
-    const instStr = instrToString(instr);
     if (
       !isControlFlowInstruction(instr) &&
       !isWasmInstructionBlockBased(instr)
@@ -336,7 +317,6 @@ function buildCFGNodesHelper(
 
       const entryNode = getNode(g, entryAddress);
       const entryNodeInstr = lastInstruction(entryNode);
-      const entryInstrStr = instrToString(entryNodeInstr);
       if (entryNode.changesFlow) {
         if (!isBranch(entryNodeInstr)) {
           addEdge(g, entryAddress, instr.startAddress);
@@ -350,79 +330,43 @@ function buildCFGNodesHelper(
 
     if (entryAddress !== undefined) {
       addEdge(g, entryAddress, instr.startAddress);
-
-      console.log(
-        `update entry Addr from ${entryAddress} to ${instr.startAddress}`,
-      );
       entryAddress = instr.startAddress;
     }
 
     if (isControlFlowInstruction(instr)) {
       if (isBranchIf(instr) || isBranch(instr)) {
-        const kindBranch = isBranchIf(instr) ? 'branch_if' : 'branch';
-        console.log(
-          `Istr ${instStr} is ${kindBranch} to target ${instr.brachTarget}`,
-        );
         const scopeIdx = instr.brachTarget + 1;
         const targetBlock = blockScopes[blockScopes.length - scopeIdx];
         const targetBlockInstr = targetBlock.startBlockInstruction;
-        const targetStr = instrToString(targetBlockInstr);
         const afterBlockInstr = targetBlock.instructionAfterBlock;
-        const afterBlockInstrStr = instrToString(afterBlockInstr);
-        console.log(
-          `Branching to first instruction of block instruction ${targetStr} or next instruction ${afterBlockInstrStr}`,
-        );
 
         if (isBranch(instr)) {
-          console.log(
-            `instr ${instStr} is branch so we remove all edges and keep the one to where the branch occurs`,
-          );
           const branchNode = getNode(g, instr.startAddress);
           branchNode.edges = [];
         }
 
         if (isLoopInstruction(targetBlockInstr)) {
-          console.log(
-            `TargetBlock is a Loop block so add edge from ${instStr} to first instruction of loop`,
-          );
           const firstLoopInstr = targetBlockInstr.subInstructions[0];
-          console.log(`FirstLoop isntrc is ${instrToString(firstLoopInstr)}`);
           addEdge(g, instr.startAddress, firstLoopInstr.startAddress);
         } else {
-          console.log(
-            `TargetBlock is a normal block so add edge from ${instStr} to first instruction after block ${afterBlockInstrStr}`,
-          );
           addEdge(g, instr.startAddress, afterBlockInstr.startAddress);
         }
-        console.log(`continue`);
         continue;
       } else if (instr.opcodeNr === WASMOpcodeNumber.Br_table) {
         throw new Error(`TODO add backedges for BR_table case`);
       } else if (isReturnBranch(instr)) {
-        console.log(`Return branch will cause to go to the outerblock`);
         const targetBlock = blockScopes[0];
         const afterBlockInstr = targetBlock.instructionAfterBlock;
-        const afterBlockInstrStr = instrToString(afterBlockInstr);
-        console.log(
-          `Will add an edge from ${instStr} to the last instruction of the outermost block which is stored in afterBlockInstr  and is ${afterBlockInstrStr}`,
-        );
         addEdge(g, instr.startAddress, afterBlockInstr.startAddress);
       } else {
-        console.log(
-          `Istr ${instStr} is a call or callindirect nothing else to do`,
-        );
-        console.log(`continue`);
         continue;
       }
     }
 
-    console.log(`Istr is block instr so navigate to subinstructions`);
     // case where instr is a block based structure instr
     // the end isntruction of the block instr is the last inst of its subisntrcs
     // the next inst of instructions as instructions[i+1] is the inst after the block'end
     const instrAfterBlock = instructions[i + 1];
-    const instrAfterBlockStr = instrToString(instrAfterBlock);
-    console.log(`Instr after ${instStr} is ${instrAfterBlockStr}`);
     const endBlockAddr = instrAfterBlock.startAddress;
     const newScopes = blockScopes.slice(); // copy
     newScopes.push({
@@ -430,10 +374,6 @@ function buildCFGNodesHelper(
       instructionAfterBlock: instrAfterBlock,
     });
     if (isIfInstruction(instr)) {
-      console.log(`Instr is if so explore consequence and alternative`);
-      console.log(
-        `Build subgraph for consequence instrs where entrynode is ${instStr} and exitNode ${instrAfterBlockStr}`,
-      );
       buildCFGNodesHelper(
         g,
         instr.consequentInstructions,
@@ -441,11 +381,7 @@ function buildCFGNodesHelper(
         instr.startAddress,
         endBlockAddr,
       );
-      console.log(`Completed consequence of ${instStr} looking at alternative`);
       if (instr.hasAlternativeBlock()) {
-        console.log(
-          `Build subgraph for alternative instrs where entrynode is ${instStr} and exitNode ${instrAfterBlockStr}`,
-        );
         buildCFGNodesHelper(
           g,
           instr.alternateInstructions,
@@ -453,23 +389,11 @@ function buildCFGNodesHelper(
           instr.startAddress,
           endBlockAddr,
         );
-        console.log(
-          `Completed alternative of ${instStr} where exitNode is ${instrAfterBlockStr}`,
-        );
       } else {
-        console.log(
-          `${instStr} has no alternative so add edge to ${instrAfterBlockStr}`,
-        );
         // No alternative block so add edge between if and nextExitAddr
         addEdge(g, instr.startAddress, endBlockAddr);
       }
     } else {
-      console.log(
-        `Instr ${instStr} is a block or loop so explore subinstructions`,
-      );
-      console.log(
-        `Exploring subIstructions where ${instStr} is entryAddr and exitAddress is ${instrAfterBlockStr}`,
-      );
       // instr is block or loop
       buildCFGNodesHelper(
         g,
@@ -478,22 +402,12 @@ function buildCFGNodesHelper(
         instr.startAddress,
         endBlockAddr,
       );
-      console.log(
-        `Finished exploring subIstructions of ${instStr} where ${instStr} is entryAddr and exitAddress is ${instrAfterBlockStr}`,
-      );
     }
     // skip endAddress of block as it has already been handled
-    console.log(
-      `entryAddress ${entryAddress} becomes the next address of ${instStr}  i.e., ${instrAfterBlockStr}`,
-    );
     entryAddress = endBlockAddr;
     i = i + 1;
-    console.log(`And i incremented to ${i}`);
   }
 
-  console.log(
-    `Finished all instructions where entryAddress is ${entryAddress} and exitAddress ${exitAddress}`,
-  );
   if (exitAddress !== undefined) {
     if (entryAddress === undefined) {
       throw new Error(
@@ -501,15 +415,6 @@ function buildCFGNodesHelper(
       );
     }
 
-    const ne = getNode(g, entryAddress);
-    const instrEntry = lastInstruction(ne);
-    const s1 = instrToString(instrEntry);
-    const na = getNode(g, exitAddress);
-    const instrExit = lastInstruction(na);
-    const s2 = instrToString(instrExit);
-    console.log(
-      `Adding last edge from the last node with address ${entryAddress} ${s1} to exitAddress node with address ${exitAddress} ${s2}`,
-    );
     addEdge(g, entryAddress, exitAddress);
   }
 }
