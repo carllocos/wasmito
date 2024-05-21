@@ -1,17 +1,24 @@
 import { type WasmInstruction } from '../webassembly/wasm/wasm_instruction';
 import { type Graph, type CFGNode, getNode } from './wasm_cfg';
 
-export function breadthFirstTraverseWasmCFGT(
-  g: Graph,
-  entryNode: CFGNode,
-  onNode: (n: CFGNode) => void,
-  onEdge: (
+export interface TraversalCallBacks {
+  onNode?: (n: CFGNode) => void;
+  onEdge?: (
     from: CFGNode,
     fromIstruction: WasmInstruction,
     to: CFGNode,
     toInstruction: WasmInstruction,
-  ) => void,
+  ) => void;
+}
+
+export function breadthFirstTraverseWasmCFGT(
+  g: Graph,
+  entryNode: CFGNode,
+  callbacks: TraversalCallBacks,
 ): void {
+  if (callbacks.onEdge === undefined && callbacks.onNode === undefined) {
+    throw new Error(`Expected on callback to be provided`);
+  }
   const visitedNodes = new Set<number>();
   const visitedEdges: Array<[number, number, number, number]> = [];
   const q: CFGNode[] = [entryNode];
@@ -21,7 +28,9 @@ export function breadthFirstTraverseWasmCFGT(
     if (n === undefined) {
       throw new Error(`n should not be undefined`);
     }
-    onNode(n);
+    if (callbacks.onNode !== undefined) {
+      callbacks.onNode(n);
+    }
     const edges = n.edges;
     for (const e of edges) {
       const toNode = getNode(g, e.instrTo.startAddress);
@@ -34,7 +43,9 @@ export function breadthFirstTraverseWasmCFGT(
         );
       });
       if (hasEdge === undefined) {
-        onEdge(n, e.instrFrom, toNode, e.instrTo);
+        if (callbacks.onEdge !== undefined) {
+          callbacks.onEdge(n, e.instrFrom, toNode, e.instrTo);
+        }
         visitedEdges.push([
           n.nodeID,
           e.instrFrom.startAddress,
