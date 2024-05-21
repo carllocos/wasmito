@@ -194,8 +194,9 @@ export class SourceMap {
       });
 
     if (maps.length > 1) {
-      throw new Error(
-        `More than one possible mapping found #${maps.length} mappings`,
+      const mappings: string = maps.map(mappingItemToString).join(', ');
+      logger.debug(
+        `More than one possible mapping  found for wasmAddr ${wasmAddr} #${maps.length} mappings: [${mappings}]`,
       );
     }
     return maps;

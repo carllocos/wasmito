@@ -8,6 +8,7 @@ import {
 import { type MappingItem } from 'source-map';
 import { type AgnosticAST } from '../ast';
 import { nodePositionToSourceLocation } from '../tree-sitter/tree-sitter-parser';
+import { createLogger } from '../logger/logger';
 
 export interface ASTNodeSourceLocation {
   linenr: number;
@@ -70,6 +71,8 @@ export class AgnosticNode {
 
 export type AgnosticASTMap = Map<string, AgnosticAST>;
 
+const logger = createLogger('AgnosticNode');
+
 export function AgnosticNodeFromWasmAddress(
   sourceMap: SourceMap,
   asts: AgnosticASTMap,
@@ -85,7 +88,8 @@ export function AgnosticNodeFromWasmAddress(
   for (const pos of positions) {
     const ast = asts.get(pos.source);
     if (ast === undefined) {
-      throw new Error(`No AST found for source ${pos.source}`);
+      logger.debug(`No AST found for source ${pos.source}`);
+      return undefined;
     }
     const node = ast.mostSpecialisedNode(pos.originalLine, pos.originalColumn);
     if (node !== undefined) {
@@ -107,8 +111,9 @@ export function AgnosticNodeFromWasmAddress(
     );
   } else {
     const positionsStr = positions.map(mappingItemToString).join(', ');
-    throw new Error(
+    logger.debug(
       `Could not find any AST node of for addr ${addr} that fits best with source locations [${positionsStr}]`,
     );
+    return undefined;
   }
 }
