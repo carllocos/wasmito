@@ -110,7 +110,7 @@ function controlFlowGraphToStringHelper(
     s += `${idx} (start:${inst.startAddress}, end ${inst.endAddress}) ${inst.name} ${inst.args.length === 0 ? inst.immediate : inst.args}\n`;
   }
   let bp: Set<number> = blocksProcessed.add(n.nodeID);
-  const edgeNodes = getEdgeNodes(g, n);
+  const edgeNodes = getWasmNodeEdges(g, n);
   for (let j = 0; j < n.edges.length; j++) {
     const edge = n.edges[j];
     const edgeNode = edgeNodes[j];
@@ -130,7 +130,7 @@ function controlFlowGraphToStringHelper(
   return [s, bp];
 }
 
-export function getEdgeNodes(g: WasmGraph, n: CFGNode): CFGNode[] {
+export function getWasmNodeEdges(g: WasmGraph, n: CFGNode): CFGNode[] {
   const edgeNodes: CFGNode[] = [];
   for (let i = 0; i < n.edges.length; i++) {
     const instTo = n.edges[i].instrTo;
