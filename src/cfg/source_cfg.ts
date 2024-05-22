@@ -46,9 +46,13 @@ export class SourceControlFlowGraph {
       (n) => n.instructions.find((i) => i.startAddress === addr) !== undefined,
     );
   }
+
+  allNodes(): SourceCFGNode[] {
+    return this._allGraphNodes;
+  }
 }
 
-interface SourceCFGNode {
+export interface SourceCFGNode {
   nodeId: number;
   node: AgnosticNode;
   edges: SourceCFGNode[];
