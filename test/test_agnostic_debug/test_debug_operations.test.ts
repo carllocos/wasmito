@@ -11,6 +11,7 @@ import { DebugAgnosticOperations } from '../../src';
 
 describe('Debug Operations on Rust AST Blink App', function () {
   const blinkApp = path.resolve('./test/data/rust_examples/blink/main.wasm');
+  const sourcePath = path.resolve('./test/data/rust_examples/blink/main.rs');
   let sourceCFG: SourceControlFlowGraph;
 
   function logNode(n: SourceCFGNode): void {
@@ -54,5 +55,26 @@ describe('Debug Operations on Rust AST Blink App', function () {
     expect(nextPossibleLocations.length).to.equal(2);
     logNode(nextPossibleLocations[0]);
     logNode(nextPossibleLocations[1]);
+  });
+
+  it('"step into" if-expression', function () {
+    const startNodes = sourceCFG.nodesFromSourceLoc({
+      source: sourcePath,
+      linenr: 56,
+      columnStart: 12,
+    });
+
+    expect(startNodes.length).to.equal(1);
+    const [branch] = startNodes;
+    logNode(branch);
+    const nextPossibleLocations = DebugAgnosticOperations.stepIn(
+      sourceCFG,
+      branch,
+    );
+
+    expect(nextPossibleLocations.length).to.equal(3);
+    for (const n of nextPossibleLocations) {
+      logNode(n);
+    }
   });
 });
