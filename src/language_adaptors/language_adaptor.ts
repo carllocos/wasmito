@@ -38,7 +38,7 @@ export class LanguageAdaptor {
 
   async buildComplementaryContext(): Promise<void> {
     await this.buildASTS();
-    this.buildASTCFG();
+    this.buildSourceCFG();
   }
 
   private async buildASTS(): Promise<void> {
