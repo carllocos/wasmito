@@ -1,10 +1,10 @@
-import { breadthFirstTraverseWasmCFGT } from '../cfg/traversals_cfg';
+import { breadthFirstTraverseWasmCFGT } from './traversals_cfg';
 import {
   type WasmGraph,
   type CFGNode,
   type WasmControlFlowGraph,
   getWasmCFGNode,
-} from '../cfg/wasm_cfg';
+} from './wasm_cfg';
 // import { createLogger } from '../logger/logger';
 import { type SourceMap } from '../source_mappers/source_map';
 import {
@@ -20,7 +20,7 @@ import {
   type AgnosticASTMap,
   AgnosticNodeFromWasmAddress,
   type AgnosticNode,
-} from './agnostic_node';
+} from '../language_adaptors/agnostic_node';
 
 // const logger = createLogger('ASTControlFlowGraph');
 
