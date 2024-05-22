@@ -13,8 +13,8 @@ describe('Rust AST Control Flow Graph for Blink App', function () {
     try {
       const sm = await SourceMapfromDWARFWasm(exampleFile);
       const langAdaptor = await constructLanguageAdaptor(sm);
-      assert(langAdaptor.astCFG !== undefined);
-      astCFG = langAdaptor.astCFG;
+      assert(langAdaptor.sourceCFG !== undefined);
+      astCFG = langAdaptor.sourceCFG;
     } catch (e) {
       fail(`Could not construct sourcemap or langadaptor. Reason ${e}`);
     }
