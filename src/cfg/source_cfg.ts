@@ -357,12 +357,14 @@ function addEdgesAndReturnEntryNodes(
           throw new Error(`Case should not have happened`);
         }
       } else {
+        // ctgn is not undefined
         // entry CFG node has a corresponding CTG node
-
-        if (!entryNodesAdded.has(ctgn.nodeId)) {
-          console.log(`Added new EntryNode ${logNode(ctgn.node)}`);
-          entryCTGNodes.push(ctgn);
-          entryNodesAdded.add(ctgn.nodeId);
+        if (n.nodeID === entryNode.nodeID) {
+          if (!entryNodesAdded.has(ctgn.nodeId)) {
+            console.log(`Added new EntryNode ${logNode(ctgn.node)}`);
+            entryCTGNodes.push(ctgn);
+            entryNodesAdded.add(ctgn.nodeId);
+          }
         }
       }
       console.log(`Adding edges for node ${logNode(ctgn.node)}`);
