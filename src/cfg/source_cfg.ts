@@ -59,7 +59,7 @@ export interface SourceCFGNode {
   instructions: WasmInstruction[];
   instructionsIndexes: number[];
   addressesWithoutASTNode: Set<number>;
-  hasEdgesToOutSideCalls: WasmInstruction[];
+  edgesToOutSideCalls: WasmInstruction[];
 }
 
 interface FunctionTreeGraph {
@@ -268,7 +268,7 @@ function addEdgesAndReturnEntryNodes(
               console.log(
                 `mark node ${ctgn.nodeId} as a node with an edge to an outside call`,
               );
-              ctgn.hasEdgesToOutSideCalls.push(e.instrTo);
+              ctgn.edgesToOutSideCalls.push(e.instrTo);
               continue;
             }
             addEdge(ctgn, toctgn);
@@ -329,7 +329,7 @@ function createNodeIfNeeded(
       edges: [],
       instructions: [],
       addressesWithoutASTNode: new Set(),
-      hasEdgesToOutSideCalls: [],
+      edgesToOutSideCalls: [],
       instructionsIndexes: [],
     };
     nodes.push(ncfg);
