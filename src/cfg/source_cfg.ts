@@ -14,6 +14,7 @@ import {
   isBranchingInstruction,
   isCallIndirect,
   isCallInstruction,
+  isWasmInstructionBlockBased,
   type WASMFunction,
 } from '../webassembly';
 import {
@@ -393,36 +394,38 @@ function addEdgesAndReturnEntryNodes(
             `about to add edge from ${logNode(ctgn.node)} to ${logNode(toctgn.node)}`,
           );
           if (ctgn.nodeId !== toctgn.nodeId) {
+            // case 1
             addEdge(ctgn, toctgn);
-          } else {
-            // TODO generalise to search for a path when dealing with a branch
-
-            // this is the case where we add an edge from the same source node to the same source node
-            // i.e., a loop
-            // This happens when some of the instructions of two different wasm cfg nodes got merged into
-            // the same source cfg node. Adding the edge would therefore result in a loop
-            // However, adding the loop edge is only necessary if
-            // if the instruction is a branching instruction (br, br_if, return)
-            // if the instruction is a call, call_indirect no need to add a self loop edge
-            // if the instruction is struct instruction as loop and block no need to add edge
-            if (isBranchingInstruction(e.instrTo)) {
-              const wasmNode = getWasmCFGNode(g, e.instrTo.startAddress);
-              for (const e2 of wasmNode.edges) {
-                const toNode2 = getWasmCFGNode(g, e2.instrTo.startAddress);
-                const toctgn2 = searchCTGNInIncreasingAddresses(toNode2, nodes);
-                if (toctgn2?.nodeId === ctgn.nodeId) {
-                  addEdge(ctgn, toctgn);
-                }
+          } else if (isWasmInstructionBlockBased(e.instrTo)) {
+            // case 2.a
+            continue;
+          } else if (
+            isCallInstruction(e.instrTo) ||
+            isCallIndirect(e.instrTo)
+          ) {
+            // case 2.b
+            console.log(
+              `mark node ${ctgn.nodeId} as a node with an edge to an outside call`,
+            );
+            ctgn.edgesToOutSideCalls.push(e.instrTo);
+            continue;
+          } else if (isBranchingInstruction(e.instrFrom)) {
+            // case 2.c
+            // TODO generalise to paths
+            const branchingNode = getWasmCFGNode(g, e.instrFrom.startAddress);
+            for (const be of branchingNode.edges) {
+              const destNode = getWasmCFGNode(g, be.instrTo.startAddress);
+              const destcfgn = searchCTGNInIncreasingAddresses(destNode, nodes);
+              if (destcfgn === undefined) {
+                throw new Error(`TODO search deeper in patch`);
+              } else {
+                // if (destcfgn.nodeId === ctgn.nodeId) {
+                addEdge(ctgn, toctgn);
+                // }
               }
-            } else {
-              if (isCallInstruction(e.instrTo) || isCallIndirect(e.instrTo)) {
-                console.log(
-                  `mark node ${ctgn.nodeId} as a node with an edge to an outside call`,
-                );
-                ctgn.edgesToOutSideCalls.push(e.instrTo);
-              }
-              continue;
             }
+          } else {
+            continue;
           }
         } else {
           // we have to search for all the neighbours of toNode that have a CTG node
