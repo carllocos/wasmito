@@ -128,11 +128,8 @@ export class SourceControlFlowGraph {
     for (const fid of funIds) {
       const p = pathJoin(outputDir, `sourcefun${fid}.dot`);
       const fg = this.funtionSourceGraph(fid);
-      if (fg?.entyNodes !== undefined) {
-        const content = sourceControlFlowGraphToDot(
-          fg.entyNodes,
-          `function ${fid}`,
-        );
+      if (fg?.allNodes !== undefined) {
+        const content = sourceControlFlowGraphToDot(fg, `function ${fid}`);
         writeFileSync(p, content);
         dots.push(content);
       }
