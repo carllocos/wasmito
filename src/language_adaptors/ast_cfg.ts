@@ -1,6 +1,6 @@
 import { breadthFirstTraverseWasmCFGT } from '../cfg/traversals_cfg';
 import {
-  type Graph,
+  type WasmGraph,
   type CFGNode,
   type WasmControlFlowGraph,
   getNode,
@@ -98,7 +98,7 @@ function buildCTGraphForFunction(
 function createAllNodes(
   sourceMap: SourceMap,
   asts: AgnosticASTMap,
-  [entryNode, g]: [CFGNode, Graph],
+  [entryNode, g]: [CFGNode, WasmGraph],
 ): ControlTreeGraphNode[] {
   const nodes: ControlTreeGraphNode[] = [];
 
@@ -210,7 +210,7 @@ function searchCTGNFromNode(
 }
 
 function addEdgesAndReturnEntryNodes(
-  [entryNode, g]: [CFGNode, Graph],
+  [entryNode, g]: [CFGNode, WasmGraph],
   nodes: ControlTreeGraphNode[],
 ): ControlTreeGraphNode[] {
   const entryCTGNodes: ControlTreeGraphNode[] = [];
@@ -284,7 +284,7 @@ function addEdgesAndReturnEntryNodes(
 }
 
 function searchNeighboursWithASTs(
-  g: Graph,
+  g: WasmGraph,
   n: CFGNode,
   nodes: ControlTreeGraphNode[],
 ): [Set<number>, ControlTreeGraphNode[]] {
