@@ -1,5 +1,5 @@
 import {
-  getEdgeNodes,
+  getWasmNodeEdges,
   getWasmCFGNode,
   type CFGNode,
   type WasmGraph,
@@ -52,7 +52,7 @@ export function wasmControlFlowGraphToDot(
   for (const n of nodes) {
     const nodeId = `block${n.nodeID}`;
     const edges = n.edges;
-    const str = getEdgeNodes(g, n)
+    const str = getWasmNodeEdges(g, n)
       .map((edgeNode, i) => {
         const e = edges[i];
         const instFrom = e.instrFrom;
