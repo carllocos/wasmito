@@ -21,6 +21,9 @@ import {
   AgnosticNodeFromWasmAddress,
   type AgnosticNode,
 } from '../language_adaptors/agnostic_node';
+import { pathJoin } from '../util/file_util';
+import { sourceControlFlowGraphToDot } from './dot_serialize';
+import { writeFileSync } from 'fs';
 
 // const logger = createLogger('ASTControlFlowGraph');
 
@@ -90,6 +93,27 @@ export class SourceControlFlowGraph {
       }
     }
     return edges;
+  }
+
+  serializeToDot(outputDir: string, funIds: number[] = []): string[] {
+    if (funIds.length === 0) {
+      this._sourceMap.wasm.functions.forEach((f) => funIds.push(f.id));
+    }
+
+    const dots: string[] = [];
+    for (const fid of funIds) {
+      const p = pathJoin(outputDir, `sourcefun${fid}.dot`);
+      const fg = this.funtionSourceGraph(fid);
+      if (fg?.entyNodes !== undefined) {
+        const content = sourceControlFlowGraphToDot(
+          fg.entyNodes,
+          `function ${fid}`,
+        );
+        writeFileSync(p, content);
+        dots.push(content);
+      }
+    }
+    return dots;
   }
 }
 

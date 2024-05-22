@@ -15,8 +15,9 @@ describe('Rust Language Adaptor for Blink App', function () {
   });
 
   it.skip('build cfg for module', () => {
+    const outputDir = path.resolve('./test/data/rust_examples/blink');
     const g = new WasmControlFlowGraph(mod);
-    const contents = g.serializeToDot();
+    const contents = g.serializeToDot(outputDir);
     for (const [funId, dotContent] of contents) {
       expect(funId).to.greaterThan(mod.imports.length);
       expect(dotContent).to.not.equal('');
