@@ -26,7 +26,7 @@ import {
 
 export class SourceControlFlowGraph {
   private readonly _astGraphs: Map<number, FunctionTreeGraph>;
-  private readonly _allGraphNodes: ControlTreeGraphNode[];
+  private readonly _allGraphNodes: SourceCFGNode[];
 
   constructor(
     asts: AgnosticASTMap,
@@ -34,32 +34,32 @@ export class SourceControlFlowGraph {
     cfg: WasmControlFlowGraph,
   ) {
     this._astGraphs = buildControlTreeGraph(sourceMap, asts, cfg);
-    let allnodes: ControlTreeGraphNode[] = [];
+    let allnodes: SourceCFGNode[] = [];
     for (const funGraph of this._astGraphs.values()) {
       allnodes = allnodes.concat(funGraph.allNodes);
     }
     this._allGraphNodes = allnodes;
   }
 
-  nodesFromAddress(addr: number): ControlTreeGraphNode[] {
+  nodesFromAddress(addr: number): SourceCFGNode[] {
     return this._allGraphNodes.filter(
       (n) => n.instructions.find((i) => i.startAddress === addr) !== undefined,
     );
   }
 }
 
-interface ControlTreeGraphNode {
+interface SourceCFGNode {
   nodeId: number;
   node: AgnosticNode;
-  edges: ControlTreeGraphNode[];
+  edges: SourceCFGNode[];
   instructions: WasmInstruction[];
   addressesWithoutASTNode: Set<number>;
   hasEdgesToOutSideCalls: WasmInstruction[];
 }
 
 interface FunctionTreeGraph {
-  entyNodes: ControlTreeGraphNode[];
-  allNodes: ControlTreeGraphNode[];
+  entyNodes: SourceCFGNode[];
+  allNodes: SourceCFGNode[];
 }
 
 function buildControlTreeGraph(
@@ -99,13 +99,13 @@ function createAllNodes(
   sourceMap: SourceMap,
   asts: AgnosticASTMap,
   [entryNode, g]: [CFGNode, WasmGraph],
-): ControlTreeGraphNode[] {
-  const nodes: ControlTreeGraphNode[] = [];
+): SourceCFGNode[] {
+  const nodes: SourceCFGNode[] = [];
 
   breadthFirstTraverseWasmCFGT(g, entryNode, {
     onNode: (n: CFGNode) => {
       console.log(`Node ID ${n.nodeID} instructions #${n.instructions.length}`);
-      let prevNode: ControlTreeGraphNode | undefined;
+      let prevNode: SourceCFGNode | undefined;
       for (let i = n.instructions.length - 1; i >= 0; i--) {
         const instr = n.instructions[i];
         const agnosticNode = AgnosticNodeFromWasmAddress(
@@ -154,25 +154,25 @@ function createAllNodes(
 
 function searchCTGNInDecreasingAddresses(
   n: CFGNode,
-  nodes: ControlTreeGraphNode[],
-): ControlTreeGraphNode | undefined {
+  nodes: SourceCFGNode[],
+): SourceCFGNode | undefined {
   const increment = false;
   return searchCTGNFromNode(n, nodes, increment);
 }
 
 function searchCTGNInIncreasingAddresses(
   n: CFGNode,
-  nodes: ControlTreeGraphNode[],
-): ControlTreeGraphNode | undefined {
+  nodes: SourceCFGNode[],
+): SourceCFGNode | undefined {
   const increment = true;
   return searchCTGNFromNode(n, nodes, increment);
 }
 
 function searchCTGNFromNode(
   n: CFGNode,
-  nodes: ControlTreeGraphNode[],
+  nodes: SourceCFGNode[],
   fromLowAddressToHigh: boolean,
-): ControlTreeGraphNode | undefined {
+): SourceCFGNode | undefined {
   let startIndex = fromLowAddressToHigh ? 0 : n.instructions.length - 1;
   const endIndex = fromLowAddressToHigh ? n.instructions.length : 0;
 
@@ -211,9 +211,9 @@ function searchCTGNFromNode(
 
 function addEdgesAndReturnEntryNodes(
   [entryNode, g]: [CFGNode, WasmGraph],
-  nodes: ControlTreeGraphNode[],
-): ControlTreeGraphNode[] {
-  const entryCTGNodes: ControlTreeGraphNode[] = [];
+  nodes: SourceCFGNode[],
+): SourceCFGNode[] {
+  const entryCTGNodes: SourceCFGNode[] = [];
   const nodesToIgnore: Set<number> = new Set<number>();
   breadthFirstTraverseWasmCFGT(g, entryNode, {
     onNode: (n: CFGNode) => {
@@ -286,11 +286,11 @@ function addEdgesAndReturnEntryNodes(
 function searchNeighboursWithASTs(
   g: WasmGraph,
   n: CFGNode,
-  nodes: ControlTreeGraphNode[],
-): [Set<number>, ControlTreeGraphNode[]] {
+  nodes: SourceCFGNode[],
+): [Set<number>, SourceCFGNode[]] {
   const nodesToIgnore = new Set<number>();
   nodesToIgnore.add(n.nodeID);
-  const found: ControlTreeGraphNode[] = [];
+  const found: SourceCFGNode[] = [];
   for (const e of n.edges) {
     const toNode = getWasmCFGNode(g, e.instrTo.startAddress);
     const toctgn = searchCTGNInIncreasingAddresses(toNode, nodes);
@@ -306,10 +306,10 @@ function searchNeighboursWithASTs(
 }
 
 function createNodeIfNeeded(
-  nodes: ControlTreeGraphNode[],
+  nodes: SourceCFGNode[],
   agnosticNode: AgnosticNode,
   instrToAdd: WasmInstruction,
-): ControlTreeGraphNode {
+): SourceCFGNode {
   let ncfg = findNode(nodes, agnosticNode.node.id);
   if (ncfg === undefined) {
     ncfg = {
@@ -330,15 +330,15 @@ function createNodeIfNeeded(
 }
 
 function findNode(
-  nodes: ControlTreeGraphNode[],
+  nodes: SourceCFGNode[],
   id: number,
-): ControlTreeGraphNode | undefined {
+): SourceCFGNode | undefined {
   return nodes.find((n) => {
     return n.nodeId === id;
   });
 }
 
-function addEdge(an1: ControlTreeGraphNode, an2: ControlTreeGraphNode): void {
+function addEdge(an1: SourceCFGNode, an2: SourceCFGNode): void {
   const alreadyAdded = an1.edges.find((n) => {
     return n.nodeId === an2.nodeId;
   });
