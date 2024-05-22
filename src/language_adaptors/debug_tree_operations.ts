@@ -10,6 +10,7 @@ import {
 } from '../source_mappers/source_map';
 import { nodePositionToSourceLocation } from '../tree-sitter/tree-sitter-parser';
 import { isAbsolutePath, isFilePath } from '../util/file_util';
+import { type SourceControlFlowGraph, type SourceCFGNode } from '../cfg';
 
 const logger = createLogger('DebugAgnosticOperations');
 
