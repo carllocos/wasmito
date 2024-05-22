@@ -1,6 +1,6 @@
 import {
   getEdgeNodes,
-  getNode,
+  getWasmCFGNode,
   type CFGNode,
   type WasmGraph,
 } from './wasm_cfg';
@@ -17,7 +17,7 @@ export function wasmControlFlowGraphToDot(
     if (nodesDone.has(node.nodeID)) {
       continue;
     }
-    const n = getNode(g, addr);
+    const n = getWasmCFGNode(g, addr);
     const record = n.instructions.length > 1 ? 'Mrecord' : 'record';
 
     const instructionsStrs: string[] = [];

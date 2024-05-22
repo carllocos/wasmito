@@ -134,7 +134,7 @@ export function getEdgeNodes(g: WasmGraph, n: CFGNode): CFGNode[] {
   const edgeNodes: CFGNode[] = [];
   for (let i = 0; i < n.edges.length; i++) {
     const instTo = n.edges[i].instrTo;
-    edgeNodes.push(getNode(g, instTo.startAddress));
+    edgeNodes.push(getWasmCFGNode(g, instTo.startAddress));
   }
   if (edgeNodes.length !== n.edges.length) {
     throw new Error(
@@ -162,7 +162,7 @@ export function buildControlFlowGraphFunction(
   return graph;
 }
 
-export function getNode(g: WasmGraph, addr: number): CFGNode {
+export function getWasmCFGNode(g: WasmGraph, addr: number): CFGNode {
   const n = g.get(addr);
   if (n === undefined) {
     throw new Error(`No  node found for address ${addr}`);
@@ -171,8 +171,8 @@ export function getNode(g: WasmGraph, addr: number): CFGNode {
 }
 
 function addEdge(g: WasmGraph, n1Address: number, n2Address: number): void {
-  const n1 = getNode(g, n1Address);
-  const n2 = getNode(g, n2Address);
+  const n1 = getWasmCFGNode(g, n1Address);
+  const n2 = getWasmCFGNode(g, n2Address);
   const instrFrom = n1.instructions.find((inst) => {
     return inst.startAddress === n1Address;
   });
@@ -250,8 +250,8 @@ export function nodeToStr(n: CFGNode): string {
 }
 
 function mergeNodes(g: WasmGraph, n1Address: number, n2Address: number): void {
-  const n1 = getNode(g, n1Address);
-  const n2 = getNode(g, n2Address);
+  const n1 = getWasmCFGNode(g, n1Address);
+  const n2 = getWasmCFGNode(g, n2Address);
   if (n1.changesFlow) {
     throw new Error(
       `Node n1 for addr ${n1Address} changes control flow and cannot be merged`,
@@ -294,7 +294,7 @@ function buildCFGForFunc(fun: WASMFunction): [CFGNode, WasmGraph] {
       instructionAfterBlock: fun.body[fun.body.length - 1],
     },
   ]);
-  const entryNode = getNode(g, fun.allInstructions[0].startAddress);
+  const entryNode = getWasmCFGNode(g, fun.allInstructions[0].startAddress);
   return [entryNode, g];
 }
 
@@ -321,7 +321,7 @@ function buildCFGNodesHelper(
         continue;
       }
 
-      const entryNode = getNode(g, entryAddress);
+      const entryNode = getWasmCFGNode(g, entryAddress);
       const entryNodeInstr = lastInstruction(entryNode);
       if (entryNode.changesFlow) {
         if (!isBranch(entryNodeInstr)) {
@@ -347,7 +347,7 @@ function buildCFGNodesHelper(
         const afterBlockInstr = targetBlock.instructionAfterBlock;
 
         if (isBranch(instr)) {
-          const branchNode = getNode(g, instr.startAddress);
+          const branchNode = getWasmCFGNode(g, instr.startAddress);
           branchNode.edges = [];
         }
 
