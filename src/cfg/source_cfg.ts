@@ -57,6 +57,7 @@ export interface SourceCFGNode {
   node: AgnosticNode;
   edges: SourceCFGNode[];
   instructions: WasmInstruction[];
+  instructionsIndexes: number[];
   addressesWithoutASTNode: Set<number>;
   hasEdgesToOutSideCalls: WasmInstruction[];
 }
@@ -131,7 +132,12 @@ function createAllNodes(
           }
           continue;
         }
-        const node = createNodeIfNeeded(nodes, agnosticNode, instr);
+        const node = createNodeIfNeeded(
+          nodes,
+          agnosticNode,
+          instr,
+          n.instructionsIndexes[i],
+        );
         if (prevNode !== undefined) {
           if (node.nodeId !== prevNode.nodeId) {
             console.log(
@@ -313,6 +319,7 @@ function createNodeIfNeeded(
   nodes: SourceCFGNode[],
   agnosticNode: AgnosticNode,
   instrToAdd: WasmInstruction,
+  instrIndex: number,
 ): SourceCFGNode {
   let ncfg = findNode(nodes, agnosticNode.node.id);
   if (ncfg === undefined) {
@@ -323,12 +330,15 @@ function createNodeIfNeeded(
       instructions: [],
       addressesWithoutASTNode: new Set(),
       hasEdgesToOutSideCalls: [],
+      instructionsIndexes: [],
     };
     nodes.push(ncfg);
   }
   ncfg.instructions.push(instrToAdd);
+  ncfg.instructionsIndexes.push(instrIndex);
   if (ncfg.instructions.length > 1) {
     ncfg.instructions.sort((i1, i2) => i1.startAddress - i2.startAddress);
+    ncfg.instructionsIndexes.sort((i1, i2) => i1 - i2);
   }
   return ncfg;
 }
