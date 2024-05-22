@@ -12,7 +12,7 @@ import {
 } from '../webassembly/wasm/wasm_instruction';
 import { type WasmModule } from '../webassembly/wasm/wasm_module';
 import { WASMOpcodeNumber } from '../webassembly/wasm/wasm_opcode';
-import { controlFlowGraphToDot } from './serialize_wasm_cfg';
+import { wasmControlFlowGraphToDot } from './serialize_wasm_cfg';
 
 export interface CFGEdge {
   instrFrom: WasmInstruction;
@@ -69,7 +69,7 @@ export class WasmControlFlowGraph {
         throw new Error(`No graph found for funcID ${f.id}`);
       }
       const g = res[1];
-      results.push([f.id, controlFlowGraphToDot(g, `function ${f.id}`)]);
+      results.push([f.id, wasmControlFlowGraphToDot(g, `function ${f.id}`)]);
     }
     return results;
   }

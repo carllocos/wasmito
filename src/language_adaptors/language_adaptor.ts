@@ -32,7 +32,7 @@ export class LanguageAdaptor {
     return this._asts;
   }
 
-  get astCFG(): SourceControlFlowGraph | undefined {
+  get sourceCFG(): SourceControlFlowGraph | undefined {
     return this._astCfg;
   }
 
