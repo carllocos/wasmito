@@ -1,5 +1,5 @@
 import { type WasmInstruction } from '../webassembly/wasm/wasm_instruction';
-import { type WasmGraph, type CFGNode, getNode } from './wasm_cfg';
+import { type WasmGraph, type CFGNode, getWasmCFGNode } from './wasm_cfg';
 
 export interface TraversalCallBacks {
   onNode?: (n: CFGNode) => void;
@@ -33,7 +33,7 @@ export function breadthFirstTraverseWasmCFGT(
     }
     const edges = n.edges;
     for (const e of edges) {
-      const toNode = getNode(g, e.instrTo.startAddress);
+      const toNode = getWasmCFGNode(g, e.instrTo.startAddress);
       const hasEdge = visitedEdges.find(([nfID, faddr, ntID, taddr]) => {
         return (
           nfID === n.nodeID &&
