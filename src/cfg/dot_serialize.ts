@@ -80,6 +80,7 @@ export function sourceControlFlowGraphToDot(
   const nodesDone = new Set<number>();
   let nodesStr = '';
   const exitNodesToAdd = new Set<number>();
+  const funNames = new Map<number, string>();
   for (const n of nodes) {
     if (nodesDone.has(n.nodeId)) {
       continue;
@@ -88,6 +89,7 @@ export function sourceControlFlowGraphToDot(
       for (const callinstr of n.edgesToOutSideCalls) {
         if (isCallInstruction(callinstr)) {
           exitNodesToAdd.add(callinstr.funIdx);
+          funNames.set(callinstr.funIdx, callinstr.args[0]);
         } else if (isCallIndirect(callinstr)) {
           throw new Error(`Call indirect not yet supported`);
         } else {
@@ -130,7 +132,8 @@ export function sourceControlFlowGraphToDot(
 
   for (const fid of exitNodesToAdd.values()) {
     const record = 'record';
-    const label = `FunCall ${fid}|instr<4>call ${fid}}`;
+    const fname = funNames.get(fid) ?? `${fid}`;
+    const label = `FunCall ${fname}|instr<4>call ${fid}}`;
     nodesStr += `block${fid} [shape=${record}, label="${label}"];\n`;
   }
   const entryNodeID = `block-1`;
