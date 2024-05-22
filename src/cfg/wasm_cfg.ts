@@ -12,7 +12,7 @@ import {
 } from '../webassembly/wasm/wasm_instruction';
 import { type WasmModule } from '../webassembly/wasm/wasm_module';
 import { WASMOpcodeNumber } from '../webassembly/wasm/wasm_opcode';
-import { wasmControlFlowGraphToDot } from './serialize_wasm_cfg';
+import { wasmControlFlowGraphToDot } from './dot_serialize';
 
 export interface CFGEdge {
   instrFrom: WasmInstruction;
