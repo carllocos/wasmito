@@ -62,6 +62,10 @@ export interface SourceCFGNode {
   edgesToOutSideCalls: WasmInstruction[];
 }
 
+export function sourceCFGHasOutgoingFunCallEdges(n: SourceCFGNode): boolean {
+  return n.edgesToOutSideCalls.length > 0;
+}
+
 interface FunctionTreeGraph {
   entyNodes: SourceCFGNode[];
   allNodes: SourceCFGNode[];
