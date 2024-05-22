@@ -24,7 +24,7 @@ import {
 
 // const logger = createLogger('ASTControlFlowGraph');
 
-export class ASTControlFlowGraph {
+export class SourceControlFlowGraph {
   private readonly _astGraphs: Map<number, FunctionTreeGraph>;
   private readonly _allGraphNodes: ControlTreeGraphNode[];
 

@@ -4,7 +4,7 @@ import { createLogger } from '../logger/logger';
 import { type SourceMap } from '../source_mappers/source_map';
 import { type AgnosticASTMap } from './agnostic_node';
 import { WasmControlFlowGraph } from '../cfg/wasm_cfg';
-import { ASTControlFlowGraph } from './ast_cfg';
+import { SourceControlFlowGraph } from './ast_cfg';
 
 const logger = createLogger('LanguageAdaptor');
 
@@ -20,7 +20,7 @@ export class LanguageAdaptor {
   public readonly sourceMap: SourceMap;
   private readonly _asts: AgnosticASTMap;
   private readonly _cfg: WasmControlFlowGraph;
-  private _astCfg?: ASTControlFlowGraph;
+  private _astCfg?: SourceControlFlowGraph;
 
   constructor(sourceMap: SourceMap) {
     this.sourceMap = sourceMap;
@@ -32,7 +32,7 @@ export class LanguageAdaptor {
     return this._asts;
   }
 
-  get astCFG(): ASTControlFlowGraph | undefined {
+  get astCFG(): SourceControlFlowGraph | undefined {
     return this._astCfg;
   }
 
@@ -67,7 +67,7 @@ export class LanguageAdaptor {
   }
 
   private buildASTCFG(): void {
-    this._astCfg = new ASTControlFlowGraph(
+    this._astCfg = new SourceControlFlowGraph(
       this._asts,
       this.sourceMap,
       this._cfg,
