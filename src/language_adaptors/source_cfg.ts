@@ -3,7 +3,7 @@ import {
   type WasmGraph,
   type CFGNode,
   type WasmControlFlowGraph,
-  getNode,
+  getWasmCFGNode,
 } from '../cfg/wasm_cfg';
 // import { createLogger } from '../logger/logger';
 import { type SourceMap } from '../source_mappers/source_map';
@@ -242,7 +242,7 @@ function addEdgesAndReturnEntryNodes(
       }
 
       for (const e of n.edges) {
-        const toNode = getNode(g, e.instrTo.startAddress);
+        const toNode = getWasmCFGNode(g, e.instrTo.startAddress);
         const toctgn = searchCTGNInIncreasingAddresses(toNode, nodes);
         if (toctgn !== undefined) {
           if (ctgn.nodeId !== toctgn.nodeId) {
@@ -292,7 +292,7 @@ function searchNeighboursWithASTs(
   nodesToIgnore.add(n.nodeID);
   const found: ControlTreeGraphNode[] = [];
   for (const e of n.edges) {
-    const toNode = getNode(g, e.instrTo.startAddress);
+    const toNode = getWasmCFGNode(g, e.instrTo.startAddress);
     const toctgn = searchCTGNInIncreasingAddresses(toNode, nodes);
     if (toctgn === undefined) {
       const [newNodesToIngore, ns] = searchNeighboursWithASTs(g, toNode, nodes);
