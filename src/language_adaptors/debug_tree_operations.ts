@@ -15,9 +15,9 @@ const logger = createLogger('DebugAgnosticOperations');
 
 export interface AgnosticDebugOperations {
   stepIn: (
-    langAdaptor: LanguageAdaptor,
-    node: AgnosticNode,
-  ) => AgnosticNode | undefined;
+    sourceCFG: SourceControlFlowGraph,
+    sourceCFGNode: SourceCFGNode,
+  ) => SourceCFGNode[];
   stepOver: (
     langAdaptor: LanguageAdaptor,
     node: AgnosticNode,
@@ -62,10 +62,10 @@ function stepOver(
 }
 
 function stepIn(
-  langAdaptor: LanguageAdaptor,
-  agnosticNode: AgnosticNode,
-): AgnosticNode | undefined {
-  throw new Error('StepOver TODO');
+  sourceCFG: SourceControlFlowGraph,
+  sourceCFGNode: SourceCFGNode,
+): SourceCFGNode[] {
+  return sourceCFG.getSourceEdges(sourceCFGNode);
 }
 
 function buildAgnosticNode(
