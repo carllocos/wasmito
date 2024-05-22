@@ -367,6 +367,19 @@ function addEdgesAndReturnEntryNodes(
           }
         }
       }
+
+      // case where we check if maybe we have to add edges which can happen when:
+      // 1. the fromInstruction of the wasm cfg node and the toInstruct belong to
+      // two different source CFG nodes
+      // 2. in the case that the fromInstr and toInstr belong to the same source CFG node cfgn
+      // then adding an edge may not be needed:
+      // 2.a. if there is just one edge name fromInstr and toInstr then the wasm CFG node is a
+      // block instr (e.g., block or loop) and no edge is needed to be added
+      // 2.b if the toInstr is a call or indirect call an edge needs to be added to another node
+      // 2.c. if the toInstr is a branching instruction (e.g., br, br_if, br_table) and edge may
+      // need to be added. And this depending on where the toInstr points to. However,
+      // this case 2.c can be handled on the next node visit which in that case should be the
+      // the first condition to check
       console.log(`Adding edges for node ${logNode(ctgn.node)}`);
 
       for (const e of n.edges) {
