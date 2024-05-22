@@ -27,12 +27,14 @@ import {
 export class SourceControlFlowGraph {
   private readonly _astGraphs: Map<number, FunctionTreeGraph>;
   private readonly _allGraphNodes: SourceCFGNode[];
+  private readonly _sourceMap: SourceMap;
 
   constructor(
     asts: AgnosticASTMap,
     sourceMap: SourceMap,
     cfg: WasmControlFlowGraph,
   ) {
+    this._sourceMap = sourceMap;
     this._astGraphs = buildControlTreeGraph(sourceMap, asts, cfg);
     let allnodes: SourceCFGNode[] = [];
     for (const funGraph of this._astGraphs.values()) {
@@ -53,6 +55,41 @@ export class SourceControlFlowGraph {
 
   allNodes(): SourceCFGNode[] {
     return this._allGraphNodes;
+  }
+
+  getSourceEdges(sourceCFGNode: SourceCFGNode): SourceCFGNode[] {
+    const alreadyAdded = new Set<number>();
+    const edges: SourceCFGNode[] = [];
+    for (const e of sourceCFGNode.edges) {
+      if (!alreadyAdded.has(e.nodeId)) {
+        edges.push(e);
+        alreadyAdded.add(e.nodeId);
+      }
+    }
+
+    if (sourceCFGHasOutgoingFunCallEdges(sourceCFGNode)) {
+      for (const i of sourceCFGNode.edgesToOutSideCalls) {
+        if (isCallInstruction(i)) {
+          const graphi = this._astGraphs.get(i.funIdx);
+          if (graphi === undefined) {
+            throw new Error(
+              `instruction ${instructionToString(i)} calls function ${i.funIdx} which has no SourceCFG`,
+            );
+          }
+          graphi.entyNodes.forEach((n) => {
+            if (!alreadyAdded.has(n.nodeId)) {
+              edges.push(n);
+              alreadyAdded.add(n.nodeId);
+            }
+          });
+        } else {
+          throw new Error(
+            `instruction ${instructionToString(i)} is not a call function`,
+          );
+        }
+      }
+    }
+    return edges;
   }
 }
 
