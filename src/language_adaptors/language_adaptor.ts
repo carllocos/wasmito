@@ -20,7 +20,7 @@ export class LanguageAdaptor {
   public readonly sourceMap: SourceMap;
   private readonly _asts: AgnosticASTMap;
   private readonly _cfg: WasmControlFlowGraph;
-  private _astCfg?: SourceControlFlowGraph;
+  private _srcCfg?: SourceControlFlowGraph;
 
   constructor(sourceMap: SourceMap) {
     this.sourceMap = sourceMap;
@@ -33,7 +33,7 @@ export class LanguageAdaptor {
   }
 
   get sourceCFG(): SourceControlFlowGraph | undefined {
-    return this._astCfg;
+    return this._srcCfg;
   }
 
   async buildComplementaryContext(): Promise<void> {
@@ -66,8 +66,8 @@ export class LanguageAdaptor {
     }
   }
 
-  private buildASTCFG(): void {
-    this._astCfg = new SourceControlFlowGraph(
+  private buildSourceCFG(): void {
+    this._srcCfg = new SourceControlFlowGraph(
       this._asts,
       this.sourceMap,
       this._cfg,
