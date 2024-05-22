@@ -6,7 +6,10 @@ import {
   getWasmCFGNode,
 } from './wasm_cfg';
 // import { createLogger } from '../logger/logger';
-import { type SourceMap } from '../source_mappers/source_map';
+import {
+  type SourceCodeLocation,
+  type SourceMap,
+} from '../source_mappers/source_map';
 import {
   isCallIndirect,
   isCallInstruction,
@@ -50,6 +53,26 @@ export class SourceControlFlowGraph {
     return this._allGraphNodes.filter(
       (n) => n.instructions.find((i) => i.startAddress === addr) !== undefined,
     );
+  }
+
+  nodesFromSourceLoc(location: SourceCodeLocation): SourceCFGNode[] {
+    const mappings = this._sourceMap.generatedPositionFor(location);
+    const nodes: SourceCFGNode[][] = [];
+    for (const m of mappings) {
+      const ns = this.nodesFromAddress(m.generatedColumn);
+      if (ns.length > 0) {
+        nodes.push(ns);
+      }
+    }
+
+    if (nodes.length > 1) {
+      console.log(`More than one set of nodes found ignoring the rest`);
+      return nodes[0];
+    } else if (nodes.length === 1) {
+      return nodes[0];
+    } else {
+      return [];
+    }
   }
 
   funtionSourceGraph(fid: number): FunctionTreeGraph | undefined {
