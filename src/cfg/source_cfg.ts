@@ -47,6 +47,10 @@ export class SourceControlFlowGraph {
     );
   }
 
+  funtionSourceGraph(fid: number): FunctionTreeGraph | undefined {
+    return this._astGraphs.get(fid);
+  }
+
   allNodes(): SourceCFGNode[] {
     return this._allGraphNodes;
   }
@@ -66,7 +70,7 @@ export function sourceCFGHasOutgoingFunCallEdges(n: SourceCFGNode): boolean {
   return n.edgesToOutSideCalls.length > 0;
 }
 
-interface FunctionTreeGraph {
+export interface FunctionTreeGraph {
   entyNodes: SourceCFGNode[];
   allNodes: SourceCFGNode[];
 }
