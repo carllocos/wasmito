@@ -139,11 +139,11 @@ export function sourceControlFlowGraphToDot(
     nodesStr += `block${fid} [shape=${record}, label="${label}"];\n`;
   }
   const entryNodeID = `block-1`;
-  if (nodes.length > 1) {
-    const record = 'record';
-    const label = `EntryNode`;
-    nodesStr += `${entryNodeID} [shape=${record}, label="${label}"];\n`;
-  }
+  // if (allnodes.length > 1) {
+  // const record2 = 'record';
+  // const label = `EntryNode`;
+  nodesStr += `${entryNodeID} [shape=record, label="EntryNode"];\n`;
+  // }
 
   const alreadyVisitedNodes = new Set<number>();
   const edgesStr: string[] = [];
