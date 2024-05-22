@@ -97,7 +97,7 @@ export function sourceControlFlowGraphToDot(
     }
     const record = n.instructions.length > 1 ? 'Mrecord' : 'record';
 
-    const instructionsStrs: string[] = [];
+    const instructionsStrs: string[] = [`${n.node.node.text}`];
     for (let i = 0; i < n.instructions.length; i++) {
       const instr = n.instructions[i];
       const instrIdx = n.instructionsIndexes[i];
@@ -127,7 +127,7 @@ export function sourceControlFlowGraphToDot(
 
   for (const fid of exitNodesToAdd.values()) {
     const record = 'record';
-    const label = `Data block ${fid}|instr<4>call ${fid}}`;
+    const label = `FunCall ${fid}|instr<4>call ${fid}}`;
     nodesStr += `block${fid} [shape=${record}, label="${label}"];\n`;
   }
 
