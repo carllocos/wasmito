@@ -97,7 +97,10 @@ export function sourceControlFlowGraphToDot(
     }
     const record = n.instructions.length > 1 ? 'Mrecord' : 'record';
 
-    const instructionsStrs: string[] = [`${n.node.node.text}`];
+    const sp = n.node.startPosition;
+    const instructionsStrs: string[] = [
+      `${n.node.node.text} (line ${sp.linenr}, col ${sp.colnr})`,
+    ];
     for (let i = 0; i < n.instructions.length; i++) {
       const instr = n.instructions[i];
       const instrIdx = n.instructionsIndexes[i];
