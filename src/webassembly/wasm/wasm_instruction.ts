@@ -308,6 +308,17 @@ export function isControlFlowInstruction(instr: WasmInstruction): boolean {
   }
 }
 
+export function isBranchingInstruction(inst: WasmInstruction): boolean {
+  switch (inst.opcodeNr) {
+    case WASMOpcodeNumber.Br:
+    case WASMOpcodeNumber.Br_if:
+    case WASMOpcodeNumber.Br_table:
+      return true;
+    default:
+      return false;
+  }
+}
+
 export function isWasmInstructionBlockBased(instr: WasmInstruction): boolean {
   switch (instr.opcodeNr) {
     case WASMOpcodeNumber.Block:
