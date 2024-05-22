@@ -1,7 +1,7 @@
 import { isCallIndirect, isCallInstruction } from '../webassembly';
 import {
+  type FunctionTreeGraph,
   sourceCFGHasOutgoingFunCallEdges,
-  type SourceCFGNode,
 } from './source_cfg';
 import {
   getWasmNodeEdges,
@@ -73,15 +73,17 @@ export function wasmControlFlowGraphToDot(
 }
 
 export function sourceControlFlowGraphToDot(
-  nodes: SourceCFGNode[], // multiple nodes as there may be multiple entry nodes per function
+  fgraph: FunctionTreeGraph,
   nameGraph: string,
 ): string {
+  const entryNodes = new Set(fgraph.entyNodes.map((n) => n.nodeId));
+  const allnodes = fgraph.allNodes;
   const header = `digraph "CFG of ${nameGraph}" `;
   const nodesDone = new Set<number>();
   let nodesStr = '';
   const exitNodesToAdd = new Set<number>();
   const funNames = new Map<number, string>();
-  for (const n of nodes) {
+  for (const n of allnodes) {
     if (nodesDone.has(n.nodeId)) {
       continue;
     }
@@ -127,7 +129,7 @@ export function sourceControlFlowGraphToDot(
     const nodeStr = `block${n.nodeId} [shape=${record}, label="${label}"];\n`;
     nodesStr += nodeStr;
     nodesDone.add(n.nodeId);
-    nodes.push(n);
+    allnodes.push(n);
   }
 
   for (const fid of exitNodesToAdd.values()) {
@@ -145,13 +147,15 @@ export function sourceControlFlowGraphToDot(
 
   const alreadyVisitedNodes = new Set<number>();
   const edgesStr: string[] = [];
-  for (const n of nodes) {
+  for (const n of allnodes) {
     if (alreadyVisitedNodes.has(n.nodeId)) {
       continue;
     }
     alreadyVisitedNodes.add(n.nodeId);
     const nodeId = `block${n.nodeId}`;
-    edgesStr.push(`${entryNodeID}->${nodeId};\n`);
+    if (entryNodes.has(n.nodeId)) {
+      edgesStr.push(`${entryNodeID}->${nodeId};\n`);
+    }
     const str = n.edges
       .map((edgeNode) => {
         return `${nodeId} -> block${edgeNode.nodeId};\n`;
