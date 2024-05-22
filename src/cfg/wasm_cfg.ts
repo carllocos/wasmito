@@ -1,3 +1,4 @@
+import { writeFileSync } from 'fs';
 import { type WASMFunction } from '../webassembly/wasm/wasm_function';
 import {
   type WasmInstruction,
@@ -13,6 +14,7 @@ import {
 import { type WasmModule } from '../webassembly/wasm/wasm_module';
 import { WASMOpcodeNumber } from '../webassembly/wasm/wasm_opcode';
 import { wasmControlFlowGraphToDot } from './dot_serialize';
+import path from 'path';
 
 export interface CFGEdge {
   instrFrom: WasmInstruction;
@@ -53,25 +55,19 @@ export class WasmControlFlowGraph {
     return r;
   }
 
-  serializeToDot(funId?: number): Array<[number, string]> {
-    let funcs = this._wasm.functions;
-    if (funId !== undefined) {
-      const f = this._wasm.getFunction(funId);
-      if (f === undefined) {
-        throw new Error(`No function found with id ${funId}`);
-      }
-      funcs = [f];
+  serializeToDot(outputDir: string, funIds: number[] = []): string[] {
+    const dots: string[] = [];
+    if (funIds.length === 0) {
+      this._wasm.functions.forEach((f) => funIds.push(f.id));
     }
-    const results: Array<[number, string]> = [];
-    for (const f of funcs) {
-      const res = this._cfgs.get(f.id);
-      if (res === undefined) {
-        throw new Error(`No graph found for funcID ${f.id}`);
-      }
-      const g = res[1];
-      results.push([f.id, wasmControlFlowGraphToDot(g, `function ${f.id}`)]);
+    for (const fid of funIds) {
+      const p = path.join(outputDir, `wasmfun${fid}.dot`);
+      const [, g] = this.getCFGStrict(fid);
+      const content = wasmControlFlowGraphToDot(g, `function ${fid}`);
+      writeFileSync(p, content);
+      dots.push(content);
     }
-    return results;
+    return dots;
   }
 
   private buildGraphs(): void {
