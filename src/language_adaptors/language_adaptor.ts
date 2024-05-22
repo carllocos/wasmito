@@ -19,13 +19,13 @@ export async function constructLanguageAdaptor(
 export class LanguageAdaptor {
   public readonly sourceMap: SourceMap;
   private readonly _asts: AgnosticASTMap;
-  private readonly _cfg: WasmControlFlowGraph;
+  private readonly _wasmCfg: WasmControlFlowGraph;
   private _srcCfg?: SourceControlFlowGraph;
 
   constructor(sourceMap: SourceMap) {
     this.sourceMap = sourceMap;
     this._asts = new Map();
-    this._cfg = new WasmControlFlowGraph(sourceMap.wasm);
+    this._wasmCfg = new WasmControlFlowGraph(sourceMap.wasm);
   }
 
   get asts(): AgnosticASTMap {
@@ -70,7 +70,7 @@ export class LanguageAdaptor {
     this._srcCfg = new SourceControlFlowGraph(
       this._asts,
       this.sourceMap,
-      this._cfg,
+      this._wasmCfg,
     );
   }
 }
