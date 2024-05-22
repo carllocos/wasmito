@@ -1,5 +1,5 @@
 import { type WasmInstruction } from '../webassembly/wasm/wasm_instruction';
-import { type Graph, type CFGNode, getNode } from './wasm_cfg';
+import { type WasmGraph, type CFGNode, getNode } from './wasm_cfg';
 
 export interface TraversalCallBacks {
   onNode?: (n: CFGNode) => void;
@@ -12,7 +12,7 @@ export interface TraversalCallBacks {
 }
 
 export function breadthFirstTraverseWasmCFGT(
-  g: Graph,
+  g: WasmGraph,
   entryNode: CFGNode,
   callbacks: TraversalCallBacks,
 ): void {

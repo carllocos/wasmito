@@ -29,11 +29,11 @@ export interface CFGNode {
   edges: CFGEdge[];
 }
 
-export type Graph = Map<number, CFGNode>;
+export type WasmGraph = Map<number, CFGNode>;
 
 export class WasmControlFlowGraph {
   private readonly _wasm: WasmModule;
-  private readonly _cfgs: Map<number, [CFGNode, Graph]>;
+  private readonly _cfgs: Map<number, [CFGNode, WasmGraph]>;
 
   constructor(wasm: WasmModule) {
     this._wasm = wasm;
@@ -41,11 +41,11 @@ export class WasmControlFlowGraph {
     this.buildGraphs();
   }
 
-  getCFG(funID: number): [CFGNode, Graph] | undefined {
+  getCFG(funID: number): [CFGNode, WasmGraph] | undefined {
     return this._cfgs.get(funID);
   }
 
-  getCFGStrict(funID: number): [CFGNode, Graph] {
+  getCFGStrict(funID: number): [CFGNode, WasmGraph] {
     const r = this.getCFG(funID);
     if (r === undefined) {
       throw new Error(`no CFG found for fun ${funID}`);
@@ -85,12 +85,15 @@ function lastInstruction(n: CFGNode): WasmInstruction {
   return n.instructions[n.instructions.length - 1];
 }
 
-export function controlFlowGraphToString(g: Graph, entryNode: CFGNode): string {
+export function controlFlowGraphToString(
+  g: WasmGraph,
+  entryNode: CFGNode,
+): string {
   return controlFlowGraphToStringHelper(g, entryNode, new Set<number>())[0];
 }
 
 function controlFlowGraphToStringHelper(
-  g: Graph,
+  g: WasmGraph,
   n: CFGNode,
   blocksProcessed: Set<number>,
 ): [string, Set<number>] {
@@ -127,7 +130,7 @@ function controlFlowGraphToStringHelper(
   return [s, bp];
 }
 
-export function getEdgeNodes(g: Graph, n: CFGNode): CFGNode[] {
+export function getEdgeNodes(g: WasmGraph, n: CFGNode): CFGNode[] {
   const edgeNodes: CFGNode[] = [];
   for (let i = 0; i < n.edges.length; i++) {
     const instTo = n.edges[i].instrTo;
@@ -144,7 +147,7 @@ export function getEdgeNodes(g: Graph, n: CFGNode): CFGNode[] {
 export function buildControlFlowGraphFunction(
   wasm: WasmModule,
   funcID: number,
-): [CFGNode, Graph] {
+): [CFGNode, WasmGraph] {
   const fun = wasm.getFunction(funcID);
 
   if (fun === undefined) {
@@ -159,7 +162,7 @@ export function buildControlFlowGraphFunction(
   return graph;
 }
 
-export function getNode(g: Graph, addr: number): CFGNode {
+export function getNode(g: WasmGraph, addr: number): CFGNode {
   const n = g.get(addr);
   if (n === undefined) {
     throw new Error(`No  node found for address ${addr}`);
@@ -167,7 +170,7 @@ export function getNode(g: Graph, addr: number): CFGNode {
   return n;
 }
 
-function addEdge(g: Graph, n1Address: number, n2Address: number): void {
+function addEdge(g: WasmGraph, n1Address: number, n2Address: number): void {
   const n1 = getNode(g, n1Address);
   const n2 = getNode(g, n2Address);
   const instrFrom = n1.instructions.find((inst) => {
@@ -246,7 +249,7 @@ export function nodeToStr(n: CFGNode): string {
   return `${s} {\n instrs:[${istrs}],\nidxs:[${idxs}],\nedges:[${edgesStr}]}`;
 }
 
-function mergeNodes(g: Graph, n1Address: number, n2Address: number): void {
+function mergeNodes(g: WasmGraph, n1Address: number, n2Address: number): void {
   const n1 = getNode(g, n1Address);
   const n2 = getNode(g, n2Address);
   if (n1.changesFlow) {
@@ -276,8 +279,8 @@ function mergeNodes(g: Graph, n1Address: number, n2Address: number): void {
   }
 }
 
-function buildCFGForFunc(fun: WASMFunction): [CFGNode, Graph] {
-  const g: Graph = new Map();
+function buildCFGForFunc(fun: WASMFunction): [CFGNode, WasmGraph] {
+  const g: WasmGraph = new Map();
   for (let i = 0; i < fun.allInstructions.length; i++) {
     const instr = fun.allInstructions[i];
     const instrChangesFlow =

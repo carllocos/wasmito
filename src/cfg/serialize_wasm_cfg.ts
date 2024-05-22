@@ -1,6 +1,14 @@
-import { getEdgeNodes, getNode, type CFGNode, type Graph } from './wasm_cfg';
+import {
+  getEdgeNodes,
+  getNode,
+  type CFGNode,
+  type WasmGraph,
+} from './wasm_cfg';
 
-export function wasmControlFlowGraphToDot(g: Graph, nameGraph: string): string {
+export function wasmControlFlowGraphToDot(
+  g: WasmGraph,
+  nameGraph: string,
+): string {
   const header = `digraph "CFG of ${nameGraph}" `;
   const nodesDone = new Set<number>();
   let nodesStr = '';
