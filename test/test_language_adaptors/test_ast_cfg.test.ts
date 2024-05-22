@@ -3,7 +3,7 @@ import path from 'path';
 import { SourceMapfromDWARFWasm } from '../../src/source_mappers/source_map_builder';
 import { constructLanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 import assert, { fail } from 'assert';
-import { type SourceControlFlowGraph } from '../../src/language_adaptors/ast_cfg';
+import { type SourceControlFlowGraph } from '../../src/language_adaptors/source_cfg';
 
 const exampleFile = path.resolve('./test/data/rust_examples/blink/main.wasm');
 describe('Rust AST Control Flow Graph for Blink App', function () {
