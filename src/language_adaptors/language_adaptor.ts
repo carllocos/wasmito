@@ -4,7 +4,7 @@ import { createLogger } from '../logger/logger';
 import { type SourceMap } from '../source_mappers/source_map';
 import { type AgnosticASTMap } from './agnostic_node';
 import { WasmControlFlowGraph } from '../cfg/wasm_cfg';
-import { SourceControlFlowGraph } from './source_cfg';
+import { SourceControlFlowGraph } from '../cfg/source_cfg';
 
 const logger = createLogger('LanguageAdaptor');
 
