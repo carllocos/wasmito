@@ -99,16 +99,16 @@ export function sourceControlFlowGraphToDot(
 
     const sp = n.node.startPosition;
     const instructionsStrs: string[] = [
-      `${n.node.node.text} (line ${sp.linenr}, col ${sp.colnr})`,
+      `(line ${sp.linenr}, col ${sp.colnr}) ${n.node.node.text}`,
     ];
-    for (let i = 0; i < n.instructions.length; i++) {
-      const instr = n.instructions[i];
-      const instrIdx = n.instructionsIndexes[i];
+    // for (let i = 0; i < n.instructions.length; i++) {
+    //   const instr = n.instructions[i];
+    //   const instrIdx = n.instructionsIndexes[i];
 
-      instructionsStrs.push(
-        `instr ${instrIdx}: (start ${instr.startAddress}, end ${instr.endAddress}) ${instr.name} ${instr.immediate ?? ''} ${instr.args}`,
-      );
-    }
+    //   instructionsStrs.push(
+    //     `instr ${instrIdx}: (start ${instr.startAddress}, end ${instr.endAddress}) ${instr.name} ${instr.immediate ?? ''} ${instr.args}`,
+    //   );
+    // }
     let s = '';
     if (instructionsStrs.length === 1) {
       s = instructionsStrs[0];
