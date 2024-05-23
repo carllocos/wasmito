@@ -66,7 +66,7 @@ function stepIn(
   sourceCFG: SourceControlFlowGraph,
   sourceCFGNode: SourceCFGNode,
 ): SourceCFGNode[] {
-  return sourceCFG.getSourceEdges(sourceCFGNode);
+  return sourceCFG.getNodeNeighbours(sourceCFGNode);
 }
 
 function buildAgnosticNode(

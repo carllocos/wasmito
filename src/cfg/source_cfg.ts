@@ -85,7 +85,7 @@ export class SourceControlFlowGraph {
     return this._allGraphNodes;
   }
 
-  getSourceEdges(sourceCFGNode: SourceCFGNode): SourceCFGNode[] {
+  getNodeNeighbours(sourceCFGNode: SourceCFGNode): SourceCFGNode[] {
     const alreadyAdded = new Set<number>();
     const edges: SourceCFGNode[] = [];
     for (const e of sourceCFGNode.edges) {
