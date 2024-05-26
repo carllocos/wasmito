@@ -17,7 +17,7 @@ export async function SourceMapfromSourceMapSpec(
 ): Promise<SourceMap> {
   const content = await fs.promises.readFile(pathToSourceMap);
   const sourceMapStr = JSON.parse(content.toString());
-  const [sources, mappings, srcRoot] = await SourceMapConsumer.with(
+  const [sources, mappings] = await SourceMapConsumer.with(
     sourceMapStr,
     null,
     (consumer) => {
@@ -25,13 +25,9 @@ export async function SourceMapfromSourceMapSpec(
       consumer.eachMapping((mapping: MappingItem) => {
         mps.push(mapping);
       });
-      const c = consumer as any; // TODO sourceRoot update types info
-      const sourceRoot = c.sourceRoot;
-      return [consumer.sources, mps, sourceRoot];
+      return [consumer.sources, mps];
     },
   );
-
-  const sourceRoot = typeof srcRoot === 'string' ? srcRoot : pathToRootSource;
 
   const cleanedMappings = mappings.filter((m: MappingItem) => {
     const hasOriginalLine =
