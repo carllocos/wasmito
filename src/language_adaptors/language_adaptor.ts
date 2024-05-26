@@ -61,8 +61,8 @@ export class LanguageAdaptor {
         this.sourceMap.targetLanguage !== 'wast'
       ) {
         await ast.buildAST();
+        this._asts.set(s, ast);
       }
-      this._asts.set(s, ast);
     }
   }
 
