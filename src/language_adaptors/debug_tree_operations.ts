@@ -1,18 +1,11 @@
-import type Parser from 'web-tree-sitter';
-import { type AgnosticASTMap, AgnosticNode } from './agnostic_node';
-import { type LanguageAdaptor } from './language_adaptor';
-import { type MappingItem } from 'source-map';
-import { createLogger } from '../logger/logger';
+// import { createLogger } from '../logger/logger';
 import {
-  type SourceCodeLocation,
-  type SourceMap,
-  mappingItemToSourceCodeMapping,
-} from '../source_mappers/source_map';
-import { nodePositionToSourceLocation } from '../tree-sitter/tree-sitter-parser';
-import { isAbsolutePath, isFilePath } from '../util/file_util';
-import { type SourceControlFlowGraph, type SourceCFGNode } from '../cfg';
+  type SourceControlFlowGraph,
+  type SourceCFGNode,
+  sourceCFGHasOutgoingFunCallEdges,
+} from '../cfg';
 
-const logger = createLogger('DebugAgnosticOperations');
+// const logger = createLogger('DebugAgnosticOperations');
 
 export interface AgnosticDebugOperations {
   stepIn: (
@@ -20,112 +13,34 @@ export interface AgnosticDebugOperations {
     node: SourceCFGNode,
   ) => SourceCFGNode[];
   stepOver: (
-    langAdaptor: LanguageAdaptor,
-    node: AgnosticNode,
-  ) => AgnosticNode | undefined;
+    sourceCFG: SourceControlFlowGraph,
+    node: SourceCFGNode,
+  ) => SourceCFGNode[];
 }
 
 function stepOver(
-  langAdaptor: LanguageAdaptor,
-  agnosticNode: AgnosticNode,
-): AgnosticNode | undefined {
-  if (agnosticNode.node === undefined) {
-    return undefined;
-  }
-  const asts = langAdaptor.asts;
-  const ast = asts.get(agnosticNode.source);
-  if (ast === undefined) {
-    return undefined;
-  }
-
-  let nextNode = ast.nextNode(
-    agnosticNode.startPosition.linenr,
-    agnosticNode.startPosition.colnr,
-  );
-  while (nextNode !== undefined) {
-    const nextAgnosticNode = buildAgnosticNode(
-      langAdaptor.asts,
-      nextNode,
-      langAdaptor.sourceMap,
-      agnosticNode.source,
-    );
-    if (nextAgnosticNode !== undefined) {
-      return nextAgnosticNode;
-    }
-    const [nextLineNr, nextColNr] = nodePositionToSourceLocation(
-      nextNode.startPosition.row,
-      nextNode.startPosition.column,
-    );
-    nextNode = ast.nextNode(nextLineNr, nextColNr);
-  }
-
-  return undefined;
+  sourceCFG: SourceControlFlowGraph,
+  node: SourceCFGNode,
+): SourceCFGNode[] {
+  const ignoreExitNodes = true;
+  return sourceCFG.getNodeNeighbours(node, ignoreExitNodes);
 }
 
 function stepIn(
   sourceCFG: SourceControlFlowGraph,
   node: SourceCFGNode,
 ): SourceCFGNode[] {
-  return sourceCFG.getNodeNeighbours(node);
-}
-
-function buildAgnosticNode(
-  asts: AgnosticASTMap,
-  node: Parser.SyntaxNode,
-  sourceMap: SourceMap,
-  source: string,
-): AgnosticNode | undefined {
-  const [linenr, columnStart] = nodePositionToSourceLocation(
-    node.startPosition.row,
-    node.startPosition.column,
-  );
-  const [linenrEnd, columnEnd] = nodePositionToSourceLocation(
-    node.endPosition.row,
-    node.endPosition.column,
-  );
-  if (linenrEnd !== linenr) {
-    throw new Error(`Linenr should not differ between start and endPosition`);
+  let ns: SourceCFGNode[] = [];
+  if (sourceCFGHasOutgoingFunCallEdges(node)) {
+    ns = sourceCFG.getFunctionEntryNodesFromNode(node);
   }
 
-  for (let col = columnStart; col < columnEnd; ++col) {
-    const loc: SourceCodeLocation = {
-      source,
-      linenr,
-      columnStart: col,
-    };
-
-    const items = sourceMap.generatedPositionFor(loc);
-    const itemtsToKeep: MappingItem[] = [];
-    let itemWithSmallestAddr: MappingItem | undefined;
-    for (const it of items) {
-      // keep items that can be viewed
-      if (
-        (isAbsolutePath(it.source) && isFilePath(it.source)) ||
-        asts.has(it.source)
-      ) {
-        if (itemWithSmallestAddr === undefined) {
-          itemWithSmallestAddr = it;
-        } else if (it.generatedColumn < itemWithSmallestAddr.generatedColumn) {
-          itemWithSmallestAddr = it;
-        }
-        itemtsToKeep.push(it);
-      }
-    }
-
-    if (itemtsToKeep.length >= 1) {
-      logger.debug(
-        `Found #${itemtsToKeep.length} ItemMapping suitable for source location {source: ${loc.source}, linenr: ${loc.linenr}, colnr: ${loc.columnStart}} will return the one with the smallest address`,
-      );
-
-      if (itemWithSmallestAddr === undefined) {
-        throw new Error(`Item with SmallestAddress should not be undefined`);
-      }
-      const an = new AgnosticNode(node);
-      an.addMapping(mappingItemToSourceCodeMapping(itemWithSmallestAddr));
-      return an;
-    }
+  if (ns.length === 0) {
+    const ignoreExitNodes = true;
+    ns = sourceCFG.getNodeNeighbours(node, ignoreExitNodes);
   }
-  return undefined;
+
+  return ns;
 }
 
 export const DebugAgnosticOperations: AgnosticDebugOperations = {
