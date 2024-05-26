@@ -173,10 +173,9 @@ export class SourceMap {
       })
       .map((m: MappingItem) => {
         const src = this._sourceToAbsPathSource.get(m.source);
-        if (src === undefined) {
-          throw new Error(`No absolutePath set for Source ${m.source}`);
+        if (src !== undefined) {
+          m.source = src;
         }
-        m.source = src;
         return m;
       });
 
