@@ -132,12 +132,13 @@ export function sourceControlFlowGraphToDot(
     allnodes.push(n);
   }
 
-  for (const fid of exitNodesToAdd.values()) {
-    const record = 'record';
-    const fname = funNames.get(fid) ?? `${fid}`;
-    const label = `FunCall ${fname}|instr<4>call ${fid}}`;
-    nodesStr += `block${fid} [shape=${record}, label="${label}"];\n`;
-  }
+  // for (const fid of exitNodesToAdd.values()) {
+  //   const record = 'record';
+  //   const fname = funNames.get(fid) ?? `${fid}`;
+  //   const label = `FunCall ${fname}|instr<4>call ${fid}}`;
+  //   nodesStr += `block${fid} [shape=${record}, label="${label}"];\n`;
+  // }
+
   const entryNodeID = `block-1`;
   // if (allnodes.length > 1) {
   // const record2 = 'record';
@@ -162,17 +163,17 @@ export function sourceControlFlowGraphToDot(
       })
       .join('');
     edgesStr.push(str);
-    if (sourceCFGHasOutgoingFunCallEdges(n)) {
-      for (const callInstr of n.edgesToOutSideCalls) {
-        if (isCallInstruction(callInstr)) {
-          edgesStr.push(`${nodeId} -> block${callInstr.funIdx};\n`);
-        } else if (isCallIndirect(callInstr)) {
-          throw new Error(`Call indirect not yet supported`);
-        } else {
-          throw new Error(`outgoing instructions should be (indirect) calls`);
-        }
-      }
-    }
+    // if (sourceCFGHasOutgoingFunCallEdges(n)) {
+    //   for (const callInstr of n.edgesToOutSideCalls) {
+    //     if (isCallInstruction(callInstr)) {
+    //       edgesStr.push(`${nodeId} -> block${callInstr.funIdx};\n`);
+    //     } else if (isCallIndirect(callInstr)) {
+    //       throw new Error(`Call indirect not yet supported`);
+    //     } else {
+    //       throw new Error(`outgoing instructions should be (indirect) calls`);
+    //     }
+    //   }
+    // }
   }
   const allEdges = edgesStr.join('');
 
