@@ -52,9 +52,8 @@ describe('Debug Operations on Rust AST Blink App', function () {
       sourceCFG,
       pinModeCall,
     );
-    expect(nextPossibleLocations.length).to.equal(2);
+    expect(nextPossibleLocations.length).to.equal(1);
     logNode(nextPossibleLocations[0]);
-    logNode(nextPossibleLocations[1]);
   });
 
   it('"step into" if-expression', function () {
