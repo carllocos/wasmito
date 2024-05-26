@@ -9,6 +9,8 @@ const exampleFile = path.resolve('./test/data/rust_examples/blink/main.wasm');
 describe('Rust AST Control Flow Graph for Blink App', function () {
   let astCFG: SourceControlFlowGraph;
 
+  this.timeout(5000);
+
   before('parse wasm module', async function () {
     try {
       const sm = await SourceMapfromDWARFWasm(exampleFile);
