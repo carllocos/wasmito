@@ -58,35 +58,14 @@ export async function SourceMapfromSourceMapSpec(
     }
   });
 
-  const sourcesAbsPath: string[] = [];
+  const cleanedSources: string[] = [];
   for (let i = 0; i < sources.length; i++) {
-    let source = sources[i];
-    if (source.startsWith(sourceRoot)) {
-      logger.debug(
-        `Removing sourceRoot '${sourceRoot}' from AssemblyScript source '${source}'`,
-      );
-      source = source.slice(sourceRoot.length + 1, source.length);
-    }
-
-    if (!isAbsolutePath(source)) {
-      logger.debug(`Creating absolute path for source '${source}`);
-      source = pathJoin(sourceRoot, source);
-    }
-    if (isFilePath(source)) {
-      sourcesAbsPath.push(source);
+    const cleanedSource = absPathMapper?.get(sources[i]);
+    if (cleanedSource !== undefined) {
+      cleanedSources.push(cleanedSource);
     } else {
-      logger.warn(
-        `Ignoring source '${source}' for source maps as such file does not exist`,
-      );
+      cleanedSources.push(sources[i]);
     }
-  }
-
-  if (sourcesAbsPath.length === 0) {
-    throw new Error(
-      `No source found in the sourcemap that satifies the conditions. All sources  ${sources.join(
-        ', ',
-      )}`,
-    );
   }
 
   const sm = new SourceMap(
