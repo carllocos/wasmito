@@ -2,10 +2,7 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "CommonJS",
-    "lib": [
-      "ES2020",
-      "esnext.asynciterable"
-    ],
+    "lib": ["ES2020", "esnext.asynciterable"],
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
@@ -19,13 +16,8 @@
     "moduleResolution": "node",
     "noImplicitAny": true,
     "preserveConstEnums": true,
-    "noEmit": false,
+    "noEmit": false
   },
-  "include": [
-    "src/**/*.ts",
-    "test/**/*.ts",
-  ],
-  "exclude": [
-    "node_modules"
-  ],
+  "include": ["src/**/*.ts", "test/**/*.ts"],
+  "exclude": ["node_modules", "test/data/assemblyscript_examples/**/*.ts"]
 }
