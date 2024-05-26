@@ -365,6 +365,10 @@ function buildCFGNodesHelper(
       }
     }
 
+    if (i + 1 >= instructions.length) {
+      break;
+    }
+
     // case where instr is a block based structure instr
     // the end instruction of the block instr is the last inst of its subisntrcs
     // the next inst of instructions as instructions[i+1] is the inst after the block'end
