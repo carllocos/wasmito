@@ -591,6 +591,65 @@ function parseInstruction(obj: any): WasmInstruction | undefined {
       );
       break;
     }
+    case 'current_memory': {
+      op = new WasmInstruction(
+        'current_memory',
+        WASMOpcodeNumber.CurrentMemory,
+      );
+      if (obj.args.length > 0) {
+        throw new Error(
+          `Handle case where 'current_memory' args is not empty ${obj.args}`,
+        );
+      }
+      break;
+    }
+    case 'xor': {
+      const opcode = obj.object + '.xor';
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
+      break;
+    }
+    case 'select': {
+      op = new WasmInstruction('select', WASMOpcodeNumber.Select);
+      if (obj.args.length > 0) {
+        throw new Error(
+          `Handle case where 'select' args is not empty ${obj.args}`,
+        );
+      }
+      break;
+    }
+    case 'grow_memory': {
+      op = new WasmInstruction('grow_memory', WASMOpcodeNumber.GrowMemory);
+      if (obj.args.length > 0) {
+        throw new Error(
+          `Handle case where 'grow_memory' args is not empty ${obj.args}`,
+        );
+      }
+      break;
+    }
+    case 'load8_u': {
+      const opcode = obj.object + '.load8_u';
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
+      break;
+    }
+    case 'load16_u': {
+      const opcode = obj.object + '.load16_u';
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
+      break;
+    }
+    case 'nop': {
+      op = new WasmInstruction('nop', WASMOpcodeNumber.Nop);
+      break;
+    }
+    case 'div_u': {
+      const opcode = obj.object + '.div_u';
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
+      break;
+    }
+    case 'extend_u/i32': {
+      const opcode = obj.object + '.extend_u/i32';
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
+      break;
+    }
     default:
       throw new Error(`Unsupported Wasm instruction ${obj.id}`);
   }
