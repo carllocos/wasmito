@@ -200,9 +200,9 @@ export class IfInstruction extends WasmInstruction {
     this.alternative.sort((i1, i2) => i1.startAddress - i2.startAddress);
     if (this.alternative.length > 0) {
       const lastAltInstr = this.alternative[this.alternative.length - 1];
-      if (lastConseInstr.opcodeNr !== WASMOpcodeNumber.End) {
+      if (lastAltInstr.opcodeNr !== WASMOpcodeNumber.End) {
         throw new Error(
-          `The Last instruction of the if-alternative is expected to be an 'end' instruction got ${lastAltInstr.name}'`,
+          `The Last instruction of the if-alternative is expected to be an 'end' instruction got '${lastAltInstr.name}'`,
         );
       }
     }
