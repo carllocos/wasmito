@@ -211,7 +211,9 @@ function buildCTGraphForFunction(
   // console.log(`===================================`);
   // console.log(`Adding Edges for function ${f.id}`);
   // console.log(`===================================`);
-  return { entyNodes: addEdgesAndReturnEntryNodes(graph, ns), allNodes: ns };
+  const entyNodes =
+    ns.length === 0 ? [] : addEdgesAndReturnEntryNodes(graph, ns);
+  return { entyNodes, allNodes: ns };
 }
 
 // function logNode(n: AgnosticNode): string {
