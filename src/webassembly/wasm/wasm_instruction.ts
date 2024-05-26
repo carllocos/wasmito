@@ -191,10 +191,14 @@ export class IfInstruction extends WasmInstruction {
     }
     this.consequence.sort((i1, i2) => i1.startAddress - i2.startAddress);
     const lastConseInstr = this.consequence[this.consequence.length - 1];
-    if (lastConseInstr.opcodeNr !== WASMOpcodeNumber.End) {
-      throw new Error(
-        `The Last instruction of the if-consequence is expected to be an 'end' instruction got ${lastConseInstr.name}'`,
-      );
+    const consequenceMustHaveEnd = this.alternative.length === 0;
+    if (consequenceMustHaveEnd) {
+      // if there is no alternative then the end instruction must be stored in the consequence block
+      if (lastConseInstr.opcodeNr !== WASMOpcodeNumber.End) {
+        throw new Error(
+          `The Last instruction of the if-consequence is expected to be an 'end' instruction got ${lastConseInstr.name}'`,
+        );
+      }
     }
 
     this.alternative.sort((i1, i2) => i1.startAddress - i2.startAddress);
