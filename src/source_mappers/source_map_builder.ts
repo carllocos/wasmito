@@ -1,5 +1,4 @@
 import fs from 'fs';
-import { isAbsolutePath, isFilePath, pathJoin } from '../util/file_util';
 import { SourceMap } from './source_map';
 import { type MappingItem, SourceMapConsumer } from 'source-map';
 import { createLogger } from '../logger/logger';
@@ -69,12 +68,11 @@ export async function SourceMapfromSourceMapSpec(
   }
 
   const sm = new SourceMap(
-    'TODO',
-    pathToSourceMap,
+    targetLanguage,
     wasmPath,
-    sourcesAbsPath,
-    sources,
+    cleanedSources,
     cleanedMappings,
+    absPathMapper ?? new Map(),
   );
   return sm;
 }
@@ -101,19 +99,10 @@ export async function SourceMapfromDWARFWasm(
     throw new Error(`No mapping found for the given wasmFile ${wasmFilePath}`);
   }
 
-  const pathToSourceMap = ''; // no path to sourceMapSpec
-
   // convert to set to remove duplicates
   const sources = Array.from(new Set(mappings.map((m) => m.source)));
 
-  return new SourceMap(
-    targetLanguage,
-    pathToSourceMap,
-    wasmFilePath,
-    sources,
-    sources,
-    mappings,
-  );
+  return new SourceMap(targetLanguage, wasmFilePath, sources, mappings);
 }
 
 export async function createMappingForAddr(
