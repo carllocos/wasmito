@@ -7,7 +7,7 @@ import {
   type SourceCFGNode,
   type SourceControlFlowGraph,
 } from '../../src/cfg/source_cfg';
-import { DebugAgnosticOperations } from '../../src';
+import { DebugAgnosticOperations } from '../../src/language_adaptors/debug_tree_operations';
 
 describe('Debug Operations on Rust AST Blink App', function () {
   const blinkApp = path.resolve('./test/data/rust_examples/blink/main.wasm');
