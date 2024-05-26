@@ -68,7 +68,7 @@ export class SourceControlFlowGraph {
     }
 
     if (nodes.length > 1) {
-      console.log(`More than one set of nodes found ignoring the rest`);
+      // console.log(`More than one set of nodes found ignoring the rest`);
       return nodes[0];
     } else if (nodes.length === 1) {
       return nodes[0];
@@ -178,24 +178,24 @@ function buildCTGraphForFunction(
   cfg: WasmControlFlowGraph,
 ): FunctionTreeGraph {
   // TODO use depthfirst traversal to build the whole graph in one go
-  console.log();
-  console.log(`===================================`);
-  console.log(`Building Graph for function ${f.id}`);
-  console.log(`===================================`);
-  console.log();
+  // console.log();
+  // console.log(`===================================`);
+  // console.log(`Building Graph for function ${f.id}`);
+  // console.log(`===================================`);
+  // console.log();
   const graph = cfg.getCFGStrict(f.id);
   const ns = createAllNodes(sourceMap, asts, graph);
-  console.log(`===================================`);
-  console.log(`Adding Edges for function ${f.id}`);
-  console.log(`===================================`);
+  // console.log(`===================================`);
+  // console.log(`Adding Edges for function ${f.id}`);
+  // console.log(`===================================`);
   return { entyNodes: addEdgesAndReturnEntryNodes(graph, ns), allNodes: ns };
 }
 
-function logNode(n: AgnosticNode): string {
-  const sp = n.startPosition;
-  const ep = n.endPosition;
-  return `{startLoc: (${sp.linenr}, ${sp.colnr}), endLoc: (${ep.linenr}, ${ep.colnr}), srcTxt: '${n.node.text}'}`;
-}
+// function logNode(n: AgnosticNode): string {
+//   const sp = n.startPosition;
+//   const ep = n.endPosition;
+//   return `{startLoc: (${sp.linenr}, ${sp.colnr}), endLoc: (${ep.linenr}, ${ep.colnr}), srcTxt: '${n.node.text}'}`;
+// }
 
 function createAllNodes(
   sourceMap: SourceMap,
@@ -206,9 +206,9 @@ function createAllNodes(
 
   breadthFirstTraverseWasmCFGT(g, entryNode, {
     onNode: (n: CFGNode) => {
-      console.log(
-        `\nNode ID ${n.nodeID} instructions #${n.instructions.length}`,
-      );
+      // console.log(
+      //   `\nNode ID ${n.nodeID} instructions #${n.instructions.length}`,
+      // );
       let prevNode: SourceCFGNode | undefined;
       for (let i = n.instructions.length - 1; i >= 0; i--) {
         const instr = n.instructions[i];
@@ -218,22 +218,22 @@ function createAllNodes(
           instr.startAddress,
         );
         if (agnosticNode === undefined) {
-          console.log(`instruction ${instructionToString(instr)} has no node`);
+          // console.log(`instruction ${instructionToString(instr)} has no node`);
           if (prevNode !== undefined) {
-            const prevStr = logNode(prevNode.node);
-            console.log(
-              `instruction ${instructionToString(instr)} added to prevNode with id ${prevNode.nodeId} node txt '${prevStr}'`,
-            );
+            // const prevStr = logNode(prevNode.node);
+            // console.log(
+            //   `instruction ${instructionToString(instr)} added to prevNode with id ${prevNode.nodeId} node txt '${prevStr}'`,
+            // );
             prevNode.addressesWithoutASTNode.add(instr.startAddress);
           } else {
-            console.log(
-              `encountered a wasm instr ${instructionToString(instr)} that cannot be stored on any CTN`,
-            );
+            // console.log(
+            //   `encountered a wasm instr ${instructionToString(instr)} that cannot be stored on any CTN`,
+            // );
           }
           continue;
         }
 
-        const nodeStr = logNode(agnosticNode);
+        // const nodeStr = logNode(agnosticNode);
         const node = createNodeIfNeeded(
           nodes,
           agnosticNode,
@@ -241,21 +241,21 @@ function createAllNodes(
           n.instructionsIndexes[i],
         );
         if (prevNode !== undefined) {
-          const prevStr = logNode(prevNode.node);
+          // const prevStr = logNode(prevNode.node);
           if (node.nodeId !== prevNode.nodeId) {
-            console.log(
-              `insrtuction ${instructionToString(instr)} new CTG node id ${node.nodeId} '${prevStr}'`,
-            );
+            // console.log(
+            //   `insrtuction ${instructionToString(instr)} new CTG node id ${node.nodeId} '${prevStr}'`,
+            // );
             addEdge(node, prevNode);
           } else {
-            console.log(
-              `insrtuction ${instructionToString(instr)} on prev CTG node id ${node.nodeId} txt '${prevStr}'`,
-            );
+            // console.log(
+            //   `insrtuction ${instructionToString(instr)} on prev CTG node id ${node.nodeId} txt '${prevStr}'`,
+            // );
           }
         } else {
-          console.log(
-            `insrtuction ${instructionToString(instr)} new CTG node id ${node.nodeId} (prev is undefined) txt ${nodeStr}'`,
-          );
+          // console.log(
+          //   `insrtuction ${instructionToString(instr)} new CTG node id ${node.nodeId} (prev is undefined) txt ${nodeStr}'`,
+          // );
         }
         prevNode = node;
       }
@@ -331,7 +331,7 @@ function addEdgesAndReturnEntryNodes(
   const nodesToIgnore: Set<number> = new Set<number>();
   breadthFirstTraverseWasmCFGT(g, entryNode, {
     onNode: (n: CFGNode) => {
-      console.log(`\nNode ID ${n.nodeID}`);
+      // console.log(`\nNode ID ${n.nodeID}`);
       const ctgn = searchCTGNInDecreasingAddresses(n, nodes);
       if (ctgn === undefined) {
         if (n.nodeID === entryNode.nodeID) {
@@ -344,7 +344,7 @@ function addEdgesAndReturnEntryNodes(
           newNodesToIngore.forEach((ni) => nodesToIgnore.add(ni));
           entryNodes.forEach((en) => {
             if (!entryNodesAdded.has(en.nodeId)) {
-              console.log(`Added new EntryNode ${logNode(en.node)}`);
+              // console.log(`Added new EntryNode ${logNode(en.node)}`);
               entryCTGNodes.push(en);
               entryNodesAdded.add(en.nodeId);
             }
@@ -362,7 +362,7 @@ function addEdgesAndReturnEntryNodes(
         // entry CFG node has a corresponding CTG node
         if (n.nodeID === entryNode.nodeID) {
           if (!entryNodesAdded.has(ctgn.nodeId)) {
-            console.log(`Added new EntryNode ${logNode(ctgn.node)}`);
+            // console.log(`Added new EntryNode ${logNode(ctgn.node)}`);
             entryCTGNodes.push(ctgn);
             entryNodesAdded.add(ctgn.nodeId);
           }
@@ -381,18 +381,18 @@ function addEdgesAndReturnEntryNodes(
       // need to be added. And this depending on where the toInstr points to. However,
       // this case 2.c can be handled on the next node visit which in that case should be the
       // the first condition to check
-      console.log(`Adding edges for node ${logNode(ctgn.node)}`);
+      // console.log(`Adding edges for node ${logNode(ctgn.node)}`);
 
       for (const e of n.edges) {
-        console.log(
-          `instrFrom ${instructionToString(e.instrFrom)} -> instrTo ${instructionToString(e.instrTo)}`,
-        );
+        // console.log(
+        //   `instrFrom ${instructionToString(e.instrFrom)} -> instrTo ${instructionToString(e.instrTo)}`,
+        // );
         const toNode = getWasmCFGNode(g, e.instrTo.startAddress);
         const toctgn = searchCTGNInIncreasingAddresses(toNode, nodes);
         if (toctgn !== undefined) {
-          console.log(
-            `about to add edge from ${logNode(ctgn.node)} to ${logNode(toctgn.node)}`,
-          );
+          // console.log(
+          //   `about to add edge from ${logNode(ctgn.node)} to ${logNode(toctgn.node)}`,
+          // );
           if (ctgn.nodeId !== toctgn.nodeId) {
             // case 1
             addEdge(ctgn, toctgn);
@@ -404,9 +404,9 @@ function addEdgesAndReturnEntryNodes(
             isCallIndirect(e.instrTo)
           ) {
             // case 2.b
-            console.log(
-              `mark node ${ctgn.nodeId} as a node with an edge to an outside call`,
-            );
+            // console.log(
+            //   `mark node ${ctgn.nodeId} as a node with an edge to an outside call`,
+            // );
             ctgn.edgesToOutSideCalls.push(e.instrTo);
             continue;
           } else if (isBranchingInstruction(e.instrFrom)) {
@@ -511,17 +511,17 @@ function addEdge(an1: SourceCFGNode, an2: SourceCFGNode): void {
     return n.nodeId === an2.nodeId;
   });
   if (alreadyAdded === undefined) {
-    const s1 = logNode(an1.node);
-    const s2 = logNode(an2.node);
+    // const s1 = logNode(an1.node);
+    // const s2 = logNode(an2.node);
     if (an1.nodeId === an2.nodeId) {
-      console.log(`addEdge ${an1.nodeId} ${s1} -> ${an2.nodeId} ${s2} LOOP!`);
+      // console.log(`addEdge ${an1.nodeId} ${s1} -> ${an2.nodeId} ${s2} LOOP!`);
     } else {
-      console.log(`addEdge ${an1.nodeId} ${s1} -> ${an2.nodeId} ${s2}`);
+      // console.log(`addEdge ${an1.nodeId} ${s1} -> ${an2.nodeId} ${s2}`);
     }
     an1.edges.push(an2);
   } else {
-    console.log(
-      `addEdge ${an1.nodeId} -> ${an2.nodeId} cancelled as edge already present`,
-    );
+    // console.log(
+    //   `addEdge ${an1.nodeId} -> ${an2.nodeId} cancelled as edge already present`,
+    // );
   }
 }
