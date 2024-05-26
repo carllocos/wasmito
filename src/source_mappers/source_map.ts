@@ -62,35 +62,22 @@ export class SourceMap {
   private readonly _sourceToAbsPathSource: Map<string, string>;
   private readonly _sources: string[];
   private readonly _mappings: MappingItem[];
-  private readonly _pathToSourceMap: string;
   private readonly _wasmPath: string;
   public readonly wasm: WasmModule;
   public readonly targetLanguage: string;
 
   constructor(
     targetLanguage: string,
-    pathToSourceMap: string,
     wasmPath: string,
-    absolutePathSources: string[],
     sources: string[],
     mappings: MappingItem[],
+    srcToAbsPath = new Map<string, string>(),
   ) {
     this.targetLanguage = targetLanguage;
-    this._pathToSourceMap = pathToSourceMap;
     this._wasmPath = wasmPath;
-    this._sourceToAbsPathSource = new Map();
+    this._sourceToAbsPathSource = srcToAbsPath;
     this._sources = sources;
     this._mappings = mappings;
-
-    if (sources.length !== absolutePathSources.length) {
-      throw new Error(
-        `Sources size #${sources.length} !== absolutePath Sources size #${absolutePathSources.length} `,
-      );
-    }
-
-    for (let i = 0; i < sources.length; i++) {
-      this._sourceToAbsPathSource.set(sources[i], absolutePathSources[i]);
-    }
 
     this.wasm = new WasmModule(this._wasmPath);
   }

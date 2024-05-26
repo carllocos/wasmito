@@ -8,14 +8,7 @@ export function createSourceMapForWAT(
   wasmPath: string,
 ): SourceMap {
   const mappings = createWAT2WASMMappings(sourcePath, lines);
-  return new SourceMap(
-    'wat',
-    'todo path to sourcemap',
-    wasmPath,
-    [sourcePath],
-    [sourcePath],
-    mappings,
-  );
+  return new SourceMap('wat', wasmPath, [sourcePath], mappings);
 }
 
 function createWAT2WASMMappings(
