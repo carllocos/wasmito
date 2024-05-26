@@ -122,6 +122,29 @@ export class SourceControlFlowGraph {
     return entryNodes;
   }
 
+  getNodeNeighbours(
+    n: SourceCFGNode,
+    ignoreExitNodes: boolean = false,
+  ): SourceCFGNode[] {
+    const alreadyAdded = new Set<number>();
+    const ns: SourceCFGNode[] = [];
+    for (const e of n.edges) {
+      if (!alreadyAdded.has(e.nodeId)) {
+        ns.push(e);
+        alreadyAdded.add(e.nodeId);
+      }
+    }
+    if (!ignoreExitNodes && sourceCFGHasOutgoingFunCallEdges(n)) {
+      this.getFunctionEntryNodesFromNode(n).forEach((en) => {
+        if (!alreadyAdded.has(en.nodeId)) {
+          ns.push(en);
+          alreadyAdded.add(en.nodeId);
+        }
+      });
+    }
+    return ns;
+  }
+
   serializeToDot(outputDir: string, funIds: number[] = []): string[] {
     if (funIds.length === 0) {
       this._sourceMap.wasm.functions.forEach((f) => funIds.push(f.id));
