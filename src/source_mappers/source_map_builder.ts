@@ -10,9 +10,10 @@ import { getProducer } from '../wasm-tools/metadata_wasm';
 const logger = createLogger('SourceMapBuilder');
 
 export async function SourceMapfromSourceMapSpec(
-  pathToRootSource: string,
   pathToSourceMap: string,
   wasmPath: string,
+  targetLanguage: string,
+  absPathMapper?: Map<string, string>,
 ): Promise<SourceMap> {
   const content = await fs.promises.readFile(pathToSourceMap);
   const sourceMapStr = JSON.parse(content.toString());
