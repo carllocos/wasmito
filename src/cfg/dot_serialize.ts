@@ -1,4 +1,7 @@
-import { isCallIndirect, isCallInstruction } from '../webassembly';
+import {
+  isCallIndirect,
+  isCallInstruction,
+} from '../webassembly/wasm/wasm_instruction';
 import {
   type FunctionTreeGraph,
   sourceCFGHasOutgoingFunCallEdges,
