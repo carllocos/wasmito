@@ -46,6 +46,9 @@ export enum WASMOpcodeNumber {
   I64Store8 = 0x3c,
   I64Store16 = 0x3d,
   I64Store32 = 0x3e,
+  CurrentMemory = 0x3f,
+
+  GrowMemory = 0x40,
 
   I32Const = 0x41, // i32.const
   I64Const = 0x42, // i64.const
@@ -220,12 +223,15 @@ export function typeFromWasmOpcode(
     case WASMOpcodeNumber.Call:
     case WASMOpcodeNumber.Call_indirect:
       return new PlaceholderType();
+
+    // void -> a result
     case WASMOpcodeNumber.I32Const:
     case WASMOpcodeNumber.I64Const:
     case WASMOpcodeNumber.F32Const:
     case WASMOpcodeNumber.F64Const:
     case WASMOpcodeNumber.Get_global:
     case WASMOpcodeNumber.Get_local:
+    case WASMOpcodeNumber.CurrentMemory:
       return new WasmType(0, 1);
 
     // binary operators that do not produce a result
@@ -381,6 +387,7 @@ export function typeFromWasmOpcode(
     case WASMOpcodeNumber.I64Load16Unsigned:
     case WASMOpcodeNumber.I64Load32Signed:
     case WASMOpcodeNumber.I64Load32Unsigned:
+    case WASMOpcodeNumber.GrowMemory:
       return new WasmType(1, 1);
     default:
       return undefined;
@@ -427,9 +434,15 @@ export function wasmOpcodeFromStr(opcode: string): WASMOpcodeNumber {
     case 'u32.store8':
     case 'i32.store8':
       return WASMOpcodeNumber.I32Store8;
+    case 'i32.load8_u':
+    case 'u32.load8_u':
+      return WASMOpcodeNumber.I32Load8Unsigned;
     case 'u32.store16':
     case 'i32.store16':
       return WASMOpcodeNumber.I32Store16;
+    case 'i32.load16_u':
+    case 'u32.load16_u':
+      return WASMOpcodeNumber.I32Load16Unsigned;
     case 'f32.store':
       return WASMOpcodeNumber.F32Store;
     case 'f64.store':
@@ -485,6 +498,11 @@ export function wasmOpcodeFromStr(opcode: string): WASMOpcodeNumber {
       return WASMOpcodeNumber.I64GEUnsigned;
     case 'i64.reinterpret/f64':
       return WASMOpcodeNumber.I64Reinterpret_F64;
+    case 'i64.extend_u/i32':
+      return WASMOpcodeNumber.I64Extend_u_I32;
+    case 'i64.load':
+    case 'u64.load':
+      return WASMOpcodeNumber.I64Load;
 
     case 'i32.and':
       return WASMOpcodeNumber.I32And;
@@ -492,6 +510,10 @@ export function wasmOpcodeFromStr(opcode: string): WASMOpcodeNumber {
       return WASMOpcodeNumber.I32Add;
     case 'i32.sub':
       return WASMOpcodeNumber.I32Sub;
+    case 'i32.ne':
+      return WASMOpcodeNumber.I32Ne;
+    case 'i32.eq':
+      return WASMOpcodeNumber.I32Eq;
     case 'i32.eqz':
       return WASMOpcodeNumber.I32Eqz;
     case 'i32.clz':
@@ -502,12 +524,30 @@ export function wasmOpcodeFromStr(opcode: string): WASMOpcodeNumber {
       return WASMOpcodeNumber.I32POPCNT;
     case 'i32.gt_s':
       return WASMOpcodeNumber.I32GTSigned;
+    case 'i32.ge_u':
+      return WASMOpcodeNumber.I32GEUnsinged;
     case 'i32.gt_u':
       return WASMOpcodeNumber.I32GTUnsigned;
     case 'i32.lt_u':
       return WASMOpcodeNumber.I32LTUnsigned;
+    case 'i32.le_u':
+      return WASMOpcodeNumber.I32LEUnsigned;
+    // case 'i32.lt_e':
+    //   return WASMOpcodeNumber.I32LEUnsigned;
     case 'i32.lt_s':
       return WASMOpcodeNumber.I32LTSigned;
+    case 'i32.shl':
+      return WASMOpcodeNumber.I32Shl;
+    case 'i32.shr_u':
+      return WASMOpcodeNumber.I32ShrUnsigned;
+    case 'i32.xor':
+      return WASMOpcodeNumber.I32Xor;
+    case 'i32.or':
+      return WASMOpcodeNumber.I32Or;
+    case 'i32.mul':
+      return WASMOpcodeNumber.I32Mult;
+    case 'i32.div_u':
+      return WASMOpcodeNumber.I32DivUnsigned;
 
     case 'f32.add':
       return WASMOpcodeNumber.F32Add;
