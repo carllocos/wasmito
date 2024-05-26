@@ -2,7 +2,8 @@ import { type MappingItem } from 'source-map';
 import { createLogger } from '../logger/logger';
 import { WasmModule } from '../webassembly/wasm/wasm_module';
 import { type WASMFunction } from '../webassembly/wasm/wasm_function';
-import { pathsEqual } from '../util/file_util';
+import { isFilePath, pathsEqual } from '../util/file_util';
+import { writeFileSync } from 'fs';
 
 const logger = createLogger('SourceMap');
 
@@ -226,4 +227,24 @@ export class SourceMap {
   //     instruction,
   //   };
   // }
+
+  storeMappingsToJSON(
+    filePath: string,
+    onlyExistingSource: boolean = false,
+  ): void {
+    let maps = this._mappings.map((m: MappingItem) => {
+      const src = this._sourceToAbsPathSource.get(m.source);
+      if (src !== undefined) {
+        m.source = src;
+      }
+      return m;
+    });
+    if (onlyExistingSource) {
+      maps = maps.filter((m) => isFilePath(m.source));
+    }
+    const mpsStr = maps.map(mappingItemToString).join(',');
+
+    const content = `{"language":"${this.targetLanguage}", "mappings":[${mpsStr}]}`;
+    writeFileSync(filePath, content);
+  }
 }
