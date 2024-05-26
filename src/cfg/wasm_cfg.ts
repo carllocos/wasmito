@@ -366,7 +366,7 @@ function buildCFGNodesHelper(
     }
 
     // case where instr is a block based structure instr
-    // the end isntruction of the block instr is the last inst of its subisntrcs
+    // the end instruction of the block instr is the last inst of its subisntrcs
     // the next inst of instructions as instructions[i+1] is the inst after the block'end
     const instrAfterBlock = instructions[i + 1];
     const endBlockAddr = instrAfterBlock.startAddress;
