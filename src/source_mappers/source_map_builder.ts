@@ -8,10 +8,16 @@ import { getProducer } from '../wasm-tools/metadata_wasm';
 
 const logger = createLogger('SourceMapBuilder');
 
+export interface SourceOffsetStart {
+  colNrStartNumber: number;
+  lineNrStartNumber: number;
+}
+
 export async function SourceMapfromSourceMapSpec(
   pathToSourceMap: string,
   wasmPath: string,
   targetLanguage: string,
+  startPositioning: SourceOffsetStart,
   absPathMapper?: Map<string, string>,
 ): Promise<SourceMap> {
   const content = await fs.promises.readFile(pathToSourceMap);
@@ -28,7 +34,7 @@ export async function SourceMapfromSourceMapSpec(
     },
   );
 
-  const cleanedMappings = mappings.filter((m: MappingItem) => {
+  let cleanedMappings = mappings.filter((m: MappingItem) => {
     const hasOriginalLine =
       m.originalLine !== undefined && m.originalLine !== null;
     const hasOriginalColumnNr =
@@ -41,7 +47,36 @@ export async function SourceMapfromSourceMapSpec(
     );
   }
 
-  cleanedMappings.forEach((m: MappingItem) => {
+  let colNrOffset = 0;
+  if (startPositioning.colNrStartNumber > 1) {
+    throw new Error(
+      `We have a startColnr greater than 1 ${startPositioning.colNrStartNumber}`,
+    );
+  } else if (startPositioning.colNrStartNumber === 0) {
+    colNrOffset = 1;
+  } else if (startPositioning.colNrStartNumber === 1) {
+    colNrOffset = 0;
+  } else {
+    throw new Error(
+      `We have a negative startColnr ${startPositioning.colNrStartNumber}`,
+    );
+  }
+
+  let lineNrOffset = 0;
+  if (startPositioning.lineNrStartNumber > 1) {
+    throw new Error(
+      `We have a startLinenr greater than 1 ${startPositioning.lineNrStartNumber}`,
+    );
+  } else if (startPositioning.lineNrStartNumber === 0) {
+    lineNrOffset = 1;
+  } else if (startPositioning.lineNrStartNumber === 1) {
+    lineNrOffset = 0;
+  } else {
+    throw new Error(
+      `We have a negative startLineNr ${startPositioning.lineNrStartNumber}`,
+    );
+  }
+  cleanedMappings = cleanedMappings.map((m: MappingItem) => {
     // case where either source, line number, column nr, is not avaialable should not occur
     // throw error just in case
     if (m.originalLine === undefined || m.originalColumn === undefined) {
@@ -55,6 +90,13 @@ export async function SourceMapfromSourceMapSpec(
     if (m.source === undefined || m.source === undefined) {
       throw new Error(`Found an empty source for mapping`);
     }
+
+    if (m.name === undefined || m.name === null) {
+      m.name = '';
+    }
+    m.originalColumn += colNrOffset;
+    m.originalLine += lineNrOffset;
+    return m;
   });
 
   const cleanedSources: string[] = [];

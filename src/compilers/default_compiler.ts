@@ -65,9 +65,10 @@ export class DefaultCompiler extends SourceCodeCompiler {
       compilerArgs.pathToSourceMap === undefined
         ? SourceMapfromDWARFWasm(compilerArgs.pathToWasm)
         : SourceMapfromSourceMapSpec(
-            this.targetLanguage,
             compilerArgs.pathToSourceMap,
             compilerArgs.pathToWasm,
+            this.targetLanguage,
+            { lineNrStartNumber: 0, colNrStartNumber: 0 },
           );
     return await constructLanguageAdaptor(await sm);
   }
