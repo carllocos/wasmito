@@ -81,22 +81,24 @@ export class SourceControlFlowGraph {
     return this._astGraphs.get(fid);
   }
 
+  getFunctionEntryNodes(fid: number): SourceCFGNode[] {
+    const f = this.funtionSourceGraph(fid);
+    if (f === undefined) {
+      return [];
+    }
+
+    return f.entyNodes;
+  }
+
   allNodes(): SourceCFGNode[] {
     return this._allGraphNodes;
   }
 
-  getNodeNeighbours(sourceCFGNode: SourceCFGNode): SourceCFGNode[] {
+  getFunctionEntryNodesFromNode(n: SourceCFGNode): SourceCFGNode[] {
+    const entryNodes: SourceCFGNode[] = [];
     const alreadyAdded = new Set<number>();
-    const edges: SourceCFGNode[] = [];
-    for (const e of sourceCFGNode.edges) {
-      if (!alreadyAdded.has(e.nodeId)) {
-        edges.push(e);
-        alreadyAdded.add(e.nodeId);
-      }
-    }
-
-    if (sourceCFGHasOutgoingFunCallEdges(sourceCFGNode)) {
-      for (const i of sourceCFGNode.edgesToOutSideCalls) {
+    if (sourceCFGHasOutgoingFunCallEdges(n)) {
+      for (const i of n.edgesToOutSideCalls) {
         if (isCallInstruction(i)) {
           const graphi = this._astGraphs.get(i.funIdx);
           if (graphi === undefined) {
@@ -106,7 +108,7 @@ export class SourceControlFlowGraph {
           }
           graphi.entyNodes.forEach((n) => {
             if (!alreadyAdded.has(n.nodeId)) {
-              edges.push(n);
+              entryNodes.push(n);
               alreadyAdded.add(n.nodeId);
             }
           });
@@ -117,7 +119,7 @@ export class SourceControlFlowGraph {
         }
       }
     }
-    return edges;
+    return entryNodes;
   }
 
   serializeToDot(outputDir: string, funIds: number[] = []): string[] {
