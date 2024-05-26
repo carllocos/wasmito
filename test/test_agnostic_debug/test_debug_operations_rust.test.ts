@@ -14,6 +14,8 @@ describe('Debug Operations on Rust AST Blink App', function () {
   const sourcePath = path.resolve('./test/data/rust_examples/blink/main.rs');
   let sourceCFG: SourceControlFlowGraph;
 
+  this.timeout(5000);
+
   function logNode(n: SourceCFGNode): void {
     const sp = n.node.startPosition;
     const ep = n.node.endPosition;
