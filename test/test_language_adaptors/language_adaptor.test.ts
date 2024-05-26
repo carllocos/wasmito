@@ -26,15 +26,22 @@ describe('Rust Language Adaptor for Blink App', function () {
     }
   });
 
-  it('MostSpecialisedNode of unexisting source location should yield undefined', () => {
-    const startWasmAddr = 493;
+  it('Step over debug operation', () => {
+    const startWasmAddr = 493; // Source Loc (44, 1)
     const node = AgnosticNodeFromWasmAddress(
       langAdaptor.sourceMap,
       langAdaptor.asts,
       startWasmAddr,
     );
     assert(node !== undefined);
-    const nextNode = DebugAgnosticOperations.stepIn(langAdaptor, node);
-    expect(nextNode?.node?.text).to.equal('pin_mode_lib');
+    let nextNode = DebugAgnosticOperations.stepOver(langAdaptor, node);
+    assert(nextNode !== undefined);
+    expect(nextNode.node.text).to.equal('pin_mode_lib');
+    nextNode = DebugAgnosticOperations.stepOver(langAdaptor, nextNode);
+    assert(nextNode !== undefined);
+    expect(nextNode.node.text).to.equal('2');
+    nextNode = DebugAgnosticOperations.stepOver(langAdaptor, nextNode);
+    assert(nextNode !== undefined);
+    expect(nextNode.node.text).to.equal('loop');
   });
 });
