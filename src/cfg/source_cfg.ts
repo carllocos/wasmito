@@ -15,9 +15,6 @@ import {
   isCallIndirect,
   isCallInstruction,
   isWasmInstructionBlockBased,
-  type WASMFunction,
-} from '../webassembly';
-import {
   instructionToString,
   type WasmInstruction,
 } from '../webassembly/wasm/wasm_instruction';
@@ -29,6 +26,7 @@ import {
 import { pathJoin } from '../util/file_util';
 import { sourceControlFlowGraphToDot } from './dot_serialize';
 import { writeFileSync } from 'fs';
+import { type WASMFunction } from '../webassembly/wasm/wasm_function';
 
 // const logger = createLogger('ASTControlFlowGraph');
 

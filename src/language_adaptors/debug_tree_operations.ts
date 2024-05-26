@@ -3,7 +3,7 @@ import {
   type SourceControlFlowGraph,
   type SourceCFGNode,
   sourceCFGHasOutgoingFunCallEdges,
-} from '../cfg';
+} from '../cfg/source_cfg';
 
 // const logger = createLogger('DebugAgnosticOperations');
 
