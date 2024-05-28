@@ -12,6 +12,12 @@ export interface AgnosticDebugOperations {
     sourceCFG: SourceControlFlowGraph,
     node: SourceCFGNode,
   ) => SourceCFGNode[];
+
+  /*
+   * The semantics of step over is if the current location is a function call
+   * then the debugger should run the function call without interruption.
+   * And the debugger should stop the first program location after the call.
+   */
   stepOver: (
     sourceCFG: SourceControlFlowGraph,
     node: SourceCFGNode,
