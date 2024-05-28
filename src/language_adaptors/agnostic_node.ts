@@ -24,13 +24,13 @@ export class AgnosticNode {
   private readonly _endPosition: ASTNodeSourceLocation;
   private readonly _source: string;
 
-  constructor(node: Parser.SyntaxNode) {
+  constructor(node: Parser.SyntaxNode, src: string) {
     this._node = node;
     this._mappings = new Map();
     this._addresses = [];
     this._startPosition = this.getPositionHelper(this._node.startPosition);
     this._endPosition = this.getPositionHelper(this._node.endPosition);
-    this._source = 'TODO';
+    this._source = src;
   }
 
   get node(): Parser.SyntaxNode {
@@ -101,7 +101,7 @@ export function AgnosticNodeFromWasmAddress(
 
   if (nodesFound.length === 1) {
     const [nodeFound, mappingFound] = nodesFound[0];
-    const an = new AgnosticNode(nodeFound);
+    const an = new AgnosticNode(nodeFound, mappingFound.source);
     an.addMapping(mappingItemToSourceCodeMapping(mappingFound));
     return an;
   } else if (nodesFound.length > 1) {
