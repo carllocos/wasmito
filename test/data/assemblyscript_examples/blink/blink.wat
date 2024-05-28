@@ -1640,6 +1640,12 @@
   local.get $value
   return
  )
+ (func $blink/addTime (param $v i32) (result i32)
+  local.get $v
+  i32.const 1
+  i32.add
+  return
+ )
  (func $blink/newTime (param $oldTime i32) (result i32)
   local.get $oldTime
   i32.const 5000
@@ -2226,6 +2232,10 @@
       local.get $pauseTimes
       local.get $i
       call $~lib/array/Array<u32>#__get
+      call $blink/addTime
+      i32.const 300
+      call $blink/addTime
+      i32.add
       local.set $pause
       i32.const 10
       global.get $blink/PinVoltage.HIGH
