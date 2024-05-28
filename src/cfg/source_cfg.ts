@@ -49,10 +49,21 @@ export class SourceControlFlowGraph {
     this._allGraphNodes = allnodes;
   }
 
-  nodesFromAddress(addr: number): SourceCFGNode[] {
-    return this._allGraphNodes.filter(
+  nodesFromAddress(addr: number): SourceCFGNode | undefined {
+    const filtered = this._allGraphNodes.filter(
       (n) => n.instructions.find((i) => i.startAddress === addr) !== undefined,
     );
+    if (filtered.length > 1) {
+      throw new Error(
+        `Found #${filtered.length} nodes for the same Wasm address ${addr}`,
+      );
+    }
+
+    if (filtered.length === 1) {
+      return filtered[0];
+    } else {
+      return undefined;
+    }
   }
 
   nodesFromSourceLoc(location: SourceCodeLocation): SourceCFGNode[] {
@@ -60,8 +71,8 @@ export class SourceControlFlowGraph {
     const nodes: SourceCFGNode[][] = [];
     for (const m of mappings) {
       const ns = this.nodesFromAddress(m.generatedColumn);
-      if (ns.length > 0) {
-        nodes.push(ns);
+      if (ns !== undefined) {
+        nodes.push([ns]);
       }
     }
 

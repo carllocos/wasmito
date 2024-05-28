@@ -1,4 +1,3 @@
-import { expect } from 'chai';
 import path from 'path';
 import { SourceMapfromDWARFWasm } from '../../src/source_mappers/source_map_builder';
 import { constructLanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
@@ -24,7 +23,7 @@ describe('Rust AST Control Flow Graph for Blink App', function () {
 
   it('build cfg function with id 7', function () {
     const startWasmAddr = 493; // Source Loc (44, 1)
-    const nodes = astCFG.nodesFromAddress(startWasmAddr);
-    expect(nodes.length).to.greaterThan(0);
+    const node = astCFG.nodesFromAddress(startWasmAddr);
+    assert(node !== undefined);
   });
 });
