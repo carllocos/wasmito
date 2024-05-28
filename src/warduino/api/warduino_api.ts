@@ -6,6 +6,7 @@ import { type ProxyCallResponse } from '../requests/fun_call_request';
 import { type BreakpointPolicy } from '../../debugger/breakpoint_policies';
 import { type Breakpoint } from '../../debugger/breakpoint';
 import { type WASMFunction } from '../../webassembly/wasm/wasm_function';
+import { type SourceCFGNode } from '../../cfg';
 
 export interface WARDuinoAPI {
   run: (timeout?: number) => Promise<boolean>;
@@ -67,6 +68,12 @@ export interface WARDuinoAPI {
 
   addHookAfter: (
     sourceCodeLocation: SourceCodeLocation,
+    hook: Hook,
+    timeout?: number,
+  ) => Promise<boolean>;
+
+  addHookBeforeSrcNode: (
+    node: SourceCFGNode,
     hook: Hook,
     timeout?: number,
   ) => Promise<boolean>;
