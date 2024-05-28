@@ -33,9 +33,14 @@ export interface CFGNode {
 
 export type WasmGraph = Map<number, CFGNode>;
 
+export interface WASMFunGraph {
+  entyNode: CFGNode;
+  graph: WasmGraph;
+}
+
 export class WasmControlFlowGraph {
   private readonly _wasm: WasmModule;
-  private readonly _cfgs: Map<number, [CFGNode, WasmGraph]>;
+  private readonly _cfgs: Map<number, WASMFunGraph>;
 
   constructor(wasm: WasmModule) {
     this._wasm = wasm;
@@ -43,11 +48,11 @@ export class WasmControlFlowGraph {
     this.buildGraphs();
   }
 
-  getCFG(funID: number): [CFGNode, WasmGraph] | undefined {
+  getCFG(funID: number): WASMFunGraph | undefined {
     return this._cfgs.get(funID);
   }
 
-  getCFGStrict(funID: number): [CFGNode, WasmGraph] {
+  getCFGStrict(funID: number): WASMFunGraph {
     const r = this.getCFG(funID);
     if (r === undefined) {
       throw new Error(`no CFG found for fun ${funID}`);
@@ -62,8 +67,11 @@ export class WasmControlFlowGraph {
     }
     for (const fid of funIds) {
       const p = path.join(outputDir, `wasmfun${fid}.dot`);
-      const [, g] = this.getCFGStrict(fid);
-      const content = wasmControlFlowGraphToDot(g, `function ${fid}`);
+      const funGraph = this.getCFGStrict(fid);
+      const content = wasmControlFlowGraphToDot(
+        funGraph.graph,
+        `function ${fid}`,
+      );
       writeFileSync(p, content);
       dots.push(content);
     }
@@ -143,7 +151,7 @@ export function getWasmNodeEdges(g: WasmGraph, n: CFGNode): CFGNode[] {
 export function buildControlFlowGraphFunction(
   wasm: WasmModule,
   funcID: number,
-): [CFGNode, WasmGraph] {
+): WASMFunGraph {
   const fun = wasm.getFunction(funcID);
 
   if (fun === undefined) {
@@ -275,7 +283,7 @@ function mergeNodes(g: WasmGraph, n1Address: number, n2Address: number): void {
   }
 }
 
-function buildCFGForFunc(fun: WASMFunction): [CFGNode, WasmGraph] {
+function buildCFGForFunc(fun: WASMFunction): WASMFunGraph {
   const g: WasmGraph = new Map();
   for (let i = 0; i < fun.allInstructions.length; i++) {
     const instr = fun.allInstructions[i];
@@ -291,7 +299,7 @@ function buildCFGForFunc(fun: WASMFunction): [CFGNode, WasmGraph] {
     },
   ]);
   const entryNode = getWasmCFGNode(g, fun.allInstructions[0].startAddress);
-  return [entryNode, g];
+  return { entyNode: entryNode, graph: g };
 }
 
 interface BlockScope {

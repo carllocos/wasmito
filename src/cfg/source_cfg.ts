@@ -4,6 +4,7 @@ import {
   type CFGNode,
   type WasmControlFlowGraph,
   getWasmCFGNode,
+  type WASMFunGraph,
 } from './wasm_cfg';
 // import { createLogger } from '../logger/logger';
 import {
@@ -260,8 +261,10 @@ function buildCTGraphForFunction(
 function createAllNodes(
   sourceMap: SourceMap,
   asts: AgnosticASTMap,
-  [entryNode, g]: [CFGNode, WasmGraph],
+  funGraph: WASMFunGraph,
 ): SourceCFGNode[] {
+  const entryNode = funGraph.entyNode;
+  const g = funGraph.graph;
   const nodes: SourceCFGNode[] = [];
 
   breadthFirstTraverseWasmCFGT(g, entryNode, {
@@ -383,9 +386,11 @@ function searchCTGNFromNode(
 }
 
 function addEdgesAndReturnEntryNodes(
-  [entryNode, g]: [CFGNode, WasmGraph],
+  funGraph: WASMFunGraph,
   nodes: SourceCFGNode[],
 ): SourceCFGNode[] {
+  const entryNode = funGraph.entyNode;
+  const g = funGraph.graph;
   const entryCTGNodes: SourceCFGNode[] = [];
   const entryNodesAdded = new Set<number>();
   const nodesToIgnore: Set<number> = new Set<number>();
