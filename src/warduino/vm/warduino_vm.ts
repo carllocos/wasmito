@@ -49,6 +49,10 @@ import {
   type SourceMap,
 } from '../../source_mappers/source_map';
 import { type LanguageAdaptor } from '../../language_adaptors';
+import {
+  sourceNodeFirstInstrStartAddr,
+  type SourceCFGNode,
+} from '../../cfg/source_cfg';
 
 // TODO Rename to Backend
 export abstract class WARDuinoVM implements WARDuinoAPI {
@@ -332,6 +336,18 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
       );
       return false;
     }
+  }
+
+  async addHookBeforeSrcNode(
+    node: SourceCFGNode,
+    hook: Hook,
+    timeout?: number | undefined,
+  ): Promise<boolean> {
+    const addr = sourceNodeFirstInstrStartAddr(node);
+    const req = new HookOnWasmAddrRequest(addr).addHook(hook);
+    req.before();
+    const response = await this.sendRequest(req, timeout);
+    return isSuccessfulMessage(response);
   }
 
   async addHookBefore(
