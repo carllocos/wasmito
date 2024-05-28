@@ -37,9 +37,8 @@ describe('Debug Operations on Rust AST Blink App', function () {
 
   it('"step into" debug operation', function () {
     const startWasmAddr = 493; // Source Loc (44, 1)
-    const sourceNodes = sourceCFG.nodesFromAddress(startWasmAddr);
-    expect(sourceNodes.length).to.equal(1);
-    const [sourceNode] = sourceNodes;
+    const sourceNode = sourceCFG.nodesFromAddress(startWasmAddr);
+    assert(sourceNode !== undefined);
     logNode(sourceNode);
 
     let nextPossibleLocations = DebugAgnosticOperations.stepIn(
