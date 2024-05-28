@@ -193,6 +193,24 @@ export function getCallInstructions(n: SourceCFGNode): WasmInstruction[] {
   );
 }
 
+export function sourceNodeFirstInstruction(n: SourceCFGNode): WasmInstruction {
+  return n.instructions[0];
+}
+
+export function sourceNodeFirstInstrStartAddr(n: SourceCFGNode): number {
+  return n.instructions[0].startAddress;
+}
+
+export function sourceNodeLastInstruction(n: SourceCFGNode): WasmInstruction {
+  return n.instructions[n.instructions.length - 1];
+}
+
+export function sourceNodeLastInstructionStartAddress(
+  n: SourceCFGNode,
+): number {
+  return n.instructions[n.instructions.length - 1].startAddress;
+}
+
 export interface FunctionTreeGraph {
   entyNodes: SourceCFGNode[];
   allNodes: SourceCFGNode[];
