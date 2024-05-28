@@ -96,7 +96,8 @@ export class SourceControlFlowGraph {
     const entryNodes: SourceCFGNode[] = [];
     const alreadyAdded = new Set<number>();
     if (sourceCFGHasOutgoingFunCallEdges(n)) {
-      for (const i of n.edgesToOutSideCalls) {
+      const callInstr = getCallInstructions(n);
+      for (const i of callInstr) {
         if (isCallInstruction(i)) {
           const graphi = this._astGraphs.get(i.funIdx);
           if (graphi === undefined) {
@@ -169,11 +170,16 @@ export interface SourceCFGNode {
   instructions: WasmInstruction[];
   instructionsIndexes: number[];
   addressesWithoutASTNode: Set<number>;
-  edgesToOutSideCalls: WasmInstruction[];
 }
 
 export function sourceCFGHasOutgoingFunCallEdges(n: SourceCFGNode): boolean {
-  return n.edgesToOutSideCalls.length > 0;
+  return getCallInstructions(n).length > 0;
+}
+
+export function getCallInstructions(n: SourceCFGNode): WasmInstruction[] {
+  return n.instructions.filter(
+    (i) => isCallInstruction(i) || isCallIndirect(i),
+  );
 }
 
 export interface FunctionTreeGraph {
@@ -432,7 +438,6 @@ function addEdgesAndReturnEntryNodes(
             // console.log(
             //   `mark node ${ctgn.nodeId} as a node with an edge to an outside call`,
             // );
-            ctgn.edgesToOutSideCalls.push(e.instrTo);
             continue;
           } else if (isBranchingInstruction(e.instrFrom)) {
             // case 2.c
@@ -508,7 +513,6 @@ function createNodeIfNeeded(
       edges: [],
       instructions: [],
       addressesWithoutASTNode: new Set(),
-      edgesToOutSideCalls: [],
       instructionsIndexes: [],
     };
     nodes.push(ncfg);

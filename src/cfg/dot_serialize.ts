@@ -5,6 +5,7 @@ import {
 import {
   type FunctionTreeGraph,
   sourceCFGHasOutgoingFunCallEdges,
+  getCallInstructions,
 } from './source_cfg';
 import {
   getWasmNodeEdges,
@@ -91,7 +92,8 @@ export function sourceControlFlowGraphToDot(
       continue;
     }
     if (sourceCFGHasOutgoingFunCallEdges(n)) {
-      for (const callinstr of n.edgesToOutSideCalls) {
+      const callInstrs = getCallInstructions(n);
+      for (const callinstr of callInstrs) {
         if (isCallInstruction(callinstr)) {
           exitNodesToAdd.add(callinstr.funIdx);
           funNames.set(callinstr.funIdx, callinstr.args[0]);
