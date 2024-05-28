@@ -35,6 +35,11 @@ function newTime(oldTime: u32): u32{
 }
 
 
+function addTime(v: u32): u32{
+    return v + 1;
+}
+
+
 export function main(): void {
   const led: u32 = 10;
   const pauseTimes: u32[] = [100, 300, 500, 600, 700, 800, 900, 1000];
@@ -43,7 +48,7 @@ export function main(): void {
 
   while (true) {
     for (let i = 0; i < pauseTimes.length; i++) {
-        const pause = pauseTimes[i];
+        const pause = addTime(pauseTimes[i]) + addTime(300);
         digitalWrite(led, PinVoltage.HIGH);
         delay(pause);
         digitalWrite(led, PinVoltage.LOW);
