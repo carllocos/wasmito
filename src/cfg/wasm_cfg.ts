@@ -36,6 +36,7 @@ export type WasmGraph = Map<number, CFGNode>;
 export interface WASMFunGraph {
   entyNode: CFGNode;
   graph: WasmGraph;
+  calls: WasmInstruction[];
 }
 
 export class WasmControlFlowGraph {
@@ -285,12 +286,19 @@ function mergeNodes(g: WasmGraph, n1Address: number, n2Address: number): void {
 
 function buildCFGForFunc(fun: WASMFunction): WASMFunGraph {
   const g: WasmGraph = new Map();
+  const funsCalled: WasmInstruction[] = [];
   for (let i = 0; i < fun.allInstructions.length; i++) {
     const instr = fun.allInstructions[i];
     const instrChangesFlow =
       isControlFlowInstruction(instr) || isWasmInstructionBlockBased(instr);
     const n = createNode(i, instrChangesFlow, [instr], [i], []);
     g.set(instr.startAddress, n);
+    if (isCallInstruction(instr) || isCallIndirect(instr)) {
+      if (isCallIndirect(instr)) {
+        console.error(`TODO CallIndirect not yet supported`);
+      }
+      funsCalled.push(instr);
+    }
   }
   buildCFGNodesHelper(g, fun.body, [
     {
@@ -299,7 +307,7 @@ function buildCFGForFunc(fun: WASMFunction): WASMFunGraph {
     },
   ]);
   const entryNode = getWasmCFGNode(g, fun.allInstructions[0].startAddress);
-  return { entyNode: entryNode, graph: g };
+  return { entyNode: entryNode, graph: g, calls: funsCalled };
 }
 
 interface BlockScope {
