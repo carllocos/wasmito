@@ -92,4 +92,25 @@ describe('Debug Operations on Rust AST Blink App', function () {
     expect(nextPossibleLocations.length).to.equal(1);
     logNode(nextPossibleLocations[0]);
   });
+
+  it('"step out" of a fun call', function () {
+    const startNodes = sourceCFG.nodesFromSourceLoc({
+      source: sourcePath,
+      linenr: 27,
+      columnStart: 5,
+    });
+
+    expect(startNodes.length).to.equal(1);
+    const [branch] = startNodes;
+    logNode(branch);
+    const nextPossibleLocations = DebugAgnosticOperations.stepOut(
+      sourceCFG,
+      wasmCFG,
+      branch,
+    );
+    for (const n of nextPossibleLocations) {
+      logNode(n);
+    }
+    expect(nextPossibleLocations.length).to.equal(1);
+  });
 });
