@@ -1,5 +1,4 @@
 // import { createLogger } from '../logger/logger';
-import { type WasmControlFlowGraph } from '../cfg';
 import {
   type SourceControlFlowGraph,
   type SourceCFGNode,
@@ -11,7 +10,6 @@ import {
 export interface AgnosticDebugOperations {
   stepIn: (
     sourceCFG: SourceControlFlowGraph,
-    wasmCFG: WasmControlFlowGraph,
     node: SourceCFGNode,
   ) => SourceCFGNode[];
 
@@ -27,7 +25,6 @@ export interface AgnosticDebugOperations {
 
   stepOut: (
     SourceCFGNode: SourceControlFlowGraph,
-    wasmCFG: WasmControlFlowGraph,
     node: SourceCFGNode,
   ) => SourceCFGNode[];
 }
@@ -42,7 +39,6 @@ function stepOver(
 
 function stepIn(
   sourceCFG: SourceControlFlowGraph,
-  wasmCFG: WasmControlFlowGraph,
   node: SourceCFGNode,
 ): SourceCFGNode[] {
   let ns: SourceCFGNode[] = [];
@@ -56,7 +52,7 @@ function stepIn(
   }
 
   if (ns.length === 0) {
-    return stepOut(sourceCFG, wasmCFG, node);
+    return stepOut(sourceCFG, node);
   } else {
     return ns;
   }
@@ -64,13 +60,12 @@ function stepIn(
 
 function stepOut(
   sourceCFG: SourceControlFlowGraph,
-  wasmCFG: WasmControlFlowGraph,
   node: SourceCFGNode,
 ): SourceCFGNode[] {
   const ns: SourceCFGNode[] = [];
   const added = new Set<number>();
   const funID = node.wasmFunOwner;
-  const wasmAddresses = wasmCFG.callSites(funID);
+  const wasmAddresses = sourceCFG.wasmCFG.callSites(funID);
   for (const addr of wasmAddresses) {
     const callNode = sourceCFG.nodesFromAddress(addr);
     if (callNode === undefined) {
