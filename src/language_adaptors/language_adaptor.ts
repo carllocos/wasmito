@@ -36,6 +36,10 @@ export class LanguageAdaptor {
     return this._srcCfg;
   }
 
+  get wasmCFG(): WasmControlFlowGraph {
+    return this._wasmCfg;
+  }
+
   async buildComplementaryContext(): Promise<void> {
     await this.buildASTS();
     this.buildSourceCFG();
