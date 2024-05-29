@@ -34,7 +34,11 @@ function stepOver(
   node: SourceCFGNode,
 ): SourceCFGNode[] {
   const ignoreExitNodes = true;
-  return sourceCFG.getNodeNeighbours(node, ignoreExitNodes);
+  const ns = sourceCFG.getNodeNeighbours(node, ignoreExitNodes);
+  if (ns.length === 0) {
+    return stepOut(sourceCFG, node);
+  }
+  return ns;
 }
 
 function stepIn(
