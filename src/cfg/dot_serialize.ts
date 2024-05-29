@@ -79,6 +79,7 @@ export function wasmControlFlowGraphToDot(
 export function sourceControlFlowGraphToDot(
   fgraph: FunctionTreeGraph,
   nameGraph: string,
+  includeInstructions: boolean = false,
 ): string {
   const entryNodes = new Set(fgraph.entyNodes.map((n) => n.nodeId));
   const allnodes = fgraph.allNodes;
@@ -112,13 +113,15 @@ export function sourceControlFlowGraphToDot(
       c += ` (call)`;
     }
     const instructionsStrs: string[] = [c];
-    for (let i = 0; i < n.instructions.length; i++) {
-      const instr = n.instructions[i];
-      const instrIdx = n.instructionsIndexes[i];
+    if (includeInstructions) {
+      for (let i = 0; i < n.instructions.length; i++) {
+        const instr = n.instructions[i];
+        const instrIdx = n.instructionsIndexes[i];
 
-      instructionsStrs.push(
-        `instr ${instrIdx}: (start ${instr.startAddress}, end ${instr.endAddress}) ${instr.name} ${instr.immediate ?? ''} ${instr.args}`,
-      );
+        instructionsStrs.push(
+          `instr ${instrIdx}: (start ${instr.startAddress}, end ${instr.endAddress}) ${instr.name} ${instr.immediate ?? ''} ${instr.args}`,
+        );
+      }
     }
     let s = '';
     if (instructionsStrs.length === 1) {
