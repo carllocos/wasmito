@@ -12,7 +12,6 @@ import {
   type SourceControlFlowGraph,
 } from '../../src/cfg/source_cfg';
 import { DebugAgnosticOperations } from '../../src/language_adaptors/debug_tree_operations';
-import { type WasmControlFlowGraph } from '../../src/cfg/wasm_cfg';
 
 describe('Debug Operations on AssemblyScript Blink App', function () {
   const pathToRootSource = path.resolve(
@@ -24,7 +23,6 @@ describe('Debug Operations on AssemblyScript Blink App', function () {
   const srcFileMapper = new Map<string, string>([['blink/blink.ts', srcPath]]);
 
   let sourceCFG: SourceControlFlowGraph;
-  let wasmCFG: WasmControlFlowGraph;
 
   function logNode(n: SourceCFGNode): void {
     const sp = n.node.startPosition;
@@ -69,7 +67,6 @@ describe('Debug Operations on AssemblyScript Blink App', function () {
     const [call] = callNode;
     const nextPossibleLocations = DebugAgnosticOperations.stepOut(
       sourceCFG,
-      wasmCFG,
       call,
     );
 
