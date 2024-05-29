@@ -179,6 +179,7 @@ export interface SourceCFGNode {
   nodeId: number;
   node: AgnosticNode;
   edges: SourceCFGNode[];
+  wasmFunOwner: number;
   instructions: WasmInstruction[];
   instructionsIndexes: number[];
   addressesWithoutASTNode: Set<number>;
@@ -243,7 +244,7 @@ function buildCTGraphForFunction(
   // console.log(`===================================`);
   // console.log();
   const graph = cfg.getCFGStrict(f.id);
-  const ns = createAllNodes(sourceMap, asts, graph);
+  const ns = createAllNodes(f.id, sourceMap, asts, graph);
   // console.log(`===================================`);
   // console.log(`Adding Edges for function ${f.id}`);
   // console.log(`===================================`);
@@ -259,6 +260,7 @@ function buildCTGraphForFunction(
 // }
 
 function createAllNodes(
+  funID: number,
   sourceMap: SourceMap,
   asts: AgnosticASTMap,
   funGraph: WASMFunGraph,
@@ -298,6 +300,7 @@ function createAllNodes(
 
         // const nodeStr = logNode(agnosticNode);
         const node = createNodeIfNeeded(
+          funID,
           nodes,
           agnosticNode,
           instr,
@@ -534,6 +537,7 @@ function searchNeighboursWithASTs(
 }
 
 function createNodeIfNeeded(
+  funID: number,
   nodes: SourceCFGNode[],
   agnosticNode: AgnosticNode,
   instrToAdd: WasmInstruction,
@@ -542,6 +546,7 @@ function createNodeIfNeeded(
   let ncfg = findNode(nodes, agnosticNode.node.id);
   if (ncfg === undefined) {
     ncfg = {
+      wasmFunOwner: funID,
       nodeId: agnosticNode.node.id,
       node: agnosticNode,
       edges: [],
