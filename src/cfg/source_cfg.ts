@@ -35,6 +35,7 @@ export class SourceControlFlowGraph {
   private readonly _astGraphs: Map<number, FunctionTreeGraph>;
   private readonly _allGraphNodes: SourceCFGNode[];
   private readonly _sourceMap: SourceMap;
+  private readonly _wasmCFG: WasmControlFlowGraph;
 
   constructor(
     asts: AgnosticASTMap,
@@ -42,12 +43,17 @@ export class SourceControlFlowGraph {
     cfg: WasmControlFlowGraph,
   ) {
     this._sourceMap = sourceMap;
+    this._wasmCFG = cfg;
     this._astGraphs = buildControlTreeGraph(sourceMap, asts, cfg);
     let allnodes: SourceCFGNode[] = [];
     for (const funGraph of this._astGraphs.values()) {
       allnodes = allnodes.concat(funGraph.allNodes);
     }
     this._allGraphNodes = allnodes;
+  }
+
+  get wasmCFG(): WasmControlFlowGraph {
+    return this._wasmCFG;
   }
 
   nodesFromAddress(addr: number): SourceCFGNode | undefined {
