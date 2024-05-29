@@ -10,6 +10,8 @@ import {
   isReturnBranch,
   isIfInstruction,
   instructionToString,
+  isCallInstruction,
+  isCallIndirect,
 } from '../webassembly/wasm/wasm_instruction';
 import { type WasmModule } from '../webassembly/wasm/wasm_module';
 import { WASMOpcodeNumber } from '../webassembly/wasm/wasm_opcode';
@@ -42,15 +44,21 @@ export interface WASMFunGraph {
 export class WasmControlFlowGraph {
   private readonly _wasm: WasmModule;
   private readonly _cfgs: Map<number, WASMFunGraph>;
+  private readonly _callSites: Map<number, Set<number>>;
 
   constructor(wasm: WasmModule) {
     this._wasm = wasm;
     this._cfgs = new Map();
     this.buildGraphs();
+    this._callSites = this.buildCallSites();
   }
 
   getCFG(funID: number): WASMFunGraph | undefined {
     return this._cfgs.get(funID);
+  }
+
+  callSites(funID: number): Set<number> {
+    return this._callSites.get(funID) ?? new Set();
   }
 
   getCFGStrict(funID: number): WASMFunGraph {
@@ -83,6 +91,32 @@ export class WasmControlFlowGraph {
     for (const f of this._wasm.functions) {
       this._cfgs.set(f.id, buildCFGForFunc(f));
     }
+  }
+
+  private buildCallSites(): Map<number, Set<number>> {
+    const callSitesMap = new Map<number, Set<number>>();
+
+    for (const f of this._wasm.functions) {
+      const fg = this.getCFGStrict(f.id);
+      for (const c of fg.calls) {
+        if (!isCallInstruction(c) && !isCallIndirect(c)) {
+          throw new Error(
+            `instruction stored in calls field should be a (indirect) call`,
+          );
+        }
+
+        if (isCallInstruction(c)) {
+          const funIDCalled = c.funIdx;
+          const callSites = callSitesMap.get(funIDCalled) ?? new Set<number>();
+          callSites.add(c.startAddress);
+          callSitesMap.set(funIDCalled, callSites);
+        } else if (isCallIndirect(c)) {
+          throw new Error(`TODO CallIndirect`);
+        }
+      }
+    }
+
+    return callSitesMap;
   }
 }
 
