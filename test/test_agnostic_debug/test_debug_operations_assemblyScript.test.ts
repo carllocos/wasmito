@@ -65,7 +65,7 @@ describe('Debug Operations on AssemblyScript Blink App', function () {
 
     expect(callNode.length).to.equal(1);
     const [call] = callNode;
-    const nextPossibleLocations = DebugAgnosticOperations.stepOut(
+    const nextPossibleLocations = DebugAgnosticOperations.stepOver(
       sourceCFG,
       call,
     );
