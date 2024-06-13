@@ -119,9 +119,9 @@ export class SourceControlFlowGraph {
         if (isCallInstruction(i)) {
           const graphi = this._astGraphs.get(i.funIdx);
           if (graphi === undefined) {
-            throw new Error(
-              `instruction ${instructionToString(i)} calls function ${i.funIdx} which has no SourceCFG`,
-            );
+            // this can happen if funIDX is an imported env fun
+            // or a function for which no source file is available
+            continue;
           }
           graphi.entyNodes.forEach((n) => {
             if (!alreadyAdded.has(n.nodeId)) {
