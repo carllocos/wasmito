@@ -11,7 +11,7 @@ import {
   type SourceCFGNode,
   type SourceControlFlowGraph,
 } from '../../src/cfg/source_cfg';
-import { DebugAgnosticOperations } from '../../src/language_adaptors/debug_tree_operations';
+import { DebugOperations } from '../../src/language_adaptors/debug_tree_operations';
 
 describe('Debug Operations on AssemblyScript Blink App', function () {
   const pathToRootSource = path.resolve(
@@ -65,10 +65,7 @@ describe('Debug Operations on AssemblyScript Blink App', function () {
 
     expect(callNode.length).to.equal(1);
     const [call] = callNode;
-    const nextPossibleLocations = DebugAgnosticOperations.stepOver(
-      sourceCFG,
-      call,
-    );
+    const nextPossibleLocations = DebugOperations.stepOver(sourceCFG, call);
 
     expect(nextPossibleLocations.length).to.equal(1);
   });
@@ -83,10 +80,7 @@ describe('Debug Operations on AssemblyScript Blink App', function () {
     expect(callNode.length).to.equal(1);
     const [call] = callNode;
     expect(sourceCFGHasOutgoingFunCallEdges(call)).to.be.equal(true);
-    const nextPossibleLocations = DebugAgnosticOperations.stepOver(
-      sourceCFG,
-      call,
-    );
+    const nextPossibleLocations = DebugOperations.stepOver(sourceCFG, call);
 
     expect(nextPossibleLocations.length).to.equal(2);
   });

@@ -87,7 +87,7 @@ function stepOut(
   return ns;
 }
 
-export const DebugAgnosticOperations: AgnosticDebugOperations = {
+export const DebugOperations: AgnosticDebugOperations = {
   stepIn,
   stepOver,
   stepOut,
