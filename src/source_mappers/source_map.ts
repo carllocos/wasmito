@@ -87,6 +87,10 @@ export class SourceMap {
     return this._sources;
   }
 
+  get mappings(): SourceCodeMapping[] {
+    return this._mappings.map(mappingItemToSourceCodeMapping);
+  }
+
   public generatedPositionFor(location: SourceCodeLocation): MappingItem[] {
     const positions: MappingItem[] = [];
     const candidates = this._mappings.filter((m) => {
