@@ -12,6 +12,44 @@ import {
   type SourceControlFlowGraph,
 } from '../../src/cfg/source_cfg';
 import { DebugOperations } from '../../src/language_adaptors/debug_tree_operations';
+import { type SourceCodeLocation } from '../../src/source_mappers/source_map';
+import { type ASTNodeSourceLocation } from '../../src/language_adaptors/agnostic_node';
+
+function sourceNodeFromLoc(
+  scfg: SourceControlFlowGraph,
+  loc: SourceCodeLocation,
+): SourceCFGNode {
+  const ns = scfg.nodesFromSourceLoc(loc);
+  assert(ns.length === 1);
+  return ns[0];
+}
+function logNode(n: SourceCFGNode): void {
+  const sp = n.node.startPosition;
+  const ep = n.node.endPosition;
+  console.log(
+    `{startLoc: (${sp.linenr}, ${sp.colnr}), endLoc: (${ep.linenr}, ${ep.colnr}), srcTxt: '${n.node.node.text}'}`,
+  );
+}
+
+function sourceNodeLoc(sn: SourceCFGNode): ASTNodeSourceLocation {
+  return sn.node.startPosition;
+}
+
+function sourceText(sn: SourceCFGNode): string {
+  return sn.node.node.text;
+}
+
+function sortIncreasingNr(ns: SourceCFGNode[]): SourceCFGNode[] {
+  return ns.sort((n1, n2) => {
+    const l1 = sourceNodeLoc(n1);
+    const l2 = sourceNodeLoc(n2);
+    if (l1.linenr !== l2.linenr) {
+      return l1.linenr - l2.linenr;
+    } else {
+      return l1.colnr - l2.colnr;
+    }
+  });
+}
 
 describe('Debug Operations on AssemblyScript Blink App', function () {
   const pathToRootSource = path.resolve(
@@ -23,14 +61,6 @@ describe('Debug Operations on AssemblyScript Blink App', function () {
   const srcFileMapper = new Map<string, string>([['blink/blink.ts', srcPath]]);
 
   let sourceCFG: SourceControlFlowGraph;
-
-  function logNode(n: SourceCFGNode): void {
-    const sp = n.node.startPosition;
-    const ep = n.node.endPosition;
-    console.log(
-      `{startLoc: (${sp.linenr}, ${sp.colnr}), endLoc: (${ep.linenr}, ${ep.colnr}), srcTxt: '${n.node.node.text}'}`,
-    );
-  }
 
   before('parse wasm module', async function () {
     try {
@@ -83,5 +113,124 @@ describe('Debug Operations on AssemblyScript Blink App', function () {
     const nextPossibleLocations = DebugOperations.stepOver(sourceCFG, call);
 
     expect(nextPossibleLocations.length).to.equal(2);
+  });
+});
+
+describe('Debug Operations on AS Intermittent Blink', function () {
+  this.timeout(30000);
+
+  const pathToRootSource = path.resolve(
+    './test/data/assemblyscript_examples/blink_intermittent/',
+  );
+  const sourceMapPath = path.resolve(pathToRootSource, 'main.wasm.map');
+  const wasmPath = path.resolve(pathToRootSource, 'main.wasm');
+  const sourcePath = path.resolve(pathToRootSource, 'blink_intermittent.ts');
+  const srcFileMapper = new Map<string, string>([
+    [
+      'mainblinkintermt.debug/assembly-blink-intermittent/blink_intermittent.ts',
+      sourcePath,
+    ],
+  ]);
+
+  let sourceCFG: SourceControlFlowGraph;
+
+  before('parse wasm module', async function () {
+    try {
+      const startPositioning: SourceOffsetStart = {
+        colNrStartNumber: 0,
+        lineNrStartNumber: 1,
+      };
+      const sm = await SourceMapfromSourceMapSpec(
+        sourceMapPath,
+        wasmPath,
+        'typescript',
+        startPositioning,
+        srcFileMapper,
+      );
+      const langAdaptor = await constructLanguageAdaptor(sm);
+      assert(langAdaptor.sourceCFG !== undefined);
+      sourceCFG = langAdaptor.sourceCFG;
+      langAdaptor.sourceMap.storeMappingsToJSON(
+        path.resolve(pathToRootSource, 'mappings.json'),
+      );
+    } catch (e) {
+      fail(`Could not construct sourcemap or langadaptor. Reason ${e}`);
+    }
+  });
+
+  it('"step into" "pinMode" call line (27, 5)', function () {
+    const startNode = sourceNodeFromLoc(sourceCFG, {
+      source: sourcePath,
+      linenr: 27,
+      columnStart: 5,
+    });
+
+    const nextNodes = DebugOperations.stepIn(sourceCFG, startNode);
+    expect(nextNodes.length).equal(1);
+
+    const srcTxt = sourceText(nextNodes[0]);
+    const nextLoc = sourceNodeLoc(nextNodes[0]);
+
+    expect(srcTxt).equal('mode');
+    expect(nextLoc.linenr).equal(6);
+    expect(nextLoc.colnr).equal(20);
+  });
+
+  it('"step over" "pinMode" call line (27, 5)', function () {
+    const startNode = sourceNodeFromLoc(sourceCFG, {
+      source: sourcePath,
+      linenr: 27,
+      columnStart: 5,
+    });
+
+    const nextNodes = DebugOperations.stepOver(sourceCFG, startNode);
+    expect(nextNodes.length).equal(1);
+
+    const srcTxt = sourceText(nextNodes[0]);
+    const nextLoc = sourceNodeLoc(nextNodes[0]);
+
+    expect(srcTxt).equal('true');
+    expect(nextLoc.linenr).equal(29);
+    expect(nextLoc.colnr).equal(12);
+  });
+
+  it('"step out" of a "pinMode" fun has 1 callside', function () {
+    const startNode = sourceNodeFromLoc(sourceCFG, {
+      source: sourcePath,
+      linenr: 6,
+      columnStart: 15,
+    });
+    const nextNodes = DebugOperations.stepOut(sourceCFG, startNode);
+    expect(nextNodes.length).equal(1);
+    const n = nextNodes[0];
+    const loc = sourceNodeLoc(n);
+    expect(sourceText(n)).equal('true');
+    expect(loc.linenr).equal(29);
+    expect(loc.colnr).equal(12);
+  });
+
+  it('"step out" of a "digitalWrite" fun has 3 callsides', function () {
+    const startNode = sourceNodeFromLoc(sourceCFG, {
+      source: sourcePath,
+      linenr: 14,
+      columnStart: 20,
+    });
+    const nextNodes = sortIncreasingNr(
+      DebugOperations.stepOut(sourceCFG, startNode),
+    );
+    expect(nextNodes.length).equal(3);
+
+    const lineNrs = [32, 34, 38];
+    const colNrs = [19, 19, 15];
+    const srcTxs = ['SHORT_SLEEP', 'SHORT_SLEEP', 'LONG_SLEEP'];
+    for (let i = 0; i < nextNodes.length; i++) {
+      const n = nextNodes[i];
+      const txt = sourceText(n);
+      expect(txt).equal(srcTxs[i]);
+
+      const loc = sourceNodeLoc(n);
+      expect(loc.linenr).equal(lineNrs[i]);
+      expect(loc.colnr).equal(colNrs[i]);
+    }
   });
 });
