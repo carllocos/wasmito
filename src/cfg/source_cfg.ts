@@ -162,7 +162,11 @@ export class SourceControlFlowGraph {
     return ns;
   }
 
-  serializeToDot(outputDir: string, funIds: number[] = []): string[] {
+  serializeToDot(
+    outputDir: string,
+    includeInstructions: boolean = false,
+    funIds: number[] = [],
+  ): string[] {
     if (funIds.length === 0) {
       this._sourceMap.wasm.functions.forEach((f) => funIds.push(f.id));
     }
@@ -172,7 +176,11 @@ export class SourceControlFlowGraph {
       const p = pathJoin(outputDir, `sourcefun${fid}.dot`);
       const fg = this.funtionSourceGraph(fid);
       if (fg?.allNodes !== undefined) {
-        const content = sourceControlFlowGraphToDot(fg, `function ${fid}`);
+        const content = sourceControlFlowGraphToDot(
+          fg,
+          `function ${fid}`,
+          includeInstructions,
+        );
         writeFileSync(p, content);
         dots.push(content);
       }
