@@ -65,7 +65,7 @@ function searchNodeHelper(
 ): Parser.SyntaxNode | undefined {
   // printNodeInfo(node);
   if (node.startPosition.row === row) {
-    if (node.startPosition.column <= col) {
+    if (node.startPosition.column === col) {
       return node;
     }
   }
