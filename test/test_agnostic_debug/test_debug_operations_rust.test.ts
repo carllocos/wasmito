@@ -7,7 +7,7 @@ import {
   type SourceCFGNode,
   type SourceControlFlowGraph,
 } from '../../src/cfg/source_cfg';
-import { DebugAgnosticOperations } from '../../src/language_adaptors/debug_tree_operations';
+import { DebugOperations } from '../../src/language_adaptors/debug_tree_operations';
 
 describe('Debug Operations on Rust AST Blink App', function () {
   const blinkApp = path.resolve('./test/data/rust_examples/blink/main.wasm');
@@ -41,18 +41,12 @@ describe('Debug Operations on Rust AST Blink App', function () {
     assert(sourceNode !== undefined);
     logNode(sourceNode);
 
-    let nextPossibleLocations = DebugAgnosticOperations.stepIn(
-      sourceCFG,
-      sourceNode,
-    );
+    let nextPossibleLocations = DebugOperations.stepIn(sourceCFG, sourceNode);
     expect(nextPossibleLocations.length).to.equal(1);
     logNode(nextPossibleLocations[0]);
 
     const [pinModeCall] = nextPossibleLocations;
-    nextPossibleLocations = DebugAgnosticOperations.stepIn(
-      sourceCFG,
-      pinModeCall,
-    );
+    nextPossibleLocations = DebugOperations.stepIn(sourceCFG, pinModeCall);
     expect(nextPossibleLocations.length).to.equal(1);
     logNode(nextPossibleLocations[0]);
   });
@@ -67,10 +61,7 @@ describe('Debug Operations on Rust AST Blink App', function () {
     expect(startNodes.length).to.equal(1);
     const [branch] = startNodes;
     logNode(branch);
-    let nextPossibleLocations = DebugAgnosticOperations.stepIn(
-      sourceCFG,
-      branch,
-    );
+    let nextPossibleLocations = DebugOperations.stepIn(sourceCFG, branch);
 
     expect(nextPossibleLocations.length).to.equal(2);
     for (const n of nextPossibleLocations) {
@@ -78,7 +69,7 @@ describe('Debug Operations on Rust AST Blink App', function () {
     }
 
     const [, useNode] = nextPossibleLocations;
-    nextPossibleLocations = DebugAgnosticOperations.stepIn(sourceCFG, useNode);
+    nextPossibleLocations = DebugOperations.stepIn(sourceCFG, useNode);
     expect(nextPossibleLocations.length).to.equal(1);
     logNode(nextPossibleLocations[0]);
   });
@@ -93,10 +84,7 @@ describe('Debug Operations on Rust AST Blink App', function () {
     expect(startNodes.length).to.equal(1);
     const [branch] = startNodes;
     logNode(branch);
-    const nextPossibleLocations = DebugAgnosticOperations.stepOut(
-      sourceCFG,
-      branch,
-    );
+    const nextPossibleLocations = DebugOperations.stepOut(sourceCFG, branch);
     for (const n of nextPossibleLocations) {
       logNode(n);
     }
