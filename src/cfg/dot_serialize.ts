@@ -108,7 +108,7 @@ export function sourceControlFlowGraphToDot(
     const record = n.instructions.length > 1 ? 'Mrecord' : 'record';
 
     const sp = n.node.startPosition;
-    let c = `(line ${sp.linenr}, col ${sp.colnr}) ${n.node.node.text}`;
+    let c = `(line ${sp.linenr}, col ${sp.colnr}) ${escapeText(n.node.node.text)}`;
     if (sourceCFGHasOutgoingFunCallEdges(n)) {
       c += ` (call)`;
     }
@@ -188,4 +188,22 @@ export function sourceControlFlowGraphToDot(
   const allEdges = edgesStr.join('');
 
   return `${header}{\n${nodesStr}${allEdges}}`;
+}
+
+const charsToEscape = ['<'];
+
+function escapeText(txt: string): string {
+  if (needsEscape(txt)) {
+    return `\\${txt}`;
+  }
+  return txt;
+}
+
+function needsEscape(txt: string): boolean {
+  for (const e of charsToEscape) {
+    if (txt.startsWith(e)) {
+      return true;
+    }
+  }
+  return false;
 }
