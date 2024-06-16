@@ -378,11 +378,15 @@ function parseInstruction(obj: any): WasmInstruction | undefined {
           return parseInstruction(o);
         })
         .filter((i: WasmInstruction | undefined) => i !== undefined);
+      let loopResultType: WASM.Type | undefined;
+
       if (obj.resulttype !== null) {
-        logger.error(`Account for resulttype field`);
-        throw new Error(`Account for the resulttype ${obj.resulttype}`);
+        loopResultType = WASM.typing.get(obj.resulttype);
+        if (loopResultType === undefined) {
+          throw new Error(`Loop resultType ${obj.resulttype} does not exist`);
+        }
       }
-      op = new LoopInstruction(label, opcodes, obj.resultType);
+      op = new LoopInstruction(label, opcodes, loopResultType);
       break;
     }
     case 'if': {
