@@ -268,11 +268,11 @@ export function isCallIndirect(inst: WasmInstruction): boolean {
 
 export class LoopInstruction extends WasmInstruction {
   public readonly label: string;
-  public readonly resultType?: string;
+  public readonly resultType?: WASM.Type;
   constructor(
     loopLabel: string,
     subInstructions: WasmInstruction[],
-    resultType?: string,
+    resultType?: WASM.Type,
   ) {
     super('loop', WASMOpcodeNumber.Loop);
     this.label = loopLabel;
