@@ -5,6 +5,7 @@ import {
   BlockInstruction,
   Branch,
   BranchIf,
+  BranchTable,
   CallInstruction,
   IfInstruction,
   LoopInstruction,
@@ -651,6 +652,16 @@ function parseInstruction(obj: any): WasmInstruction | undefined {
     }
     case 'extend_u/i32': {
       const opcode = obj.object + '.extend_u/i32';
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
+      break;
+    }
+    case 'br_table': {
+      const branchTargets = obj.args.map((a: any) => a.value);
+      op = new BranchTable(branchTargets);
+      break;
+    }
+    case 'rem_u': {
+      const opcode = obj.object + '.rem_u';
       op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
       break;
     }
