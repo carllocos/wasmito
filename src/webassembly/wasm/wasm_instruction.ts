@@ -130,19 +130,25 @@ export function isBranch(inst: WasmInstruction): inst is Branch {
 }
 
 export class BranchTable extends WasmInstruction {
-  private readonly _branchTarget: number;
-  constructor(branchTarget: number, opcodeLabels?: string[]) {
-    super('br_table', WASMOpcodeNumber.Br_table, branchTarget, opcodeLabels);
-    if (this.immediate === undefined || typeof this.immediate !== 'number') {
+  private readonly _branchTargets: number[];
+  constructor(branchTargets: number[]) {
+    super('br_table', WASMOpcodeNumber.Br_table, undefined, undefined);
+    if (branchTargets.length === 0) {
       throw new Error(
-        `immediate on br_table should be a number given ${this.immediate}`,
+        `branch_targets of br_table should be an array of at least one number`,
+      );
+    } else if (
+      branchTargets.find((bt) => typeof bt !== 'number') !== undefined
+    ) {
+      throw new Error(
+        `branch_targets of br_table should be an array of only numbers`,
       );
     }
-    this._branchTarget = branchTarget;
+    this._branchTargets = branchTargets;
   }
 
-  get brachTarget(): number {
-    return this._branchTarget;
+  get brachTargets(): number[] {
+    return this._branchTargets;
   }
 }
 
