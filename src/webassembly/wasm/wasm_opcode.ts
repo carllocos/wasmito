@@ -548,6 +548,8 @@ export function wasmOpcodeFromStr(opcode: string): WASMOpcodeNumber {
       return WASMOpcodeNumber.I32Mult;
     case 'i32.div_u':
       return WASMOpcodeNumber.I32DivUnsigned;
+    case 'i32.rem_u':
+      return WASMOpcodeNumber.I32RemUnsigned;
 
     case 'f32.add':
       return WASMOpcodeNumber.F32Add;
