@@ -12,9 +12,9 @@ import {
   instructionToString,
   isCallInstruction,
   isCallIndirect,
+  isBranchTable,
 } from '../webassembly/wasm/wasm_instruction';
 import { type WasmModule } from '../webassembly/wasm/wasm_module';
-import { WASMOpcodeNumber } from '../webassembly/wasm/wasm_opcode';
 import { wasmControlFlowGraphToDot } from './dot_serialize';
 import path from 'path';
 
@@ -404,8 +404,13 @@ function buildCFGNodesHelper(
           addEdge(g, instr.startAddress, afterBlockInstr.startAddress);
         }
         continue;
-      } else if (instr.opcodeNr === WASMOpcodeNumber.Br_table) {
-        throw new Error(`TODO add backedges for BR_table case`);
+      } else if (isBranchTable(instr)) {
+        for (const i of instr.brachTargets) {
+          const scodeIdx = blockScopes.length - (1 + i);
+          const targetBlock = blockScopes[scodeIdx];
+          const afterBlockInstr = targetBlock.instructionAfterBlock;
+          addEdge(g, instr.startAddress, afterBlockInstr.startAddress);
+        }
       } else if (isReturnBranch(instr)) {
         const targetBlock = blockScopes[0];
         const afterBlockInstr = targetBlock.instructionAfterBlock;
