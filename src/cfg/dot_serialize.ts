@@ -190,7 +190,7 @@ export function sourceControlFlowGraphToDot(
   return `${header}{\n${nodesStr}${allEdges}}`;
 }
 
-const charsToEscape = ['<'];
+const charsToEscape = ['<', '{'];
 
 function escapeText(txt: string): string {
   if (needsEscape(txt)) {
