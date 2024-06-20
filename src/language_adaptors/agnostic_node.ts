@@ -78,20 +78,19 @@ export function AgnosticNodeFromWasmAddress(
   asts: AgnosticASTMap,
   addr: number,
 ): AgnosticNode | undefined {
-  // trick to remove duplicates via set
-  const positions = Array.from(new Set(sourceMap.getOriginalPositionFor(addr)));
+  const positions = sourceMap.getOriginalPositionFor(addr);
   if (positions.length === 0) {
     return undefined;
   }
 
-  const nodes = new Set<[Parser.SyntaxNode, MappingItem]>();
+  const nodes = new Set<[Parser.SyntaxNode, SourceCodeLocation]>();
   for (const pos of positions) {
     const ast = asts.get(pos.source);
     if (ast === undefined) {
       logger.debug(`No AST found for source ${pos.source}`);
       return undefined;
     }
-    const node = ast.mostSpecialisedNode(pos.originalLine, pos.originalColumn);
+    const node = ast.mostSpecialisedNode(pos.linenr, pos.colnr);
     if (node !== undefined) {
       nodes.add([node, pos]);
     }
@@ -102,15 +101,15 @@ export function AgnosticNodeFromWasmAddress(
   if (nodesFound.length === 1) {
     const [nodeFound, mappingFound] = nodesFound[0];
     const an = new AgnosticNode(nodeFound, mappingFound.source);
-    an.addMapping(mappingItemToSourceCodeLocation(mappingFound));
+    an.addMapping(mappingFound);
     return an;
   } else if (nodesFound.length > 1) {
-    const positionsStr = positions.map(mappingItemToString).join(', ');
+    const positionsStr = positions.map(sourceCodeLocationToString).join(', ');
     throw new Error(
       `Multiple AST nodes found for addr ${addr} and locations ${positionsStr}`,
     );
   } else {
-    const positionsStr = positions.map(mappingItemToString).join(', ');
+    const positionsStr = positions.map(sourceCodeLocationToString).join(', ');
     logger.debug(
       `Could not find any AST node of for addr ${addr} that fits best with source locations [${positionsStr}]`,
     );
