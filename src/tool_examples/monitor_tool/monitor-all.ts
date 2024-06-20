@@ -353,10 +353,8 @@ async function registerBeforeHooks(
       return m;
     })
     .map((mappings) => {
-      const { generatedColumn, originalLine, originalColumn } = mappings[0];
-      const address = generatedColumn;
-      const linenr = originalLine;
-      const columnStart = originalColumn;
+      const { address, linenr, colnr } = mappings[0];
+      const columnStart = colnr;
       const columnEnd = columnStart;
       const opcode = sourceMap.wasm.instructionFromAddress(address); // TODO create opcodenr to string
       if (opcode === undefined) {
@@ -405,10 +403,8 @@ async function registerAfterHooks(
       return m;
     })
     .map((mappings) => {
-      const { generatedColumn, originalLine, originalColumn } = mappings[0];
-      const address = generatedColumn;
-      const linenr = originalLine;
-      const columnStart = originalColumn;
+      const { address, linenr, colnr } = mappings[0];
+      const columnStart = colnr;
       const columnEnd = columnStart;
       const opcode = sourceMap.wasm.instructionFromAddress(address); // TODO create opcodenr to string
       if (opcode === undefined) {

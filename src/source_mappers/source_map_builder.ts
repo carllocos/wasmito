@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { SourceMap } from './source_map';
+import { SourceMap, mappingItemToSourceCodeLocation } from './source_map';
 import { type MappingItem, SourceMapConsumer } from 'source-map';
 import { createLogger } from '../logger/logger';
 import { addr2line } from '../wasm-tools/addr2lines';
@@ -109,11 +109,12 @@ export async function SourceMapfromSourceMapSpec(
     }
   }
 
+  const sourceLocs = cleanedMappings.map(mappingItemToSourceCodeLocation);
   const sm = new SourceMap(
     targetLanguage,
     wasmPath,
     cleanedSources,
-    cleanedMappings,
+    sourceLocs,
     absPathMapper ?? new Map(),
   );
   return sm;
@@ -143,8 +144,8 @@ export async function SourceMapfromDWARFWasm(
 
   // convert to set to remove duplicates
   const sources = Array.from(new Set(mappings.map((m) => m.source)));
-
-  return new SourceMap(targetLanguage, wasmFilePath, sources, mappings);
+  const sourceLocations = mappings.map(mappingItemToSourceCodeLocation);
+  return new SourceMap(targetLanguage, wasmFilePath, sources, sourceLocations);
 }
 
 export async function createMappingForAddr(

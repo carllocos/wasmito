@@ -1,5 +1,5 @@
 import { type LineInfoPairs } from '../../webassembly/parsers/obj-dump_parser';
-import { SourceMap } from '../source_map';
+import { SourceMap, mappingItemToSourceCodeLocation } from '../source_map';
 import { type MappingItem } from 'source-map';
 
 export function createSourceMapForWAT(
@@ -8,7 +8,8 @@ export function createSourceMapForWAT(
   wasmPath: string,
 ): SourceMap {
   const mappings = createWAT2WASMMappings(sourcePath, lines);
-  return new SourceMap('wat', wasmPath, [sourcePath], mappings);
+  const sourceLocations = mappings.map(mappingItemToSourceCodeLocation);
+  return new SourceMap('wat', wasmPath, [sourcePath], sourceLocations);
 }
 
 function createWAT2WASMMappings(

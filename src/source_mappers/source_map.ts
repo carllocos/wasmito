@@ -71,7 +71,7 @@ export function sourceCodeLocationToString(m: SourceCodeLocation): string {
 export class SourceMap {
   private readonly _sourceToAbsPathSource: Map<string, string>;
   private readonly _sources: string[];
-  private readonly _mappings: MappingItem[];
+  private readonly _mappings: SourceCodeLocation[];
   private readonly _wasmPath: string;
   public readonly wasm: WasmModule;
   public readonly targetLanguage: string;
@@ -80,7 +80,7 @@ export class SourceMap {
     targetLanguage: string,
     wasmPath: string,
     sources: string[],
-    mappings: MappingItem[],
+    mappings: SourceCodeLocation[],
     srcToAbsPath = new Map<string, string>(),
   ) {
     this.targetLanguage = targetLanguage;
@@ -97,13 +97,15 @@ export class SourceMap {
   }
 
   get mappings(): SourceCodeLocation[] {
-    return this._mappings.map(mappingItemToSourceCodeLocation);
+    return this._mappings;
   }
 
-  public generatedPositionFor(location: SourceCodeLocation): MappingItem[] {
-    const positions: MappingItem[] = [];
+  public generatedPositionFor(
+    location: SourceCodeLocation2,
+  ): SourceCodeLocation[] {
+    const positions: SourceCodeLocation[] = [];
     const candidates = this._mappings.filter((m) => {
-      return m.originalLine === location.linenr;
+      return m.linenr === location.linenr;
     });
     logger.debug(
       `#${candidates.length} candidates for SourceLoc {${location.linenr}, ${location.columnStart}}`,
@@ -111,7 +113,7 @@ export class SourceMap {
 
     for (const c of candidates) {
       const colStart = location.columnStart;
-      if (colStart === c.originalColumn) {
+      if (colStart === c.colnr) {
         positions.push(c);
       }
     }
@@ -180,12 +182,12 @@ export class SourceMap {
   //   return positions;
   // }
 
-  public getOriginalPositionFor(wasmAddr: number): MappingItem[] {
+  public getOriginalPositionFor(wasmAddr: number): SourceCodeLocation[] {
     const maps = this._mappings
-      .filter((m: MappingItem) => {
-        return m.generatedColumn === wasmAddr;
+      .filter((m: SourceCodeLocation) => {
+        return m.address === wasmAddr;
       })
-      .map((m: MappingItem) => {
+      .map((m: SourceCodeLocation) => {
         const src = this._sourceToAbsPathSource.get(m.source);
         if (src !== undefined) {
           m.source = src;
@@ -194,7 +196,7 @@ export class SourceMap {
       });
 
     if (maps.length > 1) {
-      const mappings: string = maps.map(mappingItemToString).join(', ');
+      const mappings: string = maps.map(sourceCodeLocationToString).join(', ');
       logger.debug(
         `More than one possible mapping  found for wasmAddr ${wasmAddr} #${maps.length} mappings: [${mappings}]`,
       );
@@ -245,7 +247,7 @@ export class SourceMap {
     filePath: string,
     onlyExistingSource: boolean = false,
   ): void {
-    let maps = this._mappings.map((m: MappingItem) => {
+    let maps = this._mappings.map((m: SourceCodeLocation) => {
       const src = this._sourceToAbsPathSource.get(m.source);
       if (src !== undefined) {
         m.source = src;
@@ -255,7 +257,7 @@ export class SourceMap {
     if (onlyExistingSource) {
       maps = maps.filter((m) => isFilePath(m.source));
     }
-    const mpsStr = maps.map(mappingItemToString).join(',');
+    const mpsStr = maps.map(sourceCodeLocationToString).join(',');
 
     const content = `{"language":"${this.targetLanguage}", "mappings":[${mpsStr}]}`;
     writeFileSync(filePath, content);
