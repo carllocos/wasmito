@@ -8,6 +8,7 @@ import {
 } from './wasm_cfg';
 // import { createLogger } from '../logger/logger';
 import {
+  sourceCodeLocationToString,
   type SourceCodeLocation,
   type SourceCodeLocation2,
   type SourceMap,
@@ -22,13 +23,13 @@ import {
 } from '../webassembly/wasm/wasm_instruction';
 import {
   type AgnosticASTMap,
-  AgnosticNodeFromWasmAddress,
   type AgnosticNode,
 } from '../language_adaptors/agnostic_node';
 import { pathJoin } from '../util/file_util';
 import { sourceControlFlowGraphToDot } from './dot_serialize';
 import { writeFileSync } from 'fs';
 import { type WASMFunction } from '../webassembly/wasm/wasm_function';
+import * as crypto from 'crypto';
 
 // const logger = createLogger('ASTControlFlowGraph');
 
@@ -192,7 +193,8 @@ export class SourceControlFlowGraph {
 
 export interface SourceCFGNode {
   nodeId: number;
-  node: AgnosticNode;
+  node?: AgnosticNode;
+  sourceLocation: SourceCodeLocation;
   edges: SourceCFGNode[];
   wasmFunOwner: number;
   instructions: WasmInstruction[];
@@ -292,12 +294,14 @@ function createAllNodes(
       let prevNode: SourceCFGNode | undefined;
       for (let i = n.instructions.length - 1; i >= 0; i--) {
         const instr = n.instructions[i];
-        const agnosticNode = AgnosticNodeFromWasmAddress(
-          sourceMap,
-          asts,
+        const sourceLocations = sourceMap.getOriginalPositionFor(
           instr.startAddress,
         );
-        if (agnosticNode === undefined) {
+        if (sourceLocations.length > 1) {
+          throw new Error(
+            `more than one source location found for addr ${instr.startAddress}`,
+          );
+        } else if (sourceLocations.length === 0) {
           // console.log(`instruction ${instructionToString(instr)} has no node`);
           if (prevNode !== undefined) {
             // const prevStr = logNode(prevNode.node);
@@ -312,12 +316,12 @@ function createAllNodes(
           }
           continue;
         }
-
+        const sourceLocation = sourceLocations[0];
         // const nodeStr = logNode(agnosticNode);
         const node = createNodeIfNeeded(
           funID,
           nodes,
-          agnosticNode,
+          sourceLocation,
           instr,
           n.instructionsIndexes[i],
         );
@@ -554,16 +558,17 @@ function searchNeighboursWithASTs(
 function createNodeIfNeeded(
   funID: number,
   nodes: SourceCFGNode[],
-  agnosticNode: AgnosticNode,
+  sourceLocation: SourceCodeLocation,
   instrToAdd: WasmInstruction,
   instrIndex: number,
 ): SourceCFGNode {
-  let ncfg = findNode(nodes, agnosticNode.node.id);
+  const id = generateNodeID(sourceLocation);
+  let ncfg = findNode(nodes, id);
   if (ncfg === undefined) {
     ncfg = {
       wasmFunOwner: funID,
-      nodeId: agnosticNode.node.id,
-      node: agnosticNode,
+      nodeId: id,
+      sourceLocation,
       edges: [],
       instructions: [],
       addressesWithoutASTNode: new Set(),
@@ -607,4 +612,16 @@ function addEdge(an1: SourceCFGNode, an2: SourceCFGNode): void {
     //   `addEdge ${an1.nodeId} -> ${an2.nodeId} cancelled as edge already present`,
     // );
   }
+}
+
+function generateNodeID(sourceLocation: SourceCodeLocation): number {
+  const idStr = `${sourceLocation.source}\t${sourceLocation.name}\t${sourceLocation.linenr}\t${sourceLocation.source}\t${sourceLocation.address}`;
+  const hasher = crypto.createHash('md5');
+  const id = Number(`0x${hasher.update(idStr).digest('hex')}`);
+  if (isNaN(id)) {
+    throw new Error(
+      `Could not genetate a valid node id for ${sourceCodeLocationToString(sourceLocation)}`,
+    );
+  }
+  return id;
 }
