@@ -87,8 +87,9 @@ export class SourceMap {
     this._wasmPath = wasmPath;
     this._sourceToAbsPathSource = srcToAbsPath;
     this._sources = sources;
-    this._mappings = mappings;
 
+    // trick to remove duplicates via set
+    this._mappings = Array.from(new Set(mappings));
     this.wasm = new WasmModule(this._wasmPath);
   }
 
