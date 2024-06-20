@@ -8,41 +8,15 @@ import { constructLanguageAdaptor } from '../../src/language_adaptors/language_a
 import assert, { fail } from 'assert';
 import {
   sourceCFGHasOutgoingFunCallEdges,
-  type SourceCFGNode,
   type SourceControlFlowGraph,
 } from '../../src/cfg/source_cfg';
 import { DebugOperations } from '../../src/language_adaptors/debug_tree_operations';
-import { type SourceCodeLocation } from '../../src/source_mappers/source_map';
-import { type ASTNodeSourceLocation } from '../../src/language_adaptors/agnostic_node';
-
-function sourceNodeFromLoc(
-  scfg: SourceControlFlowGraph,
-  loc: SourceCodeLocation,
-): SourceCFGNode {
-  const ns = scfg.nodesFromSourceLoc(loc);
-  assert(ns.length === 1);
-  return ns[0];
-}
-
-function sourceNodeLoc(sn: SourceCFGNode): ASTNodeSourceLocation {
-  return sn.node.startPosition;
-}
-
-function sourceText(sn: SourceCFGNode): string {
-  return sn.node.node.text;
-}
-
-function sortIncreasingNr(ns: SourceCFGNode[]): SourceCFGNode[] {
-  return ns.sort((n1, n2) => {
-    const l1 = sourceNodeLoc(n1);
-    const l2 = sourceNodeLoc(n2);
-    if (l1.linenr !== l2.linenr) {
-      return l1.linenr - l2.linenr;
-    } else {
-      return l1.colnr - l2.colnr;
-    }
-  });
-}
+import {
+  sortIncreasingNr,
+  sourceNodeFromLoc,
+  sourceNodeLoc,
+  sourceText,
+} from './resuable_code';
 
 describe('Debug Operations on AssemblyScript Blink App', function () {
   const pathToRootSource = path.resolve(

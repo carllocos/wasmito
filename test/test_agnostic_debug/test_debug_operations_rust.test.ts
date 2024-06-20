@@ -3,49 +3,15 @@ import path from 'path';
 import { SourceMapfromDWARFWasm } from '../../src/source_mappers/source_map_builder';
 import { constructLanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 import assert, { fail } from 'assert';
-import {
-  type SourceCFGNode,
-  type SourceControlFlowGraph,
-} from '../../src/cfg/source_cfg';
+import { type SourceControlFlowGraph } from '../../src/cfg/source_cfg';
 import { DebugOperations } from '../../src/language_adaptors/debug_tree_operations';
-import { type ASTNodeSourceLocation, type SourceCodeLocation } from '../../src';
-
-function sourceNodeFromLoc(
-  scfg: SourceControlFlowGraph,
-  loc: SourceCodeLocation,
-): SourceCFGNode {
-  const ns = scfg.nodesFromSourceLoc(loc);
-  assert(ns.length === 1);
-  return ns[0];
-}
-
-function sourceNodeLoc(sn: SourceCFGNode): ASTNodeSourceLocation {
-  return sn.node.startPosition;
-}
-
-function sourceText(sn: SourceCFGNode): string {
-  return sn.node.node.text;
-}
-
-function logNode(n: SourceCFGNode): void {
-  const sp = n.node.startPosition;
-  const ep = n.node.endPosition;
-  console.log(
-    `{startLoc: (${sp.linenr}, ${sp.colnr}), endLoc: (${ep.linenr}, ${ep.colnr}), srcTxt: '${n.node.node.text}'}`,
-  );
-}
-
-function sortIncreasingNr(ns: SourceCFGNode[]): SourceCFGNode[] {
-  return ns.sort((n1, n2) => {
-    const l1 = sourceNodeLoc(n1);
-    const l2 = sourceNodeLoc(n2);
-    if (l1.linenr !== l2.linenr) {
-      return l1.linenr - l2.linenr;
-    } else {
-      return l1.colnr - l2.colnr;
-    }
-  });
-}
+import {
+  logNode,
+  sortIncreasingNr,
+  sourceNodeFromLoc,
+  sourceNodeLoc,
+  sourceText,
+} from './resuable_code';
 
 describe('Debug Operations on Rust AST Blink App', function () {
   const blinkApp = path.resolve('./test/data/rust_examples/blink/main.wasm');
