@@ -1,11 +1,9 @@
 import type Parser from 'web-tree-sitter';
 import {
   type SourceCodeLocation,
-  mappingItemToSourceCodeLocation,
-  mappingItemToString,
   type SourceMap,
+  sourceCodeLocationToString,
 } from '../source_mappers/source_map';
-import { type MappingItem } from 'source-map';
 import { type AgnosticAST } from '../ast';
 import { nodePositionToSourceLocation } from '../tree-sitter/tree-sitter-parser';
 import { createLogger } from '../logger/logger';
