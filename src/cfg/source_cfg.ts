@@ -114,7 +114,7 @@ export class SourceControlFlowGraph {
 
   getFunctionEntryNodesFromNode(n: SourceCFGNode): SourceCFGNode[] {
     const entryNodes: SourceCFGNode[] = [];
-    const alreadyAdded = new Set<number>();
+    const alreadyAdded = new Set<string>();
     if (sourceCFGHasOutgoingFunCallEdges(n)) {
       const callInstr = getCallInstructions(n);
       for (const i of callInstr) {
@@ -145,7 +145,7 @@ export class SourceControlFlowGraph {
     n: SourceCFGNode,
     ignoreExitNodes: boolean = false,
   ): SourceCFGNode[] {
-    const alreadyAdded = new Set<number>();
+    const alreadyAdded = new Set<string>();
     const ns: SourceCFGNode[] = [];
     for (const e of n.edges) {
       if (!alreadyAdded.has(e.nodeId)) {
@@ -192,7 +192,7 @@ export class SourceControlFlowGraph {
 }
 
 export interface SourceCFGNode {
-  nodeId: number;
+  nodeId: string;
   node?: AgnosticNode;
   sourceLocation: SourceCodeLocation;
   edges: SourceCFGNode[];
@@ -414,7 +414,7 @@ function addEdgesAndReturnEntryNodes(
   const entryNode = funGraph.entyNode;
   const g = funGraph.graph;
   const entryCTGNodes: SourceCFGNode[] = [];
-  const entryNodesAdded = new Set<number>();
+  const entryNodesAdded = new Set<string>();
   const nodesToIgnore: Set<number> = new Set<number>();
   breadthFirstTraverseWasmCFGT(g, entryNode, {
     onNode: (n: CFGNode) => {
@@ -587,7 +587,7 @@ function createNodeIfNeeded(
 
 function findNode(
   nodes: SourceCFGNode[],
-  id: number,
+  id: string,
 ): SourceCFGNode | undefined {
   return nodes.find((n) => {
     return n.nodeId === id;
@@ -614,14 +614,8 @@ function addEdge(an1: SourceCFGNode, an2: SourceCFGNode): void {
   }
 }
 
-function generateNodeID(sourceLocation: SourceCodeLocation): number {
-  const idStr = `${sourceLocation.source}\t${sourceLocation.name}\t${sourceLocation.linenr}\t${sourceLocation.source}\t${sourceLocation.address}`;
+function generateNodeID(sourceLocation: SourceCodeLocation): string {
+  const idStr = `${sourceLocation.source}\t${sourceLocation.name}\t${sourceLocation.linenr}\t${sourceLocation.colnr}`;
   const hasher = crypto.createHash('md5');
-  const id = Number(`0x${hasher.update(idStr).digest('hex')}`);
-  if (isNaN(id)) {
-    throw new Error(
-      `Could not genetate a valid node id for ${sourceCodeLocationToString(sourceLocation)}`,
-    );
-  }
-  return id;
+  return hasher.update(idStr).digest('hex');
 }

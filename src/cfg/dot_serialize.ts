@@ -84,7 +84,7 @@ export function sourceControlFlowGraphToDot(
   const entryNodes = new Set(fgraph.entyNodes.map((n) => n.nodeId));
   const allnodes = fgraph.allNodes;
   const header = `digraph "CFG of ${nameGraph}" `;
-  const nodesDone = new Set<number>();
+  const nodesDone = new Set<string>();
   let nodesStr = '';
   const exitNodesToAdd = new Set<number>();
   const funNames = new Map<number, string>();
@@ -160,7 +160,7 @@ export function sourceControlFlowGraphToDot(
   nodesStr += `${entryNodeID} [shape=record, label="EntryNode"];\n`;
   // }
 
-  const alreadyVisitedNodes = new Set<number>();
+  const alreadyVisitedNodes = new Set<string>();
   const edgesStr: string[] = [];
   for (const n of allnodes) {
     if (alreadyVisitedNodes.has(n.nodeId)) {
