@@ -4,7 +4,7 @@ import { isAbsolutePath, isFilePath, pathJoin } from '../../util/file_util';
 import { createLogger } from '../../logger/logger';
 import { type ASConfig } from './asconfig';
 import { getPath2AssemblyScriptLib } from '../../project_config';
-import { SourceMap } from '../source_map';
+import { SourceMap, mappingItemToSourceCodeLocation } from '../source_map';
 
 export type ASMapping = MappingItem;
 
@@ -101,12 +101,8 @@ export async function SourceMapFromASConfigPath(
     );
   }
 
-  const sm = new SourceMap(
-    'typescript',
-    config.wasmPath,
-    sources,
-    cleanedMappings,
-  );
+  const sourceLocs = cleanedMappings.map(mappingItemToSourceCodeLocation);
+  const sm = new SourceMap('typescript', config.wasmPath, sources, sourceLocs);
   return sm;
 }
 

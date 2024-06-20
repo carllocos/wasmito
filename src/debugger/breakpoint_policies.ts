@@ -86,7 +86,7 @@ export abstract class BreakpointPolicy {
       return false;
     }
 
-    const addr = mappings[0].generatedColumn;
+    const addr = mappings[0].address;
     const request = new RemoveHookOnWasmAddrRequest(addr).before();
 
     const response = await this.vm.sendRequest(request, timeout);
