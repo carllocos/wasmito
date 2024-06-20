@@ -14,8 +14,9 @@ import {
 } from './resuable_code';
 
 describe('Debug Operations on Rust AST Blink App', function () {
-  const blinkApp = path.resolve('./test/data/rust_examples/blink/main.wasm');
-  const sourcePath = path.resolve('./test/data/rust_examples/blink/main.rs');
+  const pathToDir = path.resolve('./test/data/rust_examples/blink/');
+  const blinkApp = path.join(pathToDir, 'main.wasm');
+  const sourcePath = path.join(pathToDir, 'main.rs');
   let sourceCFG: SourceControlFlowGraph;
 
   this.timeout(10000);
@@ -26,6 +27,9 @@ describe('Debug Operations on Rust AST Blink App', function () {
       const langAdaptor = await constructLanguageAdaptor(sm);
       assert(langAdaptor.sourceCFG !== undefined);
       sourceCFG = langAdaptor.sourceCFG;
+      sourceCFG.wasmCFG.serializeToDot(pathToDir);
+      const includeInstructions = false;
+      sourceCFG.serializeToDot(pathToDir, includeInstructions);
     } catch (e) {
       fail(`Could not construct sourcemap or langadaptor. Reason ${e}`);
     }
@@ -89,12 +93,11 @@ describe('Debug Operations on Rust AST Blink App', function () {
 });
 
 describe('Debug Operations on Rust AST Intermittent Blink', function () {
-  const app = path.resolve(
-    './test/data/rust_examples/blink_intermittent/blink_intermittent.wasm',
+  const pathToDir = path.resolve(
+    './test/data/rust_examples/blink_intermittent/',
   );
-  const sourcePath = path.resolve(
-    './test/data/rust_examples/blink_intermittent/blink_intermittent.rs',
-  );
+  const app = path.join(pathToDir, 'blink_intermittent.wasm');
+  const sourcePath = path.join(pathToDir, 'blink_intermittent.rs');
   let sourceCFG: SourceControlFlowGraph;
 
   this.timeout(30000);
@@ -105,6 +108,9 @@ describe('Debug Operations on Rust AST Intermittent Blink', function () {
       const langAdaptor = await constructLanguageAdaptor(sm);
       assert(langAdaptor.sourceCFG !== undefined);
       sourceCFG = langAdaptor.sourceCFG;
+      sourceCFG.wasmCFG.serializeToDot(pathToDir);
+      const includeInstructions = false;
+      sourceCFG.serializeToDot(pathToDir, includeInstructions);
     } catch (e) {
       fail(`Could not construct sourcemap or langadaptor. Reason ${e}`);
     }
