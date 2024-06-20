@@ -61,13 +61,13 @@ export interface WARDuinoAPI {
 
   // Hook API
   addHookBefore: (
-    sourceCodeLocation: SourceCodeLocation,
+    sourceCodeLocation: SourceCodeLocation2,
     hook: Hook,
     timeout?: number,
   ) => Promise<boolean>;
 
   addHookAfter: (
-    sourceCodeLocation: SourceCodeLocation,
+    sourceCodeLocation: SourceCodeLocation2,
     hook: Hook,
     timeout?: number,
   ) => Promise<boolean>;
