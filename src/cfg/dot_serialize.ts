@@ -107,8 +107,12 @@ export function sourceControlFlowGraphToDot(
     }
     const record = n.instructions.length > 1 ? 'Mrecord' : 'record';
 
-    const sp = n.node.startPosition;
-    let c = `(line ${sp.linenr}, col ${sp.colnr}) ${escapeText(n.node.node.text)}`;
+    const sp = n.sourceLocation;
+    let srcTxt = n.sourceLocation.name;
+    if (n.node !== undefined) {
+      srcTxt = escapeText(n.node.node.text);
+    }
+    let c = `(line ${sp.linenr}, col ${sp.colnr}) ${srcTxt}`;
     if (sourceCFGHasOutgoingFunCallEdges(n)) {
       c += ` (call)`;
     }
