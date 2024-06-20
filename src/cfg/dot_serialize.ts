@@ -194,20 +194,16 @@ export function sourceControlFlowGraphToDot(
   return `${header}{\n${nodesStr}${allEdges}}`;
 }
 
-const charsToEscape = ['<', '{'];
+const charsToEscape = new Set<string>(['<', '{', '}']);
 
 function escapeText(txt: string): string {
-  if (needsEscape(txt)) {
-    return `\\${txt}`;
-  }
-  return txt;
-}
-
-function needsEscape(txt: string): boolean {
-  for (const e of charsToEscape) {
-    if (txt.startsWith(e)) {
-      return true;
+  const t: string[] = [];
+  for (const c of txt) {
+    if (charsToEscape.has(c)) {
+      t.push(`\\${c}`);
+    } else {
+      t.push(c);
     }
   }
-  return false;
+  return t.join('');
 }
