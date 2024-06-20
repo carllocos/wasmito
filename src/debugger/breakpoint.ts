@@ -7,14 +7,14 @@ import { createLogger } from '../logger/logger';
 import type winston from 'winston';
 import {
   equalSourceCodeLocations,
-  type SourceCodeLocation,
+  type SourceCodeLocation2,
 } from '../source_mappers/source_map';
 
 // TODO reimplement as extension to HookWithSub? Although this is bound to an address and should be extensible to support binding to events
 export class Breakpoint implements ISubscription<WasmState> {
   protected logger: winston.Logger;
 
-  public readonly sourceCodeLocation: SourceCodeLocation;
+  public readonly sourceCodeLocation: SourceCodeLocation2;
   private _hooks: Hook[];
   private readonly removedListeners: Set<(data: WasmState) => void>;
 
@@ -22,7 +22,7 @@ export class Breakpoint implements ISubscription<WasmState> {
 
   private listeners: Array<(state: WasmState) => void>;
   constructor(
-    sourceCodeLocation: SourceCodeLocation,
+    sourceCodeLocation: SourceCodeLocation2,
     stateOnBreakpoint?: StateRequest,
   ) {
     this.logger = createLogger('Breakpoint');

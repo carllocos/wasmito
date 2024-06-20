@@ -1,5 +1,5 @@
 import { type Hook } from '../../hooks/hook';
-import { type SourceCodeLocation } from '../../source_mappers';
+import { type SourceCodeLocation2 } from '../../source_mappers';
 import { type WASM, type WasmState } from '../../webassembly/wasm';
 import { type StateRequest } from '../requests/inspect_request';
 import { type ProxyCallResponse } from '../requests/fun_call_request';
