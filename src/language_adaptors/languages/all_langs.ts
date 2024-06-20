@@ -1,7 +1,8 @@
 import { AssemblyScriptLangConfig } from './assemblyscript_config';
 import { type LanguageConfiguration } from './language_config';
+import { RustLangConfig } from './rust_config';
 
-const LanguagesConfig = [AssemblyScriptLangConfig];
+const LanguagesConfig = [AssemblyScriptLangConfig, RustLangConfig];
 
 export function getLangConfigFromExtension(
   ext: string,
