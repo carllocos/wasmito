@@ -67,7 +67,7 @@ function stepOut(
   node: SourceCFGNode,
 ): SourceCFGNode[] {
   const ns: SourceCFGNode[] = [];
-  const added = new Set<number>();
+  const added = new Set<string>();
   const funID = node.wasmFunOwner;
   const wasmAddresses = sourceCFG.wasmCFG.callSites(funID);
   for (const addr of wasmAddresses) {
