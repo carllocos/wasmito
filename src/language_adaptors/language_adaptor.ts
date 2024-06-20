@@ -1,10 +1,12 @@
 import { AgnosticAST } from '../ast/angostic-ast';
-import { isFilePath } from '../util/file_util';
+import { getFileExtension, isFilePath } from '../util/file_util';
 import { createLogger } from '../logger/logger';
 import { type SourceMap } from '../source_mappers/source_map';
 import { type AgnosticASTMap } from './agnostic_node';
 import { WasmControlFlowGraph } from '../cfg/wasm_cfg';
 import { SourceControlFlowGraph } from '../cfg/source_cfg';
+import { getLangConfigFromExtension } from './languages/all_langs';
+import { type LanguageConfiguration } from './languages/language_config';
 
 const logger = createLogger('LanguageAdaptor');
 
@@ -42,7 +44,7 @@ export class LanguageAdaptor {
   }
 
   private async buildASTS(): Promise<void> {
-    const availableSources: string[] = [];
+    const availableSources: Array<[string, LanguageConfiguration]> = [];
     for (const s of this.sourceMap.sources) {
       if (!isFilePath(s)) {
         logger.info(
@@ -50,19 +52,26 @@ export class LanguageAdaptor {
         );
         continue;
       }
-      availableSources.push(s);
+
+      const ext = getFileExtension(s);
+      if (ext === undefined) {
+        logger.info(
+          `Will not create an AST for source file ${s} as such filepath has no file extension`,
+        );
+        continue;
+      }
+      const conf = getLangConfigFromExtension(ext);
+      if (conf === undefined) {
+        logger.info(`No parser found for ${s} so will ignore file`);
+        continue;
+      }
+      availableSources.push([s, conf]);
     }
 
-    for (const s of availableSources) {
-      const ast = new AgnosticAST(s, this.sourceMap.targetLanguage);
-      // todo: remove tmp if introduced due to the lack of wat parser
-      if (
-        this.sourceMap.targetLanguage !== 'wat' &&
-        this.sourceMap.targetLanguage !== 'wast'
-      ) {
-        await ast.buildAST();
-        this._asts.set(s, ast);
-      }
+    for (const [s, langConfig] of availableSources) {
+      const ast = new AgnosticAST(s, langConfig);
+      await ast.buildAST();
+      this._asts.set(s, ast);
     }
   }
 
