@@ -115,7 +115,16 @@ export function sourceControlFlowGraphToDot(
     srcTxt = escapeText(srcTxt);
     let c = `(line ${sp.linenr}, col ${sp.colnr}) ${srcTxt}`;
     if (sourceCFGHasOutgoingFunCallEdges(n)) {
-      c += ` (call)`;
+      const calls = getCallInstructions(n);
+      const direct: number[] = [];
+      for (const call of calls) {
+        if (isCallInstruction(call)) {
+          direct.push(call.funIdx);
+        } else if (isCallIndirect(call)) {
+          throw new Error(`TODO`);
+        }
+      }
+      c += ` (call ${direct.join(', ')})`;
     }
     const instructionsStrs: string[] = [c];
     if (includeInstructions) {
