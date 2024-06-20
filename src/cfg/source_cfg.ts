@@ -8,7 +8,6 @@ import {
 } from './wasm_cfg';
 // import { createLogger } from '../logger/logger';
 import {
-  sourceCodeLocationToString,
   type SourceCodeLocation,
   type SourceCodeLocation2,
   type SourceMap,
