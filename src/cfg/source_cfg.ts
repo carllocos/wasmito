@@ -25,7 +25,7 @@ import {
   type AgnosticASTMap,
   type AgnosticNode,
 } from '../language_adaptors/agnostic_node';
-import { pathJoin } from '../util/file_util';
+import { isFilePath, pathJoin } from '../util/file_util';
 import { sourceControlFlowGraphToDot } from './dot_serialize';
 import { writeFileSync } from 'fs';
 import { type WASMFunction } from '../webassembly/wasm/wasm_function';
@@ -294,9 +294,12 @@ function createAllNodes(
       let prevNode: SourceCFGNode | undefined;
       for (let i = n.instructions.length - 1; i >= 0; i--) {
         const instr = n.instructions[i];
-        const sourceLocations = sourceMap.getOriginalPositionFor(
-          instr.startAddress,
-        );
+        const sourceLocations = sourceMap
+          .getOriginalPositionFor(instr.startAddress)
+          .filter((s) => {
+            return isFilePath(s.source);
+          });
+
         if (sourceLocations.length > 1) {
           throw new Error(
             `more than one source location found for addr ${instr.startAddress}`,
