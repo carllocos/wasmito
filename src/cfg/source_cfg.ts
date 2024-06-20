@@ -46,7 +46,7 @@ export class SourceControlFlowGraph {
   ) {
     this._sourceMap = sourceMap;
     this._wasmCFG = cfg;
-    this._astGraphs = buildControlTreeGraph(sourceMap, asts, cfg);
+    this._astGraphs = buildSourceCFGraph(sourceMap, cfg);
     let allnodes: SourceCFGNode[] = [];
     for (const funGraph of this._astGraphs.values()) {
       allnodes = allnodes.concat(funGraph.allNodes);
@@ -235,14 +235,14 @@ export interface FunctionTreeGraph {
   allNodes: SourceCFGNode[];
 }
 
-function buildControlTreeGraph(
+function buildSourceCFGraph(
   sourceMap: SourceMap,
-  asts: AgnosticASTMap,
+  // asts: AgnosticASTMap,
   cfg: WasmControlFlowGraph,
 ): Map<number, FunctionTreeGraph> {
   const ctg = new Map<number, FunctionTreeGraph>();
   for (const f of sourceMap.wasm.functions) {
-    const funGraph = buildCTGraphForFunction(f, sourceMap, asts, cfg);
+    const funGraph = buildCTGraphForFunction(f, sourceMap, cfg);
     ctg.set(f.id, funGraph);
   }
   return ctg;
@@ -251,7 +251,7 @@ function buildControlTreeGraph(
 function buildCTGraphForFunction(
   f: WASMFunction,
   sourceMap: SourceMap,
-  asts: AgnosticASTMap,
+  // asts: AgnosticASTMap,
   cfg: WasmControlFlowGraph,
 ): FunctionTreeGraph {
   // TODO use depthfirst traversal to build the whole graph in one go
@@ -261,7 +261,7 @@ function buildCTGraphForFunction(
   // console.log(`===================================`);
   // console.log();
   const graph = cfg.getCFGStrict(f.id);
-  const ns = createAllNodes(f.id, sourceMap, asts, graph);
+  const ns = createAllNodes(f.id, sourceMap, graph);
   // console.log(`===================================`);
   // console.log(`Adding Edges for function ${f.id}`);
   // console.log(`===================================`);
@@ -279,7 +279,7 @@ function buildCTGraphForFunction(
 function createAllNodes(
   funID: number,
   sourceMap: SourceMap,
-  asts: AgnosticASTMap,
+  // asts: AgnosticASTMap,
   funGraph: WASMFunGraph,
 ): SourceCFGNode[] {
   const entryNode = funGraph.entyNode;
