@@ -351,7 +351,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   }
 
   async addHookBefore(
-    sourceCodeLocation: SourceCodeLocation,
+    sourceCodeLocation: SourceCodeLocation2,
     hook: Hook,
     timeout?: number | undefined,
   ): Promise<boolean> {
@@ -364,7 +364,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   }
 
   async addHookAfter(
-    sourceCodeLocation: SourceCodeLocation,
+    sourceCodeLocation: SourceCodeLocation2,
     hook: Hook,
     timeout?: number | undefined,
   ): Promise<boolean> {
@@ -377,7 +377,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   }
 
   private async addHook(
-    sourceCodeLocation: SourceCodeLocation,
+    sourceCodeLocation: SourceCodeLocation2,
     hook: Hook,
     moment: HookOnWasmAddrMoment,
     timeout?: number,
