@@ -450,10 +450,14 @@ function addEdgesAndReturnEntryNodes(
         // ctgn is not undefined
         // entry CFG node has a corresponding CTG node
         if (n.nodeID === entryNode.nodeID) {
-          if (!entryNodesAdded.has(ctgn.nodeId)) {
+          const startNode = searchCTGNInIncreasingAddresses(n, nodes);
+          if (startNode === undefined) {
+            throw new Error(`startNode should not be undefined`);
+          }
+          if (!entryNodesAdded.has(startNode.nodeId)) {
             // console.log(`Added new EntryNode ${logNode(ctgn.node)}`);
-            entryCTGNodes.push(ctgn);
-            entryNodesAdded.add(ctgn.nodeId);
+            entryCTGNodes.push(startNode);
+            entryNodesAdded.add(startNode.nodeId);
           }
         }
       }
