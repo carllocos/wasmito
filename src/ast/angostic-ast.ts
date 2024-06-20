@@ -8,19 +8,20 @@ import {
   mostSpecialisedNode,
   sourceLocationToNodePosition,
 } from '../tree-sitter/tree-sitter-parser';
+import { type LanguageConfiguration } from '../language_adaptors/languages/language_config';
 
 export class AgnosticAST {
   public readonly source: string;
-  public readonly targetLanguage: string;
+  public readonly targetLanguage: LanguageConfiguration;
   private _parser: Parser | undefined;
   private _tree: Parser.Tree | undefined;
 
-  constructor(source: string, targetLanguage: string) {
+  constructor(source: string, langConfig: LanguageConfiguration) {
     this.source = source;
     if (!isFilePath(source)) {
       throw new Error(`Given source file does not exist ${source}`);
     }
-    this.targetLanguage = targetLanguage;
+    this.targetLanguage = langConfig;
   }
 
   get ast(): Parser.Tree {
@@ -81,7 +82,7 @@ export class AgnosticAST {
   }
 
   async buildAST(): Promise<void> {
-    this._parser = await buildASTParser(this.targetLanguage);
+    this._parser = await buildASTParser(this.targetLanguage.parserPath);
     const content = await fs.promises.readFile(this.source);
     const sourceCode = content.toString();
     this._tree = this._parser.parse(sourceCode);
