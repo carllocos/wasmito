@@ -28,9 +28,7 @@ export function equalSourceCodeLocations(
   );
 }
 
-// alias of MappingItem
-// Todo rename to AddrLineMapping
-export interface SourceCodeMapping {
+export interface SourceCodeLocation {
   source: string;
   address: number;
   linenr: number;
@@ -38,9 +36,9 @@ export interface SourceCodeMapping {
   name: string;
 }
 
-export function mappingItemToSourceCodeMapping(
+export function mappingItemToSourceCodeLocation(
   m: MappingItem,
-): SourceCodeMapping {
+): SourceCodeLocation {
   return {
     source: m.source,
     address: m.generatedColumn,
@@ -88,8 +86,8 @@ export class SourceMap {
     return this._sources;
   }
 
-  get mappings(): SourceCodeMapping[] {
-    return this._mappings.map(mappingItemToSourceCodeMapping);
+  get mappings(): SourceCodeLocation[] {
+    return this._mappings.map(mappingItemToSourceCodeLocation);
   }
 
   public generatedPositionFor(location: SourceCodeLocation): MappingItem[] {

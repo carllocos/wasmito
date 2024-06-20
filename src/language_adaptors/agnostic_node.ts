@@ -1,8 +1,8 @@
 import type Parser from 'web-tree-sitter';
 import {
-  mappingItemToSourceCodeMapping,
+  type SourceCodeLocation,
+  mappingItemToSourceCodeLocation,
   mappingItemToString,
-  type SourceCodeMapping,
   type SourceMap,
 } from '../source_mappers/source_map';
 import { type MappingItem } from 'source-map';
@@ -17,7 +17,7 @@ export interface ASTNodeSourceLocation {
 
 export class AgnosticNode {
   private readonly _node: Parser.SyntaxNode;
-  private readonly _mappings: Map<number, SourceCodeMapping>;
+  private readonly _mappings: Map<number, SourceCodeLocation>;
 
   private readonly _addresses: number[];
   private readonly _startPosition: ASTNodeSourceLocation;
@@ -49,7 +49,7 @@ export class AgnosticNode {
     return this._source;
   }
 
-  addMapping(m: SourceCodeMapping): void {
+  addMapping(m: SourceCodeLocation): void {
     if (!this._mappings.has(m.address)) {
       this._mappings.set(m.address, m);
       this._addresses.push(m.address);
@@ -102,7 +102,7 @@ export function AgnosticNodeFromWasmAddress(
   if (nodesFound.length === 1) {
     const [nodeFound, mappingFound] = nodesFound[0];
     const an = new AgnosticNode(nodeFound, mappingFound.source);
-    an.addMapping(mappingItemToSourceCodeMapping(mappingFound));
+    an.addMapping(mappingItemToSourceCodeLocation(mappingFound));
     return an;
   } else if (nodesFound.length > 1) {
     const positionsStr = positions.map(mappingItemToString).join(', ');
