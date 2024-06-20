@@ -54,7 +54,7 @@ describe('SourceMap entries', function () {
     const mappings = sourceMap.getOriginalPositionFor(startWasmAddress);
     expect(mappings.length).to.not.equal(0);
     for (const loc of mappings) {
-      expect(loc.originalLine).to.equal(44);
+      expect(loc.linenr).to.equal(44);
     }
   });
 });
