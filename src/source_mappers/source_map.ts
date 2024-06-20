@@ -89,7 +89,7 @@ export class SourceMap {
     this._sources = sources;
 
     // trick to remove duplicates via set
-    this._mappings = Array.from(new Set(mappings));
+    this._mappings = Array.from(new Set<SourceCodeLocation>(mappings));
     this.wasm = new WasmModule(this._wasmPath);
   }
 
