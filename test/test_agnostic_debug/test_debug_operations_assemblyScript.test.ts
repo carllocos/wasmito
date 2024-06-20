@@ -23,13 +23,6 @@ function sourceNodeFromLoc(
   assert(ns.length === 1);
   return ns[0];
 }
-function logNode(n: SourceCFGNode): void {
-  const sp = n.node.startPosition;
-  const ep = n.node.endPosition;
-  console.log(
-    `{startLoc: (${sp.linenr}, ${sp.colnr}), endLoc: (${ep.linenr}, ${ep.colnr}), srcTxt: '${n.node.node.text}'}`,
-  );
-}
 
 function sourceNodeLoc(sn: SourceCFGNode): ASTNodeSourceLocation {
   return sn.node.startPosition;
