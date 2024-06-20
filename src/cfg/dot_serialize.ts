@@ -110,8 +110,9 @@ export function sourceControlFlowGraphToDot(
     const sp = n.sourceLocation;
     let srcTxt = n.sourceLocation.name;
     if (n.node !== undefined) {
-      srcTxt = escapeText(n.node.node.text);
+      srcTxt = n.node.node.text;
     }
+    srcTxt = escapeText(srcTxt);
     let c = `(line ${sp.linenr}, col ${sp.colnr}) ${srcTxt}`;
     if (sourceCFGHasOutgoingFunCallEdges(n)) {
       c += ` (call)`;
