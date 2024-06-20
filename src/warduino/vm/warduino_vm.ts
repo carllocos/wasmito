@@ -45,7 +45,7 @@ import { EventInspectHook } from '../../hooks/hook_event';
 import { type DeviceIdentity } from '../../device';
 import { type WASMFunction } from '../../webassembly/wasm/wasm_function';
 import {
-  type SourceCodeLocation,
+  type SourceCodeLocation2,
   type SourceMap,
 } from '../../source_mappers/source_map';
 import { type LanguageAdaptor } from '../../language_adaptors';

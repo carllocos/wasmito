@@ -8,7 +8,8 @@ import { writeFileSync } from 'fs';
 const logger = createLogger('SourceMap');
 
 // TODO Sourcelocation will be gone and replaced by ASTMapping of adaptor.
-export interface SourceCodeLocation {
+// Or remove?
+export interface SourceCodeLocation2 {
   source: string;
   linenr: number;
   columnStart?: number;
@@ -16,8 +17,8 @@ export interface SourceCodeLocation {
 }
 
 export function equalSourceCodeLocations(
-  loc1: SourceCodeLocation,
-  loc2: SourceCodeLocation,
+  loc1: SourceCodeLocation2,
+  loc2: SourceCodeLocation2,
 ): boolean {
   return (
     loc1.linenr === loc2.linenr &&

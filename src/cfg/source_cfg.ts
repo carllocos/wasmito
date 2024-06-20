@@ -8,7 +8,7 @@ import {
 } from './wasm_cfg';
 // import { createLogger } from '../logger/logger';
 import {
-  type SourceCodeLocation,
+  type SourceCodeLocation2,
   type SourceMap,
 } from '../source_mappers/source_map';
 import {
@@ -73,7 +73,7 @@ export class SourceControlFlowGraph {
     }
   }
 
-  nodesFromSourceLoc(location: SourceCodeLocation): SourceCFGNode[] {
+  nodesFromSourceLoc(location: SourceCodeLocation2): SourceCFGNode[] {
     const mappings = this._sourceMap.generatedPositionFor(location);
     const nodes: SourceCFGNode[][] = [];
     for (const m of mappings) {
