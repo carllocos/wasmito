@@ -68,8 +68,14 @@ export function sourceCodeLocationToString(m: SourceCodeLocation): string {
   }`;
 }
 
+export interface SourceMapConfig {
+  srcToAbsPath?: Map<string, string>;
+  ignoreDirectories?: string[];
+}
+
 export class SourceMap {
   private readonly _sourceToAbsPathSource: Map<string, string>;
+  private readonly _ignoreDirs: string[];
   private readonly _sources: string[];
   private readonly _mappings: SourceCodeLocation[];
   private readonly _wasmPath: string;
@@ -81,15 +87,25 @@ export class SourceMap {
     wasmPath: string,
     sources: string[],
     mappings: SourceCodeLocation[],
-    srcToAbsPath = new Map<string, string>(),
+    config?: SourceMapConfig,
   ) {
     this.targetLanguage = targetLanguage;
     this._wasmPath = wasmPath;
-    this._sourceToAbsPathSource = srcToAbsPath;
+    this._sourceToAbsPathSource = config?.srcToAbsPath ?? new Map();
+    this._ignoreDirs = config?.ignoreDirectories ?? [];
     this._sources = sources;
 
-    // trick to remove duplicates via set
-    this._mappings = Array.from(new Set<SourceCodeLocation>(mappings));
+    // user Set to remove duplicates
+    // remove mappings that are supposed to be ignored
+    this._mappings = Array.from(new Set<SourceCodeLocation>(mappings)).filter(
+      (m) => {
+        const found = this._ignoreDirs.find((dir) => {
+          return m.source.startsWith(dir);
+        });
+        return found === undefined;
+      },
+    );
+
     this.wasm = new WasmModule(this._wasmPath);
   }
 
