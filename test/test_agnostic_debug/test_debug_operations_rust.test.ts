@@ -3,7 +3,10 @@ import path from 'path';
 import { SourceMapfromDWARFWasm } from '../../src/source_mappers/source_map_builder';
 import { constructLanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 import assert, { fail } from 'assert';
-import { type SourceControlFlowGraph } from '../../src/cfg/source_cfg';
+import {
+  type DotSerializationConfgig,
+  type SourceControlFlowGraph,
+} from '../../src/cfg/source_cfg';
 import { DebugOperations } from '../../src/language_adaptors/debug_tree_operations';
 import {
   logNode,
@@ -28,8 +31,11 @@ describe('Debug Operations on Rust AST Blink App', function () {
       assert(langAdaptor.sourceCFG !== undefined);
       sourceCFG = langAdaptor.sourceCFG;
       sourceCFG.wasmCFG.serializeToDot(pathToDir);
-      const includeInstructions = false;
-      sourceCFG.serializeToDot(pathToDir, includeInstructions);
+      const config: DotSerializationConfgig = {
+        includeInstructions: false,
+        includeEmptySCFG: false,
+      };
+      sourceCFG.serializeToDot(pathToDir, config);
     } catch (e) {
       fail(`Could not construct sourcemap or langadaptor. Reason ${e}`);
     }
@@ -109,8 +115,11 @@ describe('Debug Operations on Rust AST Intermittent Blink', function () {
       assert(langAdaptor.sourceCFG !== undefined);
       sourceCFG = langAdaptor.sourceCFG;
       sourceCFG.wasmCFG.serializeToDot(pathToDir);
-      const includeInstructions = false;
-      sourceCFG.serializeToDot(pathToDir, includeInstructions);
+      const config: DotSerializationConfgig = {
+        includeInstructions: false,
+        includeEmptySCFG: false,
+      };
+      sourceCFG.serializeToDot(pathToDir, config);
     } catch (e) {
       fail(`Could not construct sourcemap or langadaptor. Reason ${e}`);
     }
