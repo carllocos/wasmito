@@ -17,6 +17,7 @@ import {
   sourceNodeLoc,
   sourceText,
 } from './resuable_code';
+import { type SourceMapConfig } from '../../src/source_mappers/source_map';
 
 describe('Debug Operations on AssemblyScript Blink App', function () {
   const pathToRootSource = path.resolve(
@@ -26,6 +27,9 @@ describe('Debug Operations on AssemblyScript Blink App', function () {
   const wasmPath = path.resolve(pathToRootSource, 'blink.wasm');
   const srcPath = path.resolve(pathToRootSource, 'blink.ts');
   const srcFileMapper = new Map<string, string>([['blink/blink.ts', srcPath]]);
+  const sourceMapConfig: SourceMapConfig = {
+    srcToAbsPath: srcFileMapper,
+  };
 
   let sourceCFG: SourceControlFlowGraph;
 
@@ -40,7 +44,7 @@ describe('Debug Operations on AssemblyScript Blink App', function () {
         wasmPath,
         'typescript',
         startPositioning,
-        srcFileMapper,
+        sourceMapConfig,
       );
       const langAdaptor = await constructLanguageAdaptor(sm);
       assert(langAdaptor.sourceCFG !== undefined);
@@ -98,6 +102,9 @@ describe('Debug Operations on AS Intermittent Blink', function () {
       sourcePath,
     ],
   ]);
+  const sourceMapConfig: SourceMapConfig = {
+    srcToAbsPath: srcFileMapper,
+  };
 
   let sourceCFG: SourceControlFlowGraph;
 
@@ -112,7 +119,7 @@ describe('Debug Operations on AS Intermittent Blink', function () {
         wasmPath,
         'typescript',
         startPositioning,
-        srcFileMapper,
+        sourceMapConfig,
       );
       const langAdaptor = await constructLanguageAdaptor(sm);
       assert(langAdaptor.sourceCFG !== undefined);
