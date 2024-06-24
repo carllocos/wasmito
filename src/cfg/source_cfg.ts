@@ -31,6 +31,11 @@ import { type WASMFunction } from '../webassembly/wasm/wasm_function';
 import * as crypto from 'crypto';
 
 // const logger = createLogger('ASTControlFlowGraph');
+export interface DotSerializationConfgig {
+  includeInstructions: boolean;
+  includeEmptySCFG: boolean;
+  funIds?: number[];
+}
 
 export class SourceControlFlowGraph {
   private readonly _astGraphs: Map<number, FunctionTreeGraph>;
@@ -163,25 +168,25 @@ export class SourceControlFlowGraph {
     return ns;
   }
 
-  serializeToDot(
-    outputDir: string,
-    includeInstructions: boolean = false,
-    funIds: number[] = [],
-  ): string[] {
+  serializeToDot(outputDir: string, config: DotSerializationConfgig): string[] {
+    const funIds = config.funIds ?? [];
     if (funIds.length === 0) {
       this._sourceMap.wasm.functions.forEach((f) => funIds.push(f.id));
     }
 
     const dots: string[] = [];
     for (const fid of funIds) {
-      const p = pathJoin(outputDir, `sourcefun${fid}.dot`);
       const fg = this.funtionSourceGraph(fid);
+      if (fg === undefined || fg.entyNodes.length === 0) {
+        continue;
+      }
       if (fg?.allNodes !== undefined) {
         const content = sourceControlFlowGraphToDot(
           fg,
           `function ${fid}`,
-          includeInstructions,
+          config.includeInstructions,
         );
+        const p = pathJoin(outputDir, `sourcefun${fid}.dot`);
         writeFileSync(p, content);
         dots.push(content);
       }
