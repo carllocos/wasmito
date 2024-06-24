@@ -1,5 +1,9 @@
 import fs from 'fs';
-import { SourceMap, mappingItemToSourceCodeLocation } from './source_map';
+import {
+  SourceMap,
+  type SourceMapConfig,
+  mappingItemToSourceCodeLocation,
+} from './source_map';
 import { type MappingItem, SourceMapConsumer } from 'source-map';
 import { createLogger } from '../logger/logger';
 import { addr2line } from '../wasm-tools/addr2lines';
@@ -18,7 +22,7 @@ export async function SourceMapfromSourceMapSpec(
   wasmPath: string,
   targetLanguage: string,
   startPositioning: SourceOffsetStart,
-  absPathMapper?: Map<string, string>,
+  config?: SourceMapConfig,
 ): Promise<SourceMap> {
   const content = await fs.promises.readFile(pathToSourceMap);
   const sourceMapStr = JSON.parse(content.toString());
@@ -101,7 +105,7 @@ export async function SourceMapfromSourceMapSpec(
 
   const cleanedSources: string[] = [];
   for (let i = 0; i < sources.length; i++) {
-    const cleanedSource = absPathMapper?.get(sources[i]);
+    const cleanedSource = config?.srcToAbsPath?.get(sources[i]);
     if (cleanedSource !== undefined) {
       cleanedSources.push(cleanedSource);
     } else {
@@ -115,7 +119,7 @@ export async function SourceMapfromSourceMapSpec(
     wasmPath,
     cleanedSources,
     sourceLocs,
-    absPathMapper ?? new Map(),
+    config,
   );
   return sm;
 }
