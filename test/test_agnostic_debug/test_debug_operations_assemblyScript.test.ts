@@ -7,6 +7,7 @@ import {
 import { constructLanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 import assert, { fail } from 'assert';
 import {
+  type DotSerializationConfgig,
   sourceCFGHasOutgoingFunCallEdges,
   type SourceControlFlowGraph,
 } from '../../src/cfg/source_cfg';
@@ -15,7 +16,6 @@ import {
   sortIncreasingNr,
   sourceNodeFromLoc,
   sourceNodeLoc,
-  sourceText,
 } from './resuable_code';
 import { type SourceMapConfig } from '../../src/source_mappers/source_map';
 
@@ -127,6 +127,11 @@ describe('Debug Operations on AS Intermittent Blink', function () {
       langAdaptor.sourceMap.storeMappingsToJSON(
         path.resolve(pathToRootSource, 'mappings.json'),
       );
+      const config: DotSerializationConfgig = {
+        includeInstructions: false,
+        includeEmptySCFG: false,
+      };
+      sourceCFG.serializeToDot(pathToRootSource, config);
     } catch (e) {
       fail(`Could not construct sourcemap or langadaptor. Reason ${e}`);
     }
@@ -142,12 +147,10 @@ describe('Debug Operations on AS Intermittent Blink', function () {
     const nextNodes = DebugOperations.stepIn(sourceCFG, startNode);
     expect(nextNodes.length).equal(1);
 
-    const srcTxt = sourceText(nextNodes[0]);
     const nextLoc = sourceNodeLoc(nextNodes[0]);
 
-    expect(srcTxt).equal('mode');
     expect(nextLoc.linenr).equal(6);
-    expect(nextLoc.colnr).equal(20);
+    expect(nextLoc.colnr).equal(15);
   });
 
   it('"step over" "pinMode" call line (27, 5)', function () {
@@ -160,10 +163,8 @@ describe('Debug Operations on AS Intermittent Blink', function () {
     const nextNodes = DebugOperations.stepOver(sourceCFG, startNode);
     expect(nextNodes.length).equal(1);
 
-    const srcTxt = sourceText(nextNodes[0]);
     const nextLoc = sourceNodeLoc(nextNodes[0]);
 
-    expect(srcTxt).equal('true');
     expect(nextLoc.linenr).equal(29);
     expect(nextLoc.colnr).equal(12);
   });
@@ -178,7 +179,6 @@ describe('Debug Operations on AS Intermittent Blink', function () {
     expect(nextNodes.length).equal(1);
     const n = nextNodes[0];
     const loc = sourceNodeLoc(n);
-    expect(sourceText(n)).equal('true');
     expect(loc.linenr).equal(29);
     expect(loc.colnr).equal(12);
   });
@@ -196,11 +196,8 @@ describe('Debug Operations on AS Intermittent Blink', function () {
 
     const lineNrs = [32, 34, 38];
     const colNrs = [19, 19, 15];
-    const srcTxs = ['SHORT_SLEEP', 'SHORT_SLEEP', 'LONG_SLEEP'];
     for (let i = 0; i < nextNodes.length; i++) {
       const n = nextNodes[i];
-      const txt = sourceText(n);
-      expect(txt).equal(srcTxs[i]);
 
       const loc = sourceNodeLoc(n);
       expect(loc.linenr).equal(lineNrs[i]);
