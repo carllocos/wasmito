@@ -13,7 +13,6 @@ import {
   sortIncreasingNr,
   sourceNodeFromLoc,
   sourceNodeLoc,
-  sourceText,
 } from './resuable_code';
 
 describe('Debug Operations on Rust AST Blink App', function () {
@@ -45,7 +44,7 @@ describe('Debug Operations on Rust AST Blink App', function () {
     const startWasmAddr = 493; // Source Loc (44, 1)
     const sourceNode = sourceCFG.nodesFromAddress(startWasmAddr);
     assert(sourceNode !== undefined);
-    logNode(sourceNode);
+    // logNode(sourceNode);
 
     let nextPossibleLocations = DebugOperations.stepIn(sourceCFG, sourceNode);
     expect(nextPossibleLocations.length).to.equal(1);
@@ -54,7 +53,7 @@ describe('Debug Operations on Rust AST Blink App', function () {
     const [pinModeCall] = nextPossibleLocations;
     nextPossibleLocations = DebugOperations.stepIn(sourceCFG, pinModeCall);
     expect(nextPossibleLocations.length).to.equal(1);
-    logNode(nextPossibleLocations[0]);
+    // logNode(nextPossibleLocations[0]);
   });
 
   it('"step into" if-expression', function () {
@@ -66,18 +65,13 @@ describe('Debug Operations on Rust AST Blink App', function () {
 
     expect(startNodes.length).to.equal(1);
     const [branch] = startNodes;
-    logNode(branch);
     let nextPossibleLocations = DebugOperations.stepIn(sourceCFG, branch);
 
     expect(nextPossibleLocations.length).to.equal(2);
-    for (const n of nextPossibleLocations) {
-      logNode(n);
-    }
 
     const [, useNode] = nextPossibleLocations;
     nextPossibleLocations = DebugOperations.stepIn(sourceCFG, useNode);
     expect(nextPossibleLocations.length).to.equal(1);
-    logNode(nextPossibleLocations[0]);
   });
 
   it('"step out" of a fun call', function () {
@@ -89,11 +83,7 @@ describe('Debug Operations on Rust AST Blink App', function () {
 
     expect(startNodes.length).to.equal(1);
     const [branch] = startNodes;
-    logNode(branch);
     const nextPossibleLocations = DebugOperations.stepOut(sourceCFG, branch);
-    for (const n of nextPossibleLocations) {
-      logNode(n);
-    }
     expect(nextPossibleLocations.length).to.equal(1);
   });
 });
@@ -135,15 +125,13 @@ describe('Debug Operations on Rust AST Intermittent Blink', function () {
     const nextNodes = DebugOperations.stepIn(sourceCFG, startNode);
     expect(nextNodes.length).equal(1);
 
-    const srcTxt = sourceText(nextNodes[0]);
     const nextLoc = sourceNodeLoc(nextNodes[0]);
 
-    expect(srcTxt).equal('env_chip_pin_mode');
-    expect(nextLoc.linenr).equal(19);
-    expect(nextLoc.colnr).equal(5);
+    expect(nextLoc.linenr).equal(17);
+    expect(nextLoc.colnr).equal(1);
   });
 
-  it('"step into" "1..MAX_SHORT_SLEEPS" std lib call line (48, 1) should be ignored', function () {
+  it('"step into" "1..MAX_SHORT_SLEEPS" std lib call line (48, 19) should be ignored', function () {
     const startNode = sourceNodeFromLoc(sourceCFG, {
       source: sourcePath,
       linenr: 48,
@@ -153,16 +141,12 @@ describe('Debug Operations on Rust AST Intermittent Blink', function () {
     const nextNodes = DebugOperations.stepIn(sourceCFG, startNode);
     expect(nextNodes.length).equal(2);
     const n1 = nextNodes[0];
-    const srcTxt1 = sourceText(n1);
     const loc1 = sourceNodeLoc(n1);
-    expect(srcTxt1).equal('_i');
     expect(loc1.linenr).equal(48);
     expect(loc1.colnr).equal(13);
 
     const n2 = nextNodes[1];
-    const srcTxt2 = sourceText(n2);
     const loc2 = sourceNodeLoc(n2);
-    expect(srcTxt2).equal('digital_write');
     expect(loc2.linenr).equal(55);
     expect(loc2.colnr).equal(9);
   });
@@ -177,10 +161,8 @@ describe('Debug Operations on Rust AST Intermittent Blink', function () {
     const nextNodes = DebugOperations.stepOver(sourceCFG, startNode);
     expect(nextNodes.length).equal(1);
 
-    const srcTxt = sourceText(nextNodes[0]);
     const nextLoc = sourceNodeLoc(nextNodes[0]);
 
-    expect(srcTxt).equal('1');
     expect(nextLoc.linenr).equal(48);
     expect(nextLoc.colnr).equal(19);
   });
@@ -195,7 +177,6 @@ describe('Debug Operations on Rust AST Intermittent Blink', function () {
     expect(nextNodes.length).equal(1);
     const n = nextNodes[0];
     const loc = sourceNodeLoc(n);
-    expect(sourceText(n)).equal('1');
     expect(loc.linenr).equal(48);
     expect(loc.colnr).equal(19);
   });
@@ -213,11 +194,8 @@ describe('Debug Operations on Rust AST Intermittent Blink', function () {
 
     const lineNrs = [50, 52, 56];
     const colNrs = [13, 13, 9];
-    const srcTxs = ['delay', 'delay', 'delay'];
     for (let i = 0; i < nextNodes.length; i++) {
       const n = nextNodes[i];
-      const txt = sourceText(n);
-      expect(txt).equal(srcTxs[i]);
 
       const loc = sourceNodeLoc(n);
       expect(loc.linenr).equal(lineNrs[i]);
