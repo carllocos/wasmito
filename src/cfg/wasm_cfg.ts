@@ -303,7 +303,8 @@ function mergeNodes(g: WasmGraph, n1Address: number, n2Address: number): void {
   }
 
   if (n1.nodeID === n2.nodeID) {
-    throw new Error(`Attempting to merge the same node`);
+    return;
+    // throw new Error(`Attempting to merge the same node`);
   }
 
   const edges = n1.edges.concat(n2.edges);
