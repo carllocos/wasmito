@@ -95,17 +95,40 @@ export class SourceMap {
     this._ignoreDirs = config?.ignoreDirectories ?? [];
     this._sources = sources;
 
-    // user Set to remove duplicates
-    // remove mappings that are supposed to be ignored
-    this._mappings = Array.from(new Set<SourceCodeLocation>(mappings)).filter(
-      (m) => {
-        const found = this._ignoreDirs.find((dir) => {
-          return m.source.startsWith(dir);
-        });
-        return found === undefined;
-      },
-    );
+    // remove duplicate mappings
+    // ignore mappings that are supposed to be ignored
+    const tbl = new Map<number, SourceCodeLocation>();
+    const cleanedMappings: SourceCodeLocation[] = [];
+    for (const m of mappings) {
+      const found = this._ignoreDirs.find((dir) => {
+        return m.source.startsWith(dir);
+      });
+      if (found !== undefined) {
+        continue;
+      }
 
+      const sl = tbl.get(m.address);
+      if (sl === undefined) {
+        cleanedMappings.push(m);
+        tbl.set(m.address, m);
+        continue;
+      }
+
+      if (
+        sl.linenr === m.linenr &&
+        sl.colnr === m.colnr &&
+        sl.name === m.name &&
+        sl.source === m.source
+      ) {
+        continue;
+      }
+      // logger.error(
+      //   `Found 2 different source location for the same Wasm addr ${m.address} loc1 ${sourceCodeLocationToString(m)}
+      //   loc2 ${sourceCodeLocationToString(sl)}`,
+      // );
+    }
+
+    this._mappings = cleanedMappings;
     this.wasm = new WasmModule(this._wasmPath);
   }
 
