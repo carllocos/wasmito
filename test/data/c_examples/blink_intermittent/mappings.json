@@ -1,0 +1,313 @@
+{"language":"unused", "mappings":[{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 485,
+    "linenr": 6,
+    "colnr": 1,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 529,
+    "linenr": 7,
+    "colnr": 23,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 536,
+    "linenr": 7,
+    "colnr": 28,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 543,
+    "linenr": 7,
+    "colnr": 5,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 553,
+    "linenr": 8,
+    "colnr": 1,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 573,
+    "linenr": 8,
+    "colnr": 1,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 575,
+    "linenr": 11,
+    "colnr": 1,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 619,
+    "linenr": 12,
+    "colnr": 28,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 626,
+    "linenr": 12,
+    "colnr": 33,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 633,
+    "linenr": 12,
+    "colnr": 5,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 643,
+    "linenr": 13,
+    "colnr": 1,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 663,
+    "linenr": 13,
+    "colnr": 1,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 665,
+    "linenr": 16,
+    "colnr": 1,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 702,
+    "linenr": 17,
+    "colnr": 20,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 709,
+    "linenr": 17,
+    "colnr": 5,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 717,
+    "linenr": 18,
+    "colnr": 1,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 737,
+    "linenr": 18,
+    "colnr": 1,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 740,
+    "linenr": 21,
+    "colnr": 1,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 781,
+    "linenr": 22,
+    "colnr": 18,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 792,
+    "linenr": 23,
+    "colnr": 18,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 803,
+    "linenr": 24,
+    "colnr": 18,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 814,
+    "linenr": 25,
+    "colnr": 18,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 825,
+    "linenr": 26,
+    "colnr": 18,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 837,
+    "linenr": 27,
+    "colnr": 18,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 849,
+    "linenr": 28,
+    "colnr": 18,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 860,
+    "linenr": 30,
+    "colnr": 19,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 867,
+    "linenr": 30,
+    "colnr": 24,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 874,
+    "linenr": 30,
+    "colnr": 5,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 884,
+    "linenr": 34,
+    "colnr": 18,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 897,
+    "linenr": 34,
+    "colnr": 25,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 908,
+    "linenr": 34,
+    "colnr": 29,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 915,
+    "linenr": 34,
+    "colnr": 27,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 930,
+    "linenr": 34,
+    "colnr": 9,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 946,
+    "linenr": 36,
+    "colnr": 32,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 953,
+    "linenr": 36,
+    "colnr": 37,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 960,
+    "linenr": 36,
+    "colnr": 13,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 970,
+    "linenr": 37,
+    "colnr": 24,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 977,
+    "linenr": 37,
+    "colnr": 13,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 985,
+    "linenr": 38,
+    "colnr": 32,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 992,
+    "linenr": 38,
+    "colnr": 37,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 999,
+    "linenr": 38,
+    "colnr": 13,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 1009,
+    "linenr": 39,
+    "colnr": 24,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 1016,
+    "linenr": 39,
+    "colnr": 13,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 1024,
+    "linenr": 34,
+    "colnr": 47,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 1049,
+    "linenr": 34,
+    "colnr": 9,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 1051,
+    "linenr": 34,
+    "colnr": 9,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 1053,
+    "linenr": 42,
+    "colnr": 28,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 1060,
+    "linenr": 42,
+    "colnr": 33,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 1067,
+    "linenr": 42,
+    "colnr": 9,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 1077,
+    "linenr": 43,
+    "colnr": 20,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 1084,
+    "linenr": 43,
+    "colnr": 9,
+    "name": ""
+  },{
+    "source":"/Users/crojcas/Documents/projects/wasmito/test/data/c_examples/blink_intermittent/blink_intermittent.c",
+    "address": 1092,
+    "linenr": 32,
+    "colnr": 5,
+    "name": ""
+  }]}
