@@ -467,7 +467,7 @@ function buildCFGNodesHelper(
     }
     // skip endAddress of block as it has already been handled
     entryAddress = endBlockAddr;
-    i = i + 1;
+    // i = i + 1;
   }
 
   if (exitAddress !== undefined) {
