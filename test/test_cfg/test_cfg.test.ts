@@ -14,12 +14,12 @@ describe('Rust Language Adaptor for Blink App', function () {
     mod = new WasmModule(exampleFile);
   });
 
-  it.skip('build cfg for module', () => {
+  it('build cfg for module', () => {
     const outputDir = path.resolve('./test/data/rust_examples/blink');
     const g = new WasmControlFlowGraph(mod);
     const contents = g.serializeToDot(outputDir);
-    for (const [funId, dotContent] of contents) {
-      expect(funId).to.greaterThan(mod.imports.length);
+    expect(contents.length).to.greaterThan(mod.imports.length);
+    for (const dotContent of contents) {
       expect(dotContent).to.not.equal('');
     }
   });
