@@ -18,7 +18,6 @@ export async function buildASTParser(parserName: string): Promise<Parser> {
   if (!isFilePath(pathToLanguageParser)) {
     let filesStr = 'failed to find';
     try {
-      console.log(`the __dirname ${__dirname}`);
       const files = await listFilesInDirectory(parsersRootPath());
       filesStr = files.join(', ');
     } catch (er) {
