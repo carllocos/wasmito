@@ -25,6 +25,7 @@ describe('Debug Operations on Rust AST Blink App', function () {
 
   before('parse wasm module', async function () {
     try {
+      console.log(`The path used to read the examples is ${pathToDir}`);
       const sm = await SourceMapfromDWARFWasm(blinkApp);
       const langAdaptor = await constructLanguageAdaptor(sm);
       assert(langAdaptor.sourceCFG !== undefined);
@@ -107,6 +108,7 @@ describe('Debug Operations on Rust AST Intermittent Blink', function () {
 
   before('parse wasm module', async function () {
     try {
+      console.log(`The path used to read the examples is ${pathToDir}`);
       const sm = await SourceMapfromDWARFWasm(app);
       const langAdaptor = await constructLanguageAdaptor(sm);
       assert(langAdaptor.sourceCFG !== undefined);
