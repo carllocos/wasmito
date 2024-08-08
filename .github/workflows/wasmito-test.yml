@@ -20,10 +20,11 @@ jobs:
           source "$HOME/.cargo/env" 
           rustup target add wasm32-unknown-unknown
 
+      - name: Install cargo-binstall
+        run: cargo install cargo-binstall
+
       - name: Install wasm-tools
-        uses: cargo-bins/cargo-binstall@main
-        run: |
-          cargo binstall wasm-tools
+        run: cargo binstall wasm-tools
 
       - name: Build submodules
         run: |
