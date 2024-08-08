@@ -21,6 +21,7 @@ jobs:
           rustup target add wasm32-unknown-unknown
 
       - name: Install wasm-tools
+        uses: cargo-bins/cargo-binstall@main
         run: |
           cargo binstall wasm-tools
 
