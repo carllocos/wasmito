@@ -65,7 +65,7 @@ export async function testEventHook(
     uploadSourceCode,
   );
   const bp = new Breakpoint(
-    { source: '', linenr: 88 },
+    { source: '', linenr: 88, colnr: 0, name: '', address: 0 },
     new StateRequest().includePC(),
   );
   bp.subscribe((state: WasmState) => {

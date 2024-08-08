@@ -56,7 +56,13 @@ const normalBP: TestScenario = {
   actions: [
     addBreakpointSubscription(
       'BP line 91',
-      new Breakpoint({ source: '', linenr: 91 }),
+      new Breakpoint({
+        source: '',
+        linenr: 91,
+        colnr: 0,
+        name: '',
+        address: 0,
+      }),
       3000,
     ),
     runVMAction(3000, 3000),
@@ -95,7 +101,13 @@ const singleStopBp: TestScenario = {
     },
     addBreakpointSubscription(
       'BP line 91',
-      new Breakpoint({ source: '', linenr: 91 }),
+      new Breakpoint({
+        source: '',
+        linenr: 91,
+        colnr: 0,
+        name: '',
+        address: 0,
+      }),
       3000,
     ),
     runVMAction(3000, 3000), // wait 3 seconds before executing runVMAction
