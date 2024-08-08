@@ -14,6 +14,7 @@ import {
   sourceNodeFromLoc,
   sourceNodeLoc,
 } from './resuable_code';
+import { listFilesInDirectory } from '../../src/util/file_util';
 
 describe('Debug Operations on Rust AST Blink App', function () {
   const pathToDir = path.resolve('./test/data/rust_examples/blink/');
@@ -26,6 +27,9 @@ describe('Debug Operations on Rust AST Blink App', function () {
   before('parse wasm module', async function () {
     try {
       console.log(`The path used to read the examples is ${pathToDir}`);
+      const files = await listFilesInDirectory(pathToDir);
+      console.log(`Files in path ${files.join(',')}`);
+
       const sm = await SourceMapfromDWARFWasm(blinkApp);
       const langAdaptor = await constructLanguageAdaptor(sm);
       assert(langAdaptor.sourceCFG !== undefined);
@@ -109,6 +113,9 @@ describe('Debug Operations on Rust AST Intermittent Blink', function () {
   before('parse wasm module', async function () {
     try {
       console.log(`The path used to read the examples is ${pathToDir}`);
+      const files = await listFilesInDirectory(pathToDir);
+      console.log(`Files in path ${files.join(',')}`);
+
       const sm = await SourceMapfromDWARFWasm(app);
       const langAdaptor = await constructLanguageAdaptor(sm);
       assert(langAdaptor.sourceCFG !== undefined);
