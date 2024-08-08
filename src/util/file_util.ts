@@ -153,3 +153,9 @@ export function pathsEqual(p1: string, p2: string): boolean {
   const rp2 = path.resolve(p2);
   return rp1 === rp2;
 }
+
+export async function listFilesInDirectory(
+  directoryPath: string,
+): Promise<string[]> {
+  return await fs.promises.readdir(directoryPath);
+}
