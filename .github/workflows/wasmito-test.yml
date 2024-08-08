@@ -14,20 +14,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install Rust and wasm32 targets on Ubuntu-latest
-        if: matrix.os == 'ubuntu-latest'
+      - name: Install Rust and wasm32 targets
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
           source "$HOME/.cargo/env" 
-          rustup target add wasm32-unknown-unknown
-          # sudo apt-get install -y rustc
-          # rustup target add wasm32-unknown-unknown
-
-      - name: Install Rust and wasm32 targets on macos-latest
-        if: matrix.os == 'macos-latest'
-        run: |
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-          . "$HOME/.cargo/env" 
           rustup target add wasm32-unknown-unknown
 
       - name: Install wasm-tools
