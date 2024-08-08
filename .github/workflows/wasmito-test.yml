@@ -21,8 +21,9 @@ jobs:
           rustup target add wasm32-unknown-unknown
 
       - name: Install wasm-tools
-        run: |
-          cargo install wasm-tools
+        uses: jaxxstorm/action-install-gh-release@v1.10.0
+        with:
+          repo: bytecodealliance/wasm-tools
 
       - name: Build submodules
         run: |
