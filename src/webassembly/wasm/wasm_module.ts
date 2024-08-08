@@ -10,7 +10,6 @@ import {
 import { execSync } from 'child_process';
 import {
   type VariableInfo,
-  getGlobalInfos,
   getLocalTypesFromDissambleOutput,
 } from '../parsers/obj-dump_parser';
 import { getPath2ObjDump } from '../../project_config';
@@ -46,7 +45,7 @@ export class WasmModule {
     this._sections = createSections(mod);
     this.functions = createWasmFunctions(wasmPath, mod);
     this.imports = createImportedFunctions(mod);
-    this.globals = createWasmGlobals(wasmPath, mod);
+    this.globals = createWasmGlobals(mod);
     this.types = createWasmTypes(mod);
     this.ast = mod.ast;
     this.wasmBuffer = mod.wasmBuffer;
@@ -219,8 +218,7 @@ function createWasmTypes(mod: ParsedModule): WasmType[] {
   return mod.types;
 }
 
-function createWasmGlobals(wasmPath: string, mod: ParsedModule): WasmGlobal[] {
-  const names = getGlobalNames(wasmPath);
+function createWasmGlobals(mod: ParsedModule): WasmGlobal[] {
   return mod.globals.map((g, globalID) => {
     const t = WASM.typing.get(g.globalType.valtype);
     if (t === undefined) {
@@ -228,7 +226,7 @@ function createWasmGlobals(wasmPath: string, mod: ParsedModule): WasmGlobal[] {
     }
     return {
       index: globalID,
-      name: g.name ?? names[globalID],
+      name: g.name ?? `global${globalID}`,
       type: t,
       mutable: g.globalType.mutability !== 'const',
       value: 0,
@@ -336,16 +334,16 @@ function retrieveGlobalInstructions(mod: ParsedModule): WasmInstruction[] {
 /*
  * The Wasm module parser library does not retrieve the global names so we need to retrieve that
  */
-function getGlobalNames(wasmFilePath: string): string[] {
-  const objDump = getPath2ObjDump();
-  const cmd = `${objDump} -x -m ${wasmFilePath}`;
-  const outputCmd = execSync(cmd).toString();
-  return getGlobalInfos(outputCmd)
-    .sort((g1, g2) => {
-      return g1.index - g2.index;
-    })
-    .map((s) => s.name);
-}
+// function getGlobalNames(wasmFilePath: string): string[] {
+//   const objDump = getPath2ObjDump();
+//   const cmd = `${objDump} -x -m ${wasmFilePath}`;
+//   const outputCmd = execSync(cmd).toString();
+//   return getGlobalInfos(outputCmd)
+//     .sort((g1, g2) => {
+//       return g1.index - g2.index;
+//     })
+//     .map((s) => s.name);
+// }
 
 /*
  * The Wasm module parser library does not retrieve the types of the locals so we need to retrieve that
