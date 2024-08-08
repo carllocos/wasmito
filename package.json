@@ -26,7 +26,7 @@
     "build": "npm run build:cjs",
     "cli": "npm run build && LogLevel=debug node './dist/cjs/src/cli/cli.cjs'",
     "submodules": "bash install.sh",
-    "build:cjs": "rm -rf dist/cjs && tsc --project tsconfig.json && npx convert-extension cjs dist/cjs/ && npm run copyAssets",
+    "build:cjs": "rm -rf dist/cjs && tsc --project tsconfig.json && npx convert-extension cjs dist/cjs/ && npm run copyAssets && echo listing && ls ./dist/cjs/src/tree-sitter/ && ls ./dist/cjs/src/tree-sitter/parsers",
     "build:esm": "rm -rf dist/esm  && tsc --project tsconfig-esm.json",
     "cleanNotUsed": "rm -rf dist/cjs && rm -rf dist/esm && rm -rf dist/types",
     "copyAssets": "cp -r ./src/tree-sitter/parsers/ dist/cjs/src/tree-sitter/",
