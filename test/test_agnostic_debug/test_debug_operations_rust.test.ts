@@ -35,6 +35,9 @@ describe('Debug Operations on Rust AST Blink App', function () {
         includeEmptySCFG: false,
       };
       sourceCFG.serializeToDot(pathToDir, config);
+      langAdaptor.sourceMap.storeMappingsToJSON(
+        path.resolve(pathToDir, 'mappings.json'),
+      );
     } catch (e) {
       fail(`Could not construct sourcemap or langadaptor. Reason ${e}`);
     }
@@ -114,6 +117,9 @@ describe('Debug Operations on Rust AST Intermittent Blink', function () {
         includeEmptySCFG: false,
       };
       sourceCFG.serializeToDot(pathToDir, config);
+      langAdaptor.sourceMap.storeMappingsToJSON(
+        path.resolve(pathToDir, 'mappings.json'),
+      );
     } catch (e) {
       fail(`Could not construct sourcemap or langadaptor. Reason ${e}`);
     }
