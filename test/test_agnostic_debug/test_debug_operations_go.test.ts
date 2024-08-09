@@ -12,7 +12,7 @@ import {
   sourceText,
 } from './resuable_code';
 
-describe.skip('Debug Operations on Rust AST Intermittent Blink', function () {
+describe.skip('Debug Operations on Go Hello World', function () {
   const app = path.resolve('./test/data/go_examples/main.wasm');
   const sourcePath = path.resolve('./test/data/go_examples/hello_world.go');
 
