@@ -5,6 +5,7 @@ on: [push]
 jobs:
   test-wasmito:
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
 
     strategy:
       matrix:
@@ -26,6 +27,7 @@ jobs:
 
       - name: Install cargo-binstall
         run: |
+          timeout-minutes: 2
           curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
 
       - name: Install wasm-tools v1.205.0
