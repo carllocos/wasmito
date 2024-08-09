@@ -1,4 +1,4 @@
-import { spawn } from 'child_process';
+import { exec } from 'child_process';
 
 /*
  * This source file runs `wasm-tools addr2line` command and decodes result
@@ -113,33 +113,50 @@ function extractLineColInfo(cmdStdOutput: string): Addr2LineOutput[] {
   return outputs;
 }
 
+// export async function runAddr2lineCommand(
+//   wasmFilePath: string,
+//   addr: number,
+// ): Promise<[number, string, string]> {
+//   return new Promise<[number, string, string]>((resolve, reject) => {
+//     const hexAddr = `0x${addr.toString(16)}`;
+//     const command = ['wasm-tools', 'addr2line', wasmFilePath, hexAddr];
+//     const process = spawn(command[0], command.slice(1), { stdio: 'pipe' });
+//     let stdout = '';
+//     let stderr = '';
+
+//     process.stdout.on('data', (data) => {
+//       stdout += data.toString();
+//     });
+
+//     process.stderr.on('data', (data) => {
+//       stderr += data.toString();
+//     });
+
+//     process.on('close', (code) => {
+//       if (typeof code !== 'number') {
+//         throw new Error(`Got a non number exitCode for addr2line`);
+//       }
+//       resolve([code, stdout, stderr]);
+//     });
+//     process.on('error', (err) => {
+//       reject(err);
+//     });
+//   });
+
 export async function runAddr2lineCommand(
   wasmFilePath: string,
   addr: number,
 ): Promise<[number, string, string]> {
   return new Promise<[number, string, string]>((resolve, reject) => {
-    const hexAddr = `0x${addr.toString(16)}`;
-    const command = ['wasm-tools', 'addr2line', wasmFilePath, hexAddr];
-    const process = spawn(command[0], command.slice(1), { stdio: 'pipe' });
-    let stdout = '';
-    let stderr = '';
-
-    process.stdout.on('data', (data) => {
-      stdout += data.toString();
-    });
-
-    process.stderr.on('data', (data) => {
-      stderr += data.toString();
-    });
-
-    process.on('close', (code) => {
-      if (typeof code !== 'number') {
-        throw new Error(`Got a non number exitCode for addr2line`);
+    const command = `wasm-tools addr2line ${wasmFilePath} ${addr}`;
+    const p = exec(command, (error, stdout, stderr) => {
+      if (typeof p.exitCode !== 'number') {
+        reject(new Error(`Got a non number exitCode for addr2line`));
+      } else if (error !== null) {
+        resolve([p.exitCode, stdout, error.message]);
+      } else {
+        resolve([p.exitCode, stdout, stderr]);
       }
-      resolve([code, stdout, stderr]);
-    });
-    process.on('error', (err) => {
-      reject(err);
     });
   });
 }
