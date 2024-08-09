@@ -48,7 +48,7 @@ describe('Debug Operations on Rust AST Blink App', function () {
     }
   });
 
-  it('"step into" debug operation', function () {
+  it('"step into" debug operation from location (44, 1)', function () {
     const startNodes = sourceCFG.nodesFromSourceLoc({
       source: sourcePath,
       linenr: 44,
@@ -68,7 +68,7 @@ describe('Debug Operations on Rust AST Blink App', function () {
     // logNode(nextPossibleLocations[0]);
   });
 
-  it('"step into" if-expression', function () {
+  it('"step into" if-expression from (56, 12)', function () {
     const startNodes = sourceCFG.nodesFromSourceLoc({
       source: sourcePath,
       linenr: 56,
@@ -86,7 +86,7 @@ describe('Debug Operations on Rust AST Blink App', function () {
     expect(nextPossibleLocations.length).to.equal(1);
   });
 
-  it('"step out" of a fun call', function () {
+  it('"step out" of a fun call from location (27, 5)', function () {
     const startNodes = sourceCFG.nodesFromSourceLoc({
       source: sourcePath,
       linenr: 27,
@@ -186,7 +186,7 @@ describe('Debug Operations on Rust AST Intermittent Blink', function () {
     expect(nextLoc.colnr).equal(19);
   });
 
-  it('"step out" of a "pin_mode" fun has 1 callside', function () {
+  it('"step out" from location (19, 5) of a "pin_mode" fun has 1 callside', function () {
     const startNode = sourceNodeFromLoc(sourceCFG, {
       source: sourcePath,
       linenr: 19,
@@ -200,7 +200,7 @@ describe('Debug Operations on Rust AST Intermittent Blink', function () {
     expect(loc.colnr).equal(19);
   });
 
-  it('"step out" of a "digital_write" fun has 3 callsides', function () {
+  it('"step out" from loc (25, 5) of a "digital_write" fun has 3 callsides', function () {
     const startNode = sourceNodeFromLoc(sourceCFG, {
       source: sourcePath,
       linenr: 25,
