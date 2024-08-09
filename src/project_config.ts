@@ -183,7 +183,7 @@ export function getPath2WABT(): string {
     );
   }
 
-  return `${sdkPaths.WABT}/bin`;
+  return `${sdkPaths.WABT}/build`;
 }
 
 export function getPath2WAT2WASM(): string {
