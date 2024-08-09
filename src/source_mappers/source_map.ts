@@ -148,7 +148,7 @@ export class SourceMap {
       return m.linenr === location.linenr;
     });
     logger.debug(
-      `#${candidates.length} candidates for SourceLoc {${location.linenr}, ${location.columnStart}}`,
+      `#${candidates.length} candidates for SourceLoc {${location.source}, ${location.linenr}, ${location.columnStart}}`,
     );
 
     for (const c of candidates) {
@@ -157,6 +157,10 @@ export class SourceMap {
         positions.push(c);
       }
     }
+
+    logger.debug(
+      `#${positions.length} found for SourceLoc {${location.source}, ${location.linenr}, ${location.columnStart}}`,
+    );
     return positions;
   }
 
