@@ -59,7 +59,7 @@ describe('Debug Operations on AssemblyScript Blink App', function () {
 
   it('"step over" pinMode (47, 3) function call', function () {
     const callNode = sourceCFG.nodesFromSourceLoc({
-      source: sourceMapPath,
+      source: srcPath,
       linenr: 47,
       columnStart: 3,
     });
@@ -73,7 +73,7 @@ describe('Debug Operations on AssemblyScript Blink App', function () {
 
   it('"step over" addTime (51, 23) function call', function () {
     const callNode = sourceCFG.nodesFromSourceLoc({
-      source: sourceMapPath,
+      source: srcPath,
       linenr: 51,
       columnStart: 23,
     });
