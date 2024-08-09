@@ -29,7 +29,7 @@ echo "> WABT: building tools"
 mkdir -p build
 cd build
 cmake ..
-make
+make wat2wasm
 cd ../../
 
 
