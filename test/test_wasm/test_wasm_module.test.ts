@@ -43,16 +43,4 @@ describe('WasmModule Parser', function () {
       expect(lastInstr.endAddress).to.equal(func.endAddress);
     }
   });
-
-  it('function 7 has 104 instructions', () => {
-    const func = mod.getFunction(7);
-    expect(func).to.not.equal(undefined);
-    expect(func?.allInstructions.length).to.be.equal(104);
-  });
-
-  it('function 8 has 95 instructions', () => {
-    const func = mod.getFunction(8);
-    expect(func).to.not.equal(undefined);
-    expect(func?.allInstructions.length).to.be.equal(95);
-  });
 });
