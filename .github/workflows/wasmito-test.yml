@@ -25,16 +25,9 @@ jobs:
         run: |
           rustup target add wasm32-unknown-unknown
 
-      - name: Install cargo-binstall Ubuntu
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          timeout 2m curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
-
-      - name: Install cargo-binstall && gtimeout in OSX
-        if: matrix.os == 'macos-latest'
+      - name: Install cargo-binstall (timeout after 2m)
         timeout-minutes: 2
         run: |
-          # brew install coreutils
           curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
 
       - name: Install wasm-tools v1.205.0
