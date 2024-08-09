@@ -5,7 +5,7 @@ import {
   readProjectDescription,
   readProjectName,
 } from '../project_config';
-import { DeviceManager } from '../device/device_manager';
+// import { type DeviceManager } from '../device/device_manager';
 import {
   type DeviceIdentityArgs,
   parseDeviceConfigs,
@@ -16,12 +16,13 @@ import {
   setLogLevel,
   getGlobalLogger,
 } from '../logger/logger';
+import { isDirectoryPath, isFilePath } from '../util/file_util';
 
 export function startCLI(): void {
   const projectName = readProjectName();
   console.log(figlet.textSync(projectName));
 
-  const dm = new DeviceManager();
+  // const dm = new DeviceManager();
   const program = new Command();
   program
     .name(projectName)
@@ -33,7 +34,9 @@ export function startCLI(): void {
     )
     .option('-log, --log-level <type>', 'set the log-level');
 
-  registerDeviceManagerCommands(dm, program);
+  // registerDeviceManagerCommands(dm, program);
+
+  registerCFGCommand(program);
 
   program.parse(process.argv);
 
@@ -66,45 +69,62 @@ export function startCLI(): void {
   }
 }
 
-function registerDeviceManagerCommands(
-  manager: DeviceManager,
-  program: Command,
-): void {
-  program
-    .command('spawn-vm')
-    .description('spawn an Development VM locally')
-    .argument('<string>', 'Wasm program to run')
-    .option('-p, --port <number>', 'the port where the VM will listen upon')
-    .option(
-      '--pause <boolean>',
-      'Should the program run on the VM be paused on start',
-      true,
-    )
-    .option(
-      '-n, --name <string>',
-      'a human readable name to assign for logging',
-    )
-    .option('--id <string>', 'a unique identifier to identify device')
-    .action(async (wasmApp, options) => {
-      getGlobalLogger().info(`spawning a DevVM for program ${wasmApp}`);
-      // const vmConfigArgs: VMConfigArgs = {
-      //   program: wasmApp,
-      //   toolPort: options.port,
-      // };
+// function registerDeviceManagerCommands(
+//   manager: DeviceManager,
+//   program: Command,
+// ): void {
+//   program
+//     .command('spawn-vm')
+//     .description('spawn an Development VM locally')
+//     .argument('<string>', 'the path to the Wasm program to run')
+//     .option('-p, --port <number>', 'the port where the VM will listen upon')
+//     .option(
+//       '--pause <boolean>',
+//       'Should the program run on the VM be paused on start',
+//       true,
+//     )
+//     .option(
+//       '-n, --name <string>',
+//       'a human readable name to assign for logging',
+//     )
+//     .option('--id <string>', 'a unique identifier to identify device')
+//     .action(async (wasmApp, options) => {
+//       getGlobalLogger().info(`spawning a DevVM for program ${wasmApp}`);
+//       // const vmConfigArgs: VMConfigArgs = {
+//       //   program: wasmApp,
+//       //   toolPort: options.port,
+//       // };
 
-      // const maxWaitTime = 3000; // Max waittime for connecting to the DevVM
-      try {
-        // await manager.spawnDevelopmentVM(vmConfigArgs, maxWaitTime);
-      } catch (err: unknown) {
-        let errMsg = '';
-        if (err instanceof Error) {
-          errMsg = `: ${err.message}`;
-        }
-        getGlobalLogger().error(`could not spawn DevVM ${errMsg}`);
-        getGlobalLogger().info('closing CLI');
-        process.exit(-1);
+//       // const maxWaitTime = 3000; // Max waittime for connecting to the DevVM
+//       try {
+//         // await manager.spawnDevelopmentVM(vmConfigArgs, maxWaitTime);
+//       } catch (err: unknown) {
+//         let errMsg = '';
+//         if (err instanceof Error) {
+//           errMsg = `: ${err.message}`;
+//         }
+//         getGlobalLogger().error(`could not spawn DevVM ${errMsg}`);
+//         getGlobalLogger().info('closing CLI');
+//         process.exit(-1);
+//       }
+//     });
+// }
+
+function registerCFGCommand(program: Command): void {
+  program
+    .command('cfg <wasm-path> <output-dir>')
+    .description(
+      'build SourceCode Level Control Flow Graphs (CFG) for the given Wasm module <wasm-path> and store them in <output-dir>',
+    )
+    .argument('[source-map-spec]')
+    .action((wasmPath, outputDir, sourceMapSpec) => {
+      if (!isFilePath(wasmPath)) {
+        program.error('<wasm-path> is not a valid path to a Wasm module');
+      } else if (!isDirectoryPath(outputDir)) {
+        program.error('<output-dir> is not a valid path to a directory');
+      } else if (sourceMapSpec !== undefined && !isFilePath(sourceMapSpec)) {
+        program.error('`source-map-spec` is not a path to a file');
       }
     });
 }
-
 startCLI();
