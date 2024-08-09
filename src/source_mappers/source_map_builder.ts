@@ -138,11 +138,13 @@ export async function SourceMapfromDWARFWasm(
 ): Promise<SourceMap> {
   const targetLanguage = await getProducer(wasmFilePath);
   const wasmAddresses = await getAddressRangeOffset(wasmFilePath);
-  const mappingsResults = await Promise.all(
-    wasmAddresses.map(async (addr: number) => {
-      return createMappingForAddr(wasmFilePath, addr);
-    }),
-  );
+  const mappingsResults: MappingItem[][] = [];
+  for (const addr of wasmAddresses) {
+    const m = await createMappingForAddr(wasmFilePath, addr);
+    if (m.length > 0) {
+      mappingsResults.push(m);
+    }
+  }
 
   let mappings: MappingItem[] = [];
   for (const m of mappingsResults) {
