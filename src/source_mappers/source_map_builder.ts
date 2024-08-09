@@ -17,6 +17,42 @@ export interface SourceOffsetStart {
   lineNrStartNumber: number;
 }
 
+function getOffsetToApply(
+  startPositioning: SourceOffsetStart,
+): [number, number] {
+  let colNrOffset = 0;
+  if (startPositioning.colNrStartNumber > 1) {
+    throw new Error(
+      `We have a startColnr greater than 1 ${startPositioning.colNrStartNumber}`,
+    );
+  } else if (startPositioning.colNrStartNumber === 0) {
+    colNrOffset = 1;
+  } else if (startPositioning.colNrStartNumber === 1) {
+    colNrOffset = 0;
+  } else {
+    throw new Error(
+      `We have a negative startColnr ${startPositioning.colNrStartNumber}`,
+    );
+  }
+
+  let lineNrOffset = 0;
+  if (startPositioning.lineNrStartNumber > 1) {
+    throw new Error(
+      `We have a startLinenr greater than 1 ${startPositioning.lineNrStartNumber}`,
+    );
+  } else if (startPositioning.lineNrStartNumber === 0) {
+    lineNrOffset = 1;
+  } else if (startPositioning.lineNrStartNumber === 1) {
+    lineNrOffset = 0;
+  } else {
+    throw new Error(
+      `We have a negative startLineNr ${startPositioning.lineNrStartNumber}`,
+    );
+  }
+
+  return [lineNrOffset, colNrOffset];
+}
+
 export async function SourceMapfromSourceMapSpec(
   pathToSourceMap: string,
   wasmPath: string,
@@ -51,35 +87,8 @@ export async function SourceMapfromSourceMapSpec(
     );
   }
 
-  let colNrOffset = 0;
-  if (startPositioning.colNrStartNumber > 1) {
-    throw new Error(
-      `We have a startColnr greater than 1 ${startPositioning.colNrStartNumber}`,
-    );
-  } else if (startPositioning.colNrStartNumber === 0) {
-    colNrOffset = 1;
-  } else if (startPositioning.colNrStartNumber === 1) {
-    colNrOffset = 0;
-  } else {
-    throw new Error(
-      `We have a negative startColnr ${startPositioning.colNrStartNumber}`,
-    );
-  }
+  const [lineNrOffset, colNrOffset] = getOffsetToApply(startPositioning);
 
-  let lineNrOffset = 0;
-  if (startPositioning.lineNrStartNumber > 1) {
-    throw new Error(
-      `We have a startLinenr greater than 1 ${startPositioning.lineNrStartNumber}`,
-    );
-  } else if (startPositioning.lineNrStartNumber === 0) {
-    lineNrOffset = 1;
-  } else if (startPositioning.lineNrStartNumber === 1) {
-    lineNrOffset = 0;
-  } else {
-    throw new Error(
-      `We have a negative startLineNr ${startPositioning.lineNrStartNumber}`,
-    );
-  }
   cleanedMappings = cleanedMappings.map((m: MappingItem) => {
     // case where either source, line number, column nr, is not avaialable should not occur
     // throw error just in case
