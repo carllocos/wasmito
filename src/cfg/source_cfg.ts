@@ -29,8 +29,9 @@ import { sourceControlFlowGraphToDot } from './dot_serialize';
 import { writeFileSync } from 'fs';
 import { type WASMFunction } from '../webassembly/wasm/wasm_function';
 import * as crypto from 'crypto';
+import { createLogger } from '../logger/logger';
 
-// const logger = createLogger('ASTControlFlowGraph');
+const logger = createLogger('ASTControlFlowGraph');
 export interface DotSerializationConfgig {
   includeInstructions: boolean;
   includeEmptySCFG: boolean;
@@ -80,11 +81,20 @@ export class SourceControlFlowGraph {
   }
 
   nodesFromSourceLoc(location: SourceCodeLocation2): SourceCFGNode[] {
+    logger.debug(
+      `get genereatedPosition for Location {${location.source}, ${location.linenr}, ${location.columnStart}}`,
+    );
     const mappings = this._sourceMap.generatedPositionFor(location);
+    logger.debug(
+      `#${mappings.lastIndexOf} mappings found for Location {${location.source}, ${location.linenr}, ${location.columnStart}}`,
+    );
     const nodes: SourceCFGNode[][] = [];
     for (const m of mappings) {
       const ns = this.nodesFromAddress(m.address);
       if (ns !== undefined) {
+        logger.debug(
+          `node found for addr ${m.address} for Location {${location.source}, ${location.linenr}, ${location.columnStart}}`,
+        );
         nodes.push([ns]);
       }
     }
