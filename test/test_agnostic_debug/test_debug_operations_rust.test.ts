@@ -54,7 +54,7 @@ describe('Debug Operations on Rust AST Blink App', function () {
       linenr: 44,
       columnStart: 1,
     });
-    assert(startNodes.length === 1);
+    assert(startNodes.length === 1, `#${startNodes.length} items instead of 1`);
     // logNode(sourceNode);
     const startNode = startNodes[0];
 
