@@ -14,12 +14,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install Rust and wasm32 targets
+      - name: Install Rust v1.80.1
         run: |
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain 1.80.1 -y
           source "$HOME/.cargo/env" 
-          rustup target add wasm32-unknown-unknown
           rustc --version
+
+      - name: Install wasm32 targets
+        run: |
+          rustup target add wasm32-unknown-unknown
 
       - name: Install cargo-binstall
         run: |
