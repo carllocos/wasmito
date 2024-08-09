@@ -27,30 +27,15 @@ export async function addr2line(
   addr: number,
   nrAttempts: number = 5,
 ): Promise<Addr2LineOutput[]> {
-  let attempts = 0;
-  while (attempts < nrAttempts) {
-    attempts += 1;
-    try {
-      const [exitCode, stdout, stderr] = await runAddr2lineCommand(
-        wasmFilePath,
-        addr,
-      );
-      if (exitCode !== 0 || stderr !== '') {
-        return [];
-      }
-      return extractLineColInfo(stdout);
-    } catch (err) {
-      if (
-        err instanceof Error &&
-        (err as NodeJS.ErrnoException).code === 'ENOTCONN'
-      ) {
-        logger.error('running command yield  ENOTCONN error:', err.message);
-      } else {
-        throw err;
-      }
-    }
+  const [exitCode, stdout, stderr] = await runAddr2lineCommand(
+    wasmFilePath,
+    addr,
+    nrAttempts,
+  );
+  if (exitCode !== 0 || stderr !== '') {
+    return [];
   }
-  return [];
+  return extractLineColInfo(stdout);
 }
 
 function extractLineColInfo(cmdStdOutput: string): Addr2LineOutput[] {
@@ -165,17 +150,56 @@ function extractLineColInfo(cmdStdOutput: string): Addr2LineOutput[] {
 export async function runAddr2lineCommand(
   wasmFilePath: string,
   addr: number,
+  maxAttempts: number = 5,
 ): Promise<[number, string, string]> {
-  return new Promise<[number, string, string]>((resolve, reject) => {
+  let attempts = 0;
+  while (attempts < maxAttempts) {
+    attempts += 1;
+    const [exitCode, stdout, stderr, retry] = await runAddr2lineCommandHelper(
+      wasmFilePath,
+      addr,
+    );
+    if (!retry) {
+      return [exitCode, stdout, stderr];
+    }
+    logger.debug(`#${attempts} for addr ${addr}`);
+  }
+  throw new Error(`Ran out of attempts for addr ${addr}`);
+}
+
+export async function runAddr2lineCommandHelper(
+  wasmFilePath: string,
+  addr: number,
+): Promise<[number, string, string, boolean]> {
+  return new Promise<[number, string, string, boolean]>((resolve, reject) => {
     const command = `wasm-tools addr2line ${wasmFilePath} ${addr}`;
-    const p = exec(command, (error, stdout, stderr) => {
-      if (typeof p.exitCode !== 'number') {
-        reject(new Error(`Got a non number exitCode for addr2line`));
-      } else if (error !== null) {
-        resolve([p.exitCode, stdout, error.message]);
+    try {
+      const p = exec(command, (error, stdout, stderr) => {
+        if (typeof p.exitCode !== 'number') {
+          reject(new Error(`Got a non number exitCode for addr2line`));
+        } else if (error !== null) {
+          resolve([p.exitCode, stdout, error.message, false]);
+        } else {
+          resolve([p.exitCode, stdout, stderr, false]);
+        }
+      });
+    } catch (err) {
+      if (err instanceof Error) {
+        const errcode = (err as NodeJS.ErrnoException).code;
+        if (errcode === 'ENOTCONN' || errcode === 'EBADF') {
+          resolve([-1, '', '', true]);
+        } else {
+          logger.error(
+            `Different error occurred during addr2line command: ${err.message}`,
+          );
+          throw err;
+        }
       } else {
-        resolve([p.exitCode, stdout, stderr]);
+        logger.error(
+          `Different error occurred during addr2line command: ${err}`,
+        );
+        throw err;
       }
-    });
+    }
   });
 }
