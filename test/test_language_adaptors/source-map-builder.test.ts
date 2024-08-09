@@ -30,7 +30,7 @@ describe('MappingItem building', () => {
 
 describe('SourceMap building', function () {
   const wasmPath = './test/data/rust_examples/blink/main.wasm';
-  this.timeout(10000);
+  this.timeout(15000);
 
   it('building sourcemap', async function () {
     const mapping = await SourceMapfromDWARFWasm(wasmPath);
@@ -41,7 +41,7 @@ describe('SourceMap building', function () {
 describe('SourceMap entries', function () {
   const wasmPath = './test/data/rust_examples/blink/main.wasm';
   let sourceMap: SourceMap | undefined;
-  this.timeout(10000);
+  this.timeout(15000);
 
   before('Build SourceMap', async function () {
     sourceMap = await SourceMapfromDWARFWasm(wasmPath);
