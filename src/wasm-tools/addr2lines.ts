@@ -1,4 +1,5 @@
 import { exec } from 'child_process';
+import { createLogger } from '../logger/logger';
 
 /*
  * This source file runs `wasm-tools addr2line` command and decodes result
@@ -11,6 +12,8 @@ import { exec } from 'child_process';
  *  Frames are printed innermost or youngest first."
  */
 
+const logger = createLogger('Addr2Line');
+
 export interface Addr2LineOutput {
   sourceFile: string;
   name: string;
@@ -22,16 +25,32 @@ export interface Addr2LineOutput {
 export async function addr2line(
   wasmFilePath: string,
   addr: number,
+  nrAttempts: number = 5,
 ): Promise<Addr2LineOutput[]> {
-  const [exitCode, stdout, stderr] = await runAddr2lineCommand(
-    wasmFilePath,
-    addr,
-  );
-  if (exitCode !== 0 || stderr !== '') {
-    return [];
+  let attempts = 0;
+  while (attempts < nrAttempts) {
+    attempts += 1;
+    try {
+      const [exitCode, stdout, stderr] = await runAddr2lineCommand(
+        wasmFilePath,
+        addr,
+      );
+      if (exitCode !== 0 || stderr !== '') {
+        return [];
+      }
+      return extractLineColInfo(stdout);
+    } catch (err) {
+      if (
+        err instanceof Error &&
+        (err as NodeJS.ErrnoException).code === 'ENOTCONN'
+      ) {
+        logger.error('running command yield  ENOTCONN error:', err.message);
+      } else {
+        throw err;
+      }
+    }
   }
-
-  return extractLineColInfo(stdout);
+  return [];
 }
 
 function extractLineColInfo(cmdStdOutput: string): Addr2LineOutput[] {
