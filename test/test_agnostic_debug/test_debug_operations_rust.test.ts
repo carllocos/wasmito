@@ -9,7 +9,6 @@ import {
 } from '../../src/cfg/source_cfg';
 import { DebugOperations } from '../../src/language_adaptors/debug_tree_operations';
 import {
-  logNode,
   sortIncreasingNr,
   sourceNodeFromLoc,
   sourceNodeLoc,
@@ -50,17 +49,14 @@ describe('Debug Operations on Rust AST Blink App', function () {
       columnStart: 1,
     });
     assert(startNodes.length === 1, `#${startNodes.length} items instead of 1`);
-    // logNode(sourceNode);
     const startNode = startNodes[0];
 
     let nextPossibleLocations = DebugOperations.stepIn(sourceCFG, startNode);
     expect(nextPossibleLocations.length).to.equal(1);
-    logNode(nextPossibleLocations[0]);
 
     const [pinModeCall] = nextPossibleLocations;
     nextPossibleLocations = DebugOperations.stepIn(sourceCFG, pinModeCall);
     expect(nextPossibleLocations.length).to.equal(1);
-    // logNode(nextPossibleLocations[0]);
   });
 
   it('"step into" if-expression from (56, 12)', function () {
