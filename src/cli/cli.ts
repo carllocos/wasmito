@@ -16,7 +16,7 @@ import {
   setLogLevel,
   getGlobalLogger,
 } from '../logger/logger';
-import { isDirectoryPath, isFilePath } from '../util/file_util';
+import { registerCFGCommand } from './cfg_command';
 
 export function startCLI(): void {
   const projectName = readProjectName();
@@ -110,21 +110,4 @@ export function startCLI(): void {
 //     });
 // }
 
-function registerCFGCommand(program: Command): void {
-  program
-    .command('cfg <wasm-path> <output-dir>')
-    .description(
-      'build SourceCode Level Control Flow Graphs (CFG) for the given Wasm module <wasm-path> and store them in <output-dir>',
-    )
-    .argument('[source-map-spec]')
-    .action((wasmPath, outputDir, sourceMapSpec) => {
-      if (!isFilePath(wasmPath)) {
-        program.error('<wasm-path> is not a valid path to a Wasm module');
-      } else if (!isDirectoryPath(outputDir)) {
-        program.error('<output-dir> is not a valid path to a directory');
-      } else if (sourceMapSpec !== undefined && !isFilePath(sourceMapSpec)) {
-        program.error('`source-map-spec` is not a path to a file');
-      }
-    });
-}
 startCLI();
