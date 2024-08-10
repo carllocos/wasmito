@@ -296,7 +296,7 @@ function createAllNodes(
   // asts: AgnosticASTMap,
   funGraph: WASMFunGraph,
 ): SourceCFGNode[] {
-  const entryNode = funGraph.entyNode;
+  const entryNode = funGraph.entryNode;
   const g = funGraph.graph;
   const nodes: SourceCFGNode[] = [];
 
@@ -428,7 +428,7 @@ function addEdgesAndReturnEntryNodes(
   funGraph: WASMFunGraph,
   nodes: SourceCFGNode[],
 ): SourceCFGNode[] {
-  const entryNode = funGraph.entyNode;
+  const entryNode = funGraph.entryNode;
   const g = funGraph.graph;
   const entryCTGNodes: SourceCFGNode[] = [];
   const entryNodesAdded = new Set<string>();

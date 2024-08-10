@@ -36,7 +36,7 @@ export interface CFGNode {
 export type WasmGraph = Map<number, CFGNode>;
 
 export interface WASMFunGraph {
-  entyNode: CFGNode;
+  entryNode: CFGNode;
   graph: WasmGraph;
   calls: WasmInstruction[];
 }
@@ -342,7 +342,7 @@ function buildCFGForFunc(fun: WASMFunction): WASMFunGraph {
     },
   ]);
   const entryNode = getWasmCFGNode(g, fun.allInstructions[0].startAddress);
-  return { entyNode: entryNode, graph: g, calls: funsCalled };
+  return { entryNode, graph: g, calls: funsCalled };
 }
 
 interface BlockScope {
