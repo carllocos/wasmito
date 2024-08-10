@@ -180,15 +180,15 @@ export class IfInstruction extends WasmInstruction {
   constructor(
     label: string,
     test: WasmInstruction[],
-    alternate: WasmInstruction[],
-    consequent: WasmInstruction[],
-    result?: WASM.Type,
+    alternative: WasmInstruction[],
+    consequence: WasmInstruction[],
+    resultType?: WASM.Type,
   ) {
     super('if', WASMOpcodeNumber.If);
     this.label = label;
     this.testInstructions = test;
-    this.alternative = alternate;
-    this.consequence = consequent;
+    this.alternative = alternative;
+    this.consequence = consequence;
 
     if (this.consequence.length === 0) {
       throw new Error(
@@ -217,8 +217,8 @@ export class IfInstruction extends WasmInstruction {
       }
     }
 
-    this.resultType = result;
-    this.subInstructions = test.concat(alternate, consequent);
+    this.resultType = resultType;
+    this.subInstructions = test.concat(alternative, consequence);
   }
 
   hasAlternativeBlock(): boolean {
@@ -232,9 +232,9 @@ export function isIfInstruction(inst: WasmInstruction): inst is IfInstruction {
 
 export class BlockInstruction extends WasmInstruction {
   public readonly label: string;
-  constructor(blockLabel: string, subInstructions: WasmInstruction[]) {
+  constructor(label: string, subInstructions: WasmInstruction[]) {
     super('block', WASMOpcodeNumber.Block);
-    this.label = blockLabel;
+    this.label = label;
     this.subInstructions = subInstructions;
     this.subInstructions.sort((i1, i2) => i1.startAddress - i2.startAddress);
     if (this.subInstructions.length === 0) {
@@ -276,12 +276,12 @@ export class LoopInstruction extends WasmInstruction {
   public readonly label: string;
   public readonly resultType?: WASM.Type;
   constructor(
-    loopLabel: string,
+    label: string,
     subInstructions: WasmInstruction[],
     resultType?: WASM.Type,
   ) {
     super('loop', WASMOpcodeNumber.Loop);
-    this.label = loopLabel;
+    this.label = label;
     this.subInstructions = subInstructions;
     this.resultType = resultType;
     this.subInstructions.sort((i1, i2) => i1.startAddress - i2.startAddress);
