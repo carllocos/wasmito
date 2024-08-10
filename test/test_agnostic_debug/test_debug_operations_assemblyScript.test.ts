@@ -42,7 +42,6 @@ describe('Debug Operations on AssemblyScript Blink App', function () {
       const sm = await SourceMapfromSourceMapSpec(
         sourceMapPath,
         wasmPath,
-        'typescript',
         startPositioning,
         sourceMapConfig,
       );
@@ -117,7 +116,6 @@ describe('Debug Operations on AS Intermittent Blink', function () {
       const sm = await SourceMapfromSourceMapSpec(
         sourceMapPath,
         wasmPath,
-        'typescript',
         startPositioning,
         sourceMapConfig,
       );

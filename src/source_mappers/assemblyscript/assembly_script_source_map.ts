@@ -102,7 +102,7 @@ export async function SourceMapFromASConfigPath(
   }
 
   const sourceLocs = cleanedMappings.map(mappingItemToSourceCodeLocation);
-  const sm = new SourceMap('typescript', config.wasmPath, sources, sourceLocs);
+  const sm = new SourceMap(config.wasmPath, sources, sourceLocs);
   return sm;
 }
 

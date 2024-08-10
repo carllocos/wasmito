@@ -80,16 +80,13 @@ export class SourceMap {
   private readonly _mappings: SourceCodeLocation[];
   private readonly _wasmPath: string;
   public readonly wasm: WasmModule;
-  public readonly targetLanguage: string;
 
   constructor(
-    targetLanguage: string,
     wasmPath: string,
     sources: string[],
     mappings: SourceCodeLocation[],
     config?: SourceMapConfig,
   ) {
-    this.targetLanguage = targetLanguage;
     this._wasmPath = wasmPath;
     this._sourceToAbsPathSource = config?.srcToAbsPath ?? new Map();
     this._ignoreDirs = config?.ignoreDirectories ?? [];
@@ -303,7 +300,7 @@ export class SourceMap {
     }
     const mpsStr = maps.map(sourceCodeLocationToString).join(',');
 
-    const content = `{"language":"${this.targetLanguage}", "mappings":[${mpsStr}]}`;
+    const content = `{"mappings":[${mpsStr}]}`;
     writeFileSync(filePath, content);
   }
 }

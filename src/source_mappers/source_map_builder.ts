@@ -8,7 +8,6 @@ import { type MappingItem, SourceMapConsumer } from 'source-map';
 import { createLogger } from '../logger/logger';
 import { addr2line } from '../wasm-tools/addr2lines';
 import { wasmToolsObjdump } from '../wasm-tools/objdump';
-import { getProducer } from '../wasm-tools/metadata_wasm';
 
 const logger = createLogger('SourceMapBuilder');
 
@@ -56,7 +55,6 @@ function getOffsetToApply(
 export async function SourceMapfromSourceMapSpec(
   pathToSourceMap: string,
   wasmPath: string,
-  targetLanguage: string,
   startPositioning: SourceOffsetStart,
   config?: SourceMapConfig,
 ): Promise<SourceMap> {
@@ -123,20 +121,13 @@ export async function SourceMapfromSourceMapSpec(
   }
 
   const sourceLocs = cleanedMappings.map(mappingItemToSourceCodeLocation);
-  const sm = new SourceMap(
-    targetLanguage,
-    wasmPath,
-    cleanedSources,
-    sourceLocs,
-    config,
-  );
+  const sm = new SourceMap(wasmPath, cleanedSources, sourceLocs, config);
   return sm;
 }
 
 export async function SourceMapfromDWARFWasm(
   wasmFilePath: string,
 ): Promise<SourceMap> {
-  const targetLanguage = await getProducer(wasmFilePath);
   const wasmAddresses = await getAddressRangeOffset(wasmFilePath);
   const mappingsResults: MappingItem[][] = [];
   for (const addr of wasmAddresses) {
@@ -160,7 +151,7 @@ export async function SourceMapfromDWARFWasm(
   // convert to set to remove duplicates
   const sources = Array.from(new Set(mappings.map((m) => m.source)));
   const sourceLocations = mappings.map(mappingItemToSourceCodeLocation);
-  return new SourceMap(targetLanguage, wasmFilePath, sources, sourceLocations);
+  return new SourceMap(wasmFilePath, sources, sourceLocations);
 }
 
 export async function createMappingForAddr(
