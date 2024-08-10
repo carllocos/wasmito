@@ -67,7 +67,6 @@ export class DefaultCompiler extends SourceCodeCompiler {
         : SourceMapfromSourceMapSpec(
             compilerArgs.pathToSourceMap,
             compilerArgs.pathToWasm,
-            this.targetLanguage,
             { lineNrStartNumber: 0, colNrStartNumber: 0 },
           );
     return await constructLanguageAdaptor(await sm);

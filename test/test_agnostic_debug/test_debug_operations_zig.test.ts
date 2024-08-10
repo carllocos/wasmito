@@ -39,7 +39,6 @@ describe('Debug Operations on Zig App', function () {
       const sm = await SourceMapfromSourceMapSpec(
         sourceMapPath,
         wasmPath,
-        'zig',
         startPositioning,
         sourceMapConfig,
       );

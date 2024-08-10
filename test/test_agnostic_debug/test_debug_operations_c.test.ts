@@ -36,7 +36,6 @@ describe('Debug operations on C Blink Intermittent App', function () {
       const sm = await SourceMapfromSourceMapSpec(
         pathToSrcMap,
         app,
-        'unused',
         startPositioning,
         sourceMapConfig,
       );
