@@ -22,12 +22,20 @@ export function getFileExtension(filePath: string): string | undefined {
   return extension;
 }
 
-export function getFileName(filename: string): string {
+export function getFileName(
+  filename: string,
+  includeExtension: boolean = true,
+): string {
   const splits = filename.split('/');
   if (splits.length === 0) {
     return '';
   } else {
-    return splits[splits.length - 1];
+    const fn = splits[splits.length - 1];
+    if (includeExtension) {
+      return fn;
+    } else {
+      return fn.split('.')[0];
+    }
   }
 }
 
