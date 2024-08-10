@@ -28,7 +28,7 @@ describe('Rust Language Adaptor for Blink App', function () {
     try {
       const funGraph = buildControlFlowGraphFunction(mod, 7);
       expect(funGraph).to.not.equal(undefined);
-      expect(funGraph.entyNode).to.not.equal(undefined);
+      expect(funGraph.entryNode).to.not.equal(undefined);
       expect(funGraph.graph).to.not.equal(undefined);
     } catch (e) {
       this.fail(`Building CFG for function 7 should be possible. Error ${e}`);
