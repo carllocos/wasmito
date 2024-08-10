@@ -17,6 +17,7 @@ import {
 import { type WasmModule } from '../webassembly/wasm/wasm_module';
 import { wasmControlFlowGraphToDot } from './dot_serialize';
 import path from 'path';
+import { getFileName } from '../util/file_util';
 
 export interface CFGEdge {
   instrFrom: WasmInstruction;
@@ -39,6 +40,43 @@ export interface WASMFunGraph {
   entryNode: CFGNode;
   graph: WasmGraph;
   calls: WasmInstruction[];
+}
+
+function cfgNodeToObj(nd: CFGNode): object {
+  return {
+    nodeID: nd.nodeID,
+    changesFlow: nd.changesFlow,
+    startAddress: nd.startAddress,
+    endAddress: nd.endAddress,
+    instructions: nd.instructions.map((i) => i.toJSONObj()),
+    instructionsIndexes: nd.instructionsIndexes,
+    edges: nd.edges.map((e) => edgeToJSONObj(e)),
+  };
+}
+
+function edgeToJSONObj(e: CFGEdge): object {
+  return {
+    instrFrom: e.instrFrom.toJSONObj(),
+    instrTo: e.instrTo.toJSONObj(),
+  };
+}
+
+function wasmFuncGraphToJSONObj(f: WASMFunGraph): object {
+  const g: Array<{
+    wasmAddr: number;
+    node: object;
+  }> = [];
+  for (const [wasmAddr, nd] of f.graph.entries()) {
+    g.push({
+      wasmAddr,
+      node: cfgNodeToObj(nd),
+    });
+  }
+  return {
+    entryNode: cfgNodeToObj(f.entryNode),
+    graph: g,
+    calls: f.calls.map((c) => c.toJSONObj()),
+  };
 }
 
 export class WasmControlFlowGraph {
@@ -85,6 +123,34 @@ export class WasmControlFlowGraph {
       dots.push(content);
     }
     return dots;
+  }
+
+  toJSON(outputDir?: string): string {
+    const funcsJSONs: object[] = [];
+    for (const f of this._wasm.functions) {
+      const cfg = this.getCFG(f.id);
+      if (cfg === undefined) {
+        continue;
+      }
+      funcsJSONs.push({
+        funID: f.id,
+        graph: wasmFuncGraphToJSONObj(cfg),
+      });
+    }
+
+    const c = {
+      path: this._wasm.wasmPath,
+      funcs: funcsJSONs,
+    };
+
+    const json = JSON.stringify(c);
+    if (outputDir !== undefined) {
+      const includeExtension = false;
+      const fn = getFileName(this._wasm.wasmPath, includeExtension);
+      const destinationPath = path.join(outputDir, `${fn}.json`);
+      writeFileSync(destinationPath, json);
+    }
+    return json;
   }
 
   private buildGraphs(): void {

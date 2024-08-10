@@ -59,6 +59,7 @@ export function registerCFGCommand(program: Command): void {
 
         const wasmOutputDir = path.join(outputDir, '/cfg/wasm');
         createDirectoryIfUnexisting(wasmOutputDir);
+        langAdaptor.sourceCFG.wasmCFG.toJSON(wasmOutputDir);
         langAdaptor.sourceCFG.wasmCFG.serializeToDot(wasmOutputDir);
         const config: DotSerializationConfgig = {
           includeInstructions: false,

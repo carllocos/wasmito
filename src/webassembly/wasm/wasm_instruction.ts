@@ -74,6 +74,22 @@ export class WasmInstruction {
   public getArgs(): string[] {
     return this.args;
   }
+
+  public toJSONObj(): object {
+    return {
+      startAddress: this.startAddress,
+      endAddress: this.endAddress,
+      opcodeName: this.name,
+      opcodeNr: this.opcodeNr,
+      immediate: this.immediate ?? -1,
+      subInstructions: this.subInstructions.map((i) => i.toJSONObj()),
+      allSubInstructions: this.allSubInstructions.map((i) => i.toJSONObj()),
+    };
+  }
+
+  public toJSON(): string {
+    return JSON.stringify(this.toJSONObj());
+  }
 }
 
 export function instructionToString(
@@ -102,6 +118,12 @@ export class BranchIf extends WasmInstruction {
   get brachTarget(): number {
     return this._branchTarget;
   }
+
+  public override toJSONObj(): object {
+    const obj: any = super.toJSONObj();
+    obj.branchTarget = this.brachTarget;
+    return obj;
+  }
 }
 
 export function isBranchIf(inst: WasmInstruction): inst is BranchIf {
@@ -122,6 +144,12 @@ export class Branch extends WasmInstruction {
 
   get brachTarget(): number {
     return this._branchTarget;
+  }
+
+  public override toJSONObj(): object {
+    const obj: any = super.toJSONObj();
+    obj.branchTarget = this.brachTarget;
+    return obj;
   }
 }
 
@@ -149,6 +177,12 @@ export class BranchTable extends WasmInstruction {
 
   get brachTargets(): number[] {
     return this._branchTargets;
+  }
+
+  public override toJSONObj(): object {
+    const obj: any = super.toJSONObj();
+    obj.branchTargets = this.brachTargets;
+    return obj;
   }
 }
 
@@ -224,6 +258,16 @@ export class IfInstruction extends WasmInstruction {
   hasAlternativeBlock(): boolean {
     return this.alternative.length > 0;
   }
+
+  public override toJSONObj(): object {
+    const obj: any = super.toJSONObj();
+    obj.label = this.label;
+    obj.test = this.testInstructions.map((i) => i.toJSONObj());
+    obj.alternative = this.alternative.map((i) => i.toJSONObj());
+    obj.consequence = this.consequence.map((i) => i.toJSONObj());
+    obj.resultType = this.resultType ?? '';
+    return obj;
+  }
 }
 
 export function isIfInstruction(inst: WasmInstruction): inst is IfInstruction {
@@ -249,6 +293,13 @@ export class BlockInstruction extends WasmInstruction {
       );
     }
   }
+
+  public override toJSONObj(): object {
+    const obj: any = super.toJSONObj();
+    obj.label = this.label;
+    obj.subInstructions = this.subInstructions.map((i) => i.toJSONObj());
+    return obj;
+  }
 }
 
 export class CallInstruction extends WasmInstruction {
@@ -257,6 +308,12 @@ export class CallInstruction extends WasmInstruction {
     super('call', WASMOpcodeNumber.Call);
     this.args = [funName];
     this.funIdx = funIdx;
+  }
+
+  public override toJSONObj(): object {
+    const obj: any = super.toJSONObj();
+    obj.funIdx = this.funIdx;
+    return obj;
   }
 }
 
@@ -297,6 +354,14 @@ export class LoopInstruction extends WasmInstruction {
         `Last instruction of Loop subInstructions is expected to be an 'end' instruction got ${lastInstr.name}'`,
       );
     }
+  }
+
+  public override toJSONObj(): object {
+    const obj: any = super.toJSONObj();
+    obj.label = this.label;
+    obj.subInstructions = this.subInstructions.map((i) => i.toJSONObj());
+    obj.resultType = this.resultType ?? '';
+    return obj;
   }
 }
 
