@@ -67,6 +67,7 @@ export function registerCFGCommand(program: Command): void {
         };
         const sourceCFGsOutputDir = path.join(outputDir, '/cfg/source/');
         createDirectoryIfUnexisting(sourceCFGsOutputDir);
+        langAdaptor.sourceCFG.toJSON(sourceCFGsOutputDir);
         langAdaptor.sourceCFG.serializeToDot(sourceCFGsOutputDir, config);
       } catch (e) {
         const errMsg = e instanceof Error ? e.message : e;
