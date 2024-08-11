@@ -132,9 +132,11 @@ export class WasmControlFlowGraph {
       if (cfg === undefined) {
         continue;
       }
+      const callsites: number[] = Array.from(this._callSites.get(f.id) ?? []);
       funcsJSONs.push({
         funID: f.id,
         graph: wasmFuncGraphToJSONObj(cfg),
+        callSitesWasmAddrs: callsites,
       });
     }
 
