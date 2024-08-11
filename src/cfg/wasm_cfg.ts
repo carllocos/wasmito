@@ -147,7 +147,7 @@ export class WasmControlFlowGraph {
     if (outputDir !== undefined) {
       const includeExtension = false;
       const fn = getFileName(this._wasm.wasmPath, includeExtension);
-      const destinationPath = path.join(outputDir, `${fn}.json`);
+      const destinationPath = path.join(outputDir, `${fn}.wasm.json`);
       writeFileSync(destinationPath, json);
     }
     return json;
