@@ -24,12 +24,13 @@ import {
   type AgnosticASTMap,
   type AgnosticNode,
 } from '../language_adaptors/agnostic_node';
-import { isFilePath, pathJoin } from '../util/file_util';
+import { getFileName, isFilePath, pathJoin } from '../util/file_util';
 import { sourceControlFlowGraphToDot } from './dot_serialize';
 import { writeFileSync } from 'fs';
 import { type WASMFunction } from '../webassembly/wasm/wasm_function';
 import * as crypto from 'crypto';
 import { createLogger } from '../logger/logger';
+import path from 'path';
 
 const logger = createLogger('ASTControlFlowGraph');
 export interface DotSerializationConfgig {
@@ -203,6 +204,36 @@ export class SourceControlFlowGraph {
     }
     return dots;
   }
+
+  toJSON(outputDir?: string): string {
+    const fgs: Array<{
+      funID: number;
+      graph: object;
+    }> = [];
+    for (const f of this._sourceMap.wasm.functions) {
+      const g = this._astGraphs.get(f.id);
+      if (g !== undefined) {
+        fgs.push({
+          funID: f.id,
+          graph: functionTreeGraphToJSONObj(g),
+        });
+      }
+    }
+
+    const content: object = {
+      wasmPath: this._sourceMap.wasm.wasmPath,
+      graphs: fgs,
+    };
+
+    const json = JSON.stringify(content);
+    if (outputDir !== undefined) {
+      const includeExtension = false;
+      const fn = getFileName(this._sourceMap.wasm.wasmPath, includeExtension);
+      const destinationPath = path.join(outputDir, `${fn}.source.json`);
+      writeFileSync(destinationPath, json);
+    }
+    return json;
+  }
 }
 
 export interface SourceCFGNode {
@@ -214,6 +245,22 @@ export interface SourceCFGNode {
   instructions: WasmInstruction[];
   instructionsIndexes: number[];
   addressesWithoutASTNode: Set<number>;
+}
+function sourceCFGNodeToJSONObj(n: SourceCFGNode): object {
+  const edges: object[] = n.edges.map((e) => {
+    return { nodeID: e.nodeId };
+  });
+
+  return {
+    nodeId: n.nodeId,
+    node: 'TODO AgnosticNode',
+    sourceLocation: n.sourceLocation as object,
+    wasmFunOwner: n.wasmFunOwner,
+    instructions: n.instructions.map((i) => i.toJSONObj()),
+    instructionsIndexes: n.instructionsIndexes,
+    addressesWithoutASTNode: Array.from(n.addressesWithoutASTNode),
+    edges,
+  };
 }
 
 export function sourceCFGHasOutgoingFunCallEdges(n: SourceCFGNode): boolean {
@@ -247,6 +294,13 @@ export function sourceNodeLastInstructionStartAddress(
 export interface FunctionTreeGraph {
   entryNodes: SourceCFGNode[];
   allNodes: SourceCFGNode[];
+}
+
+function functionTreeGraphToJSONObj(f: FunctionTreeGraph): object {
+  return {
+    entryNodes: f.entryNodes.map((en) => en.nodeId),
+    allNodes: f.allNodes.map((en) => sourceCFGNodeToJSONObj(en)),
+  };
 }
 
 function buildSourceCFGraph(
