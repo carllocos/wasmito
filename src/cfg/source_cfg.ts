@@ -119,7 +119,7 @@ export class SourceControlFlowGraph {
       return [];
     }
 
-    return f.entyNodes;
+    return f.entryNodes;
   }
 
   allNodes(): SourceCFGNode[] {
@@ -139,7 +139,7 @@ export class SourceControlFlowGraph {
             // or a function for which no source file is available
             continue;
           }
-          graphi.entyNodes.forEach((n) => {
+          graphi.entryNodes.forEach((n) => {
             if (!alreadyAdded.has(n.nodeId)) {
               entryNodes.push(n);
               alreadyAdded.add(n.nodeId);
@@ -187,7 +187,7 @@ export class SourceControlFlowGraph {
     const dots: string[] = [];
     for (const fid of funIds) {
       const fg = this.funtionSourceGraph(fid);
-      if (fg === undefined || fg.entyNodes.length === 0) {
+      if (fg === undefined || fg.entryNodes.length === 0) {
         continue;
       }
       if (fg?.allNodes !== undefined) {
@@ -245,7 +245,7 @@ export function sourceNodeLastInstructionStartAddress(
 }
 
 export interface FunctionTreeGraph {
-  entyNodes: SourceCFGNode[];
+  entryNodes: SourceCFGNode[];
   allNodes: SourceCFGNode[];
 }
 
@@ -279,9 +279,9 @@ function buildCTGraphForFunction(
   // console.log(`===================================`);
   // console.log(`Adding Edges for function ${f.id}`);
   // console.log(`===================================`);
-  const entyNodes =
+  const entryNodes =
     ns.length === 0 ? [] : addEdgesAndReturnEntryNodes(graph, ns);
-  return { entyNodes, allNodes: ns };
+  return { entryNodes, allNodes: ns };
 }
 
 // function logNode(n: AgnosticNode): string {

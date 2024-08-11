@@ -81,7 +81,7 @@ export function sourceControlFlowGraphToDot(
   nameGraph: string,
   includeInstructions: boolean = false,
 ): string {
-  const entryNodes = new Set(fgraph.entyNodes.map((n) => n.nodeId));
+  const entryNodes = new Set(fgraph.entryNodes.map((n) => n.nodeId));
   const allnodes = fgraph.allNodes;
   const header = `digraph "CFG of ${nameGraph}" `;
   const nodesDone = new Set<string>();
