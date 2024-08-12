@@ -13,15 +13,18 @@ import {
 } from '../source_mappers/source_map_builder';
 import { constructLanguageAdaptor } from '../language_adaptors/language_adaptor';
 import { type DotSerializationConfgig } from '../cfg/source_cfg';
+import { timeoutPromise } from '../util/promise_util';
 
 export function registerCFGCommand(program: Command): void {
   program
-    .command('cfg <wasm-path> <output-dir>')
+    .command('cfg <wasm-path> <output-dir> <timeout-secs>')
     .description(
-      'build SourceCode Level Control Flow Graphs (CFG) for the given Wasm module <wasm-path> and store them in <output-dir>',
+      `build SourceCode Level Control Flow Graphs (CFG) for the given Wasm module <wasm-path>
+       and store them in <output-dir>.
+       Specify also a max build time allowed <timeout-secs> expressed in secs.`,
     )
     .argument('[source-map-spec]')
-    .action(async (wasmPath, outputDir, sourceMapSpecPath) => {
+    .action(async (wasmPath, outputDir, timeout, sourceMapSpecPath) => {
       if (!isFilePath(wasmPath)) {
         program.error('<wasm-path> is not a valid path to a Wasm module');
       } else if (!isDirectoryPath(outputDir)) {
@@ -33,19 +36,32 @@ export function registerCFGCommand(program: Command): void {
         program.error('`source-map-spec` is not a path to a file');
       }
 
+      let timeoutSecs = Number(timeout);
+      if (isNaN(timeoutSecs) || timeoutSecs < 0) {
+        program.error('`<timeout-secs>` is not a positive number');
+      } else {
+        timeoutSecs = timeoutSecs * 1000; // convert to secs
+      }
+
       let smPromise: Promise<SourceMap> | undefined;
       if (sourceMapSpecPath !== undefined) {
         const startPositioning: SourceOffsetStart = {
           colNrStartNumber: 0,
           lineNrStartNumber: 1,
         };
-        smPromise = SourceMapfromSourceMapSpec(
-          sourceMapSpecPath,
-          wasmPath,
-          startPositioning,
+        smPromise = timeoutPromise(
+          SourceMapfromSourceMapSpec(
+            sourceMapSpecPath,
+            wasmPath,
+            startPositioning,
+          ),
+          timeoutSecs,
         );
       } else {
-        smPromise = SourceMapfromDWARFWasm(wasmPath);
+        smPromise = timeoutPromise(
+          SourceMapfromDWARFWasm(wasmPath),
+          timeoutSecs,
+        );
       }
       try {
         const sm = await smPromise;
@@ -70,7 +86,7 @@ export function registerCFGCommand(program: Command): void {
         langAdaptor.sourceCFG.serializeToDot(sourceCFGsOutputDir, config);
       } catch (e) {
         const errMsg = e instanceof Error ? e.message : e;
-        program.error(`Could not CFGs error occured: ${errMsg}`);
+        program.error(`Could not build CFGs error occured: ${errMsg}`);
       }
     });
 }
