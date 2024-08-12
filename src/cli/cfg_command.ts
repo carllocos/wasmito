@@ -49,15 +49,14 @@ export function registerCFGCommand(program: Command): void {
       }
       try {
         const sm = await smPromise;
-        const mappingsPath = path.join(outputDir, '/cfg/');
-        createDirectoryIfUnexisting(mappingsPath);
-        sm.storeMappingsToJSON(path.resolve(mappingsPath, 'mappings.json'));
+        createDirectoryIfUnexisting(outputDir);
+        sm.storeMappingsToJSON(path.resolve(outputDir, 'mappings.json'));
         const langAdaptor = await constructLanguageAdaptor(sm);
         if (langAdaptor.sourceCFG === undefined) {
           program.error(`Could not build Source CFGs`);
         }
 
-        const wasmOutputDir = path.join(outputDir, '/cfg/wasm');
+        const wasmOutputDir = path.join(outputDir, `/wasm`);
         createDirectoryIfUnexisting(wasmOutputDir);
         langAdaptor.sourceCFG.wasmCFG.toJSON(wasmOutputDir);
         langAdaptor.sourceCFG.wasmCFG.serializeToDot(wasmOutputDir);
@@ -65,7 +64,7 @@ export function registerCFGCommand(program: Command): void {
           includeInstructions: false,
           includeEmptySCFG: false,
         };
-        const sourceCFGsOutputDir = path.join(outputDir, '/cfg/source/');
+        const sourceCFGsOutputDir = path.join(outputDir, `/source/`);
         createDirectoryIfUnexisting(sourceCFGsOutputDir);
         langAdaptor.sourceCFG.toJSON(sourceCFGsOutputDir);
         langAdaptor.sourceCFG.serializeToDot(sourceCFGsOutputDir, config);
