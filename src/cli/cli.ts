@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import * as figlet from 'figlet';
+// import * as figlet from 'figlet';
 import {
   readProjectVersionNumber,
   readProjectDescription,
