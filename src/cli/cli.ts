@@ -20,7 +20,7 @@ import { registerCFGCommand } from './cfg_command';
 
 export function startCLI(): void {
   const projectName = readProjectName();
-  console.log(figlet.textSync(projectName));
+  // console.log(figlet.textSync(projectName));
 
   // const dm = new DeviceManager();
   const program = new Command();
