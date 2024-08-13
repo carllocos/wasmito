@@ -40,7 +40,13 @@ export class WasmModule {
   private readonly _sections: Section[];
 
   constructor(wasmPath: string) {
-    const mod: ParsedModule = parseWasmModule(wasmPath);
+    const [mod, errors] = parseWasmModule(wasmPath);
+    if (errors.length > 0) {
+      const errMsg = errors.join('\n');
+      throw new Error(
+        `Errors occurred while parsing module ${wasmPath}\n: ${errMsg}`,
+      );
+    }
     this.wasmPath = wasmPath;
     this._sections = createSections(mod);
     this.functions = createWasmFunctions(wasmPath, mod);
