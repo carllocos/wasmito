@@ -23,7 +23,15 @@ export function registerCFGCommand(program: Command): void {
        and store them in <output-dir>.
        Specify also a max build time allowed <timeout-secs> expressed in secs.`,
     )
-    .argument('[source-map-spec]')
+    .argument(
+      '[source-map-spec]',
+      `optional path to a Source Map Spec.
+      
+      If provided the CFG is build using the source mappings from the given file.
+      If not provided the CFG is build using only the <wasm-path> which is assumed to containd DWARF debugging
+      information
+      `,
+    )
     .action(async (wasmPath, outputDir, timeout, sourceMapSpecPath) => {
       if (!isFilePath(wasmPath)) {
         program.error('<wasm-path> is not a valid path to a Wasm module');
