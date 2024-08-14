@@ -535,6 +535,7 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
     case 'xor':
     case 'div_u':
     case 'extend_u/i32':
+    case 'extend_s/i32':
     case 'rem_u':
     case 'le_s':
     case 'load':
