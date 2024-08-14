@@ -485,6 +485,8 @@ export function wasmOpcodeFromStr(opcode: string): WASMOpcodeNumber {
       return WASMOpcodeNumber.I64Add;
     case 'i64.sub':
       return WASMOpcodeNumber.I64Sub;
+    case 'i64.mul':
+      return WASMOpcodeNumber.I64Mul;
     case 'i64.div_s':
       return WASMOpcodeNumber.I64DivSigned;
     case 'i64.div_u':
