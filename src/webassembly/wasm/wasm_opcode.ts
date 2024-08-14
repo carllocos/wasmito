@@ -515,6 +515,10 @@ export function wasmOpcodeFromStr(opcode: string): WASMOpcodeNumber {
       return WASMOpcodeNumber.I64LEUnsigned;
     case 'i64.ge_u':
       return WASMOpcodeNumber.I64GEUnsigned;
+    case 'i64.gt_s':
+      return WASMOpcodeNumber.I64GTSigned;
+    case 'i64.gt_u':
+      return WASMOpcodeNumber.I64GTUnsigned;
     case 'i64.reinterpret/f64':
       return WASMOpcodeNumber.I64Reinterpret_F64;
     case 'i64.extend_u/i32':
@@ -583,6 +587,8 @@ export function wasmOpcodeFromStr(opcode: string): WASMOpcodeNumber {
       return WASMOpcodeNumber.I32ROTL;
     case 'i32.rotr':
       return WASMOpcodeNumber.I32ROTR;
+    case 'i32.wrap/i64':
+      return WASMOpcodeNumber.I32Wrap_I64;
 
     case 'f32.add':
       return WASMOpcodeNumber.F32Add;
