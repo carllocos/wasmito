@@ -502,6 +502,7 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
       op = new BranchTable(branchTargets);
       break;
     }
+    case 'wrap/i64':
     case 'const':
     case 'sub':
     case 'div':
