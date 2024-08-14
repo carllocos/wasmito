@@ -521,6 +521,8 @@ export function wasmOpcodeFromStr(opcode: string): WASMOpcodeNumber {
       return WASMOpcodeNumber.I64GTUnsigned;
     case 'i64.reinterpret/f64':
       return WASMOpcodeNumber.I64Reinterpret_F64;
+    case 'i64.extend_s/i32':
+      return WASMOpcodeNumber.I64Extend_s_I32;
     case 'i64.extend_u/i32':
       return WASMOpcodeNumber.I64Extend_u_I32;
     case 'i64.load':
