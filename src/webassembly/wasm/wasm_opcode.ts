@@ -409,6 +409,8 @@ export function wasmOpcodeFromNr(
 
 export function wasmOpcodeFromStr(opcode: string): WASMOpcodeNumber {
   switch (opcode) {
+    case 'unreachable':
+      return WASMOpcodeNumber.Unreachable;
     case 'block':
       return WASMOpcodeNumber.Block;
     case 'loop':
@@ -427,6 +429,12 @@ export function wasmOpcodeFromStr(opcode: string): WASMOpcodeNumber {
       return WASMOpcodeNumber.Set_local;
     case 'get_global': // get_global
       return WASMOpcodeNumber.Get_global;
+    case 'select':
+      return WASMOpcodeNumber.Select;
+    case 'grow_memory':
+      return WASMOpcodeNumber.GrowMemory;
+    case 'current_memory':
+      return WASMOpcodeNumber.CurrentMemory;
 
     case 'u32.store':
     case 'i32.store':

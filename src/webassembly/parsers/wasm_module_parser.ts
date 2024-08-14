@@ -271,16 +271,6 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
   }
   let op: WasmInstruction | undefined;
   switch (obj.id) {
-    case 'unreachable': {
-      const args = obj.args;
-      if (args.length > 0) {
-        return [
-          `Handle case where args of 'unreachable' is not zero length ${args}`,
-        ];
-      }
-      op = new WasmInstruction('unreachable', WASMOpcodeNumber.Unreachable);
-      break;
-    }
     case 'get_local': {
       assertWasmSourceCodeLocation(obj.loc);
       op = new WasmInstruction(
@@ -488,32 +478,19 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
       );
       break;
     }
-    case 'current_memory': {
-      op = new WasmInstruction(
-        'current_memory',
-        WASMOpcodeNumber.CurrentMemory,
-      );
-      if (obj.args.length > 0) {
-        return [
-          `Handle case where 'current_memory' args is not empty ${obj.args}`,
-        ];
-      }
-      break;
-    }
-    case 'select': {
-      op = new WasmInstruction('select', WASMOpcodeNumber.Select);
-      if (obj.args.length > 0) {
-        return [`Handle case where 'select' args is not empty ${obj.args}`];
-      }
-      break;
-    }
+    case 'unreachable':
+    case 'current_memory':
+    case 'select':
     case 'grow_memory': {
-      op = new WasmInstruction('grow_memory', WASMOpcodeNumber.GrowMemory);
+      const opcode = obj.id;
       if (obj.args.length > 0) {
-        return [
-          `Handle case where 'grow_memory' args is not empty ${obj.args}`,
-        ];
+        return [`Handle case where '${opcode}' args is not empty ${obj.args}`];
       }
+      const errorOrNr = tryToOpcodeOrErrorMsg(opcode);
+      if (typeof errorOrNr === 'string') {
+        return [errorOrNr];
+      }
+      op = new WasmInstruction(opcode, errorOrNr);
       break;
     }
     case 'nop': {
