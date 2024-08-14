@@ -73,7 +73,7 @@ export enum WASMOpcodeNumber {
 
   I32Add = 0x6a,
   I32Sub = 0x6b,
-  I32Mult = 0x6c,
+  I32Mul = 0x6c,
   I32DivSigned = 0x6d,
   I32DivUnsigned = 0x6e,
   I32RemSigned = 0x6f,
@@ -249,7 +249,7 @@ export function typeFromWasmOpcode(
     // binary operators that produce one result
     case WASMOpcodeNumber.I32Add:
     case WASMOpcodeNumber.I32Sub:
-    case WASMOpcodeNumber.I32Mult:
+    case WASMOpcodeNumber.I32Mul:
     case WASMOpcodeNumber.I32DivSigned:
     case WASMOpcodeNumber.I32DivUnsigned:
     case WASMOpcodeNumber.I32RemSigned:
@@ -572,7 +572,7 @@ export function wasmOpcodeFromStr(opcode: string): WASMOpcodeNumber {
     case 'i32.or':
       return WASMOpcodeNumber.I32Or;
     case 'i32.mul':
-      return WASMOpcodeNumber.I32Mult;
+      return WASMOpcodeNumber.I32Mul;
     case 'i32.div_s':
       return WASMOpcodeNumber.I32DivSigned;
     case 'i32.div_u':
