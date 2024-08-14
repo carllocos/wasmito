@@ -579,9 +579,11 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
       op = new WasmInstruction(opcode, errorOrNr);
       break;
     }
-    default:
+    default: {
+      const prefixInstr = obj.object !== undefined ? `${obj.object}.` : '';
       // error msg
-      return [`Unsupported Wasm instruction ${obj.id}`];
+      return [`Unsupported Wasm instruction ${prefixInstr}${obj.id}`];
+    }
   }
 
   op.startAddress = obj.loc.start.column;
