@@ -437,6 +437,9 @@ export function wasmOpcodeFromStr(opcode: string): WASMOpcodeNumber {
     case 'i32.load8_u':
     case 'u32.load8_u':
       return WASMOpcodeNumber.I32Load8Unsigned;
+    case 'i32.load8_s':
+    case 'u32.load8_s':
+      return WASMOpcodeNumber.I32Load8Signed;
     case 'u32.store16':
     case 'i32.store16':
       return WASMOpcodeNumber.I32Store16;
@@ -474,6 +477,10 @@ export function wasmOpcodeFromStr(opcode: string): WASMOpcodeNumber {
       return WASMOpcodeNumber.I64Add;
     case 'i64.sub':
       return WASMOpcodeNumber.I64Sub;
+    case 'i64.div_s':
+      return WASMOpcodeNumber.I64DivSigned;
+    case 'i64.div_u':
+      return WASMOpcodeNumber.I64DivUnsigned;
     case 'i64.clz':
       return WASMOpcodeNumber.I64CLZ;
     case 'i64.ctz':
@@ -482,6 +489,8 @@ export function wasmOpcodeFromStr(opcode: string): WASMOpcodeNumber {
       return WASMOpcodeNumber.I64POPCNT;
     case 'i64.eq':
       return WASMOpcodeNumber.I64Eq;
+    case 'i64.eqz':
+      return WASMOpcodeNumber.I64Eqz;
     case 'i64.ne':
       return WASMOpcodeNumber.I64Neq;
     case 'i64.and':
@@ -503,6 +512,12 @@ export function wasmOpcodeFromStr(opcode: string): WASMOpcodeNumber {
     case 'i64.load':
     case 'u64.load':
       return WASMOpcodeNumber.I64Load;
+    case 'i64.load32_s':
+    case 'u64.load32_s':
+      return WASMOpcodeNumber.I64Load32Signed;
+    case 'i64.load32_u':
+    case 'u64.load32_u':
+      return WASMOpcodeNumber.I64Load32Unsigned;
 
     case 'i32.and':
       return WASMOpcodeNumber.I32And;
@@ -532,6 +547,8 @@ export function wasmOpcodeFromStr(opcode: string): WASMOpcodeNumber {
       return WASMOpcodeNumber.I32LTUnsigned;
     case 'i32.le_u':
       return WASMOpcodeNumber.I32LEUnsigned;
+    case 'i32.le_s':
+      return WASMOpcodeNumber.I32LESigned;
     // case 'i32.lt_e':
     //   return WASMOpcodeNumber.I32LEUnsigned;
     case 'i32.lt_s':
@@ -546,10 +563,16 @@ export function wasmOpcodeFromStr(opcode: string): WASMOpcodeNumber {
       return WASMOpcodeNumber.I32Or;
     case 'i32.mul':
       return WASMOpcodeNumber.I32Mult;
+    case 'i32.div_s':
+      return WASMOpcodeNumber.I32DivSigned;
     case 'i32.div_u':
       return WASMOpcodeNumber.I32DivUnsigned;
     case 'i32.rem_u':
       return WASMOpcodeNumber.I32RemUnsigned;
+    case 'i32.rotl':
+      return WASMOpcodeNumber.I32ROTL;
+    case 'i32.rotr':
+      return WASMOpcodeNumber.I32ROTR;
 
     case 'f32.add':
       return WASMOpcodeNumber.F32Add;
