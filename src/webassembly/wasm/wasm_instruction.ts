@@ -325,8 +325,25 @@ export function isCallInstruction(
   );
 }
 
-export function isCallIndirect(inst: WasmInstruction): boolean {
-  return inst.opcodeNr === WASMOpcodeNumber.Call_indirect;
+export class CallIndirect extends WasmInstruction {
+  public readonly signature: WasmType;
+  constructor(signature: WasmType) {
+    super('callIndirect', WASMOpcodeNumber.Call_indirect);
+    this.signature = signature;
+  }
+
+  public override toJSONObj(): object {
+    const obj: any = super.toJSONObj();
+    obj.signature = this.signature;
+    return obj;
+  }
+}
+
+export function isCallIndirect(inst: WasmInstruction): inst is CallIndirect {
+  return (
+    inst.opcodeNr === WASMOpcodeNumber.Call_indirect &&
+    inst instanceof CallIndirect
+  );
 }
 
 export class LoopInstruction extends WasmInstruction {
