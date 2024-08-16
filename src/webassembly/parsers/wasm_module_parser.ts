@@ -983,12 +983,55 @@ function parseTypes(fields: any): WasmType[] {
   });
   return locationsAndTypes.map((a, typeId) => {
     const funcType = a[1];
-    return new WasmType(
-      funcType.params.length,
-      funcType.results.length,
-      typeId,
-    );
+    return parseWasmType(funcType, typeId);
   });
+}
+
+function parseWasmType(obj: any, typeId?: number): WasmType {
+  if (obj.params === undefined || obj.results === undefined) {
+    throw new Error(
+      `Wasm Type is expected to have params or results as fields`,
+    );
+  }
+
+  const ps: WASM.Type[] = [];
+  const rs: WASM.Type[] = [];
+
+  for (const v of obj.params) {
+    if (typeof v !== 'object') {
+      throw new Error(
+        `Wasm Type of parameter ${v} is expected to be an object`,
+      );
+    }
+
+    const valtype = v.valtype;
+    if (typeof valtype !== 'string') {
+      throw new Error(
+        `valtype of parameter ${v} is expected to be a string now it is ${valtype}`,
+      );
+    }
+
+    const t = WASM.typing.get(valtype.trim().toLowerCase());
+    if (t === undefined) {
+      throw new Error(`No Wasm Type found for parameter ${v}`);
+    }
+    ps.push(t);
+  }
+
+  for (const v of obj.results) {
+    if (typeof v !== 'string') {
+      throw new Error(`result type ${v} is expected to be a string`);
+    }
+
+    const t = WASM.typing.get(v.trim().toLowerCase());
+    if (t === undefined) {
+      throw new Error(`No Wasm Type found for results ${v}`);
+    }
+    rs.push(t);
+  }
+
+  const wasmType = new WasmType(ps.length, rs.length, typeId);
+  return wasmType;
 }
 
 function parseFuncFields(fields: any): [Func[], string[]] {
