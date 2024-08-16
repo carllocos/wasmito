@@ -594,35 +594,61 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
 export function parseWasmModule(wasmPath: string): [ParsedModule, string[]] {
   const binary = readFileSync(wasmPath);
   const decoderOpts = {};
-  const ast = decode.decode(binary, decoderOpts);
-  if (ast.body.length > 1) {
-    logger.info(`Encountered more than one module only parsing the first`);
+  try {
+    const ast = decode.decode(binary, decoderOpts);
+    if (ast.body.length > 1) {
+      logger.info(`Encountered more than one module only parsing the first`);
+    }
+
+    const mod = ast.body[0];
+    const metadata = mod.metadata;
+    const [sections, sectionErrors] = parseSections(metadata.sections);
+    const localsNames = parseLocalNames(metadata.localNames);
+    const funcNames = parseFunctionNames(metadata.functionNames);
+    const types = parseTypes(mod.fields);
+    const [funcs, funErrors] = parseFuncFields(mod.fields);
+    const imports = parseImports(mod.fields);
+    const [globals, globalsErrs] = parseGlobals(mod.fields);
+    // TODO fiels 'Table', 'Memory'. 'Elem', 'ModuleExport'
+    const parsedMod = {
+      localsNames,
+      funcNames,
+      types,
+      funcs,
+      imports,
+      globals,
+      ast: mod,
+      sections,
+      wasmBuffer: binary,
+    };
+
+    const errors = sectionErrors.concat(funErrors, globalsErrs);
+    return [parsedMod, errors];
+  } catch (e) {
+    if (e instanceof Error) {
+      const msg = e.message;
+      if (typeof msg === 'string') {
+        const reg = /Unexpected instruction: (0x[a-fA-F0-9]+)/;
+        const matched = msg.match(reg);
+        if (matched === undefined || matched === null) {
+          throw e;
+        }
+
+        const MAX_OPCODE_WASM_VERS1 = 0xbf;
+        const opcode = Number(matched[1]);
+        if (isNaN(opcode) || opcode <= MAX_OPCODE_WASM_VERS1) {
+          throw e;
+        }
+        throw new Error(
+          `Wasm failed to parse Wasm version1 is expected: ${msg}`,
+        );
+      } else {
+        throw e;
+      }
+    } else {
+      throw e;
+    }
   }
-
-  const mod = ast.body[0];
-  const metadata = mod.metadata;
-  const [sections, sectionErrors] = parseSections(metadata.sections);
-  const localsNames = parseLocalNames(metadata.localNames);
-  const funcNames = parseFunctionNames(metadata.functionNames);
-  const types = parseTypes(mod.fields);
-  const [funcs, funErrors] = parseFuncFields(mod.fields);
-  const imports = parseImports(mod.fields);
-  const [globals, globalsErrs] = parseGlobals(mod.fields);
-  // TODO fiels 'Table', 'Memory'. 'Elem', 'ModuleExport'
-  const parsedMod = {
-    localsNames,
-    funcNames,
-    types,
-    funcs,
-    imports,
-    globals,
-    ast: mod,
-    sections,
-    wasmBuffer: binary,
-  };
-
-  const errors = sectionErrors.concat(funErrors, globalsErrs);
-  return [parsedMod, errors];
 }
 
 function assertModuleImport(obj: any): asserts obj is ModuleImport {
