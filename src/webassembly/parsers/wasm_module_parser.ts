@@ -502,50 +502,71 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
       op = new BranchTable(branchTargets);
       break;
     }
-    case 'wrap/i64':
-    case 'const':
-    case 'sub':
-    case 'div':
+    case 'eqz':
+    case 'eq':
+    case 'ne':
+    case 'lt_u':
+    case 'gt_u':
+    case 'le_s':
+    case 'le_u':
+    case 'ge_s':
     case 'ge_u':
     case 'clz':
-    case 'convert_u/i32':
-    case 'lt':
-    case 'lt_u':
-    case 'gt':
-    case 'gt_u':
-    case 'demote/f64':
-    case 'store':
-    case 'store8':
-    case 'convert_s/i32':
-    case 'mul':
-    case 'add':
+    case 'popctn':
+    case 'wrap/i64':
     case 'trunc_s/f32':
+    case 'trunc_u/f32':
+    case 'trunc_s/f64':
+    case 'trunc_u/f64':
+    case 'reinterpret/f32':
+    case 'add':
+    case 'sub':
+    case 'mul':
+    case 'div':
     case 'abs':
-    case 'ne':
-    case 'trunc':
+    case 'min':
+    case 'max':
+    case 'neg':
     case 'copysign':
-    case 'reinterpret/f64':
+    case 'ceil':
+    case 'floor':
+    case 'trunc':
+    case 'nearest':
+    case 'sqrt':
+    case 'lt':
+    case 'gt':
+    case 'le':
+    case 'ge':
+    case 'convert_s/i32':
+    case 'convert_u/i32':
+    case 'convert_s/i64':
+    case 'convert_u/i64':
+    case 'promote/f32':
     case 'reinterpret/i64':
+    case 'load':
+    case 'store':
+    case 'const':
+    case 'div_s':
+    case 'demote/f64':
+    case 'store8':
+    case 'reinterpret/f64':
     case 'shr_u':
     case 'and':
     case 'or':
     case 'shl':
-    case 'le_u':
     case 'store16':
     case 'xor':
     case 'div_u':
     case 'extend_u/i32':
     case 'extend_s/i32':
     case 'rem_u':
-    case 'le_s':
-    case 'load':
+    case 'rem_s':
     case 'load8_u':
     case 'load8_s':
     case 'load16_u':
     case 'load32_u':
     case 'load32_s':
-    case 'eqz':
-    case 'eq':
+    case 'shr_s':
     case 'rotl':
     case 'rorr':
     case 'ctz': {
