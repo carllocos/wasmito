@@ -6,6 +6,7 @@ import {
   Branch,
   BranchIf,
   BranchTable,
+  CallIndirect,
   CallInstruction,
   IfInstruction,
   LoopInstruction,
@@ -289,6 +290,21 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
     }
     case 'call': {
       op = new CallInstruction(obj.index.value, obj.numeric.value);
+      break;
+    }
+    case 'call_indirect': {
+      if (obj.signature === undefined) {
+        return [`call_indirect instruction is missing 'signature'`];
+      }
+      const expectedKeys = new Set<string>(['type', 'id', 'signature', 'loc']);
+      const keys = Object.keys(obj);
+      for (const k of keys) {
+        if (!expectedKeys.has(k)) {
+          return [`Key of Call_indirect ${k} is not being accounted for`];
+        }
+      }
+      const t = parseWasmType(obj.signature);
+      op = new CallIndirect(t);
       break;
     }
     case 'end': {
