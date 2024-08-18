@@ -328,16 +328,14 @@ export function isCallInstruction(
 }
 
 export class CallIndirect extends WasmInstruction {
-  public readonly signature: WasmType;
   constructor(signature: WasmType) {
-    super('callIndirect', WASMOpcodeNumber.Call_indirect);
-    this.signature = signature;
-  }
-
-  public override toJSONObj(): object {
-    const obj: any = super.toJSONObj();
-    obj.signature = this.signature;
-    return obj;
+    super(
+      'callIndirect',
+      WASMOpcodeNumber.Call_indirect,
+      undefined,
+      undefined,
+      signature,
+    );
   }
 }
 
