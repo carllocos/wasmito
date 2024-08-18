@@ -8,6 +8,7 @@ import {
   BranchTable,
   CallIndirect,
   CallInstruction,
+  ConstInstr,
   IfInstruction,
   LoopInstruction,
   ReturnBranch,
@@ -518,6 +519,16 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
       op = new BranchTable(branchTargets);
       break;
     }
+    case 'const': {
+      const opcode = obj.object + `.${obj.id}`;
+      const errorOrNr: string | WASMOpcodeNumber =
+        tryToOpcodeOrErrorMsg(opcode);
+      if (typeof errorOrNr === 'string') {
+        return [errorOrNr];
+      }
+      op = new ConstInstr(errorOrNr);
+      break;
+    }
     case 'eqz':
     case 'eq':
     case 'ne':
@@ -561,7 +572,6 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
     case 'reinterpret/i64':
     case 'load':
     case 'store':
-    case 'const':
     case 'div_s':
     case 'demote/f64':
     case 'store8':

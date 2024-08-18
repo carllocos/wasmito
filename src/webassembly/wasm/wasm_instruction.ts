@@ -421,3 +421,62 @@ export function isWasmInstructionBlockBased(instr: WasmInstruction): boolean {
       return false;
   }
 }
+
+export class ConstInstr extends WasmInstruction {
+  public readonly type: WASM.Type;
+
+  constructor(opcode: WASMOpcodeNumber) {
+    super(constOpcodeToString(opcode), opcode);
+    this.type = wasmTypefromConstOpcode(opcode);
+  }
+
+  public override toJSONObj(): object {
+    const obj: any = super.toJSONObj();
+    obj.type = this.type;
+    return obj;
+  }
+}
+
+function constOpcodeToString(opcode: WASMOpcodeNumber): string {
+  switch (opcode) {
+    case WASMOpcodeNumber.I32Const:
+      return 'i32.const';
+    case WASMOpcodeNumber.F32Const:
+      return 'f32.const';
+    case WASMOpcodeNumber.I64Const:
+      return 'i64.const';
+    case WASMOpcodeNumber.F64Const:
+      return 'f64.const';
+    default:
+      throw new Error(`Opcode ${opcode} is not a const`);
+  }
+}
+
+function wasmTypefromConstOpcode(opcode: WASMOpcodeNumber): WASM.Type {
+  switch (opcode) {
+    case WASMOpcodeNumber.I32Const:
+      return WASM.Type.i32;
+    case WASMOpcodeNumber.F32Const:
+      return WASM.Type.f32;
+    case WASMOpcodeNumber.I64Const:
+      return WASM.Type.i64;
+    case WASMOpcodeNumber.F64Const:
+      return WASM.Type.f64;
+    default:
+      throw new Error(
+        `Opcode ${opcode} is not a const and cannot produce wasm type`,
+      );
+  }
+}
+
+export function isConst(instr: WasmInstruction): boolean {
+  switch (instr.opcodeNr) {
+    case WASMOpcodeNumber.I32Const:
+    case WASMOpcodeNumber.I64Const:
+    case WASMOpcodeNumber.F32Const:
+    case WASMOpcodeNumber.F64Const:
+      return true;
+    default:
+      return false;
+  }
+}
