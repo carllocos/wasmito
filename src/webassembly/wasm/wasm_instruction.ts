@@ -84,6 +84,7 @@ export class WasmInstruction {
       immediate: this.immediate ?? -1,
       subInstructions: this.subInstructions.map((i) => i.toJSONObj()),
       allSubInstructions: this.allSubInstructions.map((i) => i.toJSONObj()),
+      signature: this.signature.toJSONObj(),
     };
   }
 

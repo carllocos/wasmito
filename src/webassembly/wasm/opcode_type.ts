@@ -34,6 +34,16 @@ export class WasmType {
   public hasResult(): boolean {
     return this.nrResults > 0;
   }
+
+  public toJSONObj(): object {
+    return {
+      id: this.id ?? -1,
+      nrArgs: this.nrArgs,
+      args: this.args,
+      nrResults: this.nrResults,
+      returnTypes: this.returnTypes,
+    };
+  }
 }
 
 export class PlaceholderType extends WasmType {
