@@ -127,7 +127,7 @@ class BrigadierJSONWriter {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [addr, opcode, labels, _args] = val;
-    const opcodeType = opcode.getType();
+    const opcodeType = opcode.getSignature();
     if (opcodeType instanceof PlaceholderType) {
       getGlobalLogger().error(
         `Opcode Type still needs to be determined for opcode: ${opcode.name} at addr ${address}`,
@@ -149,12 +149,12 @@ class BrigadierJSONWriter {
           `Stack contains insufficient values for to be used as arguments for opcode ${
             opcode.name
           } ${labels}. Opcode expects #${
-            opcode.getType().nrArgs
+            opcode.getSignature().nrArgs
           } stack has size #${state.stack.length}`,
         );
       } else if (opcodeType.nrArgs > 0) {
         const ops = state.stack.slice(
-          state.stack.length - opcode.getType().nrArgs,
+          state.stack.length - opcode.getSignature().nrArgs,
           state.stack.length,
         );
         ops.forEach((o) => {
@@ -193,7 +193,7 @@ class BrigadierJSONWriter {
     }
     const [opcode, labels] = val;
 
-    const opcodeType = opcode.getType();
+    const opcodeType = opcode.getSignature();
     if (state.stack === undefined) {
       getGlobalLogger().error(
         `Stack is undefined for ${opcode.name} address #${address}`,
