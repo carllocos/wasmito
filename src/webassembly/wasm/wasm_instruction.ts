@@ -23,6 +23,7 @@ export class WasmInstruction {
     opcodeNr: number,
     immediate?: number,
     opcodeLabels?: string[],
+    signature?: WasmType,
   ) {
     this.startAddress = 0;
     this.endAddress = 0;
@@ -32,7 +33,7 @@ export class WasmInstruction {
     if (op === undefined) {
       throw Error(`invalid opcode ${opcodeName}`);
     }
-    const t = typeFromWasmOpcode(this.opcodeNr);
+    const t = signature ?? typeFromWasmOpcode(this.opcodeNr);
     if (t === undefined) {
       throw Error(`unexsting opcode type for ${opcodeName}`);
     }
