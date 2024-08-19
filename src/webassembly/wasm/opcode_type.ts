@@ -1,15 +1,15 @@
 import { type WASM } from '../wasm';
 
 export class WasmType {
-  public readonly nrArgs: number;
+  private _nrArgs: number;
   private _args: WASM.Type[];
-  public readonly nrResults: number;
+  private _nrResults: number;
   private _returnTypes: WASM.Type[];
   public readonly id?: number;
 
   constructor(nrArgs: number, nrResults: number, id?: number) {
-    this.nrArgs = nrArgs;
-    this.nrResults = nrResults;
+    this._nrArgs = nrArgs;
+    this._nrResults = nrResults;
     this.id = id;
     this._args = [];
     this._returnTypes = [];
@@ -21,6 +21,14 @@ export class WasmType {
 
   set args(a: WASM.Type[]) {
     this._args = a;
+  }
+
+  get nrArgs(): number {
+    return this._nrArgs;
+  }
+
+  get nrResults(): number {
+    return this._nrResults;
   }
 
   get returnTypes(): WASM.Type[] {
