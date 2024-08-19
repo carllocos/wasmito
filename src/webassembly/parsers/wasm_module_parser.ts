@@ -521,14 +521,17 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
       break;
     }
     case 'const': {
-      const opcode = obj.object + `.${obj.id}`;
-      const errorOrNr: string | WASMOpcodeNumber =
-        tryToOpcodeOrErrorMsg(opcode);
-      if (typeof errorOrNr === 'string') {
-        return [errorOrNr];
+      const args = obj.args;
+      if (!(args instanceof Array) || args.length !== 1) {
+        throw new Error(
+          `'args' of parsed const instruction is supposed to be an array of size 1. Given ${args}`,
+        );
       }
-
-      op = parseConstValue(errorOrNr, obj);
+      const parsed = parseConstValue(obj.args[0], obj.object);
+      if (typeof parsed === 'string') {
+        return [parsed];
+      }
+      op = parsed;
       break;
     }
     case 'eqz':
