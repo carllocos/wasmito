@@ -537,7 +537,7 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
       const vObj = args[0];
       if (vObj.type !== 'NumberLiteral') {
         throw new Error(
-          `type of parsed const should be 'NumberLiterial' given ${vObj.type}`,
+          `type of parsed const should be 'NumberLiteral' given ${vObj.type}`,
         );
       }
 
