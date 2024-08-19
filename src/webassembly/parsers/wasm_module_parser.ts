@@ -526,7 +526,27 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
       if (typeof errorOrNr === 'string') {
         return [errorOrNr];
       }
-      op = new ConstInstr(errorOrNr);
+
+      const args = obj.args;
+      if (!(args instanceof Array) || args.length !== 1) {
+        throw new Error(
+          `'args' of parsed const instruction is supposed to be an array of size 1. Given ${args}`,
+        );
+      }
+      const vObj = args[0];
+      if (vObj.type !== 'NumberLiteral') {
+        throw new Error(
+          `type of parsed const should be 'NumberLiterial' given ${vObj.type}`,
+        );
+      }
+
+      const v = vObj.value;
+      if (v === undefined || typeof v !== 'number') {
+        throw new Error(
+          `The value of the parsed const instruction is supposed to be an number. Give ${vObj.value}`,
+        );
+      }
+      op = new ConstInstr(errorOrNr, v);
       break;
     }
     case 'eqz':
