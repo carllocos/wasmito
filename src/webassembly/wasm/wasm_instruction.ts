@@ -425,17 +425,26 @@ export function isWasmInstructionBlockBased(instr: WasmInstruction): boolean {
 export class ConstInstr extends WasmInstruction {
   public readonly type: WASM.Type;
   public readonly value: number;
+  private readonly _high: number;
 
-  constructor(opcode: WASMOpcodeNumber, value: number) {
+  /**
+   * high is only used in combination with a I64Const
+   * and denotes the high bit of a 64bit numbers as explained in
+   * https://www.npmjs.com/package/@xtuc/long/v/4.2.2
+   * it is needed because JS can only handle 54bit numbers
+   */
+  constructor(opcode: WASMOpcodeNumber, value: number, high?: number) {
     super(constOpcodeToString(opcode), opcode);
     this.type = wasmTypefromConstOpcode(opcode);
     this.value = value;
+    this._high = high ?? -1;
   }
 
   public override toJSONObj(): object {
     const obj: any = super.toJSONObj();
     obj.type = this.type;
     obj.value = this.value;
+    obj.high = this._high;
     return obj;
   }
 }
