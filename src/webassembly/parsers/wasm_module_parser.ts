@@ -16,6 +16,7 @@ import {
 } from '../wasm/wasm_instruction';
 import { WASM } from '../wasm';
 import { WASMOpcodeNumber, wasmOpcodeFromStr } from '../wasm/wasm_opcode';
+import { IsOpcodeWasmVersion1 } from '../wasm/wasm_versions';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const decode = require('@webassemblyjs/wasm-parser');
 const logger = createLogger('WasmParser');
@@ -680,9 +681,8 @@ export function parseWasmModule(wasmPath: string): [ParsedModule, string[]] {
           throw e;
         }
 
-        const MAX_OPCODE_WASM_VERS1 = 0xbf;
         const opcode = Number(matched[1]);
-        if (isNaN(opcode) || opcode <= MAX_OPCODE_WASM_VERS1) {
+        if (isNaN(opcode) || !IsOpcodeWasmVersion1(opcode)) {
           throw e;
         }
         throw new Error(
