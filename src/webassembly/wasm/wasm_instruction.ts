@@ -424,15 +424,18 @@ export function isWasmInstructionBlockBased(instr: WasmInstruction): boolean {
 
 export class ConstInstr extends WasmInstruction {
   public readonly type: WASM.Type;
+  public readonly value: number;
 
-  constructor(opcode: WASMOpcodeNumber) {
+  constructor(opcode: WASMOpcodeNumber, value: number) {
     super(constOpcodeToString(opcode), opcode);
     this.type = wasmTypefromConstOpcode(opcode);
+    this.value = value;
   }
 
   public override toJSONObj(): object {
     const obj: any = super.toJSONObj();
     obj.type = this.type;
+    obj.value = this.value;
     return obj;
   }
 }
