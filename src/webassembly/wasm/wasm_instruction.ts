@@ -10,7 +10,7 @@ export class WasmInstruction {
   public readonly opcodeNr: WASMOpcodeNumber;
   public readonly name: string;
   public immediate?: number;
-  private signature: WasmType;
+  private _signature: WasmType;
   public args: string[];
 
   public startAddress: number;
@@ -37,7 +37,7 @@ export class WasmInstruction {
     if (t === undefined) {
       throw Error(`unexsting opcode type for ${opcodeName}`);
     }
-    this.signature = t;
+    this._signature = t;
     this.args = opcodeLabels ?? [];
     this.immediate = immediate;
     this._subInstructions = [];
@@ -62,14 +62,14 @@ export class WasmInstruction {
     return this._allSubInstructions;
   }
 
-  public changeType(type: WasmType): void {
-    if (this.signature instanceof PlaceholderType) {
-      this.signature = new WasmType(type.nrArgs, type.nrResults, type.id);
-    }
+  get signature(): WasmType {
+    return this._signature;
   }
 
-  public getSignature(): WasmType {
-    return this.signature;
+  set signature(type: WasmType) {
+    if (this._signature instanceof PlaceholderType) {
+      this._signature = new WasmType(type.nrArgs, type.nrResults, type.id);
+    }
   }
 
   public getArgs(): string[] {
@@ -85,7 +85,7 @@ export class WasmInstruction {
       immediate: this.immediate ?? -1,
       subInstructions: this.subInstructions.map((i) => i.toJSONObj()),
       allSubInstructions: this.allSubInstructions.map((i) => i.toJSONObj()),
-      signature: this.signature.toJSONObj(),
+      signature: this._signature.toJSONObj(),
     };
   }
 

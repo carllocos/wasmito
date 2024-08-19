@@ -188,7 +188,7 @@ export class WasmModule {
         if (fun === undefined) {
           throw new Error(`Fun not found with id ${i.funIdx}`);
         }
-        i.changeType(fun.type);
+        i.signature = fun.type;
       }
     });
   }
