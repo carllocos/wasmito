@@ -619,78 +619,44 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
   return op;
 }
 
-function parseConstValue(opcode: WASMOpcodeNumber, obj: any): ConstInstr {
-  const args = obj.args;
-  if (!(args instanceof Array) || args.length !== 1) {
-    throw new Error(
-      `'args' of parsed const instruction is supposed to be an array of size 1. Given ${args}`,
-    );
+function parseConstValue(valueObj: any, vtype: string): ConstInstr | string {
+  const allowedTypes = ['i32', 'u32', 'f32', 'f64', 'i64'];
+  if (allowedTypes.find((t) => t === vtype) === undefined) {
+    return `The provided value type '${vtype}' does not match expected types: [${allowedTypes.join(
+      ', ',
+    )}]`;
   }
-  const valueObj = args[0];
-  switch (opcode) {
-    case WASMOpcodeNumber.I32Const:
-      if (valueObj.type !== 'NumberLiteral') {
-        throw new Error(
-          `'type' field of parsed I32Const is not a 'NumberLiteral'. Given ${valueObj.type}}`,
-        );
-      }
+  switch (valueObj.type) {
+    case 'NumberLiteral':
       if (typeof valueObj.value !== 'number') {
-        throw new Error(
-          `'value' field of parsed I32Const should be a number. Found: ${valueObj.value}`,
-        );
+        return `'value' field of parsed I32Const should be a number. Found: ${valueObj.value}`;
       }
       return new ConstInstr(WASMOpcodeNumber.I32Const, valueObj.value);
-    case WASMOpcodeNumber.I64Const: {
-      if (valueObj.type !== 'LongNumberLiteral') {
-        throw new Error(
-          `'type' field of parsed I32Const is not a 'LongNumberLiteral'. Given ${valueObj.type}}`,
-        );
-      }
+    case 'LongNumberLiteral': {
       const value = valueObj.value;
       if (typeof value !== 'object') {
-        throw new Error(`'value' field of parsed I64Const should be an object`);
+        return `'value' field of parsed I64Const should be an object`;
       }
 
       const low = value.low;
       const high = value.high;
       if (typeof low !== 'number' || typeof high !== 'number') {
-        throw new Error(
-          `'low' and 'high' fields of parsed I64Const Instr should be numbers. Given low ${low} and high ${high}`,
-        );
+        return `'low' and 'high' fields of parsed I64Const Instr should be numbers. Given low ${low} and high ${high}`;
       }
 
       return new ConstInstr(WASMOpcodeNumber.I64Const, low, high);
     }
-    case WASMOpcodeNumber.F32Const: {
-      if (valueObj.type !== 'FloatLiteral') {
-        throw new Error(
-          `'type' field of parsed F32Const is not a 'FloatLiteral'. Given ${valueObj.type}}`,
-        );
-      }
+    case 'FloatLiteral': {
       const value = valueObj.value;
       if (typeof value !== 'number') {
-        throw new Error(
-          `'value' of parsed F32Const is expected to be an number. Given ${value}`,
-        );
+        return `'value' of parsed ${vtype} is expected to be an number. Given ${value}`;
       }
-      return new ConstInstr(WASMOpcodeNumber.F32Const, value);
-    }
-    case WASMOpcodeNumber.F64Const: {
-      if (valueObj.type !== 'FloatLiteral') {
-        throw new Error(
-          `'type' field of parsed F64Const is not a 'FloatLiteral'. Given ${valueObj.type}}`,
-        );
-      }
-      const value = valueObj.value;
-      if (typeof value !== 'number') {
-        throw new Error(
-          `'value' of parsed F64Const is expected to be an number. Given ${value}`,
-        );
-      }
-      return new ConstInstr(WASMOpcodeNumber.F64Const, value);
+      const op =
+        vtype === 'f32' ? WASMOpcodeNumber.F32Const : WASMOpcodeNumber.F64Const;
+      return new ConstInstr(op, value);
     }
     default:
-      throw new Error(`Expected I32,I64,F32, or F64 opcode`);
+      return `Expected I32,I64,F32, or F64 opcode`;
   }
 }
 
