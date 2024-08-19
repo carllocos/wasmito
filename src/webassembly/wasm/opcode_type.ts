@@ -21,6 +21,7 @@ export class WasmType {
 
   set args(a: WASM.Type[]) {
     this._args = a;
+    this._nrArgs = a.length;
   }
 
   get nrArgs(): number {
@@ -37,6 +38,7 @@ export class WasmType {
 
   set returnTypes(a: WASM.Type[]) {
     this._returnTypes = a;
+    this._nrResults = a.length;
   }
 
   public hasResult(): boolean {
