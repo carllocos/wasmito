@@ -45,6 +45,24 @@ export class WasmType {
     return this.nrResults > 0;
   }
 
+  public equals(other: WasmType): boolean {
+    if (this.nrArgs !== other.nrArgs || this.nrResults !== other.nrResults) {
+      return false;
+    }
+    for (let i = 0; i < this.nrArgs; i++) {
+      if (this.args[i] !== other.args[i]) {
+        return false;
+      }
+    }
+
+    for (let i = 0; i < this.nrResults; i++) {
+      if (this.returnTypes[i] !== other.returnTypes[i]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   public toJSONObj(): object {
     return {
       id: this.id ?? -1,
