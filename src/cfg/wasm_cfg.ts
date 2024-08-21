@@ -158,8 +158,68 @@ export class WasmControlFlowGraph {
   }
 
   private buildGraphs(): void {
+    let tableAltered: boolean = false;
+    const fgs: WASMFunGraph[] = [];
     for (const f of this._wasm.functions) {
-      this._cfgs.set(f.id, buildCFGForFunc(f));
+      const [fg, newTblAltered] = buildCFGForFunc(f, tableAltered);
+      tableAltered = tableAltered || newTblAltered;
+      this._cfgs.set(f.id, fg);
+      fgs.push(fg);
+    }
+    this.setTargetFunctionForCallIndirects(fgs, tableAltered);
+  }
+
+  /**
+   * This private function will ensure that each graph linked to a function
+   * The callindirect instructions are marked to call the correct target function(s).
+   * To do this the function expects a `tableAltered` argument that tells whether
+   * the Wasm module for which the CFGs have been built has an instruciton that does
+   * alter the table (e.g., table's content is changed).
+   * This information drastically impacts the target functions of call_indirects
+   *
+   * @param fgs the Array of CFGS for each Wasm function
+   * @param tableAltered Tells whether in the whole Wasm module we encountered an instruction that changes the table (size, or content)
+   */
+  private setTargetFunctionForCallIndirects(
+    fgs: WASMFunGraph[],
+    tableAltered: boolean,
+  ): void {
+    for (const fg of fgs) {
+      for (const ci of fg.callIndirects) {
+        if (tableAltered || !ci.hasTableIndex()) {
+          // at this point either
+          // 1. the table got altered due to a table.set instruction
+          // 2. or the index used by the callIndirect instruction could not be determined
+          // due to the lack of dataflow analysis
+          //
+          // conservatively, to ensure soundness, we assume for both cases that each
+          // callIndirect may target each wasm function with matching signature
+          // as the callindirect
+          const funcs = this._wasm.functions.filter((f) => {
+            return f.type.equals(ci.signature);
+          });
+
+          if (funcs.length === 0) {
+            throw new Error(
+              `Found no matching func that could be targeted by CallIndirect ${ci.startAddress} tbl index ${ci.tableIndex}`,
+            );
+          }
+
+          ci.targetFuncs = funcs.map((f) => f.id);
+        } else {
+          // TODO if possible determine statically which func the callIndirect targets
+          // now fallback to targeting all wasm funcs
+
+          const funcs = this._wasm.functions.filter((f) => {
+            return f.type.equals(ci.signature);
+          });
+          if (funcs.length === 0) {
+            throw new Error(
+              `Found no matching func that could be targeted by CallIndirect ${ci.startAddress} tbl index ${ci.tableIndex}`,
+            );
+          }
+        }
+      }
     }
   }
 
@@ -270,7 +330,8 @@ export function buildControlFlowGraphFunction(
   if (fun.allInstructions.length === 0) {
     throw new Error(`Function has no instructions to use for building cfg`);
   }
-  const graph = buildCFGForFunc(fun);
+  const tableAltered = false;
+  const [graph] = buildCFGForFunc(fun, tableAltered);
   return graph;
 }
 
