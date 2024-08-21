@@ -513,7 +513,7 @@ function wasmTypefromConstOpcode(opcode: WASMOpcodeNumber): WASM.Type {
   }
 }
 
-export function isConst(instr: WasmInstruction): boolean {
+export function isConst(instr: WasmInstruction): instr is ConstInstr {
   switch (instr.opcodeNr) {
     case WASMOpcodeNumber.I32Const:
     case WASMOpcodeNumber.I64Const:
