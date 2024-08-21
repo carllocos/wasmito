@@ -328,6 +328,9 @@ export function isCallInstruction(
 }
 
 export class CallIndirect extends WasmInstruction {
+  private _targetFuncs: number[];
+  private _tblIndex: number;
+
   constructor(signature: WasmType) {
     super(
       'callIndirect',
@@ -336,6 +339,35 @@ export class CallIndirect extends WasmInstruction {
       undefined,
       signature,
     );
+    this._targetFuncs = [];
+    this._tblIndex = -1;
+  }
+
+  get targetFuncs(): number[] {
+    return this._targetFuncs;
+  }
+
+  set targetFuncs(nt: number[]) {
+    this._targetFuncs = nt;
+  }
+
+  get tableIndex(): number {
+    return this._tblIndex;
+  }
+
+  set tableIndex(i: number) {
+    this._tblIndex = i;
+  }
+
+  hasTableIndex(): boolean {
+    return this._tblIndex > -1;
+  }
+
+  public toJSONObj(): object {
+    const obj: any = super.toJSONObj();
+    obj.targetFuncs = this.targetFuncs;
+    obj.tableIndex = this.tableIndex;
+    return obj;
   }
 }
 
