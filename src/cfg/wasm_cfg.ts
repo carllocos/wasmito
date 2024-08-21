@@ -1,6 +1,7 @@
 import { writeFileSync } from 'fs';
 import { type WASMFunction } from '../webassembly/wasm/wasm_function';
 import {
+  type CallInstruction,
   type WasmInstruction,
   isControlFlowInstruction,
   isWasmInstructionBlockBased,
@@ -13,6 +14,9 @@ import {
   isCallInstruction,
   isCallIndirect,
   isBranchTable,
+  isConst,
+  type CallIndirect,
+  isTableSet,
 } from '../webassembly/wasm/wasm_instruction';
 import { type WasmModule } from '../webassembly/wasm/wasm_module';
 import { wasmControlFlowGraphToDot } from './dot_serialize';
