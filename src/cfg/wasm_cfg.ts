@@ -77,6 +77,7 @@ function wasmFuncGraphToJSONObj(f: WASMFunGraph): object {
     entryNode: cfgNodeToObj(f.entryNode),
     graph: g,
     calls: f.calls.map((c) => c.toJSONObj()),
+    callIndirects: f.callIndirects.map((c) => c.toJSONObj()),
   };
 }
 
