@@ -1,4 +1,4 @@
-{"mappings":[{
+{"wasm":"/Users/crojcas/Documents/projects/wasmito/test/data/assemblyscript_examples/blink/blink.wasm","sources":["blink/~lib/rt/common.ts","/Users/crojcas/Documents/projects/wasmito/test/data/assemblyscript_examples/blink/blink.ts","blink/~lib/shared/typeinfo.ts","blink/~lib/shared/runtime.ts","blink/~lib/util/number.ts","blink/~lib/util/math.ts","blink/~lib/util/string.ts","blink/~lib/rt.ts","blink/~lib/rt/stub.ts","blink/~lib/util/error.ts","blink/~lib/memory.ts","blink/~lib/util/memory.ts","blink/~lib/util/sort.ts","blink/~lib/array.ts"],"mappings":[{
     "source":"/Users/crojcas/Documents/projects/wasmito/test/data/assemblyscript_examples/blink/blink.ts",
     "address": 435,
     "linenr": 16,
