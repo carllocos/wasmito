@@ -42,8 +42,14 @@ export function getLogLevelFromString(
 let logLevel: LogLevel =
   getLogLevelFromString(process.env.LogLevel ?? 'info') ?? LogLevel.LogInfo;
 
+let loggerName = process.env.LoggerName ?? '';
+
 export function setLogLevel(level: LogLevel): void {
   logLevel = level;
+}
+
+export function setGlobalLoggerName(n: string): void {
+  loggerName = n;
 }
 
 export function parseLogLevel(value: string): LogLevel | undefined {
@@ -92,7 +98,7 @@ export function getGlobalLogger(): winston.Logger {
         winston.format.colorize(),
         winston.format.timestamp(),
         winston.format.printf(({ timestamp, level, message }) => {
-          return `[${timestamp} ${level}]: ${message}`;
+          return `[${timestamp} ${level}] ${loggerName}: ${message}`;
         }),
       ),
       transports: [
