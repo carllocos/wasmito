@@ -524,3 +524,7 @@ export function isConst(instr: WasmInstruction): instr is ConstInstr {
       return false;
   }
 }
+
+export function isTableSet(instr: WasmInstruction): boolean {
+  return instr.opcodeNr === WASMOpcodeNumber.TableSet;
+}

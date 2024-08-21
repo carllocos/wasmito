@@ -194,6 +194,8 @@ export enum WASMOpcodeNumber {
   I64Reinterpret_F64 = 0xbd,
   F32Reinterpret_I32 = 0xbe,
   F64Reinterpret_I64 = 0xbf,
+
+  TableSet = 0x26, // Wasm version 2
 }
 
 export function typeFromWasmOpcode(
