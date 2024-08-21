@@ -73,6 +73,47 @@ export interface SourceMapConfig {
   ignoreDirectories?: string[];
 }
 
+export interface SourceMapJSON {
+  wasm: string;
+  sources: string[];
+  mappings: SourceCodeLocation[];
+}
+
+export function isSourceCodeLocation(v: any): v is SourceCodeLocation {
+  return (
+    typeof v === 'object' &&
+    v !== null &&
+    typeof v.source === 'string' &&
+    typeof v.address === 'number' &&
+    typeof v.linenr === 'number' &&
+    typeof v.colnr === 'number' &&
+    typeof v.name === 'string'
+  );
+}
+
+export function isSourceMapJSON(arg: any): arg is SourceMapJSON {
+  if (
+    typeof arg === 'object' &&
+    arg !== null &&
+    typeof arg.wasm === 'string' &&
+    Array.isArray(arg.mappings) &&
+    Array.isArray(arg.sources)
+  ) {
+    for (const s of arg.sources) {
+      if (typeof s !== 'string') {
+        return false;
+      }
+    }
+    for (const m of arg.mappings) {
+      if (!isSourceCodeLocation(m)) {
+        return false;
+      }
+    }
+    return true;
+  }
+  return false;
+}
+
 export class SourceMap {
   private readonly _sourceToAbsPathSource: Map<string, string>;
   private readonly _ignoreDirs: string[];
