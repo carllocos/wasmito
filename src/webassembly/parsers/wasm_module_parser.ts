@@ -110,7 +110,7 @@ export interface ParsedModule {
 interface Func {
   type: 'Func';
   name: FuncName;
-  signature: FuncSignature;
+  signature: WasmType;
   body: WasmInstruction[];
   bodySize: number;
 }
@@ -181,8 +181,8 @@ function parseFunc(obj: any): [Func | undefined, string[]] {
   const name = obj.name;
   checkFuncName(name);
 
-  const signature = obj.signature;
-  assertFuncSignature(signature);
+  assertFuncSignature(obj.signature);
+  const signature = parseWasmType(obj.signature);
 
   let errors: string[] = [];
   const body = obj.body;
