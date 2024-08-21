@@ -538,6 +538,13 @@ function buildCFGNodesHelper(
     }
 
     if (beforeAddress !== undefined) {
+      const prevNode = getWasmCFGNode(g, beforeAddress);
+      const lastInstr = lastInstruction(prevNode);
+      if (!isBranch(lastInstr)) {
+        addEdge(g, beforeAddress, instr.startAddress);
+      }
+    }
+    beforeAddress = instr.startAddress;
 
     if (isControlFlowInstruction(instr)) {
       if (isBranchIf(instr) || isBranch(instr)) {
