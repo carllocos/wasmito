@@ -256,10 +256,6 @@ function createWasmFunctions(
   const funcs: WASMFunction[] = [];
   for (let i = 0; i < mod.funcs.length; i++) {
     const fun = mod.funcs[i];
-    const funcType = new WasmType(
-      fun.signature.params.length,
-      fun.signature.results.length,
-    );
     const funcName = mod.funcNames.find((fn) => {
       return fn.value === fun.name.value;
     });
@@ -299,7 +295,7 @@ function createWasmFunctions(
       fun.name.value,
       funcName.index,
       fun.body,
-      funcType,
+      fun.signature,
       locals,
     );
     funcs.push(f);
