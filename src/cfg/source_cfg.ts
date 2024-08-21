@@ -19,6 +19,8 @@ import {
   isWasmInstructionBlockBased,
   instructionToString,
   type WasmInstruction,
+  type CallInstruction,
+  type CallIndirect,
 } from '../webassembly/wasm/wasm_instruction';
 import {
   type AgnosticASTMap,
@@ -267,10 +269,16 @@ export function sourceCFGHasOutgoingFunCallEdges(n: SourceCFGNode): boolean {
   return getCallInstructions(n).length > 0;
 }
 
-export function getCallInstructions(n: SourceCFGNode): WasmInstruction[] {
-  return n.instructions.filter(
-    (i) => isCallInstruction(i) || isCallIndirect(i),
-  );
+export function getCallInstructions(
+  n: SourceCFGNode,
+): Array<CallInstruction | CallIndirect> {
+  const calls: Array<CallInstruction | CallIndirect> = [];
+  for (const i of n.instructions) {
+    if (isCallInstruction(i) || isCallIndirect(i)) {
+      calls.push(i);
+    }
+  }
+  return calls;
 }
 
 export function sourceNodeFirstInstruction(n: SourceCFGNode): WasmInstruction {
