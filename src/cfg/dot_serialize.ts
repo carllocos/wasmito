@@ -117,14 +117,17 @@ export function sourceControlFlowGraphToDot(
     if (sourceCFGHasOutgoingFunCallEdges(n)) {
       const calls = getCallInstructions(n);
       const direct: number[] = [];
+      const indirect: number[] = [];
       for (const call of calls) {
         if (isCallInstruction(call)) {
           direct.push(call.funIdx);
         } else if (isCallIndirect(call)) {
-          throw new Error(`TODO`);
+          call.targetFuncs.forEach((tf) => indirect.push(tf));
         }
       }
-      c += ` (call ${direct.join(', ')})`;
+      const indirectstr =
+        indirect.length > 0 ? ` indirect ${indirect.join(', ')}` : '';
+      c += ` (call ${direct.join(', ')}${indirectstr})`;
     }
     const instructionsStrs: string[] = [c];
     if (includeInstructions) {
