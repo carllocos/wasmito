@@ -316,9 +316,20 @@ function buildSourceCFGraph(
   // asts: AgnosticASTMap,
   cfg: WasmControlFlowGraph,
 ): Map<number, FunctionTreeGraph> {
+  logger.debug(
+    `Building Source Level Control Flow Graph for #${sourceMap.wasm.functions.length}`,
+  );
   const ctg = new Map<number, FunctionTreeGraph>();
-  for (const f of sourceMap.wasm.functions) {
+  const funcs = sourceMap.wasm.functions;
+  for (let idx = 0; idx < funcs.length; idx++) {
+    const f = funcs[idx];
+    logger.debug(
+      `[${idx}/${funcs.length - 1}] Building SCFG for function ${f.id}`,
+    );
     const funGraph = buildCTGraphForFunction(f, sourceMap, cfg);
+    logger.debug(
+      `[${idx}/${funcs.length - 1}] Storing SCFG of function ${f.id} to Map`,
+    );
     ctg.set(f.id, funGraph);
   }
   return ctg;
@@ -333,16 +344,18 @@ function buildCTGraphForFunction(
   // TODO use depthfirst traversal to build the whole graph in one go
   // console.log();
   // console.log(`===================================`);
-  // console.log(`Building Graph for function ${f.id}`);
   // console.log(`===================================`);
   // console.log();
   const graph = cfg.getCFGStrict(f.id);
   const ns = createAllNodes(f.id, sourceMap, graph);
   // console.log(`===================================`);
-  // console.log(`Adding Edges for function ${f.id}`);
+  logger.debug(
+    `${ns.length === 0 ? 'No edges to add' : 'Adding Edges'} for function ${f.id}`,
+  );
   // console.log(`===================================`);
   const entryNodes =
     ns.length === 0 ? [] : addEdgesAndReturnEntryNodes(graph, ns);
+  logger.debug(`Found #${entryNodes.length} EntryNodes for function ${f.id}`);
   return { entryNodes, allNodes: ns };
 }
 
@@ -358,6 +371,7 @@ function createAllNodes(
   // asts: AgnosticASTMap,
   funGraph: WASMFunGraph,
 ): SourceCFGNode[] {
+  logger.debug(`Creating all nodes for ${funID}`);
   const entryNode = funGraph.entryNode;
   const g = funGraph.graph;
   const nodes: SourceCFGNode[] = [];
@@ -544,7 +558,7 @@ function addEdgesAndReturnEntryNodes(
       // two different source CFG nodes
       // 2. in the case that the fromInstr and toInstr belong to the same source CFG node cfgn
       // then adding an edge may not be needed:
-      // 2.a. if there is just one edge name fromInstr and toInstr then the wasm CFG node is a
+      // 2.a. if there is just one edge then toInstr of the wasm CFG node is a
       // block instr (e.g., block or loop) and no edge is needed to be added
       // 2.b if the toInstr is a call or indirect call an edge needs to be added to another node
       // 2.c. if the toInstr is a branching instruction (e.g., br, br_if, br_table) and edge may

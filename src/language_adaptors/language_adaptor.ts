@@ -70,6 +70,7 @@ export class LanguageAdaptor {
 
     for (const [s, langConfig] of availableSources) {
       const ast = new AgnosticAST(s, langConfig);
+      logger.debug(`Building AST for ${s} with ${langConfig.language} parser`);
       await ast.buildAST();
       this._asts.set(s, ast);
     }
