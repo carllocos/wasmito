@@ -2,7 +2,7 @@ import { type MappingItem } from 'source-map';
 import { createLogger } from '../logger/logger';
 import { WasmModule } from '../webassembly/wasm/wasm_module';
 import { type WASMFunction } from '../webassembly/wasm/wasm_function';
-import { isFilePath, pathsEqual } from '../util/file_util';
+import { isFilePath, pathJoin, pathsEqual } from '../util/file_util';
 import { writeFileSync } from 'fs';
 
 const logger = createLogger('SourceMap');
@@ -71,11 +71,13 @@ export function sourceCodeLocationToString(m: SourceCodeLocation): string {
 export interface SourceMapConfig {
   srcToAbsPath?: Map<string, string>;
   ignoreDirectories?: string[];
+  prefixSources?: string;
 }
 
 export class SourceMap {
   private readonly _sourceToAbsPathSource: Map<string, string>;
   private readonly _ignoreDirs: string[];
+  private readonly _prefixPath?: string;
   private readonly _sources: string[];
   private readonly _mappings: SourceCodeLocation[];
   private readonly _wasmPath: string;
@@ -90,13 +92,29 @@ export class SourceMap {
     this._wasmPath = wasmPath;
     this._sourceToAbsPathSource = config?.srcToAbsPath ?? new Map();
     this._ignoreDirs = config?.ignoreDirectories ?? [];
-    this._sources = sources;
+    this._prefixPath = config?.prefixSources;
+    this._sources = [];
+
+    if (config?.prefixSources !== undefined) {
+      for (const s of sources) {
+        const ps = pathJoin(config.prefixSources, s);
+        this._sources.push(isFilePath(ps) ? ps : s);
+      }
+    } else {
+      this._sources = sources;
+    }
 
     // remove duplicate mappings
     // ignore mappings that are supposed to be ignored
     const tbl = new Map<number, SourceCodeLocation>();
     const cleanedMappings: SourceCodeLocation[] = [];
     for (const m of mappings) {
+      if (config?.prefixSources !== undefined) {
+        const newPath = pathJoin(config.prefixSources, m.source);
+        if (isFilePath(newPath)) {
+          m.source = newPath;
+        }
+      }
       const found = this._ignoreDirs.find((dir) => {
         return m.source.startsWith(dir);
       });
