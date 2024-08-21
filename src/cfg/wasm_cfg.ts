@@ -506,6 +506,29 @@ interface BlockScope {
   instructionAfterBlock: WasmInstruction;
 }
 
+/**
+ * The following function will construct a CFG for a sequence of Wasm `instructions`.
+ * The sequence of instructions could either be the instructions of the body of a function,
+ * or the subinstructions of block based instructions such as `block`, `if` with its
+ * consequence and alternative, and `loop`.
+ *
+ * As some instructions cause branching (e.g., `br`, `br_if`, `br_table`), the function
+ * expects as argument an array of the outerBlocks `blockScopes` that point to potential
+ * target destination for the branching instructions.
+ *
+ * if the instructions are subinstructions of an Wasm instruction e.g., the inner
+ * instructions of a `loop` instruction then the function expects two additional
+ * arguments `beforeAddress` and `afterAddress` that respectively point to a Wasm
+ * instruction that comes before the `instructions` and after the `instructions`.
+ * This is used to ensure that the CFG adds the edges to the nodes associated
+ * with the `beforeAddress` and `afterAddress`.
+ *
+ * @param g graph that maps Wasm addresses to CFGNode
+ * @param instructions Wasm instructions in sequence for which the CFG needs to be build
+ * @param blockScopes the outer scopes
+ * @param beforeAddress the addr of the Wasm instr that comes before the first instr of `instructions`
+ * @param afterAddress the addr of the Wasm instr that comes after the last instr of `instructions`
+ */
 function buildCFGNodesHelper(
   g: Map<number, CFGNode>,
   instructions: WasmInstruction[],
@@ -527,6 +550,10 @@ function buildCFGNodesHelper(
       const prevNode = getWasmCFGNode(g, beforeAddress);
       const entryNodeInstr = lastInstruction(prevNode);
       if (prevNode.changesFlow) {
+        // We cannot update the edges of the previous node
+        // if the node is an unconditional branch
+        // the reason is because the edges already got set
+        // by a previous loop iteration
         if (!isBranch(entryNodeInstr)) {
           addEdge(g, beforeAddress, instr.startAddress);
         }
@@ -537,6 +564,20 @@ function buildCFGNodesHelper(
       continue;
     }
 
+    // The following depicts two special cases:
+    // (1) additional edges may be needed
+    // between the current node and other nodes.
+    // This happens for instance when the current instruction
+    // is a branching instruction (e.g, `br`, `br_table`)
+    // (2) the graph needs to be further constructed in
+    // subinstructions of the current instructions.
+    // For instance, when encountering a block based instruction
+    // such as the `if` with its consequence and alternative
+    // the graph needs to be further build by visitn the consequence
+    // and alternative instructions
+
+    // First add an edge between the prevNode and current Node
+    // if needed
     if (beforeAddress !== undefined) {
       const prevNode = getWasmCFGNode(g, beforeAddress);
       const lastInstr = lastInstruction(prevNode);
@@ -547,25 +588,48 @@ function buildCFGNodesHelper(
     beforeAddress = instr.startAddress;
 
     if (isControlFlowInstruction(instr)) {
-      if (isBranchIf(instr) || isBranch(instr)) {
+      // (1) case where additional edges may be needed for branching instructions
+      // after adding the edges we need to continue to the next instruction
+
+      if (isCallInstruction(instr) || isCallIndirect(instr)) {
+        // if current instr is (indirect) call
+        // nothing more needs to happen
+      } else if (isBranchIf(instr) || isBranch(instr)) {
+        // in this case we have to add additional edges from the current node
+        // to the block where the branch targets
+
+        // take the target block of the instr
         const scopeIdx = instr.brachTarget + 1;
         const targetBlock = blockScopes[blockScopes.length - scopeIdx];
         const targetBlockInstr = targetBlock.startBlockInstruction;
         const afterBlockInstr = targetBlock.instructionAfterBlock;
 
         if (isBranch(instr)) {
+          // current node is an unconditional jump to the target block
+          // hence other edges are not needed
           const branchNode = getWasmCFGNode(g, instr.startAddress);
           branchNode.edges = [];
         }
 
+        // depending on the target block (e.g., loop)
+        // (conditional) branching goes to either the first instruction
+        // or last instruction of the target block
         if (isLoopInstruction(targetBlockInstr)) {
           const firstLoopInstr = targetBlockInstr.subInstructions[0];
           addEdge(g, instr.startAddress, firstLoopInstr.startAddress);
         } else {
           addEdge(g, instr.startAddress, afterBlockInstr.startAddress);
         }
+
+        // TODO when instr is Branch do we really need to continue?
+        // In theory the next instructions are not executed.
+        // why the need for continue? Maybe break?
         continue;
       } else if (isBranchTable(instr)) {
+        // edges need to be added from the current node
+        // (i.e., the node linked to current instr)
+        // to the all the blocks that this
+        // table branch instr targets
         for (const i of instr.brachTargets) {
           const scodeIdx = blockScopes.length - (1 + i);
           const targetBlock = blockScopes[scodeIdx];
@@ -573,13 +637,31 @@ function buildCFGNodesHelper(
           addEdge(g, instr.startAddress, afterBlockInstr.startAddress);
         }
       } else if (isReturnBranch(instr)) {
+        // a return instr changes the control
+        // to the most outer scope
+        // thus add edge to the last instr
+        // of the outer scope
         const targetBlock = blockScopes[0];
         const afterBlockInstr = targetBlock.instructionAfterBlock;
         addEdge(g, instr.startAddress, afterBlockInstr.startAddress);
+        // TODO if instr is return do we really need to continue or break?
+        // the following instrs may no need to be added in cfg?
       } else {
-        continue;
+        throw new Error(
+          `encountered a non handled branching instr ${instructionToString(instr)}`,
+        );
       }
+
+      // continue to the next instruction
+      // otherwise we end up in case 2 which
+      // is only applicable for block based instructions
+      // thus not the current instr
+      continue;
     }
+
+    // (2) The case where current instr is a block based instr
+    // the cfg consturction needs to be proceeded in the
+    // subinstructions of the current instr
 
     if (i + 1 >= instructions.length) {
       break;
@@ -588,6 +670,8 @@ function buildCFGNodesHelper(
     // case where instr is a block based structure instr
     // the end instruction of the block instr is the last inst of its subisntrcs
     // the next inst of instructions as instructions[i+1] is the inst after the block'end
+
+    // the instruction after the current instr
     const instrAfterBlock = instructions[i + 1];
     const endBlockAddr = instrAfterBlock.startAddress;
     const newScopes = blockScopes.slice(); // copy
