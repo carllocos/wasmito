@@ -474,6 +474,7 @@ export function wasmOpcodeFromStr(opcode: string): WASMOpcodeNumber {
     case 'i64.store32':
       return WASMOpcodeNumber.I64Store32;
 
+    case 'u32.const': // u32.const
     case 'i32.const': // i32.const
       return WASMOpcodeNumber.I32Const;
     case 'i64.const': // i64.const
