@@ -168,20 +168,23 @@ export class WasmControlFlowGraph {
 
     for (const f of this._wasm.functions) {
       const fg = this.getCFGStrict(f.id);
-      for (const c of fg.calls) {
-        if (!isCallInstruction(c) && !isCallIndirect(c)) {
-          throw new Error(
-            `instruction stored in calls field should be a (indirect) call`,
-          );
+      const indirectCalls: WasmInstruction[] = fg.callIndirects;
+      const calls: WasmInstruction[] = indirectCalls.concat(fg.calls);
+      for (const c of calls) {
+        const funcsCalled: number[] = [];
+        if (isCallInstruction(c)) {
+          funcsCalled.push(c.funIdx);
+        } else if (isCallIndirect(c)) {
+          c.targetFuncs.forEach((tf) => funcsCalled.push(tf));
+        } else {
+          // should not happen
+          throw new Error(`Encountered an non call or indirect call`);
         }
 
-        if (isCallInstruction(c)) {
-          const funIDCalled = c.funIdx;
+        for (const funIDCalled of funcsCalled) {
           const callSites = callSitesMap.get(funIDCalled) ?? new Set<number>();
           callSites.add(c.startAddress);
           callSitesMap.set(funIDCalled, callSites);
-        } else if (isCallIndirect(c)) {
-          throw new Error(`TODO CallIndirect`);
         }
       }
     }
