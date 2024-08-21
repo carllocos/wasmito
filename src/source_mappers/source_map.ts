@@ -358,8 +358,12 @@ export class SourceMap {
       maps = maps.filter((m) => isFilePath(m.source));
     }
     const mpsStr = maps.map(sourceCodeLocationToString).join(',');
-
-    const content = `{"mappings":[${mpsStr}]}`;
+    const sourcesStr = this._sources
+      .map((s) => {
+        return `"${s}"`;
+      })
+      .join(',');
+    const content = `{"wasm":"${this._wasmPath}","sources":[${sourcesStr}],"mappings":[${mpsStr}]}`;
     writeFileSync(filePath, content);
   }
 }
