@@ -39,7 +39,8 @@ export type WasmGraph = Map<number, CFGNode>;
 export interface WASMFunGraph {
   entryNode: CFGNode;
   graph: WasmGraph;
-  calls: WasmInstruction[];
+  calls: CallInstruction[];
+  callIndirects: CallIndirect[];
 }
 
 function cfgNodeToObj(nd: CFGNode): object {
