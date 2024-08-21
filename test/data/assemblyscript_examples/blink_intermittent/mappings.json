@@ -1,4 +1,4 @@
-{"mappings":[{
+{"wasm":"/Users/crojcas/Documents/projects/wasmito/test/data/assemblyscript_examples/blink_intermittent/main.wasm","sources":["mainblinkintermt.debug/~lib/rt/common.ts","/Users/crojcas/Documents/projects/wasmito/test/data/assemblyscript_examples/blink_intermittent/blink_intermittent.ts"],"mappings":[{
     "source":"/Users/crojcas/Documents/projects/wasmito/test/data/assemblyscript_examples/blink_intermittent/blink_intermittent.ts",
     "address": 218,
     "linenr": 6,
