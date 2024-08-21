@@ -2,12 +2,14 @@ import fs from 'fs';
 import {
   SourceMap,
   type SourceMapConfig,
+  isSourceMapJSON,
   mappingItemToSourceCodeLocation,
 } from './source_map';
 import { type MappingItem, SourceMapConsumer } from 'source-map';
 import { createLogger } from '../logger/logger';
 import { addr2line } from '../wasm-tools/addr2lines';
 import { wasmToolsObjdump } from '../wasm-tools/objdump';
+import { readFileAsJSON } from '../util/file_util';
 
 const logger = createLogger('SourceMapBuilder');
 
@@ -152,6 +154,17 @@ export async function SourceMapfromDWARFWasm(
   const sources = Array.from(new Set(mappings.map((m) => m.source)));
   const sourceLocations = mappings.map(mappingItemToSourceCodeLocation);
   return new SourceMap(wasmFilePath, sources, sourceLocations);
+}
+
+export async function SourceMapFromJSON(jsonPath: string): Promise<SourceMap> {
+  const sm = await readFileAsJSON(jsonPath);
+  if (!isSourceMapJSON(sm)) {
+    throw new Error(
+      `${jsonPath} does not satisfy the expected SourceMapJSON interface`,
+    );
+  }
+
+  return new SourceMap(sm.wasm, sm.sources, sm.mappings);
 }
 
 export async function createMappingForAddr(
