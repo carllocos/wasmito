@@ -1,10 +1,8 @@
 import { expect } from 'chai';
 import path from 'path';
 import { WasmModule } from '../../src/webassembly/wasm/wasm_module';
-import {
-  WasmControlFlowGraph,
-  buildControlFlowGraphFunction,
-} from '../../src/cfg/wasm_cfg';
+import { WasmControlFlowGraph } from '../../src/cfg/wasm_cfg';
+import { buildControlFlowGraphFunction } from '../../src/cfg/wasm_cfg_builder';
 
 const exampleFile = path.resolve('./test/data/rust_examples/blink/main.wasm');
 describe('Rust Language Adaptor for Blink App', function () {
