@@ -1102,6 +1102,8 @@ function parseWasmType(obj: any, typeId?: number): WasmType {
   }
 
   const wasmType = new WasmType(ps.length, rs.length, typeId);
+  wasmType.args = ps;
+  wasmType.returnTypes = rs;
   return wasmType;
 }
 
