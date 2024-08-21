@@ -86,25 +86,25 @@ export function sourceControlFlowGraphToDot(
   const header = `digraph "CFG of ${nameGraph}" `;
   const nodesDone = new Set<string>();
   let nodesStr = '';
-  const exitNodesToAdd = new Set<number>();
-  const funNames = new Map<number, string>();
+  // const exitNodesToAdd = new Set<number>();
+  // const funNames = new Map<number, string>();
   for (const n of allnodes) {
     if (nodesDone.has(n.nodeId)) {
       continue;
     }
-    if (sourceCFGHasOutgoingFunCallEdges(n)) {
-      const callInstrs = getCallInstructions(n);
-      for (const callinstr of callInstrs) {
-        if (isCallInstruction(callinstr)) {
-          exitNodesToAdd.add(callinstr.funIdx);
-          funNames.set(callinstr.funIdx, callinstr.args[0]);
-        } else if (isCallIndirect(callinstr)) {
-          throw new Error(`Call indirect not yet supported`);
-        } else {
-          throw new Error(`outgoing instructions should be (indirect) calls`);
-        }
-      }
-    }
+    // if (sourceCFGHasOutgoingFunCallEdges(n)) {
+    //   const callInstrs = getCallInstructions(n);
+    //   for (const callinstr of callInstrs) {
+    //     if (isCallInstruction(callinstr)) {
+    //       exitNodesToAdd.add(callinstr.funIdx);
+    //       funNames.set(callinstr.funIdx, callinstr.args[0]);
+    //     } else if (isCallIndirect(callinstr)) {
+    //       throw new Error(`Call indirect not yet supported`);
+    //     } else {
+    //       throw new Error(`outgoing instructions should be (indirect) calls`);
+    //     }
+    //   }
+    // }
     const record = n.instructions.length > 1 ? 'Mrecord' : 'record';
 
     const sp = n.sourceLocation;
