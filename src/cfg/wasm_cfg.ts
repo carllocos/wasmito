@@ -392,20 +392,35 @@ function mergeNodes(g: WasmGraph, n1Address: number, n2Address: number): void {
   }
 }
 
-function buildCFGForFunc(fun: WASMFunction): WASMFunGraph {
+function buildCFGForFunc(
+  fun: WASMFunction,
+  tableAltered: boolean,
+): [WASMFunGraph, boolean] {
   const g: WasmGraph = new Map();
-  const funsCalled: WasmInstruction[] = [];
+  const funsCalled: CallInstruction[] = [];
+  const callIndirects: CallIndirect[] = [];
   for (let i = 0; i < fun.allInstructions.length; i++) {
     const instr = fun.allInstructions[i];
     const instrChangesFlow =
       isControlFlowInstruction(instr) || isWasmInstructionBlockBased(instr);
     const n = createNode(i, instrChangesFlow, [instr], [i], []);
     g.set(instr.startAddress, n);
-    if (isCallInstruction(instr) || isCallIndirect(instr)) {
-      if (isCallIndirect(instr)) {
-        console.error(`TODO CallIndirect not yet supported`);
-      }
+    if (isCallInstruction(instr)) {
       funsCalled.push(instr);
+    } else if (isCallIndirect(instr)) {
+      const prevIdx = i - 1;
+      if (prevIdx > 0) {
+        // we can now the exact target func
+        // of call indirect only
+        // if the previous instr is a const
+        const prevInstr = fun.allInstructions[prevIdx];
+        if (isConst(prevInstr)) {
+          instr.tableIndex = prevInstr.value;
+        }
+      }
+      callIndirects.push(instr);
+    } else if (isTableSet(instr)) {
+      tableAltered = true;
     }
   }
   buildCFGNodesHelper(g, fun.body, [
@@ -415,7 +430,10 @@ function buildCFGForFunc(fun: WASMFunction): WASMFunGraph {
     },
   ]);
   const entryNode = getWasmCFGNode(g, fun.allInstructions[0].startAddress);
-  return { entryNode, graph: g, calls: funsCalled };
+  return [
+    { entryNode, graph: g, calls: funsCalled, callIndirects },
+    tableAltered,
+  ];
 }
 
 interface BlockScope {
