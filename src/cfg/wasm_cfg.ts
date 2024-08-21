@@ -510,8 +510,8 @@ function buildCFGNodesHelper(
   g: Map<number, CFGNode>,
   instructions: WasmInstruction[],
   blockScopes: BlockScope[],
-  entryAddress?: number | undefined,
-  exitAddress?: number | undefined,
+  beforeAddress?: number | undefined,
+  afterAddress?: number | undefined,
 ): void {
   for (let i = 0; i < instructions.length; i++) {
     const instr = instructions[i];
@@ -519,28 +519,25 @@ function buildCFGNodesHelper(
       !isControlFlowInstruction(instr) &&
       !isWasmInstructionBlockBased(instr)
     ) {
-      if (entryAddress === undefined) {
-        entryAddress = instr.startAddress;
+      if (beforeAddress === undefined) {
+        beforeAddress = instr.startAddress;
         continue;
       }
 
-      const entryNode = getWasmCFGNode(g, entryAddress);
-      const entryNodeInstr = lastInstruction(entryNode);
-      if (entryNode.changesFlow) {
+      const prevNode = getWasmCFGNode(g, beforeAddress);
+      const entryNodeInstr = lastInstruction(prevNode);
+      if (prevNode.changesFlow) {
         if (!isBranch(entryNodeInstr)) {
-          addEdge(g, entryAddress, instr.startAddress);
+          addEdge(g, beforeAddress, instr.startAddress);
         }
       } else {
-        mergeNodes(g, entryAddress, instr.startAddress);
+        mergeNodes(g, beforeAddress, instr.startAddress);
       }
-      entryAddress = instr.startAddress;
+      beforeAddress = instr.startAddress;
       continue;
     }
 
-    if (entryAddress !== undefined) {
-      addEdge(g, entryAddress, instr.startAddress);
-      entryAddress = instr.startAddress;
-    }
+    if (beforeAddress !== undefined) {
 
     if (isControlFlowInstruction(instr)) {
       if (isBranchIf(instr) || isBranch(instr)) {
@@ -622,17 +619,15 @@ function buildCFGNodesHelper(
       );
     }
     // skip endAddress of block as it has already been handled
-    entryAddress = endBlockAddr;
-    // i = i + 1;
+    beforeAddress = endBlockAddr;
   }
 
-  if (exitAddress !== undefined) {
-    if (entryAddress === undefined) {
+  if (afterAddress !== undefined) {
+    if (beforeAddress === undefined) {
       throw new Error(
         'Entry address is not expected to be undefined when reaching end',
       );
     }
-
-    addEdge(g, entryAddress, exitAddress);
+    addEdge(g, beforeAddress, afterAddress);
   }
 }
