@@ -1,3 +1,7 @@
+/**
+ * Provides the interfaces and helper functions to work with a Control Flow Graphs
+ * generated for a Wasm module
+ */
 import { writeFileSync } from 'fs';
 import {
   type CallInstruction,
