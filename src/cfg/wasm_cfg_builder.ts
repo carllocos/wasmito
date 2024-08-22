@@ -18,6 +18,7 @@ import {
   isTableSet,
 } from '../webassembly/wasm/wasm_instruction';
 import { type WasmModule } from '../webassembly/wasm/wasm_module';
+import { buildWasmCallGraph, type WasmCallGraph } from './wasm_callgraph';
 import {
   getWasmCFGNode,
   type WasmGraph,
@@ -51,21 +52,22 @@ export function buildControlFlowGraphFunction(
 }
 
 export function buildGraphs(
-  funcs: WASMFunction[],
-): [Map<number, WASMFunGraph>, Map<number, Set<number>>] {
+  wasm: WasmModule,
+): [Map<number, WASMFunGraph>, Map<number, Set<number>>, WasmCallGraph] {
   const cfgs = new Map();
   let tableAltered: boolean = false;
   const fgs: WASMFunGraph[] = [];
-  for (const f of funcs) {
+  for (const f of wasm.functions) {
     const [fg, newTblAltered] = buildCFGForFunc(f, tableAltered);
     tableAltered = tableAltered || newTblAltered;
     cfgs.set(f.id, fg);
     fgs.push(fg);
   }
 
-  setTargetFunctionForCallIndirects(funcs, fgs, tableAltered);
-  const callsites = buildCallSites(cfgs, funcs);
-  return [cfgs, callsites];
+  setTargetFunctionForCallIndirects(wasm.functions, fgs, tableAltered);
+  const callsites = buildCallSites(cfgs, wasm.functions);
+  const callgraph = buildWasmCallGraph(wasm, cfgs);
+  return [cfgs, callsites, callgraph];
 }
 
 /**
