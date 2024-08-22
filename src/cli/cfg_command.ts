@@ -60,11 +60,9 @@ export function registerCFGCommand(program: Command): void {
         timeoutMs = timeoutMs * 1000; // convert to millisecs
       }
 
-      let callgraph: string | undefined;
-
+      let callgraphOutputPath: string | undefined;
       if (options.callgraph !== undefined) {
-        callgraph = pathJoin(outputDir, options.callgraph);
-        program.error(`TODO Callgraph ${callgraph}`);
+        callgraphOutputPath = pathJoin(outputDir, options.callgraph);
       }
 
       const wasmitoPath = options.wasmitoJson;
@@ -131,6 +129,9 @@ export function registerCFGCommand(program: Command): void {
         langAdaptor.sourceCFG.toJSON(sourceCFGsOutputDir);
         logger.info(`Converting Source CFGs to dot`);
         langAdaptor.sourceCFG.serializeToDot(sourceCFGsOutputDir, config);
+        if (callgraphOutputPath !== undefined) {
+          langAdaptor.sourceCFG.wasmCFG.callgraph.toDot(callgraphOutputPath);
+        }
       } catch (e) {
         const errMsg = e instanceof Error ? e.message : e;
         program.error(`Could not build CFGs error occured: ${errMsg}`);
