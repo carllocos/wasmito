@@ -266,6 +266,7 @@ function sourceCFGNodeToJSONObj(n: SourceCFGNode): object {
 }
 
 export function sourceCFGHasOutgoingFunCallEdges(n: SourceCFGNode): boolean {
+  // TODO improve speed
   return getCallInstructions(n).length > 0;
 }
 
