@@ -4,93 +4,132 @@ import {
   createDirectoryIfUnexisting,
   isDirectoryPath,
   isFilePath,
+  pathJoin,
 } from '../util/file_util';
-import { type SourceMap } from '../source_mappers/source_map';
-import {
-  SourceMapfromDWARFWasm,
-  SourceMapfromSourceMapSpec,
-  type SourceOffsetStart,
-} from '../source_mappers/source_map_builder';
+import { SourceMapFromJSON } from '../source_mappers/source_map_builder';
 import { constructLanguageAdaptor } from '../language_adaptors/language_adaptor';
 import { type DotSerializationConfgig } from '../cfg/source_cfg';
 import { timeoutPromise } from '../util/promise_util';
+import { getGlobalLogger } from '../logger/logger';
+import { type SourceMap } from '../source_mappers/source_map';
 
 export function registerCFGCommand(program: Command): void {
   program
-    .command('cfg <wasm-path> <output-dir> <timeout-secs>')
+    .command('cfg')
     .description(
-      `build SourceCode Level Control Flow Graphs (CFG) for the given Wasm module <wasm-path>
-       and store them in <output-dir>.
-       Specify also a max build time allowed <timeout-secs> expressed in secs.`,
+      `Build SourceCode and Wasm-Level Control Flow Graphs(CFGs) as-well-as Callgraphs.`,
+    )
+    .argument('<wasm-path>', 'the wasm for which we build the CFGs')
+    .argument(
+      '<output-dir>',
+      'the location where to store all the generated CFGs',
     )
     .argument(
-      '[source-map-spec]',
-      `optional path to a Source Map Spec.
-      
-      If provided the CFG is build using the source mappings from the given file.
-      If not provided the CFG is build using only the <wasm-path> which is assumed to containd DWARF debugging
-      information
-      `,
+      '<timeout-secs>',
+      'the maximum time allocated to the build of the CFGs',
     )
-    .action(async (wasmPath, outputDir, timeout, sourceMapSpecPath) => {
+    .option(
+      '-d, --dwarf <dwarf-path>',
+      `reads the DWARF debugging information from either the path to a DWARF encoded file or the wasm module iteself.`,
+    )
+    .option(
+      '-w, --wasmito-json <path-to-wasmito-sourcemap-json>',
+      `use as debugging format wasmito internal debugging format`,
+    )
+    .option(
+      '-s, --source-spec <path-to-source-spec>',
+      `reads the debugging information from the given file that points to a SourceMap Spec
+      of the given wasm module iteself.`,
+    )
+    .option(
+      '-cg, --callgraph <callgraph-name.dot>',
+      'enable the build of the callgraph for the wasm and store it in the <output-dir> as <callgraph-name.dot>',
+    )
+    .action(async (wasmPath, outputDir, timeout, options) => {
+      const logger = getGlobalLogger();
       if (!isFilePath(wasmPath)) {
         program.error('<wasm-path> is not a valid path to a Wasm module');
       } else if (!isDirectoryPath(outputDir)) {
         program.error('<output-dir> is not a valid path to a directory');
-      } else if (
-        sourceMapSpecPath !== undefined &&
-        !isFilePath(sourceMapSpecPath)
-      ) {
-        program.error('`source-map-spec` is not a path to a file');
       }
 
-      let timeoutSecs = Number(timeout);
-      if (isNaN(timeoutSecs) || timeoutSecs < 0) {
+      let timeoutMs = Number(timeout);
+      if (isNaN(timeoutMs) || timeoutMs < 0) {
         program.error('`<timeout-secs>` is not a positive number');
       } else {
-        timeoutSecs = timeoutSecs * 1000; // convert to secs
+        timeoutMs = timeoutMs * 1000; // convert to millisecs
       }
 
-      let smPromise: Promise<SourceMap> | undefined;
-      if (sourceMapSpecPath !== undefined) {
-        const startPositioning: SourceOffsetStart = {
-          colNrStartNumber: 0,
-          lineNrStartNumber: 1,
-        };
-        smPromise = timeoutPromise(
-          SourceMapfromSourceMapSpec(
-            sourceMapSpecPath,
-            wasmPath,
-            startPositioning,
-          ),
-          timeoutSecs,
-        );
-      } else {
-        smPromise = timeoutPromise(
-          SourceMapfromDWARFWasm(wasmPath),
-          timeoutSecs,
-        );
+      let callgraph: string | undefined;
+
+      if (options.callgraph !== undefined) {
+        callgraph = pathJoin(outputDir, options.callgraph);
+        program.error(`TODO Callgraph ${callgraph}`);
       }
-      try {
-        const sm = await smPromise;
-        createDirectoryIfUnexisting(outputDir);
-        sm.storeMappingsToJSON(path.resolve(outputDir, 'mappings.json'));
-        const langAdaptor = await constructLanguageAdaptor(sm);
-        if (langAdaptor.sourceCFG === undefined) {
-          program.error(`Could not build Source CFGs`);
+
+      const wasmitoPath = options.wasmitoJson;
+      const dwarfPath = options.dwarf;
+      const sourceSpecPath = options.sourceSpec;
+      let smPromise: Promise<SourceMap> | undefined;
+
+      if (wasmitoPath !== undefined) {
+        if (!isFilePath(wasmitoPath)) {
+          program.error(
+            '`the <path-to-wasmito-sourcemap-json> is not a path to a file',
+          );
         }
+        smPromise = SourceMapFromJSON(wasmitoPath);
+      } else if (dwarfPath !== undefined) {
+        program.error(`dwarf todo`);
+      } else if (sourceSpecPath !== undefined) {
+        program.error(`source-map spec todo`);
+      } else {
+        program.error('At least one debugging format should be opted for');
+      }
+      if (smPromise === undefined) {
+        program.error('SourceMap should not be empty');
+      }
+
+      try {
+        const sm = await timeoutPromise(smPromise, timeoutMs);
+        createDirectoryIfUnexisting(outputDir);
+        // sm.storeMappingsToJSON(path.resolve(outputDir, 'mappings.json'));
+        logger.info(`Starting construction CFGs`);
+        const startTime = Date.now();
+        const langAdaptor = await timeoutPromise(
+          constructLanguageAdaptor(sm),
+          timeoutMs,
+        );
+        const endTime = Date.now();
+        if (langAdaptor.sourceCFG === undefined) {
+          logger.error(`Failed to build Source CFGs`);
+          program.error(`Failed to build Source CFGs`);
+        }
+
+        const diff = endTime - startTime;
+        logger.info(
+          `Construction Time Took ${diff} ms, ${diff / 1000} secs, ${diff / 1000 / 60} mins`,
+        );
 
         const wasmOutputDir = path.join(outputDir, `/wasm`);
         createDirectoryIfUnexisting(wasmOutputDir);
-        langAdaptor.sourceCFG.wasmCFG.toJSON(wasmOutputDir);
+        // the following CFGs conversion to JSON is very expensive
+        // logger.debug(`Converting Wasm CFGs to JSON`);
+        // langAdaptor.sourceCFG.wasmCFG.toJSON(wasmOutputDir);
+        logger.info(`Converting Wasm CFGs to dot`);
         langAdaptor.sourceCFG.wasmCFG.serializeToDot(wasmOutputDir);
+        // if (options.callgraph !== undefined) {
+        //   langAdaptor.sourceCFG.wasmCFG.callgraphToDot(callgraph);
+        // }
         const config: DotSerializationConfgig = {
           includeInstructions: false,
           includeEmptySCFG: false,
         };
         const sourceCFGsOutputDir = path.join(outputDir, `/source/`);
         createDirectoryIfUnexisting(sourceCFGsOutputDir);
+        logger.info(`Converting Source CFGs to JSON`);
         langAdaptor.sourceCFG.toJSON(sourceCFGsOutputDir);
+        logger.info(`Converting Source CFGs to dot`);
         langAdaptor.sourceCFG.serializeToDot(sourceCFGsOutputDir, config);
       } catch (e) {
         const errMsg = e instanceof Error ? e.message : e;
