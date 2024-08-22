@@ -15,8 +15,10 @@ import {
   parseLogLevel,
   setLogLevel,
   getGlobalLogger,
+  setGlobalLoggerName,
 } from '../logger/logger';
 import { registerCFGCommand } from './cfg_command';
+import { registerSourceMapCommand } from './sourcemap_command';
 
 export function startCLI(): void {
   const projectName = readProjectName();
@@ -37,6 +39,7 @@ export function startCLI(): void {
   // registerDeviceManagerCommands(dm, program);
 
   registerCFGCommand(program);
+  registerSourceMapCommand(program);
 
   program.parse(process.argv);
 
@@ -56,6 +59,7 @@ export function startCLI(): void {
     getGlobalLogger().info(`Setting log-level to '${logLevel}'`);
   }
   setLogLevel(logLevel);
+  setGlobalLoggerName('CLI');
 
   if (options.devicesConfig !== undefined) {
     const configs: DeviceIdentityArgs[] | undefined = parseDeviceConfigs(
