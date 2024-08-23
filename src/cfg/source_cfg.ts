@@ -444,7 +444,7 @@ function createAllNodes(
   return nodes;
 }
 
-function searchCTGNInDecreasingAddresses(
+function searchSourceCFGNodeInDecreasingAddresses(
   n: CFGNode,
   nodes: SourceCFGNode[],
 ): SourceCFGNode | undefined {
@@ -521,7 +521,7 @@ function addEdgesAndReturnEntryNodes(
   breadthFirstTraverseWasmCFGT(g, entryNode, {
     onNode: (n: CFGNode) => {
       // console.log(`\nNode ID ${n.nodeID}`);
-      const sourceCFGN = searchCTGNInDecreasingAddresses(n, nodes);
+      const sourceCFGN = searchSourceCFGNodeInDecreasingAddresses(n, nodes);
       if (sourceCFGN === undefined) {
         if (n.nodeID === entryNode.nodeID) {
           // handle special case where entry has no associated CTG node
