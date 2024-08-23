@@ -652,14 +652,21 @@ function searchNeighboursWithASTs(
   nodesToIgnore.add(n.nodeID);
   const found: SourceCFGNode[] = [];
   for (const e of n.edges) {
-    const toNode = getWasmCFGNode(g, e.instrTo.startAddress);
-    const toctgn = searchSourceCFGNIncreasingAddresses(toNode, nodes);
-    if (toctgn === undefined) {
-      const [newNodesToIngore, ns] = searchNeighboursWithASTs(g, toNode, nodes);
+    const toWasmNode = getWasmCFGNode(g, e.instrTo.startAddress);
+    const toSourceCFGNode = searchSourceCFGNIncreasingAddresses(
+      toWasmNode,
+      nodes,
+    );
+    if (toSourceCFGNode === undefined) {
+      const [newNodesToIngore, ns] = searchNeighboursWithASTs(
+        g,
+        toWasmNode,
+        nodes,
+      );
       newNodesToIngore.forEach((nodeid) => nodesToIgnore.add(nodeid));
       ns.forEach((nf) => found.push(nf));
     } else {
-      found.push(toctgn);
+      found.push(toSourceCFGNode);
     }
   }
   return [nodesToIgnore, found];
