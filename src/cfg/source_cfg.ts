@@ -444,7 +444,7 @@ function createAllNodes(
   return nodes;
 }
 
-function searchSourceCFGNodeInDecreasingAddresses(
+function sourceCFGNodeFromDecreasingInstrs(
   n: CFGNode,
   nodes: SourceCFGNode[],
 ): SourceCFGNode | undefined {
@@ -452,7 +452,7 @@ function searchSourceCFGNodeInDecreasingAddresses(
   return searchSourceCFGNode(n, nodes, increment);
 }
 
-function searchSourceCFGNIncreasingAddresses(
+function sourceCFGFromIncreasingInstrs(
   n: CFGNode,
   nodes: SourceCFGNode[],
 ): SourceCFGNode | undefined {
@@ -521,7 +521,7 @@ function addEdgesAndReturnEntryNodes(
   breadthFirstTraverseWasmCFGT(g, entryNode, {
     onNode: (wasmNode: CFGNode) => {
       // console.log(`\nNode ID ${n.nodeID}`);
-      const sourceCFGN = searchSourceCFGNodeInDecreasingAddresses(
+      const sourceCFGN = sourceCFGNodeFromDecreasingInstrs(
         wasmNode,
         sourceNodes,
       );
@@ -553,7 +553,7 @@ function addEdgesAndReturnEntryNodes(
         // ctgn is not undefined
         // entry CFG node has a corresponding CTG node
         if (wasmNode.nodeID === entryNode.nodeID) {
-          const startNode = searchSourceCFGNIncreasingAddresses(
+          const startNode = sourceCFGFromIncreasingInstrs(
             wasmNode,
             sourceNodes,
           );
@@ -587,7 +587,7 @@ function addEdgesAndReturnEntryNodes(
         //   `instrFrom ${instructionToString(e.instrFrom)} -> instrTo ${instructionToString(e.instrTo)}`,
         // );
         const toNode = getWasmCFGNode(g, e.instrTo.startAddress);
-        const toctgn = searchSourceCFGNIncreasingAddresses(toNode, sourceNodes);
+        const toctgn = sourceCFGFromIncreasingInstrs(toNode, sourceNodes);
         if (toctgn !== undefined) {
           // console.log(
           //   `about to add edge from ${logNode(ctgn.node)} to ${logNode(toctgn.node)}`,
@@ -613,7 +613,7 @@ function addEdgesAndReturnEntryNodes(
             const branchingNode = getWasmCFGNode(g, e.instrFrom.startAddress);
             for (const be of branchingNode.edges) {
               const destNode = getWasmCFGNode(g, be.instrTo.startAddress);
-              const destcfgn = searchSourceCFGNIncreasingAddresses(
+              const destcfgn = sourceCFGFromIncreasingInstrs(
                 destNode,
                 sourceNodes,
               );
@@ -659,10 +659,7 @@ function searchClosetsSourceCFGNodes(
   const found: SourceCFGNode[] = [];
   for (const e of n.edges) {
     const toWasmNode = getWasmCFGNode(g, e.instrTo.startAddress);
-    const toSourceCFGNode = searchSourceCFGNIncreasingAddresses(
-      toWasmNode,
-      nodes,
-    );
+    const toSourceCFGNode = sourceCFGFromIncreasingInstrs(toWasmNode, nodes);
     if (toSourceCFGNode === undefined) {
       const [newNodesToIngore, ns] = searchClosetsSourceCFGNodes(
         g,
