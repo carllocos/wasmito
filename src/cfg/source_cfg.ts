@@ -506,12 +506,12 @@ function searchSourceCFGNode(
  * of its corresponding Wasm Level CFG.
  * After adding the edges the function also returns the entry nodes of the Source Level CFG.
  * @param funGraph the CFG of the wasm function
- * @param nodes Source Level CFG nodes that need to be augmented with edges
+ * @param sourceNodes Source Level CFG nodes that need to be augmented with edges
  * @returns the Entry nodes of the Source Level CFG
  */
 function addEdgesAndReturnEntryNodes(
   funGraph: WASMFunGraph,
-  nodes: SourceCFGNode[],
+  sourceNodes: SourceCFGNode[],
 ): SourceCFGNode[] {
   const entryNode = funGraph.entryNode;
   const g = funGraph.graph;
@@ -521,14 +521,17 @@ function addEdgesAndReturnEntryNodes(
   breadthFirstTraverseWasmCFGT(g, entryNode, {
     onNode: (n: CFGNode) => {
       // console.log(`\nNode ID ${n.nodeID}`);
-      const sourceCFGN = searchSourceCFGNodeInDecreasingAddresses(n, nodes);
+      const sourceCFGN = searchSourceCFGNodeInDecreasingAddresses(
+        n,
+        sourceNodes,
+      );
       if (sourceCFGN === undefined) {
         if (n.nodeID === entryNode.nodeID) {
           // handle special case where entry has no associated CTG node
           const [newNodesToIngore, entryNodes] = searchClosetsSourceCFGNodes(
             g,
             entryNode,
-            nodes,
+            sourceNodes,
           );
           newNodesToIngore.forEach((ni) => nodesToIgnore.add(ni));
           entryNodes.forEach((en) => {
@@ -550,7 +553,7 @@ function addEdgesAndReturnEntryNodes(
         // ctgn is not undefined
         // entry CFG node has a corresponding CTG node
         if (n.nodeID === entryNode.nodeID) {
-          const startNode = searchSourceCFGNIncreasingAddresses(n, nodes);
+          const startNode = searchSourceCFGNIncreasingAddresses(n, sourceNodes);
           if (startNode === undefined) {
             throw new Error(`startNode should not be undefined`);
           }
@@ -581,7 +584,7 @@ function addEdgesAndReturnEntryNodes(
         //   `instrFrom ${instructionToString(e.instrFrom)} -> instrTo ${instructionToString(e.instrTo)}`,
         // );
         const toNode = getWasmCFGNode(g, e.instrTo.startAddress);
-        const toctgn = searchSourceCFGNIncreasingAddresses(toNode, nodes);
+        const toctgn = searchSourceCFGNIncreasingAddresses(toNode, sourceNodes);
         if (toctgn !== undefined) {
           // console.log(
           //   `about to add edge from ${logNode(ctgn.node)} to ${logNode(toctgn.node)}`,
@@ -609,7 +612,7 @@ function addEdgesAndReturnEntryNodes(
               const destNode = getWasmCFGNode(g, be.instrTo.startAddress);
               const destcfgn = searchSourceCFGNIncreasingAddresses(
                 destNode,
-                nodes,
+                sourceNodes,
               );
               if (destcfgn === undefined) {
                 throw new Error(`TODO search deeper in patch`);
@@ -627,7 +630,7 @@ function addEdgesAndReturnEntryNodes(
           const [newNodesToIngore, indirectNodes] = searchClosetsSourceCFGNodes(
             g,
             toNode,
-            nodes,
+            sourceNodes,
           );
           newNodesToIngore.forEach((nid) => nodesToIgnore.add(nid));
           for (const indirectCTGN of indirectNodes) {
