@@ -525,7 +525,7 @@ function addEdgesAndReturnEntryNodes(
       if (sourceCFGN === undefined) {
         if (n.nodeID === entryNode.nodeID) {
           // handle special case where entry has no associated CTG node
-          const [newNodesToIngore, entryNodes] = searchNeighboursWithASTs(
+          const [newNodesToIngore, entryNodes] = searchClosetsSourceCFGNodes(
             g,
             entryNode,
             nodes,
@@ -624,7 +624,7 @@ function addEdgesAndReturnEntryNodes(
           }
         } else {
           // we have to search for all the neighbours of toNode that have a CFG node
-          const [newNodesToIngore, indirectNodes] = searchNeighboursWithASTs(
+          const [newNodesToIngore, indirectNodes] = searchClosetsSourceCFGNodes(
             g,
             toNode,
             nodes,
@@ -642,7 +642,7 @@ function addEdgesAndReturnEntryNodes(
   return entryCTGNodes;
 }
 
-function searchNeighboursWithASTs(
+function searchClosetsSourceCFGNodes(
   g: WasmGraph,
   n: CFGNode,
   nodes: SourceCFGNode[],
@@ -658,7 +658,7 @@ function searchNeighboursWithASTs(
       nodes,
     );
     if (toSourceCFGNode === undefined) {
-      const [newNodesToIngore, ns] = searchNeighboursWithASTs(
+      const [newNodesToIngore, ns] = searchClosetsSourceCFGNodes(
         g,
         toWasmNode,
         nodes,
