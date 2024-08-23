@@ -521,8 +521,8 @@ function addEdgesAndReturnEntryNodes(
   breadthFirstTraverseWasmCFGT(g, entryNode, {
     onNode: (n: CFGNode) => {
       // console.log(`\nNode ID ${n.nodeID}`);
-      const ctgn = searchCTGNInDecreasingAddresses(n, nodes);
-      if (ctgn === undefined) {
+      const sourceCFGN = searchCTGNInDecreasingAddresses(n, nodes);
+      if (sourceCFGN === undefined) {
         if (n.nodeID === entryNode.nodeID) {
           // handle special case where entry has no associated CTG node
           const [newNodesToIngore, entryNodes] = searchNeighboursWithASTs(
@@ -586,9 +586,9 @@ function addEdgesAndReturnEntryNodes(
           // console.log(
           //   `about to add edge from ${logNode(ctgn.node)} to ${logNode(toctgn.node)}`,
           // );
-          if (ctgn.nodeId !== toctgn.nodeId) {
+          if (sourceCFGN.nodeId !== toctgn.nodeId) {
             // case 1
-            addEdge(ctgn, toctgn);
+            addEdge(sourceCFGN, toctgn);
           } else if (isWasmInstructionBlockBased(e.instrTo)) {
             // case 2.a
             continue;
@@ -615,7 +615,7 @@ function addEdgesAndReturnEntryNodes(
                 throw new Error(`TODO search deeper in patch`);
               } else {
                 // if (destcfgn.nodeId === ctgn.nodeId) {
-                addEdge(ctgn, toctgn);
+                addEdge(sourceCFGN, toctgn);
                 // }
               }
             }
@@ -631,7 +631,7 @@ function addEdgesAndReturnEntryNodes(
           );
           newNodesToIngore.forEach((nid) => nodesToIgnore.add(nid));
           for (const indirectCTGN of indirectNodes) {
-            addEdge(ctgn, indirectCTGN);
+            addEdge(sourceCFGN, indirectCTGN);
           }
         }
       }
