@@ -47,7 +47,7 @@ export class LanguageAdaptor {
     const availableSources: Array<[string, LanguageConfiguration]> = [];
     for (const s of this.sourceMap.sources) {
       if (!isFilePath(s)) {
-        logger.info(
+        logger.debug(
           `Will not create an AST for source file ${s} as such filepath does not exist `,
         );
         continue;
@@ -55,7 +55,7 @@ export class LanguageAdaptor {
 
       const ext = getFileExtension(s);
       if (ext === undefined) {
-        logger.info(
+        logger.debug(
           `Will not create an AST for source file ${s} as such filepath has no file extension`,
         );
         continue;
@@ -68,6 +68,9 @@ export class LanguageAdaptor {
       availableSources.push([s, conf]);
     }
 
+    logger.info(
+      `Building AST for #${availableSources.length} available sources out of ${this.sourceMap.sources.length}`,
+    );
     for (const [s, langConfig] of availableSources) {
       const ast = new AgnosticAST(s, langConfig);
       logger.debug(`Building AST for ${s} with ${langConfig.language} parser`);
