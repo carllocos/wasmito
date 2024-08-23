@@ -133,7 +133,7 @@ export function registerCFGCommand(program: Command): void {
           langAdaptor.sourceCFG.wasmCFG.callgraph.toDot(callgraphOutputPath);
         }
       } catch (e) {
-        const errMsg = e instanceof Error ? e.message : e;
+        const errMsg = e instanceof Error ? `${e.message}${e.stack ?? ''}` : e;
         program.error(`Could not build CFGs error occured: ${errMsg}`);
       }
     });
