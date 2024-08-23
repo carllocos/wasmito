@@ -648,6 +648,20 @@ function addEdgesAndReturnEntryNodes(
   return entryCTGNodes;
 }
 
+/**
+ * A helper function that given a node in a Wasm CFG of a function will search direct
+ * or indirect Source Level CFG neighbours.
+ * This function is needed in the situation where n has no corresponding source Level CFG Node but
+ * the previous node of n i.e., node p that has an edge to n, does have a corresponding source level CFG Node
+ * and thus wants to add an edge to the source level nodes that are the closets to n.
+ * These closests source level CFG nodes for n are the source nodes that are direct neighbours of n or
+ * indirect neighbours.
+ *
+ * @param g Wasm Level CFG of a Wasm function
+ * @param n a node in the CFG for which we want to find the closests Source Level CFG Nodes
+ * @param nodes All the Source Level CFGNodes
+ * @returns nodes IDs that no longer need to be visited after return and the closets nodes
+ */
 function searchClosetsSourceCFGNodes(
   g: WasmGraph,
   n: CFGNode,
