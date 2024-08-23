@@ -623,7 +623,7 @@ function addEdgesAndReturnEntryNodes(
             continue;
           }
         } else {
-          // we have to search for all the neighbours of toNode that have a CTG node
+          // we have to search for all the neighbours of toNode that have a CFG node
           const [newNodesToIngore, indirectNodes] = searchNeighboursWithASTs(
             g,
             toNode,
