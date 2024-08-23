@@ -449,18 +449,18 @@ function searchCTGNInDecreasingAddresses(
   nodes: SourceCFGNode[],
 ): SourceCFGNode | undefined {
   const increment = false;
-  return searchCTGNFromNode(n, nodes, increment);
+  return searchSourceCFGNode(n, nodes, increment);
 }
 
-function searchCTGNInIncreasingAddresses(
+function searchSourceCFGNIncreasingAddresses(
   n: CFGNode,
   nodes: SourceCFGNode[],
 ): SourceCFGNode | undefined {
   const increment = true;
-  return searchCTGNFromNode(n, nodes, increment);
+  return searchSourceCFGNode(n, nodes, increment);
 }
 
-function searchCTGNFromNode(
+function searchSourceCFGNode(
   n: CFGNode,
   nodes: SourceCFGNode[],
   fromLowAddressToHigh: boolean,
@@ -542,7 +542,7 @@ function addEdgesAndReturnEntryNodes(
         // ctgn is not undefined
         // entry CFG node has a corresponding CTG node
         if (n.nodeID === entryNode.nodeID) {
-          const startNode = searchCTGNInIncreasingAddresses(n, nodes);
+          const startNode = searchSourceCFGNIncreasingAddresses(n, nodes);
           if (startNode === undefined) {
             throw new Error(`startNode should not be undefined`);
           }
@@ -573,7 +573,7 @@ function addEdgesAndReturnEntryNodes(
         //   `instrFrom ${instructionToString(e.instrFrom)} -> instrTo ${instructionToString(e.instrTo)}`,
         // );
         const toNode = getWasmCFGNode(g, e.instrTo.startAddress);
-        const toctgn = searchCTGNInIncreasingAddresses(toNode, nodes);
+        const toctgn = searchSourceCFGNIncreasingAddresses(toNode, nodes);
         if (toctgn !== undefined) {
           // console.log(
           //   `about to add edge from ${logNode(ctgn.node)} to ${logNode(toctgn.node)}`,
@@ -599,7 +599,10 @@ function addEdgesAndReturnEntryNodes(
             const branchingNode = getWasmCFGNode(g, e.instrFrom.startAddress);
             for (const be of branchingNode.edges) {
               const destNode = getWasmCFGNode(g, be.instrTo.startAddress);
-              const destcfgn = searchCTGNInIncreasingAddresses(destNode, nodes);
+              const destcfgn = searchSourceCFGNIncreasingAddresses(
+                destNode,
+                nodes,
+              );
               if (destcfgn === undefined) {
                 throw new Error(`TODO search deeper in patch`);
               } else {
@@ -636,12 +639,13 @@ function searchNeighboursWithASTs(
   n: CFGNode,
   nodes: SourceCFGNode[],
 ): [Set<number>, SourceCFGNode[]] {
+  logger.debug(`${n.nodeID}`);
   const nodesToIgnore = new Set<number>();
   nodesToIgnore.add(n.nodeID);
   const found: SourceCFGNode[] = [];
   for (const e of n.edges) {
     const toNode = getWasmCFGNode(g, e.instrTo.startAddress);
-    const toctgn = searchCTGNInIncreasingAddresses(toNode, nodes);
+    const toctgn = searchSourceCFGNIncreasingAddresses(toNode, nodes);
     if (toctgn === undefined) {
       const [newNodesToIngore, ns] = searchNeighboursWithASTs(g, toNode, nodes);
       newNodesToIngore.forEach((nodeid) => nodesToIgnore.add(nodeid));
