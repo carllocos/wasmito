@@ -519,14 +519,14 @@ function addEdgesAndReturnEntryNodes(
   const entryNodesAdded = new Set<string>();
   const nodesToIgnore: Set<number> = new Set<number>();
   breadthFirstTraverseWasmCFGT(g, entryNode, {
-    onNode: (n: CFGNode) => {
+    onNode: (wasmNode: CFGNode) => {
       // console.log(`\nNode ID ${n.nodeID}`);
       const sourceCFGN = searchSourceCFGNodeInDecreasingAddresses(
-        n,
+        wasmNode,
         sourceNodes,
       );
       if (sourceCFGN === undefined) {
-        if (n.nodeID === entryNode.nodeID) {
+        if (wasmNode.nodeID === entryNode.nodeID) {
           // handle special case where entry has no associated CTG node
           const [newNodesToIngore, entryNodes] = searchClosetsSourceCFGNodes(
             g,
@@ -542,7 +542,7 @@ function addEdgesAndReturnEntryNodes(
             }
           });
         }
-        if (nodesToIgnore.has(n.nodeID)) {
+        if (nodesToIgnore.has(wasmNode.nodeID)) {
           // if node n has no CTG node associated then the previous parent node
           // has already added an edge to a (in)direct neighbour of n in a previous loop
           return;
@@ -552,8 +552,11 @@ function addEdgesAndReturnEntryNodes(
       } else {
         // ctgn is not undefined
         // entry CFG node has a corresponding CTG node
-        if (n.nodeID === entryNode.nodeID) {
-          const startNode = searchSourceCFGNIncreasingAddresses(n, sourceNodes);
+        if (wasmNode.nodeID === entryNode.nodeID) {
+          const startNode = searchSourceCFGNIncreasingAddresses(
+            wasmNode,
+            sourceNodes,
+          );
           if (startNode === undefined) {
             throw new Error(`startNode should not be undefined`);
           }
@@ -579,7 +582,7 @@ function addEdgesAndReturnEntryNodes(
       // the first condition to check
       // console.log(`Adding edges for node ${logNode(ctgn.node)}`);
 
-      for (const e of n.edges) {
+      for (const e of wasmNode.edges) {
         // console.log(
         //   `instrFrom ${instructionToString(e.instrFrom)} -> instrTo ${instructionToString(e.instrTo)}`,
         // );
