@@ -527,7 +527,7 @@ function addEdgesAndReturnEntryNodes(
       );
       if (sourceCFGN === undefined) {
         if (wasmNode.nodeID === entryNode.nodeID) {
-          // handle special case where entry has no associated CTG node
+          // handle special case where entry has no associated source CFGNode
           const [newNodesToIngore, entryNodes] = searchClosetsSourceCFGNodes(
             g,
             entryNode,
