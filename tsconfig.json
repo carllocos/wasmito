@@ -22,7 +22,8 @@
     "src/**/*.ts",
     "test/**/*.ts",
     "tool_examples/**/*.ts",
-    "cli/**/*.ts"
+    "cli/**/*.ts",
+    "wasmito_tester/**/*.ts"
   ],
   "exclude": ["node_modules", "test/data/assemblyscript_examples/**/*.ts"]
 }

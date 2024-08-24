@@ -1,4 +1,4 @@
-import { type WasmState } from '../../../src/webassembly/wasm';
+import { type WasmState } from '../../src/webassembly/wasm';
 import { createSystemSetup, oneM5StickCDev } from '../reausable_system_setups';
 import { SystemTester, type TestScenario } from '../system_tester';
 import {
@@ -6,12 +6,12 @@ import {
   mockPrimitiveFuncAction,
   runVMAction,
 } from '../reusable_actions';
-import { Breakpoint } from '../../../src/debugger/breakpoint';
+import { Breakpoint } from '../../src/debugger/breakpoint';
 import { type TestProgram, type PostSetupConfig } from '../shared_interfaces';
-import { RemoveAndProceedBreakpointPolicy } from '../../../src/debugger/breakpoint_policies';
-import { type WARDuinoVM } from '../../../src/warduino/vm/warduino_vm';
-import { TargetLanguage } from '../../../src/compilers/prog_language_selection';
-import { type WATCompilerArgs } from '../../../src/compilers/wat_compilers';
+import { RemoveAndProceedBreakpointPolicy } from '../../src/debugger/breakpoint_policies';
+import { type WARDuinoVM } from '../../src/warduino/vm/warduino_vm';
+import { TargetLanguage } from '../../src/compilers/prog_language_selection';
+import { type WATCompilerArgs } from '../../src/compilers/wat_compilers';
 
 /*
  * System Setup

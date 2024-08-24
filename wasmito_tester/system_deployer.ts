@@ -1,13 +1,13 @@
 import type winston from 'winston';
-import { type BoardFQBN } from '../../src/platforms/platform_config';
-import { DeviceManager } from '../../src/device/device_manager';
+import { type BoardFQBN } from '../src/platforms/platform_config';
+import { DeviceManager } from '../src/device/device_manager';
 import {
   LogLevel,
   createLogger,
   getLogLevelFromString,
-} from '../../src/logger/logger';
-import { timeoutPromise } from '../../src/util/promise_util';
-import { type WARDuinoVM } from '../../src/warduino/vm/warduino_vm';
+} from '../src/logger/logger';
+import { timeoutPromise } from '../src/util/promise_util';
+import { type WARDuinoVM } from '../src/warduino/vm/warduino_vm';
 import {
   type DeviceSetup,
   Target,
@@ -18,7 +18,7 @@ import {
 import {
   autoBuildArduinoPlatform,
   createDevPlatform,
-} from '../../src/platforms/platformbuilder_factory';
+} from '../src/platforms/platformbuilder_factory';
 
 export class SystemDeployer {
   private readonly setup;

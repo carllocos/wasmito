@@ -1,4 +1,4 @@
-import { type WasmState, type WASM } from '../../../src/webassembly/wasm';
+import { type WasmState, type WASM } from '../../src/webassembly/wasm';
 import {
   createSystemSetup,
   oneM5StickCDev,
@@ -13,11 +13,11 @@ import {
   onHandledEventSubscription,
   runVMAction,
 } from '../reusable_actions';
-import { EventRemoveHook } from '../../../src/hooks/hook_event';
+import { EventRemoveHook } from '../../src/hooks/hook_event';
 import { type TestProgram, type PostSetupConfig } from '../shared_interfaces';
-import { Breakpoint } from '../../../src/debugger/breakpoint';
-import { TargetLanguage } from '../../../src/compilers/prog_language_selection';
-import { type WATCompilerArgs } from '../../../src/compilers/wat_compilers';
+import { Breakpoint } from '../../src/debugger/breakpoint';
+import { TargetLanguage } from '../../src/compilers/prog_language_selection';
+import { type WATCompilerArgs } from '../../src/compilers/wat_compilers';
 
 /*
  * System Setup

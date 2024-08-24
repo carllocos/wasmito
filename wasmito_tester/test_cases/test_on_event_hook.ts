@@ -1,4 +1,4 @@
-import { type WASM } from '../../../src/webassembly/wasm';
+import { type WASM } from '../../src/webassembly/wasm';
 import {
   createSystemSetup,
   oneM5StickCDev,
@@ -14,13 +14,13 @@ import {
   runVMAction,
   stepAction,
 } from '../reusable_actions';
-import { type WARDuinoVM } from '../../../src/warduino/vm/warduino_vm';
-import { StateRequest } from '../../../src/warduino/requests/inspect_request';
-import { InspectStateHook } from '../../../src/hooks/hook_inspect_state';
-import { WasmValuesBuilder } from '../../../src/webassembly/wasm_value_array_builder';
+import { type WARDuinoVM } from '../../src/warduino/vm/warduino_vm';
+import { StateRequest } from '../../src/warduino/requests/inspect_request';
+import { InspectStateHook } from '../../src/hooks/hook_inspect_state';
+import { WasmValuesBuilder } from '../../src/webassembly/wasm_value_array_builder';
 import { type TestProgram, type PostSetupConfig } from '../shared_interfaces';
-import { TargetLanguage } from '../../../src/compilers/prog_language_selection';
-import { type WATCompilerArgs } from '../../../src/compilers/wat_compilers';
+import { TargetLanguage } from '../../src/compilers/prog_language_selection';
+import { type WATCompilerArgs } from '../../src/compilers/wat_compilers';
 
 /*
  * System Setup

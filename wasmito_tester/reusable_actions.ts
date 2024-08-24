@@ -1,26 +1,26 @@
-import { InspectStateHook } from '../../src/hooks/hook_inspect_state';
+import { InspectStateHook } from '../src/hooks/hook_inspect_state';
 import {
   type HookWithoutSubscription,
   type HookWithSubscription,
-} from '../../src/hooks/hook';
-import { EventInspectHook } from '../../src/hooks/hook_event';
-import { EmptyValueSubstitution } from '../../src/hooks/hook_value_substitution';
-import { type WasmValuesBuilder } from '../../src/webassembly';
-import { type WASM, type WasmState } from '../../src/webassembly/wasm';
-import { type ProxyCallResponse } from '../../src/warduino';
-import { ResponseType } from '../../src/warduino/api/request_interface';
-import { AroundFunctionRequest } from '../../src/warduino/requests/around_function_request';
-import { PushEventRequest } from '../../src/warduino/requests/inject_event_request';
-import { StateRequest } from '../../src/warduino/requests/inspect_request';
-import { UpdateCallbackMappingRequest } from '../../src/warduino/requests/update_callbacks_request';
-import { type WARDuinoVM } from '../../src/warduino/vm/warduino_vm';
+} from '../src/hooks/hook';
+import { EventInspectHook } from '../src/hooks/hook_event';
+import { EmptyValueSubstitution } from '../src/hooks/hook_value_substitution';
+import { type WasmValuesBuilder } from '../src/webassembly';
+import { type WASM, type WasmState } from '../src/webassembly/wasm';
+import { type ProxyCallResponse } from '../src/warduino';
+import { ResponseType } from '../src/warduino/api/request_interface';
+import { AroundFunctionRequest } from '../src/warduino/requests/around_function_request';
+import { PushEventRequest } from '../src/warduino/requests/inject_event_request';
+import { StateRequest } from '../src/warduino/requests/inspect_request';
+import { UpdateCallbackMappingRequest } from '../src/warduino/requests/update_callbacks_request';
+import { type WARDuinoVM } from '../src/warduino/vm/warduino_vm';
 import {
   type Action,
   type SubscriptionEmitterAction,
   type SubActReturn,
 } from './shared_interfaces';
-import { Breakpoint } from '../../src/debugger/breakpoint';
-import { type WASMFunction } from '../../src/webassembly/wasm/wasm_function';
+import { Breakpoint } from '../src/debugger/breakpoint';
+import { type WASMFunction } from '../src/webassembly/wasm/wasm_function';
 
 export function addBreakpointSubscription(
   subscriptionID: string,
