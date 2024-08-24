@@ -1,6 +1,6 @@
-import { type HookWithSubscription } from '../../hooks/hook';
-import { type TargetLanguage } from '../../compilers/prog_language_selection';
-import { type WARDuinoVM } from '../../warduino/vm/warduino_vm';
+import { type HookWithSubscription } from '../../src/hooks/hook';
+import { type TargetLanguage } from '../../src/compilers/prog_language_selection';
+import { type WARDuinoVM } from '../../src/warduino/vm/warduino_vm';
 
 export enum Target {
   mcu = 'mcu',

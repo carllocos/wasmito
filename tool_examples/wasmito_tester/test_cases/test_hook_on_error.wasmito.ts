@@ -1,10 +1,10 @@
 import { createSystemSetup, oneM5StickCDev } from '../reausable_system_setups';
 import { SystemTester, type TestScenario } from '../system_tester';
 import { createOnErrorActionEmitter, runVMAction } from '../reusable_actions';
-import { type WasmState } from '../../../webassembly';
+import { type WasmState } from '../../../src/webassembly';
 import { type TestProgram } from '../shared_interfaces';
-import { TargetLanguage } from '../../../compilers/prog_language_selection';
-import { type WATCompilerArgs } from '../../../compilers/wat_compilers';
+import { TargetLanguage } from '../../../src/compilers/prog_language_selection';
+import { type WATCompilerArgs } from '../../../src/compilers/wat_compilers';
 
 /*
  * Note on the program

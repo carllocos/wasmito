@@ -7,12 +7,12 @@ import {
 import {
   AroundFunctionRequest,
   type AroundHookResponse,
-} from '../../../warduino/requests/around_function_request';
-import { type WARDuinoVM } from '../../../warduino/vm/warduino_vm';
-import { ResponseType } from '../../../warduino/api/request_interface';
+} from '../../../src/warduino/requests/around_function_request';
+import { type WARDuinoVM } from '../../../src/warduino/vm/warduino_vm';
+import { ResponseType } from '../../../src/warduino/api/request_interface';
 import { type TestProgram } from '../shared_interfaces';
-import { TargetLanguage } from '../../../compilers/prog_language_selection';
-import { type WATCompilerArgs } from '../../../compilers/wat_compilers';
+import { TargetLanguage } from '../../../src/compilers/prog_language_selection';
+import { type WATCompilerArgs } from '../../../src/compilers/wat_compilers';
 
 const watArgs: WATCompilerArgs = {
   sourceCodePath: './src/tool_examples/wat_examples/dimmer-double-button.wat',

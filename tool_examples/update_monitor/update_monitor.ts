@@ -1,12 +1,12 @@
-import { type WARDuinoVM } from '../../warduino';
-import * as fs from 'fs';
 import * as path from 'path';
-import { type WATCompilerArgs } from '../../compilers/wat_compilers';
-import { createArduinoPlatform, createDevPlatform } from '../../platforms';
-import { DeviceManager } from '../../device';
-import { createLogger } from '../../logger/logger';
-import { BoardBaudRate } from '../../util';
-import { TargetLanguage } from '../../compilers/prog_language_selection';
+import { type WATCompilerArgs } from '../../src/compilers/wat_compilers';
+import { createArduinoPlatform, createDevPlatform } from '../../src/platforms';
+import { DeviceManager } from '../../src/device';
+import { createLogger } from '../../src/logger/logger';
+import { BoardBaudRate } from '../../src/util';
+import { TargetLanguage } from '../../src/compilers/prog_language_selection';
+import { WARDuinoVM } from '../../src/warduino/vm/warduino_vm';
+import { fs } from 'assemblyscript/util/node.js';
 
 const logger = createLogger('SourceCodeWatcher');
 

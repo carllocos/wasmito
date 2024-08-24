@@ -1,21 +1,21 @@
-import { DeviceManager } from '../device/device_manager';
-import { getGlobalLogger } from '../logger/logger';
-import {
-  type HookOnWasmAddrResponse,
-  RemoveHookOnWasmAddrRequest,
-} from '../warduino/requests/hook_on_wasm_addr_request';
-import { StateRequest } from '../warduino/requests/inspect_request';
+import { TargetLanguage } from '../src/compilers/prog_language_selection';
+import { type WATCompilerArgs } from '../src/compilers/wat_compilers';
+import { Breakpoint } from '../src/debugger/breakpoint';
+import { DeviceManager } from '../src/device/device_manager';
+import { getGlobalLogger } from '../src/logger/logger';
+import { createDevPlatform } from '../src/platforms/platformbuilder_factory';
+import { type SourceMap } from '../src/source_mappers/source_map';
 import {
   type RequestMessage,
   ResponseType,
-} from '../warduino/api/request_interface';
-import { type WARDuinoDevVM } from '../warduino/vm/dev_vm';
-import { type WasmState } from '../webassembly/wasm';
-import { Breakpoint } from '../debugger/breakpoint';
-import { TargetLanguage } from '../compilers/prog_language_selection';
-import { createDevPlatform } from '../platforms/platformbuilder_factory';
-import { type WATCompilerArgs } from '../compilers/wat_compilers';
-import { type SourceMap } from '../source_mappers/source_map';
+} from '../src/warduino/api/request_interface';
+import {
+  RemoveHookOnWasmAddrRequest,
+  type HookOnWasmAddrResponse,
+} from '../src/warduino/requests/hook_on_wasm_addr_request';
+import { StateRequest } from '../src/warduino/requests/inspect_request';
+import { type WARDuinoDevVM } from '../src/warduino/vm/dev_vm';
+import { type WasmState } from '../src/webassembly/wasm';
 
 export function allSucceeded(replies: HookOnWasmAddrResponse[]): boolean {
   let idx = 0;

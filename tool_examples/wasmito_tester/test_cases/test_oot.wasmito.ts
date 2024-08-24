@@ -1,21 +1,18 @@
-import { type WasmState } from '../../../webassembly/wasm';
-import {
-  createSystemSetup,
-  oneM5StickCDev,
-  oneM5StickCMCU,
-} from '../reausable_system_setups';
+import { type WasmState } from '../../../src/webassembly/wasm';
+import { createSystemSetup, oneM5StickCDev } from '../reausable_system_setups';
 import { SystemTester, type TestScenario } from '../system_tester';
 import {
   addBreakpointSubscription,
   mockPrimitiveFuncAction,
   runVMAction,
 } from '../reusable_actions';
-import { Breakpoint } from '../../../debugger/breakpoint';
+import { Breakpoint } from '../../../src/debugger/breakpoint';
 import { type TestProgram, type PostSetupConfig } from '../shared_interfaces';
-import { RemoveAndProceedBreakpointPolicy } from '../../../debugger/breakpoint_policies';
-import { type WARDuinoVM } from '../../../warduino/vm/warduino_vm';
-import { TargetLanguage } from '../../../compilers/prog_language_selection';
-import { type WATCompilerArgs } from '../../../compilers/wat_compilers';
+import { RemoveAndProceedBreakpointPolicy } from '../../../src/debugger/breakpoint_policies';
+import { type WARDuinoVM } from '../../../src/warduino/vm/warduino_vm';
+import { TargetLanguage } from '../../../src/compilers/prog_language_selection';
+import { type WATCompilerArgs } from '../../../src/compilers/wat_compilers';
+
 /*
  * System Setup
  */
@@ -23,15 +20,12 @@ import { type WATCompilerArgs } from '../../../compilers/wat_compilers';
 const watArgs: WATCompilerArgs = {
   sourceCodePath: './src/tool_examples/wat_examples/dimmer-double-button.wat',
 };
+
 const program: TestProgram = {
   targetLanguage: TargetLanguage.WAT,
   sourceCodeCompilationArgs: watArgs,
 };
 
-// hardware m5stick C
-const m5stickcMCU = oneM5StickCMCU('1');
-
-// Dev m5stick C
 const postSetupConfigM5Dev: PostSetupConfig = {
   pauseAfterSetup: true,
   actions: [
@@ -42,12 +36,12 @@ const postSetupConfigM5Dev: PostSetupConfig = {
 };
 const m5stickDev = oneM5StickCDev('2', postSetupConfigM5Dev);
 
-const systemSetup = createSystemSetup(
-  'System with M5stickCMCU and one M5StickCDev',
-  [m5stickcMCU, m5stickDev],
-);
+const systemSetup = createSystemSetup('System with one M5StickCDev', [
+  m5stickDev,
+]);
+
 systemSetup.logger = {
-  name: 'ScenarioTestBreakpoints',
+  name: 'ScenarioTestOutOfThings',
   level: 'debug',
 };
 

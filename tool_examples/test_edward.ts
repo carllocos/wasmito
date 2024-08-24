@@ -1,18 +1,18 @@
-import { DeviceManager } from '../device/device_manager';
-import { BoardBaudRate } from '../util/serial_port';
-import { WasmValuesBuilder } from '../webassembly/wasm_value_array_builder';
-import { type WasmState } from '../webassembly';
-import { type WARDuinoVM } from '../warduino/vm/warduino_vm';
-import { type MCUWARDuinoVM } from '../warduino/vm/mcu_vm';
-import { StateRequest } from '../warduino/requests/inspect_request';
-import { Breakpoint } from '../debugger/breakpoint';
-import { TargetLanguage } from '../compilers/prog_language_selection';
+import { DeviceManager } from '../src/device/device_manager';
+import { BoardBaudRate } from '../src/util/serial_port';
+import { WasmValuesBuilder } from '../src/webassembly/wasm_value_array_builder';
+import { type WasmState } from '../src/webassembly';
+import { type WARDuinoVM } from '../src/warduino/vm/warduino_vm';
+import { type MCUWARDuinoVM } from '../src/warduino/vm/mcu_vm';
+import { StateRequest } from '../src/warduino/requests/inspect_request';
+import { Breakpoint } from '../src/debugger/breakpoint';
+import { TargetLanguage } from '../src/compilers/prog_language_selection';
 import {
   type FactoryArgs,
   createArduinoPlatform,
   type ArduinoBoardBuilder,
-} from '../platforms';
-import { type WATCompilerArgs } from '../compilers/wat_compilers';
+} from '../src/platforms';
+import { type WATCompilerArgs } from '../src/compilers/wat_compilers';
 
 export async function callLedcSetup(vm: WARDuinoVM): Promise<void> {
   const funcLEDCSetup = 5;

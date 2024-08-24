@@ -1,35 +1,35 @@
-import { DeviceManager } from '../../device/device_manager';
-import { getGlobalLogger } from '../../logger/logger';
-import { type WasmState } from '../../webassembly/wasm';
-import { InspectStateHook } from '../../hooks/hook_inspect_state';
-import { EmptyValueSubstitution } from '../../hooks/hook_value_substitution';
-import { AroundFunctionRequest } from '../../warduino/requests/around_function_request';
+import { DeviceManager } from '../../src/device/device_manager';
+import { getGlobalLogger } from '../../src/logger/logger';
+import { type WasmState } from '../../src/webassembly/wasm';
+import { InspectStateHook } from '../../src/hooks/hook_inspect_state';
+import { EmptyValueSubstitution } from '../../src/hooks/hook_value_substitution';
+import { AroundFunctionRequest } from '../../src/warduino/requests/around_function_request';
 import {
   type HookOnWasmAddrResponse,
   HookOnWasmAddrRequest,
   HookOnWasmAddrMoment,
-} from '../../warduino/requests/hook_on_wasm_addr_request';
-import { StateRequest } from '../../warduino/requests/inspect_request';
-import { ResponseType } from '../../warduino/api/request_interface';
+} from '../../src/warduino/requests/hook_on_wasm_addr_request';
+import { StateRequest } from '../../src/warduino/requests/inspect_request';
+import { ResponseType } from '../../src/warduino/api/request_interface';
 import * as fs from 'fs';
-import { type WasmInstruction } from '../../webassembly/wasm/wasm_instruction';
-import { PlaceholderType } from '../../webassembly/wasm/opcode_type';
+import { type WasmInstruction } from '../../src/webassembly/wasm/wasm_instruction';
+import { PlaceholderType } from '../../src/webassembly/wasm/opcode_type';
 import { exit } from 'process';
-import { type WARDuinoVM } from '../../warduino/vm/warduino_vm';
+import { type WARDuinoVM } from '../../src/warduino/vm/warduino_vm';
 import path from 'path';
-import { BoardBaudRate } from '../../util/serial_port';
-import { TargetLanguage } from '../../compilers/prog_language_selection';
+import { BoardBaudRate } from '../../src/util/serial_port';
+import { TargetLanguage } from '../../src/compilers/prog_language_selection';
 import {
   createArduinoPlatform,
   createDevPlatform,
-} from '../../platforms/platformbuilder_factory';
-import { PlatformTarget } from '../../platforms/platform_config';
-import { type WATCompilerArgs } from '../../compilers/wat_compilers';
-import { type SourceMap } from '../../source_mappers/source_map';
+} from '../../src/platforms/platformbuilder_factory';
+import { PlatformTarget } from '../../src/platforms/platform_config';
+import { type WATCompilerArgs } from '../../src/compilers/wat_compilers';
+import { type SourceMap } from '../../src/source_mappers/source_map';
 // type PlatformConfigArgs,
 // createPlatformBuilder,
 // DevVMPlatform,
-// import { makeSourceCodeCompiler } from '../../source_mappers';
+// import { makeSourceCodeCompiler } from '../../src/source_mappers';
 // import { program } from 'commander';
 
 class WriteJSON {

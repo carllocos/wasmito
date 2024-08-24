@@ -1,5 +1,8 @@
 import type winston from 'winston';
-import { TimeoutPromise, maybeTimeoutPromise } from '../../util/promise_util';
+import {
+  TimeoutPromise,
+  maybeTimeoutPromise,
+} from '../../src/util/promise_util';
 import { SystemDeployer } from './system_deployer';
 import {
   type SubscriptionEmitterAction,
@@ -17,8 +20,8 @@ import {
   isActionThatSubscribesTo,
   type SubscribeAction,
 } from './shared_interfaces';
-import { type WARDuinoVM } from '../../warduino';
-import { HookWithSubscription } from '../../hooks/hook';
+import { type WARDuinoVM } from '../../src/warduino';
+import { HookWithSubscription } from '../../src/hooks/hook';
 
 export class SystemTester {
   private readonly systemDeployer: SystemDeployer;
