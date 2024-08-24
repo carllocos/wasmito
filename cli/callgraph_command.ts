@@ -3,10 +3,10 @@ import {
   createDirectoryIfUnexisting,
   getDirectory,
   isFilePath,
-} from '../util/file_util';
-import { getGlobalLogger } from '../logger/logger';
-import { buildGraphs } from '../cfg/wasm_cfg_builder';
-import { WasmModule } from '../webassembly/wasm/wasm_module';
+} from '../src/util/file_util';
+import { getGlobalLogger } from '../src/logger/logger';
+import { buildGraphs } from '../src/cfg/wasm_cfg_builder';
+import { WasmModule } from '../src/webassembly/wasm/wasm_module';
 import path from 'path';
 
 export function registerCallgraphCommand(program: Command): void {

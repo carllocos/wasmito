@@ -4,19 +4,19 @@ import {
   readProjectVersionNumber,
   readProjectDescription,
   readProjectName,
-} from '../project_config';
-// import { type DeviceManager } from '../device/device_manager';
+} from '../src/project_config';
+// import { type DeviceManager } from '../src/device/device_manager';
 import {
   type DeviceIdentityArgs,
   parseDeviceConfigs,
-} from '../device/device_config';
+} from '../src/device/device_config';
 import {
   type LogLevel,
   parseLogLevel,
   setLogLevel,
   getGlobalLogger,
   setGlobalLoggerName,
-} from '../logger/logger';
+} from '../src/logger/logger';
 import { registerCFGCommand } from './cfg_command';
 import { registerSourceMapCommand } from './sourcemap_command';
 import { registerCallgraphCommand } from './callgraph_command';

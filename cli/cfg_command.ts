@@ -5,13 +5,13 @@ import {
   isDirectoryPath,
   isFilePath,
   pathJoin,
-} from '../util/file_util';
-import { SourceMapFromJSON } from '../source_mappers/source_map_builder';
-import { constructLanguageAdaptor } from '../language_adaptors/language_adaptor';
-import { type DotSerializationConfgig } from '../cfg/source_cfg';
-import { timeoutPromise } from '../util/promise_util';
-import { getGlobalLogger } from '../logger/logger';
-import { type SourceMap } from '../source_mappers/source_map';
+} from '../src/util/file_util';
+import { SourceMapFromJSON } from '../src/source_mappers/source_map_builder';
+import { constructLanguageAdaptor } from '../src/language_adaptors/language_adaptor';
+import { type DotSerializationConfgig } from '../src/cfg/source_cfg';
+import { timeoutPromise } from '../src/util/promise_util';
+import { getGlobalLogger } from '../src/logger/logger';
+import { type SourceMap } from '../src/source_mappers/source_map';
 
 export function registerCFGCommand(program: Command): void {
   program

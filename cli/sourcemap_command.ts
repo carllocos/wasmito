@@ -1,9 +1,9 @@
 import path from 'path';
 import { type Command } from 'commander';
-import { getGlobalLogger } from '../logger/logger';
-import { createDirectoryIfUnexisting, isFilePath } from '../util/file_util';
-import { timeoutPromise } from '../util/promise_util';
-import { SourceMapfromDWARFWasm } from '../source_mappers/source_map_builder';
+import { getGlobalLogger } from '../src/logger/logger';
+import { createDirectoryIfUnexisting, isFilePath } from '../src/util/file_util';
+import { timeoutPromise } from '../src/util/promise_util';
+import { SourceMapfromDWARFWasm } from '../src/source_mappers/source_map_builder';
 
 export function registerSourceMapCommand(program: Command): void {
   program
