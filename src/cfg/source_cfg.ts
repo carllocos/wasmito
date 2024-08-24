@@ -660,15 +660,35 @@ function addEdgesAndReturnEntryNodes(
  * @param g Wasm Level CFG of a Wasm function
  * @param n a node in the CFG for which we want to find the closests Source Level CFG Nodes
  * @param nodes All the Source Level CFGNodes
+ * @param nodesToIgnore a set of already visited node ids. This prevents to loop infinitly.
  * @returns nodes IDs that no longer need to be visited after return and the closets nodes
  */
 function searchClosetsSourceCFGNodes(
   g: WasmGraph,
   n: CFGNode,
   nodes: SourceCFGNode[],
+  nodesToIgnore = new Set<number>(),
 ): [Set<number>, SourceCFGNode[]] {
-  logger.debug(`${n.nodeID}`);
-  const nodesToIgnore = new Set<number>();
+  logger.debug(`Node ${n.nodeID} has no Source CFGNode`);
+  if (nodesToIgnore.has(n.nodeID)) {
+    // consider scenario n1 -> n2 -> n3
+    //                            -> n4 -> n2
+    // if we assume that node n2 and n4 have no source level CFGNodes
+    // then the risk exist that the search for the closests source CFGNodes
+    // loops forever due to the backedge from n4 to n2
+    // to prevent this we need to keep track of the already visited nodes
+    // that solves the callstack exhaustion issue
+
+    // this can also occur when encountering self loops
+    // consider n1 -> n2 -> n3 and n2-> n2
+    // n2 has a self edge and no source level CFG
+    //
+    // when this function is called for n2 because of the self edge
+    // then the call is stoped given that the id of n2 is
+    // stored in the nodesToIgnore
+    return [nodesToIgnore, []];
+  }
+
   nodesToIgnore.add(n.nodeID);
   const found: SourceCFGNode[] = [];
   for (const e of n.edges) {
@@ -679,6 +699,7 @@ function searchClosetsSourceCFGNodes(
         g,
         toWasmNode,
         nodes,
+        nodesToIgnore,
       );
       newNodesToIngore.forEach((nodeid) => nodesToIgnore.add(nodeid));
       ns.forEach((nf) => found.push(nf));
