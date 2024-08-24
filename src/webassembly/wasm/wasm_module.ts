@@ -297,6 +297,7 @@ function createWasmFunctions(
       fun.body,
       fun.signature,
       locals,
+      funcName.export,
     );
     funcs.push(f);
   }
@@ -307,7 +308,8 @@ function createImportedFunctions(mod: ParsedModule): WASMFunction[] {
   const imports: WASMFunction[] = mod.imports.map((i, importID) => {
     const sign = i.descr.signature;
     const t = new WasmType(sign.params.length, sign.results.length);
-    const f = new WASMFunction(i.name, importID, [], t, []);
+    const exported = false;
+    const f = new WASMFunction(i.name, importID, [], t, [], exported);
     f.startAddress = i.loc.start.column;
     f.endAddress = i.loc.end.column;
     f.fullName = i.descr.id.value;
