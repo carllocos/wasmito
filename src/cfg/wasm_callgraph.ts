@@ -40,7 +40,7 @@ export function buildWasmCallGraph(
   if (entryFuncs.length === 0) {
     const fidMin = wasm.imports.length;
     wasm.functions
-      .filter((f) => f.id >= fidMin) // TODO check if f is exported
+      .filter((f) => f.exported && f.id >= fidMin)
       .map((f) => f.id)
       .forEach((f) => entryFuncs.push(f));
   }
