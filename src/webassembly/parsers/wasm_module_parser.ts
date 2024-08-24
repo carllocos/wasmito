@@ -133,6 +133,10 @@ export interface ModuleImport {
   loc: WasmSourceLocation;
 }
 
+export interface FunExport {
+  name: string;
+}
+
 export interface GlobalType {
   type: 'GlobalType';
   valtype: string;
@@ -676,6 +680,7 @@ export function parseWasmModule(wasmPath: string): [ParsedModule, string[]] {
     const metadata = mod.metadata;
     const [sections, sectionErrors] = parseSections(metadata.sections);
     const localsNames = parseLocalNames(metadata.localNames);
+    const exportedFuncs = parseExportFuncs(mod.fields);
     const funcNames = parseFunctionNames(metadata.functionNames);
     const types = parseTypes(mod.fields);
     const [funcs, funErrors] = parseFuncFields(mod.fields);
@@ -768,6 +773,30 @@ function parseImports(fields: any): ModuleImport[] {
     .sort((a, b) => {
       return a.loc.start.column - b.loc.start.column;
     });
+}
+
+function parseExportFuncs(fields: any): FunExport[] {
+  const exports: FunExport[] = [];
+  for (const f of fields) {
+    if (validExportFuncField(f)) {
+      const ef: FunExport = {
+        name: f.descr.id.value,
+      };
+      exports.push(ef);
+    }
+  }
+  return exports;
+}
+
+function validExportFuncField(obj: any): boolean {
+  return (
+    obj.type === 'ModuleExport' &&
+    typeof obj === 'object' &&
+    obj.type === 'ModuleExport' &&
+    obj.descr !== undefined &&
+    typeof obj.descr === 'object' &&
+    obj.descr.exportType === 'Func'
+  );
 }
 
 function assertGlobalType(obj: any): asserts obj is GlobalType {
