@@ -32,6 +32,7 @@ interface MetaDataFunctionName {
   type: string;
   value: string;
   index: number;
+  export: boolean;
 }
 
 interface Location {
@@ -681,7 +682,7 @@ export function parseWasmModule(wasmPath: string): [ParsedModule, string[]] {
     const [sections, sectionErrors] = parseSections(metadata.sections);
     const localsNames = parseLocalNames(metadata.localNames);
     const exportedFuncs = parseExportFuncs(mod.fields);
-    const funcNames = parseFunctionNames(metadata.functionNames);
+    const funcNames = parseFunctionNames(metadata.functionNames, exportedFuncs);
     const types = parseTypes(mod.fields);
     const [funcs, funErrors] = parseFuncFields(mod.fields);
     const imports = parseImports(mod.fields);
@@ -903,7 +904,10 @@ function parseLocalNames(localNames: any): LocalName[] {
   return locals;
 }
 
-function parseFunctionNames(functionNames: any): MetaDataFunctionName[] {
+function parseFunctionNames(
+  functionNames: any,
+  exportedFuncs: FunExport[],
+): MetaDataFunctionName[] {
   if (functionNames === undefined) {
     logger.debug(`No function names for module`);
     return [];
@@ -912,10 +916,13 @@ function parseFunctionNames(functionNames: any): MetaDataFunctionName[] {
     if (n.type !== 'FunctionNameMetadata') {
       logger.warn(`encountered a functionName of unexpected type ${n.type}`);
     }
+    const exported =
+      exportedFuncs.find((ef) => ef.name === n.value) !== undefined;
     const f: MetaDataFunctionName = {
       type: n.type,
       value: n.value,
       index: n.index,
+      export: exported,
     };
     return f;
   });
