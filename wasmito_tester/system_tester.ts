@@ -102,7 +102,7 @@ export class SystemTester {
     }
   }
 
-  async runTests(): Promise<void> {
+  async runTests(): Promise<TestScenarioResult[]> {
     for (let i = 0; i < this.testScenarios.length; i++) {
       const [targetDeviceID, scenario, scenarioResult] = this.testScenarios[i];
       await this.setupDevice(scenario, targetDeviceID);
@@ -114,6 +114,7 @@ export class SystemTester {
         return v[2];
       }),
     );
+    return this.testScenarios.map((v) => v[2]);
   }
 
   private reportScenarios(testScenarios: TestScenarioResult[]): void {
