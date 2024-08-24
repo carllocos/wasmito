@@ -12,7 +12,7 @@ import {
   type TestScenarioResult,
   ActionRunState,
   type ActionRunResult,
-  TestScenarioState,
+  TestScenarioResultState,
   type DevicesLab,
   type Act,
   isDelayedAction,
@@ -81,7 +81,7 @@ export class SystemTester {
       }) ?? [];
     const testResult: TestScenarioResult = {
       scenario,
-      result: TestScenarioState.Running,
+      result: TestScenarioResultState.Running,
       actionRunResults,
       expectRunResults,
     };

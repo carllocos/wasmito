@@ -214,7 +214,7 @@ export interface ActionRunResult {
   failMsg?: string;
 }
 
-export enum TestScenarioState {
+export enum TestScenarioResultState {
   Success = 'Success',
   Failed = 'Failed',
   Running = 'Running',
@@ -222,7 +222,7 @@ export enum TestScenarioState {
 
 export interface TestScenarioResult {
   scenario: TestScenario;
-  result: TestScenarioState;
+  result: TestScenarioResultState;
   actionRunResults: ActionRunResult[];
   expectRunResults: ActionRunResult[];
 }
