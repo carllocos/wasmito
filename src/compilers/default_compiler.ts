@@ -10,12 +10,15 @@ import {
 } from '../language_adaptors/language_adaptor';
 import {
   SourceMapfromDWARFWasm,
+  SourceMapFromJSON,
   SourceMapfromSourceMapSpec,
 } from '../source_mappers/source_map_builder';
+import { type SourceMap } from '../source_mappers';
 
 export interface DefaultCompileArgs {
   pathToSrcRoot: string;
   pathToSourceMap?: string;
+  pathToJsonMap?: string;
   pathToWasm: string;
 }
 
@@ -61,14 +64,18 @@ export class DefaultCompiler extends SourceCodeCompiler {
     }
 
     this._lastCompileArgs = compilerArgs;
-    const sm =
-      compilerArgs.pathToSourceMap === undefined
-        ? SourceMapfromDWARFWasm(compilerArgs.pathToWasm)
-        : SourceMapfromSourceMapSpec(
-            compilerArgs.pathToSourceMap,
-            compilerArgs.pathToWasm,
-            { lineNrStartNumber: 0, colNrStartNumber: 0 },
-          );
-    return await constructLanguageAdaptor(await sm);
+    let sm: SourceMap | undefined;
+    if (compilerArgs.pathToSourceMap !== undefined) {
+      sm = await SourceMapfromSourceMapSpec(
+        compilerArgs.pathToSourceMap,
+        compilerArgs.pathToWasm,
+        { lineNrStartNumber: 0, colNrStartNumber: 0 },
+      );
+    } else if (compilerArgs.pathToJsonMap !== undefined) {
+      sm = await SourceMapFromJSON(compilerArgs.pathToJsonMap);
+    } else {
+      sm = await SourceMapfromDWARFWasm(compilerArgs.pathToWasm);
+    }
+    return await constructLanguageAdaptor(sm);
   }
 }
