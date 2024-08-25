@@ -21,6 +21,8 @@ import {
 import { type WARDuinoVM } from '../src/warduino';
 import { HookWithSubscription } from '../src/hooks/hook';
 
+type DelayResolver = (value: boolean | PromiseLike<boolean>) => void;
+
 export class SystemTester {
   private readonly systemDeployer: SystemDeployer;
   private readonly testScenarios: Array<
@@ -196,10 +198,6 @@ export class SystemTester {
     for (let i = 0; i < actions.length; i++) {
       const actionRunResult = actionRunResults[i];
       const action = actions[i];
-      if (isDelayedAction(action)) {
-        this.delayAction(scenarioName, action, actionRunResult, i, vm);
-        continue;
-      }
 
       try {
         let success = false;
@@ -217,6 +215,19 @@ export class SystemTester {
             i,
             hookMap,
           );
+        } else if (isDelayedAction(action)) {
+          let res: DelayResolver | undefined;
+          const p = new Promise<boolean>((resolve) => {
+            res = resolve;
+          });
+          if (res === undefined) {
+            throw new Error(`laal`);
+          }
+          this.delayAction(scenarioName, action, actionRunResult, i, vm, res);
+          success = await p;
+          // the actionRunResult is filled by delayAction.
+          // Thus continue
+          continue;
         } else if (isAction(action)) {
           [resultValue, success] = await this.runAction(vm, action);
         } else {
@@ -336,6 +347,7 @@ export class SystemTester {
     actionRunResult: ActionRunResult,
     actionIndex: number,
     vm: WARDuinoVM,
+    resolveDelay: DelayResolver,
   ): void {
     const isDelayed = action.delay !== undefined;
     actionRunResult.result = ActionRunState.Delayed;
@@ -346,6 +358,7 @@ export class SystemTester {
         actionRunResult,
         actionIndex,
         vm,
+        resolveDelay,
       );
     }, action.delay);
 
@@ -366,6 +379,7 @@ export class SystemTester {
     actionRunResult: ActionRunResult,
     actionIndex: number,
     vm: WARDuinoVM,
+    resolveDelay: DelayResolver,
   ): void {
     let successFul = false;
     let errorOccurred = false;
@@ -413,6 +427,7 @@ export class SystemTester {
           actionIndex,
           actionRunResult,
         );
+        resolveDelay(successFul);
       });
   }
 
