@@ -14,6 +14,7 @@ import {
   type DevicesLab,
   type TestScenario,
   type TestProgram,
+  type DeviceID,
 } from './shared_interfaces';
 import {
   autoBuildArduinoPlatform,
@@ -27,7 +28,7 @@ export class SystemDeployer {
 
   private readonly deviceManager: DeviceManager;
 
-  private readonly vmMap: Map<string, WARDuinoVM>;
+  private readonly vmMap: Map<DeviceID, WARDuinoVM>;
 
   public MAX_WAIT_TIME_DevVM_SPAWN: number;
 
@@ -57,17 +58,17 @@ export class SystemDeployer {
     return this.setup.devices;
   }
 
-  device(id: string): DeviceSetup | undefined {
+  device(id: DeviceID): DeviceSetup | undefined {
     return this.setup.devices.find((dev) => {
       return dev.id === id;
     });
   }
 
-  hasVMDevice(id: string): boolean {
+  hasVMDevice(id: DeviceID): boolean {
     return this.vmMap.has(id);
   }
 
-  deviceVM(id: string): WARDuinoVM {
+  deviceVM(id: DeviceID): WARDuinoVM {
     const vm = this.vmMap.get(id);
     if (vm === undefined) {
       throw new Error(`VM for device with id ${id} does not exists`);
@@ -77,7 +78,7 @@ export class SystemDeployer {
 
   async deployOnDevice(
     scenario: TestScenario,
-    deviceID: string,
+    deviceID: DeviceID,
   ): Promise<void> {
     const device = this.setup.devices.find((d: DeviceSetup, idx: number) => {
       return d.id === deviceID;
@@ -195,7 +196,7 @@ export class SystemDeployer {
   }
 
   private assertUniqueID(): void {
-    const usedIDs = new Set<string>();
+    const usedIDs = new Set<DeviceID>();
     for (let i = 0; i < this.setup.devices.length; i++) {
       const device = this.setup.devices[i];
       device.id = device.id.trim();

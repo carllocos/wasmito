@@ -237,12 +237,14 @@ export interface PostSetupConfig {
   actions?: Array<Action<any>>;
 }
 
+export type DeviceID = string;
+
 export interface DeviceSetup {
   name?: string;
   deviceClass?: string; // TODO
 
   target: string; // must be a string from Target enum
-  id: string;
+  id: DeviceID;
 
   toolPort?: number; // in case we connect to an already spawned Dev vm
 

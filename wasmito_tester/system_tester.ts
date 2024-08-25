@@ -19,6 +19,7 @@ import {
   isAction,
   isActionThatSubscribesTo,
   type SubscribeAction,
+  type DeviceID,
 } from './shared_interfaces';
 import { type WARDuinoVM } from '../src/warduino';
 import { HookWithSubscription } from '../src/hooks/hook';
@@ -26,10 +27,10 @@ import { HookWithSubscription } from '../src/hooks/hook';
 export class SystemTester {
   private readonly systemDeployer: SystemDeployer;
   private readonly testScenarios: Array<
-    [string, TestScenario, TestScenarioResult]
+    [DeviceID, TestScenario, TestScenarioResult]
   >;
 
-  private readonly deviceTestsMap: Map<string, TestScenario[]>;
+  private readonly deviceTestsMap: Map<DeviceID, TestScenario[]>;
 
   constructor(setup: DevicesLab) {
     this.systemDeployer = new SystemDeployer(setup);
@@ -41,7 +42,7 @@ export class SystemTester {
     return this.systemDeployer.logger;
   }
 
-  addTestScenario(scenario: TestScenario, targetDeviceID: string): void {
+  addTestScenario(scenario: TestScenario, targetDeviceID: DeviceID): void {
     if (scenario.skipTest !== undefined && scenario.skipTest) {
       return;
     }
@@ -91,7 +92,7 @@ export class SystemTester {
 
   private async setupDevice(
     scenario: TestScenario,
-    deviceID: string,
+    deviceID: DeviceID,
   ): Promise<void> {
     try {
       await this.systemDeployer.deployOnDevice(scenario, deviceID);
@@ -158,7 +159,7 @@ export class SystemTester {
   }
 
   private async runTestScenario(
-    targetDeviceID: string,
+    targetDeviceID: DeviceID,
     scenario: TestScenario,
     scenarioResult: TestScenarioResult,
   ): Promise<void> {
@@ -595,7 +596,7 @@ export class SystemTester {
     }
   }
 
-  private assertDeviceIDExists(targetDeviceID: string): void {
+  private assertDeviceIDExists(targetDeviceID: DeviceID): void {
     const device = this.systemDeployer.device(targetDeviceID);
     if (device === undefined) {
       throw Error(
@@ -604,7 +605,7 @@ export class SystemTester {
     }
   }
 
-  private assertVMOfDeviceIDExists(targetDeviceID: string): void {
+  private assertVMOfDeviceIDExists(targetDeviceID: DeviceID): void {
     if (!this.systemDeployer.hasVMDevice(targetDeviceID)) {
       throw Error(
         `Test scenario written device id ${targetDeviceID} has no VM assigned to it`,
