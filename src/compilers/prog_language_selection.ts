@@ -2,6 +2,7 @@ export enum TargetLanguage {
   WAT = 'wat',
   AssemblyScript = 'ts',
   Rust = 'rs',
+  Wasm = 'wasm',
 }
 
 export function isTargetLanguage(value: any): value is TargetLanguage {
