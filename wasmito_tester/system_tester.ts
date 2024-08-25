@@ -197,7 +197,6 @@ export class SystemTester {
       const actionRunResult = actionRunResults[i];
       const action = actions[i];
       if (isDelayedAction(action)) {
-        actionRunResult.result = ActionRunState.Delayed;
         this.delayAction(scenarioName, action, actionRunResult, i, vm);
         continue;
       }
