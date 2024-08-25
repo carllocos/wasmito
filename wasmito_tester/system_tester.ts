@@ -231,7 +231,11 @@ export class SystemTester {
           success = await p;
           // the actionRunResult is filled by delayAction.
           // Thus continue
-          continue;
+          if (success) {
+            continue;
+          } else {
+            return false;
+          }
         } else if (isAction(action)) {
           // important has to be the last case of the if
           [resultValue, success] = await this.runAction(vm, action);
