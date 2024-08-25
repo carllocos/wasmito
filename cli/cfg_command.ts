@@ -45,6 +45,10 @@ export function registerCFGCommand(program: Command): void {
       '-cg, --callgraph <callgraph-name.dot>',
       'enable the build of the callgraph for the wasm and store it in the <output-dir> as <callgraph-name.dot>',
     )
+    .option(
+      '--count-mappings <count-mappings.json>',
+      'will do a check to determine whether for each source mapping a node can be found in the generated Source CFGs. Missing nodes can be an indicator that the Source CFG are not complete. If no such mapping is found code program will fail',
+    )
     .action(async (wasmPath, outputDir, timeout, options) => {
       const logger = getGlobalLogger();
       if (!isFilePath(wasmPath)) {
@@ -65,6 +69,10 @@ export function registerCFGCommand(program: Command): void {
         callgraphOutputPath = pathJoin(outputDir, options.callgraph);
       }
 
+      let countMappings: string | undefined;
+      if (options.callgraph !== undefined) {
+        countMappings = pathJoin(outputDir, options.countMappings);
+      }
       const wasmitoPath = options.wasmitoJson;
       const dwarfPath = options.dwarf;
       const sourceSpecPath = options.sourceSpec;
@@ -130,7 +138,13 @@ export function registerCFGCommand(program: Command): void {
         logger.info(`Converting Source CFGs to dot`);
         langAdaptor.sourceCFG.serializeToDot(sourceCFGsOutputDir, config);
         if (callgraphOutputPath !== undefined) {
+          logger.info(`Converting Callgraph to dot`);
           langAdaptor.sourceCFG.wasmCFG.callgraph.toDot(callgraphOutputPath);
+        }
+
+        if (countMappings !== undefined) {
+          logger.info(`Storing CountMappingJSON`);
+          langAdaptor.countMappingsToJSON(countMappings);
         }
       } catch (e) {
         const errMsg = e instanceof Error ? `${e.message}${e.stack ?? ''}` : e;
