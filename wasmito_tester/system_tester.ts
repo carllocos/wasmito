@@ -1,8 +1,5 @@
 import type winston from 'winston';
-import {
-  TimeoutPromise,
-  maybeTimeoutPromise,
-} from '../src/util/promise_util';
+import { TimeoutPromise, maybeTimeoutPromise } from '../src/util/promise_util';
 import { SystemDeployer } from './system_deployer';
 import {
   type SubscriptionEmitterAction,
