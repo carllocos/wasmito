@@ -70,7 +70,7 @@ export function registerCFGCommand(program: Command): void {
       }
 
       let countMappings: string | undefined;
-      if (options.callgraph !== undefined) {
+      if (options.countMappings !== undefined) {
         countMappings = pathJoin(outputDir, options.countMappings);
       }
       const wasmitoPath = options.wasmitoJson;
