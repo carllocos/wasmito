@@ -76,6 +76,15 @@ export class SystemDeployer {
     return vm;
   }
 
+  async close(): Promise<void> {
+    for (const s of this.setup.devices) {
+      if (this.hasVMDevice(s.id)) {
+        const vm = this.deviceVM(s.id);
+        await vm.close();
+      }
+    }
+  }
+
   async deployOnDevice(
     scenario: TestScenario,
     deviceID: DeviceID,

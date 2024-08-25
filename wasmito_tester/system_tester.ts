@@ -115,6 +115,7 @@ export class SystemTester {
         return v[2];
       }),
     );
+    await this.systemDeployer.close();
     return this.testScenarios.map((v) => v[2]);
   }
 
