@@ -229,6 +229,7 @@ export class SystemTester {
           // Thus continue
           continue;
         } else if (isAction(action)) {
+          // important has to be the last case of the if
           [resultValue, success] = await this.runAction(vm, action);
         } else {
           throw new Error(`Invalid type action`);
