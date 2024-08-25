@@ -401,26 +401,18 @@ export class SystemTester {
         );
       })
       .finally(() => {
-        if (!errorOccurred) {
-          if (successFul) {
-            actionRunResult.result = ActionRunState.Success;
-          } else {
-            actionRunResult.result = ActionRunState.Failed;
-          }
-          this.logActionSuccess(
-            successFul,
-            scenarioName,
-            actionIndex,
-            actionRunResult,
-          );
-        } else {
-          this.logActionSuccess(
-            false,
-            scenarioName,
-            actionIndex,
-            actionRunResult,
-          );
+        if (errorOccurred) {
+          successFul = false;
         }
+        actionRunResult.result = successFul
+          ? ActionRunState.Success
+          : ActionRunState.Failed;
+        this.logActionSuccess(
+          successFul,
+          scenarioName,
+          actionIndex,
+          actionRunResult,
+        );
       });
   }
 
