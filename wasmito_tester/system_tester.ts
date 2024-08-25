@@ -176,16 +176,20 @@ export class SystemTester {
     );
 
     if (!doExpects) {
+      scenarioResult.result = TestScenarioResultState.Failed;
       return;
     }
 
-    await this.runExpects(
+    const successExpects = await this.runExpects(
       vm,
       scenario.testName,
       scenario.expect ?? [],
       scenarioResult.expectRunResults,
       actionHooksMap,
     );
+    scenarioResult.result = successExpects
+      ? TestScenarioResultState.Success
+      : TestScenarioResultState.Failed;
   }
 
   private async runActions(
