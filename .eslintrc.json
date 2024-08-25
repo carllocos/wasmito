@@ -9,7 +9,12 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "ignorePatterns": ["dist/*", "libs/", "assemblyscript_examples/"],
+  "ignorePatterns": [
+    "dist/*",
+    "libs/",
+    "assemblyscript_examples/",
+    "wasmito_tester/cli.js"
+  ],
   "plugins": ["prettier"],
   "rules": {
     "@typescript-eslint/no-namespace": "off",
