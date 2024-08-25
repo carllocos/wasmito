@@ -1,12 +1,16 @@
 import { AgnosticAST } from '../ast/angostic-ast';
 import { getFileExtension, isFilePath } from '../util/file_util';
 import { createLogger } from '../logger/logger';
-import { type SourceMap } from '../source_mappers/source_map';
+import {
+  type SourceCodeLocation,
+  type SourceMap,
+} from '../source_mappers/source_map';
 import { type AgnosticASTMap } from './agnostic_node';
 import { WasmControlFlowGraph } from '../cfg/wasm_cfg';
-import { SourceControlFlowGraph } from '../cfg/source_cfg';
+import { type SourceCFGNode, SourceControlFlowGraph } from '../cfg/source_cfg';
 import { getLangConfigFromExtension } from './languages/all_langs';
 import { type LanguageConfiguration } from './languages/language_config';
+import { writeFileSync } from 'fs';
 
 const logger = createLogger('LanguageAdaptor');
 
@@ -16,6 +20,13 @@ export async function constructLanguageAdaptor(
   const la = new LanguageAdaptor(sourceMap);
   await la.buildComplementaryContext();
   return la;
+}
+
+export interface CountMappingJson {
+  numberOfMappings: number;
+  numberOfAvailableMappings: number;
+  numberOfUniqueMappings: number;
+  unusedMappings: SourceCodeLocation[];
 }
 
 export class LanguageAdaptor {
@@ -41,6 +52,56 @@ export class LanguageAdaptor {
   async buildComplementaryContext(): Promise<void> {
     await this.buildASTS();
     this.buildSourceCFG();
+  }
+
+  public countMappingsToJSON(ouputFile?: string): string {
+    const mappings = this.sourceMap.mappings;
+    const availableMappings = mappings.filter((m) => isFilePath(m.source));
+    const uniqueMappings: SourceCodeLocation[] = [];
+    for (const m of availableMappings) {
+      const found = uniqueMappings.find((um) => {
+        return (
+          um.source === m.source &&
+          um.linenr === m.linenr &&
+          um.colnr === m.colnr
+        );
+      });
+
+      if (found === undefined) {
+        uniqueMappings.push(m);
+      }
+    }
+
+    const allNodes: SourceCFGNode[] = this.sourceCFG?.allNodes() ?? [];
+    const locsWithoutNode: SourceCodeLocation[] = [];
+    for (const um of uniqueMappings) {
+      const used = allNodes.find((n) => {
+        const sl = n.sourceLocation;
+        return (
+          um.linenr === sl.linenr &&
+          um.colnr === sl.colnr &&
+          um.source === sl.source
+        );
+      });
+
+      if (used === undefined) {
+        locsWithoutNode.push(um);
+      }
+    }
+
+    const m: CountMappingJson = {
+      numberOfMappings: mappings.length,
+      numberOfAvailableMappings: availableMappings.length,
+      numberOfUniqueMappings: uniqueMappings.length,
+      unusedMappings: locsWithoutNode,
+    };
+
+    const c = JSON.stringify(m);
+    if (ouputFile !== undefined) {
+      writeFileSync(ouputFile, c);
+    }
+
+    return c;
   }
 
   private async buildASTS(): Promise<void> {
