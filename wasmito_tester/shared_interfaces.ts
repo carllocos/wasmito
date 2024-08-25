@@ -17,7 +17,11 @@ export function isTestFailure<V>(obj: any): obj is FailureHandler<V> {
 export interface Action<ResultType> {
   timeout?: number;
   ifFail?: FailureHandler<ResultType>;
-  delay?: number; // delay ms before run
+
+  // delay ms before run
+  // Next actions are not run as long as this
+  // action does not run
+  delay?: number;
 
   description: string;
   doAction: (device: WARDuinoVM) => Promise<ResultType>; // ignored if subscribeTo set
