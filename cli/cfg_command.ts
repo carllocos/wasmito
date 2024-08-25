@@ -49,6 +49,8 @@ export function registerCFGCommand(program: Command): void {
       '--count-mappings <count-mappings.json>',
       'will do a check to determine whether for each source mapping a node can be found in the generated Source CFGs. Missing nodes can be an indicator that the Source CFG are not complete. If no such mapping is found code program will fail',
     )
+    .option('--scfg-json', 'Save the source level CFGs as JSON')
+    .option('--wcfg-json', 'Save the wasm level CFGs as JSON')
     .action(async (wasmPath, outputDir, timeout, options) => {
       const logger = getGlobalLogger();
       if (!isFilePath(wasmPath)) {
