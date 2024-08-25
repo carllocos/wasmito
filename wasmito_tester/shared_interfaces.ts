@@ -255,6 +255,7 @@ export interface DeviceSetup {
   serialPort?: string;
   baudrate?: number;
   fqbn?: string;
+  disableStrictModuleLoad?: boolean;
 
   postSetup: PostSetupConfig;
 }

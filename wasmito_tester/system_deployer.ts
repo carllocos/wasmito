@@ -147,6 +147,7 @@ export class SystemDeployer {
         vmConfig: {
           serialPort: device.serialPort,
           baudrate: device.baudrate,
+          disableStrictModuleLoad: device.disableStrictModuleLoad,
           fqbn,
         },
       },
@@ -176,6 +177,7 @@ export class SystemDeployer {
       },
       vmConfig: {
         toolPort: device.toolPort,
+        disableStrictModuleLoad: device.disableStrictModuleLoad,
       },
     });
 
