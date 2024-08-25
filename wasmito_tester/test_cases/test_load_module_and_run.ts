@@ -15,7 +15,7 @@ import { type WasmState } from '../../src/webassembly/wasm';
  * and run it for a max of seconds
  */
 
-export async function loadAndrunWasmModuleTest(
+export async function runTest(
   wasmPath: string,
   mapping: string,
 ): Promise<TestScenarioResult[]> {
