@@ -96,6 +96,9 @@ export function registerCFGCommand(program: Command): void {
         program.error('SourceMap should not be empty');
       }
 
+      const saveSCFGJSON = options.scfgJson !== undefined;
+      const saveWCFGJSON = options.wcfgJson !== undefined;
+
       try {
         const sm = await timeoutPromise(smPromise, timeoutMs);
         createDirectoryIfUnexisting(outputDir);
@@ -119,26 +122,31 @@ export function registerCFGCommand(program: Command): void {
 
         const wasmOutputDir = path.join(outputDir, `/wasm`);
         createDirectoryIfUnexisting(wasmOutputDir);
-        // the following CFGs conversion to JSON is very expensive
-        // logger.debug(`Converting Wasm CFGs to JSON`);
-        // langAdaptor.sourceCFG.wasmCFG.toJSON(wasmOutputDir);
+        if (saveWCFGJSON) {
+          // the following CFGs conversion to JSON is very expensive
+          logger.debug(`Converting Wasm CFGs to JSON`);
+          langAdaptor.sourceCFG.wasmCFG.toJSON(wasmOutputDir);
+        }
         logger.info(`Converting Wasm CFGs to dot`);
         langAdaptor.sourceCFG.wasmCFG.serializeToDot(wasmOutputDir);
-        // if (options.callgraph !== undefined) {
-        //   langAdaptor.sourceCFG.wasmCFG.callgraphToDot(callgraph);
-        // }
+
         const config: DotSerializationConfgig = {
           includeInstructions: false,
           includeEmptySCFG: false,
         };
         const sourceCFGsOutputDir = path.join(outputDir, `/source/`);
         createDirectoryIfUnexisting(sourceCFGsOutputDir);
-        logger.info(`Converting Source CFGs to JSON`);
-        langAdaptor.sourceCFG.toJSON(sourceCFGsOutputDir);
+        if (saveSCFGJSON) {
+          // the following CFGs conversion to JSON is very expensive
+          logger.info(
+            `Converting Source CFGs to JSON at ${sourceCFGsOutputDir}`,
+          );
+          langAdaptor.sourceCFG.toJSON(sourceCFGsOutputDir);
+        }
         logger.info(`Converting Source CFGs to dot`);
         langAdaptor.sourceCFG.serializeToDot(sourceCFGsOutputDir, config);
         if (callgraphOutputPath !== undefined) {
-          logger.info(`Converting Callgraph to dot`);
+          logger.info(`Converting Callgraph to dot at ${callgraphOutputPath}`);
           langAdaptor.sourceCFG.wasmCFG.callgraph.toDot(callgraphOutputPath);
         }
 
