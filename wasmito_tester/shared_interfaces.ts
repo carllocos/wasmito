@@ -125,7 +125,7 @@ export type Act<V, Y, Z extends HookWithSubscription<Y>> =
 
 export interface TestProgram {
   targetLanguage: TargetLanguage;
-  sourceCodeCompilationArgs: any;
+  sourceCodeCompilationArgs?: any;
 }
 
 export interface TestScenario {
