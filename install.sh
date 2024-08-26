@@ -28,7 +28,7 @@ git submodule update --init
 echo "> WABT: building tools"
 mkdir -p build
 cd build
-cmake ..
+cmake .. . -DBUILD_TESTS=OFF
 echo building wat2wasm
 make wat2wasm
 echo building wasm-objdump
