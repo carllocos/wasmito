@@ -233,6 +233,7 @@ function checkFuncName(obj: any): asserts obj is FuncName {
   if (
     typeof obj !== 'object' ||
     typeof obj.type !== 'string' ||
+    obj.type !== 'Identifier' ||
     typeof obj.value !== 'string'
   ) {
     if (obj.numeric !== undefined && typeof obj.numeric === 'string') {
