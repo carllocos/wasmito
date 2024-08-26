@@ -111,6 +111,7 @@ export interface ParsedModule {
 interface Func {
   type: 'Func';
   name: FuncName;
+  id?: number;
   signature: WasmType;
   body: WasmInstruction[];
   bodySize: number;
@@ -187,6 +188,14 @@ function parseFunc(obj: any): [Func | undefined, string[]] {
   const name = obj.name;
   checkFuncName(name);
 
+  const funName =
+    obj.name.numeric !== undefined ? obj.name.numeric : obj.name.value;
+  const regID = /^func_([0-9]+)$/;
+  const foundID = regID.exec(funName);
+  let fID: number | undefined;
+  if (foundID !== undefined && foundID !== null) {
+    fID = +foundID[1];
+  }
   assertFuncSignature(obj.signature);
   const signature = parseWasmType(obj.signature);
 
@@ -212,6 +221,7 @@ function parseFunc(obj: any): [Func | undefined, string[]] {
   const f: Func = {
     type,
     name,
+    id: fID,
     signature,
     body: bodyInstrs,
     bodySize: obj.metadata.bodySize,
