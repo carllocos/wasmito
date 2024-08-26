@@ -256,17 +256,40 @@ function createWasmFunctions(
   const funcs: WASMFunction[] = [];
   for (let i = 0; i < mod.funcs.length; i++) {
     const fun = mod.funcs[i];
+
+    // funcName might not be available
     const funcName = mod.funcNames.find((fn) => {
       return fn.value === fun.name.value;
     });
-    if (funcName === undefined) {
-      throw new Error(`Fun with name ${fun.name.value} has no identifier`);
+
+    const funExported = mod.exportedFuncs.find((ef) => {
+      return (
+        ef.name === fun.name.value || (fun.id !== undefined && ef.id === fun.id)
+      );
+    });
+
+    // The following tries to derive the funID
+    // from different sources from the parsed module
+    let funID = -1;
+    if (funcName !== undefined) {
+      funID = funcName.index;
+    } else if (funExported?.id !== undefined) {
+      // fun is exported and has ID
+      funID = funExported.id;
+    } else {
+      // try to derive from fun name
+      if (fun.id === undefined) {
+        throw new Error(
+          `Could not derive identifier for Fun with name ${fun.name.value}`,
+        );
+      }
+      funID = fun.id;
     }
 
-    const localTypes = allLocalTypes.get(funcName.index);
+    const localTypes = allLocalTypes.get(funID);
     const locals: WasmLocal[] = mod.localsNames
       .filter((l) => {
-        return l.functionIndex === funcName.index;
+        return l.functionIndex === funID;
       })
       .map((l) => {
         const local = localTypes?.find((lt) => lt.index === l.localIndex);
@@ -279,7 +302,7 @@ function createWasmFunctions(
           t = newType;
         } else {
           logger.warn(
-            `Failed to find type of local index ${l.localIndex} named '${l.value}' of function id ${funcName.index}`,
+            `Failed to find type of local index ${l.localIndex} named '${l.value}' of function id ${funID}`,
           );
         }
         return {
@@ -293,11 +316,11 @@ function createWasmFunctions(
 
     const f = new WASMFunction(
       fun.name.value,
-      funcName.index,
+      funID,
       fun.body,
       fun.signature,
       locals,
-      funcName.export,
+      funExported !== undefined,
     );
     funcs.push(f);
   }
