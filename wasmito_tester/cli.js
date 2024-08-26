@@ -17,6 +17,13 @@ if (testFileMod.runTest === 0) {
   process.exit(1);
 }
 
+if (testFileMod.runTest.length !== testFileArgs.length) {
+  console.error(
+    `runTest of ${testFile} expects ${testFileMod.runTest.length}. Given ${testFileArgs.length}`
+  );
+  process.exit(1);
+}
+
 async function runTest() {
   try {
     const startTime = Date.now();
