@@ -18,6 +18,7 @@ import { type WasmState } from '../../src/webassembly/wasm';
 export async function runTest(
   wasmPath: string,
   mapping: string,
+  runningTime: number,
 ): Promise<TestScenarioResult[]> {
   const m5stickDev = oneM5StickCDev('2');
   m5stickDev.disableStrictModuleLoad = false;
@@ -37,8 +38,7 @@ export async function runTest(
   };
 
   let firstPC: number | undefined;
-  const waitSecs = 5;
-  const milliSecs = waitSecs * 1000;
+  const milliSecs = runningTime * 1000;
   const testLoadAndRunModule: TestScenario = {
     testName: `Test If wasm ${wasmPath} loads and runs on DevVm`,
     testProgram: program,
@@ -64,7 +64,7 @@ export async function runTest(
     ],
     expect: [
       {
-        description: `Ask for pc after running for ${waitSecs} s`,
+        description: `Ask for pc after running for ${runningTime} s`,
         delay: milliSecs,
         timeout: milliSecs,
         doAction: async (dev: WARDuinoVM): Promise<WasmState> => {
