@@ -136,6 +136,7 @@ export interface ModuleImport {
 
 export interface FunExport {
   name: string;
+  id?: number;
 }
 
 export interface GlobalType {
