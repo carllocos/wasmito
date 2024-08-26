@@ -54,7 +54,7 @@ export class LanguageAdaptor {
     this.buildSourceCFG();
   }
 
-  public countMappingsToJSON(ouputFile?: string): string {
+  public unusedMappingsToJSON(ouputFile?: string): string {
     const mappings = this.sourceMap.mappings;
     const availableMappings = mappings.filter((m) => isFilePath(m.source));
     const uniqueMappings: SourceCodeLocation[] = [];

@@ -46,8 +46,10 @@ export function registerCFGCommand(program: Command): void {
       'enable the build of the callgraph for the wasm and store it in the <output-dir> as <callgraph-name.dot>',
     )
     .option(
-      '--count-mappings <count-mappings.json>',
-      'will do a check to determine whether for each source mapping a node can be found in the generated Source CFGs. Missing nodes can be an indicator that the Source CFG are not complete. If no such mapping is found code program will fail',
+      '--unused-mappings <output-name.json>',
+      `will generate a json containing the source mappings that were not used when building the CFGs.
+      This can be helpful to assess soundness of the generated Source level CFGs.
+      Unused mappings can be an indicator that the Source CFG is missing nodes.`,
     )
     .option('--scfg-json', 'Save the source level CFGs as JSON')
     .option('--wcfg-json', 'Save the wasm level CFGs as JSON')
@@ -71,9 +73,9 @@ export function registerCFGCommand(program: Command): void {
         callgraphOutputPath = pathJoin(outputDir, options.callgraph);
       }
 
-      let countMappings: string | undefined;
-      if (options.countMappings !== undefined) {
-        countMappings = pathJoin(outputDir, options.countMappings);
+      let unusedMappings: string | undefined;
+      if (options.unusedMappings !== undefined) {
+        unusedMappings = pathJoin(outputDir, options.unusedMappings);
       }
       const wasmitoPath = options.wasmitoJson;
       const dwarfPath = options.dwarf;
@@ -152,9 +154,9 @@ export function registerCFGCommand(program: Command): void {
           langAdaptor.sourceCFG.wasmCFG.callgraph.toDot(callgraphOutputPath);
         }
 
-        if (countMappings !== undefined) {
-          logger.info(`Storing CountMappingJSON`);
-          langAdaptor.countMappingsToJSON(countMappings);
+        if (unusedMappings !== undefined) {
+          logger.info(`Storing UnusedMappingsJSON`);
+          langAdaptor.unusedMappingsToJSON(unusedMappings);
         }
       } catch (e) {
         const errMsg = e instanceof Error ? `${e.message}${e.stack ?? ''}` : e;
