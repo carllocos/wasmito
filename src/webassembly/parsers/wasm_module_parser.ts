@@ -97,6 +97,7 @@ export interface Section {
 
 export interface ParsedModule {
   localsNames: LocalName[];
+  exportedFuncs: FunExport[];
   funcNames: MetaDataFunctionName[];
   types: WasmType[];
   funcs: Func[];
@@ -689,6 +690,7 @@ export function parseWasmModule(wasmPath: string): [ParsedModule, string[]] {
     // TODO fiels 'Table', 'Memory'. 'Elem', 'ModuleExport'
     const parsedMod = {
       localsNames,
+      exportedFuncs,
       funcNames,
       types,
       funcs,
