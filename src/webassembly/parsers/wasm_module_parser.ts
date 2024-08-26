@@ -296,7 +296,7 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
       break;
     }
     case 'call': {
-      op = new CallInstruction(obj.index.value, obj.numeric.value);
+      op = parseCall(obj);
       break;
     }
     case 'call_indirect': {
@@ -625,6 +625,72 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
   op.startAddress = obj.loc.start.column;
   op.endAddress = obj.loc.end.column;
   return op;
+}
+
+function parseCall(obj: any): CallInstruction {
+  if (obj.index === undefined) {
+    throw new Error(
+      `Call instruction has no expected 'index' field got ${obj}`,
+    );
+  }
+
+  let funName = '';
+  let funID = -1;
+  switch (obj.index.type) {
+    case 'NumberLiteral': {
+      if (typeof obj.index.value !== 'number') {
+        throw new Error(
+          `obj index value is supposed to be a number when type is 'NumberLiteral' got ${obj.type.value}`,
+        );
+      }
+      funID = obj.index.value;
+      break;
+    }
+    case 'Identifier': {
+      if (typeof obj.index.value !== 'string') {
+        throw new Error(
+          `obj index 'value' field is supposed to be a string. Got ${obj.index.value}`,
+        );
+      }
+      funName = obj.index.value;
+      break;
+    }
+    default: {
+      throw new Error(
+        `obj index 'type' is of unhandled type. Got ${obj.index.type}`,
+      );
+    }
+  }
+
+  if (funID === -1) {
+    // above changed the funName
+    if (
+      typeof obj.numeric !== 'object' ||
+      obj.numeric.type !== 'NumberLiteral' ||
+      obj.numeric.value === undefined ||
+      typeof obj.numeric.value !== 'number'
+    ) {
+      throw new Error(
+        `The fun ID is expected to be stored in a numeric object of type 'NumberLiteral' got ${obj.numeric}`,
+      );
+    }
+
+    funID = obj.numeric.value;
+  } else {
+    // above changed the funID
+    // there is no function name so lets produce it
+    const expectedFields = new Set<string>(['loc', 'index', 'id', 'type']);
+    const fields = Object.keys(obj);
+    for (const f of fields) {
+      if (!expectedFields.has(f)) {
+        throw new Error(
+          `encountered a field that may give info on fun name ${f} from obj ${JSON.stringify(obj)}`,
+        );
+      }
+    }
+    funName = `func_${funID}`;
+  }
+  return new CallInstruction(funName, funID);
 }
 
 function parseConstValue(valueObj: any, vtype: string): ConstInstr | string {
