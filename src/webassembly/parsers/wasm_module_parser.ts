@@ -803,10 +803,8 @@ function parseExportFuncs(fields: any): FunExport[] {
 
 function validExportFuncField(obj: any): boolean {
   return (
-    obj.type === 'ModuleExport' &&
     typeof obj === 'object' &&
     obj.type === 'ModuleExport' &&
-    obj.descr !== undefined &&
     typeof obj.descr === 'object' &&
     obj.descr.exportType === 'Func'
   );
