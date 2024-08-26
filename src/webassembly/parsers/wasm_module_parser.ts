@@ -781,8 +781,19 @@ function parseExportFuncs(fields: any): FunExport[] {
   const exports: FunExport[] = [];
   for (const f of fields) {
     if (validExportFuncField(f)) {
+      if (f.name === undefined || typeof f.name !== 'string') {
+        throw new Error(
+          `Found a case where the name is missing or is not a string in export field ${f}`,
+        );
+      }
+      let id: number | undefined;
+      if (f.descr.id.type === 'NumberLiteral') {
+        id = f.descr.id.value;
+      }
+
       const ef: FunExport = {
-        name: f.descr.id.value,
+        name: f.name,
+        id,
       };
       exports.push(ef);
     }
