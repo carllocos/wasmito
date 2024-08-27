@@ -1,0 +1,419 @@
+import { Option, type Command } from 'commander';
+import {
+  isDirectoryPath,
+  isFilePath,
+  pathJoin,
+  readFileAsJSON,
+} from '../src/util/file_util';
+import { getGlobalLogger } from '../src/logger/logger';
+import { writeFileSync } from 'fs';
+import { projectDirName } from './project_command';
+import { createDeviceID, DefaultDeviceName } from '../src/device/device_config';
+import { ArduinoListBoardsFQBNs } from '../src/platforms/arduino_platform';
+import { convertToBoardBaudRate } from '../src/util/serial_port';
+
+interface DevicesJSON {
+  devices: DeviceJSON[];
+}
+
+type Platform = string;
+
+const ArduinoPlatform: Platform = 'arduino';
+const DevVM: Platform = 'DevVM';
+
+interface DeviceJSON {
+  name: string;
+  id: string;
+  platform: Platform; // either arduino or devvm
+
+  // only if platform arduino
+  boardName: string;
+  fqbn: string;
+  baudrate: number;
+}
+
+function createNewDevice(platform: Platform, name?: string): DeviceJSON {
+  return {
+    name: name ?? DefaultDeviceName,
+    id: createDeviceID(),
+    platform,
+    fqbn: '',
+    boardName: '',
+    baudrate: -1,
+  };
+}
+
+export function registerDevicesCommand(program: Command): void {
+  program
+    .command('devices')
+    .description(`manage MCUs or DevBoards part of your project`)
+    .requiredOption(
+      '-d <id-or-name>',
+      'The id or name of the device to which the actions will apply',
+      '',
+    )
+    .option('--add [name]', `add a device with [name]`)
+    .option('--rmv', `remove <id-or-name> from the project config`)
+    .option(
+      '--serial <serial-port>',
+      `configure the serial port of <id-or-name>`,
+    )
+    .addOption(
+      new Option('-p, --platform <platform>', 'platform of choice').choices([
+        ArduinoPlatform,
+        DevVM,
+      ]),
+    )
+    .option('--fqbn <fqbn>', `configure the fqbn of <id-or-name>`)
+    .option('--baudrate <baudrate>', `configure the baudrate of <id-or-name>`)
+    .option('--list-fqbns', 'display all currently avaiable boards')
+    .option('--list', 'display all registered devices')
+    .action(async (options) => {
+      const wd = process.cwd();
+      const projectDir = pathJoin(wd, projectDirName);
+      let actionHandled = false;
+      if (!isDirectoryPath(projectDir)) {
+        program.error(
+          `There is no project defined in the current working directory. First create a project see 'help project'`,
+        );
+      }
+
+      const devicesPath = pathJoin(projectDir, 'devices.json');
+      if (!isFilePath(devicesPath)) {
+        program.error(`No device added yet to the project`);
+        return;
+      }
+
+      let addPlatformHandled = false;
+      const idOrName = options.d;
+      let platform = DevVM;
+      if (options.platform !== undefined) {
+        addPlatformHandled = true;
+        platform = options.platform;
+      }
+
+      if (options.add !== undefined) {
+        actionHandled = true;
+        if (idOrName !== '') {
+          program.error(`Cannot provide <id-or-name> when adding a device`);
+          return;
+        } else {
+          const devName =
+            typeof options.addDev === 'string' ? options.addDev : undefined;
+          const dev = createNewDevice(platform, devName);
+          await addDevice(dev, devicesPath);
+        }
+      }
+
+      if (options.platform !== undefined && !addPlatformHandled) {
+        // happens only when a device got added with the platform flag passed as argument:w
+        actionHandled = true;
+        if (idOrName === '') {
+          program.error(`<id-or-name> is needed to run this command`);
+          return;
+        } else {
+          await changePlatform(
+            program,
+            devicesPath,
+            idOrName,
+            options.platform,
+          );
+        }
+      }
+
+      if (options.rmv !== undefined) {
+        actionHandled = true;
+        if (idOrName === '') {
+          program.error(`<id-or-name> is expected when removing a device`);
+          return;
+        }
+
+        await removeDevice(program, idOrName, devicesPath);
+      }
+
+      if (options.listFqbns !== undefined) {
+        actionHandled = true;
+        await listAllFQBN();
+      }
+
+      if (options.fqbn !== undefined) {
+        actionHandled = true;
+        await addFQBN(program, devicesPath, idOrName, options.fqbn);
+      }
+
+      if (options.baudrate !== undefined) {
+        actionHandled = true;
+        await addBaudrate(program, devicesPath, idOrName, options.baudrate);
+      }
+
+      if (options.list !== undefined) {
+        actionHandled = true;
+        await listDevices(devicesPath);
+      }
+      if (!actionHandled) {
+        program.error(`no action provided. Type 'help device'`);
+      }
+    });
+}
+
+async function listDevices(devicesPath: string): Promise<void> {
+  const devices = await readDevices(devicesPath);
+
+  const dstr = devices
+    .map((d) => {
+      return `${d.name}\t${d.id}\t${d.platform}`;
+    })
+    .join('\n');
+
+  const header = `name\tid\tplatform`;
+  const logger = getGlobalLogger();
+  logger.info(`registerd devices:\n${header}\n${dstr}`);
+}
+async function addDevice(dev: DeviceJSON, devicesPath: string): Promise<void> {
+  const logger = getGlobalLogger();
+  const devices = await readDevices(devicesPath);
+  devices.push(dev);
+
+  const found = devices.filter((d: DeviceJSON) => {
+    return d.name === dev.name;
+  });
+  if (found.length > 1) {
+    logger.warn(
+      `#${found.length} devices found named '${dev.name}': [${found.map((d: object) => JSON.stringify(d)).join(', ')}]`,
+    );
+  }
+
+  writeDevices(devices, devicesPath);
+  logger.info(`Device name='${dev.name}' id='${dev.id}' added`);
+}
+
+async function removeDevice(
+  program: Command,
+  idOrName: string,
+  devicesPath: string,
+): Promise<void> {
+  const devices = await readDevices(devicesPath);
+  const newDevices: DeviceJSON[] = [];
+  const devicesToRmv: DeviceJSON[] = [];
+  for (const d of devices) {
+    if (d.id === idOrName || d.name === idOrName) {
+      devicesToRmv.push(d);
+    } else {
+      newDevices.push(d);
+    }
+  }
+
+  if (devicesToRmv.length === 0) {
+    program.error(`No device found with id or name '${idOrName}'`);
+  } else if (devicesToRmv.length > 1) {
+    const devicesStr = devicesToStr(devicesToRmv);
+    program.error(
+      `Multiple devices found with id or name '${idOrName}':\n${devicesStr}`,
+    );
+  } else {
+    const logger = getGlobalLogger();
+    writeDevices(newDevices, devicesPath);
+    const d = devicesToRmv[0];
+    logger.info(`Removed device name='${d.name}' id='${d.id}'`);
+  }
+}
+
+function devicesToStr(devices: DeviceJSON[]): string {
+  const devicesStr = devices
+    .map((d) => {
+      return `${d.name}\t${d.id}`;
+    })
+    .join('\n');
+  const header = 'name\tid';
+  return `${header}\n${devicesStr}`;
+}
+
+async function listAllFQBN(): Promise<void> {
+  const logger = getGlobalLogger();
+  const boards = await ArduinoListBoardsFQBNs();
+  let max = 0;
+  for (const b of boards) {
+    max = b.boardName.length > max ? b.boardName.length : max;
+  }
+  max += 2;
+  const bstr = boards.map((b) => {
+    let bn = b.boardName;
+    if (bn.length < max) {
+      bn = `${bn}${' '.repeat(max - bn.length)}`;
+    }
+    return `\t${bn}${b.fqbn}`;
+  });
+  const bnHeader = 'board name';
+  const header = `${bnHeader}${' '.repeat(max - bnHeader.length)}FQBN`;
+  logger.info(`boards installed:[\n\t${header}\n${bstr.join('\n')}\n]`);
+}
+
+async function addFQBN(
+  program: Command,
+  devicesPath: string,
+  idOrName: string,
+  fqbn: string,
+): Promise<void> {
+  const devices = await getMatchingDeviceOrError(
+    program,
+    devicesPath,
+    idOrName,
+    ArduinoPlatform,
+  );
+  if (devices === undefined) {
+    return;
+  }
+
+  const [device, allDevices] = devices;
+  const boards = await ArduinoListBoardsFQBNs();
+  const found = boards.find((b) => {
+    return b.fqbn === fqbn;
+  });
+
+  if (found !== undefined) {
+    const oldfqbn = device.fqbn;
+    device.boardName = found.boardName;
+    device.fqbn = found.fqbn;
+    writeDevices(allDevices, devicesPath);
+
+    const logger = getGlobalLogger();
+    let s = `fqbn of '${idOrName}' changed to '${found.fqbn}'`;
+    if (oldfqbn !== '') {
+      s = `${s} (old '${oldfqbn}')'`;
+    }
+    logger.info(s);
+  } else {
+    program.error(
+      `No fqbn found that matches '${fqbn}'. Type '--list-fqbns' for a full list`,
+    );
+  }
+}
+
+async function addBaudrate(
+  program: Command,
+  devicesPath: string,
+  idOrName: string,
+  baudrateStr: string,
+): Promise<void> {
+  const baudrate = Number(baudrateStr);
+  if (isNaN(baudrate) || convertToBoardBaudRate(baudrate) === undefined) {
+    program.error(
+      `The provided baudrate '${baudrateStr}' is not a valid number`,
+    );
+    return;
+  }
+
+  const devices = await getMatchingDeviceOrError(
+    program,
+    devicesPath,
+    idOrName,
+    ArduinoPlatform,
+  );
+  if (devices === undefined) {
+    return;
+  }
+  const [device, allDevices] = devices;
+
+  const oldBaudrate = device.baudrate;
+  device.baudrate = baudrate;
+  writeDevices(allDevices, devicesPath);
+  const logger = getGlobalLogger();
+  if (oldBaudrate !== -1) {
+    logger.info(
+      `baudrate of '${idOrName}' changed from '${oldBaudrate}' -> ${baudrate}`,
+    );
+  } else {
+    logger.info(`baudrate of '${idOrName}' changed to ${baudrate}`);
+  }
+}
+
+async function readDevices(devicesPath: string): Promise<DeviceJSON[]> {
+  const content: DevicesJSON = await readFileAsJSON(devicesPath);
+  return content.devices;
+}
+
+function writeDevices(devices: DeviceJSON[], devicesPath: string): void {
+  const updated: DevicesJSON = {
+    devices,
+  };
+  const content = JSON.stringify(updated);
+  writeFileSync(devicesPath, content);
+}
+
+async function getMatchingDeviceOrError(
+  program: Command,
+  devicesPath: string,
+  idOrName: string,
+  expectedPlatform?: string,
+): Promise<[DeviceJSON, DeviceJSON[]] | undefined> {
+  const matching = await getMatchingDevices(devicesPath, idOrName);
+  if (matching === undefined) {
+    program.error(`No device register under the name or id '${idOrName}'`);
+    return undefined;
+  }
+
+  const [devicesFound, allDevices] = matching;
+  if (devicesFound.length > 1) {
+    const devicesStr = devicesToStr(devicesFound);
+    program.error(
+      `multiple devices found with id or name '${idOrName}':\n${devicesStr}$`,
+    );
+    return undefined;
+  }
+
+  const device = devicesFound[0];
+  if (expectedPlatform !== undefined && device.platform !== expectedPlatform) {
+    program.error(
+      `Command is meant for a device that targets '${expectedPlatform}' but '${idOrName}' targets '${device.platform}'`,
+    );
+    return undefined;
+  }
+  return [device, allDevices];
+}
+
+/**
+ *
+ * @param devicesPath path to devices.json
+ * @param idOrName id or name of a device
+ * @returns all the devices that match name or id and all the devices read. If no device is found it retunrs undefined
+ */
+async function getMatchingDevices(
+  devicesPath: string,
+  idOrName: string,
+): Promise<[DeviceJSON[], DeviceJSON[]] | undefined> {
+  const devices = await readDevices(devicesPath);
+  const filtered = devices.filter((d) => {
+    return d.name === idOrName || d.id === idOrName;
+  });
+  if (filtered.length === 0) {
+    return undefined;
+  } else {
+    return [filtered, devices];
+  }
+}
+
+async function changePlatform(
+  program: Command,
+  devicesPath: string,
+  idOrName: string,
+  platform: Platform,
+): Promise<void> {
+  const match = await getMatchingDeviceOrError(program, devicesPath, idOrName);
+  if (match === undefined) {
+    return;
+  }
+
+  const [device, allDevices] = match;
+  const old = device.platform;
+  device.platform = platform;
+  if (old !== platform) {
+    writeDevices(allDevices, devicesPath);
+  }
+
+  let logStr = `Device '${idOrName}' platform changed to ${platform}`;
+  if (old !== '') {
+    logStr = `${logStr} (old '${old}')`;
+  }
+  const logger = getGlobalLogger();
+  logger.info(logStr);
+}
