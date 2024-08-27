@@ -13,9 +13,9 @@ export class DeviceIdentity {
   private _deviceName: string;
   private readonly _anonymous: string;
 
-  constructor(args: DeviceIdentityArgs) {
+  constructor(args: DeviceIdentityArgs, id?: string) {
     this._anonymous = 'anonymous';
-    this._id = createDeviceID();
+    this._id = id ?? createDeviceID();
     if (args.name !== undefined && typeof args.name !== 'string') {
       throw new Error(
         `device name is expected to be a string. Given ${args.name}`,
