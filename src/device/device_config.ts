@@ -15,7 +15,7 @@ export class DeviceIdentity {
 
   constructor(args: DeviceIdentityArgs) {
     this._anonymous = 'anonymous';
-    this._id = this.createID();
+    this._id = createDeviceID();
     if (args.name !== undefined && typeof args.name !== 'string') {
       throw new Error(
         `device name is expected to be a string. Given ${args.name}`,
@@ -43,10 +43,10 @@ export class DeviceIdentity {
   get id(): string {
     return this._id;
   }
+}
 
-  private createID(): string {
-    return uuidv4();
-  }
+export function createDeviceID(): string {
+  return uuidv4();
 }
 
 export function validateDeviceConfig(value: any): string[] {
