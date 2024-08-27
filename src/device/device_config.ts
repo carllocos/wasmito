@@ -11,17 +11,15 @@ export interface DeviceIdentityArgs {
 export class DeviceIdentity {
   private readonly _id: string;
   private _deviceName: string;
-  private readonly _anonymous: string;
 
   constructor(args: DeviceIdentityArgs, id?: string) {
-    this._anonymous = 'anonymous';
     this._id = id ?? createDeviceID();
     if (args.name !== undefined && typeof args.name !== 'string') {
       throw new Error(
         `device name is expected to be a string. Given ${args.name}`,
       );
     }
-    this._deviceName = args.name ?? this._anonymous;
+    this._deviceName = args.name ?? DefaultDeviceName;
   }
 
   get fullname(): string {
@@ -37,13 +35,15 @@ export class DeviceIdentity {
   }
 
   hasName(): boolean {
-    return this._anonymous !== this.name;
+    return DefaultDeviceName !== this.name;
   }
 
   get id(): string {
     return this._id;
   }
 }
+
+export const DefaultDeviceName = 'anonymous';
 
 export function createDeviceID(): string {
   return uuidv4();
