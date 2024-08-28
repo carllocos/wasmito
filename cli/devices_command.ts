@@ -419,6 +419,11 @@ async function changePlatform(
     writeDevices(allDevices, devicesPath);
   }
 
+  const logStr = `Device '${idOrName}' platform changed to ${platform} (old ${old})`;
+  const logger = getGlobalLogger();
+  logger.info(logStr);
+}
+
 async function addSerialPort(
   program: Command,
   devicesPath: string,
