@@ -8,13 +8,33 @@ import { DevVMPlatform } from '../src/platforms/dev_vm_platform';
 import { type DeviceIdentity } from '../src/device/device_config';
 import { type WasmCompilerArgs } from '../src/compilers/wasm_compiler';
 
+function validateIdOrName(idOrName: any, prev: any): string {
+  if (typeof idOrName !== 'string') {
+    throw new InvalidArgumentError('Not a string');
+  }
+  return idOrName;
+}
+
+function isValidWasmPath(wasmPath: any, prev: any): string {
+  if (typeof wasmPath !== 'string' || !isFilePath(wasmPath)) {
+    throw new InvalidArgumentError('Is not a Wasm module file path');
+  }
+  return wasmPath;
+}
+
 export function registerUploadCommand(program: Command): void {
   program
     .command('upload')
     .description(`upload a WebAssembly module to a device`)
     .argument(
-      '<id-or-name> <wasm-path>',
+      '<id-or-name>',
+      'the id or name of the device in the project to which the action applies',
+      validateIdOrName,
+    )
+    .argument(
+      '<wasm-path>',
       'the wasm module <wasm-path> to which device to upload <id-or-name>',
+      isValidWasmPath,
     )
     .action(async (idOrName, wasmPath) => {
       if (!isProjectDirPresent()) {
