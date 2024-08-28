@@ -235,26 +235,29 @@ export class ArduinoBoardBuilder extends Platform {
   }
 
   async createCompiler(selectedLanguage: ProgLangSelectionArgs): Promise<void> {
-    // copy Arduino template
-    this.logger.info(
-      `Copying Arduino template for ${this.config.deviceIdentity.name} (board=${this.config.vmConfig.fqbn.boardName}, ID=${this.config.deviceIdentity.id}) from ${this.pathToArduinoTemplateDir} to ${this.pathToArduinoSketchDir}`,
-    );
-    copyRecursive(
-      `${this.pathToArduinoTemplateDir}/`,
-      this.pathToArduinoSketchDir,
-    );
-
-    const exitCodeClean = await ArduinoClean(this.pathToArduinoSketchDir);
-    if (exitCodeClean !== 0) {
-      throw new Error(`Failed to perform ArduinoClean`);
+    if (!this.hasAllTemplateFiles()) {
+      // copy Arduino template
+      this.logger.info(
+        `Copying Arduino template for ${this.config.deviceIdentity.name} (board=${this.config.vmConfig.fqbn.boardName}, ID=${this.config.deviceIdentity.id}) from ${this.pathToArduinoTemplateDir} to ${this.pathToArduinoSketchDir}`,
+      );
+      copyRecursive(
+        `${this.pathToArduinoTemplateDir}/`,
+        this.pathToArduinoSketchDir,
+      );
+      if (!isFilePath(this.legacyConfigFile)) {
+        // although we do not use the .config file
+        // we need to create the .config file
+        // otherwise the Makefile used
+        // to build the Arduino.ino will crash
+        writeFileSync(this.legacyConfigFile, '');
+      }
     }
 
-    if (!isFilePath(this.legacyConfigFile)) {
-      // although we do not use the .config file
-      // we need to create the .config file
-      // otherwise the Makefile used
-      // to build the Arduino.ino will crash
-      writeFileSync(this.legacyConfigFile, '');
+    if (!this.cachePlatformBuild) {
+      const exitCodeClean = await ArduinoClean(this.pathToArduinoSketchDir);
+      if (exitCodeClean !== 0) {
+        throw new Error(`Failed to perform ArduinoClean`);
+      }
     }
 
     // compile the source code
