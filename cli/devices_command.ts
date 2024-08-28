@@ -175,8 +175,7 @@ async function listDevices(devicesPath: string): Promise<void> {
     .join('\n');
 
   const header = `name\tid\tplatform`;
-  const logger = getGlobalLogger();
-  logger.info(`registerd devices:\n${header}\n${dstr}`);
+  console.log(`registerd devices:\n${header}\n${dstr}`);
 }
 async function addDevice(dev: DeviceJSON, devicesPath: string): Promise<void> {
   const logger = getGlobalLogger();
@@ -193,7 +192,7 @@ async function addDevice(dev: DeviceJSON, devicesPath: string): Promise<void> {
   }
 
   writeDevices(devices, devicesPath);
-  logger.info(
+  console.log(
     `Device name='${dev.identity.name}' id='${dev.identity.id}' added`,
   );
 }
@@ -222,10 +221,9 @@ async function removeDevice(
       `Multiple devices found with id or name '${idOrName}':\n${devicesStr}`,
     );
   } else {
-    const logger = getGlobalLogger();
     writeDevices(newDevices, devicesPath);
     const d = devicesToRmv[0];
-    logger.info(
+    console.log(
       `Removed device name='${d.identity.name}' id='${d.identity.id}'`,
     );
   }
@@ -242,7 +240,6 @@ function devicesToStr(devices: DeviceJSON[]): string {
 }
 
 async function listAllFQBN(): Promise<void> {
-  const logger = getGlobalLogger();
   const boards = await ArduinoListBoardsFQBNs();
   let max = 0;
   for (const b of boards) {
@@ -258,7 +255,7 @@ async function listAllFQBN(): Promise<void> {
   });
   const bnHeader = 'board name';
   const header = `${bnHeader}${' '.repeat(max - bnHeader.length)}FQBN`;
-  logger.info(`boards installed:[\n\t${header}\n${bstr.join('\n')}\n]`);
+  console.log(`boards installed:[\n\t${header}\n${bstr.join('\n')}\n]`);
 }
 
 async function addFQBN(
@@ -289,12 +286,11 @@ async function addFQBN(
     device.fqbn = found.fqbn;
     writeDevices(allDevices, devicesPath);
 
-    const logger = getGlobalLogger();
     let s = `fqbn of '${idOrName}' changed to '${found.fqbn}'`;
     if (oldfqbn !== '') {
       s = `${s} (old '${oldfqbn}')'`;
     }
-    logger.info(s);
+    console.log(s);
   } else {
     program.error(
       `No fqbn found that matches '${fqbn}'. Type '--list-fqbns' for a full list`,
@@ -330,13 +326,12 @@ async function addBaudrate(
   const oldBaudrate = device.baudrate;
   device.baudrate = baudrate;
   writeDevices(allDevices, devicesPath);
-  const logger = getGlobalLogger();
   if (oldBaudrate !== -1) {
-    logger.info(
+    console.log(
       `baudrate of '${idOrName}' changed from '${oldBaudrate}' -> ${baudrate}`,
     );
   } else {
-    logger.info(`baudrate of '${idOrName}' changed to ${baudrate}`);
+    console.log(`baudrate of '${idOrName}' changed to ${baudrate}`);
   }
 }
 
@@ -431,8 +426,7 @@ async function changePlatform(
   }
 
   const logStr = `Device '${idOrName}' platform changed to ${platform} (old ${old})`;
-  const logger = getGlobalLogger();
-  logger.info(logStr);
+  console.log(logStr);
 }
 
 async function addSerialPort(
@@ -467,8 +461,7 @@ async function addSerialPort(
   if (old !== '') {
     logStr = `${logStr} (old '${old}')`;
   }
-  const logger = getGlobalLogger();
-  logger.info(logStr);
+  console.log(logStr);
 }
 
 export async function getProjectDevices(): Promise<DeviceJSON[]> {
