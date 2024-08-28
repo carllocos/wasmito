@@ -1,6 +1,5 @@
 import { Option, type Command } from 'commander';
 import { isFilePath, pathJoin, readFileAsJSON } from '../src/util/file_util';
-import { getGlobalLogger } from '../src/logger/logger';
 import { writeFileSync } from 'fs';
 import { getProjectDir, isProjectDirPresent } from './project_command';
 import {
@@ -178,7 +177,6 @@ async function listDevices(devicesPath: string): Promise<void> {
   console.log(`registerd devices:\n${header}\n${dstr}`);
 }
 async function addDevice(dev: DeviceJSON, devicesPath: string): Promise<void> {
-  const logger = getGlobalLogger();
   const devices = await readDevices(devicesPath);
   devices.push(dev);
 
@@ -186,7 +184,7 @@ async function addDevice(dev: DeviceJSON, devicesPath: string): Promise<void> {
     return d.identity.name === dev.identity.name;
   });
   if (found.length > 1) {
-    logger.warn(
+    console.warn(
       `#${found.length} devices found named '${dev.identity.name}': [${found.map((d: object) => JSON.stringify(d)).join(', ')}]`,
     );
   }
