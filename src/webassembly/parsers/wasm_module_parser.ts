@@ -810,8 +810,15 @@ function parseModuleImport(obj: any): ModuleImport {
   ) {
     throw new Error(`Obj expected to satisfy ModuleImport Interface`);
   }
-  parseModuleDescription(obj.descr);
-  assertWasmSourceCodeLocation(obj.loc);
+
+  const loc = obj.loc;
+  assertWasmSourceCodeLocation(loc);
+  return {
+    module: obj.module,
+    name: obj.name,
+    descr: parseModuleDescription(obj.descr),
+    loc,
+  };
 }
 
 function parseModuleDescription(obj: any): ModuleImportDescription {
