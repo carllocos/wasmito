@@ -61,11 +61,7 @@ export function registerUploadCommand(program: Command): void {
       const arg: WasmCompilerArgs = {
         wasmPath,
       };
-
-      const compiled = await platform.compileSourceCode({
-        arg,
-        maxWaitTime,
-      });
+      const compiled = await platform.compileSourceCode(arg, maxWaitTime);
       if (compiled !== 0) {
         program.error(`Failed to compile source code`);
       } else {
