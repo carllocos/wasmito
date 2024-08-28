@@ -70,8 +70,8 @@ export function registerUploadCommand(program: Command): void {
       const arg: WasmCompilerArgs = {
         wasmPath,
       };
-      const compiled = await platform.compileSourceCode(arg, maxWaitTime);
-      if (compiled !== 0) {
+      const build = await platform.buildForPlatform(arg, maxWaitTime);
+      if (build !== 0) {
         program.error(`Failed to compile source code`);
       } else {
         // TODO fix upload for DevVM
