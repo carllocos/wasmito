@@ -73,8 +73,7 @@ export function registerDevicesCommand(program: Command): void {
       let actionHandled = false;
       const devicesPath = getDevicesFilePath();
       if (!isFilePath(devicesPath)) {
-        program.error(`No device added yet to the project`);
-        return;
+        createDevicesFileIfNeeded(devicesPath);
       }
 
       let addPlatformHandled = false;
@@ -381,6 +380,13 @@ async function getMatchingDeviceOrError(
   return [device, allDevices];
 }
 
+function createDevicesFileIfNeeded(devicesPAth: string): void {
+  const d: DevicesJSON = {
+    devices: [],
+  };
+
+  writeFileSync(devicesPAth, JSON.stringify(d));
+}
 /**
  *
  * @param devicesPath path to devices.json
