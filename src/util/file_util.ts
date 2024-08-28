@@ -1,7 +1,8 @@
 import os from 'os';
 import * as path from 'path';
-import fs from 'fs';
+import fs, { readFileSync } from 'fs';
 import { getGlobalLogger } from '../logger/logger';
+import { createHash } from 'crypto';
 
 export function replaceFileExtension(
   filePath: string,
@@ -166,4 +167,9 @@ export async function listFilesInDirectory(
   directoryPath: string,
 ): Promise<string[]> {
   return await fs.promises.readdir(directoryPath);
+}
+
+export function sha256ForFile(filePath: string): string {
+  const fileBuffer = readFileSync(filePath);
+  return createHash('sha256').update(fileBuffer).digest('hex');
 }
