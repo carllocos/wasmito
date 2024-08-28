@@ -1,7 +1,11 @@
-import { type Command } from 'commander';
+import { InvalidArgumentError, type Command } from 'commander';
 import { getProjectDir, isProjectDirPresent } from './project_command';
 import { getDeviceConfiguration } from './devices_command';
-import { createDirectoryIfUnexisting, pathJoin } from '../src/util/file_util';
+import {
+  createDirectoryIfUnexisting,
+  isFilePath,
+  pathJoin,
+} from '../src/util/file_util';
 import { PlatformTarget } from '../src/platforms/platform_config';
 import { ArduinoBoardBuilder } from '../src/platforms/arduino_platform';
 import { DevVMPlatform } from '../src/platforms/dev_vm_platform';
