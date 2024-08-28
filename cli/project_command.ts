@@ -17,7 +17,7 @@ export function registerProjectCommand(program: Command): void {
       const targetDir = getProjectDir();
 
       if (options.new !== undefined) {
-        if (!isProjectDirPresent()) {
+        if (isProjectDirPresent()) {
           program.error(
             `The current working directory has already a project set on ${targetDir}. To delete project run 'project --rmv'`,
           );
