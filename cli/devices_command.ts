@@ -1,12 +1,8 @@
 import { Option, type Command } from 'commander';
-import {
-  isDirectoryPath,
-  isFilePath,
-  pathJoin,
-  readFileAsJSON,
-} from '../src/util/file_util';
+import { isFilePath, pathJoin, readFileAsJSON } from '../src/util/file_util';
 import { getGlobalLogger } from '../src/logger/logger';
 import { writeFileSync } from 'fs';
+import { getProjectDir, isProjectDirPresent } from './project_command';
 import {
   createDeviceID,
   DefaultDeviceName,
@@ -67,16 +63,14 @@ export function registerDevicesCommand(program: Command): void {
     .option('--list-fqbns', 'display all currently avaiable boards')
     .option('--list', 'display all registered devices')
     .action(async (options) => {
-      const wd = process.cwd();
-      const projectDir = pathJoin(wd, projectDirName);
-      let actionHandled = false;
-      if (!isDirectoryPath(projectDir)) {
+      if (!isProjectDirPresent()) {
         program.error(
-          `There is no project defined in the current working directory. First create a project see 'help project'`,
+          `There is no project directory defined in the current working directory. First create a project see 'help project'`,
         );
       }
 
-      const devicesPath = pathJoin(projectDir, 'devices.json');
+      let actionHandled = false;
+      const devicesPath = getDevicesFilePath();
       if (!isFilePath(devicesPath)) {
         program.error(`No device added yet to the project`);
         return;
@@ -460,3 +454,14 @@ async function addSerialPort(
   const logger = getGlobalLogger();
   logger.info(logStr);
 }
+
+export async function getProjectDevices(): Promise<DeviceJSON[]> {
+  const dp = getDevicesFilePath();
+  return await readDevices(dp);
+}
+
+function getDevicesFilePath(): string {
+  const p = getProjectDir();
+  return pathJoin(p, 'devices.json');
+}
+

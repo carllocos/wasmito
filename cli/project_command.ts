@@ -3,8 +3,6 @@ import { isDirectoryPath, pathJoin } from '../src/util/file_util';
 import { getGlobalLogger } from '../src/logger/logger';
 import { mkdirSync, rmdirSync } from 'fs';
 
-export const projectDirName = '.wasmito_project';
-
 export function registerProjectCommand(program: Command): void {
   program
     .command('project')
@@ -16,26 +14,25 @@ export function registerProjectCommand(program: Command): void {
     )
     .action((options) => {
       const logger = getGlobalLogger();
-      const wd = process.cwd();
-      const targetDir = pathJoin(wd, projectDirName);
+      const targetDir = getProjectDir();
 
       if (options.new !== undefined) {
-        if (isDirectoryPath(targetDir)) {
+        if (!isProjectDirPresent()) {
           program.error(
             `The current working directory has already a project set on ${targetDir}. To delete project run 'project --rmv'`,
           );
         } else {
           mkdirSync(targetDir);
-          if (isDirectoryPath(targetDir)) {
+          if (isProjectDirPresent()) {
             logger.info(`Project directory ${targetDir} created`);
           } else {
             program.error(`Failed to create project directory ${targetDir}`);
           }
         }
       } else if (options.rmv !== undefined) {
-        if (isDirectoryPath(targetDir)) {
+        if (isProjectDirPresent()) {
           rmdirSync(targetDir);
-          if (isDirectoryPath(targetDir)) {
+          if (isProjectDirPresent()) {
             program.error(`Failed to remove project directory ${targetDir}`);
           } else {
             logger.info(`Project directory ${targetDir} removed`);
@@ -49,4 +46,14 @@ export function registerProjectCommand(program: Command): void {
         program.error(`No action provided. write 'help project'`);
       }
     });
+}
+
+export function isProjectDirPresent(): boolean {
+  return isDirectoryPath(getProjectDir());
+}
+
+export function getProjectDir(): string {
+  const projectDirName = '.wasmito_project';
+  const cwd = process.cwd();
+  return pathJoin(cwd, projectDirName);
 }
