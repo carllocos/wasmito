@@ -14,7 +14,7 @@ import { makeSourceCodeCompiler } from '../compilers/compiler_factory';
 import path from 'path';
 import { type ProgLangSelectionArgs } from '../compilers/prog_language_selection';
 import { maybeTimeoutPromise } from '../util/promise_util';
-import { isSerialPort } from '../util/serial_port';
+import { type BoardBaudRate, isSerialPort } from '../util/serial_port';
 import { writeFileSync } from 'fs';
 
 const arduinoLogger = createLogger('Arduino');
@@ -75,6 +75,16 @@ export async function ArduinoListBoardsFQBNs(): Promise<BoardFQBN[]> {
     }
   });
   return fqbns;
+}
+
+interface CompiledCacheConfig {
+  deviceId: string;
+  fqbn: string;
+  pauseOnStart: boolean;
+  inoSha256: string;
+  wasmSha256: string;
+  uploadHeaderSha256: string;
+  baudrate: BoardBaudRate;
 }
 
 export async function ArduinoCompile(
