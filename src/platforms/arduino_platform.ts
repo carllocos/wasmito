@@ -201,6 +201,8 @@ export class ArduinoBoardBuilder extends Platform {
 
   public cachePlatformBuild: boolean;
 
+  private readonly lastCompiledCacheConfigPath: string;
+
   constructor(config: PlatformConfig, outputDir: string = '') {
     super(config, outputDir);
     this.pathToArduinoTemplateDir = getAbsolutePath(
@@ -215,6 +217,10 @@ export class ArduinoBoardBuilder extends Platform {
 
     this.legacyConfigFile = path.join(this.pathToArduinoSketchDir, '.config');
     this.cachePlatformBuild = true;
+    this.lastCompiledCacheConfigPath = path.join(
+      this.pathToArduinoSketchDir,
+      'upload_config.json',
+    );
   }
 
   async createCompiler(selectedLanguage: ProgLangSelectionArgs): Promise<void> {
