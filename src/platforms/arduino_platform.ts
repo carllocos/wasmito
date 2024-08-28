@@ -7,6 +7,7 @@ import {
   createDirectoryIfUnexisting,
   getAbsolutePath,
   getFileName,
+  isFilePath,
   renameFile,
 } from '../util/file_util';
 import { makeSourceCodeCompiler } from '../compilers/compiler_factory';
@@ -14,6 +15,7 @@ import path from 'path';
 import { type ProgLangSelectionArgs } from '../compilers/prog_language_selection';
 import { maybeTimeoutPromise } from '../util/promise_util';
 import { isSerialPort } from '../util/serial_port';
+import { writeFileSync } from 'fs';
 
 const arduinoLogger = createLogger('Arduino');
 
@@ -194,6 +196,9 @@ export class ArduinoBoardBuilder extends Platform {
   private readonly pathToArduinoSketchDir: string;
   private readonly pathToArduinoWasmBinaryDir: string;
 
+  // file not really used however required for the makefil to not crash
+  private readonly legacyConfigFile: string;
+
   constructor(config: PlatformConfig, outputDir: string = '') {
     super(config, outputDir);
     this.pathToArduinoTemplateDir = getAbsolutePath(
@@ -205,6 +210,8 @@ export class ArduinoBoardBuilder extends Platform {
     this.pathToArduinoWasmBinaryDir = getAbsolutePath(
       path.join(this.pathToArduinoSketchDir, '/bin'),
     );
+
+    this.legacyConfigFile = path.join(this.pathToArduinoSketchDir, '.config');
   }
 
   async createCompiler(selectedLanguage: ProgLangSelectionArgs): Promise<void> {
@@ -220,6 +227,14 @@ export class ArduinoBoardBuilder extends Platform {
     const exitCodeClean = await ArduinoClean(this.pathToArduinoSketchDir);
     if (exitCodeClean !== 0) {
       throw new Error(`Failed to perform ArduinoClean`);
+    }
+
+    if (!isFilePath(this.legacyConfigFile)) {
+      // although we do not use the .config file
+      // we need to create the .config file
+      // otherwise the Makefile used
+      // to build the Arduino.ino will crash
+      writeFileSync(this.legacyConfigFile, '');
     }
 
     // compile the source code
