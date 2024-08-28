@@ -10,6 +10,7 @@ import {
   isFilePath,
   readFileAsJSON,
   renameFile,
+  sha256ForFile,
 } from '../util/file_util';
 import { makeSourceCodeCompiler } from '../compilers/compiler_factory';
 import path from 'path';
@@ -335,6 +336,68 @@ export class ArduinoBoardBuilder extends Platform {
       this.config.vmConfig.fqbn.fqbn,
       this.config.vmConfig.program,
     );
+  }
+
+  private async changedSinceLastBuild(
+    wasmPathToDeploy: string,
+    vmConfig: VMConfiguration,
+    deviceId: string,
+  ): Promise<boolean> {
+    if (!isFilePath(this.lastCompiledCacheConfigPath)) {
+      // this file gets created after the first compilation
+      // if absent then it is the first compilation
+      // and should therefore happen
+      return true;
+    }
+
+    const buildConfig = await this.readLastBuildConfig();
+
+    if (buildConfig.deviceId !== deviceId) {
+      // Arduino.ino was build for another device
+      // force recompilation
+      return true;
+    }
+    if (buildConfig.pauseOnStart !== vmConfig.pauseOnStart) {
+      // VM has changed to no longer pause on start
+      return true;
+    }
+
+    if (buildConfig.fqbn !== vmConfig.fqbn.fqbn) {
+      // VM has changed fqbn
+      return true;
+    }
+
+    if (buildConfig.baudrate !== vmConfig.baudrate) {
+      // VM has changed fqbn
+      return true;
+    }
+
+    if (!this.hasAllTemplateFiles()) {
+      return true;
+    }
+
+    const pathToInoSketch = path.join(
+      this.pathToArduinoSketchDir,
+      'Arduino.ino',
+    );
+    const headerFile = path.join(this.pathToArduinoWasmBinaryDir, 'upload.h');
+
+    const shaNew = sha256ForFile(wasmPathToDeploy);
+    if (shaNew !== buildConfig.wasmSha256) {
+      return true;
+    }
+
+    const headerSha = sha256ForFile(headerFile);
+    if (headerSha !== buildConfig.uploadHeaderSha256) {
+      return true;
+    }
+
+    const inoSha = sha256ForFile(pathToInoSketch);
+    if (inoSha !== buildConfig.inoSha256) {
+      return true;
+    }
+
+    return false;
   }
 
   private async readLastBuildConfig(): Promise<CompiledCacheConfig> {
