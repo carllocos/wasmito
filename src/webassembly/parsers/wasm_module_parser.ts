@@ -820,18 +820,42 @@ function parseModuleDescription(obj: any): ModuleImportDescription {
       `Obj expected to satisfy ModuleImportDescription Interface`,
     );
   }
-  assertModuleImportID(obj.id);
-  assertFuncSignature(obj.signature);
-}
-
-function assertModuleImportID(obj: any): asserts obj is ModuleImportID {
-  if (
-    typeof obj !== 'object' ||
-    typeof obj.type !== 'string' ||
-    typeof obj.value !== 'string'
-  ) {
-    throw new Error(`Obj expected to satisfy ModuleImportID Interface`);
+  if (obj.type !== 'FuncImportDescr') {
+    throw new Error(
+      `parsing a ModuleDescription of unexpected structure ${JSON.stringify(obj)}`,
+    );
   }
+
+  let id = '';
+  if (typeof obj.id === 'string') {
+    // e.g., id= "func_0"
+    id = obj.id;
+  } else if (typeof obj.id === 'object') {
+    // e.g., id: {
+    //       type: "Identifier",
+    //       value: "chip_pin_mode",
+    //     },
+    const objId = obj.id;
+    if (objId.type !== 'Identifier' || typeof objId.value !== 'string') {
+      throw new Error(
+        `id of ModuleDescription has an unexpected structure ${JSON.stringify(obj)}`,
+      );
+    }
+    id = objId.value;
+  } else {
+    throw new Error(
+      `id of ModuleDescription has an unhandled structure ${JSON.stringify(obj)}`,
+    );
+  }
+
+  const signature = obj.signature;
+  assertFuncSignature(signature);
+
+  return {
+    type: obj.type,
+    id,
+    signature,
+  };
 }
 
 function parseImports(fields: any): ModuleImport[] {
