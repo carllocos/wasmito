@@ -37,8 +37,8 @@ export function registerUploadCommand(program: Command): void {
       'the id or name of the device in the project to which the action applies',
       validateIdOrName,
     )
-    .argument(
-      '<wasm-path>',
+    .option(
+      '--wasm <wasm-path>',
       'the wasm module <wasm-path> to which device to upload <id-or-name>',
       isValidWasmPath,
     )
@@ -46,7 +46,7 @@ export function registerUploadCommand(program: Command): void {
       '--pause-on-start',
       'After uploading the Wasm module pause the execution',
     )
-    .action(async (idOrName, wasmPath, options) => {
+    .action(async (idOrName, options) => {
       if (!isProjectDirPresent()) {
         program.error(
           `There is no project defined in the current working directory. First create a project see 'help project'`,
