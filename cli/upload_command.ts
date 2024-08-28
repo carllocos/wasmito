@@ -79,6 +79,13 @@ export function registerUploadCommand(program: Command): void {
       await platform.createCompiler({
         targetLanguage: TargetLanguage.Wasm,
       });
+
+      const wasmPath = options.wasm ?? (await platform.getUploadedWasm());
+      if (wasmPath === undefined) {
+        program.error(`No previously uploaded wasm found`);
+        return;
+      }
+
       const arg: WasmCompilerArgs = {
         wasmPath,
       };
