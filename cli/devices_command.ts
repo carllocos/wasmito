@@ -10,7 +10,7 @@ import { writeFileSync } from 'fs';
 import { projectDirName } from './project_command';
 import { createDeviceID, DefaultDeviceName } from '../src/device/device_config';
 import { ArduinoListBoardsFQBNs } from '../src/platforms/arduino_platform';
-import { convertToBoardBaudRate } from '../src/util/serial_port';
+import { convertToBoardBaudRate, isSerialPort } from '../src/util/serial_port';
 
 interface DevicesJSON {
   devices: DeviceJSON[];
@@ -30,6 +30,7 @@ interface DeviceJSON {
   boardName: string;
   fqbn: string;
   baudrate: number;
+  serial: string;
 }
 
 function createNewDevice(platform: Platform, name?: string): DeviceJSON {
@@ -40,6 +41,7 @@ function createNewDevice(platform: Platform, name?: string): DeviceJSON {
     fqbn: '',
     boardName: '',
     baudrate: -1,
+    serial: '',
   };
 }
 
@@ -54,10 +56,7 @@ export function registerDevicesCommand(program: Command): void {
     )
     .option('--add [name]', `add a device with [name]`)
     .option('--rmv', `remove <id-or-name> from the project config`)
-    .option(
-      '--serial <serial-port>',
-      `configure the serial port of <id-or-name>`,
-    )
+    .option('--serial <port>', `configure the serial <port> of <id-or-name>`)
     .addOption(
       new Option('-p, --platform <platform>', 'platform of choice').choices([
         ArduinoPlatform,
@@ -146,10 +145,23 @@ export function registerDevicesCommand(program: Command): void {
         await addBaudrate(program, devicesPath, idOrName, options.baudrate);
       }
 
+      if (options.serial !== undefined) {
+        actionHandled = true;
+        if (idOrName === '') {
+          program.error(
+            `<id-or-name> is expected when setting the serial port`,
+          );
+          return;
+        } else {
+          await addSerialPort(program, devicesPath, idOrName, options.serial);
+        }
+      }
+
       if (options.list !== undefined) {
         actionHandled = true;
         await listDevices(devicesPath);
       }
+
       if (!actionHandled) {
         program.error(`no action provided. Type 'help device'`);
       }
@@ -410,7 +422,35 @@ async function changePlatform(
     writeDevices(allDevices, devicesPath);
   }
 
-  let logStr = `Device '${idOrName}' platform changed to ${platform}`;
+async function addSerialPort(
+  program: Command,
+  devicesPath: string,
+  idOrName: string,
+  serial: string,
+): Promise<void> {
+  if (!isSerialPort(serial)) {
+    program.error(`The provided serial '${serial}' is not a valid port`);
+    return;
+  }
+
+  const match = await getMatchingDeviceOrError(
+    program,
+    devicesPath,
+    idOrName,
+    PlatformTarget.Arduino,
+  );
+  if (match === undefined) {
+    return;
+  }
+
+  const [device, allDevices] = match;
+  const old = device.serial;
+  device.serial = serial;
+  if (old !== serial) {
+    writeDevices(allDevices, devicesPath);
+  }
+
+  let logStr = `Device '${idOrName}' serial changed to ${serial}`;
   if (old !== '') {
     logStr = `${logStr} (old '${old}')`;
   }
