@@ -335,7 +335,7 @@ function createImportedFunctions(mod: ParsedModule): WASMFunction[] {
     const f = new WASMFunction(i.name, importID, [], t, [], exported);
     f.startAddress = i.loc.start.column;
     f.endAddress = i.loc.end.column;
-    f.fullName = i.descr.id.value;
+    f.fullName = i.descr.id;
     return f;
   });
   return imports;
