@@ -7,6 +7,7 @@ import { ArduinoBoardBuilder } from '../src/platforms/arduino_platform';
 import { DevVMPlatform } from '../src/platforms/dev_vm_platform';
 import { type DeviceIdentity } from '../src/device/device_config';
 import { type WasmCompilerArgs } from '../src/compilers/wasm_compiler';
+import { TargetLanguage } from '../src/compilers/prog_language_selection';
 
 function validateIdOrName(idOrName: any, prev: any): string {
   if (typeof idOrName !== 'string') {
@@ -58,6 +59,10 @@ export function registerUploadCommand(program: Command): void {
         dev.target === PlatformTarget.Arduino
           ? new ArduinoBoardBuilder(dev, dest)
           : new DevVMPlatform(dev, dest);
+
+      await platform.createCompiler({
+        targetLanguage: TargetLanguage.Wasm,
+      });
       const arg: WasmCompilerArgs = {
         wasmPath,
       };
