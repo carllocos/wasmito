@@ -332,4 +332,34 @@ export class ArduinoBoardBuilder extends Platform {
       this.config.vmConfig.program,
     );
   }
+
+  private async readLastBuildConfig(): Promise<CompiledCacheConfig> {
+    const filePath = this.lastCompiledCacheConfigPath;
+    const c: CompiledCacheConfig = await readFileAsJSON(filePath);
+    return c;
+  }
+
+  private saveCompileConfig(deviceId: string, vmConfig: VMConfiguration): void {
+    const pathToInoSketch = path.join(
+      this.pathToArduinoSketchDir,
+      'Arduino.ino',
+    );
+    const headerFile = path.join(this.pathToArduinoWasmBinaryDir, 'upload.h');
+    const pathToWasm = path.join(
+      this.pathToArduinoWasmBinaryDir,
+      'upload.wasm',
+    );
+    const c: CompiledCacheConfig = {
+      deviceId,
+      fqbn: vmConfig.fqbn.fqbn,
+      baudrate: vmConfig.baudrate,
+      pauseOnStart: vmConfig.pauseOnStart,
+      wasmSha256: sha256ForFile(pathToWasm),
+      uploadHeaderSha256: sha256ForFile(headerFile),
+      inoSha256: sha256ForFile(pathToInoSketch),
+    };
+    const content = JSON.stringify(c);
+    writeFileSync(this.lastCompiledCacheConfigPath, content);
+  }
+
 }
