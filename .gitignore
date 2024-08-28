@@ -4,5 +4,5 @@ node_modules/
 combined.log
 error.log
 example-wat/
-.wasmito/
+.wasmito*/
 *.dot
