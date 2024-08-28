@@ -807,7 +807,7 @@ export function parseWasmModule(wasmPath: string): [ParsedModule, string[]] {
   }
 }
 
-function assertModuleImport(obj: any): asserts obj is ModuleImport {
+function parseModuleImport(obj: any): asserts obj is ModuleImport {
   if (
     typeof obj !== 'object' ||
     typeof obj.name !== 'string' ||
@@ -815,11 +815,11 @@ function assertModuleImport(obj: any): asserts obj is ModuleImport {
   ) {
     throw new Error(`Obj expected to satisfy ModuleImport Interface`);
   }
-  assertModuleDescription(obj.descr);
+  parseModuleDescription(obj.descr);
   assertWasmSourceCodeLocation(obj.loc);
 }
 
-function assertModuleDescription(
+function parseModuleDescription(
   obj: any,
 ): asserts obj is ModuleImportDescription {
   if (typeof obj !== 'object' || typeof obj.type !== 'string') {
@@ -847,7 +847,7 @@ function parseImports(fields: any): ModuleImport[] {
   });
   return importFields
     .map((i) => {
-      assertModuleImport(i);
+      parseModuleImport(i);
       return i;
     })
     .sort((a, b) => {
