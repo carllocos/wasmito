@@ -6,14 +6,15 @@ const Logger = createLogger('DeviceConfiguration');
 
 export interface DeviceIdentityArgs {
   name?: string;
+  id?: string;
 }
 
 export class DeviceIdentity {
   private readonly _id: string;
   private _deviceName: string;
 
-  constructor(args: DeviceIdentityArgs, id?: string) {
-    this._id = id ?? createDeviceID();
+  constructor(args: DeviceIdentityArgs) {
+    this._id = args.id ?? createDeviceID();
     if (args.name !== undefined && typeof args.name !== 'string') {
       throw new Error(
         `device name is expected to be a string. Given ${args.name}`,
