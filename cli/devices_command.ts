@@ -16,6 +16,7 @@ interface DevicesJSON {
   devices: DeviceJSON[];
 }
 
+interface DeviceJSON {
   identity: DeviceIdentityArgs;
   platform: PlatformTarget;
 
