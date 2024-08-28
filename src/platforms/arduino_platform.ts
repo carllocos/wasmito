@@ -486,4 +486,29 @@ export class ArduinoBoardBuilder extends Platform {
     }
     return true;
   }
+
+  async getUploadedWasm(): Promise<string | undefined> {
+    if (this._languageAdaptor !== undefined) {
+      return this._languageAdaptor.sourceMap.wasm.wasmPath;
+    } else if (this.config.vmConfig.hasWasmPath()) {
+      return this.config.vmConfig.program;
+    }
+    if (!isFilePath(this.lastCompiledCacheConfigPath)) {
+      return undefined;
+    }
+    const expectedPath = path.join(
+      this.pathToArduinoWasmBinaryDir,
+      'upload.wasm',
+    );
+    if (!isFilePath(expectedPath)) {
+      return undefined;
+    }
+
+    const c = await this.readLastBuildConfig();
+    const sha = sha256ForFile(expectedPath);
+    if (c.wasmSha256 === sha) {
+      return expectedPath;
+    }
+    return undefined;
+  }
 }

@@ -99,4 +99,6 @@ export abstract class Platform {
   public getSourceMap(): SourceMap | undefined {
     return this._languageAdaptor?.sourceMap;
   }
+
+  abstract getUploadedWasm(): Promise<string | undefined>;
 }

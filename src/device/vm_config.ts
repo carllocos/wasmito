@@ -215,6 +215,10 @@ export class VMConfiguration {
     return this._baudrate !== undefined;
   }
 
+  public hasWasmPath(): boolean {
+    return this._program !== undefined;
+  }
+
   static async fromArgs(args: any): Promise<VMConfiguration> {
     const a = await createValidVMConfigArgs(args);
     return new VMConfiguration(a);

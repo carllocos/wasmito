@@ -46,4 +46,8 @@ export class DevVMPlatform extends Platform {
   async upload(): Promise<number> {
     return 0;
   }
+
+  async getUploadedWasm(): Promise<string | undefined> {
+    return undefined;
+  }
 }
