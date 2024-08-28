@@ -22,6 +22,7 @@ import { registerSourceMapCommand } from './sourcemap_command';
 import { registerCallgraphCommand } from './callgraph_command';
 import { registerProjectCommand } from './project_command';
 import { registerDevicesCommand } from './devices_command';
+import { registerUploadCommand } from './upload_command';
 
 export function startCLI(): void {
   const projectName = readProjectName();
@@ -46,6 +47,7 @@ export function startCLI(): void {
   registerCallgraphCommand(program);
   registerProjectCommand(program);
   registerDevicesCommand(program);
+  registerUploadCommand(program);
 
   program.parse(process.argv);
 
