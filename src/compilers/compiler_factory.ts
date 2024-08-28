@@ -7,6 +7,7 @@ import {
   isTargetLanguage,
   type ProgLangSelectionArgs,
 } from './prog_language_selection';
+import { WasmCompiler } from './wasm_compiler';
 import { WATCompiler } from './wat_compilers';
 
 export function makeSourceCodeCompiler(
@@ -18,6 +19,8 @@ export function makeSourceCodeCompiler(
       return new WATCompiler(compilationOutput);
     case TargetLanguage.AssemblyScript:
       return new AssemblyScriptCompiler(compilationOutput);
+    case TargetLanguage.Wasm:
+      return new WasmCompiler(compilationOutput);
     default:
       if (isTargetLanguage(compilerSelection.targetLanguage)) {
         getGlobalLogger().info(
