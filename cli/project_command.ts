@@ -7,7 +7,7 @@ export function registerProjectCommand(program: Command): void {
   program
     .command('project')
     .description(`create and deploy a project on a mcu`)
-    .option('--new', `create an empty project`)
+    .option('--new', `create an empty project in the current working directory`)
     .option(
       '--rmv',
       'delete the project configuration in the current working directory',
