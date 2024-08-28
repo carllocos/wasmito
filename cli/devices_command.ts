@@ -46,7 +46,7 @@ export function registerDevicesCommand(program: Command): void {
     .command('devices')
     .description(`manage MCUs or DevBoards part of your project`)
     .requiredOption(
-      '-d <id-or-name>',
+      '--d <id-or-name>',
       'The id or name of the device to which the actions will apply',
       '',
     )
