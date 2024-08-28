@@ -272,11 +272,6 @@ export class ArduinoBoardBuilder extends Platform {
       return exitCodeSourceCodeComp;
     }
 
-    const di = this.config.deviceIdentity;
-    this.logger.info(
-      `Arduino compiling sketch ${this.pathToArduinoSketchDir} for ${di.name} (board=${this.config.vmConfig.fqbn.boardName}, ID=${di.id})`,
-    );
-
     if (this._languageAdaptor === undefined) {
       return -1;
     }
@@ -289,6 +284,10 @@ export class ArduinoBoardBuilder extends Platform {
       wasmPath = await renameFile(wasmPath, `tmp-name-${filename}`);
     }
 
+    const di = this.config.deviceIdentity;
+    this.logger.info(
+      `Arduino compiling sketch ${this.pathToArduinoSketchDir} for ${di.name} (board=${this.config.vmConfig.fqbn.boardName}, ID=${di.id})`,
+    );
     const exitCodeCompile = await ArduinoCompile(
       this.config.vmConfig.fqbn.fqbn,
       wasmPath,
