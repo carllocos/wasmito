@@ -308,19 +308,31 @@ export class ArduinoBoardBuilder extends Platform {
       wasmPath = await renameFile(wasmPath, `tmp-name-${filename}`);
     }
 
+    let exitCodeCompile = 0;
     const di = this.config.deviceIdentity;
-    this.logger.info(
-      `Arduino compiling sketch ${this.pathToArduinoSketchDir} for ${di.name} (board=${this.config.vmConfig.fqbn.boardName}, ID=${di.id})`,
-    );
-    const exitCodeCompile = await ArduinoCompile(
-      this.config.vmConfig.fqbn.fqbn,
-      wasmPath,
-      this.pathToArduinoSketchDir,
-      this.config.vmConfig.pauseOnStart,
-    );
+    if (
+      !this.cachePlatformBuild ||
+      (await this.changedSinceLastBuild(wasmPath, this.config.vmConfig, di.id))
+    ) {
+      this.logger.info(
+        `Arduino compiling sketch ${this.pathToArduinoSketchDir} for ${di.name} (board=${this.config.vmConfig.fqbn.boardName}, ID=${di.id})`,
+      );
+      exitCodeCompile = await ArduinoCompile(
+        this.config.vmConfig.fqbn.fqbn,
+        wasmPath,
+        this.pathToArduinoSketchDir,
+        this.config.vmConfig.pauseOnStart,
+      );
+    } else {
+      this.logger.info(
+        `Using cached 'Arduino.ino' build for '${this.config.deviceIdentity.fullname}'`,
+      );
+    }
+
     if (exitCodeCompile === 0) {
       this.config.vmConfig.program =
         this._languageAdaptor.sourceMap.wasm.wasmPath;
+      this.saveCompileConfig(di.id, this.config.vmConfig);
     }
 
     return exitCodeCompile;
