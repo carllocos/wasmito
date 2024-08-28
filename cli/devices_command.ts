@@ -7,24 +7,21 @@ import {
 } from '../src/util/file_util';
 import { getGlobalLogger } from '../src/logger/logger';
 import { writeFileSync } from 'fs';
-import { projectDirName } from './project_command';
-import { createDeviceID, DefaultDeviceName } from '../src/device/device_config';
+import {
+  createDeviceID,
+  DefaultDeviceName,
+  type DeviceIdentityArgs,
+} from '../src/device/device_config';
 import { ArduinoListBoardsFQBNs } from '../src/platforms/arduino_platform';
 import { convertToBoardBaudRate, isSerialPort } from '../src/util/serial_port';
+import { PlatformTarget } from '../src/platforms/platform_config';
 
 interface DevicesJSON {
   devices: DeviceJSON[];
 }
 
-type Platform = string;
-
-const ArduinoPlatform: Platform = 'arduino';
-const DevVM: Platform = 'DevVM';
-
-interface DeviceJSON {
-  name: string;
-  id: string;
-  platform: Platform; // either arduino or devvm
+  identity: DeviceIdentityArgs;
+  platform: PlatformTarget;
 
   // only if platform arduino
   boardName: string;
@@ -33,10 +30,12 @@ interface DeviceJSON {
   serial: string;
 }
 
-function createNewDevice(platform: Platform, name?: string): DeviceJSON {
+function createNewDevice(platform: PlatformTarget, name?: string): DeviceJSON {
   return {
-    name: name ?? DefaultDeviceName,
-    id: createDeviceID(),
+    identity: {
+      id: createDeviceID(),
+      name: name ?? DefaultDeviceName,
+    },
     platform,
     fqbn: '',
     boardName: '',
@@ -59,8 +58,8 @@ export function registerDevicesCommand(program: Command): void {
     .option('--serial <port>', `configure the serial <port> of <id-or-name>`)
     .addOption(
       new Option('-p, --platform <platform>', 'platform of choice').choices([
-        ArduinoPlatform,
-        DevVM,
+        PlatformTarget.Arduino,
+        PlatformTarget.DevVM,
       ]),
     )
     .option('--fqbn <fqbn>', `configure the fqbn of <id-or-name>`)
@@ -85,11 +84,6 @@ export function registerDevicesCommand(program: Command): void {
 
       let addPlatformHandled = false;
       const idOrName = options.d;
-      let platform = DevVM;
-      if (options.platform !== undefined) {
-        addPlatformHandled = true;
-        platform = options.platform;
-      }
 
       if (options.add !== undefined) {
         actionHandled = true;
@@ -97,8 +91,13 @@ export function registerDevicesCommand(program: Command): void {
           program.error(`Cannot provide <id-or-name> when adding a device`);
           return;
         } else {
+          let platform = PlatformTarget.DevVM;
+          if (options.platform !== undefined) {
+            platform = options.platform;
+            addPlatformHandled = true;
+          }
           const devName =
-            typeof options.addDev === 'string' ? options.addDev : undefined;
+            typeof options.add === 'string' ? options.add : undefined;
           const dev = createNewDevice(platform, devName);
           await addDevice(dev, devicesPath);
         }
@@ -173,7 +172,7 @@ async function listDevices(devicesPath: string): Promise<void> {
 
   const dstr = devices
     .map((d) => {
-      return `${d.name}\t${d.id}\t${d.platform}`;
+      return `${d.identity.name}\t${d.identity.id}\t${d.platform}`;
     })
     .join('\n');
 
@@ -187,16 +186,18 @@ async function addDevice(dev: DeviceJSON, devicesPath: string): Promise<void> {
   devices.push(dev);
 
   const found = devices.filter((d: DeviceJSON) => {
-    return d.name === dev.name;
+    return d.identity.name === dev.identity.name;
   });
   if (found.length > 1) {
     logger.warn(
-      `#${found.length} devices found named '${dev.name}': [${found.map((d: object) => JSON.stringify(d)).join(', ')}]`,
+      `#${found.length} devices found named '${dev.identity.name}': [${found.map((d: object) => JSON.stringify(d)).join(', ')}]`,
     );
   }
 
   writeDevices(devices, devicesPath);
-  logger.info(`Device name='${dev.name}' id='${dev.id}' added`);
+  logger.info(
+    `Device name='${dev.identity.name}' id='${dev.identity.id}' added`,
+  );
 }
 
 async function removeDevice(
@@ -208,7 +209,7 @@ async function removeDevice(
   const newDevices: DeviceJSON[] = [];
   const devicesToRmv: DeviceJSON[] = [];
   for (const d of devices) {
-    if (d.id === idOrName || d.name === idOrName) {
+    if (d.identity.id === idOrName || d.identity.name === idOrName) {
       devicesToRmv.push(d);
     } else {
       newDevices.push(d);
@@ -226,14 +227,16 @@ async function removeDevice(
     const logger = getGlobalLogger();
     writeDevices(newDevices, devicesPath);
     const d = devicesToRmv[0];
-    logger.info(`Removed device name='${d.name}' id='${d.id}'`);
+    logger.info(
+      `Removed device name='${d.identity.name}' id='${d.identity.id}'`,
+    );
   }
 }
 
 function devicesToStr(devices: DeviceJSON[]): string {
   const devicesStr = devices
     .map((d) => {
-      return `${d.name}\t${d.id}`;
+      return `${d.identity.name}\t${d.identity.id}`;
     })
     .join('\n');
   const header = 'name\tid';
@@ -270,7 +273,7 @@ async function addFQBN(
     program,
     devicesPath,
     idOrName,
-    ArduinoPlatform,
+    PlatformTarget.Arduino,
   );
   if (devices === undefined) {
     return;
@@ -319,7 +322,7 @@ async function addBaudrate(
     program,
     devicesPath,
     idOrName,
-    ArduinoPlatform,
+    PlatformTarget.Arduino,
   );
   if (devices === undefined) {
     return;
@@ -395,7 +398,7 @@ async function getMatchingDevices(
 ): Promise<[DeviceJSON[], DeviceJSON[]] | undefined> {
   const devices = await readDevices(devicesPath);
   const filtered = devices.filter((d) => {
-    return d.name === idOrName || d.id === idOrName;
+    return d.identity.name === idOrName || d.identity.id === idOrName;
   });
   if (filtered.length === 0) {
     return undefined;
@@ -408,7 +411,7 @@ async function changePlatform(
   program: Command,
   devicesPath: string,
   idOrName: string,
-  platform: Platform,
+  platform: PlatformTarget,
 ): Promise<void> {
   const match = await getMatchingDeviceOrError(program, devicesPath, idOrName);
   if (match === undefined) {
