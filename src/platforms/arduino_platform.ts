@@ -121,11 +121,16 @@ async function ArduinoFlash(
   pathToArduinoSketch: string,
   port: string,
   fqbn: string,
+  wasmPath: string,
 ): Promise<number> {
   return await new Promise<number>((resolve, reject) => {
-    const flash = spawn('make', ['flash', `PORT=${port}`, `FQBN=${fqbn}`], {
-      cwd: pathToArduinoSketch,
-    });
+    const flash = spawn(
+      'make',
+      ['flash', `PORT=${port}`, `FQBN=${fqbn}`, `BINARY=${wasmPath}`],
+      {
+        cwd: pathToArduinoSketch,
+      },
+    );
     flash.stdout.on('data', (data) => {
       arduinoLogger.debug(data.toString());
     });
@@ -291,6 +296,7 @@ export class ArduinoBoardBuilder extends Platform {
       this.pathToArduinoSketchDir,
       this.config.vmConfig.serialPort,
       this.config.vmConfig.fqbn.fqbn,
+      this.config.vmConfig.program,
     );
   }
 }
