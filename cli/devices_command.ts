@@ -474,6 +474,7 @@ function getDevicesFilePath(): string {
 
 export async function getDeviceConfiguration(
   idOrName: string,
+  updatesOnTheFly?: VMConfigArgs,
 ): Promise<PlatformConfig | string[]> {
   const devices = await readDevices(getDevicesFilePath());
   const found = devices.filter((d) => {
@@ -488,13 +489,14 @@ export async function getDeviceConfiguration(
   const device = found[0];
   const vmConfig: VMConfigArgs = {};
   if (device.platform === PlatformTarget.Arduino) {
-    vmConfig.serialPort = device.serial;
-    vmConfig.baudrate = device.baudrate;
+    vmConfig.serialPort = updatesOnTheFly?.serialPort ?? device.serial;
+    vmConfig.baudrate = updatesOnTheFly?.baudrate ?? device.baudrate;
     vmConfig.fqbn = {
       boardName: device.boardName,
       fqbn: device.fqbn,
     };
   }
+  vmConfig.pauseOnStart = updatesOnTheFly?.pauseOnStart ?? false;
   vmConfig.disableStrictModuleLoad = true;
   const args: object = {
     vmConfig,

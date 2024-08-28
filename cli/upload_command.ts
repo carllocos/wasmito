@@ -12,6 +12,7 @@ import { DevVMPlatform } from '../src/platforms/dev_vm_platform';
 import { type DeviceIdentity } from '../src/device/device_config';
 import { type WasmCompilerArgs } from '../src/compilers/wasm_compiler';
 import { TargetLanguage } from '../src/compilers/prog_language_selection';
+import { type VMConfigArgs } from '../src/device/vm_config';
 
 function validateIdOrName(idOrName: any, prev: any): string {
   if (typeof idOrName !== 'string') {
@@ -41,7 +42,11 @@ export function registerUploadCommand(program: Command): void {
       'the wasm module <wasm-path> to which device to upload <id-or-name>',
       isValidWasmPath,
     )
-    .action(async (idOrName, wasmPath) => {
+    .option(
+      '--pause-on-start',
+      'After uploading the Wasm module pause the execution',
+    )
+    .action(async (idOrName, wasmPath, options) => {
       if (!isProjectDirPresent()) {
         program.error(
           `There is no project defined in the current working directory. First create a project see 'help project'`,
@@ -49,7 +54,14 @@ export function registerUploadCommand(program: Command): void {
         return;
       }
 
-      const dev = await getDeviceConfiguration(idOrName);
+      let updates: VMConfigArgs | undefined;
+      if (options.pauseOnStart !== undefined) {
+        updates = {
+          pauseOnStart: options.pauseOnStart,
+        };
+      }
+
+      const dev = await getDeviceConfiguration(idOrName, updates);
       if (Array.isArray(dev)) {
         const errors = dev.join('\n');
         program.error(`could not upload to device '${idOrName}':\n${errors}`);
