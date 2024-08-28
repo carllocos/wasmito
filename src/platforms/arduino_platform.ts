@@ -18,6 +18,7 @@ import { type ProgLangSelectionArgs } from '../compilers/prog_language_selection
 import { maybeTimeoutPromise } from '../util/promise_util';
 import { type BoardBaudRate, isSerialPort } from '../util/serial_port';
 import { writeFileSync } from 'fs';
+import { type VMConfiguration } from '../device';
 
 const arduinoLogger = createLogger('Arduino');
 
