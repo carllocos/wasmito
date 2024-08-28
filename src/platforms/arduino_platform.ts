@@ -199,6 +199,8 @@ export class ArduinoBoardBuilder extends Platform {
   // file not really used however required for the makefil to not crash
   private readonly legacyConfigFile: string;
 
+  public cachePlatformBuild: boolean;
+
   constructor(config: PlatformConfig, outputDir: string = '') {
     super(config, outputDir);
     this.pathToArduinoTemplateDir = getAbsolutePath(
@@ -212,6 +214,7 @@ export class ArduinoBoardBuilder extends Platform {
     );
 
     this.legacyConfigFile = path.join(this.pathToArduinoSketchDir, '.config');
+    this.cachePlatformBuild = true;
   }
 
   async createCompiler(selectedLanguage: ProgLangSelectionArgs): Promise<void> {
