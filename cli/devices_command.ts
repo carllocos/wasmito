@@ -10,7 +10,11 @@ import {
 } from '../src/device/device_config';
 import { ArduinoListBoardsFQBNs } from '../src/platforms/arduino_platform';
 import { convertToBoardBaudRate, isSerialPort } from '../src/util/serial_port';
-import { PlatformTarget } from '../src/platforms/platform_config';
+import {
+  PlatformConfig,
+  PlatformTarget,
+} from '../src/platforms/platform_config';
+import { type VMConfigArgs } from '../src/device/vm_config';
 
 interface DevicesJSON {
   devices: DeviceJSON[];
@@ -477,3 +481,33 @@ function getDevicesFilePath(): string {
   return pathJoin(p, 'devices.json');
 }
 
+export async function getDeviceConfiguration(
+  idOrName: string,
+): Promise<PlatformConfig | string[]> {
+  const devices = await readDevices(getDevicesFilePath());
+  const found = devices.filter((d) => {
+    return d.identity.id === idOrName || d.identity.name === idOrName;
+  });
+  if (found.length === 0) {
+    return [`no device found with id or name '${idOrName}'`];
+  } else if (found.length > 1) {
+    return [`found multiple devices that equal name '${idOrName}'`];
+  }
+  // VMConfigArgs
+  const device = found[0];
+  const vmConfig: VMConfigArgs = {};
+  if (device.platform === PlatformTarget.Arduino) {
+    vmConfig.serialPort = device.serial;
+    vmConfig.baudrate = device.baudrate;
+    vmConfig.fqbn = {
+      boardName: device.boardName,
+      fqbn: device.fqbn,
+    };
+  }
+  vmConfig.disableStrictModuleLoad = true;
+  const args: object = {
+    vmConfig,
+    deviceIdentity: device.identity,
+  };
+  return await PlatformConfig.fromConfigArgs(device.platform, args);
+}
