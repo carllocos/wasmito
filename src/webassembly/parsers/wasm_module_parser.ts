@@ -117,14 +117,9 @@ interface Func {
   bodySize: number;
 }
 
-export interface ModuleImportID {
-  type: string;
-  value: string;
-}
-
 export interface ModuleImportDescription {
   type: string;
-  id: ModuleImportID;
+  id: string;
   signature: FuncSignature;
 }
 
