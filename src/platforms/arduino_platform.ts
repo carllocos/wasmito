@@ -8,6 +8,7 @@ import {
   getAbsolutePath,
   getFileName,
   isFilePath,
+  readFileAsJSON,
   renameFile,
 } from '../util/file_util';
 import { makeSourceCodeCompiler } from '../compilers/compiler_factory';
@@ -362,4 +363,48 @@ export class ArduinoBoardBuilder extends Platform {
     writeFileSync(this.lastCompiledCacheConfigPath, content);
   }
 
+  private hasAllTemplateFiles(): boolean {
+    // if no Arduino present, force copy of template dir
+    const pathToInoSketch = path.join(
+      this.pathToArduinoSketchDir,
+      'Arduino.ino',
+    );
+    if (!isFilePath(pathToInoSketch)) {
+      return false;
+    }
+
+    // if header got removed, force copy of template dir
+    const headerFile = path.join(this.pathToArduinoWasmBinaryDir, 'upload.h');
+    if (!isFilePath(headerFile)) {
+      return false;
+    }
+
+    // if wasm upload got removed, force copy of template dir
+    const wasmUpload = path.join(
+      this.pathToArduinoWasmBinaryDir,
+      'upload.wasm',
+    );
+    if (!isFilePath(wasmUpload)) {
+      return false;
+    }
+
+    // if no .config file force copy of template dir
+    if (!isFilePath(this.legacyConfigFile)) {
+      return false;
+    }
+
+    const templateIno = path.join(
+      this.pathToArduinoSketchDir,
+      'Arduino.ino.template',
+    );
+    if (!isFilePath(templateIno)) {
+      return false;
+    }
+
+    const makeFilePath = path.join(this.pathToArduinoSketchDir, 'Makefile');
+    if (!isFilePath(makeFilePath)) {
+      return false;
+    }
+    return true;
+  }
 }
