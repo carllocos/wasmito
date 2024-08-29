@@ -389,21 +389,21 @@ export class ArduinoBoardBuilder extends Platform {
       return true;
     }
 
-    const pathToInoSketch = path.join(
-      this.pathToArduinoSketchDir,
-      'Arduino.ino',
-    );
-    const headerFile = path.join(this.pathToArduinoWasmBinaryDir, 'upload.h');
-
     const shaNew = sha256ForFile(wasmPathToDeploy);
     if (shaNew !== buildConfig.wasmSha256) {
       return true;
     }
 
+    const headerFile = path.join(this.pathToArduinoWasmBinaryDir, 'upload.h');
     const headerSha = sha256ForFile(headerFile);
     if (headerSha !== buildConfig.uploadHeaderSha256) {
       return true;
     }
+
+    const pathToInoSketch = path.join(
+      this.pathToArduinoSketchDir,
+      'Arduino.ino',
+    );
 
     const inoSha = sha256ForFile(pathToInoSketch);
     if (inoSha !== buildConfig.inoSha256) {
