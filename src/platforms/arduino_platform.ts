@@ -315,6 +315,11 @@ export class ArduinoBoardBuilder extends Platform {
       !this.cachePlatformBuild ||
       (await this.changedSinceLastBuild(wasmPath, this.config.vmConfig, di.id))
     ) {
+      const exitCodeClean = await ArduinoClean(this.pathToArduinoSketchDir);
+      if (exitCodeClean !== 0) {
+        throw new Error(`Failed to perform ArduinoClean`);
+      }
+
       this.logger.info(
         `Arduino compiling sketch ${this.pathToArduinoSketchDir} for ${di.name} (board=${this.config.vmConfig.fqbn.boardName}, ID=${di.id})`,
       );
