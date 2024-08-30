@@ -1,9 +1,11 @@
 #bin/bash
 
-backtraces=(0x40083fa1:0x3ffb1f00 0x4008e29d:0x3ffb1f20 0x400938a5:0x3ffb1f40 0x4009349d:0x3ffb2070 0x40084511:0x3ffb2090 0x400938d5:0x3ffb20b0 0x400e065b:0x3ffb20d0 0x400e0675:0x3ffb2100 0x400e08d7:0x3ffb2130 0x400d3c44:0x3ffb2190 0x400db742:0x3ffb21b0 0x400df03a:0x3ffb21d0 0x400e5fbf:0x3ffb2210 0x400e60e9:0x3ffb2230 0x400d3045:0x3ffb2250 0x400efb89:0x3ffb2290)
-pathToElf=$1
-echo $pathToElf
+# decode esp32 trace
+# before running this script run get_idf
 
-for backtrace in "${backtraces[@]}"; do
+pathToElf=$1
+shift
+
+for backtrace in "$@"; do
     xtensa-esp32-elf-addr2line -pfiaC -e $pathToElf $backtrace
 done
