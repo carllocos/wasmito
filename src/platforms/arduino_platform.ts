@@ -204,6 +204,7 @@ export class ArduinoBoardBuilder extends Platform {
   private readonly pathToArduinoTemplateDir: string;
   private readonly pathToArduinoSketchDir: string;
   private readonly pathToArduinoWasmBinaryDir: string;
+  private readonly pathToWasms: string;
 
   // file not really used however required for the makefil to not crash
   private readonly legacyConfigFile: string;
@@ -230,6 +231,7 @@ export class ArduinoBoardBuilder extends Platform {
       this.pathToArduinoSketchDir,
       'upload_config.json',
     );
+    this.pathToWasms = path.join(this.pathToArduinoSketchDir, 'wasms');
   }
 
   async createCompiler(selectedLanguage: ProgLangSelectionArgs): Promise<void> {
@@ -250,6 +252,8 @@ export class ArduinoBoardBuilder extends Platform {
         writeFileSync(this.legacyConfigFile, '');
       }
     }
+
+    createDirectoryIfUnexisting(this.pathToWasms);
 
     if (!this.cachePlatformBuild) {
       const exitCodeClean = await ArduinoClean(this.pathToArduinoSketchDir);
