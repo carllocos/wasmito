@@ -303,16 +303,10 @@ export class ArduinoBoardBuilder extends Platform {
       return -1;
     }
 
-    let wasmPath = this._languageAdaptor.sourceMap.wasm.wasmPath;
-    const filename = getFileName(wasmPath);
-    if (filename === 'upload.wasm') {
-      // special case where the output file has the same name as the file used to flash.
-      // rename file to avoid conflicts
-      wasmPath = await renameFile(wasmPath, `tmp-name-${filename}`);
-    }
-
-    let exitCodeCompile = 0;
+    const wasmPath = this._languageAdaptor.sourceMap.wasm.wasmPath;
     const di = this.config.deviceIdentity;
+    let exitCodeCompile = 0;
+    let wasmNoCustomSec = '';
     if (
       !this.cachePlatformBuild ||
       (await this.changedSinceLastBuild(wasmPath, this.config.vmConfig, di.id))
@@ -322,12 +316,15 @@ export class ArduinoBoardBuilder extends Platform {
         throw new Error(`Failed to perform ArduinoClean`);
       }
 
+      wasmNoCustomSec = await this.prepareWasm(
+        this._languageAdaptor.sourceMap.wasm.wasmPath,
+      );
       this.logger.info(
         `Arduino compiling sketch ${this.pathToArduinoSketchDir} for ${di.name} (board=${this.config.vmConfig.fqbn.boardName}, ID=${di.id})`,
       );
       exitCodeCompile = await ArduinoCompile(
         this.config.vmConfig.fqbn.fqbn,
-        wasmPath,
+        wasmNoCustomSec,
         this.pathToArduinoSketchDir,
         this.config.vmConfig.pauseOnStart,
       );
@@ -340,7 +337,7 @@ export class ArduinoBoardBuilder extends Platform {
     if (exitCodeCompile === 0) {
       this.config.vmConfig.program =
         this._languageAdaptor.sourceMap.wasm.wasmPath;
-      this.saveCompileConfig(di.id, this.config.vmConfig);
+      this.saveCompileConfig(di.id, wasmNoCustomSec, this.config.vmConfig);
     }
 
     return exitCodeCompile;
