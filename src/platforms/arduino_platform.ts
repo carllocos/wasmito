@@ -98,9 +98,15 @@ export async function ArduinoCompile(
   wasmBinaryPath: string,
   outputDir: string,
   paused: boolean,
+  disableStrictModuleLoad: boolean,
 ): Promise<number> {
   return await new Promise<number>((resolve, reject) => {
-    const makeArgs = ['compile', `FQBN=${fqbn}`, `BINARY=${wasmBinaryPath}`];
+    const makeArgs = [
+      'compile',
+      `FQBN=${fqbn}`,
+      `BINARY=${wasmBinaryPath}`,
+      `DISABLESTRICTMODULELOAD=${disableStrictModuleLoad}`,
+    ];
     if (paused) {
       makeArgs.push('PAUSED=true');
     }
@@ -329,6 +335,7 @@ export class ArduinoBoardBuilder extends Platform {
         wasmNoCustomSec,
         this.pathToArduinoSketchDir,
         this.config.vmConfig.pauseOnStart,
+        this.config.vmConfig.disableStrictModuleLoad,
       );
     } else {
       this.logger.info(
