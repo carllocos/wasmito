@@ -8,8 +8,8 @@ import {
   getAbsolutePath,
   getFileName,
   isFilePath,
+  pathJoin,
   readFileAsJSON,
-  renameFile,
   sha256ForFile,
 } from '../util/file_util';
 import { makeSourceCodeCompiler } from '../compilers/compiler_factory';
@@ -17,8 +17,9 @@ import path from 'path';
 import { type ProgLangSelectionArgs } from '../compilers/prog_language_selection';
 import { maybeTimeoutPromise } from '../util/promise_util';
 import { type BoardBaudRate, isSerialPort } from '../util/serial_port';
-import { writeFileSync } from 'fs';
+import { copyFile, writeFileSync } from 'fs';
 import { type VMConfiguration } from '../device';
+import { wasmStripCustomSection } from '../wasm-tools/wasm_strip';
 
 const arduinoLogger = createLogger('Arduino');
 
@@ -415,6 +416,46 @@ export class ArduinoBoardBuilder extends Platform {
     }
 
     return false;
+  }
+
+  private async prepareWasm(wasmPath: string): Promise<string> {
+    const copiedWasm = await this.copyWasm(wasmPath);
+    return this.reduceWasmInSize(copiedWasm);
+  }
+
+  private async reduceWasmInSize(wasmPath: string): Promise<string> {
+    const outputFile = pathJoin(this.pathToWasms, 'no_custom_sec.wasm');
+    const [exitCode, stdout, stderr] = await wasmStripCustomSection(
+      wasmPath,
+      outputFile,
+    );
+    if (exitCode !== 0) {
+      this.logger.error(
+        `wasm-tools strip give error: ${stderr}\n\nstdout of wasm-tools strip ${stdout}`,
+      );
+      throw new Error(`wasm-tools 'strip' failed on ${wasmPath}`);
+    }
+    return outputFile;
+  }
+
+  private async copyWasm(wasmPath: string): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      let filename = getFileName(wasmPath);
+      if (filename === 'upload.wasm') {
+        // special case where the output file has the same name as the file used to flash.
+        // rename file to avoid conflicts
+        filename = `tmp-name-${filename}`;
+      }
+      const filePath = pathJoin(this.pathToWasms, filename);
+      copyFile(wasmPath, filePath, (err: NodeJS.ErrnoException | null) => {
+        if (err !== null && err !== undefined) {
+          const errMsg = `Error occurred while copying wasm from ${wasmPath} to ${filePath} (error no ${err.errno}):\n${err.message}`;
+          reject(errMsg);
+        } else {
+          resolve(filePath);
+        }
+      });
+    });
   }
 
   private async readLastBuildConfig(): Promise<CompiledCacheConfig> {
