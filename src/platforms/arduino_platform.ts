@@ -89,6 +89,7 @@ interface CompiledCacheConfig {
   wasmSha256: string;
   uploadHeaderSha256: string;
   baudrate: BoardBaudRate;
+  wasmNoCustomSec: string;
 }
 
 export async function ArduinoCompile(
@@ -464,7 +465,11 @@ export class ArduinoBoardBuilder extends Platform {
     return c;
   }
 
-  private saveCompileConfig(deviceId: string, vmConfig: VMConfiguration): void {
+  private saveCompileConfig(
+    deviceId: string,
+    wasmNoCustomSec: string,
+    vmConfig: VMConfiguration,
+  ): void {
     const pathToInoSketch = path.join(
       this.pathToArduinoSketchDir,
       'Arduino.ino',
@@ -482,6 +487,7 @@ export class ArduinoBoardBuilder extends Platform {
       wasmSha256: sha256ForFile(pathToWasm),
       uploadHeaderSha256: sha256ForFile(headerFile),
       inoSha256: sha256ForFile(pathToInoSketch),
+      wasmNoCustomSec,
     };
     const content = JSON.stringify(c);
     writeFileSync(this.lastCompiledCacheConfigPath, content);
