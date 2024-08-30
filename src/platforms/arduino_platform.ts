@@ -85,6 +85,7 @@ interface CompiledCacheConfig {
   deviceId: string;
   fqbn: string;
   pauseOnStart: boolean;
+  disableStrictModuleLoad: boolean;
   inoSha256: string;
   wasmSha256: string;
   uploadHeaderSha256: string;
@@ -379,6 +380,13 @@ export class ArduinoBoardBuilder extends Platform {
       return true;
     }
 
+    if (
+      buildConfig.disableStrictModuleLoad !== vmConfig.disableStrictModuleLoad
+    ) {
+      // VM has changed the strict module parse
+      return true;
+    }
+
     if (buildConfig.fqbn !== vmConfig.fqbn.fqbn) {
       // VM has changed fqbn
       return true;
@@ -482,6 +490,7 @@ export class ArduinoBoardBuilder extends Platform {
       fqbn: vmConfig.fqbn.fqbn,
       baudrate: vmConfig.baudrate,
       pauseOnStart: vmConfig.pauseOnStart,
+      disableStrictModuleLoad: vmConfig.disableStrictModuleLoad,
       wasmSha256: sha256ForFile(pathToWasm),
       uploadHeaderSha256: sha256ForFile(headerFile),
       inoSha256: sha256ForFile(pathToInoSketch),
