@@ -173,3 +173,7 @@ export function sha256ForFile(filePath: string): string {
   const fileBuffer = readFileSync(filePath);
   return createHash('sha256').update(fileBuffer).digest('hex');
 }
+
+export function copyFile(file1: string, file2: string): void {
+  fs.copyFileSync(file1, file2);
+}
