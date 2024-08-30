@@ -497,7 +497,8 @@ export async function getDeviceConfiguration(
     };
   }
   vmConfig.pauseOnStart = updatesOnTheFly?.pauseOnStart ?? false;
-  vmConfig.disableStrictModuleLoad = true;
+  vmConfig.disableStrictModuleLoad =
+    updatesOnTheFly?.disableStrictModuleLoad ?? true;
   const args: object = {
     vmConfig,
     deviceIdentity: device.identity,

@@ -1,4 +1,4 @@
-import { InvalidArgumentError, type Command } from 'commander';
+import { InvalidArgumentError, Option, type Command } from 'commander';
 import { getProjectDir, isProjectDirPresent } from './project_command';
 import { getDeviceConfiguration } from './devices_command';
 import {
@@ -46,6 +46,14 @@ export function registerUploadCommand(program: Command): void {
       '--pause-on-start',
       'After uploading the Wasm module pause the execution',
     )
+    .addOption(
+      new Option(
+        '--experimental-mode [on-or-off]',
+        'Will upload the VM in a way that it allows for experimentation with hooks.',
+      )
+        .choices(['on', 'off'])
+        .default('on'),
+    )
     .action(async (idOrName, options) => {
       if (!isProjectDirPresent()) {
         program.error(
@@ -59,6 +67,13 @@ export function registerUploadCommand(program: Command): void {
         updates = {
           pauseOnStart: options.pauseOnStart,
         };
+      }
+
+      if (options.experimentalMode !== undefined) {
+        if (updates === undefined) {
+          updates = {};
+        }
+        updates.disableStrictModuleLoad = options.experimentalMode === 'on';
       }
 
       const dev = await getDeviceConfiguration(idOrName, updates);
