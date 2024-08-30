@@ -108,7 +108,8 @@ export async function ArduinoCompile(
     });
 
     compile.stdout.on('data', (data) => {
-      arduinoLogger.debug(data.toString());
+      const d = data.toString();
+      arduinoLogger.debug(d);
     });
 
     compile.stderr.on('data', (data: string) => {
