@@ -25,7 +25,7 @@ import { type WASMFunction } from '../src/webassembly/wasm/wasm_function';
 export function addBreakpointSubscription(
   subscriptionID: string,
   breakpoint: Breakpoint,
-  timeout: number,
+  timeout?: number,
 ): SubscriptionEmitterAction<boolean, WasmState, InspectStateHook> {
   const act: SubscriptionEmitterAction<boolean, WasmState, InspectStateHook> = {
     subscriptionID,
@@ -184,7 +184,7 @@ export function onHandledEventAction(
 }
 
 export function runVMAction(
-  timeout: number,
+  timeout?: number,
   delayTime?: number,
 ): Action<boolean> {
   const act: Action<boolean> = {
@@ -240,7 +240,7 @@ export function mockPrimitiveFuncAction(
 export function addEventAction(
   topic: string,
   payload: string,
-  timeout: number,
+  timeout?: number,
 ): Action<boolean> {
   const act = {
     description: `Add Event(topic=${topic}, payload=${payload}) to device`,
