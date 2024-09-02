@@ -378,6 +378,13 @@ function retrieveGlobalInstructions(mod: ParsedModule): WasmInstruction[] {
 function getLocalsTypes(wasmFilePath: string): Map<number, VariableInfo[]> {
   const objDump = getPath2ObjDump();
   const outputCmdDetails = `${objDump} -d ${wasmFilePath}`;
-  const result = execSync(outputCmdDetails).toString();
-  return getLocalTypesFromDissambleOutput(result);
+  try {
+    const result = execSync(outputCmdDetails).toString();
+    return getLocalTypesFromDissambleOutput(result);
+  } catch (err) {
+    if (err instanceof Error) {
+      err.message = `wabt/wasm-objdump failed with error: ${err.message}`;
+    }
+    throw err;
+  }
 }
