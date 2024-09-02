@@ -130,6 +130,10 @@ export interface ModuleFuncImport {
   loc: WasmSourceLocation;
 }
 
+enum ImportType {
+  FuncImport = 'FuncImportDescr',
+}
+
 export interface FunExport {
   name: string;
   id?: number;
@@ -830,7 +834,7 @@ function parseModuleDescription(obj: any): ModuleFuncImportDescription {
       `Obj expected to satisfy ModuleImportDescription Interface`,
     );
   }
-  if (obj.type !== 'FuncImportDescr') {
+  if (obj.type !== ImportType.FuncImport) {
     throw new Error(
       `parsing a ModuleDescription of unexpected structure ${JSON.stringify(obj)}`,
     );
@@ -868,21 +872,26 @@ function parseModuleDescription(obj: any): ModuleFuncImportDescription {
   };
 }
 
-function parseFuncImports(fields: any): ModuleFuncImport[] {
-  const importFields: any[] = fields.filter((f: any) => {
-    if (f.type !== 'ModuleImport') {
-      return false;
-    }
-    if (
-      f.descr === undefined ||
-      f.descr.type === undefined ||
-      typeof f.descr.type !== 'string'
-    ) {
-      return false;
-    }
+function isImport(obj: any): boolean {
+  if (obj.type !== 'ModuleImport') {
+    return false;
+  }
+  if (
+    obj.descr === undefined ||
+    obj.descr.type === undefined ||
+    typeof obj.descr.type !== 'string'
+  ) {
+    return false;
+  }
+  return true;
+}
 
-    return f.descr.type === 'FuncImportDescr';
-  });
+function isFunctionImport(obj: any): boolean {
+  return isImport(obj) && obj.descr.type === ImportType.FuncImport;
+}
+
+function parseFuncImports(fields: any): ModuleFuncImport[] {
+  const importFields: any[] = fields.filter(isFunctionImport);
   return importFields
     .map((i) => {
       return parseModuleImport(i);
