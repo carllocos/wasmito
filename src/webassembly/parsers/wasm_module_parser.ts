@@ -787,12 +787,15 @@ export function parseWasmModule(wasmPath: string): [ParsedModule, string[]] {
         }
 
         const opcode = Number(matched[1]);
-        if (isNaN(opcode) || !IsOpcodeWasmVersion1(opcode)) {
+        if (isNaN(opcode)) {
           throw e;
         }
-        throw new Error(
-          `Wasm failed to parse Wasm version1 is expected: ${msg}`,
-        );
+        if (!IsOpcodeWasmVersion1(opcode)) {
+          throw new Error(
+            `Wasm failed to parse Wasm version1 is expected: ${msg}`,
+          );
+        }
+        throw e;
       } else {
         throw e;
       }
