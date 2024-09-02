@@ -39,7 +39,9 @@ describe.skip('Debug Operations on Go Hello World', function () {
     const startNode = sourceNodeFromLoc(sourceCFG, {
       source: sourcePath,
       linenr: 45,
-      columnStart: 5,
+      colnr: 5,
+      name: '',
+      address: 0,
     });
 
     const nextNodes = DebugOperations.stepIn(sourceCFG, startNode);
@@ -57,7 +59,9 @@ describe.skip('Debug Operations on Go Hello World', function () {
     const startNode = sourceNodeFromLoc(sourceCFG, {
       source: sourcePath,
       linenr: 48,
-      columnStart: 19,
+      colnr: 19,
+      name: '',
+      address: 0,
     });
 
     const nextNodes = DebugOperations.stepIn(sourceCFG, startNode);
@@ -81,7 +85,9 @@ describe.skip('Debug Operations on Go Hello World', function () {
     const startNode = sourceNodeFromLoc(sourceCFG, {
       source: sourcePath,
       linenr: 45,
-      columnStart: 5,
+      colnr: 5,
+      name: '',
+      address: 0,
     });
 
     const nextNodes = DebugOperations.stepOver(sourceCFG, startNode);
@@ -99,7 +105,9 @@ describe.skip('Debug Operations on Go Hello World', function () {
     const startNode = sourceNodeFromLoc(sourceCFG, {
       source: sourcePath,
       linenr: 19,
-      columnStart: 5,
+      colnr: 5,
+      name: '',
+      address: 0,
     });
     const nextNodes = DebugOperations.stepOut(sourceCFG, startNode);
     expect(nextNodes.length).equal(1);
@@ -114,7 +122,9 @@ describe.skip('Debug Operations on Go Hello World', function () {
     const startNode = sourceNodeFromLoc(sourceCFG, {
       source: sourcePath,
       linenr: 25,
-      columnStart: 5,
+      colnr: 5,
+      name: '',
+      address: 0,
     });
     const nextNodes = sortIncreasingNr(
       DebugOperations.stepOut(sourceCFG, startNode),

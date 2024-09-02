@@ -46,7 +46,9 @@ describe('Debug Operations on Rust AST Blink App', function () {
     const startNodes = sourceCFG.nodesFromSourceLoc({
       source: sourcePath,
       linenr: 44,
-      columnStart: 1,
+      colnr: 1,
+      name: '',
+      address: 0,
     });
     assert(startNodes.length === 1, `#${startNodes.length} items instead of 1`);
     const startNode = startNodes[0];
@@ -63,7 +65,9 @@ describe('Debug Operations on Rust AST Blink App', function () {
     const startNodes = sourceCFG.nodesFromSourceLoc({
       source: sourcePath,
       linenr: 56,
-      columnStart: 12,
+      colnr: 12,
+      address: 0,
+      name: '',
     });
 
     expect(startNodes.length).to.equal(1);
@@ -81,7 +85,9 @@ describe('Debug Operations on Rust AST Blink App', function () {
     const startNodes = sourceCFG.nodesFromSourceLoc({
       source: sourcePath,
       linenr: 27,
-      columnStart: 5,
+      colnr: 5,
+      name: '',
+      address: 0,
     });
 
     expect(startNodes.length).to.equal(1);
@@ -125,7 +131,9 @@ describe('Debug Operations on Rust AST Intermittent Blink', function () {
     const startNode = sourceNodeFromLoc(sourceCFG, {
       source: sourcePath,
       linenr: 45,
-      columnStart: 5,
+      colnr: 5,
+      name: '',
+      address: 0,
     });
 
     const nextNodes = DebugOperations.stepIn(sourceCFG, startNode);
@@ -141,7 +149,9 @@ describe('Debug Operations on Rust AST Intermittent Blink', function () {
     const startNode = sourceNodeFromLoc(sourceCFG, {
       source: sourcePath,
       linenr: 48,
-      columnStart: 19,
+      colnr: 19,
+      name: '',
+      address: 0,
     });
 
     const nextNodes = DebugOperations.stepIn(sourceCFG, startNode);
@@ -161,7 +171,9 @@ describe('Debug Operations on Rust AST Intermittent Blink', function () {
     const startNode = sourceNodeFromLoc(sourceCFG, {
       source: sourcePath,
       linenr: 45,
-      columnStart: 5,
+      colnr: 5,
+      name: '',
+      address: 0,
     });
 
     const nextNodes = DebugOperations.stepOver(sourceCFG, startNode);
@@ -177,7 +189,9 @@ describe('Debug Operations on Rust AST Intermittent Blink', function () {
     const startNode = sourceNodeFromLoc(sourceCFG, {
       source: sourcePath,
       linenr: 19,
-      columnStart: 5,
+      colnr: 5,
+      name: '',
+      address: 0,
     });
     const nextNodes = DebugOperations.stepOut(sourceCFG, startNode);
     expect(nextNodes.length).equal(1);
@@ -191,7 +205,9 @@ describe('Debug Operations on Rust AST Intermittent Blink', function () {
     const startNode = sourceNodeFromLoc(sourceCFG, {
       source: sourcePath,
       linenr: 25,
-      columnStart: 5,
+      colnr: 5,
+      name: '',
+      address: 0,
     });
     const nextNodes = sortIncreasingNr(
       DebugOperations.stepOut(sourceCFG, startNode),

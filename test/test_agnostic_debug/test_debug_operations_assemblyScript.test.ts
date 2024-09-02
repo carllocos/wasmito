@@ -60,7 +60,9 @@ describe('Debug Operations on AssemblyScript Blink App', function () {
     const callNode = sourceCFG.nodesFromSourceLoc({
       source: srcPath,
       linenr: 47,
-      columnStart: 3,
+      colnr: 3,
+      name: '',
+      address: 0,
     });
 
     expect(callNode.length).to.equal(1);
@@ -74,7 +76,9 @@ describe('Debug Operations on AssemblyScript Blink App', function () {
     const callNode = sourceCFG.nodesFromSourceLoc({
       source: srcPath,
       linenr: 51,
-      columnStart: 23,
+      colnr: 23,
+      name: '',
+      address: 0,
     });
 
     expect(callNode.length).to.equal(1);
@@ -139,7 +143,9 @@ describe('Debug Operations on AS Intermittent Blink', function () {
     const startNode = sourceNodeFromLoc(sourceCFG, {
       source: sourcePath,
       linenr: 27,
-      columnStart: 5,
+      colnr: 5,
+      name: '',
+      address: 0,
     });
 
     const nextNodes = DebugOperations.stepIn(sourceCFG, startNode);
@@ -155,7 +161,9 @@ describe('Debug Operations on AS Intermittent Blink', function () {
     const startNode = sourceNodeFromLoc(sourceCFG, {
       source: sourcePath,
       linenr: 27,
-      columnStart: 5,
+      colnr: 5,
+      name: '',
+      address: 0,
     });
 
     const nextNodes = DebugOperations.stepOver(sourceCFG, startNode);
@@ -171,7 +179,9 @@ describe('Debug Operations on AS Intermittent Blink', function () {
     const startNode = sourceNodeFromLoc(sourceCFG, {
       source: sourcePath,
       linenr: 6,
-      columnStart: 15,
+      colnr: 15,
+      name: '',
+      address: 0,
     });
     const nextNodes = DebugOperations.stepOut(sourceCFG, startNode);
     expect(nextNodes.length).equal(1);
@@ -185,7 +195,9 @@ describe('Debug Operations on AS Intermittent Blink', function () {
     const startNode = sourceNodeFromLoc(sourceCFG, {
       source: sourcePath,
       linenr: 14,
-      columnStart: 20,
+      colnr: 20,
+      name: '',
+      address: 0,
     });
     const nextNodes = sortIncreasingNr(
       DebugOperations.stepOut(sourceCFG, startNode),
