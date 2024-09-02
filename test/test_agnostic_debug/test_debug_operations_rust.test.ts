@@ -181,8 +181,8 @@ describe('Debug Operations on Rust AST Intermittent Blink', function () {
 
     const nextLoc = sourceNodeLoc(nextNodes[0]);
 
-    expect(nextLoc.linenr).equal(5);
-    expect(nextLoc.colnr).equal(1);
+    expect(nextLoc.linenr).equal(48);
+    expect(nextLoc.colnr).equal(19);
   });
 
   it('"step out" from location (19, 5) of a "pin_mode" fun has 1 callside', function () {
@@ -197,8 +197,8 @@ describe('Debug Operations on Rust AST Intermittent Blink', function () {
     expect(nextNodes.length).equal(1);
     const n = nextNodes[0];
     const loc = sourceNodeLoc(n);
-    expect(loc.linenr).equal(5);
-    expect(loc.colnr).equal(1);
+    expect(loc.linenr).equal(48);
+    expect(loc.colnr).equal(19);
   });
 
   it('"step out" from loc (25, 5) of a "digital_write" fun has 3 callsides', function () {
