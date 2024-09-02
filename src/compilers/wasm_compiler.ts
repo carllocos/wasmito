@@ -25,8 +25,14 @@ function parseWasmArgs(args: any): WasmCompilerArgs {
     throw new Error('wasmPath is mandatory and expected to be a string');
   }
 
+  const mj = args.mappingsJSON;
+  if (mj !== undefined && typeof mj !== 'string') {
+    throw new Error('mappingsJSON is expected to be a string');
+  }
+
   return {
     wasmPath: pathToWasmPath,
+    mappingsJSON: mj,
   };
 }
 
