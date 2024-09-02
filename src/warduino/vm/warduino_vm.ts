@@ -45,7 +45,7 @@ import { EventInspectHook } from '../../hooks/hook_event';
 import { type DeviceIdentity } from '../../device';
 import { type WASMFunction } from '../../webassembly/wasm/wasm_function';
 import {
-  type SourceCodeLocation2,
+  type SourceCodeLocation,
   type SourceMap,
 } from '../../source_mappers/source_map';
 import { type LanguageAdaptor } from '../../language_adaptors';
@@ -351,7 +351,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   }
 
   async addHookBefore(
-    sourceCodeLocation: SourceCodeLocation2,
+    sourceCodeLocation: SourceCodeLocation,
     hook: Hook,
     timeout?: number | undefined,
   ): Promise<boolean> {
@@ -364,7 +364,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   }
 
   async addHookAfter(
-    sourceCodeLocation: SourceCodeLocation2,
+    sourceCodeLocation: SourceCodeLocation,
     hook: Hook,
     timeout?: number | undefined,
   ): Promise<boolean> {
@@ -377,7 +377,7 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   }
 
   private async addHook(
-    sourceCodeLocation: SourceCodeLocation2,
+    sourceCodeLocation: SourceCodeLocation,
     hook: Hook,
     moment: HookOnWasmAddrMoment,
     timeout?: number,

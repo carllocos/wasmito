@@ -12,7 +12,7 @@ import { type Breakpoint } from '../../src/debugger/breakpoint';
 import { type WASMFunction } from '../../src/webassembly/wasm/wasm_function';
 import { type Platform } from '../../src/platforms/platform';
 import {
-  type SourceCodeLocation2,
+  type SourceCodeLocation,
   type SourceMap,
 } from '../../src/source_mappers/source_map';
 
@@ -161,7 +161,7 @@ export class MockVM extends WARDuinoVM {
   }
 
   async addHookBefore(
-    sourceCodeLocation: SourceCodeLocation2,
+    sourceCodeLocation: SourceCodeLocation,
     hook: Hook,
     timeout?: number | undefined,
   ): Promise<boolean> {
@@ -169,7 +169,7 @@ export class MockVM extends WARDuinoVM {
   }
 
   async addHookAfter(
-    sourceCodeLocation: SourceCodeLocation2,
+    sourceCodeLocation: SourceCodeLocation,
     hook: Hook,
     timeout?: number | undefined,
   ): Promise<boolean> {
