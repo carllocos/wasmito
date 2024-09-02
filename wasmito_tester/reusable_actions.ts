@@ -18,6 +18,7 @@ import {
   type Action,
   type SubscriptionEmitterAction,
   type SubActReturn,
+  type SubscribeAction,
 } from './shared_interfaces';
 import { Breakpoint } from '../src/debugger/breakpoint';
 import { type WASMFunction } from '../src/webassembly/wasm/wasm_function';
@@ -457,4 +458,51 @@ export function createOnErrorActionEmitter(
     timeout,
   };
   return ac;
+}
+
+export function PauseAction(timeout?: number, delay?: number): Action<boolean> {
+  return {
+    description: 'Pause VM',
+    doAction: async (device: WARDuinoVM): Promise<boolean> => {
+      await device.pause(timeout);
+      return true;
+    },
+    checkActionSuccess: async (
+      successfullResponse: boolean,
+    ): Promise<boolean> => {
+      return successfullResponse;
+    },
+    ifFail: `failed to pause the VM`,
+    timeout,
+    delay,
+  };
+}
+
+export function TriggerInterrupt(
+  pin: number,
+  timeout?: number,
+  delay?: number,
+): Action<boolean> {
+  const a = addEventAction(`interrupt_${pin}`, '', timeout);
+  a.delay = delay;
+  return a;
+}
+
+export function SubscribeOnBPReached(
+  id: string,
+  timeout?: number,
+  delay?: number,
+): SubscribeAction<WasmState, InspectStateHook> {
+  const description = `wait ${timeout === undefined ? '' : `max ${timeout}`} for bp reach with id ${id}`;
+  const act = {
+    subscribeToID: id,
+    description,
+    checkSubscription: async (state: WasmState): Promise<boolean> => {
+      return true;
+    },
+    ifFail: 'Failed to hit breakpoint',
+    timeout,
+    delay,
+  };
+  return act;
 }
