@@ -249,23 +249,42 @@ export class SourceMap {
     filePath: string,
     onlyExistingSource: boolean = false,
   ): void {
-    let maps = this._mappings.map((m: SourceCodeLocation) => {
-      const src = this._sourceToAbsPathSource.get(m.source);
-      if (src !== undefined) {
-        m.source = src;
-      }
-      return m;
-    });
-    if (onlyExistingSource) {
-      maps = maps.filter((m) => isFilePath(m.source));
-    }
-    const mpsStr = maps.map(sourceCodeLocationToString).join(',');
-    const sourcesStr = this._sources
-      .map((s) => {
-        return `"${s}"`;
-      })
-      .join(',');
-    const content = `{"wasm":"${this._wasmPath}","sources":[${sourcesStr}],"mappings":[${mpsStr}]}`;
-    writeFileSync(filePath, content);
+    const sm: SourceMapJSON = {
+      wasm: this._wasmPath,
+      sources: this._sources,
+      mappings: this._mappings,
+    };
+    StoreMappingsToJSON(
+      filePath,
+      sm,
+      onlyExistingSource,
+      this._sourceToAbsPathSource,
+    );
   }
+}
+
+export function StoreMappingsToJSON(
+  filePath: string,
+  sourceMap: SourceMapJSON,
+  onlyExistingSource: boolean = false,
+  sourceToAbsPathSource = new Map<string, string>(),
+): void {
+  let maps = sourceMap.mappings.map((m: SourceCodeLocation) => {
+    const src = sourceToAbsPathSource.get(m.source);
+    if (src !== undefined) {
+      m.source = src;
+    }
+    return m;
+  });
+  if (onlyExistingSource) {
+    maps = maps.filter((m) => isFilePath(m.source));
+  }
+  const mpsStr = maps.map(sourceCodeLocationToString).join(',');
+  const sourcesStr = sourceMap.sources
+    .map((s) => {
+      return `"${s}"`;
+    })
+    .join(',');
+  const content = `{"wasm":"${sourceMap.wasm}","sources":[${sourcesStr}],"mappings":[${mpsStr}]}`;
+  writeFileSync(filePath, content);
 }
