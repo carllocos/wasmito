@@ -3,6 +3,8 @@ import { WasmType } from './opcode_type';
 import { WASM } from '../wasm';
 import { WASMFunction, type WasmLocal } from './wasm_function';
 import {
+  type ModuleElement,
+  type ModuleTableImport,
   type ParsedModule,
   parseWasmModule,
   type Section,
@@ -38,6 +40,8 @@ export class WasmModule {
   private readonly _instructions: WasmInstruction[];
   private readonly _globalInstructions: WasmInstruction[];
   private readonly _sections: Section[];
+  public readonly tableImport: ModuleTableImport[];
+  public readonly elements: ModuleElement[];
 
   constructor(wasmPath: string) {
     const [mod, errors] = parseWasmModule(wasmPath);
@@ -58,6 +62,8 @@ export class WasmModule {
     this._globalInstructions = retrieveGlobalInstructions(mod);
     this._instructions = retrieveAllInstructions(mod, this.functions);
     this.correctCallInstructionsTypes();
+    this.tableImport = mod.tableImports;
+    this.elements = mod.elements;
   }
 
   get instructions(): WasmInstruction[] {
