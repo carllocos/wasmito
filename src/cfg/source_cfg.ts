@@ -9,7 +9,6 @@ import {
 // import { createLogger } from '../logger/logger';
 import {
   type SourceCodeLocation,
-  type SourceCodeLocation2,
   type SourceMap,
 } from '../source_mappers/source_map';
 import {
@@ -83,20 +82,20 @@ export class SourceControlFlowGraph {
     }
   }
 
-  nodesFromSourceLoc(location: SourceCodeLocation2): SourceCFGNode[] {
+  nodesFromSourceLoc(location: SourceCodeLocation): SourceCFGNode[] {
     logger.debug(
-      `get genereatedPosition for Location {${location.source}, ${location.linenr}, ${location.columnStart}}`,
+      `get genereatedPosition for Location {${location.source}, ${location.linenr}, ${location.colnr}}`,
     );
     const mappings = this._sourceMap.generatedPositionFor(location);
     logger.debug(
-      `#${mappings.lastIndexOf} mappings found for Location {${location.source}, ${location.linenr}, ${location.columnStart}}`,
+      `#${mappings.lastIndexOf} mappings found for Location {${location.source}, ${location.linenr}, ${location.colnr}}`,
     );
     const nodes: SourceCFGNode[][] = [];
     for (const m of mappings) {
       const ns = this.nodesFromAddress(m.address);
       if (ns !== undefined) {
         logger.debug(
-          `node found for addr ${m.address} for Location {${location.source}, ${location.linenr}, ${location.columnStart}}`,
+          `node found for addr ${m.address} for Location {${location.source}, ${location.linenr}, ${location.colnr}}`,
         );
         nodes.push([ns]);
       }
