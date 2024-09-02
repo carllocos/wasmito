@@ -823,12 +823,12 @@ function parseFuncImport(obj: any): ModuleFuncImport {
   return {
     module: obj.module,
     name: obj.name,
-    descr: parseModuleDescription(obj.descr),
+    descr: parseFuncImportDescription(obj.descr),
     loc,
   };
 }
 
-function parseModuleDescription(obj: any): ModuleFuncImportDescription {
+function parseFuncImportDescription(obj: any): ModuleFuncImportDescription {
   if (typeof obj !== 'object' || typeof obj.type !== 'string') {
     throw new Error(
       `Obj expected to satisfy ModuleImportDescription Interface`,
