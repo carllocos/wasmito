@@ -223,55 +223,6 @@ export class SourceMap {
     }
   }
 
-  // AS generatedPositionFor
-  // public generatedPositionFor(
-  //   location: SourceCodeLocation,
-  // ): SourceCodeMapping[] {
-  //   const positions: SourceCodeMapping[] = [];
-  //   const candidates = this._mappings.filter((m) => {
-  //     return m.originalLine === location.linenr;
-  //   });
-
-  //   for (const s of candidates) {
-  //     // if (s.originalLine !== location.linenr) {
-  //     //   continue;
-  //     // }
-  //     const colStart = location.columnStart;
-  //     if (colStart !== undefined) {
-  //       if (colStart > s.originalColumn) {
-  //         continue;
-  //       }
-  //     }
-
-  //     const colEnd = location.columnEnd;
-  //     if (colEnd !== undefined) {
-  //       logger.warn(
-  //         `Ignoring columEnd ${colEnd} as sourceMap has only column field`,
-  //       );
-  //     }
-
-  //     const instruction = this.wasm.instructionFromAddress(s.generatedColumn);
-  //     if (instruction === undefined) {
-  //       logger.error(
-  //         `Skipping a wasm instruction unncesserily. TODO remove wasm instruction from mapping`,
-  //       );
-  //       throw new Error(
-  //         `Skipping a wasm instruction unncesserily. TODO remove wasm instruction from mapping`,
-  //       );
-  //     }
-  //     const m: SourceCodeMapping = {
-  //       source: s.source,
-  //       address: s.generatedColumn,
-  //       linenr: location.linenr,
-  //       columnStart: s.originalColumn,
-  //       columnEnd: s.originalColumn,
-  //       instruction,
-  //     };
-  //     positions.push(m);
-  //   }
-  //   return positions;
-  // }
-
   public getOriginalPositionFor(wasmAddr: number): SourceCodeLocation[] {
     const maps = this._mappings
       .filter((m: SourceCodeLocation) => {
@@ -293,45 +244,6 @@ export class SourceMap {
     }
     return maps;
   }
-
-  // AS getOriginalPositionFor
-  // public override getOriginalPositionFor(
-  //   wasmAddr: number,
-  // ): SourceCodeMapping | undefined {
-  //   let m = this._mappings.find((m: MappingItem) => {
-  //     return m.generatedColumn === wasmAddr;
-  //   });
-
-  //   let instruction: WasmInstruction | undefined;
-  //   if (m === undefined) {
-  //     instruction = this.wasm.instructionFromAddress(wasmAddr);
-  //     if (instruction === undefined) {
-  //       return undefined;
-  //     }
-  //     m = this._mappings.find((mi: MappingItem) => {
-  //       return mi.generatedColumn === instruction?.startAddress;
-  //     });
-  //   }
-  //   if (m?.source === undefined || m?.source === null) {
-  //     return undefined;
-  //   }
-  //   const src = this._sourceToAbsPathSource.get(m.source);
-  //   if (src === undefined) {
-  //     throw new Error(`No absolutePath set for Source ${m.source}`);
-  //   }
-  //   instruction = this.wasm.instructionFromAddress(wasmAddr);
-  //   if (instruction === undefined) {
-  //     return undefined;
-  //   }
-  //   return {
-  //     source: src,
-  //     address: m.generatedColumn,
-  //     linenr: m.originalLine,
-  //     columnStart: m.originalColumn,
-  //     columnEnd: m.originalColumn,
-  //     instruction,
-  //   };
-  // }
 
   storeMappingsToJSON(
     filePath: string,
