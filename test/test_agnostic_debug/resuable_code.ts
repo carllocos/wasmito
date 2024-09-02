@@ -3,19 +3,16 @@ import {
   type SourceControlFlowGraph,
   type SourceCFGNode,
 } from '../../src/cfg/source_cfg';
-import {
-  type SourceCodeLocation2,
-  type SourceCodeLocation,
-} from '../../src/source_mappers/source_map';
+import { type SourceCodeLocation } from '../../src/source_mappers/source_map';
 
 export function sourceNodeFromLoc(
   scfg: SourceControlFlowGraph,
-  loc: SourceCodeLocation2,
+  loc: SourceCodeLocation,
 ): SourceCFGNode {
   const ns = scfg.nodesFromSourceLoc(loc);
   assert(
     ns.length === 1,
-    `one ASTnode should be found for the given location linenr=${loc.linenr}, colnr=${loc.columnStart}, colend=${loc.columnEnd}`,
+    `one ASTnode should be found for the given location linenr=${loc.linenr}, colnr=${loc.colnr}`,
   );
   return ns[0];
 }
