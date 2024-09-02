@@ -50,8 +50,9 @@ export function isDelayedAction<ResultType>(
 }
 
 export interface SubscribeAction<
-  Hook,
-  ResultType extends HookWithSubscription<Hook>,
+  ResultType,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _Hook extends HookWithSubscription<ResultType>,
 > {
   description: string;
   timeout?: number;
@@ -61,9 +62,9 @@ export interface SubscribeAction<
 }
 
 export function isActionThatSubscribesTo<
-  HookType,
-  ResultType extends HookWithSubscription<HookType>,
->(obj: any): obj is SubscribeAction<HookType, ResultType> {
+  ResultType,
+  HookType extends HookWithSubscription<ResultType>,
+>(obj: any): obj is SubscribeAction<ResultType, HookType> {
   return (
     typeof obj === 'object' &&
     typeof obj.description === 'string' &&
