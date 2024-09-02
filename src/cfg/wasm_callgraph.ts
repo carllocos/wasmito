@@ -79,11 +79,9 @@ export function buildWasmCallGraph(
   const entryNodes: CallGraphNode[] = [];
   for (const f of entryFuncs) {
     const n = nodes.get(f);
-    if (n === undefined) {
-      throw new Error(`No node created for entryNode linked to fun ${f}`);
+    if (n !== undefined) {
+      entryNodes.push(n);
     }
-
-    entryNodes.push(n);
   }
   return new WasmCallGraph(entryNodes, nodes);
 }
