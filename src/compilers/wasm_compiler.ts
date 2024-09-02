@@ -12,6 +12,7 @@ const logger = createLogger('WasmCompiler');
 
 export interface WasmCompilerArgs {
   wasmPath: string;
+  mappingsJSON?: string;
 }
 
 function parseWasmArgs(args: any): WasmCompilerArgs {
