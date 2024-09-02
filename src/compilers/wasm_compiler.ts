@@ -7,6 +7,7 @@ import {
   constructLanguageAdaptor,
 } from '../language_adaptors/language_adaptor';
 import { SourceMap } from '../source_mappers/source_map';
+import { SourceMapFromJSON } from '../source_mappers/source_map_builder';
 
 const logger = createLogger('WasmCompiler');
 
@@ -54,7 +55,10 @@ export class WasmCompiler extends SourceCodeCompiler {
 
   async compile(compilerArgs: any): Promise<LanguageAdaptor> {
     this._lastCompileArgs = parseWasmArgs(compilerArgs);
-    const sm = new SourceMap(this._lastCompileArgs.wasmPath, [], []);
+    const sm =
+      this._lastCompileArgs.mappingsJSON !== undefined
+        ? await SourceMapFromJSON(this._lastCompileArgs.mappingsJSON)
+        : new SourceMap(this._lastCompileArgs.wasmPath, [], []);
     return await constructLanguageAdaptor(sm);
   }
 }
