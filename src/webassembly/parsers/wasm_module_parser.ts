@@ -809,7 +809,7 @@ export function parseWasmModule(wasmPath: string): [ParsedModule, string[]] {
   }
 }
 
-function parseModuleImport(obj: any): ModuleFuncImport {
+function parseFuncImport(obj: any): ModuleFuncImport {
   if (
     typeof obj !== 'object' ||
     typeof obj.name !== 'string' ||
@@ -894,7 +894,7 @@ function parseFuncImports(fields: any): ModuleFuncImport[] {
   const importFields: any[] = fields.filter(isFunctionImport);
   return importFields
     .map((i) => {
-      return parseModuleImport(i);
+      return parseFuncImport(i);
     })
     .sort((a, b) => {
       return a.loc.start.column - b.loc.start.column;
