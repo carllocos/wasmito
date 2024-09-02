@@ -3,7 +3,8 @@ import { type Command } from 'commander';
 import { getGlobalLogger } from '../src/logger/logger';
 import { createDirectoryIfUnexisting, isFilePath } from '../src/util/file_util';
 import { timeoutPromise } from '../src/util/promise_util';
-import { SourceMapfromDWARFWasm } from '../src/source_mappers/source_map_builder';
+import { ReadDWARFMappings } from '../src/source_mappers/source_map_builder';
+import { StoreMappingsToJSON } from '../src/source_mappers/source_map';
 
 export function registerSourceMapCommand(program: Command): void {
   program
@@ -31,10 +32,7 @@ export function registerSourceMapCommand(program: Command): void {
           `Building SourceMap JSON from DWARF (timeout ${timeout} secs, ${timeout / 60} min)`,
         );
         const startTime = Date.now();
-        const sm = await timeoutPromise(
-          SourceMapfromDWARFWasm(wasmPath),
-          timeoutMs,
-        );
+        const sm = await timeoutPromise(ReadDWARFMappings(wasmPath), timeoutMs);
         const endTime = Date.now();
         const diff = endTime - startTime;
 
@@ -44,7 +42,7 @@ export function registerSourceMapCommand(program: Command): void {
         logger.info(`Storing json at ${outputFile}`);
         const outputDir = path.dirname(outputFile);
         createDirectoryIfUnexisting(outputDir);
-        sm.storeMappingsToJSON(outputFile, true);
+        StoreMappingsToJSON(outputFile, sm, true);
       } catch (e) {
         const errMsg = e instanceof Error ? e.message : e;
         program.error(`Could not the SourceMap JSON error occured: ${errMsg}`);
