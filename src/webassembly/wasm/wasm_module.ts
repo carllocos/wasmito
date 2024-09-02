@@ -328,7 +328,7 @@ function createWasmFunctions(
 }
 
 function createImportedFunctions(mod: ParsedModule): WASMFunction[] {
-  const imports: WASMFunction[] = mod.imports.map((i, importID) => {
+  const imports: WASMFunction[] = mod.funcImports.map((i, importID) => {
     const sign = i.descr.signature;
     const t = new WasmType(sign.params.length, sign.results.length);
     const exported = false;

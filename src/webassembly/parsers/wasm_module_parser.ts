@@ -101,7 +101,7 @@ export interface ParsedModule {
   funcNames: MetaDataFunctionName[];
   types: WasmType[];
   funcs: Func[];
-  imports: ModuleImport[];
+  funcImports: ModuleFuncImport[];
   globals: ParsedGlobal[];
   sections: Section[];
   ast: any;
@@ -117,16 +117,16 @@ interface Func {
   bodySize: number;
 }
 
-export interface ModuleImportDescription {
+export interface ModuleFuncImportDescription {
   type: string;
   id: string;
   signature: FuncSignature;
 }
 
-export interface ModuleImport {
+export interface ModuleFuncImport {
   module: string;
   name: string;
-  descr: ModuleImportDescription;
+  descr: ModuleFuncImportDescription;
   loc: WasmSourceLocation;
 }
 
@@ -758,7 +758,7 @@ export function parseWasmModule(wasmPath: string): [ParsedModule, string[]] {
     const funcNames = parseFunctionNames(metadata.functionNames);
     const types = parseTypes(mod.fields);
     const [funcs, funErrors] = parseFuncFields(mod.fields);
-    const imports = parseImports(mod.fields);
+    const funcImports = parseFuncImports(mod.fields);
     const [globals, globalsErrs] = parseGlobals(mod.fields);
     // TODO fiels 'Table', 'Memory'. 'Elem', 'ModuleExport'
     const parsedMod = {
@@ -767,7 +767,7 @@ export function parseWasmModule(wasmPath: string): [ParsedModule, string[]] {
       funcNames,
       types,
       funcs,
-      imports,
+      funcImports,
       globals,
       ast: mod,
       sections,
@@ -805,7 +805,7 @@ export function parseWasmModule(wasmPath: string): [ParsedModule, string[]] {
   }
 }
 
-function parseModuleImport(obj: any): ModuleImport {
+function parseModuleImport(obj: any): ModuleFuncImport {
   if (
     typeof obj !== 'object' ||
     typeof obj.name !== 'string' ||
@@ -824,7 +824,7 @@ function parseModuleImport(obj: any): ModuleImport {
   };
 }
 
-function parseModuleDescription(obj: any): ModuleImportDescription {
+function parseModuleDescription(obj: any): ModuleFuncImportDescription {
   if (typeof obj !== 'object' || typeof obj.type !== 'string') {
     throw new Error(
       `Obj expected to satisfy ModuleImportDescription Interface`,
@@ -868,7 +868,7 @@ function parseModuleDescription(obj: any): ModuleImportDescription {
   };
 }
 
-function parseImports(fields: any): ModuleImport[] {
+function parseFuncImports(fields: any): ModuleFuncImport[] {
   const importFields: any[] = fields.filter((f: any) => {
     if (f.type !== 'ModuleImport') {
       return false;
