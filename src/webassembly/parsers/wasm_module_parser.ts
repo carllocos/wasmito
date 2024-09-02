@@ -870,7 +870,18 @@ function parseModuleDescription(obj: any): ModuleImportDescription {
 
 function parseImports(fields: any): ModuleImport[] {
   const importFields: any[] = fields.filter((f: any) => {
-    return f.type === 'ModuleImport';
+    if (f.type !== 'ModuleImport') {
+      return false;
+    }
+    if (
+      f.descr === undefined ||
+      f.descr.type === undefined ||
+      typeof f.descr.type !== 'string'
+    ) {
+      return false;
+    }
+
+    return f.descr.type === 'FuncImportDescr';
   });
   return importFields
     .map((i) => {
