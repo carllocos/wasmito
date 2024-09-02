@@ -7,23 +7,13 @@ import { writeFileSync } from 'fs';
 
 const logger = createLogger('SourceMap');
 
-// TODO Sourcelocation will be gone and replaced by ASTMapping of adaptor.
-// Or remove?
-export interface SourceCodeLocation2 {
-  source: string;
-  linenr: number;
-  columnStart?: number;
-  columnEnd?: number;
-}
-
 export function equalSourceCodeLocations(
-  loc1: SourceCodeLocation2,
-  loc2: SourceCodeLocation2,
+  loc1: SourceCodeLocation,
+  loc2: SourceCodeLocation,
 ): boolean {
   return (
     loc1.linenr === loc2.linenr &&
-    loc1.columnEnd === loc2.columnEnd &&
-    loc1.columnStart === loc2.columnStart &&
+    loc1.colnr === loc2.colnr &&
     pathsEqual(loc1.source, loc2.source)
   );
 }
@@ -197,25 +187,25 @@ export class SourceMap {
   }
 
   public generatedPositionFor(
-    location: SourceCodeLocation2,
+    location: SourceCodeLocation,
   ): SourceCodeLocation[] {
     const positions: SourceCodeLocation[] = [];
     const candidates = this._mappings.filter((m) => {
       return m.linenr === location.linenr;
     });
     logger.debug(
-      `#${candidates.length} candidates for SourceLoc {${location.source}, ${location.linenr}, ${location.columnStart}}`,
+      `#${candidates.length} candidates for SourceLoc {${location.source}, ${location.linenr}, ${location.colnr}}`,
     );
 
     for (const c of candidates) {
-      const colStart = location.columnStart;
+      const colStart = location.colnr;
       if (colStart === c.colnr) {
         positions.push(c);
       }
     }
 
     logger.debug(
-      `#${positions.length} found for SourceLoc {${location.source}, ${location.linenr}, ${location.columnStart}}`,
+      `#${positions.length} found for SourceLoc {${location.source}, ${location.linenr}, ${location.colnr}}`,
     );
     return positions;
   }
