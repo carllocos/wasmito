@@ -37,6 +37,14 @@ export function buildWasmCallGraph(
   const entryFuncs = wasm.functions
     .filter((f) => mainNames.has(f.name))
     .map((f) => f.id);
+
+  for (const ti of wasm.tableImport) {
+    for (const el of wasm.elements) {
+      if (el.tableId === ti.descr.id) {
+        el.funcs.forEach((f) => entryFuncs.push(f));
+      }
+    }
+  }
   if (entryFuncs.length === 0) {
     const fidMin = wasm.imports.length;
     wasm.functions
