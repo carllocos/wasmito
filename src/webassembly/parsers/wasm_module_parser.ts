@@ -101,6 +101,7 @@ export interface ParsedModule {
   funcNames: MetaDataFunctionName[];
   types: WasmType[];
   funcs: Func[];
+  tableImports: ModuleTableImport[];
   funcImports: ModuleFuncImport[];
   globals: ParsedGlobal[];
   sections: Section[];
@@ -132,6 +133,20 @@ export interface ModuleFuncImport {
 
 enum ImportType {
   FuncImport = 'FuncImportDescr',
+  TableImport = 'Table',
+}
+
+export interface ModuleTableImportDescription {
+  type: string;
+  value: string;
+  id: number;
+}
+
+export interface ModuleTableImport {
+  module: string;
+  name: string;
+  descr: ModuleTableImportDescription;
+  loc: WasmSourceLocation;
 }
 
 export interface FunExport {
@@ -763,6 +778,7 @@ export function parseWasmModule(wasmPath: string): [ParsedModule, string[]] {
     const types = parseTypes(mod.fields);
     const [funcs, funErrors] = parseFuncFields(mod.fields);
     const funcImports = parseFuncImports(mod.fields);
+    const tableImports = parseTableImports(mod.fields);
     const [globals, globalsErrs] = parseGlobals(mod.fields);
     // TODO fiels 'Table', 'Memory'. 'Elem', 'ModuleExport'
     const parsedMod = {
@@ -932,6 +948,88 @@ function validExportFuncField(obj: any): boolean {
     typeof obj.descr === 'object' &&
     obj.descr.exportType === 'Func'
   );
+}
+
+function parseTableImportDescription(obj: any): ModuleTableImportDescription {
+  // an example of description is
+  //  {
+  //   type: "Table",
+  //   elementType: "anyfunc",
+  //   limits: {
+  //     type: "Limit",
+  //     min: 1,
+  //   },
+  //   name: {
+  //     type: "Identifier",
+  //     value: "table_0",
+  //     raw: "1",
+  //   },
+  // }
+
+  if (
+    obj.type !== 'Table' ||
+    typeof obj.name !== 'object' ||
+    obj.name.type !== 'Identifier' ||
+    typeof obj.name.value !== 'string'
+  ) {
+    throw new Error(`TalbeDescription does not satisfy interface`);
+  }
+
+  const value = obj.name.value;
+  const reg = /^table_([0-9]+)$/;
+
+  const matched = value.match(reg);
+  if (matched === undefined || matched === null) {
+    throw new Error(
+      `Could not derive id for imported table. Description is ${JSON.stringify(obj.value)}`,
+    );
+  }
+  const id = Number(matched[1]);
+  if (isNaN(id)) {
+    throw new Error(
+      `The derived id for imported table using '${value}' could not be converted to a number. Description is ${JSON.stringify(obj.value)}`,
+    );
+  }
+  return { type: obj.type, value, id };
+}
+
+function isTableImport(obj: any): boolean {
+  return isImport(obj) && obj.descr.type === ImportType.TableImport;
+}
+
+function parseTableImport(obj: any): ModuleTableImport {
+  if (
+    typeof obj !== 'object' ||
+    typeof obj.name !== 'string' ||
+    typeof obj.type !== 'string' ||
+    typeof obj.module !== 'string' ||
+    typeof obj.descr !== 'object' ||
+    typeof obj.loc !== 'object' ||
+    obj.name !== 'table' ||
+    obj.type !== 'ModuleImport'
+  ) {
+    throw new Error(`obj does not satisfy Table import interface`);
+  }
+
+  const loc = obj.loc;
+  assertWasmSourceCodeLocation(loc);
+  return {
+    module: obj.module,
+    name: obj.name,
+    descr: parseTableImportDescription(obj.descr),
+    loc,
+  };
+}
+
+function parseTableImports(fields: any): ModuleTableImport[] {
+  const importFields: any[] = fields.filter(isTableImport);
+  return importFields
+    .map((i) => {
+      return parseTableImport(i);
+    })
+    .sort((a, b) => {
+      return a.loc.start.column - b.loc.start.column;
+    });
 }
 
 function assertGlobalType(obj: any): asserts obj is GlobalType {
