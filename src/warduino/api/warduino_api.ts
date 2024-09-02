@@ -1,5 +1,5 @@
 import { type Hook } from '../../hooks/hook';
-import { type SourceCodeLocation2 } from '../../source_mappers';
+import { type SourceCodeLocation } from '../../source_mappers';
 import { type WASM, type WasmState } from '../../webassembly/wasm';
 import { type StateRequest } from '../requests/inspect_request';
 import { type ProxyCallResponse } from '../requests/fun_call_request';
@@ -61,13 +61,13 @@ export interface WARDuinoAPI {
 
   // Hook API
   addHookBefore: (
-    sourceCodeLocation: SourceCodeLocation2,
+    sourceCodeLocation: SourceCodeLocation,
     hook: Hook,
     timeout?: number,
   ) => Promise<boolean>;
 
   addHookAfter: (
-    sourceCodeLocation: SourceCodeLocation2,
+    sourceCodeLocation: SourceCodeLocation,
     hook: Hook,
     timeout?: number,
   ) => Promise<boolean>;
