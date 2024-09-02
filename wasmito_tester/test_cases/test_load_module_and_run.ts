@@ -17,7 +17,6 @@ import { type WasmState } from '../../src/webassembly/wasm';
 
 export async function runTest(
   wasmPath: string,
-  mapping: string,
   runningTime: number,
 ): Promise<TestScenarioResult[]> {
   const m5stickDev = oneM5StickCDev('2');
@@ -31,9 +30,7 @@ export async function runTest(
   const program: TestProgram = {
     targetLanguage: TargetLanguage.Wasm,
     sourceCodeCompilationArgs: {
-      pathToWasm: wasmPath,
-      pathToSrcRoot: '',
-      pathToJsonMap: mapping,
+      wasmPath,
     },
   };
 
