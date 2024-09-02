@@ -2,6 +2,7 @@ import fs from 'fs';
 import {
   SourceMap,
   type SourceMapConfig,
+  type SourceMapJSON,
   isSourceMapJSON,
   mappingItemToSourceCodeLocation,
 } from './source_map';
@@ -130,30 +131,8 @@ export async function SourceMapfromSourceMapSpec(
 export async function SourceMapfromDWARFWasm(
   wasmFilePath: string,
 ): Promise<SourceMap> {
-  const wasmAddresses = await getAddressRangeOffset(wasmFilePath);
-  const mappingsResults: MappingItem[][] = [];
-  for (const addr of wasmAddresses) {
-    const m = await createMappingForAddr(wasmFilePath, addr);
-    if (m.length > 0) {
-      mappingsResults.push(m);
-    }
-  }
-
-  let mappings: MappingItem[] = [];
-  for (const m of mappingsResults) {
-    if (m !== undefined) {
-      mappings = mappings.concat(m);
-    }
-  }
-
-  if (mappings.length === 0) {
-    throw new Error(`No mapping found for the given wasmFile ${wasmFilePath}`);
-  }
-
-  // convert to set to remove duplicates
-  const sources = Array.from(new Set(mappings.map((m) => m.source)));
-  const sourceLocations = mappings.map(mappingItemToSourceCodeLocation);
-  return new SourceMap(wasmFilePath, sources, sourceLocations);
+  const read = await ReadDWARFMappings(wasmFilePath);
+  return new SourceMap(wasmFilePath, read.sources, read.mappings);
 }
 
 export async function SourceMapFromJSON(jsonPath: string): Promise<SourceMap> {
@@ -204,4 +183,38 @@ async function getAddressRangeOffset(wasmFilePath: string): Promise<number[]> {
     wasmAddresses.push(addr);
   }
   return wasmAddresses;
+}
+
+export async function ReadDWARFMappings(
+  wasmFilePath: string,
+): Promise<SourceMapJSON> {
+  const wasmAddresses = await getAddressRangeOffset(wasmFilePath);
+  const mappingsResults: MappingItem[][] = [];
+  for (const addr of wasmAddresses) {
+    const m = await createMappingForAddr(wasmFilePath, addr);
+    if (m.length > 0) {
+      mappingsResults.push(m);
+    }
+  }
+
+  let mappings: MappingItem[] = [];
+  for (const m of mappingsResults) {
+    if (m !== undefined) {
+      mappings = mappings.concat(m);
+    }
+  }
+
+  if (mappings.length === 0) {
+    throw new Error(`No mapping found for the given wasmFile ${wasmFilePath}`);
+  }
+
+  // convert to set to remove duplicates
+  const sources = Array.from(new Set(mappings.map((m) => m.source)));
+  const sourceLocations = mappings.map(mappingItemToSourceCodeLocation);
+
+  return {
+    wasm: wasmFilePath,
+    sources,
+    mappings: sourceLocations,
+  };
 }
