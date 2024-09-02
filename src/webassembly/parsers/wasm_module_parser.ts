@@ -103,6 +103,7 @@ export interface ParsedModule {
   funcs: Func[];
   tableImports: ModuleTableImport[];
   funcImports: ModuleFuncImport[];
+  elements: ModuleElement[];
   globals: ParsedGlobal[];
   sections: Section[];
   ast: any;
@@ -779,6 +780,7 @@ export function parseWasmModule(wasmPath: string): [ParsedModule, string[]] {
     const [funcs, funErrors] = parseFuncFields(mod.fields);
     const funcImports = parseFuncImports(mod.fields);
     const tableImports = parseTableImports(mod.fields);
+    const elements = parseElements(mod.fields);
     const [globals, globalsErrs] = parseGlobals(mod.fields);
     // TODO fiels 'Table', 'Memory'. 'Elem', 'ModuleExport'
     const parsedMod = {
@@ -788,6 +790,8 @@ export function parseWasmModule(wasmPath: string): [ParsedModule, string[]] {
       types,
       funcs,
       funcImports,
+      tableImports,
+      elements,
       globals,
       ast: mod,
       sections,
@@ -1030,6 +1034,132 @@ function parseTableImports(fields: any): ModuleTableImport[] {
     .sort((a, b) => {
       return a.loc.start.column - b.loc.start.column;
     });
+}
+
+export interface ModuleElement {
+  type: string;
+  tableId: number;
+  funcs: number[];
+  loc: WasmSourceLocation;
+}
+
+function parseElements(fields: any): ModuleElement[] {
+  // example of Element field
+  // {
+  //   type: "Elem",
+  //   table: {
+  //     type: "NumberLiteral",
+  //     value: 0,
+  //     raw: "0",
+  //   },
+  //   offset: [
+  //     {
+  //       type: "Instr",
+  //       id: "const",
+  //       args: [
+  //         {
+  //           type: "NumberLiteral",
+  //           value: 0,
+  //           raw: "0",
+  //         },
+  //       ],
+  //       object: "i32",
+  //       loc: {
+  //         start: {
+  //           line: -1,
+  //           column: 69,
+  //         },
+  //         end: {
+  //           line: -1,
+  //           column: 71,
+  //         },
+  //       },
+  //     },
+  //     {
+  //       type: "Instr",
+  //       id: "end",
+  //       args: [
+  //       ],
+  //       loc: {
+  //         start: {
+  //           line: -1,
+  //           column: 71,
+  //         },
+  //         end: {
+  //           line: -1,
+  //           column: 72,
+  //         },
+  //       },
+  //     },
+  //   ],
+  //   funcs: [
+  //     {
+  //       type: "NumberLiteral",
+  //       value: 2,
+  //       raw: "2",
+  //     },
+  //   ],
+  //   loc: {
+  //     start: {
+  //       line: -1,
+  //       column: 68,
+  //     },
+  //     end: {
+  //       line: -1,
+  //       column: 74,
+  //     },
+  //   },
+  // }
+  const elements: ModuleElement[] = [];
+  for (const field of fields) {
+    if (typeof field !== 'object' || field.type !== 'Elem') {
+      continue;
+    }
+
+    if (
+      typeof field.table !== 'object' ||
+      field.table.type !== 'NumberLiteral' ||
+      typeof field.table.value !== 'number'
+    ) {
+      throw new Error(
+        `Element does not have table field or not the right type: ${JSON.stringify(field)}`,
+      );
+    }
+
+    const loc = field.loc;
+    assertWasmSourceCodeLocation(loc);
+
+    const tblIndex = field.table.value;
+
+    let funcs: any[] = [];
+    if (Array.isArray(field.funcs)) {
+      funcs = field.funcs;
+    }
+
+    const funcsIDs: number[] = [];
+    for (let i = 0; i < funcs.length; i++) {
+      const f = funcs[i];
+      if (
+        typeof f !== 'object' ||
+        f.type !== 'NumberLiteral' ||
+        typeof f.value !== 'number'
+      ) {
+        throw new Error(
+          `Func of element does not have expected interface: ${JSON.stringify(f)}`,
+        );
+      }
+      funcsIDs.push(f.value);
+    }
+    elements.push({
+      type: field.type,
+      tableId: tblIndex,
+      funcs: funcsIDs,
+      loc,
+    });
+  }
+  return elements.sort((a, b) => {
+    return a.loc.start.column - b.loc.start.column;
+  });
 }
 
 function assertGlobalType(obj: any): asserts obj is GlobalType {
