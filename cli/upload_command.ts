@@ -3,6 +3,7 @@ import { getProjectDir, isProjectDirPresent } from './project_command';
 import { getDeviceConfiguration } from './devices_command';
 import {
   createDirectoryIfUnexisting,
+  isAbsolutePath,
   isFilePath,
   pathJoin,
 } from '../src/util/file_util';
@@ -13,6 +14,7 @@ import { type DeviceIdentity } from '../src/device/device_config';
 import { type WasmCompilerArgs } from '../src/compilers/wasm_compiler';
 import { TargetLanguage } from '../src/compilers/prog_language_selection';
 import { type VMConfigArgs } from '../src/device/vm_config';
+import { resolve } from 'path';
 
 function validateIdOrName(idOrName: any, prev: any): string {
   if (typeof idOrName !== 'string') {
@@ -22,10 +24,15 @@ function validateIdOrName(idOrName: any, prev: any): string {
 }
 
 function isValidWasmPath(wasmPath: any, prev: any): string {
-  if (typeof wasmPath !== 'string' || !isFilePath(wasmPath)) {
+  if (typeof wasmPath !== 'string') {
+    throw new InvalidArgumentError('Is not a string');
+  }
+
+  const path = isAbsolutePath(wasmPath) ? wasmPath : resolve(wasmPath);
+  if (!isFilePath(path)) {
     throw new InvalidArgumentError('Is not a Wasm module file path');
   }
-  return wasmPath;
+  return path;
 }
 
 export function registerUploadCommand(program: Command): void {
