@@ -268,6 +268,10 @@ export class SystemTester {
     return true;
   }
 
+  private storeEmittedHookValue(hookID: string, v: any): void {
+    this.storedHookValues.set(hookID, v);
+  }
+
   private async runActionToEmitSubscriptionValues<
     R,
     H,
@@ -287,6 +291,11 @@ export class SystemTester {
     const successfulCheck = await action.checkSetupSuccess(valueForCheck);
     if (successfulCheck) {
       const hook = result[1];
+      if (action.store === undefined || action.store) {
+        hook.subscribe((v: any) => {
+          this.storeEmittedHookValue(action.subscriptionID, v);
+        });
+      }
       hookMap.set(action.subscriptionID, hook);
     }
     return [valueForCheck, successfulCheck];
