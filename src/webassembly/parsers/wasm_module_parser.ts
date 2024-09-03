@@ -96,17 +96,17 @@ export interface Section {
 }
 
 export interface ParsedModule {
-  localsNames: LocalName[];
-  exportedFuncs: FunExport[];
-  funcNames: MetaDataFunctionName[];
-  types: WasmType[];
-  funcs: Func[];
-  tableImports: ModuleTableImport[];
-  funcImports: ModuleFuncImport[];
-  elements: ModuleElement[];
-  globals: ParsedGlobal[];
-  sections: Section[];
   ast: any;
+  elements: ModuleElement[];
+  exportedFuncs: FunExport[];
+  funcImports: ModuleFuncImport[];
+  funcNames: MetaDataFunctionName[];
+  funcs: Func[];
+  globals: ParsedGlobal[];
+  localsNames: LocalName[];
+  sections: Section[];
+  tableImports: ModuleTableImport[];
+  types: WasmType[];
   wasmBuffer: Buffer;
 }
 
