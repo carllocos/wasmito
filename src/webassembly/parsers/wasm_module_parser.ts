@@ -835,7 +835,7 @@ function parseFuncImport(obj: any): ModuleFuncImport {
     typeof obj.name !== 'string' ||
     typeof obj.module !== 'string'
   ) {
-    throw new Error(`Obj expected to satisfy ModuleImport Interface`);
+    throw new Error(`Obj expected to satisfy ModuleFuncImport Interface`);
   }
 
   const loc = obj.loc;
