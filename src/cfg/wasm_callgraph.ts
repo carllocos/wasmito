@@ -58,7 +58,7 @@ export function buildWasmCallGraph(
     .map((f) => f.id);
   for (const ti of wasm.tableImports) {
     for (const el of wasm.elements) {
-      if (el.tableId === ti.descr.id) {
+      if (el.tableId === ti.id) {
         el.funcs.forEach((f) => allExportedFuncs.push(f));
       }
     }

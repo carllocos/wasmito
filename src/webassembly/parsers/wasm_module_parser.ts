@@ -1012,7 +1012,7 @@ function parseFuncImports(fields: any): ModuleFuncImport[] {
     });
 }
 
-export interface ModuleTableImportDescription {
+interface ModuleTableImportDescription {
   type: string;
   value: string;
   id: number;
@@ -1021,7 +1021,9 @@ export interface ModuleTableImportDescription {
 export interface ModuleTableImport {
   module: string;
   name: string;
-  descr: ModuleTableImportDescription;
+  id: number;
+  value: string;
+  type: string;
   loc: WasmSourceLocation;
 }
 
@@ -1088,10 +1090,13 @@ function parseTableImport(obj: any): ModuleTableImport {
 
   const loc = obj.loc;
   assertWasmSourceCodeLocation(loc);
+  const descr = parseTableImportDescription(obj.descr);
   return {
     module: obj.module,
     name: obj.name,
-    descr: parseTableImportDescription(obj.descr),
+    id: descr.id,
+    value: descr.value,
+    type: descr.type,
     loc,
   };
 }
