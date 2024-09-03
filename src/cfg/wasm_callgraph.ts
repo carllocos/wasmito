@@ -52,6 +52,7 @@ export function buildWasmCallGraph(
   // imported host funcs could call
   // (1) any explicitly exported func in module marked with `export`
   // (2) any func added to a table imported by the host environment
+  // (3) any func added to a table exported by the module
   const importedFuncs = new Set(wasm.importFuncs.map((f) => f.id));
   const allExportedFuncs = wasm.functions
     .filter((f) => f.exported)
@@ -59,6 +60,13 @@ export function buildWasmCallGraph(
   for (const ti of wasm.tableImports) {
     for (const el of wasm.elements) {
       if (el.tableId === ti.id) {
+        el.funcs.forEach((f) => allExportedFuncs.push(f));
+      }
+    }
+  }
+  for (const te of wasm.tableExports) {
+    for (const el of wasm.elements) {
+      if (el.tableId === te.id) {
         el.funcs.forEach((f) => allExportedFuncs.push(f));
       }
     }
