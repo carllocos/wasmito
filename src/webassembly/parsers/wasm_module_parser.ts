@@ -903,7 +903,7 @@ function parseFuncImports(fields: any): ModuleFuncImport[] {
     });
 }
 /**
- * Exported content
+ * Exports
  */
 
 enum ExportType {
@@ -953,7 +953,7 @@ function parseExportFuncs(fields: any): FunExport[] {
 
 
 /**
- * Imported content
+ * Imports
  */
 
 export interface ModuleTableImportDescription {
