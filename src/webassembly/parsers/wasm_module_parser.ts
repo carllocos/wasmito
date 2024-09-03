@@ -811,6 +811,28 @@ export function parseWasmModule(wasmPath: string): [ParsedModule, string[]] {
   }
 }
 
+/**
+ * Imports
+ */
+
+export interface ModuleFuncImportDescription {
+  type: string;
+  id: string;
+  signature: FuncSignature;
+}
+
+export interface ModuleFuncImport {
+  module: string;
+  name: string;
+  descr: ModuleFuncImportDescription;
+  loc: WasmSourceLocation;
+}
+
+enum ImportType {
+  FuncImport = 'FuncImportDescr',
+  TableImport = 'Table',
+}
+
 function parseFuncImport(obj: any): ModuleFuncImport {
   if (
     typeof obj !== 'object' ||
@@ -902,59 +924,6 @@ function parseFuncImports(fields: any): ModuleFuncImport[] {
       return a.loc.start.column - b.loc.start.column;
     });
 }
-/**
- * Exports
- */
-
-enum ExportType {
-  Func = 'Func',
-}
-
-export interface FunExport {
-  name: string;
-  id?: number;
-}
-
-function isExportField(obj: any): boolean {
-  return (
-    typeof obj === 'object' &&
-    obj.type === 'ModuleExport' &&
-    typeof obj.descr === 'object'
-  );
-}
-
-function validExportFuncField(obj: any): boolean {
-  return isExportField(obj) && obj.descr.exportType === ExportType.Func;
-}
-
-function parseExportFuncs(fields: any): FunExport[] {
-  const exports: FunExport[] = [];
-  for (const f of fields) {
-    if (validExportFuncField(f)) {
-      if (f.name === undefined || typeof f.name !== 'string') {
-        throw new Error(
-          `Found a case where the name is missing or is not a string in export field ${f}`,
-        );
-      }
-      let id: number | undefined;
-      if (f.descr.id.type === 'NumberLiteral') {
-        id = f.descr.id.value;
-      }
-
-      const ef: FunExport = {
-        name: f.name,
-        id,
-      };
-      exports.push(ef);
-    }
-  }
-  return exports;
-}
-
-
-/**
- * Imports
- */
 
 export interface ModuleTableImportDescription {
   type: string;
