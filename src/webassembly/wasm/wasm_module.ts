@@ -40,7 +40,7 @@ export class WasmModule {
   private readonly _instructions: WasmInstruction[];
   private readonly _globalInstructions: WasmInstruction[];
   private readonly _sections: Section[];
-  public readonly tableImport: ModuleTableImport[];
+  public readonly tableImports: ModuleTableImport[];
   public readonly elements: ModuleElement[];
 
   constructor(wasmPath: string) {
@@ -62,7 +62,7 @@ export class WasmModule {
     this._globalInstructions = retrieveGlobalInstructions(mod);
     this._instructions = retrieveAllInstructions(mod, this.functions);
     this.correctCallInstructionsTypes();
-    this.tableImport = mod.tableImports;
+    this.tableImports = mod.tableImports;
     this.elements = mod.elements;
   }
 
