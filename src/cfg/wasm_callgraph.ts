@@ -79,14 +79,21 @@ export function buildWasmCallGraph(
     visited.add(f);
 
     const fg = cfg.get(f);
+    let calls: number[] = [];
     if (fg === undefined) {
-      // happens if f is an import
-      continue;
+      // f is an import
+      if (!importedFuncs.has(f)) {
+        throw new Error(
+          `Function ${f} that has no CFG is expected to be an imported func`,
+        );
+      }
+      calls = allExportedFuncs;
+    } else {
+      calls = fg.calls
+        .map((c) => c.funIdx)
+        .concat(fg.callIndirects.flatMap((ci) => ci.targetFuncs));
     }
 
-    const calls = fg.calls
-      .map((c) => c.funIdx)
-      .concat(fg.callIndirects.flatMap((ci) => ci.targetFuncs));
     for (const call of calls) {
       addEdge(nodes, f, call);
       if (!visited.has(call)) {
