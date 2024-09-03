@@ -8,6 +8,7 @@ import {
   type ParsedModule,
   parseWasmModule,
   type Section,
+  type TableExport,
 } from '../parsers/wasm_module_parser';
 import { execSync } from 'child_process';
 import {
@@ -41,6 +42,7 @@ export class WasmModule {
   private readonly _globalInstructions: WasmInstruction[];
   private readonly _sections: Section[];
   public readonly tableImports: ModuleTableImport[];
+  public readonly tableExports: TableExport[];
   public readonly elements: ModuleElement[];
 
   constructor(wasmPath: string) {
@@ -63,6 +65,7 @@ export class WasmModule {
     this._instructions = retrieveAllInstructions(mod, this.functions);
     this.correctCallInstructionsTypes();
     this.tableImports = mod.tableImports;
+    this.tableExports = mod.tableExports;
     this.elements = mod.elements;
   }
 
