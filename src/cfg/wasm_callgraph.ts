@@ -86,10 +86,7 @@ export function buildWasmCallGraph(
 
   const entryNodes: CallGraphNode[] = [];
   for (const f of entryFuncs) {
-    const n = nodes.get(f);
-    if (n !== undefined) {
-      entryNodes.push(n);
-    }
+    entryNodes.push(getNodeOrCreate(nodes, f));
   }
   return new WasmCallGraph(entryNodes, nodes);
 }
