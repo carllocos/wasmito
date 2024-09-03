@@ -120,24 +120,6 @@ interface Func {
   bodySize: number;
 }
 
-export interface ModuleFuncImportDescription {
-  type: string;
-  id: string;
-  signature: FuncSignature;
-}
-
-export interface ModuleFuncImport {
-  module: string;
-  name: string;
-  descr: ModuleFuncImportDescription;
-  loc: WasmSourceLocation;
-}
-
-enum ImportType {
-  FuncImport = 'FuncImportDescr',
-  TableImport = 'Table',
-}
-
 export interface GlobalType {
   type: 'GlobalType';
   valtype: string;
