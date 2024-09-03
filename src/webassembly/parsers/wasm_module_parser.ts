@@ -150,11 +150,6 @@ export interface ModuleTableImport {
   loc: WasmSourceLocation;
 }
 
-export interface FunExport {
-  name: string;
-  id?: number;
-}
-
 export interface GlobalType {
   type: 'GlobalType';
   valtype: string;
@@ -919,6 +914,30 @@ function parseFuncImports(fields: any): ModuleFuncImport[] {
     .sort((a, b) => {
       return a.loc.start.column - b.loc.start.column;
     });
+}
+/**
+ * Exported content
+ */
+
+enum ExportType {
+  Func = 'Func',
+}
+
+export interface FunExport {
+  name: string;
+  id?: number;
+}
+
+function isExportField(obj: any): boolean {
+  return (
+    typeof obj === 'object' &&
+    obj.type === 'ModuleExport' &&
+    typeof obj.descr === 'object'
+  );
+}
+
+function validExportFuncField(obj: any): boolean {
+  return isExportField(obj) && obj.descr.exportType === ExportType.Func;
 }
 
 function parseExportFuncs(fields: any): FunExport[] {
