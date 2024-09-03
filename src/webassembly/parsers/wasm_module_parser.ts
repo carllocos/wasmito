@@ -137,19 +137,6 @@ enum ImportType {
   TableImport = 'Table',
 }
 
-export interface ModuleTableImportDescription {
-  type: string;
-  value: string;
-  id: number;
-}
-
-export interface ModuleTableImport {
-  module: string;
-  name: string;
-  descr: ModuleTableImportDescription;
-  loc: WasmSourceLocation;
-}
-
 export interface GlobalType {
   type: 'GlobalType';
   valtype: string;
@@ -964,13 +951,22 @@ function parseExportFuncs(fields: any): FunExport[] {
   return exports;
 }
 
-function validExportFuncField(obj: any): boolean {
-  return (
-    typeof obj === 'object' &&
-    obj.type === 'ModuleExport' &&
-    typeof obj.descr === 'object' &&
-    obj.descr.exportType === 'Func'
-  );
+
+/**
+ * Imported content
+ */
+
+export interface ModuleTableImportDescription {
+  type: string;
+  value: string;
+  id: number;
+}
+
+export interface ModuleTableImport {
+  module: string;
+  name: string;
+  descr: ModuleTableImportDescription;
+  loc: WasmSourceLocation;
 }
 
 function parseTableImportDescription(obj: any): ModuleTableImportDescription {
