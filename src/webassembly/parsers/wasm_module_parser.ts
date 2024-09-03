@@ -745,6 +745,7 @@ export function parseWasmModule(wasmPath: string): [ParsedModule, string[]] {
     const [funcs, funErrors] = parseFuncFields(mod.fields);
     const funcImports = parseFuncImports(mod.fields);
     const tableImports = parseTableImports(mod.fields);
+    const tableExports = parseExportTable(mod.fields);
     const elements = parseElements(mod.fields);
     const [globals, globalsErrs] = parseGlobals(mod.fields);
     // TODO fiels 'Table', 'Memory'. 'Elem', 'ModuleExport'
@@ -756,6 +757,7 @@ export function parseWasmModule(wasmPath: string): [ParsedModule, string[]] {
       funcs,
       funcImports,
       tableImports,
+      tableExports,
       elements,
       globals,
       ast: mod,
