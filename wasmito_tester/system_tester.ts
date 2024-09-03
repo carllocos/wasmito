@@ -30,11 +30,13 @@ export class SystemTester {
   >;
 
   private readonly deviceTestsMap: Map<DeviceID, TestScenario[]>;
+  private readonly storedHookValues: Map<string, any>;
 
   constructor(setup: DevicesLab) {
     this.systemDeployer = new SystemDeployer(setup);
     this.testScenarios = [];
     this.deviceTestsMap = new Map();
+    this.storedHookValues = new Map();
   }
 
   get logger(): winston.Logger {
