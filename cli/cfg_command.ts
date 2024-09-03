@@ -6,7 +6,11 @@ import {
   isFilePath,
   pathJoin,
 } from '../src/util/file_util';
-import { SourceMapFromJSON } from '../src/source_mappers/source_map_builder';
+import {
+  SourceMapFromJSON,
+  SourceMapfromSourceMapSpec,
+  type SourceOffsetStart,
+} from '../src/source_mappers/source_map_builder';
 import { constructLanguageAdaptor } from '../src/language_adaptors/language_adaptor';
 import { type DotSerializationConfgig } from '../src/cfg/source_cfg';
 import { timeoutPromise } from '../src/util/promise_util';
@@ -92,7 +96,15 @@ export function registerCFGCommand(program: Command): void {
       } else if (dwarfPath !== undefined) {
         program.error(`dwarf todo`);
       } else if (sourceSpecPath !== undefined) {
-        program.error(`source-map spec todo`);
+        const startPositioning: SourceOffsetStart = {
+          colNrStartNumber: 0,
+          lineNrStartNumber: 1,
+        };
+        smPromise = SourceMapfromSourceMapSpec(
+          sourceSpecPath,
+          wasmPath,
+          startPositioning,
+        );
       } else {
         program.error('At least one debugging format should be opted for');
       }
