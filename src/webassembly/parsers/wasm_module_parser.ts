@@ -105,6 +105,7 @@ export interface ParsedModule {
   globals: ParsedGlobal[];
   localsNames: LocalName[];
   sections: Section[];
+  tableExports: TableExport[];
   tableImports: ModuleTableImport[];
   types: WasmType[];
   wasmBuffer: Buffer;
