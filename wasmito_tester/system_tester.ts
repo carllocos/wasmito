@@ -473,7 +473,13 @@ export class SystemTester {
           });
       };
 
-      hook.subscribe(cb);
+      if (this.storedHookValues.has(action.subscribeToID)) {
+        const v = this.storedHookValues.get(action.subscribeToID);
+        this.storedHookValues.delete(action.subscribeToID);
+        cb(v);
+      } else {
+        hook.subscribe(cb);
+      }
     });
     return await maybeTimeoutPromise(p, action.timeout);
   }
