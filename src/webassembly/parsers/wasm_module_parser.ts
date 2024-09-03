@@ -812,6 +812,108 @@ export function parseWasmModule(wasmPath: string): [ParsedModule, string[]] {
 }
 
 /**
+ * Exports
+ */
+
+enum ExportType {
+  Func = 'Func',
+  Table = 'Table',
+}
+
+export interface FunExport {
+  name: string;
+  id?: number;
+}
+
+function isExportField(obj: any): boolean {
+  return (
+    typeof obj === 'object' &&
+    obj.type === 'ModuleExport' &&
+    typeof obj.descr === 'object'
+  );
+}
+
+function validExportFuncField(obj: any): boolean {
+  return isExportField(obj) && obj.descr.exportType === ExportType.Func;
+}
+
+function parseExportFuncs(fields: any): FunExport[] {
+  const exports: FunExport[] = [];
+  for (const f of fields) {
+    if (validExportFuncField(f)) {
+      if (f.name === undefined || typeof f.name !== 'string') {
+        throw new Error(
+          `Found a case where the name is missing or is not a string in export field ${f}`,
+        );
+      }
+      let id: number | undefined;
+      if (f.descr.id.type === 'NumberLiteral') {
+        id = f.descr.id.value;
+      }
+
+      const ef: FunExport = {
+        name: f.name,
+        id,
+      };
+      exports.push(ef);
+    }
+  }
+  return exports;
+}
+
+export interface TableExport {
+  name: string;
+  id: number;
+}
+
+function validExportTableField(obj: any): boolean {
+  return isExportField(obj) && obj.descr.exportType === ExportType.Table;
+}
+
+function parseExportTable(fields: any): TableExport[] {
+  // example of a table exported field
+  // {
+  //   type: "ModuleExport",
+  //   name: "table",
+  //   descr: {
+  //     type: "ModuleExportDescr",
+  //     exportType: "Table",
+  //     id: {
+  //       type: "NumberLiteral",
+  //       value: 0,
+  //       raw: "0",
+  //     },
+  //   },
+  //   loc: {...},
+  // }
+  const exports: TableExport[] = [];
+  for (const f of fields) {
+    if (validExportTableField(f)) {
+      if (
+        typeof f.name !== 'string' ||
+        f.descr.type !== 'ModuleExportDescr' ||
+        typeof f.descr.id !== 'object' ||
+        f.descr.id.type !== 'NumberLiteral' ||
+        typeof f.descr.id.value !== 'number'
+      ) {
+        throw new Error(
+          `Case where table export does not match expected inteface. Field ${JSON.stringify(f)}`,
+        );
+      }
+      const loc = f.loc;
+      assertWasmSourceCodeLocation(loc);
+      const id = f.descr.id.value;
+      const ef: TableExport = {
+        name: f.name,
+        id,
+      };
+      exports.push(ef);
+    }
+  }
+  return exports;
+}
+
+/**
  * Imports
  */
 
