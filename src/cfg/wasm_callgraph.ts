@@ -38,19 +38,30 @@ export function buildWasmCallGraph(
     .filter((f) => mainNames.has(f.name))
     .map((f) => f.id);
 
-  for (const ti of wasm.tableImport) {
-    for (const el of wasm.elements) {
-      if (el.tableId === ti.descr.id) {
-        el.funcs.forEach((f) => entryFuncs.push(f));
-      }
-    }
-  }
+  // if no entry funcs found
+  // consider all exported funcs
+  // as possible entry funcs
   if (entryFuncs.length === 0) {
     const fidMin = wasm.imports.length;
     wasm.functions
       .filter((f) => f.exported && f.id >= fidMin)
       .map((f) => f.id)
       .forEach((f) => entryFuncs.push(f));
+  }
+
+  // imported host funcs could call
+  // (1) any explicitly exported func in module marked with `export`
+  // (2) any func added to a table imported by the host environment
+  const importedFuncs = new Set(wasm.imports.map((f) => f.id));
+  const allExportedFuncs = wasm.functions
+    .filter((f) => f.exported)
+    .map((f) => f.id);
+  for (const ti of wasm.tableImport) {
+    for (const el of wasm.elements) {
+      if (el.tableId === ti.descr.id) {
+        el.funcs.forEach((f) => allExportedFuncs.push(f));
+      }
+    }
   }
 
   const nodes = new Map<number, CallGraphNode>();
