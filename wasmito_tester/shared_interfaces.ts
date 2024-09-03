@@ -95,6 +95,16 @@ export interface SubscriptionEmitterAction<
   checkSetupSuccess: (actionResult: ActionResultType) => Promise<boolean>;
   ifFail?: FailureHandler<ActionResultType>;
   timeout?: number;
+
+  /**
+   * stores every newly emitted value
+   * uses it on the first subscriber and removes it then.
+   *
+   * This is usefull for situations when there is a small
+   * time window between the value gets emitted and the subscriber
+   * registering for such value
+   */
+  store?: boolean; // defaults true
 }
 
 export function isSubscriptionEmitterAction<
@@ -115,6 +125,7 @@ export function isSubscriptionEmitterAction<
     typeof obj.setupSubscription === 'function' &&
     typeof obj.checkSetupSuccess === 'function' &&
     (obj.timeout === undefined || typeof obj.timeout === 'number') &&
+    (obj.store === undefined || typeof obj.store === 'boolean') &&
     (obj.ifFail === undefined || isTestFailure(obj.ifFail))
   );
 }
