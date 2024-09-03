@@ -42,7 +42,7 @@ export function buildWasmCallGraph(
   // consider all exported funcs
   // as possible entry funcs
   if (entryFuncs.length === 0) {
-    const fidMin = wasm.imports.length;
+    const fidMin = wasm.importFuncs.length;
     wasm.functions
       .filter((f) => f.exported && f.id >= fidMin)
       .map((f) => f.id)
@@ -52,7 +52,7 @@ export function buildWasmCallGraph(
   // imported host funcs could call
   // (1) any explicitly exported func in module marked with `export`
   // (2) any func added to a table imported by the host environment
-  const importedFuncs = new Set(wasm.imports.map((f) => f.id));
+  const importedFuncs = new Set(wasm.importFuncs.map((f) => f.id));
   const allExportedFuncs = wasm.functions
     .filter((f) => f.exported)
     .map((f) => f.id);
