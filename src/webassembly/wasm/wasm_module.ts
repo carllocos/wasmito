@@ -32,7 +32,7 @@ export class WasmModule {
   public readonly wasmPath: string;
 
   public readonly types: WasmType[];
-  public readonly imports: WASMFunction[];
+  public readonly importFuncs: WASMFunction[];
   public readonly globals: WasmGlobal[];
   public readonly functions: WASMFunction[];
   private readonly ast: object;
@@ -54,7 +54,7 @@ export class WasmModule {
     this.wasmPath = wasmPath;
     this._sections = createSections(mod);
     this.functions = createWasmFunctions(wasmPath, mod);
-    this.imports = createImportedFunctions(mod);
+    this.importFuncs = createImportedFunctions(mod);
     this.globals = createWasmGlobals(mod);
     this.types = createWasmTypes(mod);
     this.ast = mod.ast;
@@ -176,12 +176,12 @@ export class WasmModule {
   }
 
   public getFunction(id: number): WASMFunction | undefined {
-    if (id >= this.imports.length) {
+    if (id >= this.importFuncs.length) {
       return this.functions.find((f) => {
         return f.id === id;
       });
     } else {
-      return this.imports.find((f) => {
+      return this.importFuncs.find((f) => {
         return f.id === id;
       });
     }

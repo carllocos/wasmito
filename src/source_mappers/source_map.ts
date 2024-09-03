@@ -212,12 +212,12 @@ export class SourceMap {
 
   // move next method to AST
   public getFunction(id: number): WASMFunction | undefined {
-    if (id >= this.wasm.imports.length) {
+    if (id >= this.wasm.importFuncs.length) {
       return this.wasm.functions.find((f) => {
         return f.id === id;
       });
     } else {
-      return this.wasm.imports.find((f) => {
+      return this.wasm.importFuncs.find((f) => {
         return f.id === id;
       });
     }

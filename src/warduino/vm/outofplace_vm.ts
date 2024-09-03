@@ -276,7 +276,7 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
     maxWaitTime?: number,
   ): Promise<boolean> {
     const sm = this.sourceMap;
-    const primitiveFuncs = sm.wasm.imports;
+    const primitiveFuncs = sm.wasm.importFuncs;
     for (const func of primitiveFuncs) {
       const succ = await this.registerFuncForProxyCall(func, maxWaitTime);
       if (!succ) return succ;
