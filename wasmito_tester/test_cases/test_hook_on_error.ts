@@ -2,9 +2,12 @@ import { createSystemSetup, oneM5StickCDev } from '../reausable_system_setups';
 import { SystemTester, type TestScenario } from '../system_tester';
 import { createOnErrorActionEmitter, runVMAction } from '../reusable_actions';
 import { type WasmState } from '../../src/webassembly';
-import { type TestProgram } from '../shared_interfaces';
+import {
+  type TestScenarioResult,
+  type TestProgram,
+} from '../shared_interfaces';
 import { TargetLanguage } from '../../src/compilers/prog_language_selection';
-import { type WATCompilerArgs } from '../../src/compilers/wat_compilers';
+import { type WasmCompilerArgs } from '../../src/compilers/wasm_compiler';
 
 /*
  * Note on the program
@@ -13,11 +16,11 @@ import { type WATCompilerArgs } from '../../src/compilers/wat_compilers';
  * The triggered error is exactly what we are testing here.
  */
 
-const watArgs: WATCompilerArgs = {
-  sourceCodePath: './src/tool_examples/wat_examples/dimmer-double-button.wat',
+const watArgs: WasmCompilerArgs = {
+  wasmPath: './tool_examples/wat_examples/dimmer-double-button.wasm',
 };
 const program: TestProgram = {
-  targetLanguage: TargetLanguage.WAT,
+  targetLanguage: TargetLanguage.Wasm,
   sourceCodeCompilationArgs: watArgs,
 };
 
@@ -33,11 +36,6 @@ const systemSetup = createSystemSetup(
   'System with M5stickCMCU and one M5StickCDev',
   [m5stickDev],
 );
-
-systemSetup.logger = {
-  name: 'ScenarioTestHookOnError',
-  level: 'debug',
-};
 
 /*
  * Test Cases
@@ -68,10 +66,12 @@ const testAddHookOnError: TestScenario = {
   ],
 };
 
-// Uncomment for test with external process
-// import { Target } from '../shared_interfaces';
-// m5stickDev.toolPort = 8300;
-// m5stickDev.target = Target.devExternal;
-const tester = new SystemTester(systemSetup);
-tester.addTestScenario(testAddHookOnError, m5stickDev.id);
-tester.runTests().catch(console.error);
+export async function run(): Promise<TestScenarioResult[]> {
+  // Uncomment for test with external process
+  // import { Target } from '../shared_interfaces';
+  // m5stickDev.toolPort = 8300;
+  // m5stickDev.target = Target.devExternal;
+  const tester = new SystemTester(systemSetup);
+  tester.addTestScenario(testAddHookOnError, m5stickDev.id);
+  return await tester.runTests();
+}
