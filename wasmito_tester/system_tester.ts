@@ -44,19 +44,18 @@ export class SystemTester {
   }
 
   addTestScenario(scenario: TestScenario, targetDeviceID: DeviceID): void {
-    if (scenario.skipTest !== undefined && scenario.skipTest) {
-      return;
-    }
-    this.assertNotEmptyScenario(scenario);
-    this.assertValidScenarioFields(scenario);
-    this.assertDeviceIDExists(targetDeviceID);
-    this.assertUniqueSubscriptionIDs(scenario);
-    this.assertSubscriptionOnlyToExistingID(scenario);
-    this.assertSubscriptionActionsAllHaveSubscribers(scenario);
+    if (scenario.skipTest === undefined || !scenario.skipTest) {
+      this.assertNotEmptyScenario(scenario);
+      this.assertValidScenarioFields(scenario);
+      this.assertDeviceIDExists(targetDeviceID);
+      this.assertUniqueSubscriptionIDs(scenario);
+      this.assertSubscriptionOnlyToExistingID(scenario);
+      this.assertSubscriptionActionsAllHaveSubscribers(scenario);
 
-    const deviceTests = this.deviceTestsMap.get(targetDeviceID) ?? [];
-    deviceTests.push(scenario);
-    this.deviceTestsMap.set(targetDeviceID, deviceTests);
+      const deviceTests = this.deviceTestsMap.get(targetDeviceID) ?? [];
+      deviceTests.push(scenario);
+      this.deviceTestsMap.set(targetDeviceID, deviceTests);
+    }
 
     this.testScenarios.push([
       targetDeviceID,
