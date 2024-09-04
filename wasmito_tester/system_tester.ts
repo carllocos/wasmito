@@ -66,11 +66,17 @@ export class SystemTester {
   }
 
   private createTestScenarioResult(scenario: TestScenario): TestScenarioResult {
+    let result = ActionRunState.Cancelled;
+    let skip = false;
+    if (scenario.skipTest !== undefined && scenario.skipTest) {
+      result = ActionRunState.Skipped;
+      skip = true;
+    }
     const actionRunResults: ActionRunResult[] =
       scenario.actions?.map((action) => {
         return {
           action,
-          result: ActionRunState.Cancelled,
+          result,
         };
       }) ?? [];
 
@@ -78,12 +84,14 @@ export class SystemTester {
       scenario.expect?.map((expect) => {
         return {
           action: expect,
-          result: ActionRunState.Cancelled,
+          result,
         };
       }) ?? [];
     const testResult: TestScenarioResult = {
       scenario,
-      result: TestScenarioResultState.Running,
+      result: skip
+        ? TestScenarioResultState.Skipped
+        : TestScenarioResultState.Running,
       actionRunResults,
       expectRunResults,
     };
