@@ -270,6 +270,8 @@ export interface DeviceSetup {
   disableStrictModuleLoad?: boolean;
 
   postSetup: PostSetupConfig;
+
+  setupMaxWaitTime?: number; // defaults 2 min
 }
 
 export interface LoggerConfig {
