@@ -38,7 +38,7 @@ export class SystemDeployer {
     this.setup = setup;
     this.vmMap = new Map();
     const loggerName = setup.logger?.name ?? 'SystemDeployer';
-    let loggerLevel = LogLevel.LogInfo;
+    let loggerLevel = LogLevel.LogOff;
     if (setup.logger?.level !== undefined) {
       const level = getLogLevelFromString(setup.logger.level);
       if (level !== undefined) {
