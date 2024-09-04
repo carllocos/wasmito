@@ -12,7 +12,7 @@ const testFileArgs = cliArgs.slice(1);
 
 console.info(`Running Tests of '${testFile}'`, "with args", testFileArgs);
 const testFileMod = require(testFile);
-if (testFileMod.run === 0) {
+if (testFileMod.run === undefined) {
   console.error(`imported script ${testFile} has no exported 'run' fun`);
   process.exit(1);
 }
