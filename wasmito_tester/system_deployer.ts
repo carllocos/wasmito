@@ -160,6 +160,7 @@ export class SystemDeployer {
       platform,
       program.sourceCodeCompilationArgs,
     );
+    vm.channel.addOnData(this.onDataLogger.bind(this));
     this.usedSerialPorts.add(platform.config.vmConfig.serialPort);
     await this.waitUntilVMReady(
       vm,
@@ -295,5 +296,9 @@ export class SystemDeployer {
       }
     }
     this.vmMap.set(device.id, vm);
+  }
+
+  private onDataLogger(d: string): void {
+    console.debug(d);
   }
 }
