@@ -222,6 +222,7 @@ export enum ActionRunState {
   Cancelled = 'Cancelled',
   TimedOut = 'Timedout',
   Delayed = 'Delayed',
+  Skipped = 'Skipped',
 }
 
 export interface ActionRunResult {
@@ -234,6 +235,7 @@ export enum TestScenarioResultState {
   Success = 'Success',
   Failed = 'Failed',
   Running = 'Running',
+  Skipped = 'Skipped',
 }
 
 export interface TestScenarioResult {
