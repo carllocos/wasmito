@@ -47,4 +47,4 @@ async function runTest() {
   }
 }
 
-runTest().then(console.log).catch(console.error);
+runTest().catch(console.error);
