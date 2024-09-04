@@ -298,6 +298,6 @@ export class SystemDeployer {
   }
 
   private onDataLogger(d: string): void {
-    console.debug(d);
+    console.debug('MCU:', d);
   }
 }
