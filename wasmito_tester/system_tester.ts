@@ -169,6 +169,7 @@ export class SystemTester {
     const vm = this.systemDeployer.deviceVM(targetDeviceID);
     const actionHooksMap = new Map<string, HookWithSubscription<any>>();
 
+    console.debug(`'${scenario.testName}'`);
     const doExpects = await this.runActions(
       vm,
       scenario.testName,
@@ -200,6 +201,7 @@ export class SystemTester {
     actions: Array<Act<any, any, any>>,
     actionRunResults: ActionRunResult[],
     hookMap: Map<string, HookWithSubscription<any>>,
+    logPrefix: string = 'Action',
   ): Promise<boolean> {
     for (let i = 0; i < actions.length; i++) {
       const actionRunResult = actionRunResults[i];
@@ -212,14 +214,16 @@ export class SystemTester {
           [resultValue, success] = await this.runActionToEmitSubscriptionValues(
             vm,
             action,
-            i,
             hookMap,
+            logPrefix,
+            i,
           );
         } else if (isActionThatSubscribesTo(action)) {
           [resultValue, success] = await this.runActionThatSubscribesTo(
             action,
-            i,
             hookMap,
+            logPrefix,
+            i,
           );
         } else if (isDelayedAction(action)) {
           let res: DelayResolver | undefined;
@@ -229,7 +233,15 @@ export class SystemTester {
           if (res === undefined) {
             throw new Error(`laal`);
           }
-          this.delayAction(scenarioName, action, actionRunResult, i, vm, res);
+          this.delayAction(
+            scenarioName,
+            action,
+            actionRunResult,
+            vm,
+            res,
+            logPrefix,
+            i,
+          );
           success = await p;
           // the actionRunResult is filled by delayAction.
           // Thus continue
@@ -240,7 +252,12 @@ export class SystemTester {
           }
         } else if (isAction(action)) {
           // important has to be the last case of the if
-          [resultValue, success] = await this.runAction(vm, action);
+          [resultValue, success] = await this.runAction(
+            vm,
+            action,
+            logPrefix,
+            i,
+          );
         } else {
           throw new Error(`Invalid type action`);
         }
@@ -253,6 +270,8 @@ export class SystemTester {
             action,
             actionRunResult,
             `check on action with index #${i} is false`,
+            logPrefix,
+            i,
           );
           return false;
         }
@@ -279,9 +298,13 @@ export class SystemTester {
   >(
     vm: WARDuinoVM,
     action: SubscriptionEmitterAction<R, H, S>,
-    actionIndex: number,
     hookMap: Map<string, HookWithSubscription<any>>,
+    logPrefix: string,
+    actionIndex: number,
   ): Promise<[R, boolean]> {
+    console.debug(
+      `${logPrefix} #${actionIndex}: Setting subscription for '${action.subscriptionID}'`,
+    );
     const result = await maybeTimeoutPromise(
       action.setupSubscription(vm),
       action.timeout,
@@ -290,6 +313,9 @@ export class SystemTester {
     const valueForCheck = result[0];
     const successfulCheck = await action.checkSetupSuccess(valueForCheck);
     if (successfulCheck) {
+      console.debug(
+        `${logPrefix} #${actionIndex}: successful Subscription setup for '${action.subscriptionID}'`,
+      );
       const hook = result[1];
       if (action.store === undefined || action.store) {
         hook.subscribe((v: any) => {
@@ -308,29 +334,30 @@ export class SystemTester {
     expectsResults: ActionRunResult[],
     hookMap: Map<string, HookWithSubscription<any>>,
   ): Promise<boolean> {
+    const logPrefix = 'Expect';
     return await this.runActions(
       vm,
       scenarioName,
       expects,
       expectsResults,
       hookMap,
+      logPrefix,
     );
   }
 
   private logActionSuccess(
     successful: boolean,
     scenarioName: string,
-    actionIndex: number,
     actionRunResult: ActionRunResult,
+    logPrefix: string,
+    actionIndex: number,
   ): void {
     if (!successful) {
-      this.logger.error(
-        `TestScenario '${scenarioName}': Action #${actionIndex} failed with msg '${actionRunResult.failMsg}'`,
+      console.error(
+        `${logPrefix} #${actionIndex}: failed with msg '${actionRunResult.failMsg}'`,
       );
     } else {
-      this.logger.info(
-        `TestScenario '${scenarioName}': Action #${actionIndex} succeeded`,
-      );
+      console.debug(`${logPrefix} #${actionIndex}: succeeded`);
     }
   }
 
@@ -340,22 +367,28 @@ export class SystemTester {
     S extends HookWithSubscription<H>,
   >(
     action: SubscribeAction<H, S>,
-    actionIndex: number,
     hookMap: Map<string, HookWithSubscription<any>>,
+    logPrefix: string,
+    actionIdx: number,
   ): Promise<[T, boolean]> {
     const hook = hookMap.get(action.subscribeToID);
     if (hook === undefined) {
       throw Error(
-        `Action ${actionIndex} is attempting to subscribe to an unexisting subscriptionID '${action.subscribeToID}'`,
+        `${logPrefix} # ${actionIdx}: is attempting to subscribe to an unexisting subscriptionID '${action.subscribeToID}'`,
       );
     }
-    return await this.subscribeToHook(action, hook);
+    return await this.subscribeToHook(action, hook, logPrefix, actionIdx);
   }
 
   private async runAction<T>(
     vm: WARDuinoVM,
     action: Action<T>,
+    logPrefix: string,
+    actionIdx: number,
   ): Promise<[T, boolean]> {
+    console.debug(
+      `${logPrefix} #${actionIdx}: running '${action.description}'`,
+    );
     const r = await action.doAction(vm);
     const s = await action.checkActionSuccess(r);
     return [r, s];
@@ -365,9 +398,10 @@ export class SystemTester {
     scenarioName: string,
     action: Action<T>,
     actionRunResult: ActionRunResult,
-    actionIndex: number,
     vm: WARDuinoVM,
     resolveDelay: DelayResolver,
+    logPrefix: string,
+    actionIndex: number,
   ): void {
     const isDelayed = action.delay !== undefined;
     actionRunResult.result = ActionRunState.Delayed;
@@ -376,19 +410,20 @@ export class SystemTester {
         scenarioName,
         action,
         actionRunResult,
-        actionIndex,
         vm,
         resolveDelay,
+        logPrefix,
+        actionIndex,
       );
     }, action.delay);
 
     if (isDelayed) {
-      this.logger.info(
-        `TestScenario '${scenarioName}': Action #${actionIndex} '${action.description}' delayed for #${action.delay} ms`,
+      console.debug(
+        `${logPrefix} #${actionIndex}: '${action.description}' delayed for #${action.delay} ms`,
       );
     } else {
-      this.logger.error(
-        `TestScenario '${scenarioName}': attempting to delay Action #${actionIndex} '${action.description}' which cannot be delayed without 'delay' field`,
+      console.error(
+        `${logPrefix}' ${actionIndex}: attempting to delay '${action.description}' which cannot be delayed without 'delay' field`,
       );
     }
   }
@@ -397,9 +432,10 @@ export class SystemTester {
     scenarioName: string,
     action: Action<T>,
     actionRunResult: ActionRunResult,
-    actionIndex: number,
     vm: WARDuinoVM,
     resolveDelay: DelayResolver,
+    logPrefix: string,
+    actionIndex: number,
   ): void {
     let successFul = false;
     let errorOccurred = false;
@@ -421,7 +457,9 @@ export class SystemTester {
             actionResult,
             action,
             actionRunResult,
-            `check on action with index #${actionIndex} is false`,
+            `${logPrefix} #${actionIndex}: check is false`,
+            logPrefix,
+            actionIndex,
           );
         }
         successFul = successCheck;
@@ -431,7 +469,7 @@ export class SystemTester {
         this.fillRunActionDueToError(
           err,
           actionRunResult,
-          `action with index #${actionIndex} failed due to exception`,
+          `${logPrefix} #${actionIndex}: failed due to exception`,
         );
       })
       .finally(() => {
@@ -444,8 +482,9 @@ export class SystemTester {
         this.logActionSuccess(
           successFul,
           scenarioName,
-          actionIndex,
           actionRunResult,
+          logPrefix,
+          actionIndex,
         );
         resolveDelay(successFul);
       });
@@ -454,7 +493,12 @@ export class SystemTester {
   private async subscribeToHook<T>(
     action: SubscribeAction<any, any>,
     hook: HookWithSubscription<any>,
+    logPrefix: string,
+    actionIdx: number,
   ): Promise<[T, boolean]> {
+    console.debug(
+      `${logPrefix} #${actionIdx}: setting up subscribe to '${action.subscribeToID}'`,
+    );
     const p = new Promise<[T, boolean]>((resolve, reject) => {
       const cb = (r: T): void => {
         action
@@ -489,6 +533,8 @@ export class SystemTester {
     action: Act<any, any, any>,
     actionRunResult: ActionRunResult,
     fallbackFailMsg: string,
+    logPrefix: string,
+    actionIdx: number,
   ): void {
     actionRunResult.result = ActionRunState.Failed;
 
@@ -499,8 +545,8 @@ export class SystemTester {
       } else if (typeof action.ifFail === 'string') {
         msg = action.ifFail;
       } else {
-        this.logger.error(
-          `Action does not provide a function or a string for ifFail value`,
+        console.error(
+          `${logPrefix} #${actionIdx}: does not provide a function or a string for ifFail value`,
         );
       }
     }
