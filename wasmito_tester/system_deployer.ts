@@ -6,7 +6,7 @@ import {
   createLogger,
   getLogLevelFromString,
 } from '../src/logger/logger';
-import { timeoutPromise } from '../src/util/promise_util';
+import { maybeTimeoutPromise, timeoutPromise } from '../src/util/promise_util';
 import { type WARDuinoVM } from '../src/warduino/vm/warduino_vm';
 import {
   type DeviceSetup,
@@ -20,6 +20,7 @@ import {
   autoBuildArduinoPlatform,
   createDevPlatform,
 } from '../src/platforms/platformbuilder_factory';
+import { type MCUWARDuinoVM } from '../src/warduino/vm/mcu_vm';
 
 export class SystemDeployer {
   private readonly setup;
@@ -160,8 +161,49 @@ export class SystemDeployer {
       program.sourceCodeCompilationArgs,
     );
     this.usedSerialPorts.add(platform.config.vmConfig.serialPort);
+    await this.waitUntilVMReady(
+      vm,
+      device.setupMaxWaitTime ?? this.MAX_WAIT_VM_READY,
+    );
     await this.applyPostDeployment(device, vm);
   }
+
+  private async waitUntilVMReady(
+    vm: MCUWARDuinoVM,
+    maxWaitTime: number,
+  ): Promise<void> {
+    let cb: ((d: string) => void) | undefined;
+    try {
+      const p = new Promise<void>((resolve) => {
+        cb = (d: string) => {
+          const possibleLoadedMessages = ['LOADED', 'START', 'Free heap:'];
+          for (let idx = 0; idx < possibleLoadedMessages.length; idx++) {
+            const m = possibleLoadedMessages[idx];
+            if (d.includes(m)) {
+              resolve();
+              break;
+            }
+          }
+        };
+        vm.channel.addOnData(cb);
+      });
+      await maybeTimeoutPromise(p, maxWaitTime);
+    } catch (err) {
+      let errMsg = err;
+      if (err instanceof Error) {
+        errMsg = `${err.message}. Trace: ${err.stack}`;
+      }
+      console.error(
+        `While waiting for VM to be ready error occurred: ${errMsg}`,
+      );
+      return;
+    } finally {
+      if (cb !== undefined) {
+        vm.channel.removeOnData(cb);
+      }
+    }
+  }
+
 
   private async deployDev(
     testProgram: TestProgram,
