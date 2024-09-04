@@ -10,16 +10,19 @@ import {
 } from '../../src/warduino/requests/around_function_request';
 import { type WARDuinoVM } from '../../src/warduino/vm/warduino_vm';
 import { ResponseType } from '../../src/warduino/api/request_interface';
-import { type TestProgram } from '../shared_interfaces';
+import {
+  type TestScenarioResult,
+  type TestProgram,
+} from '../shared_interfaces';
 import { TargetLanguage } from '../../src/compilers/prog_language_selection';
-import { type WATCompilerArgs } from '../../src/compilers/wat_compilers';
+import { type WasmCompilerArgs } from '../../src/compilers/wasm_compiler';
 
-const watArgs: WATCompilerArgs = {
-  sourceCodePath: './src/tool_examples/wat_examples/dimmer-double-button.wat',
+const wasmArgs: WasmCompilerArgs = {
+  wasmPath: './tool_examples/wat_examples/dimmer-double-button.wasm',
 };
 const program: TestProgram = {
-  targetLanguage: TargetLanguage.WAT,
-  sourceCodeCompilationArgs: watArgs,
+  targetLanguage: TargetLanguage.Wasm,
+  sourceCodeCompilationArgs: wasmArgs,
 };
 
 /*
@@ -33,12 +36,6 @@ const m5stickDev = oneM5StickCDev('2');
 const systemSetup = createSystemSetup('System with one M5StickCDev', [
   m5stickDev,
 ]);
-
-systemSetup.logger = {
-  name: 'ScenarioTestAroundFunction',
-  level: 'debug',
-};
-
 /*
  * Test Cases
  */
@@ -84,7 +81,9 @@ const testFailUnregisterProxyCall: TestScenario = {
 // import { Target } from '../shared_interfaces';
 // m5stickDev.toolPort = 8300;
 // m5stickDev.target = Target.devExternal;
-const tester = new SystemTester(systemSetup);
-tester.addTestScenario(testRegisterProxyCall, m5stickDev.id);
-tester.addTestScenario(testFailUnregisterProxyCall, m5stickDev.id);
-tester.runTests().catch(console.error);
+export async function run(): Promise<TestScenarioResult[]> {
+  const tester = new SystemTester(systemSetup);
+  tester.addTestScenario(testRegisterProxyCall, m5stickDev.id);
+  tester.addTestScenario(testFailUnregisterProxyCall, m5stickDev.id);
+  return await tester.runTests();
+}
