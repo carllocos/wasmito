@@ -138,6 +138,7 @@ export class SystemTester {
       } [${result.result.toUpperCase()}]`;
       const titleLength = testNameTitle.length;
       const separator = '='.repeat(titleLength);
+      console.log();
       console.log(separator);
       console.log(testNameTitle);
       console.log(separator);
