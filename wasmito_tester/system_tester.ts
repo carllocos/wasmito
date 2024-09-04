@@ -143,6 +143,9 @@ export class SystemTester {
       console.log(testNameTitle);
       console.log(separator);
       console.log();
+      if (result.result === TestScenarioResultState.Skipped) {
+        continue;
+      }
       for (let j = 0; j < result.actionRunResults.length; j++) {
         const actionResult = result.actionRunResults[j];
         console.log(
