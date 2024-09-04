@@ -205,7 +205,6 @@ export class SystemDeployer {
     }
   }
 
-
   private async deployDev(
     testProgram: TestProgram,
     device: DeviceSetup,
