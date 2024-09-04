@@ -12,14 +12,14 @@ const testFileArgs = cliArgs.slice(1);
 
 console.info(`Running Tests of '${testFile}'`, "with args", testFileArgs);
 const testFileMod = require(testFile);
-if (testFileMod.runTest === 0) {
-  console.error(`imported script ${testFile} has no exported 'runTest' fun`);
+if (testFileMod.run === 0) {
+  console.error(`imported script ${testFile} has no exported 'run' fun`);
   process.exit(1);
 }
 
-if (testFileMod.runTest.length !== testFileArgs.length) {
+if (testFileMod.run.length !== testFileArgs.length) {
   console.error(
-    `runTest of ${testFile} expects ${testFileMod.runTest.length}. Given ${testFileArgs.length}`
+    `run of ${testFile} expects ${testFileMod.run.length}. Given ${testFileArgs.length}`
   );
   process.exit(1);
 }
@@ -27,10 +27,7 @@ if (testFileMod.runTest.length !== testFileArgs.length) {
 async function runTest() {
   try {
     const startTime = Date.now();
-    const [testCaseResult] = await testFileMod.runTest.apply(
-      null,
-      testFileArgs
-    );
+    const [testCaseResult] = await testFileMod.run.apply(null, testFileArgs);
     const endTime = Date.now();
     const diff = endTime - startTime;
     console.info(
