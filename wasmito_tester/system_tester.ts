@@ -146,6 +146,9 @@ export class SystemTester {
           console.log();
         }
       }
+      if (result.expectRunResults.length > 0) {
+        console.log();
+      }
 
       for (let y = 0; y < result.expectRunResults.length; y++) {
         const expectResult = result.expectRunResults[y];
@@ -155,6 +158,8 @@ export class SystemTester {
         if (expectResult.result !== ActionRunState.Success) {
           console.log(`\t ${expectResult.failMsg}`);
         }
+      }
+      if (result.expectRunResults.length > 0) {
         console.log();
       }
     }
