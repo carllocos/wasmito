@@ -114,6 +114,9 @@ export class SystemTester {
   async runTests(): Promise<TestScenarioResult[]> {
     for (let i = 0; i < this.testScenarios.length; i++) {
       const [targetDeviceID, scenario, scenarioResult] = this.testScenarios[i];
+      if (scenario.skipTest !== undefined && scenario.skipTest) {
+        continue;
+      }
       await this.setupDevice(scenario, targetDeviceID);
       await this.runTestScenario(targetDeviceID, scenario, scenarioResult);
     }
