@@ -27,18 +27,27 @@ if (testFileMod.run.length !== testFileArgs.length) {
 async function runTest() {
   try {
     const startTime = Date.now();
-    const [testCaseResult] = await testFileMod.run.apply(null, testFileArgs);
+    const results = await testFileMod.run.apply(null, testFileArgs);
     const endTime = Date.now();
     const diff = endTime - startTime;
     console.info(
       `Took ${diff} ms, ${diff / 1000} secs, ${diff / 1000 / 60} mins`
     );
 
-    if (testCaseResult.result !== TestScenarioResultState.Success) {
-      console.error(
-        `TestScenario '${testCaseResult.scenario.testName}' Failed`
-      );
-      process.exit(1);
+    if (Array.isArray(results)) {
+      let exitCode = 0;
+
+      if (results.length > 0) {
+        for (let i = 0; i < results.length; i++) {
+          const [testCaseResult] = results;
+          if (testCaseResult.result === TestScenarioResultState.Failed) {
+            exitCode = 1;
+          }
+        }
+      } else {
+        console.log(`Nothing to report for ${testFile}`);
+      }
+      process.exit(exitCode);
     }
   } catch (e) {
     const errMsg = e instanceof Error ? e.message : e;
