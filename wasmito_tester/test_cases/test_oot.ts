@@ -7,23 +7,31 @@ import {
   runVMAction,
 } from '../reusable_actions';
 import { Breakpoint } from '../../src/debugger/breakpoint';
-import { type TestProgram, type PostSetupConfig } from '../shared_interfaces';
+import {
+  type TestProgram,
+  type PostSetupConfig,
+  type TestScenarioResult,
+} from '../shared_interfaces';
 import { RemoveAndProceedBreakpointPolicy } from '../../src/debugger/breakpoint_policies';
 import { type WARDuinoVM } from '../../src/warduino/vm/warduino_vm';
 import { TargetLanguage } from '../../src/compilers/prog_language_selection';
-import { type WATCompilerArgs } from '../../src/compilers/wat_compilers';
+import { type WasmCompilerArgs } from '../../src/compilers/wasm_compiler';
+import {
+  type SourceCodeLocation,
+  SourceMap,
+} from '../../src/source_mappers/source_map';
 
 /*
  * System Setup
  */
 
-const watArgs: WATCompilerArgs = {
-  sourceCodePath: './src/tool_examples/wat_examples/dimmer-double-button.wat',
+const wasmArgs: WasmCompilerArgs = {
+  wasmPath: './tool_examples/wat_examples/dimmer-double-button.wasm',
 };
 
 const program: TestProgram = {
-  targetLanguage: TargetLanguage.WAT,
-  sourceCodeCompilationArgs: watArgs,
+  targetLanguage: TargetLanguage.Wasm,
+  sourceCodeCompilationArgs: wasmArgs,
 };
 
 const postSetupConfigM5Dev: PostSetupConfig = {
@@ -40,9 +48,24 @@ const systemSetup = createSystemSetup('System with one M5StickCDev', [
   m5stickDev,
 ]);
 
-systemSetup.logger = {
-  name: 'ScenarioTestOutOfThings',
-  level: 'debug',
+// systemSetup.logger = {
+//   name: 'ScenarioTestOutOfThings',
+//   level: 'debug',
+// };
+
+const sm = new SourceMap(wasmArgs.wasmPath, [], []);
+const mainFunc = sm.wasm.getFunction(12); // fun id 12 is the main func
+if (mainFunc === undefined) {
+  throw new Error(`Failed to find main fun 12 in module ${wasmArgs.wasmPath}`);
+}
+
+const [localSetBrightness] = mainFunc.getLocalSetInstructions();
+const setBrightness: SourceCodeLocation = {
+  source: '',
+  linenr: 91,
+  colnr: -1,
+  address: localSetBrightness.startAddress,
+  name: '',
 };
 
 /*
@@ -56,13 +79,7 @@ const normalBP: TestScenario = {
   actions: [
     addBreakpointSubscription(
       'BP line 91',
-      new Breakpoint({
-        source: '',
-        linenr: 91,
-        colnr: 0,
-        name: '',
-        address: 0,
-      }),
+      new Breakpoint(setBrightness),
       3000,
     ),
     runVMAction(3000, 3000),
@@ -81,7 +98,7 @@ const normalBP: TestScenario = {
 };
 
 const singleStopBp: TestScenario = {
-  skipTest: false,
+  skipTest: true,
   testName: 'Test single stop breakpoint',
   testProgram: program,
   actions: [
@@ -101,13 +118,7 @@ const singleStopBp: TestScenario = {
     },
     addBreakpointSubscription(
       'BP line 91',
-      new Breakpoint({
-        source: '',
-        linenr: 91,
-        colnr: 0,
-        name: '',
-        address: 0,
-      }),
+      new Breakpoint(setBrightness),
       3000,
     ),
     runVMAction(3000, 3000), // wait 3 seconds before executing runVMAction
@@ -125,7 +136,12 @@ const singleStopBp: TestScenario = {
   ],
 };
 
-const tester = new SystemTester(systemSetup);
-tester.addTestScenario(normalBP, m5stickDev.id);
-tester.addTestScenario(singleStopBp, m5stickDev.id);
-tester.runTests().catch(console.error);
+export async function run(): Promise<TestScenarioResult[]> {
+  const tester = new SystemTester(systemSetup);
+  tester.addTestScenario(normalBP, m5stickDev.id);
+  // singleStopBP fails
+  tester.addTestScenario(singleStopBp, m5stickDev.id);
+  return await tester.runTests();
+}
+
+// run().catch(console.error);

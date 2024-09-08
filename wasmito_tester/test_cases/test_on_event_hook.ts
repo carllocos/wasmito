@@ -13,35 +13,56 @@ import {
   removeBPAt,
   runVMAction,
   stepAction,
+  TriggerInterrupt,
 } from '../reusable_actions';
 import { type WARDuinoVM } from '../../src/warduino/vm/warduino_vm';
 import { StateRequest } from '../../src/warduino/requests/inspect_request';
-import { InspectStateHook } from '../../src/hooks/hook_inspect_state';
 import { WasmValuesBuilder } from '../../src/webassembly/wasm_value_array_builder';
 import { type TestProgram, type PostSetupConfig } from '../shared_interfaces';
 import { TargetLanguage } from '../../src/compilers/prog_language_selection';
-import { type WATCompilerArgs } from '../../src/compilers/wat_compilers';
+import { type WasmCompilerArgs } from '../../src/compilers/wasm_compiler';
+import {
+  type SourceCodeLocation,
+  SourceMap,
+} from '../../src/source_mappers/source_map';
 
 /*
  * System Setup
  */
 
-const watArgs: WATCompilerArgs = {
-  sourceCodePath: './src/tool_examples/wat_examples/dimmer-double-button.wat',
+const wasmArgs: WasmCompilerArgs = {
+  wasmPath: './tool_examples/wat_examples/dimmer-double-button.wasm',
 };
 
 const program: TestProgram = {
-  targetLanguage: TargetLanguage.WAT,
-  sourceCodeCompilationArgs: watArgs,
+  targetLanguage: TargetLanguage.Wasm,
+  sourceCodeCompilationArgs: wasmArgs,
+};
+
+const sm = new SourceMap(wasmArgs.wasmPath, [], []);
+const mainFunc = sm.wasm.getFunction(12); // fun id 12 is the main func
+if (mainFunc === undefined) {
+  throw new Error(`Failed to find main fun 12 in module ${wasmArgs.wasmPath}`);
+}
+
+const [localGetBrightness] = mainFunc.getLocalGetInstructions();
+const getBrightness: SourceCodeLocation = {
+  source: '',
+  linenr: 88,
+  colnr: -1,
+  address: localGetBrightness.startAddress,
+  name: '',
 };
 
 const psM5StickCMCU: PostSetupConfig = {
   pauseAfterSetup: true,
-  actions: [addBPAndRunUntil(88, 5000), removeBPAt(88, 3000)],
+  actions: [
+    addBPAndRunUntil(getBrightness, 5000),
+    removeBPAt(getBrightness, 3000),
+  ],
 };
 
 const m5stickcMCU = oneM5StickCMCU('1', psM5StickCMCU);
-m5stickcMCU.serialPort = '/dev/ttyUSB1';
 
 const postSetupConfigM5Dev: PostSetupConfig = {
   pauseAfterSetup: true,
@@ -49,8 +70,8 @@ const postSetupConfigM5Dev: PostSetupConfig = {
     mockPrimitiveFuncAction(5, 2000),
     mockPrimitiveFuncAction(6, 2000),
     mockPrimitiveFuncAction(7, 2000),
-    addBPAndRunUntil(88, 5000),
-    removeBPAt(88, 5000),
+    addBPAndRunUntil(getBrightness, 5000),
+    removeBPAt(getBrightness, 5000),
   ],
 };
 
@@ -69,12 +90,16 @@ systemSetup.logger = {
  * Test Cases
  */
 
-const testHookOnMCUScenario: TestScenario = {
+const testHookScenario: TestScenario = {
   skipTest: true,
   testName:
-    'Test if event is received after adding event hooks and manually pressing on button',
+    'Test if event is received after adding event hooks and manually triggering event',
   testProgram: program,
-  actions: [onNewEventAction('OnNewEventHook', 3000), runVMAction(3000)],
+  actions: [
+    onNewEventAction('OnNewEventHook', 3000),
+    TriggerInterrupt(39),
+    runVMAction(3000),
+  ],
   expect: [
     {
       subscribeToID: 'OnNewEventHook',
@@ -88,53 +113,8 @@ const testHookOnMCUScenario: TestScenario = {
   ],
 };
 
-const testHookOnDevScenario: TestScenario = {
-  skipTest: true,
-  testName: 'Test if event is received after adding event hooks on Dev VM',
-  testProgram: program,
-  actions: [onNewEventAction('OnNewEventHook', 3000), runVMAction(3000)],
-  expect: [
-    {
-      subscribeToID: 'OnNewEventHook',
-      description: 'Wait max 10000ms for a new event to occur on VM',
-      checkSubscription: async (ev: WASM.Event): Promise<boolean> => {
-        return true;
-      },
-      ifFail: 'Did not receive event in expected time',
-      timeout: 10000,
-    },
-  ],
-};
-
-const testHookOnDevScenario2: TestScenario = {
-  skipTest: true,
-  testName: 'Test whether Callbackmapping hook works onNewEvent',
-  testProgram: program,
-  actions: [
-    onNewEventAction('OnNewEventHook', 3000),
-    {
-      description: 'Add hook Callbackmapping',
-      doAction: async (device: WARDuinoVM): Promise<boolean> => {
-        const reply = await device.addHookOnNewEvent(
-          new InspectStateHook(new StateRequest().includeCallbackMappings()),
-        );
-        return reply;
-      },
-
-      checkActionSuccess: async (added: boolean): Promise<boolean> => {
-        return added;
-      },
-      ifFail: 'Failed to add callbackmapping hook on new event',
-      timeout: 3000,
-    },
-  ],
-};
-
-// m5stickDev.target = 'dev-external';
-// m5stickDev.toolPort = 8300;
-
 const testAddEvent: TestScenario = {
-  skipTest: true,
+  skipTest: false,
   testName: 'Test whether adding event works',
   testProgram: program,
   actions: [
@@ -151,28 +131,29 @@ const testAddEvent: TestScenario = {
       ifFail: 'could not get callback mappings',
       timeout: 3000,
     },
-    // addEventAction('interrupt_1', '', 3000),
-    // addEventAction('interrupt_1', '', 3000),
-    // updateMappingsAction(
-    //   [
-    //     {
-    //       callbackid: 'interrupt_39',
-    //       tableIndexes: [8, 9],
-    //     },
-    //     { callbackid: 'interrupt_37', tableIndexes: [9, 8] },
-    //   ],
-    //   3000,
-    // ),
   ],
 };
 
-m5stickDev.target = 'dev-external';
-m5stickDev.toolPort = 8300;
+const delayID = 0;
+const [callDelay] = mainFunc.getCallInstructions(delayID);
+
 const testPrimitiveDelayVM: TestScenario = {
-  skipTest: true,
+  skipTest: false,
   testName: 'Test delay has right argument',
   testProgram: program,
-  actions: [addBPAndRunUntil(113, 5000), stepAction(1000)],
+  actions: [
+    addBPAndRunUntil(
+      {
+        source: '',
+        linenr: 113,
+        colnr: -1,
+        address: callDelay.startAddress,
+        name: '',
+      },
+      5000,
+    ),
+    stepAction(1000),
+  ],
 };
 
 const testRemoteCallPrimitiveDelayVM: TestScenario = {
@@ -182,11 +163,14 @@ const testRemoteCallPrimitiveDelayVM: TestScenario = {
   actions: [proxyCallAction(0, new WasmValuesBuilder().addI32Value(100), 5000)],
 };
 
-const tester = new SystemTester(systemSetup);
-tester.addTestScenario(testHookOnMCUScenario, m5stickcMCU.id);
-tester.addTestScenario(testHookOnDevScenario, m5stickDev.id);
-tester.addTestScenario(testHookOnDevScenario2, m5stickDev.id);
-tester.addTestScenario(testAddEvent, m5stickDev.id);
-tester.addTestScenario(testPrimitiveDelayVM, m5stickDev.id);
-tester.addTestScenario(testRemoteCallPrimitiveDelayVM, m5stickDev.id);
-tester.runTests().catch(console.error);
+export async function run(): Promise<void> {
+  const tester = new SystemTester(systemSetup);
+  tester.addTestScenario(testHookScenario, m5stickDev.id);
+  tester.addTestScenario(testAddEvent, m5stickDev.id);
+  tester.addTestScenario(testPrimitiveDelayVM, m5stickDev.id);
+  tester.addTestScenario(testRemoteCallPrimitiveDelayVM, m5stickDev.id);
+  tester.addTestScenario(testHookScenario, m5stickcMCU.id); // fails leads to a block stack underflow Warduino.cpp:236
+  await tester.runTests();
+}
+
+// run().catch(console.error);
