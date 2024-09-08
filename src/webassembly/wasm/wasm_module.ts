@@ -79,6 +79,17 @@ export class WasmModule {
     });
   }
 
+  getInstruction(addr: number): WasmInstruction | undefined {
+    for (const f of this.functions) {
+      if (addr < f.startAddress || f.endAddress <= addr) {
+        continue;
+      }
+      return f.allInstructions.find((i) => i.startAddress === addr);
+    }
+
+    return undefined;
+  }
+
   sectionFromAddress(addr: number): Section | undefined {
     return this._sections.find((s) => {
       return s.startAddress <= addr && addr <= s.endAddress;
