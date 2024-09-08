@@ -71,22 +71,37 @@ export abstract class BreakpointPolicy {
     breakpoint: Breakpoint,
     timeout?: number,
   ): Promise<boolean> {
-    const sm = this.vm.sourceMap;
-    const mappings = sm.generatedPositionFor(breakpoint.sourceCodeLocation);
-    if (mappings.length === 0) {
-      throw new Error(
-        `Cannot remove breakpoint on an unexisting wasm address derived from breakpoint ${breakpoint.toString()}`,
-      );
-    }
-
     if (!this.hasBreakpoint(breakpoint)) {
       this.logger.info(
         `no breakpoint ${breakpoint.toString()} was previously set so nothing to remove`,
       );
       return false;
     }
+    const sm = this.vm.sourceMap;
+    let mappings = sm.generatedPositionFor(breakpoint.sourceCodeLocation);
+    let addr = -1;
+    if (mappings.length === 0) {
+      mappings = sm.getOriginalPositionFor(
+        breakpoint.sourceCodeLocation.address,
+      );
+    }
 
-    const addr = mappings[0].address;
+    if (mappings.length > 0) {
+      addr = mappings[0].address;
+    } else {
+      // might not be a sourcemap and user is tagetting a wasm addr
+
+      const instr = sm.wasm.getInstruction(
+        breakpoint.sourceCodeLocation.address,
+      );
+      if (instr === undefined) {
+        throw new Error(
+          `Cannot remove breakpoint on an unexisting wasm address derived from breakpoint ${breakpoint.toString()}`,
+        );
+      }
+      addr = instr.startAddress;
+    }
+
     const request = new RemoveHookOnWasmAddrRequest(addr).before();
 
     const response = await this.vm.sendRequest(request, timeout);
