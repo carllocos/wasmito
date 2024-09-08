@@ -22,6 +22,10 @@ import {
 } from './shared_interfaces';
 import { Breakpoint } from '../src/debugger/breakpoint';
 import { type WASMFunction } from '../src/webassembly/wasm/wasm_function';
+import {
+  sourceCodeLocationToString,
+  type SourceCodeLocation,
+} from '../src/source_mappers/source_map';
 
 export function addBreakpointSubscription(
   subscriptionID: string,
@@ -49,20 +53,14 @@ export function addBreakpointSubscription(
 }
 
 export function addBPAndRunUntil(
-  linenr: number,
+  loc: SourceCodeLocation,
   timeout: number,
 ): Action<boolean> {
   const act: Action<boolean> = {
-    description: `add a bp at linenr ${linenr}, run until bp, and remove bp`,
+    description: `add a bp ${sourceCodeLocationToString(loc)}, run until bp, and remove bp`,
     doAction: async (device: WARDuinoVM): Promise<boolean> => {
       return new Promise<boolean>((resolve, reject) => {
-        const bp = new Breakpoint({
-          source: '',
-          linenr,
-          colnr: 0,
-          name: '',
-          address: 0,
-        });
+        const bp = new Breakpoint(loc);
         bp.subscribe((state: WasmState): void => {
           resolve(true);
         });
@@ -90,29 +88,26 @@ export function addBPAndRunUntil(
       return bpAdded;
     },
     timeout,
-    ifFail: `Failed to add and run until bp at line ${linenr}`,
+    ifFail: `Failed to add and run until bp at ${sourceCodeLocationToString(loc)}`,
   };
   return act;
 }
 
-export function removeBPAt(linenr: number, timeout: number): Action<boolean> {
+export function removeBPAt(
+  loc: SourceCodeLocation,
+  timeout: number,
+): Action<boolean> {
   const act: Action<boolean> = {
     timeout,
-    description: `remove breakpoint at line ${linenr}`,
+    description: `remove breakpoint ${sourceCodeLocationToString(loc)}`,
     doAction: async (device: WARDuinoVM): Promise<boolean> => {
-      const bp = new Breakpoint({
-        source: '',
-        linenr,
-        colnr: 0,
-        name: '',
-        address: 0,
-      });
+      const bp = new Breakpoint(loc);
       return await device.removeBreakpoint(bp);
     },
     checkActionSuccess: async (v: boolean): Promise<boolean> => {
       return v;
     },
-    ifFail: `Failed to remove bp at line ${linenr}`,
+    ifFail: `Failed to remove bp ${sourceCodeLocationToString(loc)}`,
   };
   return act;
 }
