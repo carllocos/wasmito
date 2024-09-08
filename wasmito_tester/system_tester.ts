@@ -189,6 +189,21 @@ export class SystemTester {
     console.log();
   }
 
+  private longestDescriptionLength(testScenario: TestScenarioResult): number {
+    let l = testScenario.scenario.testName.length;
+    for (const r of testScenario.actionRunResults) {
+      if (r.action.description.length > l) {
+        l = r.action.description.length;
+      }
+    }
+
+    for (const e of testScenario.expectRunResults) {
+      if (e.action.description.length > l) {
+        l = e.action.description.length;
+      }
+    }
+
+    return l;
   }
 
   private async runTestScenario(
