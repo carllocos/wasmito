@@ -6,10 +6,14 @@ const pathToJS = "../dist/cjs/";
 const { TestScenarioResultState } = require(
   `${pathToJS}/wasmito_tester/shared_interfaces.cjs`
 );
-const cliArgs = process.argv.slice(2);
-const testFile = cliArgs[0];
-const testFileArgs = cliArgs.slice(1);
+const path = require("path");
 
+const cliArgs = process.argv.slice(2);
+let testFile = cliArgs[0];
+if (!path.isAbsolute(testFile)) {
+  testFile = path.resolve(testFile);
+}
+const testFileArgs = cliArgs.slice(1);
 console.info(`Running Tests of '${testFile}'`, "with args", testFileArgs);
 const testFileMod = require(testFile);
 if (testFileMod.run === undefined) {
