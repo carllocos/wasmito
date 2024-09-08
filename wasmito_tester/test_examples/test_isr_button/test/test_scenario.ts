@@ -2,23 +2,23 @@ import {
   createSystemSetup,
   oneM5StickCDev,
   oneM5StickCMCU,
-} from '../../reausable_system_setups';
-import { SystemTester, type TestScenario } from '../../system_tester';
+} from '../../../reausable_system_setups';
+import { SystemTester, type TestScenario } from '../../../system_tester';
 import {
   type TestScenarioResult,
   type TestProgram,
   type PostSetupConfig,
-} from '../../shared_interfaces';
-import { TargetLanguage } from '../../../src/compilers/prog_language_selection';
+} from '../../../shared_interfaces';
+import { TargetLanguage } from '../../../../src/compilers/prog_language_selection';
 import {
   addBreakpointSubscription,
   PauseAction,
   runVMAction,
   SubscribeOnBPReached,
   TriggerInterrupt,
-} from '../../reusable_actions';
-import { Breakpoint } from '../../../src/debugger/breakpoint';
-import { type WasmCompilerArgs } from '../../../src/compilers/wasm_compiler';
+} from '../../../reusable_actions';
+import { Breakpoint } from '../../../../src/debugger/breakpoint';
+import { type WasmCompilerArgs } from '../../../../src/compilers/wasm_compiler';
 
 /**
  * Device Config
@@ -33,10 +33,9 @@ const mcu = oneM5StickCMCU('m5stickCMCU', postSetupConfigM5Dev);
 
 const systemSetup = createSystemSetup('DevVM', [m5stickDev, mcu]);
 const arg: WasmCompilerArgs = {
-  wasmPath:
-    '/Users/crojcas/Documents/projects/language-examples/rust/mcu_examples/isr_led/wasm/main.wasm',
+  wasmPath: './wasmito_tester/test_examples/test_isr_button/wasm/main.wasm',
   mappingsJSON:
-    '/Users/crojcas/Documents/projects/wasmito/test_cfg/mappings-isr.json',
+    './wasmito_tester/test_examples/test_isr_button/wasm/isr_mappings.json',
 };
 
 const program: TestProgram = {
@@ -73,15 +72,9 @@ const testLoadAndRunModule: TestScenario = {
   ],
 };
 
-export async function runTest(mcuOrDev: string): Promise<TestScenarioResult[]> {
-  if (systemSetup.logger !== undefined) {
-    systemSetup.logger.level = 'off';
-  }
+export async function run(): Promise<TestScenarioResult[]> {
   const tester = new SystemTester(systemSetup);
-  if (mcuOrDev === 'mcu') {
-    tester.addTestScenario(testLoadAndRunModule, mcu.id);
-  } else {
-    tester.addTestScenario(testLoadAndRunModule, m5stickDev.id);
-  }
+  tester.addTestScenario(testLoadAndRunModule, m5stickDev.id);
+  tester.addTestScenario(testLoadAndRunModule, mcu.id);
   return await tester.runTests();
 }
