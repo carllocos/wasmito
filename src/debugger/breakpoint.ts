@@ -7,6 +7,7 @@ import { createLogger } from '../logger/logger';
 import type winston from 'winston';
 import {
   equalSourceCodeLocations,
+  sourceCodeLocationToString,
   type SourceCodeLocation,
 } from '../source_mappers/source_map';
 
@@ -110,12 +111,6 @@ export class Breakpoint implements ISubscription<WasmState> {
   }
 
   toString(): string {
-    const loc = this.sourceCodeLocation;
-    let s = `{source: '${loc.source}', linenr: ${loc.linenr}`;
-    if (loc.colnr !== undefined) {
-      s += ` ,columnStart ${loc.colnr}`;
-    }
-    s += '}';
-    return s;
+    return sourceCodeLocationToString(this.sourceCodeLocation);
   }
 }
