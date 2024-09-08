@@ -1,6 +1,11 @@
 import { type WasmType } from './opcode_type';
 import { type WASM } from '../wasm';
-import { type WasmInstruction } from './wasm_instruction';
+import {
+  isCallInstruction,
+  type CallInstruction,
+  type WasmInstruction,
+} from './wasm_instruction';
+import { WASMOpcodeNumber } from './wasm_opcode';
 
 export interface WasmLocal {
   index: number;
@@ -68,5 +73,38 @@ export class WASMFunction {
     }
 
     return allInts;
+  }
+
+  getCallInstructions(fID?: number): CallInstruction[] {
+    const callInstr: CallInstruction[] = [];
+    for (const c of this.allInstructions) {
+      if (!isCallInstruction(c)) {
+        continue;
+      }
+      if (fID === undefined || c.funIdx === fID) {
+        callInstr.push(c);
+      }
+    }
+    return callInstr;
+  }
+
+  getLocalGetInstructions(): WasmInstruction[] {
+    const localGetInstrs: WasmInstruction[] = [];
+    for (const i of this.allInstructions) {
+      if (i.opcodeNr === WASMOpcodeNumber.Get_local) {
+        localGetInstrs.push(i);
+      }
+    }
+    return localGetInstrs;
+  }
+
+  getLocalSetInstructions(): WasmInstruction[] {
+    const localSetInstrs: WasmInstruction[] = [];
+    for (const i of this.allInstructions) {
+      if (i.opcodeNr === WASMOpcodeNumber.Set_local) {
+        localSetInstrs.push(i);
+      }
+    }
+    return localSetInstrs;
   }
 }
