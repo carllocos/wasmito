@@ -45,6 +45,7 @@ import { EventInspectHook } from '../../hooks/hook_event';
 import { type DeviceIdentity } from '../../device';
 import { type WASMFunction } from '../../webassembly/wasm/wasm_function';
 import {
+  sourceCodeLocationToString,
   type SourceCodeLocation,
   type SourceMap,
 } from '../../source_mappers/source_map';
@@ -383,13 +384,26 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     timeout?: number,
   ): Promise<boolean> {
     const sm = this.sourceMap;
-    const mappings = sm.generatedPositionFor(sourceCodeLocation);
+    let addr = -1;
+    let mappings = sm.generatedPositionFor(sourceCodeLocation);
     if (mappings.length === 0) {
-      throw new this.ErrorClass(
-        `Cannot set hook upon unexisting wasm address derived from source location ${sourceCodeLocation.linenr}`,
-      );
+      mappings = sm.getOriginalPositionFor(sourceCodeLocation.address);
     }
-    const addr = mappings[0].address;
+    if (mappings.length !== 0) {
+      addr = mappings[0].address;
+    } else {
+      // Case where SourceMap might be empty
+      // happens when target language is wasm
+      // we can still addHook only if the loc has
+      // a valid wasm addr
+      const instr = sm.wasm.getInstruction(sourceCodeLocation.address);
+      if (instr === undefined) {
+        throw new this.ErrorClass(
+          `Cannot set hook upon unexisting wasm address derived from source location ${sourceCodeLocationToString(sourceCodeLocation)}`,
+        );
+      }
+      addr = instr.startAddress;
+    }
     const req = new HookOnWasmAddrRequest(addr).addHook(hook);
     switch (moment) {
       case HookOnWasmAddrMoment.HookBefore:
