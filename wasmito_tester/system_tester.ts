@@ -119,6 +119,7 @@ export class SystemTester {
       }
       await this.setupDevice(scenario, targetDeviceID);
       await this.runTestScenario(targetDeviceID, scenario, scenarioResult);
+      this.reportScenario(scenarioResult);
     }
 
     this.reportScenarios(
@@ -130,53 +131,64 @@ export class SystemTester {
     return this.testScenarios.map((v) => v[2]);
   }
 
-  private reportScenarios(testScenarios: TestScenarioResult[]): void {
-    for (let i = 0; i < testScenarios.length; i++) {
-      const result = testScenarios[i];
-      const testNameTitle = `${
-        result.scenario.testName
-      } [${result.result.toUpperCase()}]`;
-      const titleLength = testNameTitle.length;
-      const separator = '='.repeat(titleLength);
-      console.log();
-      console.log(separator);
-      console.log(testNameTitle);
-      console.log(separator);
-      console.log();
-      if (result.result === TestScenarioResultState.Skipped) {
-        continue;
-      }
-      for (let j = 0; j < result.actionRunResults.length; j++) {
-        const actionResult = result.actionRunResults[j];
-        console.log(
-          `Action ${j} - ${actionResult.action.description} [${actionResult.result}]`,
-        );
-        if (
-          actionResult.result !== ActionRunState.Success &&
-          actionResult.result !== ActionRunState.Delayed &&
-          actionResult.result !== ActionRunState.Cancelled
-        ) {
-          console.log(`\t ${actionResult.failMsg}`);
-          console.log();
-        }
-      }
-      if (result.expectRunResults.length > 0) {
-        console.log();
-      }
-
-      for (let y = 0; y < result.expectRunResults.length; y++) {
-        const expectResult = result.expectRunResults[y];
-        console.log(
-          `Expect ${y} - ${expectResult.action.description} [${expectResult.result}]`,
-        );
-        if (expectResult.result !== ActionRunState.Success) {
-          console.log(`\t ${expectResult.failMsg}`);
-        }
-      }
-      if (result.expectRunResults.length > 0) {
+  private reportScenario(result: TestScenarioResult): void {
+    // const padding = this.longestDescriptionLength(result);
+    const testNameTitle = `${
+      result.scenario.testName
+    } [${result.result.toUpperCase()}]`;
+    const titleLength = testNameTitle.length;
+    const separator = '='.repeat(titleLength);
+    console.log();
+    console.log(separator);
+    console.log(testNameTitle);
+    console.log(separator);
+    console.log();
+    if (result.result === TestScenarioResultState.Skipped) {
+      return;
+    }
+    for (let j = 0; j < result.actionRunResults.length; j++) {
+      const actionResult = result.actionRunResults[j];
+      console.log(
+        `Action ${j} - ${actionResult.action.description} [${actionResult.result}]`,
+      );
+      if (
+        actionResult.result !== ActionRunState.Success &&
+        actionResult.result !== ActionRunState.Delayed &&
+        actionResult.result !== ActionRunState.Cancelled
+      ) {
+        console.log(`\t ${actionResult.failMsg}`);
         console.log();
       }
     }
+    if (result.expectRunResults.length > 0) {
+      console.log();
+    }
+
+    for (let y = 0; y < result.expectRunResults.length; y++) {
+      const expectResult = result.expectRunResults[y];
+      console.log(
+        `Expect ${y} - ${expectResult.action.description} [${expectResult.result}]`,
+      );
+      if (expectResult.result !== ActionRunState.Success) {
+        console.log(`\t ${expectResult.failMsg}`);
+      }
+    }
+    if (result.expectRunResults.length > 0) {
+      console.log();
+    }
+  }
+
+  private reportScenarios(testScenarios: TestScenarioResult[]): void {
+    console.log();
+    console.log();
+    console.log(`Report of #${testScenarios.length} TestScenarios`);
+    console.log();
+    for (let i = 0; i < testScenarios.length; i++) {
+      this.reportScenario(testScenarios[i]);
+    }
+    console.log();
+  }
+
   }
 
   private async runTestScenario(
