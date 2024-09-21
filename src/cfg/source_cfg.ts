@@ -124,7 +124,7 @@ export class SourceControlFlowGraph {
     return f.entryNodes;
   }
 
-  allNodes(): SourceCFGNode[] {
+  get allNodes(): SourceCFGNode[] {
     return this._allGraphNodes;
   }
 

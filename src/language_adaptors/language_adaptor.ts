@@ -72,7 +72,7 @@ export class LanguageAdaptor {
       }
     }
 
-    const allNodes: SourceCFGNode[] = this.sourceCFG?.allNodes() ?? [];
+    const allNodes: SourceCFGNode[] = this.sourceCFG?.allNodes ?? [];
     const locsWithoutNode: SourceCodeLocation[] = [];
     for (const um of uniqueMappings) {
       const used = allNodes.find((n) => {
