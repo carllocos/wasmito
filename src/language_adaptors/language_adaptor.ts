@@ -201,8 +201,7 @@ export class LanguageAdaptor {
     description: ASTNodeDescription,
   ): boolean {
     logger.debug(
-      `ASTNode GrammardID='${n.node.grammarId}' GrammarType='${n.node.grammarType}' (rowStart=${n.node.startPosition.row},colStart=${n.node.startPosition.column}
-    rowEnd=${n.node.endPosition.row},colEnd=${n.node.endPosition.column}) txt='${n.node.text.slice(0, 10)}' `,
+      `ASTNode GrammardID='${n.node.grammarId}' GrammarType='${n.node.grammarType}' (rowStart=${n.node.startPosition.row},colStart=${n.node.startPosition.column} rowEnd=${n.node.endPosition.row},colEnd=${n.node.endPosition.column}) txt='${n.node.text.slice(0, 10)}'`,
     );
     return (
       description.grammarID === n.node.grammarId &&
