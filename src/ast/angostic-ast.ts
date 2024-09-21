@@ -9,6 +9,7 @@ import {
   sourceLocationToNodePosition,
 } from '../tree-sitter/tree-sitter-parser';
 import { type LanguageConfiguration } from '../language_adaptors/languages/language_config';
+import { AgnosticNode } from '../language_adaptors/agnostic_node';
 
 export class AgnosticAST {
   public readonly source: string;
@@ -39,12 +40,14 @@ export class AgnosticAST {
    * @returns the most specific node or undefined if none is found
    */
 
-  mostSpecialisedNode(
-    lineNr: number,
-    colNr: number,
-  ): Parser.SyntaxNode | undefined {
+  mostSpecialisedNode(lineNr: number, colNr: number): AgnosticNode | undefined {
     const pos = sourceLocationToNodePosition(lineNr, colNr);
-    return mostSpecialisedNode(this.ast, pos);
+    const n = mostSpecialisedNode(this.ast, pos);
+    if (n === undefined) {
+      return undefined;
+    } else {
+      return new AgnosticNode(n);
+    }
   }
 
   /**
@@ -59,21 +62,21 @@ export class AgnosticAST {
    * @returns
    */
 
-  nextNode(lineNr: number, colNr: number): Parser.SyntaxNode | undefined {
+  nextNode(lineNr: number, colNr: number): AgnosticNode | undefined {
     const currentNode = this.mostSpecialisedNode(lineNr, colNr);
     if (currentNode === undefined) {
       return undefined;
     }
-    const sibling = currentNode.nextSibling;
+    const sibling = currentNode.node.nextSibling;
     if (isNode(sibling)) {
-      return firstLeafChild(sibling);
+      return new AgnosticNode(firstLeafChild(sibling));
     }
 
-    let parent = currentNode.parent;
+    let parent = currentNode.node.parent;
     while (isNode(parent)) {
       const parentSibling = parent.nextSibling;
       if (isNode(parentSibling)) {
-        return firstLeafChild(parentSibling);
+        return new AgnosticNode(firstLeafChild(parentSibling));
       }
       parent = parent.parent;
     }
