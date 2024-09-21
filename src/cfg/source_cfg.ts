@@ -59,6 +59,7 @@ export class SourceControlFlowGraph {
       allnodes = allnodes.concat(funGraph.allNodes);
     }
     this._allGraphNodes = allnodes;
+    this.addASTNodes(asts, this._allGraphNodes);
   }
 
   get wasmCFG(): WasmControlFlowGraph {
@@ -234,6 +235,19 @@ export class SourceControlFlowGraph {
       writeFileSync(destinationPath, json);
     }
     return json;
+  }
+
+  addASTNodes(asts: AgnosticASTMap, nodes: SourceCFGNode[]): void {
+    for (const cfgNode of nodes) {
+      const ast = asts.get(cfgNode.sourceLocation.source);
+      if (ast === undefined) {
+        continue;
+      }
+      cfgNode.node = ast.mostSpecialisedNode(
+        cfgNode.sourceLocation.linenr,
+        cfgNode.sourceLocation.colnr,
+      );
+    }
   }
 }
 
