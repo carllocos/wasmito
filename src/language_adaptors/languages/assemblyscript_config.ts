@@ -10,6 +10,7 @@ export const AssemblyScriptLangConfig: LanguageConfiguration = {
   astDebugOperations: [
     {
       astNodeDescription: {
+        grammarID: 58,
         grammarType: 'new',
       },
       debugOperation: DebugOperationName.BreakOnInstanceCreation,

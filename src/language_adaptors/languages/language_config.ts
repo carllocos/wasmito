@@ -10,6 +10,7 @@ export enum DebugOperationName {
 }
 
 export interface ASTNodeDescription {
+  grammarID: number;
   grammarType: string;
 }
 
