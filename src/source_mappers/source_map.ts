@@ -56,6 +56,7 @@ export interface SourceMapConfig {
   srcToAbsPath?: Map<string, string>;
   ignoreDirectories?: string[];
   prefixSources?: string;
+  deletePrefixedDir?: boolean;
 }
 
 export interface SourceMapJSON {
@@ -123,7 +124,11 @@ export class SourceMap {
     if (config?.prefixSources !== undefined) {
       for (const s of sources) {
         const ps = pathJoin(config.prefixSources, s);
-        this._sources.push(isFilePath(ps) ? ps : s);
+        if (isFilePath(ps)) {
+          this._sources.push(ps);
+        } else {
+          this._sources.push(s);
+        }
       }
     } else {
       this._sources = sources;
