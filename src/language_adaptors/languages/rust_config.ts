@@ -4,4 +4,5 @@ export const RustLangConfig: LanguageConfiguration = {
   language: 'rust',
   fileExtensions: ['rs'],
   parserPath: 'tree-sitter-rust.wasm',
+  astDebugOperations: [],
 };
