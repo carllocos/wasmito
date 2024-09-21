@@ -668,7 +668,7 @@ function searchClosetsSourceCFGNodes(
   nodes: SourceCFGNode[],
   nodesToIgnore = new Set<number>(),
 ): [Set<number>, SourceCFGNode[]] {
-  logger.debug(`Node ${n.nodeID} has no Source CFGNode`);
+  logger.debug(`Wasm Node ${n.nodeID} has no Source CFGNode`);
   if (nodesToIgnore.has(n.nodeID)) {
     // consider scenario n1 -> n2 -> n3
     //                            -> n4 -> n2
