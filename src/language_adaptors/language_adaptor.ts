@@ -9,11 +9,11 @@ import {
 import { type AgnosticNode, type AgnosticASTMap } from './agnostic_node';
 import { WasmControlFlowGraph } from '../cfg/wasm_cfg';
 import { type SourceCFGNode, SourceControlFlowGraph } from '../cfg/source_cfg';
-import { getLangConfigFromExtension } from './all_langs';
 import {
   type DebugOperationName,
   type ASTNodeDescription,
   type ASTDebuggableLanguage,
+  getLangConfigFromExtension,
 } from './language_config';
 import { writeFileSync } from 'fs';
 

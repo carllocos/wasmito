@@ -4,7 +4,7 @@ import path from 'path';
 import { pathJoin } from '../../src/util/file_util';
 import { AgnosticAST } from '../../src/ast/angostic-ast';
 import { sourceLocationToNodePosition } from '../../src/language_adaptors/tree-sitter-parser';
-import { getLangConfigFromExtension } from '../../src/language_adaptors/all_langs';
+import { getLangConfigFromExtension } from '../../src/language_adaptors/language_config';
 
 const rustExamplesPath = path.resolve('./test/data/rust_examples/');
 
