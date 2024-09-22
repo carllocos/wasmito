@@ -9,12 +9,12 @@ import {
 import { type AgnosticNode, type AgnosticASTMap } from './agnostic_node';
 import { WasmControlFlowGraph } from '../cfg/wasm_cfg';
 import { type SourceCFGNode, SourceControlFlowGraph } from '../cfg/source_cfg';
-import { getLangConfigFromExtension } from './languages/all_langs';
+import { getLangConfigFromExtension } from './all_langs';
 import {
   type DebugOperationName,
   type ASTNodeDescription,
-  type LanguageConfiguration,
-} from './languages/language_config';
+  type ASTDebuggableLanguage,
+} from './language_config';
 import { writeFileSync } from 'fs';
 
 const logger = createLogger('LanguageAdaptor');
@@ -112,7 +112,7 @@ export class LanguageAdaptor {
   }
 
   private async buildASTS(): Promise<void> {
-    const availableSources: Array<[string, LanguageConfiguration]> = [];
+    const availableSources: Array<[string, ASTDebuggableLanguage]> = [];
     for (const s of this.sourceMap.sources) {
       if (!isFilePath(s)) {
         logger.debug(
