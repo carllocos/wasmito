@@ -4,16 +4,19 @@ import path from 'path';
 import { pathJoin } from '../../src/util/file_util';
 import { AgnosticAST } from '../../src/ast/angostic-ast';
 import { sourceLocationToNodePosition } from '../../src/tree-sitter/tree-sitter-parser';
-import { RustLangConfig } from '../../src/language_adaptors/languages/rust_config';
+import { getLangConfigFromExtension } from '../../src/language_adaptors/all_langs';
 
 const rustExamplesPath = path.resolve('./test/data/rust_examples/');
 
 describe('Rust Blink App AST Building and Operations on AST', () => {
   const blinkApp = pathJoin(rustExamplesPath, 'blink/main.rs');
-  const blinkAST = new AgnosticAST(blinkApp, RustLangConfig);
+  let blinkAST: AgnosticAST;
 
   before('Build Blink AST', async () => {
     try {
+      const RustLangConfig = getLangConfigFromExtension('rs');
+      assert(RustLangConfig !== undefined);
+      blinkAST = new AgnosticAST(blinkApp, RustLangConfig);
       await blinkAST.buildAST();
     } catch (e) {
       assert.fail(`Could not construct AST for source ${blinkApp}. ${e}`);

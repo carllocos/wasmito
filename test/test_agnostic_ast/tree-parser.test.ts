@@ -1,13 +1,15 @@
 import { expect } from 'chai';
-import { buildASTParser } from '../../src/tree-sitter/tree-sitter-factory';
 import assert from 'assert';
-import { RustLangConfig } from '../../src/language_adaptors/languages/rust_config';
-import { AssemblyScriptLangConfig } from '../../src/language_adaptors/languages/assemblyscript_config';
+import { getLangConfigFromExtension } from '../../src/language_adaptors/all_langs';
+import { createASTLanguageParser } from '../../src/tree-sitter/tree-sitter-parser';
 
 describe('Building Language Parsers', () => {
   it('Construct Parser for Rust', async () => {
     try {
-      const parser = await buildASTParser(RustLangConfig.parserPath);
+      const rustLanguage = getLangConfigFromExtension('rs');
+      assert(rustLanguage !== undefined);
+
+      const parser = await createASTLanguageParser(rustLanguage.parserPath);
       expect(parser).to.not.equal(undefined);
     } catch (e) {
       assert.fail(`Could not construct parser for Rust. ${e}`);
@@ -16,7 +18,11 @@ describe('Building Language Parsers', () => {
 
   it('Construct Parser for TypeScript', async () => {
     try {
-      const parser = await buildASTParser(AssemblyScriptLangConfig.parserPath);
+      const assemblyScriptLang = getLangConfigFromExtension('as');
+      assert(assemblyScriptLang !== undefined);
+      const parser = await createASTLanguageParser(
+        assemblyScriptLang.parserPath,
+      );
       expect(parser).to.not.equal(undefined);
     } catch (e) {
       assert.fail(`Could not construct parser for Typescript. ${e}`);
@@ -26,7 +32,7 @@ describe('Building Language Parsers', () => {
   it('Construct Parser for unexisting language should throw error', async () => {
     let parser: any;
     try {
-      parser = await buildASTParser('bloep');
+      parser = await createASTLanguageParser('bloep');
       assert.fail(
         `Parser should have not been constructed. Got value of type ${typeof parser}`,
       );
