@@ -1,6 +1,6 @@
-import { isFilePath } from '../util';
 import path from 'path';
 import fs from 'fs';
+import { isFilePath } from '../util/file_util';
 
 const LanguagesJSONPath = path.join(
   path.resolve(__dirname),
