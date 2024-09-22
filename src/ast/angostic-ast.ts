@@ -1,8 +1,7 @@
 import fs from 'fs';
 import type Parser from 'web-tree-sitter';
-import { buildASTParser } from '../tree-sitter/tree-sitter-factory';
-import { isFilePath } from '../util/file_util';
 import {
+  createASTLanguageParser,
   firstLeafChild,
   isNode,
   mostSpecialisedNode,
@@ -86,7 +85,9 @@ export class AgnosticAST {
   }
 
   async buildAST(): Promise<void> {
-    this._parser = await buildASTParser(this.targetLanguage.parserPath);
+    this._parser = await createASTLanguageParser(
+      this.targetLanguage.parserPath,
+    );
     const content = await fs.promises.readFile(this.source);
     const sourceCode = content.toString();
     this._tree = this._parser.parse(sourceCode);
