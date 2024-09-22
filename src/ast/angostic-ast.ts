@@ -6,7 +6,7 @@ import {
   isNode,
   mostSpecialisedNode,
   sourceLocationToNodePosition,
-} from '../tree-sitter/tree-sitter-parser';
+} from '../language_adaptors/tree-sitter-parser';
 import { isFilePath } from '../util/file_util';
 import { type ASTDebuggableLanguage } from '../language_adaptors/language_config';
 import { AgnosticNode } from '../language_adaptors/agnostic_node';

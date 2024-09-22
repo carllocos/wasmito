@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import path from 'path';
 import { pathJoin } from '../../src/util/file_util';
 import { AgnosticAST } from '../../src/ast/angostic-ast';
-import { sourceLocationToNodePosition } from '../../src/tree-sitter/tree-sitter-parser';
+import { sourceLocationToNodePosition } from '../../src/language_adaptors/tree-sitter-parser';
 import { getLangConfigFromExtension } from '../../src/language_adaptors/all_langs';
 
 const rustExamplesPath = path.resolve('./test/data/rust_examples/');

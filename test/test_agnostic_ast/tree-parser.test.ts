@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import assert from 'assert';
 import { getLangConfigFromExtension } from '../../src/language_adaptors/all_langs';
-import { createASTLanguageParser } from '../../src/tree-sitter/tree-sitter-parser';
+import { createASTLanguageParser } from '../../src/language_adaptors/tree-sitter-parser';
 
 describe('Building Language Parsers', () => {
   it('Construct Parser for Rust', async () => {
