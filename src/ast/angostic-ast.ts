@@ -8,16 +8,17 @@ import {
   mostSpecialisedNode,
   sourceLocationToNodePosition,
 } from '../tree-sitter/tree-sitter-parser';
-import { type LanguageConfiguration } from '../language_adaptors/languages/language_config';
+import { isFilePath } from '../util/file_util';
+import { type ASTDebuggableLanguage } from '../language_adaptors/language_config';
 import { AgnosticNode } from '../language_adaptors/agnostic_node';
 
 export class AgnosticAST {
   public readonly source: string;
-  public readonly targetLanguage: LanguageConfiguration;
+  public readonly targetLanguage: ASTDebuggableLanguage;
   private _parser: Parser | undefined;
   private _tree: Parser.Tree | undefined;
 
-  constructor(source: string, langConfig: LanguageConfiguration) {
+  constructor(source: string, langConfig: ASTDebuggableLanguage) {
     this.source = source;
     if (!isFilePath(source)) {
       throw new Error(`Given source file does not exist ${source}`);
