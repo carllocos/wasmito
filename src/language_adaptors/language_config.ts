@@ -1,16 +1,20 @@
 import { isFilePath } from '../util';
 import path from 'path';
+import fs from 'fs';
 
-export const LanguagesJSONPath = path.join(
+const LanguagesJSONPath = path.join(
   path.resolve(__dirname),
   'languages',
   'languages.json',
 );
-export const ASTParsersDirectory = path.join(
+const ASTParsersDirectory = path.join(
   path.resolve(__dirname),
   'languages',
   'ast_parsers',
 );
+
+const extensionToLanguage = new Map<string, ASTDebuggableLanguage>();
+let languagesLoaded = false;
 
 export interface ASTDebuggableLanguage {
   language: string;
@@ -27,16 +31,6 @@ export interface ASTDebuggableLanguages {
 export enum DebugOperationName {
   BreakOnInstanceCreation = 'BreakOnInstanceCreation',
 }
-
-function stringToDebugOperationName(s: string): DebugOperationName {
-  switch (s) {
-    case DebugOperationName.BreakOnInstanceCreation:
-      return DebugOperationName.BreakOnInstanceCreation;
-    default:
-      throw new Error(`No debug operation name found for '${s}'`);
-  }
-}
-
 export interface ASTNodeDescription {
   grammarID: number;
   grammarType: string;
@@ -45,6 +39,46 @@ export interface ASTNodeDescription {
 export interface ASTDebugOperation {
   astNodeDescription: ASTNodeDescription;
   debugOperation: DebugOperationName;
+}
+
+export function getLangConfigFromExtension(
+  ext: string,
+): ASTDebuggableLanguage | undefined {
+  const extensionToLanguage = readLanguagesJSON();
+  return extensionToLanguage.get(ext);
+}
+
+function readLanguagesJSON(): Map<string, ASTDebuggableLanguage> {
+  if (languagesLoaded) {
+    return extensionToLanguage;
+  }
+
+  const jsonContent = fs.readFileSync(LanguagesJSONPath).toString();
+  const obj = JSON.parse(jsonContent);
+
+  const parsedLangauges = parseASTDebuggableLanguagesJSON(obj);
+  for (const lang of parsedLangauges.languages) {
+    for (const ext of lang.fileExtensions) {
+      if (extensionToLanguage.has(ext)) {
+        throw new Error(
+          `More than one language found that uses extension ${ext}: language '${extensionToLanguage.get(ext)?.language}' and '${lang.language}'`,
+        );
+      }
+      extensionToLanguage.set(ext, lang);
+    }
+  }
+
+  languagesLoaded = true;
+  return extensionToLanguage;
+}
+
+function stringToDebugOperationName(s: string): DebugOperationName {
+  switch (s) {
+    case DebugOperationName.BreakOnInstanceCreation:
+      return DebugOperationName.BreakOnInstanceCreation;
+    default:
+      throw new Error(`No debug operation name found for '${s}'`);
+  }
 }
 
 export function parseASTDebuggableLanguagesJSON(
