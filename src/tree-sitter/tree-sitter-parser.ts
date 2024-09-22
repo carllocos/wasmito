@@ -30,7 +30,7 @@ export async function initParser(): Promise<void> {
   }
 }
 
-export async function createLanguageParser(
+export async function createASTLanguageParser(
   languageWasmParser: string,
 ): Promise<Parser> {
   await initParser();
