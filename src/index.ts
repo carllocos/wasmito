@@ -12,4 +12,3 @@ export * from './wasm-tools/index';
 export * from './language_adaptors/index';
 export * from './ast/index';
 export * from './cfg/index';
-export * from './tree-sitter/index';

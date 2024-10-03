@@ -30,7 +30,7 @@
     "build:cjs": "rm -rf dist/cjs && tsc --project tsconfig.json && npx convert-extension cjs dist/cjs/ && npm run copyAssets",
     "build:esm": "rm -rf dist/esm  && tsc --project tsconfig-esm.json",
     "cleanNotUsed": "rm -rf dist/cjs && rm -rf dist/esm && rm -rf dist/types",
-    "copyAssets": "cp -r ./src/tree-sitter/parsers/ dist/cjs/src/tree-sitter/parsers",
+    "copyAssets": "cp -r ./src/language_adaptors/languages/ dist/cjs/src/language_adaptors/languages/",
     "compileCodeExamples": "bash ./test/data/compile_examples.sh",
     "prepack": "npm run build",
     "test-hooks": "npm run build:cjs && npm run hook:test1 && npm run hook:test2 && npm run hook:test3 && npm run hook:test4 && npm run hook:test5 && npm run hook:test6 && npm run hook:test7",

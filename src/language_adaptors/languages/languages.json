@@ -1,0 +1,29 @@
+{
+    "languages": [
+        {
+            "language": "AssemblyScript",
+            "fileExtensions": [
+                "ts",
+                "as"
+            ],
+            "parserName": "tree-sitter-typescript.wasm",
+            "astDebugOperations": [
+                {
+                    "astNodeDescription": {
+                        "grammarID": 58,
+                        "grammarType": "new"
+                    },
+                    "debugOperation": "BreakOnInstanceCreation"
+                }
+            ]
+        },
+        {
+            "language": "Rust",
+            "fileExtensions": [
+                "rs"
+            ],
+            "parserName": "tree-sitter-rust.wasm",
+            "astDebugOperations": []
+        }
+    ]
+}

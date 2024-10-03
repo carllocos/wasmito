@@ -2,14 +2,19 @@ import { AgnosticAST } from '../ast/angostic-ast';
 import { getFileExtension, isFilePath } from '../util/file_util';
 import { createLogger } from '../logger/logger';
 import {
+  sourceCodeLocationToString,
   type SourceCodeLocation,
   type SourceMap,
 } from '../source_mappers/source_map';
-import { type AgnosticASTMap } from './agnostic_node';
+import { type AgnosticNode, type AgnosticASTMap } from './agnostic_node';
 import { WasmControlFlowGraph } from '../cfg/wasm_cfg';
 import { type SourceCFGNode, SourceControlFlowGraph } from '../cfg/source_cfg';
-import { getLangConfigFromExtension } from './languages/all_langs';
-import { type LanguageConfiguration } from './languages/language_config';
+import {
+  type DebugOperationName,
+  type ASTNodeDescription,
+  type ASTDebuggableLanguage,
+  getLangConfigFromExtension,
+} from './language_config';
 import { writeFileSync } from 'fs';
 
 const logger = createLogger('LanguageAdaptor');
@@ -34,11 +39,13 @@ export class LanguageAdaptor {
   private readonly _asts: AgnosticASTMap;
   private readonly _wasmCfg: WasmControlFlowGraph;
   private _srcCfg?: SourceControlFlowGraph;
+  private _astDebugOperations: Map<DebugOperationName, SourceCFGNode[]>;
 
   constructor(sourceMap: SourceMap) {
     this.sourceMap = sourceMap;
     this._asts = new Map();
     this._wasmCfg = new WasmControlFlowGraph(sourceMap.wasm);
+    this._astDebugOperations = new Map();
   }
 
   get asts(): AgnosticASTMap {
@@ -72,7 +79,7 @@ export class LanguageAdaptor {
       }
     }
 
-    const allNodes: SourceCFGNode[] = this.sourceCFG?.allNodes() ?? [];
+    const allNodes: SourceCFGNode[] = this.sourceCFG?.allNodes ?? [];
     const locsWithoutNode: SourceCodeLocation[] = [];
     for (const um of uniqueMappings) {
       const used = allNodes.find((n) => {
@@ -105,7 +112,7 @@ export class LanguageAdaptor {
   }
 
   private async buildASTS(): Promise<void> {
-    const availableSources: Array<[string, LanguageConfiguration]> = [];
+    const availableSources: Array<[string, ASTDebuggableLanguage]> = [];
     for (const s of this.sourceMap.sources) {
       if (!isFilePath(s)) {
         logger.debug(
@@ -145,6 +152,60 @@ export class LanguageAdaptor {
       this._asts,
       this.sourceMap,
       this._wasmCfg,
+    );
+    this._astDebugOperations = this.seletectASTNodesForDebugOperations(
+      this._srcCfg,
+      this._asts,
+    );
+  }
+
+  private seletectASTNodesForDebugOperations(
+    scfg: SourceControlFlowGraph,
+    asts: AgnosticASTMap,
+  ): Map<DebugOperationName, SourceCFGNode[]> {
+    const m = new Map<DebugOperationName, SourceCFGNode[]>();
+    for (const cfgNode of scfg.allNodes) {
+      if (cfgNode.node === undefined) {
+        continue;
+      }
+
+      const ast = asts.get(cfgNode.sourceLocation.source);
+      if (ast === undefined) {
+        throw new Error(
+          `AST for node with loc ${sourceCodeLocationToString(cfgNode.sourceLocation)} should not be null as Node has ASTNode`,
+        );
+      }
+
+      for (const debugOp of ast.targetLanguage.astDebugOperations) {
+        if (
+          !this.doesNodeStatisfyDescription(
+            cfgNode.node,
+            debugOp.astNodeDescription,
+          )
+        ) {
+          continue;
+        }
+        let ns = m.get(debugOp.debugOperation);
+        if (ns === undefined) {
+          ns = [];
+        }
+        ns.push(cfgNode);
+        m.set(debugOp.debugOperation, ns);
+      }
+    }
+    return m;
+  }
+
+  private doesNodeStatisfyDescription(
+    n: AgnosticNode,
+    description: ASTNodeDescription,
+  ): boolean {
+    logger.debug(
+      `ASTNode GrammardID='${n.node.grammarId}' GrammarType='${n.node.grammarType}' (rowStart=${n.node.startPosition.row},colStart=${n.node.startPosition.column} rowEnd=${n.node.endPosition.row},colEnd=${n.node.endPosition.column}) txt='${n.node.text.slice(0, 10)}'`,
+    );
+    return (
+      description.grammarID === n.node.grammarId &&
+      description.grammarType === n.node.grammarType
     );
   }
 }

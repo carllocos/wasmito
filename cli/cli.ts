@@ -23,6 +23,7 @@ import { registerCallgraphCommand } from './callgraph_command';
 import { registerProjectCommand } from './project_command';
 import { registerDevicesCommand } from './devices_command';
 import { registerUploadCommand } from './upload_command';
+import { registerSourceSpecCommand } from './sourcespec_command';
 
 export function startCLI(): void {
   const projectName = readProjectName();
@@ -48,6 +49,7 @@ export function startCLI(): void {
   registerProjectCommand(program);
   registerDevicesCommand(program);
   registerUploadCommand(program);
+  registerSourceSpecCommand(program);
 
   program.parse(process.argv);
 

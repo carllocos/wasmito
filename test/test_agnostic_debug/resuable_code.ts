@@ -36,15 +36,3 @@ export function sortIncreasingNr(ns: SourceCFGNode[]): SourceCFGNode[] {
     }
   });
 }
-
-export function logNode(n: SourceCFGNode): void {
-  const sp = n.sourceLocation;
-  if (n.node !== undefined) {
-    const ep = n.node.endPosition;
-    console.log(
-      `{startLoc: (${sp.linenr}, ${sp.colnr}), endLoc: (${ep.linenr}, ${ep.colnr}), srcTxt: '${n.node.node.text}'}`,
-    );
-  } else {
-    console.log(`{startLoc: (${sp.linenr}, ${sp.colnr})}`);
-  }
-}
