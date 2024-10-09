@@ -190,6 +190,7 @@ export class SourceControlFlowGraph {
       this._sourceMap.wasm.functions.forEach((f) => funIds.push(f.id));
     }
 
+    const seenDotFileNames = new Set<string>();
     const dots: string[] = [];
     for (const fid of funIds) {
       const fg = this.getFuntionSourceCFG(fid);
@@ -197,12 +198,29 @@ export class SourceControlFlowGraph {
         continue;
       }
       if (fg?.allNodes !== undefined) {
+        const fun = this.sourceMap.wasm.getFunction(fid);
+        if (fun === undefined) {
+          throw new Error(`Fun is not supposed to be empty`);
+        }
+        let funName = fun.name === '' ? 'source' : fun.name;
+        funName = funName.trim();
+        funName = `${funName}_fun${fid}`;
+
+        if (seenDotFileNames.has(funName)) {
+          funName = `${funName}${fid}`;
+          if (seenDotFileNames.has(funName)) {
+            throw new Error(
+              `Case where two dot files share same name i.e., ${funName}`,
+            );
+          }
+        }
+        seenDotFileNames.add(funName);
         const content = sourceControlFlowGraphToDot(
           fg,
-          `function ${fid}`,
+          funName,
           config.includeInstructions,
         );
-        const p = pathJoin(outputDir, `sourcefun${fid}.dot`);
+        const p = pathJoin(outputDir, `${funName}.dot`);
         writeFileSync(p, content);
         dots.push(content);
       }
