@@ -596,7 +596,7 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
     case 'load32_s':
     case 'shr_s':
     case 'rotl':
-    case 'rorr':
+    case 'rotr':
     case 'ctz': {
       const opcode = obj.object + `.${obj.id}`;
       const errorOrNr: string | WASMOpcodeNumber =
