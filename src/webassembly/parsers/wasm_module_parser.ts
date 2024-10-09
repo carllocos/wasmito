@@ -571,6 +571,7 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
     case 'convert_s/i64':
     case 'convert_u/i64':
     case 'promote/f32':
+    case 'reinterpret/i32':
     case 'reinterpret/i64':
     case 'load':
     case 'store':
@@ -592,6 +593,7 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
     case 'load8_u':
     case 'load8_s':
     case 'load16_u':
+    case 'load16_s':
     case 'load32_u':
     case 'load32_s':
     case 'shr_s':

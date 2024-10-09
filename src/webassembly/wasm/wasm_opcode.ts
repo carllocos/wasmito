@@ -450,6 +450,9 @@ export function wasmOpcodeFromStr(opcode: string): WASMOpcodeNumber {
     case 'i32.load16_u':
     case 'u32.load16_u':
       return WASMOpcodeNumber.I32Load16Unsigned;
+    case 'i32.load16_s':
+    case 'u32.load16_s':
+      return WASMOpcodeNumber.I32Load16Signed;
 
     case 'u32.store':
     case 'i32.store':
