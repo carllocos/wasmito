@@ -16,6 +16,8 @@ import { type DotSerializationConfgig } from '../src/cfg/source_cfg';
 import { timeoutPromise } from '../src/util/promise_util';
 import { getGlobalLogger } from '../src/logger/logger';
 import { type SourceMap } from '../src/source_mappers/source_map';
+import { CoarseGrainedSourceCFGraph } from '../src/cfg/source_cfg_coarse';
+import { mkdirSync } from 'fs';
 
 export function registerCFGCommand(program: Command): void {
   program
@@ -57,6 +59,10 @@ export function registerCFGCommand(program: Command): void {
     )
     .option('--scfg-json', 'Save the source level CFGs as JSON')
     .option('--wcfg-json', 'Save the wasm level CFGs as JSON')
+    .option(
+      '--coarse-grained',
+      "Enables the creation of more coarse-grained source-level and stores them as dot files. The generated coarse dot files have as extension 'coarse.dot'",
+    )
     .action(async (wasmPath, outputDir, timeout, options) => {
       const logger = getGlobalLogger();
       if (!isFilePath(wasmPath)) {
@@ -114,6 +120,7 @@ export function registerCFGCommand(program: Command): void {
 
       const saveSCFGJSON = options.scfgJson !== undefined;
       const saveWCFGJSON = options.wcfgJson !== undefined;
+      const coarseGrained = options.coarseGrained !== undefined;
 
       try {
         const sm = await timeoutPromise(smPromise, timeoutMs);
@@ -164,6 +171,23 @@ export function registerCFGCommand(program: Command): void {
         if (callgraphOutputPath !== undefined) {
           logger.info(`Converting Callgraph to dot at ${callgraphOutputPath}`);
           langAdaptor.sourceCFG.wasmCFG.callgraph.toDot(callgraphOutputPath);
+        }
+        if (coarseGrained) {
+          logger.info(`Converting Source CFGs to Coarse Grained CFGs`);
+          const startConversion = Date.now();
+          const coarseCFGs = new CoarseGrainedSourceCFGraph(
+            langAdaptor.sourceCFG,
+          );
+          const conversionTime = startConversion - Date.now();
+          logger.info(
+            `Construction Time Took ${conversionTime} ms, ${conversionTime / 1000} secs, ${conversionTime / 1000 / 60} mins`,
+          );
+          logger.info('Storing Coarse Grained CFGs to dot');
+          const coarseOutPutDir = pathJoin(outputDir, 'coarse');
+          if (!isDirectoryPath(coarseOutPutDir)) {
+            mkdirSync(coarseOutPutDir);
+          }
+          coarseCFGs.serializeToDot(coarseOutPutDir);
         }
 
         if (unusedMappings !== undefined) {
