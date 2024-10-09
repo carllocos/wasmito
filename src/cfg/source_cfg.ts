@@ -41,7 +41,7 @@ export interface DotSerializationConfgig {
 }
 
 export class SourceControlFlowGraph {
-  private readonly _astGraphs: Map<number, FunctionTreeGraph>;
+  private readonly _astGraphs: Map<number, FunctionSourceCFG>;
   private readonly _allGraphNodes: SourceCFGNode[];
   private readonly _sourceMap: SourceMap;
   private readonly _wasmCFG: WasmControlFlowGraph;
@@ -111,12 +111,12 @@ export class SourceControlFlowGraph {
     }
   }
 
-  funtionSourceGraph(fid: number): FunctionTreeGraph | undefined {
+  getFuntionSourceCFG(fid: number): FunctionSourceCFG | undefined {
     return this._astGraphs.get(fid);
   }
 
   getFunctionEntryNodes(fid: number): SourceCFGNode[] {
-    const f = this.funtionSourceGraph(fid);
+    const f = this.getFuntionSourceCFG(fid);
     if (f === undefined) {
       return [];
     }
@@ -188,7 +188,7 @@ export class SourceControlFlowGraph {
 
     const dots: string[] = [];
     for (const fid of funIds) {
-      const fg = this.funtionSourceGraph(fid);
+      const fg = this.getFuntionSourceCFG(fid);
       if (fg === undefined || fg.entryNodes.length === 0) {
         continue;
       }
@@ -299,12 +299,13 @@ export function sourceNodeLastInstructionStartAddress(
   return n.instructions[n.instructions.length - 1].startAddress;
 }
 
-export interface FunctionTreeGraph {
+// TODO rename
+export interface FunctionSourceCFG {
   entryNodes: SourceCFGNode[];
   allNodes: SourceCFGNode[];
 }
 
-function functionTreeGraphToJSONObj(f: FunctionTreeGraph): object {
+function functionTreeGraphToJSONObj(f: FunctionSourceCFG): object {
   return {
     entryNodes: f.entryNodes.map((en) => en.nodeId),
     allNodes: f.allNodes.map((en) => sourceCFGNodeToJSONObj(en)),
@@ -315,11 +316,11 @@ function buildSourceCFGraph(
   sourceMap: SourceMap,
   // asts: AgnosticASTMap,
   cfg: WasmControlFlowGraph,
-): Map<number, FunctionTreeGraph> {
+): Map<number, FunctionSourceCFG> {
   logger.debug(
     `Building Source Level Control Flow Graph for #${sourceMap.wasm.functions.length}`,
   );
-  const ctg = new Map<number, FunctionTreeGraph>();
+  const ctg = new Map<number, FunctionSourceCFG>();
   const funcs = sourceMap.wasm.functions;
   for (let idx = 0; idx < funcs.length; idx++) {
     const f = funcs[idx];
@@ -340,7 +341,7 @@ function buildCTGraphForFunction(
   sourceMap: SourceMap,
   // asts: AgnosticASTMap,
   cfg: WasmControlFlowGraph,
-): FunctionTreeGraph {
+): FunctionSourceCFG {
   // TODO use depthfirst traversal to build the whole graph in one go
   // console.log();
   // console.log(`===================================`);
