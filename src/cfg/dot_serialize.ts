@@ -8,6 +8,11 @@ import {
   getCallInstructions,
 } from './source_cfg';
 import {
+  coarseSourceCFGNodeHasCallInstructions,
+  getCallInstructionsCoarseSourceNode,
+  type CoarseFunctionGraph,
+} from './source_cfg_coarse';
+import {
   getWasmNodeEdges,
   getWasmCFGNode,
   type CFGNode,
@@ -219,4 +224,75 @@ function escapeText(txt: string): string {
     }
   }
   return t.join('');
+}
+
+export function coarseSourceControlFlowGraphToDot(
+  fgraph: CoarseFunctionGraph,
+  nameGraph: string,
+): string {
+  const entryNodes = new Set(fgraph.entryNodes.map((n) => n.nodeId));
+  const allnodes = fgraph.allNodes;
+  const header = `digraph "CFG of ${nameGraph}" `;
+  const nodesDone = new Set<string>();
+  let nodesStr = '';
+  for (const n of allnodes) {
+    if (nodesDone.has(n.nodeId)) {
+      continue;
+    }
+    const record = n.instructions.length > 1 ? 'Mrecord' : 'record';
+
+    const nodeText: string[] = [];
+    for (const sl of n.sourceLocations) {
+      const c = `(line ${sl.linenr}, col ${sl.colnr})`;
+      nodeText.push(c);
+    }
+
+    if (coarseSourceCFGNodeHasCallInstructions(n)) {
+      const direct: number[] = [];
+      const indirect: number[] = [];
+      const callInstrs = getCallInstructionsCoarseSourceNode(n);
+      for (const call of callInstrs) {
+        if (isCallInstruction(call)) {
+          direct.push(call.funIdx);
+        } else if (isCallIndirect(call)) {
+          call.targetFuncs.forEach((tf) => indirect.push(tf));
+        }
+      }
+      const indirectstr =
+        indirect.length > 0 ? ` indirect ${indirect.join(', ')}` : '';
+      nodeText.push(` (call ${direct.join(', ')}${indirectstr})`);
+    }
+
+    const joined = nodeText.join('\n');
+    const label = `{Data block ${n.nodeId}|${joined}}`;
+    const nodeStr = `block${n.nodeId} [shape=${record}, label="${label}"];\n`;
+    nodesStr += nodeStr;
+    nodesDone.add(n.nodeId);
+    allnodes.push(n);
+  }
+
+  const entryNodeID = `block1`;
+  nodesStr += `${entryNodeID} [shape=record, label="EntryNode"];\n`;
+
+  const alreadyVisitedNodes = new Set<string>();
+  const edgesStr: string[] = [];
+  for (const n of allnodes) {
+    if (alreadyVisitedNodes.has(n.nodeId)) {
+      continue;
+    }
+    alreadyVisitedNodes.add(n.nodeId);
+    const nodeId = `block${n.nodeId}`;
+    if (entryNodes.has(n.nodeId)) {
+      edgesStr.push(`${entryNodeID}->${nodeId};\n`);
+    }
+    const str = n.edges
+      .map((edgeNode) => {
+        return `${nodeId} -> block${edgeNode.nodeId};\n`;
+      })
+      .join('');
+    edgesStr.push(str);
+  }
+  const allEdges = edgesStr.join('');
+
+  return `${header}{\n${nodesStr}${allEdges}}`;
 }
