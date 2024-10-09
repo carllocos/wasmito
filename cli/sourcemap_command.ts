@@ -3,8 +3,15 @@ import { type Command } from 'commander';
 import { getGlobalLogger } from '../src/logger/logger';
 import { createDirectoryIfUnexisting, isFilePath } from '../src/util/file_util';
 import { timeoutPromise } from '../src/util/promise_util';
-import { ReadDWARFMappings } from '../src/source_mappers/source_map_builder';
-import { StoreMappingsToJSON } from '../src/source_mappers/source_map';
+import {
+  ReadDWARFMappings,
+  ReadSourceSpec,
+  type SourceOffsetStart,
+} from '../src/source_mappers/source_map_builder';
+import {
+  type SourceMapJSON,
+  StoreMappingsToJSON,
+} from '../src/source_mappers/source_map';
 
 export function registerSourceMapCommand(program: Command): void {
   program
@@ -14,10 +21,39 @@ export function registerSourceMapCommand(program: Command): void {
       The generated JSON will be stored it in <output-file.json> creating parent directories if needed.
       Specify also a max build time allowed <timeout-secs> expressed in secs.`,
     )
-    .action(async (wasmPath, outputFile, timeout) => {
+    .option(
+      '-d, --dwarf <dwarf-path>',
+      `reads the DWARF debugging information from either the path to a DWARF encoded file or the wasm module iteself.`,
+    )
+    .option(
+      '-s, --source-spec <path-to-source-spec>',
+      `reads the debugging information from the given file that points to a SourceMap Spec
+      of the given wasm module iteself.`,
+    )
+    .action(async (wasmPath, outputFile, timeout, options) => {
       const logger = getGlobalLogger();
+      const dwarfPath = options.dwarf;
+      const sourceSpec = options.sourceSpec;
       if (!isFilePath(wasmPath)) {
         program.error('<wasm-path> is not a valid path to a Wasm module');
+      }
+
+      if (sourceSpec === undefined && dwarfPath === undefined) {
+        program.error('either --dwarf or --source-spec is missing');
+      } else if (sourceSpec !== undefined && dwarfPath !== undefined) {
+        program.error('only --dwarf or --source-spec is expected');
+      } else if (sourceSpec !== undefined) {
+        if (!isFilePath(sourceSpec)) {
+          program.error(
+            '--source-spec <path-to-source-spec> is not a valid path to a file',
+          );
+        }
+      } else {
+        if (!isFilePath(dwarfPath)) {
+          program.error(
+            '--dwarf <dwarf-path> is not a valid path to a Wasm module containing dwarf',
+          );
+        }
       }
 
       let timeoutMs = Number(timeout);
@@ -27,12 +63,26 @@ export function registerSourceMapCommand(program: Command): void {
         timeoutMs = timeoutMs * 1000; // convert to millisecs
       }
 
+      let smJSON: Promise<SourceMapJSON> | undefined;
+      let kindDebuggingFormat = '';
+      if (dwarfPath !== undefined) {
+        kindDebuggingFormat = 'DWARF';
+        smJSON = ReadDWARFMappings(dwarfPath);
+      } else {
+        kindDebuggingFormat = 'SourceSpec';
+        const startPositioning: SourceOffsetStart = {
+          colNrStartNumber: 0,
+          lineNrStartNumber: 1,
+        };
+        smJSON = ReadSourceSpec(sourceSpec, wasmPath, startPositioning);
+      }
+
       try {
         logger.info(
-          `Building SourceMap JSON from DWARF (timeout ${timeout} secs, ${timeout / 60} min)`,
+          `Building SourceMap JSON from ${kindDebuggingFormat} (timeout ${timeout} secs, ${timeout / 60} min)`,
         );
         const startTime = Date.now();
-        const sm = await timeoutPromise(ReadDWARFMappings(wasmPath), timeoutMs);
+        const sm = await timeoutPromise(smJSON, timeoutMs);
         const endTime = Date.now();
         const diff = endTime - startTime;
 
