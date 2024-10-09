@@ -61,6 +61,10 @@ export class SourceControlFlowGraph {
     this._allGraphNodes = allnodes;
   }
 
+  get sourceMap(): SourceMap {
+    return this._sourceMap;
+  }
+
   get wasmCFG(): WasmControlFlowGraph {
     return this._wasmCFG;
   }
