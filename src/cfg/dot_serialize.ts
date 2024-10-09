@@ -171,7 +171,7 @@ export function sourceControlFlowGraphToDot(
   //   nodesStr += `block${fid} [shape=${record}, label="${label}"];\n`;
   // }
 
-  const entryNodeID = `block-1`;
+  const entryNodeID = `block1`;
   // if (allnodes.length > 1) {
   // const record2 = 'record';
   // const label = `EntryNode`;
