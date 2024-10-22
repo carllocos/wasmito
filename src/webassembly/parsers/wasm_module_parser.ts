@@ -1582,7 +1582,7 @@ function parseFuncFields(fields: any): [Func[], string[]] {
     return f.type === 'Func';
   });
   if (funcFields.length === 0) {
-    return [[], ['No function Fields found during parsingFuncFields call']];
+    return [[], []];
   }
 
   const parsedFuncs: Array<[Func | undefined, string[]]> = funcFields.map(
