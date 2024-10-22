@@ -1,16 +1,18 @@
 import fs from 'fs';
 import {
+  type SourceCodeLocation,
   SourceMap,
   type SourceMapConfig,
   type SourceMapJSON,
   isSourceMapJSON,
   mappingItemToSourceCodeLocation,
+  sourceCodeLocationToString,
 } from './source_map';
 import { type MappingItem, SourceMapConsumer } from 'source-map';
 import { createLogger } from '../logger/logger';
 import { addr2line } from '../wasm-tools/addr2lines';
 import { wasmToolsObjdump } from '../wasm-tools/objdump';
-import { readFileAsJSON } from '../util/file_util';
+import { isFilePath, pathJoin, readFileAsJSON } from '../util/file_util';
 
 const logger = createLogger('SourceMapBuilder');
 
@@ -182,58 +184,98 @@ export async function ReadSourceSpec(
     },
   );
 
-  let cleanedMappings = mappings.filter((m: MappingItem) => {
-    const hasOriginalLine =
-      m.originalLine !== undefined && m.originalLine !== null;
-    const hasOriginalColumnNr =
-      m.originalColumn !== undefined && m.originalColumn !== null;
-    return hasOriginalLine && hasOriginalColumnNr;
-  });
-  if (mappings.length !== cleanedMappings.length) {
+  const sourceLocs = mappings
+    .filter((m: MappingItem) => {
+      const hasOriginalLine =
+        m.originalLine !== undefined && m.originalLine !== null;
+      const hasOriginalColumnNr =
+        m.originalColumn !== undefined && m.originalColumn !== null;
+      return hasOriginalLine && hasOriginalColumnNr;
+    })
+    .map(mappingItemToSourceCodeLocation);
+
+  return {
+    wasm: wasmPath,
+    sources: cleanSources(sources, config),
+    mappings: cleanMappings(sourceLocs, startPositioning, config),
+  };
+}
+
+function cleanMappings(
+  sourceCodeLocations: SourceCodeLocation[],
+  startPositioning?: SourceOffsetStart,
+  config?: SourceMapConfig,
+): SourceCodeLocation[] {
+  const [lineNrOffset, colNrOffset] =
+    startPositioning === undefined
+      ? [0, 0]
+      : getOffsetToApply(startPositioning);
+
+  const seenLocs = new Map<number, SourceCodeLocation[]>();
+  const cleaned: SourceCodeLocation[] = [];
+  for (const sl of sourceCodeLocations) {
+    sl.colnr += colNrOffset;
+    sl.linenr += lineNrOffset;
+    sl.name = sl.name ?? '';
+    sl.source = cleanSource(sl.source, config);
+
+    if (config?.ignoreDirectories !== undefined) {
+      const found = config.ignoreDirectories.find((dir) => {
+        return sl.source.startsWith(dir);
+      });
+      if (found === undefined) {
+        // we do not add mapping as needs to be ignored
+        continue;
+      }
+    }
+
+    const locs = seenLocs.get(sl.address);
+    if (locs === undefined) {
+      seenLocs.set(sl.address, [sl]);
+    } else {
+      const foundDifferent = locs.filter((l) => {
+        return (
+          l.colnr !== sl.colnr ||
+          l.linenr !== sl.linenr ||
+          l.source === sl.source
+        );
+      });
+      if (foundDifferent.length > 0) {
+        const locsStrs = foundDifferent
+          .map(sourceCodeLocationToString)
+          .join(', ');
+        logger.warn(
+          `found Wasm address ${sl.address} that maps to #${foundDifferent.length} locations: ${locsStrs})}}`,
+        );
+      }
+    }
+
+    cleaned.push(sl);
+  }
+
+  if (sourceCodeLocations.length !== cleaned.length) {
     logger.debug(
-      `We removed ${mappings.length - cleanedMappings.length} entries from the sourcemap as it has no originalLineNr nor originalColumnNr`,
+      `We removed ${sourceCodeLocations.length - cleaned.length} entries from the sourcemap as it has no originalLineNr nor originalColumnNr`,
     );
   }
 
-  const [lineNrOffset, colNrOffset] = getOffsetToApply(startPositioning);
+  return cleaned;
+}
 
-  cleanedMappings = cleanedMappings.map((m: MappingItem) => {
-    // case where either source, line number, column nr, is not avaialable should not occur
-    // throw error just in case
-    if (m.originalLine === undefined || m.originalColumn === undefined) {
-      throw new Error(`Found an empty originalLine nr for mapping`);
-    }
+function cleanSources(sources: string[], config?: SourceMapConfig): string[] {
+  return sources.map((s) => cleanSource(s, config));
+}
 
-    if (m.originalColumn === undefined || m.originalColumn === undefined) {
-      throw new Error(`Found an empty originalColumn nr for mapping`);
-    }
-
-    if (m.source === undefined || m.source === undefined) {
-      throw new Error(`Found an empty source for mapping`);
-    }
-
-    if (m.name === undefined || m.name === null) {
-      m.name = '';
-    }
-    m.originalColumn += colNrOffset;
-    m.originalLine += lineNrOffset;
-    return m;
-  });
-
-  const cleanedSources: string[] = [];
-  for (let i = 0; i < sources.length; i++) {
-    const cleanedSource = config?.srcToAbsPath?.get(sources[i]);
-    if (cleanedSource !== undefined) {
-      cleanedSources.push(cleanedSource);
-    } else {
-      cleanedSources.push(sources[i]);
-    }
+function cleanSource(source: string, config?: SourceMapConfig): string {
+  if (config === undefined) {
+    return source;
   }
 
-  const sourceLocs = cleanedMappings.map(mappingItemToSourceCodeLocation);
-  return {
-    wasm: wasmPath,
-    sources,
-    mappings: sourceLocs,
-  };
+  let newSource = source;
+  if (config.prefixSources !== undefined) {
+    newSource = pathJoin(config.prefixSources, source);
+  } else if (config.srcToAbsPath !== undefined) {
+    newSource = config.srcToAbsPath?.get(source) ?? source;
+  }
+  return isFilePath(newSource) ? newSource : source;
 }
