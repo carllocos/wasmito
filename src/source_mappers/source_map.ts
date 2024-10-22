@@ -120,9 +120,17 @@ export class SourceMap {
     this._prefixPath = config?.prefixSources;
     this._sources = [];
 
-    if (config?.prefixSources !== undefined) {
+    if (
+      config?.prefixSources !== undefined ||
+      config?.srcToAbsPath !== undefined
+    ) {
       for (const s of sources) {
-        const ps = pathJoin(config.prefixSources, s);
+        let ps = s;
+        if (config.prefixSources !== undefined) {
+          ps = pathJoin(config.prefixSources, s);
+        } else if (config.srcToAbsPath !== undefined) {
+          ps = config.srcToAbsPath.get(s) ?? '';
+        }
         this._sources.push(isFilePath(ps) ? ps : s);
       }
     } else {
@@ -136,6 +144,11 @@ export class SourceMap {
     for (const m of mappings) {
       if (config?.prefixSources !== undefined) {
         const newPath = pathJoin(config.prefixSources, m.source);
+        if (isFilePath(newPath)) {
+          m.source = newPath;
+        }
+      } else if (config?.srcToAbsPath !== undefined) {
+        const newPath = config.srcToAbsPath.get(m.source) ?? '';
         if (isFilePath(newPath)) {
           m.source = newPath;
         }
