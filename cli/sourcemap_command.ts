@@ -95,7 +95,7 @@ export function registerSourceMapCommand(program: Command): void {
         StoreMappingsToJSON(outputFile, sm, true);
       } catch (e) {
         const errMsg = e instanceof Error ? e.message : e;
-        program.error(`Could not the SourceMap JSON error occured: ${errMsg}`);
+        program.error(`Could not build the SourceMap error occured: ${errMsg}`);
       }
     });
 }
