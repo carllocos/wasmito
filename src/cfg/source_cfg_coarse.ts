@@ -9,7 +9,7 @@ import {
   type CallInstruction,
   type WasmInstruction,
 } from '../webassembly/wasm/wasm_instruction';
-import { pathJoin } from '../util/file_util';
+import { pathJoin, sanitizeFilename } from '../util/file_util';
 import { coarseSourceControlFlowGraphToDot } from './dot_serialize';
 import { writeFileSync } from 'fs';
 import * as crypto from 'crypto';
@@ -68,7 +68,7 @@ export class CoarseGrainedSourceCFGraph {
         }
         let funName = fun.name === '' ? 'source' : fun.name;
         funName = funName.trim();
-        funName = `${funName}_fun${fid}`;
+        funName = sanitizeFilename(`${funName}_fun${fid}`);
 
         if (seenDotFileNames.has(funName)) {
           funName = `${funName}${fid}`;

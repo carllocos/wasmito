@@ -25,7 +25,12 @@ import {
   type AgnosticASTMap,
   type AgnosticNode,
 } from '../language_adaptors/agnostic_node';
-import { getFileName, isFilePath, pathJoin } from '../util/file_util';
+import {
+  getFileName,
+  isFilePath,
+  pathJoin,
+  sanitizeFilename,
+} from '../util/file_util';
 import { sourceControlFlowGraphToDot } from './dot_serialize';
 import { writeFileSync } from 'fs';
 import { type WASMFunction } from '../webassembly/wasm/wasm_function';
@@ -204,7 +209,7 @@ export class SourceControlFlowGraph {
         }
         let funName = fun.name === '' ? 'source' : fun.name;
         funName = funName.trim();
-        funName = `${funName}_fun${fid}`;
+        funName = sanitizeFilename(`${funName}_fun${fid}`);
 
         if (seenDotFileNames.has(funName)) {
           funName = `${funName}${fid}`;

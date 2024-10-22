@@ -177,3 +177,8 @@ export function sha256ForFile(filePath: string): string {
 export function copyFile(file1: string, file2: string): void {
   fs.copyFileSync(file1, file2);
 }
+
+export function sanitizeFilename(filename: string): string {
+  // eslint-disable-next-line no-useless-escape
+  return filename.replace(/[\/\\:*?"<>|]/g, '_');
+}
