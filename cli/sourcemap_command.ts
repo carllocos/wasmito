@@ -1,7 +1,12 @@
 import path from 'path';
 import { type Command } from 'commander';
 import { getGlobalLogger } from '../src/logger/logger';
-import { createDirectoryIfUnexisting, isFilePath } from '../src/util/file_util';
+import {
+  createDirectoryIfUnexisting,
+  getAbsolutePath,
+  isFilePath,
+  readFileAsJSON,
+} from '../src/util/file_util';
 import { timeoutPromise } from '../src/util/promise_util';
 import {
   ReadDWARFMappings,
@@ -9,6 +14,7 @@ import {
   type SourceOffsetStart,
 } from '../src/source_mappers/source_map_builder';
 import {
+  type SourceMapConfig,
   type SourceMapJSON,
   StoreMappingsToJSON,
 } from '../src/source_mappers/source_map';
@@ -30,10 +36,12 @@ export function registerSourceMapCommand(program: Command): void {
       `reads the debugging information from the given file that points to a SourceMap Spec
       of the given wasm module iteself.`,
     )
+    .option('-r, --rebase-locations <path-to-config.json>')
     .action(async (wasmPath, outputFile, timeout, options) => {
       const logger = getGlobalLogger();
       const dwarfPath = options.dwarf;
       const sourceSpec = options.sourceSpec;
+      wasmPath = getAbsolutePath(wasmPath);
       if (!isFilePath(wasmPath)) {
         program.error('<wasm-path> is not a valid path to a Wasm module');
       }
@@ -65,6 +73,7 @@ export function registerSourceMapCommand(program: Command): void {
 
       let smJSON: Promise<SourceMapJSON> | undefined;
       let kindDebuggingFormat = '';
+      const config: SourceMapConfig = {};
       if (dwarfPath !== undefined) {
         kindDebuggingFormat = 'DWARF';
         smJSON = ReadDWARFMappings(dwarfPath);
@@ -74,7 +83,33 @@ export function registerSourceMapCommand(program: Command): void {
           colNrStartNumber: 0,
           lineNrStartNumber: 1,
         };
-        smJSON = ReadSourceSpec(sourceSpec, wasmPath, startPositioning);
+        const rebaseJSONPath = options.rebaseLocations;
+        if (rebaseJSONPath !== undefined) {
+          if (!isFilePath(rebaseJSONPath)) {
+            program.error(
+              `The given source location rebase config '${options.prefixSources}' is not a valid file path`,
+            );
+          }
+
+          config.srcToAbsPath = new Map<string, string>();
+          const rebase = await readFileAsJSON(rebaseJSONPath);
+          const pathsAr = rebase.absolutePaths;
+          if (Array.isArray(pathsAr)) {
+            for (let i = 0; i < pathsAr.length; i++) {
+              const pathMap = pathsAr[i];
+              if (!Array.isArray(pathMap) || pathMap.length !== 2) {
+                program.error('A filepath map requires 2 values');
+              } else {
+                const [p1, p2] = pathMap;
+                if (typeof p1 !== 'string' || typeof p2 !== 'string') {
+                  program.error('Filepaths are supposed to be strings');
+                }
+                config.srcToAbsPath.set(p1, p2);
+              }
+            }
+          }
+        }
+        smJSON = ReadSourceSpec(sourceSpec, wasmPath, startPositioning, config);
       }
 
       try {
