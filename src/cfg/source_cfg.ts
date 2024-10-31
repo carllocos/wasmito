@@ -8,6 +8,7 @@ import {
 } from './wasm_cfg';
 // import { createLogger } from '../logger/logger';
 import {
+  equalSourceCodeLocations,
   type SourceCodeLocation,
   type SourceMap,
 } from '../source_mappers/source_map';
@@ -34,7 +35,6 @@ import {
 import { sourceControlFlowGraphToDot } from './dot_serialize';
 import { writeFileSync } from 'fs';
 import { type WASMFunction } from '../webassembly/wasm/wasm_function';
-import * as crypto from 'crypto';
 import { createLogger } from '../logger/logger';
 import path from 'path';
 
@@ -272,7 +272,6 @@ export interface SourceCFGNode {
   wasmFunOwner: number;
   instructions: WasmInstruction[];
   instructionsIndexes: number[];
-  addressesWithoutASTNode: Set<number>;
 }
 function sourceCFGNodeToJSONObj(n: SourceCFGNode): object {
   const edges: object[] = n.edges.map((e) => {
@@ -286,7 +285,6 @@ function sourceCFGNodeToJSONObj(n: SourceCFGNode): object {
     wasmFunOwner: n.wasmFunOwner,
     instructions: n.instructions.map((i) => i.toJSONObj()),
     instructionsIndexes: n.instructionsIndexes,
-    addressesWithoutASTNode: Array.from(n.addressesWithoutASTNode),
     edges,
   };
 }
@@ -410,7 +408,7 @@ function createAllNodes(
       //   `\nNode ID ${n.nodeID} instructions #${n.instructions.length}`,
       // );
       let prevNode: SourceCFGNode | undefined;
-      for (let i = n.instructions.length - 1; i >= 0; i--) {
+      for (let i = 0; i < n.instructions.length; i++) {
         const instr = n.instructions[i];
         const sourceLocations = sourceMap
           .getOriginalPositionFor(instr.startAddress)
@@ -423,45 +421,20 @@ function createAllNodes(
             `more than one source location found for addr ${instr.startAddress}`,
           );
         } else if (sourceLocations.length === 0) {
-          // console.log(`instruction ${instructionToString(instr)} has no node`);
-          if (prevNode !== undefined) {
-            // const prevStr = logNode(prevNode.node);
-            // console.log(
-            //   `instruction ${instructionToString(instr)} added to prevNode with id ${prevNode.nodeId} node txt '${prevStr}'`,
-            // );
-            prevNode.addressesWithoutASTNode.add(instr.startAddress);
-          } else {
-            // console.log(
-            //   `encountered a wasm instr ${instructionToString(instr)} that cannot be stored on any CTN`,
-            // );
-          }
           continue;
         }
         const sourceLocation = sourceLocations[0];
-        // const nodeStr = logNode(agnosticNode);
         const node = createNodeIfNeeded(
           funID,
           nodes,
           sourceLocation,
           instr,
           n.instructionsIndexes[i],
+          prevNode,
         );
-        if (prevNode !== undefined) {
-          // const prevStr = logNode(prevNode.node);
-          if (node.nodeId !== prevNode.nodeId) {
-            // console.log(
-            //   `insrtuction ${instructionToString(instr)} new CTG node id ${node.nodeId} '${prevStr}'`,
-            // );
-            addEdge(node, prevNode);
-          } else {
-            // console.log(
-            //   `insrtuction ${instructionToString(instr)} on prev CTG node id ${node.nodeId} txt '${prevStr}'`,
-            // );
-          }
-        } else {
-          // console.log(
-          //   `insrtuction ${instructionToString(instr)} new CTG node id ${node.nodeId} (prev is undefined) txt ${nodeStr}'`,
-          // );
+
+        if (prevNode !== undefined && prevNode.nodeId !== node.nodeId) {
+          addEdge(prevNode, node);
         }
         prevNode = node;
       }
@@ -743,37 +716,60 @@ function createNodeIfNeeded(
   sourceLocation: SourceCodeLocation,
   instrToAdd: WasmInstruction,
   instrIndex: number,
+  prevNode: SourceCFGNode | undefined,
 ): SourceCFGNode {
-  const id = generateNodeID(sourceLocation);
-  let ncfg = findNode(nodes, id);
+  let ncfg = findNode(nodes, instrToAdd);
   if (ncfg === undefined) {
-    ncfg = {
-      wasmFunOwner: funID,
-      nodeId: id,
-      sourceLocation,
-      edges: [],
-      instructions: [],
-      addressesWithoutASTNode: new Set(),
-      instructionsIndexes: [],
-    };
-    nodes.push(ncfg);
+    if (
+      prevNode === undefined ||
+      !equalSourceCodeLocations(prevNode.sourceLocation, sourceLocation)
+    ) {
+      ncfg = {
+        wasmFunOwner: funID,
+        nodeId: `${instrToAdd.startAddress}`,
+        sourceLocation,
+        edges: [],
+        instructions: [],
+        instructionsIndexes: [],
+      };
+      nodes.push(ncfg);
+    } else {
+      ncfg = prevNode;
+    }
   }
   ncfg.instructions.push(instrToAdd);
   ncfg.instructionsIndexes.push(instrIndex);
   if (ncfg.instructions.length > 1) {
     ncfg.instructions.sort((i1, i2) => i1.startAddress - i2.startAddress);
     ncfg.instructionsIndexes.sort((i1, i2) => i1 - i2);
+    // update node id to addr of first instr
+    ncfg.nodeId = `${ncfg.instructions[0].startAddress}`;
   }
   return ncfg;
 }
 
 function findNode(
   nodes: SourceCFGNode[],
-  id: string,
+  instr: WasmInstruction,
 ): SourceCFGNode | undefined {
-  return nodes.find((n) => {
-    return n.nodeId === id;
-  });
+  for (let i = 0; i < nodes.length; i++) {
+    const n = nodes[i];
+    const foundInstr = n.instructions.find((i) => {
+      if (i.startAddress === instr.startAddress) {
+        if (i.endAddress !== instr.endAddress) {
+          throw new Error(
+            `Found two Wasm instr with same start address yet different end address: instr 1 ${instructionToString(i)} and instr 2 ${instructionToString(instr)}`,
+          );
+        }
+        return true;
+      }
+      return false;
+    });
+    if (foundInstr !== undefined) {
+      return n;
+    }
+  }
+  return undefined;
 }
 
 function addEdge(an1: SourceCFGNode, an2: SourceCFGNode): void {
@@ -794,10 +790,4 @@ function addEdge(an1: SourceCFGNode, an2: SourceCFGNode): void {
     //   `addEdge ${an1.nodeId} -> ${an2.nodeId} cancelled as edge already present`,
     // );
   }
-}
-
-function generateNodeID(sourceLocation: SourceCodeLocation): string {
-  const idStr = `${sourceLocation.source}\t${sourceLocation.name}\t${sourceLocation.linenr}\t${sourceLocation.colnr}`;
-  const hasher = crypto.createHash('md5');
-  return hasher.update(idStr).digest('hex');
 }
