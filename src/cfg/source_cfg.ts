@@ -364,21 +364,13 @@ function buildSourceCFGraph(
 function binaryLiftWasmCFG(
   f: WASMFunction,
   sourceMap: SourceMap,
-  // asts: AgnosticASTMap,
   cfg: WasmControlFlowGraph,
 ): FunctionSourceCFG {
-  // TODO use depthfirst traversal to build the whole graph in one go
-  // console.log();
-  // console.log(`===================================`);
-  // console.log(`===================================`);
-  // console.log();
   const graph = cfg.getCFGStrict(f.id);
   const ns = createAllNodes(f.id, sourceMap, graph);
-  // console.log(`===================================`);
   logger.debug(
     `${ns.length === 0 ? 'No edges to add' : 'Adding Edges'} for function ${f.id}`,
   );
-  // console.log(`===================================`);
   const entryNodes =
     ns.length === 0 ? [] : addEdgesAndReturnEntryNodes(graph, ns);
   logger.debug(`Found #${entryNodes.length} EntryNodes for function ${f.id}`);
@@ -394,7 +386,6 @@ function binaryLiftWasmCFG(
 function createAllNodes(
   funID: number,
   sourceMap: SourceMap,
-  // asts: AgnosticASTMap,
   funGraph: WASMFunGraph,
 ): SourceCFGNode[] {
   logger.debug(`Creating all nodes for ${funID}`);
