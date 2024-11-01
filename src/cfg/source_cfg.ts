@@ -394,9 +394,6 @@ function visitWasmNodes(
 
   breadthFirstTraverseWasmCFGT(g, entryNode, {
     onNode: (n: CFGNode) => {
-      // console.log(
-      //   `\nNode ID ${n.nodeID} instructions #${n.instructions.length}`,
-      // );
       let prevNode: SourceCFGNode | undefined;
       for (let i = 0; i < n.instructions.length; i++) {
         const instr = n.instructions[i];
@@ -510,7 +507,6 @@ function visitWasmEdges(
   const nodesToIgnore: Set<number> = new Set<number>();
   breadthFirstTraverseWasmCFGT(g, entryNode, {
     onNode: (wasmNode: CFGNode) => {
-      // console.log(`\nNode ID ${n.nodeID}`);
       const sourceCFGN = sourceCFGNodeFromDecreasingInstrs(
         wasmNode,
         sourceNodes,
@@ -551,7 +547,6 @@ function visitWasmEdges(
             throw new Error(`startNode should not be undefined`);
           }
           if (!entryNodesAdded.has(startNode.nodeId)) {
-            // console.log(`Added new EntryNode ${logNode(ctgn.node)}`);
             entryCTGNodes.push(startNode);
             entryNodesAdded.add(startNode.nodeId);
           }
@@ -573,15 +568,9 @@ function visitWasmEdges(
       // console.log(`Adding edges for node ${logNode(ctgn.node)}`);
 
       for (const e of wasmNode.edges) {
-        // console.log(
-        //   `instrFrom ${instructionToString(e.instrFrom)} -> instrTo ${instructionToString(e.instrTo)}`,
-        // );
         const toNode = getWasmCFGNode(g, e.instrTo.startAddress);
         const toctgn = sourceCFGFromIncreasingInstrs(toNode, sourceNodes);
         if (toctgn !== undefined) {
-          // console.log(
-          //   `about to add edge from ${logNode(ctgn.node)} to ${logNode(toctgn.node)}`,
-          // );
           if (sourceCFGN.nodeId !== toctgn.nodeId) {
             // case 1
             addEdge(sourceCFGN, toctgn);
@@ -610,9 +599,7 @@ function visitWasmEdges(
               if (destcfgn === undefined) {
                 throw new Error(`TODO search deeper in patch`);
               } else {
-                // if (destcfgn.nodeId === ctgn.nodeId) {
                 addEdge(sourceCFGN, toctgn);
-                // }
               }
             }
           } else {
