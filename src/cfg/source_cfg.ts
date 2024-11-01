@@ -139,7 +139,7 @@ export class SourceControlFlowGraph {
 
   getFunctionEntryNodesFromNode(n: SourceCFGNode): SourceCFGNode[] {
     const entryNodes: SourceCFGNode[] = [];
-    const alreadyAdded = new Set<string>();
+    const alreadyAdded = new Set<number>();
     if (sourceCFGHasOutgoingFunCallEdges(n)) {
       const callInstr = getCallInstructions(n);
       for (const i of callInstr) {
@@ -170,7 +170,7 @@ export class SourceControlFlowGraph {
     n: SourceCFGNode,
     ignoreExitNodes: boolean = false,
   ): SourceCFGNode[] {
-    const alreadyAdded = new Set<string>();
+    const alreadyAdded = new Set<number>();
     const ns: SourceCFGNode[] = [];
     for (const e of n.edges) {
       if (!alreadyAdded.has(e.nodeId)) {
@@ -265,7 +265,7 @@ export class SourceControlFlowGraph {
 }
 
 export interface SourceCFGNode {
-  nodeId: string;
+  nodeId: number;
   node?: AgnosticNode;
   sourceLocation: SourceCodeLocation;
   edges: SourceCFGNode[];
@@ -502,7 +502,7 @@ function visitWasmEdges(
   const entryNode = funGraph.entryNode;
   const g = funGraph.graph;
   const entryCTGNodes: SourceCFGNode[] = [];
-  const entryNodesAdded = new Set<string>();
+  const entryNodesAdded = new Set<number>();
   const nodesToIgnore: Set<number> = new Set<number>();
   breadthFirstTraverseWasmCFGT(g, entryNode, {
     onNode: (wasmNode: CFGNode) => {
@@ -697,7 +697,7 @@ function createNodeIfNeeded(
   if (ncfg === undefined) {
     ncfg = {
       wasmFunOwner: funID,
-      nodeId: `${instrToAdd.startAddress}`,
+      nodeId: instrToAdd.startAddress,
       sourceLocation,
       edges: [],
       instructions: [],
@@ -711,7 +711,7 @@ function createNodeIfNeeded(
     ncfg.instructions.sort((i1, i2) => i1.startAddress - i2.startAddress);
     ncfg.instructionsIndexes.sort((i1, i2) => i1 - i2);
     // update node id to addr of first instr
-    ncfg.nodeId = `${ncfg.instructions[0].startAddress}`;
+    ncfg.nodeId = ncfg.instructions[0].startAddress;
   }
   return ncfg;
 }

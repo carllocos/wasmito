@@ -12,7 +12,6 @@ import {
 import { pathJoin, sanitizeFilename } from '../util/file_util';
 import { coarseSourceControlFlowGraphToDot } from './dot_serialize';
 import { writeFileSync } from 'fs';
-import * as crypto from 'crypto';
 import {
   sourceCFGHasOutgoingFunCallEdges,
   type SourceCFGNode,
@@ -26,8 +25,8 @@ export interface DotSerializationConfgig {
 }
 
 export interface CoarseSourceCFGNode {
-  nodeId: string;
-  originalIDs: Set<string>;
+  nodeId: number;
+  originalIDs: Set<number>;
   sourceLocations: SourceCodeLocation[];
   edges: CoarseSourceCFGNode[];
   instructions: WasmInstruction[];
@@ -108,8 +107,8 @@ export class CoarseGrainedSourceCFGraph {
     return m;
   }
 
-  private countIncomingEdges(nodes: SourceCFGNode[]): Map<string, number> {
-    const incomingEdges = new Map<string, number>();
+  private countIncomingEdges(nodes: SourceCFGNode[]): Map<number, number> {
+    const incomingEdges = new Map<number, number>();
     for (const n of nodes) {
       for (const e of n.edges) {
         const incomingNr = incomingEdges.get(e.nodeId) ?? 0;
@@ -128,10 +127,10 @@ export class CoarseGrainedSourceCFGraph {
       return undefined;
     }
 
-    const coarseNodes = new Map<string, CoarseSourceCFGNode>();
-    const visitedNodes = new Set<string>();
+    const coarseNodes = new Map<number, CoarseSourceCFGNode>();
+    const visitedNodes = new Set<number>();
     const nodesToVisit: SourceCFGNode[] = [];
-    const exitNodesIDs = new Set<string>();
+    const exitNodesIDs = new Set<number>();
     const incomingEdges = this.countIncomingEdges(allSourceNodes);
 
     const coarseEntryNodes: CoarseSourceCFGNode[] = [];
@@ -227,7 +226,7 @@ export class CoarseGrainedSourceCFGraph {
     }
 
     const allNodes: CoarseSourceCFGNode[] = [];
-    const coarseNodeSeen = new Set<string>();
+    const coarseNodeSeen = new Set<number>();
     for (const n of coarseNodes.values()) {
       if (!coarseNodeSeen.has(n.nodeId)) {
         allNodes.push(n);
@@ -253,7 +252,7 @@ export class CoarseGrainedSourceCFGraph {
 }
 
 function createOrGetCoarseNode(
-  nodes: Map<string, CoarseSourceCFGNode>,
+  nodes: Map<number, CoarseSourceCFGNode>,
   n: SourceCFGNode,
 ): CoarseSourceCFGNode {
   let cn = nodes.get(n.nodeId);
@@ -261,7 +260,7 @@ function createOrGetCoarseNode(
     return cn;
   }
   cn = {
-    nodeId: generateNodeID(n.nodeId),
+    nodeId: n.nodeId,
     originalIDs: new Set([n.nodeId]),
     sourceLocations: [n.sourceLocation],
     edges: [],
@@ -273,7 +272,7 @@ function createOrGetCoarseNode(
 }
 
 function mergeSourceNodes(
-  nodes: Map<string, CoarseSourceCFGNode>,
+  nodes: Map<number, CoarseSourceCFGNode>,
   s1: SourceCFGNode,
   s2: SourceCFGNode,
 ): CoarseSourceCFGNode {
@@ -310,7 +309,7 @@ function mergeSourceNodes(
 }
 
 function coarseNodeAddEdge(
-  nodes: Map<string, CoarseSourceCFGNode>,
+  nodes: Map<number, CoarseSourceCFGNode>,
   from: SourceCFGNode,
   to: SourceCFGNode,
 ): void {
@@ -322,12 +321,6 @@ function coarseNodeAddEdge(
   if (found === undefined) {
     n1.edges.push(n2);
   }
-}
-
-function generateNodeID(seed: string): string {
-  const hasher = crypto.createHash('md5');
-  const id = hasher.update(seed).digest('hex');
-  return id;
 }
 
 export function getCallInstructionsCoarseSourceNode(

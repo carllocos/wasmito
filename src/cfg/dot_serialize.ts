@@ -89,7 +89,7 @@ export function sourceControlFlowGraphToDot(
   const entryNodes = new Set(fgraph.entryNodes.map((n) => n.nodeId));
   const allnodes = fgraph.allNodes;
   const header = `digraph "CFG of ${nameGraph}" `;
-  const nodesDone = new Set<string>();
+  const nodesDone = new Set<number>();
   let nodesStr = '';
   // const exitNodesToAdd = new Set<number>();
   // const funNames = new Map<number, string>();
@@ -178,7 +178,7 @@ export function sourceControlFlowGraphToDot(
   nodesStr += `${entryNodeID} [shape=record, label="EntryNode"];\n`;
   // }
 
-  const alreadyVisitedNodes = new Set<string>();
+  const alreadyVisitedNodes = new Set<number>();
   const edgesStr: string[] = [];
   for (const n of allnodes) {
     if (alreadyVisitedNodes.has(n.nodeId)) {
@@ -233,7 +233,7 @@ export function coarseSourceControlFlowGraphToDot(
   const entryNodes = new Set(fgraph.entryNodes.map((n) => n.nodeId));
   const allnodes = fgraph.allNodes;
   const header = `digraph "CFG of ${nameGraph}" `;
-  const nodesDone = new Set<string>();
+  const nodesDone = new Set<number>();
   let nodesStr = '';
   for (const n of allnodes) {
     if (nodesDone.has(n.nodeId)) {
@@ -274,7 +274,7 @@ export function coarseSourceControlFlowGraphToDot(
   const entryNodeID = `block1`;
   nodesStr += `${entryNodeID} [shape=record, label="EntryNode"];\n`;
 
-  const alreadyVisitedNodes = new Set<string>();
+  const alreadyVisitedNodes = new Set<number>();
   const edgesStr: string[] = [];
   for (const n of allnodes) {
     if (alreadyVisitedNodes.has(n.nodeId)) {
