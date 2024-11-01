@@ -367,12 +367,11 @@ function binaryLiftWasmCFG(
   cfg: WasmControlFlowGraph,
 ): FunctionSourceCFG {
   const graph = cfg.getCFGStrict(f.id);
-  const ns = createAllNodes(f.id, sourceMap, graph);
+  const ns = visitWasmNodes(f.id, sourceMap, graph);
   logger.debug(
     `${ns.length === 0 ? 'No edges to add' : 'Adding Edges'} for function ${f.id}`,
   );
-  const entryNodes =
-    ns.length === 0 ? [] : addEdgesAndReturnEntryNodes(graph, ns);
+  const entryNodes = ns.length === 0 ? [] : visitWasmEdges(graph, ns);
   logger.debug(`Found #${entryNodes.length} EntryNodes for function ${f.id}`);
   return { entryNodes, allNodes: ns };
 }
@@ -383,7 +382,7 @@ function binaryLiftWasmCFG(
 //   return `{startLoc: (${sp.linenr}, ${sp.colnr}), endLoc: (${ep.linenr}, ${ep.colnr}), srcTxt: '${n.node.text}'}`;
 // }
 
-function createAllNodes(
+function visitWasmNodes(
   funID: number,
   sourceMap: SourceMap,
   funGraph: WASMFunGraph,
@@ -500,7 +499,7 @@ function searchSourceCFGNode(
  * @param sourceNodes Source Level CFG nodes that need to be augmented with edges
  * @returns the Entry nodes of the Source Level CFG
  */
-function addEdgesAndReturnEntryNodes(
+function visitWasmEdges(
   funGraph: WASMFunGraph,
   sourceNodes: SourceCFGNode[],
 ): SourceCFGNode[] {
