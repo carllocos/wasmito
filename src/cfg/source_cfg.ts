@@ -417,7 +417,6 @@ function visitWasmNodes(
           sourceLocation,
           instr,
           n.instructionsIndexes[i],
-          prevNode,
         );
 
         if (prevNode !== undefined && prevNode.nodeId !== node.nodeId) {
@@ -693,26 +692,18 @@ function createNodeIfNeeded(
   sourceLocation: SourceCodeLocation,
   instrToAdd: WasmInstruction,
   instrIndex: number,
-  prevNode: SourceCFGNode | undefined,
 ): SourceCFGNode {
   let ncfg = findNode(nodes, instrToAdd);
   if (ncfg === undefined) {
-    if (
-      prevNode === undefined ||
-      !equalSourceCodeLocations(prevNode.sourceLocation, sourceLocation)
-    ) {
-      ncfg = {
-        wasmFunOwner: funID,
-        nodeId: `${instrToAdd.startAddress}`,
-        sourceLocation,
-        edges: [],
-        instructions: [],
-        instructionsIndexes: [],
-      };
-      nodes.push(ncfg);
-    } else {
-      ncfg = prevNode;
-    }
+    ncfg = {
+      wasmFunOwner: funID,
+      nodeId: `${instrToAdd.startAddress}`,
+      sourceLocation,
+      edges: [],
+      instructions: [],
+      instructionsIndexes: [],
+    };
+    nodes.push(ncfg);
   }
   ncfg.instructions.push(instrToAdd);
   ncfg.instructionsIndexes.push(instrIndex);
@@ -723,6 +714,25 @@ function createNodeIfNeeded(
     ncfg.nodeId = `${ncfg.instructions[0].startAddress}`;
   }
   return ncfg;
+}
+
+function tmpMergeNodeName(n1: SourceCFGNode, n2: SourceCFGNode): void {
+  // if (
+  //   prevNode === undefined ||
+  //   !equalSourceCodeLocations(prevNode.sourceLocation, sourceLocation)
+  // ) {
+  //   ncfg = {
+  //     wasmFunOwner: funID,
+  //     nodeId: `${instrToAdd.startAddress}`,
+  //     sourceLocation,
+  //     edges: [],
+  //     instructions: [],
+  //     instructionsIndexes: [],
+  //   };
+  //   nodes.push(ncfg);
+  // } else {
+  //   ncfg = prevNode;
+  // }
 }
 
 function findNode(
