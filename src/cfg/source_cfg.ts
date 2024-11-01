@@ -352,7 +352,7 @@ function buildSourceCFGraph(
     logger.debug(
       `[${idx}/${funcs.length - 1}] Building SCFG for function ${f.id}`,
     );
-    const funGraph = buildCTGraphForFunction(f, sourceMap, cfg);
+    const funGraph = binaryLiftWasmCFG(f, sourceMap, cfg);
     logger.debug(
       `[${idx}/${funcs.length - 1}] Storing SCFG of function ${f.id} to Map`,
     );
@@ -361,7 +361,7 @@ function buildSourceCFGraph(
   return ctg;
 }
 
-function buildCTGraphForFunction(
+function binaryLiftWasmCFG(
   f: WASMFunction,
   sourceMap: SourceMap,
   // asts: AgnosticASTMap,
