@@ -9,7 +9,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest] #, macos-latest]
+        os: [ubuntu-latest, macos-latest]
 
     steps:
       - name: Checkout code
@@ -22,12 +22,19 @@ jobs:
           target: wasm32-unknown-unknown
 
       - name: Install cargo-binstall (timeout after 2m)
+        if: runner.os == 'ubuntu-latest'
         timeout-minutes: 2
         run: |
           curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
 
       - name: Install wasm-tools v1.205.0
+        if: runner.os == 'ubuntu-latest'
         run: cargo binstall wasm-tools --no-confirm --version 1.205.0
+
+      # Using curl to install wasm-tools timesout in osx
+      - name: Install wasm-tools v1.205.0
+        if: runner.os == 'macos-latest'
+        run: cargo install wasm-tools --version 1.205.0
 
       - name: Build submodules
         run: |
