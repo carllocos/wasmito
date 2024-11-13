@@ -258,7 +258,7 @@ function buildCFGNodesHelper(
           addEdge(g, beforeAddress, instr.startAddress);
         }
       } else {
-        mergeNodes(g, beforeAddress, instr.startAddress);
+        mergeTwoNonControlChangingNodes(g, beforeAddress, instr.startAddress);
       }
       beforeAddress = instr.startAddress;
       continue;
@@ -497,7 +497,11 @@ function addEdge(g: WasmGraph, n1Address: number, n2Address: number): void {
   }
 }
 
-function mergeNodes(g: WasmGraph, n1Address: number, n2Address: number): void {
+function mergeTwoNonControlChangingNodes(
+  g: WasmGraph,
+  n1Address: number,
+  n2Address: number,
+): void {
   const n1 = getWasmCFGNode(g, n1Address);
   const n2 = getWasmCFGNode(g, n2Address);
   if (n1.changesFlow) {
