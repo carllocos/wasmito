@@ -449,6 +449,7 @@ function createNode(
     edges,
     startAddress,
     endAddress,
+    incomingEdges,
   };
 }
 
@@ -485,6 +486,10 @@ function addEdge(g: WasmGraph, n1Address: number, n2Address: number): void {
   });
   if (edgeAlreadyPresent === undefined) {
     n1.edges.push({
+      instrFrom,
+      instrTo,
+    });
+    n2.incomingEdges.push({
       instrFrom,
       instrTo,
     });
