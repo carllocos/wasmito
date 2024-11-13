@@ -32,11 +32,11 @@ export interface CFGNode {
   incomingEdges: CFGEdge[];
 }
 
-export type WasmGraph = Map<number, CFGNode>;
+export type WasmAddrToNodeMap = Map<number, CFGNode>;
 
 export interface WasmCFG {
   entryNode: CFGNode;
-  graph: WasmGraph;
+  graph: WasmAddrToNodeMap;
   calls: CallInstruction[];
   callIndirects: CallIndirect[];
   exitNode: CFGNode;
@@ -161,14 +161,14 @@ export class WasmControlFlowGraph {
 }
 
 export function controlFlowGraphToString(
-  g: WasmGraph,
+  g: WasmAddrToNodeMap,
   entryNode: CFGNode,
 ): string {
   return controlFlowGraphToStringHelper(g, entryNode, new Set<number>())[0];
 }
 
 function controlFlowGraphToStringHelper(
-  g: WasmGraph,
+  g: WasmAddrToNodeMap,
   n: CFGNode,
   blocksProcessed: Set<number>,
 ): [string, Set<number>] {
@@ -205,7 +205,7 @@ function controlFlowGraphToStringHelper(
   return [s, bp];
 }
 
-export function getWasmNodeEdges(g: WasmGraph, n: CFGNode): CFGNode[] {
+export function getWasmNodeEdges(g: WasmAddrToNodeMap, n: CFGNode): CFGNode[] {
   const edgeNodes: CFGNode[] = [];
   for (let i = 0; i < n.edges.length; i++) {
     const instTo = n.edges[i].instrTo;
@@ -219,7 +219,7 @@ export function getWasmNodeEdges(g: WasmGraph, n: CFGNode): CFGNode[] {
   return edgeNodes;
 }
 
-export function getWasmCFGNode(g: WasmGraph, addr: number): CFGNode {
+export function getWasmCFGNode(g: WasmAddrToNodeMap, addr: number): CFGNode {
   const n = g.get(addr);
   if (n === undefined) {
     throw new Error(`No  node found for address ${addr}`);
