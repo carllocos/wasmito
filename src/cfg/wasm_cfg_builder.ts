@@ -201,7 +201,7 @@ function buildCFGForFunc(
   const lastInstr = fun.body[fun.body.length - 1];
   const exitNode = getWasmCFGNode(g, lastInstr.startAddress);
   return [
-    { entryNode, graph: g, calls: funsCalled, callIndirects, exitNode },
+    { entryNode, addrToNode: g, calls: funsCalled, callIndirects, exitNode },
     tableAltered,
   ];
 }

@@ -36,7 +36,7 @@ export type WasmAddrToNodeMap = Map<number, CFGNode>;
 
 export interface WasmCFG {
   entryNode: CFGNode;
-  graph: WasmAddrToNodeMap;
+  addrToNode: WasmAddrToNodeMap;
   calls: CallInstruction[];
   callIndirects: CallIndirect[];
   exitNode: CFGNode;
@@ -66,7 +66,7 @@ function wasmFuncGraphToJSONObj(f: WasmCFG): object {
     wasmAddr: number;
     node: object;
   }> = [];
-  for (const [wasmAddr, nd] of f.graph.entries()) {
+  for (const [wasmAddr, nd] of f.addrToNode.entries()) {
     g.push({
       wasmAddr,
       node: cfgNodeToObj(nd),

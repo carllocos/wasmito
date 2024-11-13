@@ -421,7 +421,7 @@ function findExitNodes(
   }
 
   const [exitSourceNodes] = closestsParentSourceNodes(
-    wasmCFG.graph,
+    wasmCFG.addrToNode,
     exitWasmNode,
     sourceNodes,
   );
@@ -490,7 +490,7 @@ function findEntryNodes(
   // we have to retrieve the (indirect) children of the entryNode
   // that do have a source CFG node associtated to them
   const [entryNodesAndInstr] = closetsChildrenSourceCFGNodes(
-    wasmCFG.graph,
+    wasmCFG.addrToNode,
     wasmCFG.entryNode,
     sourceNodes,
   );
@@ -547,7 +547,7 @@ function binaryLiftWasmNodes(
 ): SourceCFGNode[] {
   logger.debug(`Creating all nodes for ${funID}`);
   const entryNode = funGraph.entryNode;
-  const g = funGraph.graph;
+  const g = funGraph.addrToNode;
   const nodes: SourceCFGNode[] = [];
 
   breadthFirstTraverseWasmCFGT(g, entryNode, {
@@ -685,7 +685,7 @@ function binaryLiftWasmEdges(
     return;
   }
 
-  const g = funGraph.graph;
+  const g = funGraph.addrToNode;
   const wasmNodesToIgnore: Set<number> = new Set<number>();
   breadthFirstTraverseWasmCFGT(g, funGraph.entryNode, {
     onNode: (wasmNode: CFGNode) => {

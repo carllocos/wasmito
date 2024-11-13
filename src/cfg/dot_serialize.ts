@@ -22,7 +22,7 @@ export function wasmControlFlowGraphToDot(
   const nodesDone = new Set<number>();
   let nodesStr = '';
   const nodes: CFGNode[] = [];
-  const g = funGraph.graph;
+  const g = funGraph.addrToNode;
   for (const [addr, node] of g.entries()) {
     if (nodesDone.has(node.nodeID)) {
       continue;
