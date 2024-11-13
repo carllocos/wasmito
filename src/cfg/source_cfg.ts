@@ -376,8 +376,20 @@ function binaryLiftWasmCFG(
   logger.debug(
     `${ns.length === 0 ? 'No edges to add' : 'Adding Edges'} for function ${f.id}`,
   );
-  const entryNodes = ns.length === 0 ? [] : visitWasmEdges(graph, ns);
+  visitWasmEdges(graph, ns);
+  const mergedSourceNodes = mergeSameLocNodeNeighbours(ns);
+
+  const entryNodes = findEntryNodes(graph, mergedSourceNodes);
   logger.debug(`Found #${entryNodes.length} EntryNodes for function ${f.id}`);
+  const exitNodes = findExitNodes(graph, mergedSourceNodes);
+  logger.debug(`Found #${exitNodes.length} ExitNodes for function ${f.id}`);
+
+  return {
+    entryNodes,
+    allNodes: mergedSourceNodes,
+    exitNodes,
+  };
+}
 
 function findExitNodes(
   wasmCFG: WASMFunGraph,
