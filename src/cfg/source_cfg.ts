@@ -9,6 +9,7 @@ import {
 // import { createLogger } from '../logger/logger';
 import {
   equalSourceCodeLocations,
+  sourceCodeLocationToString,
   type SourceCodeLocation,
   type SourceMap,
 } from '../source_mappers/source_map';
@@ -37,6 +38,7 @@ import { writeFileSync } from 'fs';
 import { type WASMFunction } from '../webassembly/wasm/wasm_function';
 import { createLogger } from '../logger/logger';
 import path from 'path';
+import assert from 'assert';
 
 const logger = createLogger('ASTControlFlowGraph');
 export interface DotSerializationConfgig {
@@ -376,7 +378,41 @@ function binaryLiftWasmCFG(
   );
   const entryNodes = ns.length === 0 ? [] : visitWasmEdges(graph, ns);
   logger.debug(`Found #${entryNodes.length} EntryNodes for function ${f.id}`);
-  return { entryNodes, allNodes: ns };
+
+function mergeSameLocNodeNeighbours(
+  allNodes: SourceCFGNode[],
+): SourceCFGNode[] {
+  /** TODO doc
+   */
+
+  for (const n of allNodes) {
+    if (
+      n.incomingEdges.length === 0 ||
+      n.incomingEdges.some(([inNode]) => {
+        return !equalSourceCodeLocations(
+          inNode.sourceLocation,
+          n.sourceLocation,
+        );
+      })
+    ) {
+      continue;
+    }
+
+    // console.log(`Merge #${n.incomingEdges.length} nodes`);
+    let mergedNode = n;
+    for (const [inNode] of n.incomingEdges) {
+      // in case of self edges
+      // the incomingEdge may have already been invalidated
+      if (inNode.sourceLocation.address === -1) {
+        continue;
+      }
+      mergedNode = mergeNeighbourNodes(inNode, mergedNode);
+    }
+  }
+
+  return allNodes.filter((n) => {
+    return n.sourceLocation.address !== -1;
+  });
 }
 
 // function logNode(n: AgnosticNode): string {
@@ -720,23 +756,92 @@ function createNodeIfNeeded(
   return ncfg;
 }
 
-function tmpMergeNodeName(n1: SourceCFGNode, n2: SourceCFGNode): void {
-  // if (
-  //   prevNode === undefined ||
-  //   !equalSourceCodeLocations(prevNode.sourceLocation, sourceLocation)
-  // ) {
-  //   ncfg = {
-  //     wasmFunOwner: funID,
-  //     nodeId: `${instrToAdd.startAddress}`,
-  //     sourceLocation,
-  //     edges: [],
-  //     instructions: [],
-  //     instructionsIndexes: [],
-  //   };
-  //   nodes.push(ncfg);
-  // } else {
-  //   ncfg = prevNode;
-  // }
+function removeEdge(
+  nodeFrom: SourceCFGNode,
+  fromInstr: WasmInstruction,
+  nodeTo: SourceCFGNode,
+  toInstr: WasmInstruction,
+): void {
+  const priorRemoval = nodeFrom.edges.length;
+  nodeFrom.edges = nodeFrom.edges.filter(
+    ([edgeNode, edgeFromInstr, edgeToInstr]) => {
+      return (
+        edgeNode.nodeId !== nodeTo.nodeId ||
+        edgeFromInstr.startAddress !== fromInstr.startAddress ||
+        edgeToInstr.startAddress !== toInstr.startAddress
+      );
+    },
+  );
+  assert(priorRemoval === nodeFrom.edges.length + 1);
+
+  const pr = nodeTo.incomingEdges.length;
+  nodeTo.incomingEdges = nodeTo.incomingEdges.filter(
+    ([incoming, edgeFromInstr, edgeToInstr]) => {
+      return (
+        incoming.nodeId !== nodeFrom.nodeId ||
+        edgeFromInstr.startAddress !== fromInstr.startAddress ||
+        edgeToInstr.startAddress !== toInstr.startAddress
+      );
+    },
+  );
+  assert(pr === nodeTo.incomingEdges.length + 1);
+}
+
+function mergeNeighbourNodes(
+  nfrom: SourceCFGNode,
+  nto: SourceCFGNode,
+): SourceCFGNode {
+  if (!equalSourceCodeLocations(nfrom.sourceLocation, nto.sourceLocation)) {
+    throw new Error(
+      `Merging two nodes of different source locations: ${sourceCodeLocationToString(nfrom.sourceLocation)} -> ${sourceCodeLocationToString(nto.sourceLocation)} `,
+    );
+  }
+
+  // update incoming edges
+  const copyIncoming = nto.incomingEdges.map((n) => n);
+  for (const [inNode, instrFrom, instrTo] of copyIncoming) {
+    removeEdge(inNode, instrFrom, nto, instrTo);
+    if (inNode.nodeId !== nfrom.nodeId) {
+      if (inNode.nodeId === nto.nodeId) {
+        // self edge
+        addEdge(nfrom, instrFrom, nfrom, instrTo);
+      } else {
+        addEdge(inNode, instrFrom, nfrom, instrTo);
+      }
+    }
+  }
+
+  // update outgoing edges of nto
+  for (const [outgoingEdge, instrFrom, instrTo] of nto.edges) {
+    if (outgoingEdge.nodeId === nto.nodeId) {
+      // self edge already handled
+      // when handling incoming edges
+      continue;
+    }
+    removeEdge(nto, instrFrom, outgoingEdge, instrTo);
+    addEdge(nfrom, instrFrom, outgoingEdge, instrTo);
+  }
+
+  nto.instructions.forEach((i) => {
+    nfrom.instructions.push(i);
+  });
+  nto.instructionsIndexes.forEach((i) => {
+    nfrom.instructionsIndexes.push(i);
+  });
+  nfrom.instructions.sort((i1, i2) => i1.startAddress - i2.startAddress);
+  nfrom.instructionsIndexes.sort((i1, i2) => i1 - i2);
+  nfrom.nodeId = nfrom.instructions[0].startAddress;
+
+  // nullify node
+  nto.nodeId = -1 * nto.nodeId;
+  nto.incomingEdges = [];
+  nto.edges = [];
+  nto.instructionsIndexes = [];
+  nto.node = undefined;
+  nto.sourceLocation = Object.assign({}, nto.sourceLocation); // It is very important to copy! Otherwise we affect oringal source map
+  nto.sourceLocation.address = -1;
+
+  return nfrom;
 }
 
 function findNode(
