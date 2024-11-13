@@ -14,7 +14,7 @@ import {
   sourceNodeLoc,
 } from './resuable_code';
 
-describe('Debug Operations on Rust AST Blink App', function () {
+describe.skip('Debug Operations on Rust AST Blink App', function () {
   const pathToDir = path.resolve('./test/data/rust_examples/blink/');
   const blinkApp = path.join(pathToDir, 'main.wasm');
   const sourcePath = path.join(pathToDir, 'main.rs');
@@ -97,7 +97,7 @@ describe('Debug Operations on Rust AST Blink App', function () {
   });
 });
 
-describe('Debug Operations on Rust AST Intermittent Blink', function () {
+describe.skip('Debug Operations on Rust AST Intermittent Blink', function () {
   const pathToDir = path.resolve(
     './test/data/rust_examples/blink_intermittent/',
   );

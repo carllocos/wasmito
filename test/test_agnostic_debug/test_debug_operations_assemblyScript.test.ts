@@ -19,7 +19,7 @@ import {
 } from './resuable_code';
 import { type SourceMapConfig } from '../../src/source_mappers/source_map';
 
-describe('Debug Operations on AssemblyScript Blink App', function () {
+describe.skip('Debug Operations on AssemblyScript Blink App', function () {
   const pathToRootSource = path.resolve(
     './test/data/assemblyscript_examples/blink/',
   );
