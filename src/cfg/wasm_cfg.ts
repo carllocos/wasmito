@@ -29,6 +29,7 @@ export interface CFGNode {
   instructions: WasmInstruction[];
   instructionsIndexes: number[];
   edges: CFGEdge[];
+  incomingEdges: CFGEdge[];
 }
 
 export type WasmGraph = Map<number, CFGNode>;
@@ -38,6 +39,7 @@ export interface WASMFunGraph {
   graph: WasmGraph;
   calls: CallInstruction[];
   callIndirects: CallIndirect[];
+  exitNode: CFGNode;
 }
 
 function cfgNodeToObj(nd: CFGNode): object {
@@ -120,10 +122,7 @@ export class WasmControlFlowGraph {
     for (const fid of funIds) {
       const p = path.join(outputDir, `wasmfun${fid}.dot`);
       const funGraph = this.getCFGStrict(fid);
-      const content = wasmControlFlowGraphToDot(
-        funGraph.graph,
-        `function ${fid}`,
-      );
+      const content = wasmControlFlowGraphToDot(funGraph, `function ${fid}`);
       writeFileSync(p, content);
       dots.push(content);
     }
