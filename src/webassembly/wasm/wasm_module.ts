@@ -403,7 +403,11 @@ function getLocalsTypes(wasmFilePath: string): Map<number, VariableInfo[]> {
     return getLocalTypesFromDissambleOutput(result);
   } catch (err) {
     if (err instanceof Error) {
-      err.message = `wabt/wasm-objdump failed with error: ${err.message}`;
+      if (err.message.includes('ENOBUFS')) {
+        return new Map();
+      } else {
+        err.message = `wabt/wasm-objdump failed with error: ${err.message}`;
+      }
     }
     throw err;
   }
