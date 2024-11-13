@@ -15,14 +15,14 @@ import {
 import { getWasmCFGNode, type CFGNode, type WasmCFG } from './wasm_cfg';
 
 export function wasmControlFlowGraphToDot(
-  funGraph: WasmCFG,
+  wasmCFG: WasmCFG,
   nameGraph: string,
 ): string {
   const header = `digraph "CFG of ${nameGraph}" `;
   const nodesDone = new Set<number>();
   let nodesStr = '';
   const nodes: CFGNode[] = [];
-  const g = funGraph.addrToNode;
+  const g = wasmCFG.addrToNode;
   for (const [addr, node] of g.entries()) {
     if (nodesDone.has(node.nodeID)) {
       continue;
@@ -75,7 +75,7 @@ export function wasmControlFlowGraphToDot(
       .join('');
     edgesStr.push(str);
   }
-  edgesStr.push(`block${funGraph.exitNode.nodeID} -> ${exitNodeID};\n`);
+  edgesStr.push(`block${wasmCFG.exitNode.nodeID} -> ${exitNodeID};\n`);
 
   const allEdges = edgesStr.join('');
 

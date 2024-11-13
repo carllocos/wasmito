@@ -78,15 +78,15 @@ export function buildGraphs(
  * alter the table (e.g., table's content is changed).
  * This information drastically impacts the target functions of call_indirects
  *
- * @param fgs the Array of CFGS for each Wasm function
+ * @param cfgs the Array of CFGS for each Wasm function
  * @param tableAltered Tells whether in the whole Wasm module we encountered an instruction that changes the table (size, or content)
  */
 function setTargetFunctionForCallIndirects(
   funcs: WASMFunction[],
-  fgs: WasmCFG[],
+  cfgs: WasmCFG[],
   tableAltered: boolean,
 ): void {
-  for (const fg of fgs) {
+  for (const fg of cfgs) {
     for (const ci of fg.callIndirects) {
       if (tableAltered || !ci.hasTableIndex()) {
         // at this point either

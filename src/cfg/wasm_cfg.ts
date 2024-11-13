@@ -61,22 +61,22 @@ function edgeToJSONObj(e: CFGEdge): object {
   };
 }
 
-function wasmFuncGraphToJSONObj(f: WasmCFG): object {
+function wasmFuncGraphToJSONObj(cfg: WasmCFG): object {
   const g: Array<{
     wasmAddr: number;
     node: object;
   }> = [];
-  for (const [wasmAddr, nd] of f.addrToNode.entries()) {
+  for (const [wasmAddr, nd] of cfg.addrToNode.entries()) {
     g.push({
       wasmAddr,
       node: cfgNodeToObj(nd),
     });
   }
   return {
-    entryNode: cfgNodeToObj(f.entryNode),
+    entryNode: cfgNodeToObj(cfg.entryNode),
     graph: g,
-    calls: f.calls.map((c) => c.toJSONObj()),
-    callIndirects: f.callIndirects.map((c) => c.toJSONObj()),
+    calls: cfg.calls.map((c) => c.toJSONObj()),
+    callIndirects: cfg.callIndirects.map((c) => c.toJSONObj()),
   };
 }
 
