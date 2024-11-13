@@ -379,6 +379,99 @@ function binaryLiftWasmCFG(
   const entryNodes = ns.length === 0 ? [] : visitWasmEdges(graph, ns);
   logger.debug(`Found #${entryNodes.length} EntryNodes for function ${f.id}`);
 
+function findExitNodes(
+  wasmCFG: WASMFunGraph,
+  sourceNodes: SourceCFGNode[],
+): SourceCFGNode[] {
+  const exitWasmNode = wasmCFG.exitNode;
+  const found = sourceCFGNodeAndInstrFromDecrInstrAddrs(
+    exitWasmNode,
+    sourceNodes,
+  );
+
+  if (found !== undefined) {
+    const [exitSourceNode] = found;
+    return [exitSourceNode];
+  }
+
+  const [exitSourceNodes] = closestsParentSourceNodes(
+    wasmCFG.graph,
+    exitWasmNode,
+    sourceNodes,
+  );
+
+  return exitSourceNodes;
+}
+
+function closestsParentSourceNodes(
+  g: WasmGraph,
+  n: CFGNode,
+  sourceNodes: SourceCFGNode[],
+  wasmNodesVisited: Set<number> = new Set<number>(),
+): [SourceCFGNode[], Set<number>] {
+  if (wasmNodesVisited.has(n.nodeID)) {
+    return [[], wasmNodesVisited];
+  }
+
+  wasmNodesVisited.add(n.nodeID);
+
+  const exitSourceNodes: SourceCFGNode[] = [];
+  const sourceNodesAdded = new Set<number>();
+  for (const incomingEdge of n.incomingEdges) {
+    const fromWasmNode = getWasmCFGNode(g, incomingEdge.instrFrom.startAddress);
+    const found = sourceCFGNodeAndInstrFromDecrInstrAddrs(
+      fromWasmNode,
+      sourceNodes,
+    );
+    if (found === undefined) {
+      const [closests, newlyVisited] = closestsParentSourceNodes(
+        g,
+        fromWasmNode,
+        sourceNodes,
+        wasmNodesVisited,
+      );
+      closests.forEach((n) => {
+        if (!sourceNodesAdded.has(n.nodeId)) {
+          exitSourceNodes.push(n);
+          sourceNodesAdded.add(n.nodeId);
+        }
+      });
+      newlyVisited.forEach((v) => wasmNodesVisited.add(v));
+    } else {
+      const [n] = found;
+      exitSourceNodes.push(n);
+    }
+  }
+  return [exitSourceNodes, wasmNodesVisited];
+}
+
+function findEntryNodes(
+  wasmCFG: WASMFunGraph,
+  sourceNodes: SourceCFGNode[],
+): SourceCFGNode[] {
+  // the entry source node CFG is the first source level CFG node that we find
+  // when traversing the entry WasmNode from low Wasminstruction addresses to high
+  const foundEntryNode = sourceCFGNodeAndInstrFromIncrInstrAddrs(
+    wasmCFG.entryNode,
+    sourceNodes,
+  );
+  if (foundEntryNode !== undefined) {
+    const [entrySourceNode] = foundEntryNode;
+    return [entrySourceNode];
+  }
+
+  // case where Wasm entry node has no associated source CFGNode
+  // we have to retrieve the (indirect) children of the entryNode
+  // that do have a source CFG node associtated to them
+  const [entryNodesAndInstr] = closetsChildrenSourceCFGNodes(
+    wasmCFG.graph,
+    wasmCFG.entryNode,
+    sourceNodes,
+  );
+  const entryNodes = entryNodesAndInstr.map((n) => n[0]);
+  return entryNodes;
+}
+
 function mergeSameLocNodeNeighbours(
   allNodes: SourceCFGNode[],
 ): SourceCFGNode[] {
