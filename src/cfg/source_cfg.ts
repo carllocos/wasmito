@@ -438,18 +438,34 @@ function visitWasmNodes(
   return nodes;
 }
 
-function sourceCFGNodeFromDecreasingInstrs(
+/**
+ * A helper func that given a `n` Wasm CFG Node will retrieve its binary lifted Source Level CFG Node.
+ * The search for the Source Level CFG Node will happen by searching in decreasing order
+ * the Source Level node associated to each Wasm instruction beloning to `n`.
+ * @param n Wasm CFG node
+ * @param nodes source level CFG nodes
+ * @returns Source Level CFG and Wasm Instruction
+ */
+function sourceCFGNodeAndInstrFromDecrInstrAddrs(
   n: CFGNode,
   nodes: SourceCFGNode[],
-): SourceCFGNode | undefined {
+): [SourceCFGNode, WasmInstruction] | undefined {
   const increment = false;
   return searchSourceCFGNode(n, nodes, increment);
 }
 
-function sourceCFGFromIncreasingInstrs(
+/**
+ * A helper func that given a `n` Wasm CFG Node will retrieve its binary lifted Source Level CFG Node.
+ * The search for the Source Level CFG Node will happen by searching in increasing order
+ * the Source Level node associated to each Wasm instruction beloning to `n`.
+ * @param n Wasm CFG node
+ * @param nodes source level CFG nodes
+ * @returns Source Level CFG and Wasm Instruction
+ */
+function sourceCFGNodeAndInstrFromIncrInstrAddrs(
   n: CFGNode,
   nodes: SourceCFGNode[],
-): SourceCFGNode | undefined {
+): [SourceCFGNode, WasmInstruction] | undefined {
   const increment = true;
   return searchSourceCFGNode(n, nodes, increment);
 }
@@ -458,7 +474,7 @@ function searchSourceCFGNode(
   n: CFGNode,
   nodes: SourceCFGNode[],
   fromLowAddressToHigh: boolean,
-): SourceCFGNode | undefined {
+): [SourceCFGNode, WasmInstruction] | undefined {
   let startIndex = fromLowAddressToHigh ? 0 : n.instructions.length - 1;
   const endIndex = fromLowAddressToHigh ? n.instructions.length : 0;
 
@@ -473,13 +489,15 @@ function searchSourceCFGNode(
       }
     }
     const instr = n.instructions[startIndex];
-    const ns = nodes.filter((n) => {
-      return (
-        n.instructions.find((ni) => ni.startAddress === instr.startAddress) !==
-        undefined
+    const ns: Array<[SourceCFGNode, WasmInstruction]> = [];
+    for (const n of nodes) {
+      const i = n.instructions.find(
+        (ni) => ni.startAddress === instr.startAddress,
       );
-    });
-
+      if (i !== undefined) {
+        ns.push([n, i]);
+      }
+    }
     if (ns.length > 1) {
       throw new Error(`found address as part of multiple AST nodes`);
     } else if (ns.length === 1) {
