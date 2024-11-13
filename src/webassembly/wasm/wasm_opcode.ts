@@ -544,7 +544,7 @@ export function wasmOpcodeFromStr(opcode: string): WASMOpcodeNumber {
       return WASMOpcodeNumber.I64CLZ;
     case 'i64.ctz':
       return WASMOpcodeNumber.I64CTZ;
-    case 'i64.popctn':
+    case 'i64.popcnt':
       return WASMOpcodeNumber.I64POPCNT;
 
     case 'i64.extend_s/i32':
@@ -610,7 +610,7 @@ export function wasmOpcodeFromStr(opcode: string): WASMOpcodeNumber {
       return WASMOpcodeNumber.I32CLZ;
     case 'i32.ctz':
       return WASMOpcodeNumber.I32CTZ;
-    case 'i32.popctn':
+    case 'i32.popcnt':
       return WASMOpcodeNumber.I32POPCNT;
 
     case 'i32.add':
