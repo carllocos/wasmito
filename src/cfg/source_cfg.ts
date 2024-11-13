@@ -653,24 +653,24 @@ function visitWasmEdges(
 /**
  * A helper function that given a node in a Wasm CFG of a function will search direct
  * or indirect Source Level CFG neighbours.
- * This function is needed in the situation where n has no corresponding source Level CFG Node but
- * the previous node of n i.e., node p that has an edge to n, does have a corresponding source level CFG Node
- * and thus wants to add an edge to the source level nodes that are the closets to n.
- * These closests source level CFG nodes for n are the source nodes that are direct neighbours of n or
+ * This function is needed in the situation where `n` has no corresponding source Level CFG Node but
+ * the parent node of `n` i.e., node p that has an edge to n, does have a corresponding source level CFG Node
+ * and thus wants to add an edge to the source level nodes that are the closets to `n`.
+ * These closests source level CFG nodes for `n` are the source nodes that are direct neighbours of n or
  * indirect neighbours.
  *
  * @param g Wasm Level CFG of a Wasm function
- * @param n a node in the CFG for which we want to find the closests Source Level CFG Nodes
+ * @param n a node in the Wasm CFG for which we want to find the closests Source Level CFG Nodes
  * @param nodes All the Source Level CFGNodes
  * @param nodesToIgnore a set of already visited node ids. This prevents to loop infinitly.
  * @returns nodes IDs that no longer need to be visited after return and the closets nodes
  */
-function searchClosetsSourceCFGNodes(
+function closetsChildrenSourceCFGNodes(
   g: WasmGraph,
   n: CFGNode,
   nodes: SourceCFGNode[],
   nodesToIgnore = new Set<number>(),
-): [Set<number>, SourceCFGNode[]] {
+): [Array<[SourceCFGNode, WasmInstruction]>, Set<number>] {
   logger.debug(`Node ${n.nodeID} has no Source CFGNode`);
   if (nodesToIgnore.has(n.nodeID)) {
     // consider scenario n1 -> n2 -> n3
@@ -688,28 +688,28 @@ function searchClosetsSourceCFGNodes(
     // when this function is called for n2 because of the self edge
     // then the call is stoped given that the id of n2 is
     // stored in the nodesToIgnore
-    return [nodesToIgnore, []];
+    return [[], nodesToIgnore];
   }
 
   nodesToIgnore.add(n.nodeID);
-  const found: SourceCFGNode[] = [];
+  const closests: Array<[SourceCFGNode, WasmInstruction]> = [];
   for (const e of n.edges) {
     const toWasmNode = getWasmCFGNode(g, e.instrTo.startAddress);
-    const toSourceCFGNode = sourceCFGFromIncreasingInstrs(toWasmNode, nodes);
-    if (toSourceCFGNode === undefined) {
-      const [newNodesToIngore, ns] = searchClosetsSourceCFGNodes(
+    const found = sourceCFGNodeAndInstrFromIncrInstrAddrs(toWasmNode, nodes);
+    if (found === undefined) {
+      const [ns, newNodesToIngore] = closetsChildrenSourceCFGNodes(
         g,
         toWasmNode,
         nodes,
         nodesToIgnore,
       );
       newNodesToIngore.forEach((nodeid) => nodesToIgnore.add(nodeid));
-      ns.forEach((nf) => found.push(nf));
+      ns.forEach((nf) => closests.push(nf));
     } else {
-      found.push(toSourceCFGNode);
+      closests.push(found);
     }
   }
-  return [nodesToIgnore, found];
+  return [closests, nodesToIgnore];
 }
 
 function createNodeIfNeeded(
