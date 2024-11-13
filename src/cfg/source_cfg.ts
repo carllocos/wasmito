@@ -370,12 +370,27 @@ function binaryLiftWasmCFG(
   sourceMap: SourceMap,
   cfg: WasmControlFlowGraph,
 ): BinaryLiftedCFG {
+  /**
+   * The process of binary lifting a Wasm CFG is divided into the following steps:
+   * 1. Binary Lift the nodes of the Wasm CFG.
+   * 2. Binary Lift the edges between the nodes of the Wasm CFG.
+   * 3. Merge neighbour nodes of the Binary Lifted CFG when possible
+   * 4. search for entry nodes and exit nodes
+   *
+   * The third step is needed since it may happen that some WasmInstructions that map
+   * to the same source code location but that are part of different nodes in the WCFG
+   * are then lifted to become neighbour nodes.
+   * Merging those nodes is required as they point to the same source code location
+   * and otherwise leaving them split would introduce unencessary debug steps that
+   * visually seems as the debugger is not advancing.
+   *
+   */
   const graph = cfg.getCFGStrict(f.id);
-  const ns = visitWasmNodes(f.id, sourceMap, graph);
+  const ns = binaryLiftWasmNodes(f.id, sourceMap, graph);
   logger.debug(
     `${ns.length === 0 ? 'No edges to add' : 'Adding Edges'} for function ${f.id}`,
   );
-  visitWasmEdges(graph, ns);
+  binaryLiftWasmEdges(graph, ns);
   const mergedSourceNodes = mergeSameLocNodeNeighbours(ns);
 
   const entryNodes = findEntryNodes(graph, mergedSourceNodes);
@@ -525,7 +540,7 @@ function mergeSameLocNodeNeighbours(
 //   return `{startLoc: (${sp.linenr}, ${sp.colnr}), endLoc: (${ep.linenr}, ${ep.colnr}), srcTxt: '${n.node.text}'}`;
 // }
 
-function visitWasmNodes(
+function binaryLiftWasmNodes(
   funID: number,
   sourceMap: SourceMap,
   funGraph: WASMFunGraph,
@@ -662,7 +677,7 @@ function searchSourceCFGNode(
  * @param sourceNodes Source Level CFG nodes that need to be augmented with edges
  * @returns the Entry nodes of the Source Level CFG
  */
-function visitWasmEdges(
+function binaryLiftWasmEdges(
   funGraph: WASMFunGraph,
   sourceNodes: SourceCFGNode[],
 ): void {
