@@ -268,10 +268,11 @@ export interface SourceCFGNode {
   nodeId: number;
   node?: AgnosticNode;
   sourceLocation: SourceCodeLocation;
-  edges: SourceCFGNode[];
+  edges: Array<[SourceCFGNode, WasmInstruction, WasmInstruction]>;
   wasmFunOwner: number;
   instructions: WasmInstruction[];
   instructionsIndexes: number[];
+  incomingEdges: Array<[SourceCFGNode, WasmInstruction, WasmInstruction]>;
 }
 function sourceCFGNodeToJSONObj(n: SourceCFGNode): object {
   const edges: object[] = n.edges.map((e) => {
