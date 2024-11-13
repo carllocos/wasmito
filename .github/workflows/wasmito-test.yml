@@ -16,14 +16,10 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install Rust v1.76.0
-        run: |
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain 1.80.1 -y
-          source "$HOME/.cargo/env" 
-          rustc --version
-
-      - name: Install wasm32 targets
-        run: |
-          rustup target add wasm32-unknown-unknown
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable, 1.76.0
+          target: wasm32-unknown-unknown
 
       - name: Install cargo-binstall (timeout after 2m)
         timeout-minutes: 2
