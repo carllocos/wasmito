@@ -34,7 +34,7 @@ export interface CFGNode {
 
 export type WasmGraph = Map<number, CFGNode>;
 
-export interface WASMFunGraph {
+export interface WasmCFG {
   entryNode: CFGNode;
   graph: WasmGraph;
   calls: CallInstruction[];
@@ -61,7 +61,7 @@ function edgeToJSONObj(e: CFGEdge): object {
   };
 }
 
-function wasmFuncGraphToJSONObj(f: WASMFunGraph): object {
+function wasmFuncGraphToJSONObj(f: WasmCFG): object {
   const g: Array<{
     wasmAddr: number;
     node: object;
@@ -82,7 +82,7 @@ function wasmFuncGraphToJSONObj(f: WASMFunGraph): object {
 
 export class WasmControlFlowGraph {
   private readonly _wasm: WasmModule;
-  private readonly _cfgs: Map<number, WASMFunGraph>;
+  private readonly _cfgs: Map<number, WasmCFG>;
   private readonly _callSites: Map<number, Set<number>>;
   private readonly _callgraph: WasmCallGraph;
 
@@ -98,7 +98,7 @@ export class WasmControlFlowGraph {
     return this._callgraph;
   }
 
-  getCFG(funID: number): WASMFunGraph | undefined {
+  getCFG(funID: number): WasmCFG | undefined {
     return this._cfgs.get(funID);
   }
 
@@ -106,7 +106,7 @@ export class WasmControlFlowGraph {
     return this._callSites.get(funID) ?? new Set();
   }
 
-  getCFGStrict(funID: number): WASMFunGraph {
+  getCFGStrict(funID: number): WasmCFG {
     const r = this.getCFG(funID);
     if (r === undefined) {
       throw new Error(`no CFG found for fun ${funID}`);

@@ -4,7 +4,7 @@ import {
   type CFGNode,
   type WasmControlFlowGraph,
   getWasmCFGNode,
-  type WASMFunGraph,
+  type WasmCFG,
 } from './wasm_cfg';
 // import { createLogger } from '../logger/logger';
 import {
@@ -406,7 +406,7 @@ function binaryLiftWasmCFG(
 }
 
 function findExitNodes(
-  wasmCFG: WASMFunGraph,
+  wasmCFG: WasmCFG,
   sourceNodes: SourceCFGNode[],
 ): SourceCFGNode[] {
   const exitWasmNode = wasmCFG.exitNode;
@@ -472,7 +472,7 @@ function closestsParentSourceNodes(
 }
 
 function findEntryNodes(
-  wasmCFG: WASMFunGraph,
+  wasmCFG: WasmCFG,
   sourceNodes: SourceCFGNode[],
 ): SourceCFGNode[] {
   // the entry source node CFG is the first source level CFG node that we find
@@ -543,7 +543,7 @@ function mergeSameLocNodeNeighbours(
 function binaryLiftWasmNodes(
   funID: number,
   sourceMap: SourceMap,
-  funGraph: WASMFunGraph,
+  funGraph: WasmCFG,
 ): SourceCFGNode[] {
   logger.debug(`Creating all nodes for ${funID}`);
   const entryNode = funGraph.entryNode;
@@ -678,7 +678,7 @@ function searchSourceCFGNode(
  * @returns the Entry nodes of the Source Level CFG
  */
 function binaryLiftWasmEdges(
-  funGraph: WASMFunGraph,
+  funGraph: WasmCFG,
   sourceNodes: SourceCFGNode[],
 ): void {
   if (sourceNodes.length === 0) {

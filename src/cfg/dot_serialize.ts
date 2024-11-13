@@ -12,10 +12,10 @@ import {
   getCallInstructionsCoarseSourceNode,
   type CoarseFunctionGraph,
 } from './source_cfg_coarse';
-import { getWasmCFGNode, type CFGNode, type WASMFunGraph } from './wasm_cfg';
+import { getWasmCFGNode, type CFGNode, type WasmCFG } from './wasm_cfg';
 
 export function wasmControlFlowGraphToDot(
-  funGraph: WASMFunGraph,
+  funGraph: WasmCFG,
   nameGraph: string,
 ): string {
   const header = `digraph "CFG of ${nameGraph}" `;
