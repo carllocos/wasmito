@@ -420,6 +420,7 @@ function visitWasmNodes(
           sourceLocation,
           instr,
           n.instructionsIndexes[i],
+          prevNode,
         );
 
         if (prevNode !== undefined && prevNode.nodeId !== node.nodeId) {
@@ -718,18 +719,27 @@ function createNodeIfNeeded(
   sourceLocation: SourceCodeLocation,
   instrToAdd: WasmInstruction,
   instrIndex: number,
+  parentNode: SourceCFGNode | undefined,
 ): SourceCFGNode {
   let ncfg = findNode(nodes, instrToAdd);
   if (ncfg === undefined) {
-    ncfg = {
-      wasmFunOwner: funID,
-      nodeId: instrToAdd.startAddress,
-      sourceLocation,
-      edges: [],
-      instructions: [],
-      instructionsIndexes: [],
-    };
-    nodes.push(ncfg);
+    if (
+      parentNode === undefined ||
+      !equalSourceCodeLocations(parentNode.sourceLocation, sourceLocation)
+    ) {
+      ncfg = {
+        wasmFunOwner: funID,
+        nodeId: instrToAdd.startAddress,
+        sourceLocation,
+        edges: [],
+        instructions: [],
+        instructionsIndexes: [],
+        incomingEdges: [],
+      };
+      nodes.push(ncfg);
+    } else {
+      ncfg = parentNode;
+    }
   }
   ncfg.instructions.push(instrToAdd);
   ncfg.instructionsIndexes.push(instrIndex);
