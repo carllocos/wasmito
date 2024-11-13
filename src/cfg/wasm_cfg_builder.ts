@@ -429,6 +429,7 @@ function createNode(
   instrs: WasmInstruction[],
   indexes: number[],
   edges: CFGEdge[],
+  incomingEdges: CFGEdge[] = [],
 ): CFGNode {
   const sortedIdx = indexes.sort((i1, i2) => i1 - i2);
   const sortedInstrs = instrs.sort(
@@ -519,7 +520,14 @@ function mergeNodes(g: WasmGraph, n1Address: number, n2Address: number): void {
   const indexes = n1.instructionsIndexes.concat(n2.instructionsIndexes);
   const insts = n1.instructions.concat(n2.instructions);
   const nodeID = n1.nodeID < n2.nodeID ? n1.nodeID : n2.nodeID;
-  const mergedNode = createNode(nodeID, false, insts, indexes, edges);
+  const mergedNode = createNode(
+    nodeID,
+    false,
+    insts,
+    indexes,
+    edges,
+    n1.incomingEdges,
+  );
 
   for (let i = 0; i < mergedNode.instructions.length; i++) {
     const instr = mergedNode.instructions[i];
