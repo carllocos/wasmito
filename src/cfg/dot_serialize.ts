@@ -12,21 +12,17 @@ import {
   getCallInstructionsCoarseSourceNode,
   type CoarseFunctionGraph,
 } from './source_cfg_coarse';
-import {
-  getWasmNodeEdges,
-  getWasmCFGNode,
-  type CFGNode,
-  type WasmGraph,
-} from './wasm_cfg';
+import { getWasmCFGNode, type CFGNode, type WASMFunGraph } from './wasm_cfg';
 
 export function wasmControlFlowGraphToDot(
-  g: WasmGraph,
+  funGraph: WASMFunGraph,
   nameGraph: string,
 ): string {
   const header = `digraph "CFG of ${nameGraph}" `;
   const nodesDone = new Set<number>();
   let nodesStr = '';
   const nodes: CFGNode[] = [];
+  const g = funGraph.graph;
   for (const [addr, node] of g.entries()) {
     if (nodesDone.has(node.nodeID)) {
       continue;
