@@ -575,15 +575,16 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
     case 'reinterpret/i64':
     case 'load':
     case 'store':
+    case 'store8':
+    case 'store16':
+    case 'store32':
     case 'div_s':
     case 'demote/f64':
-    case 'store8':
     case 'reinterpret/f64':
     case 'shr_u':
     case 'and':
     case 'or':
     case 'shl':
-    case 'store16':
     case 'xor':
     case 'div_u':
     case 'extend_u/i32':
