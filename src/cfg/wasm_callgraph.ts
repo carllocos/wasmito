@@ -3,7 +3,7 @@
  */
 import fs from 'fs';
 import { type WasmModule } from '../webassembly';
-import { type WASMFunGraph } from './wasm_cfg';
+import { type WasmCFG } from './wasm_cfg';
 
 export interface CallGraphNode {
   fid: number;
@@ -30,7 +30,7 @@ export class WasmCallGraph {
 
 export function buildWasmCallGraph(
   wasm: WasmModule,
-  cfg: Map<number, WASMFunGraph>,
+  cfg: Map<number, WasmCFG>,
 ): WasmCallGraph {
   // find entry funcs
   const mainNames = new Set<string>(['main', '_main']);

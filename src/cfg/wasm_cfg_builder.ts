@@ -24,7 +24,7 @@ import {
   type WasmGraph,
   type CFGEdge,
   type CFGNode,
-  type WASMFunGraph,
+  type WasmCFG,
 } from './wasm_cfg';
 
 interface BlockScope {
@@ -35,7 +35,7 @@ interface BlockScope {
 export function buildControlFlowGraphFunction(
   wasm: WasmModule,
   funcID: number,
-): WASMFunGraph {
+): WasmCFG {
   const fun = wasm.getFunction(funcID);
 
   if (fun === undefined) {
@@ -53,10 +53,10 @@ export function buildControlFlowGraphFunction(
 
 export function buildGraphs(
   wasm: WasmModule,
-): [Map<number, WASMFunGraph>, Map<number, Set<number>>, WasmCallGraph] {
+): [Map<number, WasmCFG>, Map<number, Set<number>>, WasmCallGraph] {
   const cfgs = new Map();
   let tableAltered: boolean = false;
-  const fgs: WASMFunGraph[] = [];
+  const fgs: WasmCFG[] = [];
   for (const f of wasm.functions) {
     const [fg, newTblAltered] = buildCFGForFunc(f, tableAltered);
     tableAltered = tableAltered || newTblAltered;
@@ -83,7 +83,7 @@ export function buildGraphs(
  */
 function setTargetFunctionForCallIndirects(
   funcs: WASMFunction[],
-  fgs: WASMFunGraph[],
+  fgs: WasmCFG[],
   tableAltered: boolean,
 ): void {
   for (const fg of fgs) {
@@ -126,7 +126,7 @@ function setTargetFunctionForCallIndirects(
 }
 
 function buildCallSites(
-  cfgs: Map<number, WASMFunGraph>,
+  cfgs: Map<number, WasmCFG>,
   funcs: WASMFunction[],
 ): Map<number, Set<number>> {
   const callSitesMap = new Map<number, Set<number>>();
@@ -163,7 +163,7 @@ function buildCallSites(
 function buildCFGForFunc(
   fun: WASMFunction,
   tableAltered: boolean,
-): [WASMFunGraph, boolean] {
+): [WasmCFG, boolean] {
   const g: WasmGraph = new Map();
   const funsCalled: CallInstruction[] = [];
   const callIndirects: CallIndirect[] = [];
