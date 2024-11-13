@@ -21,7 +21,7 @@ import { type WasmModule } from '../webassembly/wasm/wasm_module';
 import { buildWasmCallGraph, type WasmCallGraph } from './wasm_callgraph';
 import {
   getWasmCFGNode,
-  type WasmGraph,
+  type WasmAddrToNodeMap,
   type CFGEdge,
   type CFGNode,
   type WasmCFG,
@@ -164,7 +164,7 @@ function buildCFGForFunc(
   fun: WASMFunction,
   tableAltered: boolean,
 ): [WasmCFG, boolean] {
-  const g: WasmGraph = new Map();
+  const g: WasmAddrToNodeMap = new Map();
   const funsCalled: CallInstruction[] = [];
   const callIndirects: CallIndirect[] = [];
   for (let i = 0; i < fun.allInstructions.length; i++) {
@@ -458,7 +458,11 @@ function lastInstruction(n: CFGNode): WasmInstruction {
   return n.instructions[n.instructions.length - 1];
 }
 
-function addEdge(g: WasmGraph, n1Address: number, n2Address: number): void {
+function addEdge(
+  g: WasmAddrToNodeMap,
+  n1Address: number,
+  n2Address: number,
+): void {
   const n1 = getWasmCFGNode(g, n1Address);
   const n2 = getWasmCFGNode(g, n2Address);
   const instrFrom = n1.instructions.find((inst) => {
@@ -498,7 +502,7 @@ function addEdge(g: WasmGraph, n1Address: number, n2Address: number): void {
 }
 
 function mergeTwoNonControlChangingNodes(
-  g: WasmGraph,
+  g: WasmAddrToNodeMap,
   n1Address: number,
   n2Address: number,
 ): void {

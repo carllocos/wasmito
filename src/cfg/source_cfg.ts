@@ -1,6 +1,6 @@
 import { breadthFirstTraverseWasmCFGT } from './traversals_cfg';
 import {
-  type WasmGraph,
+  type WasmAddrToNodeMap,
   type CFGNode,
   type WasmControlFlowGraph,
   getWasmCFGNode,
@@ -430,7 +430,7 @@ function findExitNodes(
 }
 
 function closestsParentSourceNodes(
-  g: WasmGraph,
+  g: WasmAddrToNodeMap,
   n: CFGNode,
   sourceNodes: SourceCFGNode[],
   wasmNodesVisited: Set<number> = new Set<number>(),
@@ -790,7 +790,7 @@ function binaryLiftWasmEdges(
  * @returns nodes IDs that no longer need to be visited after return and the closets nodes
  */
 function closetsChildrenSourceCFGNodes(
-  g: WasmGraph,
+  g: WasmAddrToNodeMap,
   n: CFGNode,
   nodes: SourceCFGNode[],
   nodesToIgnore = new Set<number>(),
