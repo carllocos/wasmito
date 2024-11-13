@@ -22,7 +22,7 @@ jobs:
           target: wasm32-unknown-unknown
 
       - name: Install cargo-binstall (timeout after 2m)
-        if: runner.os == 'ubuntu-latest'
+        if: matrix.os == 'ubuntu-latest'
         timeout-minutes: 2
         run: |
           curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
