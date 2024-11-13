@@ -3,7 +3,7 @@ import {
   isCallInstruction,
 } from '../webassembly/wasm/wasm_instruction';
 import {
-  type FunctionSourceCFG,
+  type BinaryLiftedCFG,
   sourceCFGHasOutgoingFunCallEdges,
   getCallInstructions,
 } from './source_cfg';
@@ -83,7 +83,7 @@ export function wasmControlFlowGraphToDot(
 }
 
 export function sourceControlFlowGraphToDot(
-  fgraph: FunctionSourceCFG,
+  fgraph: BinaryLiftedCFG,
   nameGraph: string,
   includeInstructions: boolean = false,
 ): string {

@@ -48,7 +48,7 @@ export interface DotSerializationConfgig {
 }
 
 export class SourceControlFlowGraph {
-  private readonly _astGraphs: Map<number, FunctionSourceCFG>;
+  private readonly _astGraphs: Map<number, BinaryLiftedCFG>;
   private readonly _allGraphNodes: SourceCFGNode[];
   private readonly _sourceMap: SourceMap;
   private readonly _wasmCFG: WasmControlFlowGraph;
@@ -122,7 +122,7 @@ export class SourceControlFlowGraph {
     }
   }
 
-  getFuntionSourceCFG(fid: number): FunctionSourceCFG | undefined {
+  getFuntionSourceCFG(fid: number): BinaryLiftedCFG | undefined {
     return this._astGraphs.get(fid);
   }
 
@@ -328,14 +328,13 @@ export function sourceNodeLastInstructionStartAddress(
   return n.instructions[n.instructions.length - 1].startAddress;
 }
 
-// TODO rename
-export interface FunctionSourceCFG {
+export interface BinaryLiftedCFG {
   entryNodes: SourceCFGNode[];
   allNodes: SourceCFGNode[];
   exitNodes: SourceCFGNode[];
 }
 
-function functionTreeGraphToJSONObj(f: FunctionSourceCFG): object {
+function functionTreeGraphToJSONObj(f: BinaryLiftedCFG): object {
   return {
     entryNodes: f.entryNodes.map((en) => en.nodeId),
     allNodes: f.allNodes.map((en) => sourceCFGNodeToJSONObj(en)),
@@ -346,11 +345,11 @@ function buildSourceCFGraph(
   sourceMap: SourceMap,
   // asts: AgnosticASTMap,
   cfg: WasmControlFlowGraph,
-): Map<number, FunctionSourceCFG> {
+): Map<number, BinaryLiftedCFG> {
   logger.debug(
     `Building Source Level Control Flow Graph for #${sourceMap.wasm.functions.length}`,
   );
-  const ctg = new Map<number, FunctionSourceCFG>();
+  const ctg = new Map<number, BinaryLiftedCFG>();
   const funcs = sourceMap.wasm.functions;
   for (let idx = 0; idx < funcs.length; idx++) {
     const f = funcs[idx];
@@ -370,7 +369,7 @@ function binaryLiftWasmCFG(
   f: WASMFunction,
   sourceMap: SourceMap,
   cfg: WasmControlFlowGraph,
-): FunctionSourceCFG {
+): BinaryLiftedCFG {
   const graph = cfg.getCFGStrict(f.id);
   const ns = visitWasmNodes(f.id, sourceMap, graph);
   logger.debug(
