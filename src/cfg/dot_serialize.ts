@@ -58,20 +58,25 @@ export function wasmControlFlowGraphToDot(
     nodes.push(n);
   }
 
+  // add exit node to nodes
+  const exitNodeID = `blockExit`;
+  nodesStr += `${exitNodeID} [shape=record, label="ExitNode"];\n`;
+
   const edgesStr: string[] = [];
   for (const n of nodes) {
     const nodeId = `block${n.nodeID}`;
-    const edges = n.edges;
-    const str = getWasmNodeEdges(g, n)
-      .map((edgeNode, i) => {
-        const e = edges[i];
+    const str = n.edges
+      .map((e) => {
         const instFrom = e.instrFrom;
         const instTo = e.instrTo;
-        return `${nodeId} -> block${edgeNode.nodeID} [label="from ${instFrom.startAddress} to ${instTo.startAddress}"];\n`;
+        const toNode = getWasmCFGNode(g, instTo.startAddress);
+        return `${nodeId} -> block${toNode.nodeID} [label="from ${instFrom.startAddress} to ${instTo.startAddress}"];\n`;
       })
       .join('');
     edgesStr.push(str);
   }
+  edgesStr.push(`block${funGraph.exitNode.nodeID} -> ${exitNodeID};\n`);
+
   const allEdges = edgesStr.join('');
 
   return `${header}{\n${nodesStr}${allEdges}}`;
