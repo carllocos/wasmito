@@ -110,7 +110,7 @@ export class CoarseGrainedSourceCFGraph {
   private countIncomingEdges(nodes: SourceCFGNode[]): Map<number, number> {
     const incomingEdges = new Map<number, number>();
     for (const n of nodes) {
-      for (const e of n.edges) {
+      for (const [e] of n.edges) {
         const incomingNr = incomingEdges.get(e.nodeId) ?? 0;
         incomingEdges.set(e.nodeId, incomingNr + 1);
       }
@@ -140,7 +140,7 @@ export class CoarseGrainedSourceCFGraph {
       const cn = createOrGetCoarseNode(coarseNodes, entryNode);
       coarseEntryNodes.push(cn);
       if (entryNodes.length > 1) {
-        for (const e of entryNode.edges) {
+        for (const [e] of entryNode.edges) {
           cn.edges.push(createOrGetCoarseNode(coarseNodes, e));
           coarseNodeAddEdge(coarseNodes, entryNode, e);
           nodesToVisit.push(e);
@@ -151,7 +151,7 @@ export class CoarseGrainedSourceCFGraph {
         // 1. no more than one incoming edge for the node
         // 2. the neighbour is not a call node
         // 3. the entryNode is not a call
-        const neighbour = entryNode.edges[0];
+        const [neighbour] = entryNode.edges[0];
         const nrIncomingEdges = incomingEdges.get(neighbour.nodeId);
         if (nrIncomingEdges === undefined) {
           throw new Error(
@@ -193,7 +193,7 @@ export class CoarseGrainedSourceCFGraph {
         createOrGetCoarseNode(coarseNodes, nodeToVist);
         exitNodesIDs.add(nodeToVist.nodeId);
       } else if (nodeToVist.edges.length === 1) {
-        const neighbour = nodeToVist.edges[0];
+        const [neighbour] = nodeToVist.edges[0];
         const nrIncomingEdges = incomingEdges.get(neighbour.nodeId);
         if (nrIncomingEdges === undefined) {
           throw new Error(
@@ -216,7 +216,7 @@ export class CoarseGrainedSourceCFGraph {
         nodesToVisit.push(neighbour);
       } else {
         // case where more than one neighbour so nothing to merge
-        for (const e of nodeToVist.edges) {
+        for (const [e] of nodeToVist.edges) {
           coarseNodeAddEdge(coarseNodes, nodeToVist, e);
           if (!visitedNodes.has(e.nodeId)) {
             nodesToVisit.push(e);
