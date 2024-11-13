@@ -423,7 +423,12 @@ function visitWasmNodes(
         );
 
         if (prevNode !== undefined && prevNode.nodeId !== node.nodeId) {
-          addEdge(prevNode, node);
+          addEdge(
+            prevNode,
+            prevNode.instructions[prevNode.instructions.length - 1],
+            node,
+            node.instructions[0],
+          );
         }
         prevNode = node;
       }
@@ -762,22 +767,17 @@ function findNode(
   return undefined;
 }
 
-function addEdge(an1: SourceCFGNode, an2: SourceCFGNode): void {
-  const alreadyAdded = an1.edges.find((n) => {
+function addEdge(
+  an1: SourceCFGNode,
+  fromInstr: WasmInstruction,
+  an2: SourceCFGNode,
+  toInstr: WasmInstruction,
+): void {
+  const alreadyAdded = an1.edges.find(([n]) => {
     return n.nodeId === an2.nodeId;
   });
   if (alreadyAdded === undefined) {
-    // const s1 = logNode(an1.node);
-    // const s2 = logNode(an2.node);
-    if (an1.nodeId === an2.nodeId) {
-      // console.log(`addEdge ${an1.nodeId} ${s1} -> ${an2.nodeId} ${s2} LOOP!`);
-    } else {
-      // console.log(`addEdge ${an1.nodeId} ${s1} -> ${an2.nodeId} ${s2}`);
-    }
-    an1.edges.push(an2);
-  } else {
-    // console.log(
-    //   `addEdge ${an1.nodeId} -> ${an2.nodeId} cancelled as edge already present`,
-    // );
+    an1.edges.push([an2, fromInstr, toInstr]);
+    an2.incomingEdges.push([an1, fromInstr, toInstr]);
   }
 }
