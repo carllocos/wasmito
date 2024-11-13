@@ -27,6 +27,9 @@ export function breadthFirstTraverseWasmCFGT(
     if (n === undefined) {
       throw new Error(`n should not be undefined`);
     }
+    if (visitedNodes.has(n.nodeID)) {
+      continue;
+    }
     visitedNodes.add(n.nodeID);
     if (callbacks.onNode !== undefined) {
       callbacks.onNode(n);
