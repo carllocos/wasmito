@@ -525,58 +525,21 @@ function searchSourceCFGNode(
 function visitWasmEdges(
   funGraph: WASMFunGraph,
   sourceNodes: SourceCFGNode[],
-): SourceCFGNode[] {
-  const entryNode = funGraph.entryNode;
+): void {
+  if (sourceNodes.length === 0) {
+    return;
+  }
+
   const g = funGraph.graph;
-  const entryCTGNodes: SourceCFGNode[] = [];
-  const entryNodesAdded = new Set<number>();
-  const nodesToIgnore: Set<number> = new Set<number>();
-  breadthFirstTraverseWasmCFGT(g, entryNode, {
+  const wasmNodesToIgnore: Set<number> = new Set<number>();
+  breadthFirstTraverseWasmCFGT(g, funGraph.entryNode, {
     onNode: (wasmNode: CFGNode) => {
-      const sourceCFGN = sourceCFGNodeFromDecreasingInstrs(
+      const found = sourceCFGNodeAndInstrFromDecrInstrAddrs(
         wasmNode,
         sourceNodes,
       );
-      if (sourceCFGN === undefined) {
-        if (wasmNode.nodeID === entryNode.nodeID) {
-          // handle special case where entry has no associated source CFGNode
-          const [newNodesToIngore, entryNodes] = searchClosetsSourceCFGNodes(
-            g,
-            entryNode,
-            sourceNodes,
-          );
-          newNodesToIngore.forEach((ni) => nodesToIgnore.add(ni));
-          entryNodes.forEach((en) => {
-            if (!entryNodesAdded.has(en.nodeId)) {
-              // console.log(`Added new EntryNode ${logNode(en.node)}`);
-              entryCTGNodes.push(en);
-              entryNodesAdded.add(en.nodeId);
-            }
-          });
-        }
-        if (nodesToIgnore.has(wasmNode.nodeID)) {
-          // if node n has no CTG node associated then the previous parent node
-          // has already added an edge to a (in)direct neighbour of n in a previous loop
-          return;
-        } else {
-          throw new Error(`Case should not have happened`);
-        }
-      } else {
-        // ctgn is not undefined
-        // entry CFG node has a corresponding CTG node
-        if (wasmNode.nodeID === entryNode.nodeID) {
-          const startNode = sourceCFGFromIncreasingInstrs(
-            wasmNode,
-            sourceNodes,
-          );
-          if (startNode === undefined) {
-            throw new Error(`startNode should not be undefined`);
-          }
-          if (!entryNodesAdded.has(startNode.nodeId)) {
-            entryCTGNodes.push(startNode);
-            entryNodesAdded.add(startNode.nodeId);
-          }
-        }
+      if (found === undefined) {
+        return;
       }
 
       // case where we check if maybe we have to add edges which can happen when:
@@ -586,20 +549,29 @@ function visitWasmEdges(
       // then adding an edge may not be needed:
       // 2.a. if there is just one edge then toInstr of the wasm CFG node is a
       // block instr (e.g., block or loop) and no edge is needed to be added
-      // 2.b if the toInstr is a call or indirect call an edge needs to be added to another node
+      // 2.b if the toInstr is a call or indirect call the corresponding Source CFG Node no edge
+      // needs to be added. This call node simply indicates that when applying debug operations
+      // and when encountering this call node another Source CFG has to be accessed.
       // 2.c. if the toInstr is a branching instruction (e.g., br, br_if, br_table) and edge may
       // need to be added. And this depending on where the toInstr points to. However,
       // this case 2.c can be handled on the next node visit which in that case should be the
       // the first condition to check
       // console.log(`Adding edges for node ${logNode(ctgn.node)}`);
 
+      const [sourceCFGNFrom, fromInstr] = found;
       for (const e of wasmNode.edges) {
-        const toNode = getWasmCFGNode(g, e.instrTo.startAddress);
-        const toctgn = sourceCFGFromIncreasingInstrs(toNode, sourceNodes);
-        if (toctgn !== undefined) {
-          if (sourceCFGN.nodeId !== toctgn.nodeId) {
+        const toWasmNode = getWasmCFGNode(g, e.instrTo.startAddress);
+        const foundToNodeAndInstr = sourceCFGNodeAndInstrFromIncrInstrAddrs(
+          toWasmNode,
+          sourceNodes,
+        );
+
+        if (foundToNodeAndInstr !== undefined) {
+          const [toSourceCFGNode, toInstr] = foundToNodeAndInstr;
+
+          if (sourceCFGNFrom.nodeId !== toSourceCFGNode.nodeId) {
             // case 1
-            addEdge(sourceCFGN, toctgn);
+            addEdge(sourceCFGNFrom, fromInstr, toSourceCFGNode, toInstr);
           } else if (isWasmInstructionBlockBased(e.instrTo)) {
             // case 2.a
             continue;
@@ -617,15 +589,17 @@ function visitWasmEdges(
             // TODO generalise to paths
             const branchingNode = getWasmCFGNode(g, e.instrFrom.startAddress);
             for (const be of branchingNode.edges) {
-              const destNode = getWasmCFGNode(g, be.instrTo.startAddress);
-              const destcfgn = sourceCFGFromIncreasingInstrs(
-                destNode,
-                sourceNodes,
-              );
-              if (destcfgn === undefined) {
+              const destWasmNode = getWasmCFGNode(g, be.instrTo.startAddress);
+              const foundDestSourceAndInstr =
+                sourceCFGNodeAndInstrFromIncrInstrAddrs(
+                  destWasmNode,
+                  sourceNodes,
+                );
+              if (foundDestSourceAndInstr === undefined) {
                 throw new Error(`TODO search deeper in patch`);
               } else {
-                addEdge(sourceCFGN, toctgn);
+                const [destSourceNode, destInstr] = foundDestSourceAndInstr;
+                addEdge(sourceCFGNFrom, fromInstr, destSourceNode, destInstr);
               }
             }
           } else {
@@ -633,22 +607,16 @@ function visitWasmEdges(
           }
         } else {
           // we have to search for all the neighbours of toNode that have a CFG node
-          const [newNodesToIngore, indirectNodes] = searchClosetsSourceCFGNodes(
-            g,
-            toNode,
-            sourceNodes,
-          );
-          newNodesToIngore.forEach((nid) => nodesToIgnore.add(nid));
-          for (const indirectCTGN of indirectNodes) {
-            addEdge(sourceCFGN, indirectCTGN);
+          const [indirectNodes, newWasmNodesToIngore] =
+            closetsChildrenSourceCFGNodes(g, toWasmNode, sourceNodes);
+          newWasmNodesToIngore.forEach((nid) => wasmNodesToIgnore.add(nid));
+          for (const [indirectCTGN, indirectInstr] of indirectNodes) {
+            addEdge(sourceCFGNFrom, fromInstr, indirectCTGN, indirectInstr);
           }
         }
       }
     },
   });
-  // }
-
-  return entryCTGNodes;
 }
 
 /**
