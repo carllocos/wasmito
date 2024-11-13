@@ -172,7 +172,7 @@ export class SourceControlFlowGraph {
   ): SourceCFGNode[] {
     const alreadyAdded = new Set<number>();
     const ns: SourceCFGNode[] = [];
-    for (const e of n.edges) {
+    for (const [e] of n.edges) {
       if (!alreadyAdded.has(e.nodeId)) {
         ns.push(e);
         alreadyAdded.add(e.nodeId);
