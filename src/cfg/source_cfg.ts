@@ -274,8 +274,9 @@ export interface SourceCFGNode {
   instructionsIndexes: number[];
   incomingEdges: Array<[SourceCFGNode, WasmInstruction, WasmInstruction]>;
 }
+
 function sourceCFGNodeToJSONObj(n: SourceCFGNode): object {
-  const edges: object[] = n.edges.map((e) => {
+  const edges: object[] = n.edges.map(([e, _]) => {
     return { nodeID: e.nodeId };
   });
 
