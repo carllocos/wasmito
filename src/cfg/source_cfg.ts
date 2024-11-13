@@ -330,6 +330,7 @@ export function sourceNodeLastInstructionStartAddress(
 export interface FunctionSourceCFG {
   entryNodes: SourceCFGNode[];
   allNodes: SourceCFGNode[];
+  exitNodes: SourceCFGNode[];
 }
 
 function functionTreeGraphToJSONObj(f: FunctionSourceCFG): object {
