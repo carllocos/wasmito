@@ -92,34 +92,13 @@ export function sourceControlFlowGraphToDot(
   const header = `digraph "CFG of ${nameGraph}" `;
   const nodesDone = new Set<number>();
   let nodesStr = '';
-  // const exitNodesToAdd = new Set<number>();
-  // const funNames = new Map<number, string>();
   for (const n of allnodes) {
     if (nodesDone.has(n.nodeId)) {
       continue;
     }
-    // if (sourceCFGHasOutgoingFunCallEdges(n)) {
-    //   const callInstrs = getCallInstructions(n);
-    //   for (const callinstr of callInstrs) {
-    //     if (isCallInstruction(callinstr)) {
-    //       exitNodesToAdd.add(callinstr.funIdx);
-    //       funNames.set(callinstr.funIdx, callinstr.args[0]);
-    //     } else if (isCallIndirect(callinstr)) {
-    //       throw new Error(`Call indirect not yet supported`);
-    //     } else {
-    //       throw new Error(`outgoing instructions should be (indirect) calls`);
-    //     }
-    //   }
-    // }
     const record = n.instructions.length > 1 ? 'Mrecord' : 'record';
 
-    const sp = n.sourceLocation;
-    let srcTxt = n.sourceLocation.name;
-    if (n.node !== undefined) {
-      srcTxt = n.node.node.text;
-    }
-    srcTxt = escapeText(srcTxt);
-    let c = `(line ${sp.linenr}, col ${sp.colnr}) ${srcTxt}`;
+    let c = '';
     if (sourceCFGHasOutgoingFunCallEdges(n)) {
       const calls = getCallInstructions(n);
       const direct: number[] = [];
@@ -135,7 +114,7 @@ export function sourceControlFlowGraphToDot(
         indirect.length > 0 ? ` indirect ${indirect.join(', ')}` : '';
       c += ` (call ${direct.join(', ')}${indirectstr})`;
     }
-    const instructionsStrs: string[] = [c];
+    const instructionsStrs: string[] = [];
     if (includeInstructions) {
       for (let i = 0; i < n.instructions.length; i++) {
         const instr = n.instructions[i];
@@ -157,7 +136,13 @@ export function sourceControlFlowGraphToDot(
         .join('|');
     }
 
-    const label = `{Data block ${n.nodeId}|${s}}`;
+    const sp = n.sourceLocation;
+    let srcTxt = n.sourceLocation.name;
+    if (n.node !== undefined) {
+      srcTxt = n.node.node.text;
+    }
+    srcTxt = escapeText(srcTxt);
+    const label = `{(line ${sp.linenr}, col ${sp.colnr}) ${srcTxt} ${c} ${includeInstructions ? '|' : ''}${s}}`;
 
     const nodeStr = `block${n.nodeId} [shape=${record}, label="${label}"];\n`;
     nodesStr += nodeStr;
@@ -165,19 +150,13 @@ export function sourceControlFlowGraphToDot(
     allnodes.push(n);
   }
 
-  // for (const fid of exitNodesToAdd.values()) {
-  //   const record = 'record';
-  //   const fname = funNames.get(fid) ?? `${fid}`;
-  //   const label = `FunCall ${fname}|instr<4>call ${fid}}`;
-  //   nodesStr += `block${fid} [shape=${record}, label="${label}"];\n`;
-  // }
-
+  // add entry and exit nodes
   const entryNodeID = `block1`;
-  // if (allnodes.length > 1) {
-  // const record2 = 'record';
-  // const label = `EntryNode`;
   nodesStr += `${entryNodeID} [shape=record, label="EntryNode"];\n`;
-  // }
+  const exitNodeID = `blockExit`;
+  if (fgraph.exitNodes.length > 0) {
+    nodesStr += `${exitNodeID} [shape=record, label="ExitNode"];\n`;
+  }
 
   const alreadyVisitedNodes = new Set<number>();
   const edgesStr: string[] = [];
@@ -191,22 +170,20 @@ export function sourceControlFlowGraphToDot(
       edgesStr.push(`${entryNodeID}->${nodeId};\n`);
     }
     const str = n.edges
-      .map((edgeNode) => {
-        return `${nodeId} -> block${edgeNode.nodeId};\n`;
+      .map(([edgeNode, fromInstr, toInstr]) => {
+        let s = `${nodeId} -> block${edgeNode.nodeId}`;
+        if (includeInstructions) {
+          s += ` [label="from ${fromInstr.startAddress} to ${toInstr.startAddress}"]`;
+        }
+        s += ';\n';
+        return s;
       })
       .join('');
     edgesStr.push(str);
-    // if (sourceCFGHasOutgoingFunCallEdges(n)) {
-    //   for (const callInstr of n.edgesToOutSideCalls) {
-    //     if (isCallInstruction(callInstr)) {
-    //       edgesStr.push(`${nodeId} -> block${callInstr.funIdx};\n`);
-    //     } else if (isCallIndirect(callInstr)) {
-    //       throw new Error(`Call indirect not yet supported`);
-    //     } else {
-    //       throw new Error(`outgoing instructions should be (indirect) calls`);
-    //     }
-    //   }
-    // }
+  }
+
+  for (const en of fgraph.exitNodes) {
+    edgesStr.push(`block${en.nodeId} -> ${exitNodeID};\n`);
   }
   const allEdges = edgesStr.join('');
 
