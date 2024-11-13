@@ -541,7 +541,7 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
     case 'ge_s':
     case 'ge_u':
     case 'clz':
-    case 'popctn':
+    case 'popcnt':
     case 'wrap/i64':
     case 'trunc_s/f32':
     case 'trunc_u/f32':
