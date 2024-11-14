@@ -6,7 +6,7 @@ import {
 import { constructLanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 import assert, { fail } from 'assert';
 import {
-  type DotSerializationConfgig,
+  type DotSerializationConfig,
   type SourceControlFlowGraph,
 } from '../../src/cfg/source_cfg';
 import { type SourceMapConfig } from '../../src';
@@ -46,7 +46,7 @@ describe('Debug Operations on Zig App', function () {
       assert(langAdaptor.sourceCFG !== undefined);
       sourceCFG = langAdaptor.sourceCFG;
       sourceCFG.wasmCFG.serializeToDot(pathToDir);
-      const config: DotSerializationConfgig = {
+      const config: DotSerializationConfig = {
         includeInstructions: true,
         includeEmptySCFG: false,
       };

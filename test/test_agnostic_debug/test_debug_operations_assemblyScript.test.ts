@@ -7,7 +7,7 @@ import {
 import { constructLanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 import assert, { fail } from 'assert';
 import {
-  type DotSerializationConfgig,
+  type DotSerializationConfig,
   sourceCFGHasOutgoingFunCallEdges,
   type SourceControlFlowGraph,
 } from '../../src/cfg/source_cfg';
@@ -129,7 +129,7 @@ describe('Debug Operations on AS Intermittent Blink', function () {
       langAdaptor.sourceMap.storeMappingsToJSON(
         path.resolve(pathToRootSource, 'mappings.json'),
       );
-      const config: DotSerializationConfgig = {
+      const config: DotSerializationConfig = {
         includeInstructions: false,
         includeEmptySCFG: false,
       };

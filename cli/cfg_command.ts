@@ -12,7 +12,7 @@ import {
   type SourceOffsetStart,
 } from '../src/source_mappers/source_map_builder';
 import { constructLanguageAdaptor } from '../src/language_adaptors/language_adaptor';
-import { type DotSerializationConfgig } from '../src/cfg/source_cfg';
+import { type DotSerializationConfig } from '../src/cfg/source_cfg';
 import { timeoutPromise } from '../src/util/promise_util';
 import { getGlobalLogger } from '../src/logger/logger';
 import { type SourceMap } from '../src/source_mappers/source_map';

@@ -4,7 +4,7 @@ import { SourceMapfromDWARFWasm } from '../../src/source_mappers/source_map_buil
 import { constructLanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 import assert, { fail } from 'assert';
 import {
-  type DotSerializationConfgig,
+  type DotSerializationConfig,
   type SourceControlFlowGraph,
 } from '../../src/cfg/source_cfg';
 import { DebugOperations } from '../../src/language_adaptors/debug_tree_operations';
@@ -29,7 +29,7 @@ describe.skip('Debug Operations on Rust AST Blink App', function () {
       assert(langAdaptor.sourceCFG !== undefined);
       sourceCFG = langAdaptor.sourceCFG;
       sourceCFG.wasmCFG.serializeToDot(pathToDir);
-      const config: DotSerializationConfgig = {
+      const config: DotSerializationConfig = {
         includeInstructions: false,
         includeEmptySCFG: false,
       };
@@ -114,7 +114,7 @@ describe.skip('Debug Operations on Rust AST Intermittent Blink', function () {
       assert(langAdaptor.sourceCFG !== undefined);
       sourceCFG = langAdaptor.sourceCFG;
       sourceCFG.wasmCFG.serializeToDot(pathToDir);
-      const config: DotSerializationConfgig = {
+      const config: DotSerializationConfig = {
         includeInstructions: false,
         includeEmptySCFG: false,
       };

@@ -6,7 +6,7 @@ import {
 import { constructLanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 import assert, { fail } from 'assert';
 import {
-  type DotSerializationConfgig,
+  type DotSerializationConfig,
   type SourceControlFlowGraph,
 } from '../../src/cfg/source_cfg';
 import { type SourceMapConfig } from '../../src/source_mappers/source_map';
@@ -46,7 +46,7 @@ describe('Debug operations on C Blink Intermittent App', function () {
         path.resolve(pathToDir, 'mappings.json'),
       );
       sourceCFG.wasmCFG.serializeToDot(pathToDir);
-      const config: DotSerializationConfgig = {
+      const config: DotSerializationConfig = {
         includeInstructions: false,
         includeEmptySCFG: false,
       };

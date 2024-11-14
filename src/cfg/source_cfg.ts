@@ -41,7 +41,7 @@ import path from 'path';
 import assert from 'assert';
 
 const logger = createLogger('ASTControlFlowGraph');
-export interface DotSerializationConfgig {
+export interface DotSerializationConfig {
   includeInstructions: boolean;
   includeEmptySCFG: boolean;
   funIds?: number[];
@@ -191,7 +191,7 @@ export class SourceControlFlowGraph {
     return ns;
   }
 
-  serializeToDot(outputDir: string, config: DotSerializationConfgig): string[] {
+  serializeToDot(outputDir: string, config: DotSerializationConfig): string[] {
     const funIds = config.funIds ?? [];
     if (funIds.length === 0) {
       this._sourceMap.wasm.functions.forEach((f) => funIds.push(f.id));
