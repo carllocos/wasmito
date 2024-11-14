@@ -62,6 +62,10 @@ export function registerCFGCommand(program: Command): void {
       "Enables the creation of more coarse-grained source-level and stores them as dot files. The generated coarse dot files have as extension 'coarse.dot'",
     )
     .option(
+      '--dot-wasminstrs',
+      'Add to the BL CFG dot files their corresponding Wasm Instructions',
+    )
+    .option(
       '--dot-no-exitnode',
       'do not include the exit node in the generated dot file',
     )
@@ -150,7 +154,7 @@ export function registerCFGCommand(program: Command): void {
         langAdaptor.sourceCFG.wasmCFG.serializeToDot(wasmOutputDir);
 
         const config: DotSerializationConfig = {
-          includeInstructions: false,
+          includeInstructions: options.dotWasminstrs,
           includeEmptySCFG: false,
           includeExitNode: options.dotNoExitnode === undefined,
           includeEntryNode: options.dotNoEntrynode === undefined,
