@@ -222,11 +222,7 @@ export class SourceControlFlowGraph {
           }
         }
         seenDotFileNames.add(funName);
-        const content = sourceControlFlowGraphToDot(
-          fg,
-          funName,
-          config.includeInstructions,
-        );
+        const content = sourceControlFlowGraphToDot(fg, funName, config);
         const p = pathJoin(outputDir, `${funName}.dot`);
         writeFileSync(p, content);
         dots.push(content);

@@ -6,6 +6,7 @@ import {
   type BinaryLiftedCFG,
   sourceCFGHasOutgoingFunCallEdges,
   getCallInstructions,
+  type DotSerializationConfig,
 } from './source_cfg';
 import {
   coarseSourceCFGNodeHasCallInstructions,
@@ -85,7 +86,7 @@ export function wasmControlFlowGraphToDot(
 export function sourceControlFlowGraphToDot(
   fgraph: BinaryLiftedCFG,
   nameGraph: string,
-  includeInstructions: boolean = false,
+  config: DotSerializationConfig,
 ): string {
   const entryNodes = new Set(fgraph.entryNodes.map((n) => n.nodeId));
   const allnodes = fgraph.allNodes;
@@ -115,7 +116,7 @@ export function sourceControlFlowGraphToDot(
       c += ` (call ${direct.join(', ')}${indirectstr})`;
     }
     const instructionsStrs: string[] = [];
-    if (includeInstructions) {
+    if (config.includeInstructions) {
       for (let i = 0; i < n.instructions.length; i++) {
         const instr = n.instructions[i];
         const instrIdx = n.instructionsIndexes[i];
@@ -142,7 +143,7 @@ export function sourceControlFlowGraphToDot(
       srcTxt = n.node.node.text;
     }
     srcTxt = escapeText(srcTxt);
-    const label = `{(line ${sp.linenr}, col ${sp.colnr}) ${srcTxt} ${c} ${includeInstructions ? '|' : ''}${s}}`;
+    const label = `{(line ${sp.linenr}, col ${sp.colnr}) ${srcTxt} ${c} ${config.includeInstructions ? '|' : ''}${s}}`;
 
     const nodeStr = `block${n.nodeId} [shape=${record}, label="${label}"];\n`;
     nodesStr += nodeStr;
@@ -172,7 +173,7 @@ export function sourceControlFlowGraphToDot(
     const str = n.edges
       .map(([edgeNode, fromInstr, toInstr]) => {
         let s = `${nodeId} -> block${edgeNode.nodeId}`;
-        if (includeInstructions) {
+        if (config.includeInstructions) {
           s += ` [label="from ${fromInstr.startAddress} to ${toInstr.startAddress}"]`;
         }
         s += ';\n';
