@@ -57,8 +57,6 @@ export function registerCFGCommand(program: Command): void {
       This can be helpful to assess soundness of the generated Source level CFGs.
       Unused mappings can be an indicator that the Source CFG is missing nodes.`,
     )
-    .option('--scfg-json', 'Save the source level CFGs as JSON')
-    .option('--wcfg-json', 'Save the wasm level CFGs as JSON')
     .option(
       '--coarse-grained',
       "Enables the creation of more coarse-grained source-level and stores them as dot files. The generated coarse dot files have as extension 'coarse.dot'",
@@ -118,14 +116,9 @@ export function registerCFGCommand(program: Command): void {
         program.error('SourceMap should not be empty');
       }
 
-      const saveSCFGJSON = options.scfgJson !== undefined;
-      const saveWCFGJSON = options.wcfgJson !== undefined;
-      const coarseGrained = options.coarseGrained !== undefined;
-
       try {
         const sm = await timeoutPromise(smPromise, timeoutMs);
         createDirectoryIfUnexisting(outputDir);
-        // sm.storeMappingsToJSON(path.resolve(outputDir, 'mappings.json'));
         logger.info(`Starting construction CFGs`);
         const startTime = Date.now();
         const langAdaptor = await timeoutPromise(
@@ -145,11 +138,6 @@ export function registerCFGCommand(program: Command): void {
 
         const wasmOutputDir = path.join(outputDir, `/wasm`);
         createDirectoryIfUnexisting(wasmOutputDir);
-        if (saveWCFGJSON) {
-          // the following CFGs conversion to JSON is very expensive
-          logger.debug(`Converting Wasm CFGs to JSON`);
-          langAdaptor.sourceCFG.wasmCFG.toJSON(wasmOutputDir);
-        }
         logger.info(`Converting Wasm CFGs to dot`);
         langAdaptor.sourceCFG.wasmCFG.serializeToDot(wasmOutputDir);
 
@@ -159,13 +147,6 @@ export function registerCFGCommand(program: Command): void {
         };
         const sourceCFGsOutputDir = path.join(outputDir, `/source/`);
         createDirectoryIfUnexisting(sourceCFGsOutputDir);
-        if (saveSCFGJSON) {
-          // the following CFGs conversion to JSON is very expensive
-          logger.info(
-            `Converting Source CFGs to JSON at ${sourceCFGsOutputDir}`,
-          );
-          langAdaptor.sourceCFG.toJSON(sourceCFGsOutputDir);
-        }
         logger.info(`Converting Source CFGs to dot`);
         langAdaptor.sourceCFG.serializeToDot(sourceCFGsOutputDir, config);
         if (callgraphOutputPath !== undefined) {
