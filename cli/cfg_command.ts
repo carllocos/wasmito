@@ -141,7 +141,7 @@ export function registerCFGCommand(program: Command): void {
         logger.info(`Converting Wasm CFGs to dot`);
         langAdaptor.sourceCFG.wasmCFG.serializeToDot(wasmOutputDir);
 
-        const config: DotSerializationConfgig = {
+        const config: DotSerializationConfig = {
           includeInstructions: false,
           includeEmptySCFG: false,
         };
