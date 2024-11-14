@@ -3,9 +3,12 @@ name: wasmito Tests
 on: [push]
 
 jobs:
+  linting:
+    uses: ./.github/workflows/lint.yml
   test-wasmito:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
+    needs: [linting]
 
     strategy:
       matrix:
