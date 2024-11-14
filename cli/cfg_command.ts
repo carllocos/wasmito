@@ -163,7 +163,8 @@ export function registerCFGCommand(program: Command): void {
           logger.info(`Converting Callgraph to dot at ${callgraphOutputPath}`);
           langAdaptor.sourceCFG.wasmCFG.callgraph.toDot(callgraphOutputPath);
         }
-        if (coarseGrained) {
+
+        if (options.coarseGrained !== undefined) {
           logger.info(`Converting Source CFGs to Coarse Grained CFGs`);
           const startConversion = Date.now();
           const coarseCFGs = new CoarseGrainedSourceCFGraph(
