@@ -61,6 +61,14 @@ export function registerCFGCommand(program: Command): void {
       '--coarse-grained',
       "Enables the creation of more coarse-grained source-level and stores them as dot files. The generated coarse dot files have as extension 'coarse.dot'",
     )
+    .option(
+      '--dot-no-exitnode',
+      'do not include the exit node in the generated dot file',
+    )
+    .option(
+      '--dot-no-entrynode',
+      'do not include the entry node in the generated dot file',
+    )
     .action(async (wasmPath, outputDir, timeout, options) => {
       const logger = getGlobalLogger();
       if (!isFilePath(wasmPath)) {
@@ -144,6 +152,8 @@ export function registerCFGCommand(program: Command): void {
         const config: DotSerializationConfig = {
           includeInstructions: false,
           includeEmptySCFG: false,
+          includeExitNode: options.dotNoExitnode === undefined,
+          includeEntryNode: options.dotNoEntrynode === undefined,
         };
         const sourceCFGsOutputDir = path.join(outputDir, `/source/`);
         createDirectoryIfUnexisting(sourceCFGsOutputDir);
