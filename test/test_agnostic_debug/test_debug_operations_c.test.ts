@@ -49,6 +49,8 @@ describe('Debug operations on C Blink Intermittent App', function () {
       const config: DotSerializationConfig = {
         includeInstructions: false,
         includeEmptySCFG: false,
+        includeExitNode: true,
+        includeEntryNode: true,
       };
       sourceCFG.serializeToDot(pathToDir, config);
     } catch (e) {

@@ -132,6 +132,8 @@ describe('Debug Operations on AS Intermittent Blink', function () {
       const config: DotSerializationConfig = {
         includeInstructions: false,
         includeEmptySCFG: false,
+        includeExitNode: true,
+        includeEntryNode: true,
       };
       sourceCFG.serializeToDot(pathToRootSource, config);
     } catch (e) {

@@ -44,6 +44,8 @@ const logger = createLogger('ASTControlFlowGraph');
 export interface DotSerializationConfig {
   includeInstructions: boolean;
   includeEmptySCFG: boolean;
+  includeExitNode: boolean;
+  includeEntryNode: boolean;
   funIds?: number[];
 }
 

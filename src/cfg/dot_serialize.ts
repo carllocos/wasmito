@@ -153,10 +153,14 @@ export function sourceControlFlowGraphToDot(
 
   // add entry and exit nodes
   const entryNodeID = `block1`;
-  nodesStr += `${entryNodeID} [shape=record, label="EntryNode"];\n`;
+  if (config.includeEntryNode) {
+    nodesStr += `${entryNodeID} [shape=record, label="EntryNode"];\n`;
+  }
   const exitNodeID = `blockExit`;
-  if (fgraph.exitNodes.length > 0) {
-    nodesStr += `${exitNodeID} [shape=record, label="ExitNode"];\n`;
+  if (config.includeExitNode) {
+    if (fgraph.exitNodes.length > 0) {
+      nodesStr += `${exitNodeID} [shape=record, label="ExitNode"];\n`;
+    }
   }
 
   const alreadyVisitedNodes = new Set<number>();
@@ -167,7 +171,7 @@ export function sourceControlFlowGraphToDot(
     }
     alreadyVisitedNodes.add(n.nodeId);
     const nodeId = `block${n.nodeId}`;
-    if (entryNodes.has(n.nodeId)) {
+    if (config.includeEntryNode && entryNodes.has(n.nodeId)) {
       edgesStr.push(`${entryNodeID}->${nodeId};\n`);
     }
     const str = n.edges
@@ -183,8 +187,10 @@ export function sourceControlFlowGraphToDot(
     edgesStr.push(str);
   }
 
-  for (const en of fgraph.exitNodes) {
-    edgesStr.push(`block${en.nodeId} -> ${exitNodeID};\n`);
+  if (config.includeExitNode) {
+    for (const en of fgraph.exitNodes) {
+      edgesStr.push(`block${en.nodeId} -> ${exitNodeID};\n`);
+    }
   }
   const allEdges = edgesStr.join('');
 

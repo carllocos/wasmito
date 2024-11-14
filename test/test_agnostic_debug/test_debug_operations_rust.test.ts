@@ -32,6 +32,8 @@ describe.skip('Debug Operations on Rust AST Blink App', function () {
       const config: DotSerializationConfig = {
         includeInstructions: false,
         includeEmptySCFG: false,
+        includeExitNode: true,
+        includeEntryNode: true,
       };
       sourceCFG.serializeToDot(pathToDir, config);
       langAdaptor.sourceMap.storeMappingsToJSON(
@@ -117,6 +119,8 @@ describe.skip('Debug Operations on Rust AST Intermittent Blink', function () {
       const config: DotSerializationConfig = {
         includeInstructions: false,
         includeEmptySCFG: false,
+        includeExitNode: true,
+        includeEntryNode: true,
       };
       sourceCFG.serializeToDot(pathToDir, config);
       langAdaptor.sourceMap.storeMappingsToJSON(

@@ -49,6 +49,8 @@ describe('Debug Operations on Zig App', function () {
       const config: DotSerializationConfig = {
         includeInstructions: true,
         includeEmptySCFG: false,
+        includeExitNode: true,
+        includeEntryNode: true,
       };
       sourceCFG.serializeToDot(pathToDir, config);
     } catch (e) {
