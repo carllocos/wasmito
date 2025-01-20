@@ -27,6 +27,7 @@ export interface CountMappingJson {
   numberOfAvailableMappings: number;
   numberOfUniqueMappings: number;
   unusedMappings: SourceCodeLocation[];
+  noSuchAddrMappings: SourceCodeLocation[];
 }
 
 export class LanguageAdaptor {
@@ -89,11 +90,23 @@ export class LanguageAdaptor {
       }
     }
 
+    const unusedMappings: SourceCodeLocation[] = [];
+    const noSuchAddrMappings: SourceCodeLocation[] = [];
+    for (const l of locsWithoutNode) {
+      const instr = this.sourceMap.wasm.getInstruction(l.address);
+      if (instr === undefined) {
+        noSuchAddrMappings.push(l);
+      } else {
+        unusedMappings.push(l);
+      }
+    }
+
     const m: CountMappingJson = {
       numberOfMappings: mappings.length,
       numberOfAvailableMappings: availableMappings.length,
       numberOfUniqueMappings: uniqueMappings.length,
-      unusedMappings: locsWithoutNode,
+      unusedMappings,
+      noSuchAddrMappings,
     };
 
     const c = JSON.stringify(m);
