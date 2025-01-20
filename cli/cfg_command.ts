@@ -12,7 +12,6 @@ import {
   type SourceOffsetStart,
 } from '../src/source_mappers/source_map_builder';
 import { constructLanguageAdaptor } from '../src/language_adaptors/language_adaptor';
-import { type DotSerializationConfig } from '../src/cfg/source_cfg';
 import { timeoutPromise } from '../src/util/promise_util';
 import { getGlobalLogger } from '../src/logger/logger';
 import { type SourceMap } from '../src/source_mappers/source_map';
@@ -56,14 +55,6 @@ export function registerCFGCommand(program: Command): void {
       `will generate a json containing the source mappings that were not used when building the CFGs.
       This can be helpful to assess soundness of the generated Source level CFGs.
       Unused mappings can be an indicator that the Source CFG is missing nodes.`,
-    )
-    .option(
-      '--coarse-grained',
-      "Enables the creation of more coarse-grained source-level and stores them as dot files. The generated coarse dot files have as extension 'coarse.dot'",
-    )
-    .option(
-      '--dot-wasminstrs',
-      'Add to the BL CFG dot files their corresponding Wasm Instructions',
     )
     .option(
       '--dot-no-exitnode',
@@ -153,16 +144,23 @@ export function registerCFGCommand(program: Command): void {
         logger.info(`Converting Wasm CFGs to dot`);
         langAdaptor.sourceCFG.wasmCFG.serializeToDot(wasmOutputDir);
 
-        const config: DotSerializationConfig = {
-          includeInstructions: options.dotWasminstrs,
-          includeEmptySCFG: false,
-          includeExitNode: options.dotNoExitnode === undefined,
-          includeEntryNode: options.dotNoEntrynode === undefined,
-        };
         const sourceCFGsOutputDir = path.join(outputDir, `/source/`);
         createDirectoryIfUnexisting(sourceCFGsOutputDir);
         logger.info(`Converting Source CFGs to dot`);
-        langAdaptor.sourceCFG.serializeToDot(sourceCFGsOutputDir, config);
+        langAdaptor.sourceCFG.serializeToDot(sourceCFGsOutputDir, {
+          includeInstructions: false,
+          includeEmptySCFG: false,
+          includeExitNode: options.dotNoExitnode === undefined,
+          includeEntryNode: options.dotNoEntrynode === undefined,
+        });
+        const sourceWithInstrs = path.join(outputDir, `/source_with_instrs/`);
+        createDirectoryIfUnexisting(sourceWithInstrs);
+        langAdaptor.sourceCFG.serializeToDot(sourceWithInstrs, {
+          includeInstructions: true,
+          includeEmptySCFG: false,
+          includeExitNode: options.dotNoExitnode === undefined,
+          includeEntryNode: options.dotNoEntrynode === undefined,
+        });
         if (callgraphOutputPath !== undefined) {
           logger.info(`Converting Callgraph to dot at ${callgraphOutputPath}`);
           langAdaptor.sourceCFG.wasmCFG.callgraph.toDot(callgraphOutputPath);
