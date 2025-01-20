@@ -671,6 +671,7 @@ export function wasmOpcodeFromStr(opcode: string): WASMOpcodeNumber {
       return WASMOpcodeNumber.F32Abs;
     case 'f32.max':
       return WASMOpcodeNumber.F32Max;
+    case 'f32.copysign':
     case 'f32.copysing':
       return WASMOpcodeNumber.F32CopySign;
     case 'f32.neg':
