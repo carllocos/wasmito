@@ -254,7 +254,7 @@ function buildCFGNodesHelper(
         // if the node is an unconditional branch
         // the reason is because the edges already got set
         // by a previous loop iteration
-        if (!isBranch(entryNodeInstr)) {
+        if (!isBranch(entryNodeInstr) && !isReturnBranch(entryNodeInstr)) {
           addEdge(g, beforeAddress, instr.startAddress);
         }
       } else {
@@ -281,7 +281,7 @@ function buildCFGNodesHelper(
     if (beforeAddress !== undefined) {
       const prevNode = getWasmCFGNode(g, beforeAddress);
       const lastInstr = lastInstruction(prevNode);
-      if (!isBranch(lastInstr)) {
+      if (!isBranch(lastInstr) && !isReturnBranch(lastInstr)) {
         addEdge(g, beforeAddress, instr.startAddress);
       }
     }
