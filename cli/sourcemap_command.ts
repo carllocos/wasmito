@@ -37,6 +37,10 @@ export function registerSourceMapCommand(program: Command): void {
       of the given wasm module iteself.`,
     )
     .option('-r, --rebase-locations <path-to-config.json>')
+    .option(
+      '--all-mappings',
+      'include also the source mappings for files that do not exist on the current machine',
+    )
     .action(async (wasmPath, outputFile, timeout, options) => {
       const logger = getGlobalLogger();
       const dwarfPath = options.dwarf;
@@ -127,7 +131,8 @@ export function registerSourceMapCommand(program: Command): void {
         logger.info(`Storing json at ${outputFile}`);
         const outputDir = path.dirname(outputFile);
         createDirectoryIfUnexisting(outputDir);
-        StoreMappingsToJSON(outputFile, sm, true);
+        const onlyExistingMappings = options.allMappings === undefined;
+        StoreMappingsToJSON(outputFile, sm, onlyExistingMappings);
       } catch (e) {
         const errMsg = e instanceof Error ? e.message : e;
         program.error(`Could not build the SourceMap error occured: ${errMsg}`);
