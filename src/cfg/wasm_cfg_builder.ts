@@ -282,7 +282,21 @@ function buildCFGNodesHelper(
       const prevNode = getWasmCFGNode(g, beforeAddress);
       const lastInstr = lastInstruction(prevNode);
       if (!isBranch(lastInstr) && !isReturnBranch(lastInstr)) {
-        addEdge(g, beforeAddress, instr.startAddress);
+        if (
+          beforeAddress === instr.startAddress &&
+          (isCallInstruction(instr) || isCallIndirect(instr))
+        ) {
+          // special case where a call (indirect) instruction is
+          // the first instruction after the end of a block
+          // in other words instructions in the block that need to have
+          // an edge to just outside the block will have an edge to the call (indirect) instruction
+          // and after visiting the block the first instruction to be visited is
+          // the call (indirect) instruction and the beforeAddress is also the same
+          // call indirect instruction
+          // We should thus not add the self edge
+        } else {
+          addEdge(g, beforeAddress, instr.startAddress);
+        }
       }
     }
     beforeAddress = instr.startAddress;
