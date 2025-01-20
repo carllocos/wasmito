@@ -670,10 +670,8 @@ function searchSourceCFGNode(
 /**
  * This function will add missing edges to the Source Level CFG by looking at the edges
  * of its corresponding Wasm Level CFG.
- * After adding the edges the function also returns the entry nodes of the Source Level CFG.
  * @param funGraph the CFG of the wasm function
  * @param sourceNodes Source Level CFG nodes that need to be augmented with edges
- * @returns the Entry nodes of the Source Level CFG
  */
 function binaryLiftWasmEdges(
   funGraph: WasmCFG,
