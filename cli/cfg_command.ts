@@ -29,8 +29,8 @@ export function registerCFGCommand(program: Command): void {
       '<output-dir>',
       'the location where to store all the generated CFGs',
     )
-    .argument(
-      '<timeout-secs>',
+    .option(
+      '-t <timeout-secs>',
       'the maximum time allocated to the build of the CFGs',
     )
     .option(
@@ -64,7 +64,7 @@ export function registerCFGCommand(program: Command): void {
       '--dot-no-entrynode',
       'do not include the entry node in the generated dot file',
     )
-    .action(async (wasmPath, outputDir, timeout, options) => {
+    .action(async (wasmPath, outputDir, options) => {
       const logger = getGlobalLogger();
       if (!isFilePath(wasmPath)) {
         program.error('<wasm-path> is not a valid path to a Wasm module');
@@ -72,12 +72,14 @@ export function registerCFGCommand(program: Command): void {
         program.error('<output-dir> is not a valid path to a directory');
       }
 
-      let timeoutMs = Number(timeout);
-      if (isNaN(timeoutMs) || timeoutMs < 0) {
-        program.error('`<timeout-secs>` is not a positive number');
-      } else {
-        timeoutMs = timeoutMs * 1000; // convert to millisecs
+      let timeoutMs = 180;
+      if (options.timeout !== undefined) {
+        timeoutMs = Number(options.timeout);
+        if (isNaN(timeoutMs) || timeoutMs < 0) {
+          program.error('`<timeout-secs>` is not a positive number');
+        }
       }
+      timeoutMs = timeoutMs * 1000; // convert to millisecs
 
       let callgraphOutputPath: string | undefined;
       if (options.callgraph !== undefined) {
