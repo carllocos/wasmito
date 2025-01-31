@@ -49,6 +49,12 @@ export interface DotSerializationConfig {
   funIds?: number[];
 }
 
+interface DotMetaData {
+  funName: string;
+  dotPath: string;
+  fid: number;
+}
+
 export class SourceControlFlowGraph {
   private readonly _astGraphs: Map<number, BinaryLiftedCFG>;
   private readonly _allGraphNodes: SourceCFGNode[];
@@ -201,6 +207,7 @@ export class SourceControlFlowGraph {
 
     const seenDotFileNames = new Set<string>();
     const dots: string[] = [];
+    const metadata: DotMetaData[] = [];
     for (const fid of funIds) {
       const fg = this.getFuntionSourceCFG(fid);
       if (fg === undefined || fg.entryNodes.length === 0) {
@@ -228,8 +235,22 @@ export class SourceControlFlowGraph {
         const p = pathJoin(outputDir, `${funName}.dot`);
         writeFileSync(p, content);
         dots.push(content);
+        const dotMetadata: DotMetaData = {
+          funName,
+          dotPath: p,
+          fid,
+        };
+        metadata.push(dotMetadata);
       }
     }
+
+    writeFileSync(
+      pathJoin(outputDir, `dots_metadata.json`),
+      JSON.stringify({
+        metadata,
+      }),
+    );
+
     return dots;
   }
 
