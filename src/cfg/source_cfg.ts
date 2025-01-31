@@ -693,6 +693,10 @@ function binaryLiftWasmEdges(
         return;
       }
 
+      // the following code only made sense from the perspective if the
+      // SCFG nodes are unique per sourcecode location.
+      // This means that all SCFG edges are automatically added
+
       // case where we check if maybe we have to add edges which can happen when:
       // 1. the fromInstruction of the wasm cfg node and the toInstruct belong to
       // two different source CFG nodes
@@ -700,9 +704,13 @@ function binaryLiftWasmEdges(
       // then adding an edge may not be needed:
       // 2.a. if there is just one edge then toInstr of the wasm CFG node is a
       // block instr (e.g., block or loop) and no edge is needed to be added
+      // AFTER updating the SCFG to no longer be unique with respect to sourcecode locations.
+      // This case will be automatically solved by merging neighbours
       // 2.b if the toInstr is a call or indirect call the corresponding Source CFG Node no edge
       // needs to be added. This call node simply indicates that when applying debug operations
       // and when encountering this call node another Source CFG has to be accessed.
+      // AFTER updating the SCFG to no longer be unique with respect to sourcecode locations.
+      // This case will be automatically solved by merging neighbours
       // 2.c. if the toInstr is a branching instruction (e.g., br, br_if, br_table) and edge may
       // need to be added. And this depending on where the toInstr points to. However,
       // this case 2.c can be handled on the next node visit which in that case should be the
@@ -725,7 +733,8 @@ function binaryLiftWasmEdges(
             addEdge(sourceCFGNFrom, fromInstr, toSourceCFGNode, toInstr);
           } else if (isWasmInstructionBlockBased(e.instrTo)) {
             // case 2.a
-            continue;
+            throw new Error('case 2.a from -> to (to is Block-based instr)');
+            // continue;
           } else if (
             isCallInstruction(e.instrTo) ||
             isCallIndirect(e.instrTo)
@@ -734,27 +743,32 @@ function binaryLiftWasmEdges(
             // console.log(
             //   `mark node ${ctgn.nodeId} as a node with an edge to an outside call`,
             // );
-            continue;
+            // continue;
+            throw new Error(
+              'case 2.b from -> to (to is call or indirect call)',
+            );
           } else if (isBranchingInstruction(e.instrFrom)) {
             // case 2.c
             // TODO generalise to paths
-            const branchingNode = getWasmCFGNode(g, e.instrFrom.startAddress);
-            for (const be of branchingNode.edges) {
-              const destWasmNode = getWasmCFGNode(g, be.instrTo.startAddress);
-              const foundDestSourceAndInstr =
-                sourceCFGNodeAndInstrFromIncrInstrAddrs(
-                  destWasmNode,
-                  sourceNodes,
-                );
-              if (foundDestSourceAndInstr === undefined) {
-                throw new Error(`TODO search deeper in patch`);
-              } else {
-                const [destSourceNode, destInstr] = foundDestSourceAndInstr;
-                addEdge(sourceCFGNFrom, fromInstr, destSourceNode, destInstr);
-              }
-            }
+            throw new Error('case 2.c from -> to (to is a branch instr)');
+            // const branchingNode = getWasmCFGNode(g, e.instrFrom.startAddress);
+            // for (const be of branchingNode.edges) {
+            //   const destWasmNode = getWasmCFGNode(g, be.instrTo.startAddress);
+            //   const foundDestSourceAndInstr =
+            //     sourceCFGNodeAndInstrFromIncrInstrAddrs(
+            //       destWasmNode,
+            //       sourceNodes,
+            //     );
+            //   if (foundDestSourceAndInstr === undefined) {
+            //     throw new Error(`TODO search deeper in patch`);
+            //   } else {
+            //     const [destSourceNode, destInstr] = foundDestSourceAndInstr;
+            //     addEdge(sourceCFGNFrom, fromInstr, destSourceNode, destInstr);
+            //   }
+            // }
           } else {
-            continue;
+            throw new Error('case 2.d from -> to (to is the else case)');
+            // continue;
           }
         } else {
           // we have to search for all the neighbours of toNode that have a CFG node
