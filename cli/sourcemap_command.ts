@@ -21,7 +21,7 @@ import {
 
 export function registerSourceMapCommand(program: Command): void {
   program
-    .command('sourcemap <wasm-path> <output-file.json> <timeout-secs>')
+    .command('sourcemap <wasm-path> <output-file.json>')
     .description(
       `build a JSON sourcemap as used by the Source Control Flow graph builder from the <wasm-path>.
       The generated JSON will be stored it in <output-file.json> creating parent directories if needed.
@@ -41,7 +41,12 @@ export function registerSourceMapCommand(program: Command): void {
       '--all-mappings',
       'include also the source mappings for files that do not exist on the current machine',
     )
-    .action(async (wasmPath, outputFile, timeout, options) => {
+    .option(
+      '-t, --timeout <timeout-secs>',
+      'the maximum seconds allocated to load the sourcemap according to our format',
+      '180',
+    )
+    .action(async (wasmPath, outputFile, options) => {
       const logger = getGlobalLogger();
       const dwarfPath = options.dwarf;
       const sourceSpec = options.sourceSpec;
@@ -68,11 +73,9 @@ export function registerSourceMapCommand(program: Command): void {
         }
       }
 
-      let timeoutMs = Number(timeout);
-      if (isNaN(timeoutMs) || timeoutMs < 0) {
+      const timeout = Number(options.timeout) * 1000; // convert to millisecs
+      if (isNaN(timeout) || timeout < 0) {
         program.error('`<timeout-secs>` is not a positive number');
-      } else {
-        timeoutMs = timeoutMs * 1000; // convert to millisecs
       }
 
       let smJSON: Promise<SourceMapJSON> | undefined;
@@ -121,7 +124,7 @@ export function registerSourceMapCommand(program: Command): void {
           `Building SourceMap JSON from ${kindDebuggingFormat} (timeout ${timeout} secs, ${timeout / 60} min)`,
         );
         const startTime = Date.now();
-        const sm = await timeoutPromise(smJSON, timeoutMs);
+        const sm = await timeoutPromise(smJSON, timeout);
         const endTime = Date.now();
         const diff = endTime - startTime;
 
