@@ -30,8 +30,9 @@ export function registerCFGCommand(program: Command): void {
       'the location where to store all the generated CFGs',
     )
     .option(
-      '-t <timeout-secs>',
-      'the maximum time allocated to the build of the CFGs',
+      '-t, --timeout <timeout-secs>',
+      'the maximum seconds allocated to the build of the CFGs',
+      '180',
     )
     .option(
       '-d, --dwarf <dwarf-path>',
@@ -72,14 +73,10 @@ export function registerCFGCommand(program: Command): void {
         program.error('<output-dir> is not a valid path to a directory');
       }
 
-      let timeoutMs = 180;
-      if (options.timeout !== undefined) {
-        timeoutMs = Number(options.timeout);
-        if (isNaN(timeoutMs) || timeoutMs < 0) {
-          program.error('`<timeout-secs>` is not a positive number');
-        }
+      const timeoutMs = Number(options.timeout) * 1000; // convert to millisecs
+      if (isNaN(timeoutMs) || timeoutMs < 0) {
+        program.error('`<timeout-secs>` is not a positive number');
       }
-      timeoutMs = timeoutMs * 1000; // convert to millisecs
 
       let callgraphOutputPath: string | undefined;
       if (options.callgraph !== undefined) {
