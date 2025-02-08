@@ -2,7 +2,7 @@
 import {
   type SourceControlFlowGraph,
   type SourceCFGNode,
-  sourceCFGHasOutgoingFunCallEdges,
+  isCallNode,
 } from '../cfg/source_cfg';
 
 // const logger = createLogger('DebugAgnosticOperations');

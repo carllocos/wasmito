@@ -9,7 +9,7 @@ import { constructLanguageAdaptor } from '../../src/language_adaptors/language_a
 import assert, { fail } from 'assert';
 import {
   type DotSerializationConfig,
-  sourceCFGHasOutgoingFunCallEdges,
+  isCallNode,
   type SourceControlFlowGraph,
 } from '../../src/cfg/source_cfg';
 import { DebugOperations } from '../../src/language_adaptors/debug_operations';
@@ -83,7 +83,7 @@ describe.skip('Debug Operations on AssemblyScript Blink App', function () {
 
     expect(callNode.length).to.equal(1);
     const [call] = callNode;
-    expect(sourceCFGHasOutgoingFunCallEdges(call)).to.be.equal(true);
+    expect(isCallNode(call)).to.be.equal(true);
     const nextPossibleLocations = DebugOperations.stepOver(sourceCFG, call);
 
     expect(nextPossibleLocations.length).to.equal(2);

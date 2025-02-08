@@ -4,7 +4,7 @@ import {
 } from '../webassembly/wasm/wasm_instruction';
 import {
   type BinaryLiftedCFG,
-  sourceCFGHasOutgoingFunCallEdges,
+  isCallNode,
   getCallInstructions,
   type DotSerializationConfig,
 } from './source_cfg';
@@ -100,7 +100,7 @@ export function sourceControlFlowGraphToDot(
     const record = n.instructions.length > 1 ? 'Mrecord' : 'record';
 
     let c = '';
-    if (sourceCFGHasOutgoingFunCallEdges(n)) {
+    if (isCallNode(n)) {
       const calls = getCallInstructions(n);
       const direct: number[] = [];
       const indirect: number[] = [];

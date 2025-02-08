@@ -150,7 +150,7 @@ export class SourceControlFlowGraph {
   getFunctionEntryNodesFromNode(n: SourceCFGNode): SourceCFGNode[] {
     const entryNodes: SourceCFGNode[] = [];
     const alreadyAdded = new Set<number>();
-    if (sourceCFGHasOutgoingFunCallEdges(n)) {
+    if (isCallNode(n)) {
       const callInstr = getCallInstructions(n);
       for (const i of callInstr) {
         if (isCallInstruction(i)) {
@@ -312,7 +312,7 @@ function sourceCFGNodeToJSONObj(n: SourceCFGNode): object {
   };
 }
 
-export function sourceCFGHasOutgoingFunCallEdges(n: SourceCFGNode): boolean {
+export function isCallNode(n: SourceCFGNode): boolean {
   // TODO improve speed
   return getCallInstructions(n).length > 0;
 }
