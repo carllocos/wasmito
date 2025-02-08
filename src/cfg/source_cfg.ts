@@ -771,7 +771,8 @@ function binaryLiftWasmEdges(
           } else if (isBranchingInstruction(e.instrFrom)) {
             // case 2.c
             // TODO generalise to paths
-            throw new Error('case 2.c from -> to (to is a branch instr)');
+            addEdge(sourceCFGNFrom, fromInstr, toSourceCFGNode, toInstr);
+            // throw new Error('case 2.c from -> to (to is a branch instr)');
             // const branchingNode = getWasmCFGNode(g, e.instrFrom.startAddress);
             // for (const be of branchingNode.edges) {
             //   const destWasmNode = getWasmCFGNode(g, be.instrTo.startAddress);
