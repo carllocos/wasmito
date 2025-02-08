@@ -153,7 +153,8 @@ describe('Debug Operations on AS Intermittent Blink', function () {
     const nextNodes = DebugOperations.stepIn(sourceCFG, startNode);
     expect(nextNodes.length).equal(1);
 
-    const nextLoc = sourceNodeLoc(nextNodes[0]);
+    const [nextNode] = nextNodes[0];
+    const nextLoc = sourceNodeLoc(nextNode);
 
     expect(nextLoc.linenr).equal(6);
     expect(nextLoc.colnr).equal(15);
@@ -171,7 +172,8 @@ describe('Debug Operations on AS Intermittent Blink', function () {
     const nextNodes = DebugOperations.stepOver(sourceCFG, startNode);
     expect(nextNodes.length).equal(1);
 
-    const nextLoc = sourceNodeLoc(nextNodes[0]);
+    const [nextNode] = nextNodes[0];
+    const nextLoc = sourceNodeLoc(nextNode);
 
     expect(nextLoc.linenr).equal(29);
     expect(nextLoc.colnr).equal(12);
@@ -187,7 +189,7 @@ describe('Debug Operations on AS Intermittent Blink', function () {
     });
     const nextNodes = DebugOperations.stepOut(sourceCFG, startNode);
     expect(nextNodes.length).equal(1);
-    const n = nextNodes[0];
+    const [n] = nextNodes[0];
     const loc = sourceNodeLoc(n);
     expect(loc.linenr).equal(29);
     expect(loc.colnr).equal(12);
@@ -209,7 +211,7 @@ describe('Debug Operations on AS Intermittent Blink', function () {
     const lineNrs = [32, 34, 38];
     const colNrs = [19, 19, 15];
     for (let i = 0; i < nextNodes.length; i++) {
-      const n = nextNodes[i];
+      const [n] = nextNodes[i];
 
       const loc = sourceNodeLoc(n);
       expect(loc.linenr).equal(lineNrs[i]);

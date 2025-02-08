@@ -25,8 +25,10 @@ export function sourceText(sn: SourceCFGNode): string {
   return sn.node?.node.text ?? '';
 }
 
-export function sortIncreasingNr(ns: SourceCFGNode[]): SourceCFGNode[] {
-  return ns.sort((n1, n2) => {
+export function sortIncreasingNr(
+  ns: Array<[SourceCFGNode, number]>,
+): Array<[SourceCFGNode, number]> {
+  return ns.sort(([n1], [n2]) => {
     const l1 = sourceNodeLoc(n1);
     const l2 = sourceNodeLoc(n2);
     if (l1.linenr !== l2.linenr) {

@@ -58,7 +58,7 @@ describe.skip('Debug Operations on Rust AST Blink App', function () {
     let nextPossibleLocations = DebugOperations.stepIn(sourceCFG, startNode);
     expect(nextPossibleLocations.length).to.equal(1);
 
-    const [pinModeCall] = nextPossibleLocations;
+    const [[pinModeCall]] = nextPossibleLocations;
     nextPossibleLocations = DebugOperations.stepIn(sourceCFG, pinModeCall);
     expect(nextPossibleLocations.length).to.equal(1);
   });
@@ -78,7 +78,7 @@ describe.skip('Debug Operations on Rust AST Blink App', function () {
 
     expect(nextPossibleLocations.length).to.equal(2);
 
-    const [, useNode] = nextPossibleLocations;
+    const [, [useNode]] = nextPossibleLocations;
     nextPossibleLocations = DebugOperations.stepIn(sourceCFG, useNode);
     expect(nextPossibleLocations.length).to.equal(1);
   });
@@ -143,7 +143,8 @@ describe.skip('Debug Operations on Rust AST Intermittent Blink', function () {
     const nextNodes = DebugOperations.stepIn(sourceCFG, startNode);
     expect(nextNodes.length).equal(1);
 
-    const nextLoc = sourceNodeLoc(nextNodes[0]);
+    const [nextNode] = nextNodes[0];
+    const nextLoc = sourceNodeLoc(nextNode);
 
     expect(nextLoc.linenr).equal(17);
     expect(nextLoc.colnr).equal(1);
@@ -160,12 +161,12 @@ describe.skip('Debug Operations on Rust AST Intermittent Blink', function () {
 
     const nextNodes = DebugOperations.stepIn(sourceCFG, startNode);
     expect(nextNodes.length).equal(2);
-    const n1 = nextNodes[0];
+    const [n1] = nextNodes[0];
     const loc1 = sourceNodeLoc(n1);
     expect(loc1.linenr).equal(48);
     expect(loc1.colnr).equal(13);
 
-    const n2 = nextNodes[1];
+    const [n2] = nextNodes[1];
     const loc2 = sourceNodeLoc(n2);
     expect(loc2.linenr).equal(55);
     expect(loc2.colnr).equal(9);
@@ -183,7 +184,8 @@ describe.skip('Debug Operations on Rust AST Intermittent Blink', function () {
     const nextNodes = DebugOperations.stepOver(sourceCFG, startNode);
     expect(nextNodes.length).equal(1);
 
-    const nextLoc = sourceNodeLoc(nextNodes[0]);
+    const [nextNode] = nextNodes[0];
+    const nextLoc = sourceNodeLoc(nextNode);
 
     expect(nextLoc.linenr).equal(48);
     expect(nextLoc.colnr).equal(19);
@@ -199,7 +201,7 @@ describe.skip('Debug Operations on Rust AST Intermittent Blink', function () {
     });
     const nextNodes = DebugOperations.stepOut(sourceCFG, startNode);
     expect(nextNodes.length).equal(1);
-    const n = nextNodes[0];
+    const [n] = nextNodes[0];
     const loc = sourceNodeLoc(n);
     expect(loc.linenr).equal(48);
     expect(loc.colnr).equal(19);
@@ -221,7 +223,7 @@ describe.skip('Debug Operations on Rust AST Intermittent Blink', function () {
     const lineNrs = [50, 52, 56];
     const colNrs = [13, 13, 9];
     for (let i = 0; i < nextNodes.length; i++) {
-      const n = nextNodes[i];
+      const [n] = nextNodes[i];
 
       const loc = sourceNodeLoc(n);
       expect(loc.linenr).equal(lineNrs[i]);

@@ -47,8 +47,9 @@ describe.skip('Debug Operations on Go Hello World', function () {
     const nextNodes = DebugOperations.stepIn(sourceCFG, startNode);
     expect(nextNodes.length).equal(1);
 
-    const srcTxt = sourceText(nextNodes[0]);
-    const nextLoc = sourceNodeLoc(nextNodes[0]);
+    const [nextNode] = nextNodes[0];
+    const srcTxt = sourceText(nextNode);
+    const nextLoc = sourceNodeLoc(nextNode);
 
     expect(srcTxt).equal('env_chip_pin_mode');
     expect(nextLoc.linenr).equal(19);
@@ -66,14 +67,14 @@ describe.skip('Debug Operations on Go Hello World', function () {
 
     const nextNodes = DebugOperations.stepIn(sourceCFG, startNode);
     expect(nextNodes.length).equal(2);
-    const n1 = nextNodes[0];
+    const [n1] = nextNodes[0];
     const srcTxt1 = sourceText(n1);
     const loc1 = sourceNodeLoc(n1);
     expect(srcTxt1).equal('_i');
     expect(loc1.linenr).equal(48);
     expect(loc1.colnr).equal(13);
 
-    const n2 = nextNodes[1];
+    const [n2] = nextNodes[1];
     const srcTxt2 = sourceText(n2);
     const loc2 = sourceNodeLoc(n2);
     expect(srcTxt2).equal('digital_write');
@@ -93,8 +94,9 @@ describe.skip('Debug Operations on Go Hello World', function () {
     const nextNodes = DebugOperations.stepOver(sourceCFG, startNode);
     expect(nextNodes.length).equal(1);
 
-    const srcTxt = sourceText(nextNodes[0]);
-    const nextLoc = sourceNodeLoc(nextNodes[0]);
+    const [nextNode] = nextNodes[0];
+    const srcTxt = sourceText(nextNode);
+    const nextLoc = sourceNodeLoc(nextNode);
 
     expect(srcTxt).equal('1');
     expect(nextLoc.linenr).equal(48);
@@ -111,7 +113,7 @@ describe.skip('Debug Operations on Go Hello World', function () {
     });
     const nextNodes = DebugOperations.stepOut(sourceCFG, startNode);
     expect(nextNodes.length).equal(1);
-    const n = nextNodes[0];
+    const [n] = nextNodes[0];
     const loc = sourceNodeLoc(n);
     expect(sourceText(n)).equal('1');
     expect(loc.linenr).equal(48);
@@ -135,7 +137,7 @@ describe.skip('Debug Operations on Go Hello World', function () {
     const colNrs = [13, 13, 9];
     const srcTxs = ['delay', 'delay', 'delay'];
     for (let i = 0; i < nextNodes.length; i++) {
-      const n = nextNodes[i];
+      const [n] = nextNodes[i];
       const txt = sourceText(n);
       expect(txt).equal(srcTxs[i]);
 
