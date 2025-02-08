@@ -11,7 +11,7 @@ export interface AgnosticDebugOperations {
   stepIn: (
     sourceCFG: SourceControlFlowGraph,
     node: SourceCFGNode,
-  ) => SourceCFGNode[];
+  ) => Array<[SourceCFGNode, number]>;
 
   /*
    * The semantics of step over is if the current location is a function call
@@ -21,18 +21,18 @@ export interface AgnosticDebugOperations {
   stepOver: (
     sourceCFG: SourceControlFlowGraph,
     node: SourceCFGNode,
-  ) => SourceCFGNode[];
+  ) => Array<[SourceCFGNode, number]>;
 
   stepOut: (
     SourceCFGNode: SourceControlFlowGraph,
     node: SourceCFGNode,
-  ) => SourceCFGNode[];
+  ) => Array<[SourceCFGNode, number]>;
 }
 
 function stepOver(
   sourceCFG: SourceControlFlowGraph,
   node: SourceCFGNode,
-): SourceCFGNode[] {
+): Array<[SourceCFGNode, number]> {
   const ignoreExitNodes = true;
   const ns = sourceCFG.getNodeNeighbours(node, ignoreExitNodes);
   if (ns.length === 0) {
@@ -44,10 +44,11 @@ function stepOver(
 function stepIn(
   sourceCFG: SourceControlFlowGraph,
   node: SourceCFGNode,
-): SourceCFGNode[] {
-  let ns: SourceCFGNode[] = [];
-  if (sourceCFGHasOutgoingFunCallEdges(node)) {
-    ns = sourceCFG.getFunctionEntryNodesFromNode(node);
+): Array<[SourceCFGNode, number]> {
+  let ns: Array<[SourceCFGNode, number]> = [];
+  if (isCallNode(node)) {
+    const entryNodes = sourceCFG.getFunctionEntryNodesFromNode(node);
+    ns = entryNodes.map((n) => [n, n.instructions[0].startAddress]);
   }
 
   if (ns.length === 0) {
@@ -65,8 +66,8 @@ function stepIn(
 function stepOut(
   sourceCFG: SourceControlFlowGraph,
   node: SourceCFGNode,
-): SourceCFGNode[] {
-  const ns: SourceCFGNode[] = [];
+): Array<[SourceCFGNode, number]> {
+  const ns: Array<[SourceCFGNode, number]> = [];
   const added = new Set<number>();
   const funID = node.wasmFunOwner;
   const wasmAddresses = sourceCFG.wasmCFG.callSites(funID);
@@ -77,10 +78,10 @@ function stepOut(
       continue;
     }
     const nodesPostCall = stepOver(sourceCFG, callNode);
-    for (const n of nodesPostCall) {
-      if (!added.has(n.nodeId)) {
-        added.add(n.nodeId);
-        ns.push(n);
+    for (const [n, addr] of nodesPostCall) {
+      if (!added.has(addr)) {
+        added.add(addr);
+        ns.push([n, addr]);
       }
     }
   }

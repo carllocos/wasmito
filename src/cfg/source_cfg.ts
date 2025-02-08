@@ -179,20 +179,22 @@ export class SourceControlFlowGraph {
   getNodeNeighbours(
     n: SourceCFGNode,
     ignoreExitNodes: boolean = false,
-  ): SourceCFGNode[] {
+  ): Array<[SourceCFGNode, number]> {
     const alreadyAdded = new Set<number>();
-    const ns: SourceCFGNode[] = [];
-    for (const [e] of n.edges) {
-      if (!alreadyAdded.has(e.nodeId)) {
-        ns.push(e);
-        alreadyAdded.add(e.nodeId);
+    const ns: Array<[SourceCFGNode, number]> = [];
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    for (const [e, _ifrom, ito] of n.edges) {
+      if (!alreadyAdded.has(ito.startAddress)) {
+        ns.push([e, ito.startAddress]);
+        alreadyAdded.add(ito.startAddress);
       }
     }
-    if (!ignoreExitNodes && sourceCFGHasOutgoingFunCallEdges(n)) {
+    if (!ignoreExitNodes && isCallNode(n)) {
       this.getFunctionEntryNodesFromNode(n).forEach((en) => {
-        if (!alreadyAdded.has(en.nodeId)) {
-          ns.push(en);
-          alreadyAdded.add(en.nodeId);
+        const startInstr = en.instructions[0];
+        if (!alreadyAdded.has(startInstr.startAddress)) {
+          ns.push([en, startInstr.startAddress]);
+          alreadyAdded.add(startInstr.startAddress);
         }
       });
     }
