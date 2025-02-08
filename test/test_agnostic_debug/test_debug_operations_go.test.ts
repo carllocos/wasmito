@@ -4,7 +4,7 @@ import { SourceMapfromDWARFWasm } from '../../src/source_mappers/source_map_buil
 import { constructLanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 import assert, { fail } from 'assert';
 import { type SourceControlFlowGraph } from '../../src/cfg/source_cfg';
-import { DebugOperations } from '../../src/language_adaptors/debug_tree_operations';
+import { DebugOperations } from '../../src/language_adaptors/debug_operations';
 import {
   sortIncreasingNr,
   sourceNodeFromLoc,
