@@ -291,19 +291,18 @@ function createWasmFunctions(
     // The following tries to derive the funID
     // from different sources from the parsed module
     let funID = -1;
-    if (funcName !== undefined) {
+    if (fun.id !== undefined) {
+      funID = fun.id;
+    } else if (funcName !== undefined) {
       funID = funcName.index;
-    } else if (funExported?.id !== undefined) {
-      // fun is exported and has ID
-      funID = funExported.id;
     } else {
       // try to derive from fun name
-      if (fun.id === undefined) {
+      if (funExported?.id === undefined) {
         throw new Error(
           `Could not derive identifier for Fun with name ${fun.name.value}`,
         );
       }
-      funID = fun.id;
+      funID = funExported.id;
     }
 
     const localTypes = allLocalTypes.get(funID);
