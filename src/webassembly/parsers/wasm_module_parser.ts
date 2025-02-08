@@ -1085,7 +1085,7 @@ function parseTableImport(obj: any): ModuleTableImport {
     typeof obj.module !== 'string' ||
     typeof obj.descr !== 'object' ||
     typeof obj.loc !== 'object' ||
-    obj.name !== 'table' ||
+    (obj.name !== 'table' && obj.name !== '__indirect_function_table') ||
     obj.type !== 'ModuleImport'
   ) {
     throw new Error(`obj does not satisfy Table import interface`);
