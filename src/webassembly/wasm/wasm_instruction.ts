@@ -226,7 +226,7 @@ export class IfInstruction extends WasmInstruction {
     this.alternative = alternative;
     this.consequence = consequence;
 
-    if (this.consequence.length === 0) {
+    if (this.consequence.length === 0 && this.alternative.length === 0) {
       throw new Error(
         `An IfInstruction should have at the very least consequence Instructions`,
       );
