@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import path from 'path';
 import {
+  type SourceMapConfig,
   SourceMapfromSourceMapSpec,
   type SourceOffsetStart,
 } from '../../src/source_mappers/source_map_builder';
@@ -17,7 +18,6 @@ import {
   sourceNodeFromLoc,
   sourceNodeLoc,
 } from './resuable_code';
-import { type SourceMapConfig } from '../../src/source_mappers/source_map';
 
 describe.skip('Debug Operations on AssemblyScript Blink App', function () {
   const pathToRootSource = path.resolve(

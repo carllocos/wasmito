@@ -4,6 +4,7 @@ import { WasmModule } from '../webassembly/wasm/wasm_module';
 import { type WASMFunction } from '../webassembly/wasm/wasm_function';
 import { isFilePath, pathJoin, pathsEqual } from '../util/file_util';
 import { writeFileSync } from 'fs';
+import { type SourceMapConfig } from './source_map_builder';
 
 const logger = createLogger('SourceMap');
 
@@ -50,12 +51,6 @@ export function mappingItemToString(m: MappingItem): string {
 
 export function sourceCodeLocationToString(m: SourceCodeLocation): string {
   return `{"source":"${m.source}", "address": ${m.address}, "linenr": ${m.linenr}, "colnr": ${m.colnr},"name": "${m.name}"}`;
-}
-
-export interface SourceMapConfig {
-  srcToAbsPath?: Map<string, string>;
-  ignoreDirectories?: string[];
-  prefixSources?: string;
 }
 
 export interface SourceMapJSON {

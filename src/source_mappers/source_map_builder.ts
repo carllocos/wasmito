@@ -2,7 +2,6 @@ import fs from 'fs';
 import {
   type SourceCodeLocation,
   SourceMap,
-  type SourceMapConfig,
   type SourceMapJSON,
   isSourceMapJSON,
   mappingItemToSourceCodeLocation,
@@ -19,6 +18,50 @@ const logger = createLogger('SourceMapBuilder');
 export interface SourceOffsetStart {
   colNrStartNumber: number;
   lineNrStartNumber: number;
+}
+
+export interface SourceMapConfig {
+  srcToAbsPath?: Map<string, string>;
+  ignoreDirectories?: string[];
+  prefixSources?: string;
+}
+
+export async function readSourceMapConfig(
+  jsonPath: string,
+): Promise<SourceMapConfig> {
+  const rebase = await readFileAsJSON(jsonPath);
+
+  const config: SourceMapConfig = {};
+  config.srcToAbsPath = new Map<string, string>();
+  const pathsAr = rebase.absolutePaths ?? [];
+  if (Array.isArray(pathsAr)) {
+    for (let i = 0; i < pathsAr.length; i++) {
+      const pathMap = pathsAr[i];
+      if (!Array.isArray(pathMap) || pathMap.length !== 2) {
+        throw new Error('SourceMapConfig: A filepath map requires 2 values');
+      } else {
+        const [p1, p2] = pathMap;
+        if (typeof p1 !== 'string' || typeof p2 !== 'string') {
+          throw new Error(
+            'SourceMapConfig: Filepaths are supposed to be strings',
+          );
+        }
+        config.srcToAbsPath.set(p1, p2);
+      }
+    }
+  }
+
+  if (rebase.prefixSources !== undefined) {
+    const prefixSources = rebase.prefixSources;
+    if (typeof prefixSources !== 'string') {
+      throw new Error(
+        'SourceMapConfig: `prefixSources` is expected to be a string',
+      );
+    }
+    config.prefixSources = prefixSources;
+  }
+
+  return config;
 }
 
 function getOffsetToApply(

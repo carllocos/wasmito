@@ -1,5 +1,6 @@
 import path from 'path';
 import {
+  type SourceMapConfig,
   SourceMapfromSourceMapSpec,
   type SourceOffsetStart,
 } from '../../src/source_mappers/source_map_builder';
@@ -9,7 +10,6 @@ import {
   type DotSerializationConfig,
   type SourceControlFlowGraph,
 } from '../../src/cfg/source_cfg';
-import { type SourceMapConfig } from '../../src/source_mappers/source_map';
 
 describe('Debug operations on C Blink Intermittent App', function () {
   const pathToDir = path.resolve('./test/data/c_examples/blink_intermittent/');

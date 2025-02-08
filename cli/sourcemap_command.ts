@@ -5,16 +5,16 @@ import {
   createDirectoryIfUnexisting,
   getAbsolutePath,
   isFilePath,
-  readFileAsJSON,
 } from '../src/util/file_util';
 import { timeoutPromise } from '../src/util/promise_util';
 import {
   ReadDWARFMappings,
+  readSourceMapConfig,
   ReadSourceSpec,
+  type SourceMapConfig,
   type SourceOffsetStart,
 } from '../src/source_mappers/source_map_builder';
 import {
-  type SourceMapConfig,
   type SourceMapJSON,
   StoreMappingsToJSON,
 } from '../src/source_mappers/source_map';
@@ -80,7 +80,6 @@ export function registerSourceMapCommand(program: Command): void {
 
       let smJSON: Promise<SourceMapJSON> | undefined;
       let kindDebuggingFormat = '';
-      const config: SourceMapConfig = {};
       if (dwarfPath !== undefined) {
         kindDebuggingFormat = 'DWARF';
         smJSON = ReadDWARFMappings(dwarfPath);
@@ -90,31 +89,14 @@ export function registerSourceMapCommand(program: Command): void {
           colNrStartNumber: 0,
           lineNrStartNumber: 1,
         };
-        const rebaseJSONPath = options.rebaseLocations;
-        if (rebaseJSONPath !== undefined) {
-          if (!isFilePath(rebaseJSONPath)) {
+        let config: SourceMapConfig = {};
+        if (options.rebaseLocations !== undefined) {
+          if (!isFilePath(options.rebaseLocations)) {
             program.error(
               `The given source location rebase config '${options.prefixSources}' is not a valid file path`,
             );
           }
-
-          config.srcToAbsPath = new Map<string, string>();
-          const rebase = await readFileAsJSON(rebaseJSONPath);
-          const pathsAr = rebase.absolutePaths;
-          if (Array.isArray(pathsAr)) {
-            for (let i = 0; i < pathsAr.length; i++) {
-              const pathMap = pathsAr[i];
-              if (!Array.isArray(pathMap) || pathMap.length !== 2) {
-                program.error('A filepath map requires 2 values');
-              } else {
-                const [p1, p2] = pathMap;
-                if (typeof p1 !== 'string' || typeof p2 !== 'string') {
-                  program.error('Filepaths are supposed to be strings');
-                }
-                config.srcToAbsPath.set(p1, p2);
-              }
-            }
-          }
+          config = await readSourceMapConfig(options.rebaseLocations);
         }
         smJSON = ReadSourceSpec(sourceSpec, wasmPath, startPositioning, config);
       }
