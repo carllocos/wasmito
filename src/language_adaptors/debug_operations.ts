@@ -3,6 +3,7 @@ import {
   type SourceControlFlowGraph,
   type SourceCFGNode,
   isCallNode,
+  sourceNodeFirstInstrStartAddr,
 } from '../cfg/source_cfg';
 
 // const logger = createLogger('DebugAgnosticOperations');
@@ -48,7 +49,7 @@ function stepIn(
   let ns: Array<[SourceCFGNode, number]> = [];
   if (isCallNode(node)) {
     const entryNodes = sourceCFG.getFunctionEntryNodesFromNode(node);
-    ns = entryNodes.map((n) => [n, n.instructions[0].startAddress]);
+    ns = entryNodes.map((n) => [n, sourceNodeFirstInstrStartAddr(n)]);
   }
 
   if (ns.length === 0) {

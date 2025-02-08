@@ -191,10 +191,10 @@ export class SourceControlFlowGraph {
     }
     if (!ignoreExitNodes && isCallNode(n)) {
       this.getFunctionEntryNodesFromNode(n).forEach((en) => {
-        const startInstr = en.instructions[0];
-        if (!alreadyAdded.has(startInstr.startAddress)) {
-          ns.push([en, startInstr.startAddress]);
-          alreadyAdded.add(startInstr.startAddress);
+        const startAddress = sourceNodeFirstInstrStartAddr(en);
+        if (!alreadyAdded.has(startAddress)) {
+          ns.push([en, startAddress]);
+          alreadyAdded.add(startAddress);
         }
       });
     }
