@@ -107,7 +107,7 @@ export class SourceControlFlowGraph {
     );
 
     let mappings: SourceCodeLocation[] = [];
-    if (location.address !== -1) {
+    if (location.address > 0) {
       mappings = this._sourceMap.getOriginalPositionFor(location.address);
       logger.debug(
         `#${mappings.length} mappings found for Location ${sourceCodeLocationToString(location)}`,
