@@ -105,10 +105,20 @@ export class SourceControlFlowGraph {
     logger.debug(
       `get genereatedPosition for Location {${location.source}, ${location.linenr}, ${location.colnr}}`,
     );
-    const mappings = this._sourceMap.generatedPositionFor(location);
-    logger.debug(
-      `#${mappings.lastIndexOf} mappings found for Location {${location.source}, ${location.linenr}, ${location.colnr}}`,
-    );
+
+    let mappings: SourceCodeLocation[] = [];
+    if (location.address !== -1) {
+      mappings = this._sourceMap.getOriginalPositionFor(location.address);
+      logger.debug(
+        `#${mappings.length} mappings found for Location ${sourceCodeLocationToString(location)}`,
+      );
+    } else {
+      mappings = this._sourceMap.generatedPositionFor(location);
+      logger.debug(
+        `#${mappings.length} mappings found for Location {${location.source}, ${location.linenr}, ${location.colnr}}`,
+      );
+    }
+
     const nodes: SourceCFGNode[][] = [];
     for (const m of mappings) {
       const ns = this.nodesFromAddress(m.address);
@@ -201,7 +211,11 @@ export class SourceControlFlowGraph {
     return ns;
   }
 
-  serializeToDot(outputDir: string, config: DotSerializationConfig): string[] {
+  serializeToDot(
+    outputDir: string,
+    config: DotSerializationConfig,
+    prefixFilenameIfDetaultTooLong: string = 'sourcefg',
+  ): string[] {
     const funIds = config.funIds ?? [];
     if (funIds.length === 0) {
       this._sourceMap.wasm.functions.forEach((f) => funIds.push(f.id));
@@ -235,7 +249,21 @@ export class SourceControlFlowGraph {
         seenDotFileNames.add(funName);
         const content = sourceControlFlowGraphToDot(fg, funName, config);
         const p = pathJoin(outputDir, `${funName}.dot`);
-        writeFileSync(p, content);
+        try {
+          writeFileSync(p, content);
+        } catch (err) {
+          if (err instanceof Error) {
+            if (err.message.includes('ENAMETOOLONG')) {
+              const shorterp = pathJoin(
+                outputDir,
+                `${prefixFilenameIfDetaultTooLong}_fun${fid}.dot`,
+              );
+              writeFileSync(shorterp, content);
+            } else {
+              throw err;
+            }
+          }
+        }
         dots.push(content);
         const dotMetadata: DotMetaData = {
           funName,
