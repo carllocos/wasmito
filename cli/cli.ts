@@ -24,6 +24,8 @@ import { registerProjectCommand } from './project_command';
 import { registerDevicesCommand } from './devices_command';
 import { registerUploadCommand } from './upload_command';
 import { registerDebugOpCommand } from './debugop_command';
+import { registerWCFGCommand } from './wcfg_command';
+import { registerWasmParseCommand } from './wasmparse_command';
 
 export function startCLI(): void {
   const projectName = readProjectName();
@@ -44,6 +46,7 @@ export function startCLI(): void {
   // registerDeviceManagerCommands(dm, program);
 
   registerCFGCommand(program);
+  registerWCFGCommand(program);
   registerSourceMapCommand(program);
   registerCallgraphCommand(program);
   registerProjectCommand(program);
