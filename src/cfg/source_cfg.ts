@@ -144,6 +144,14 @@ export class SourceControlFlowGraph {
     return this._astGraphs.get(fid);
   }
 
+  getFuntionSourceCFGStrict(fid: number): BinaryLiftedCFG {
+    const f = this.getFuntionSourceCFG(fid);
+    if (f === undefined) {
+      throw new Error(`Function ${fid} does not have a source CFG`);
+    }
+    return f;
+  }
+
   getFunctionEntryNodes(fid: number): SourceCFGNode[] {
     const f = this.getFuntionSourceCFG(fid);
     if (f === undefined) {
