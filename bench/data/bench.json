@@ -1,0 +1,184 @@
+{
+    "nrOfRuns": 50,
+    "nrOfWarmups": 30,
+    "results": "bench_results",
+    "bench": [
+        {
+            "wasm": "fac/fac.wasm",
+            "mappings": "fac/mappings.json",
+            "skip": false,
+            "operations": [
+                {
+                    "operation": "stepInto",
+                    "description": "step into fac call",
+                    "skip": false,
+                    "startLocation": {
+                        "source": "fac/fac.rs",
+                        "linenr": 21,
+                        "colnr": 9,
+                        "address": 533
+                    }
+                },
+                {
+                    "operation": "stepOver",
+                    "description": "step over fac call",
+                    "skip": false,
+                    "startLocation": {
+                        "source": "fac/fac.rs",
+                        "linenr": 21,
+                        "colnr": 9,
+                        "address": 533
+                    },
+                    "endAddress": [527]
+                },
+                {
+                    "operation": "stepInto",
+                    "description": "step into fac if branch condition",
+                    "skip": false,
+                    "startLocation": {
+                        "source": "fac/fac.rs",
+                        "linenr": 11,
+                        "colnr": 8,
+                        "address":241 
+                    }
+                },
+                {
+                    "operation": "stepOut",
+                    "description": "step out the factorial at the tail recursion",
+                    "skip": false,
+                    "startLocation": {
+                        "source": "fac/fac.rs",
+                        "linenr": 14,
+                        "colnr": 13,
+                        "address": 364
+                    },
+                    "endAddress": [527,378]
+                }
+            ]
+        },
+        {
+            "wasm": "fac_fib/fac_fib.wasm",
+            "mappings": "fac_fib/mappings.json",
+            "skip": true,
+            "operations": [
+                {
+                    "operation": "stepInto",
+                    "description": "step into fac call",
+                    "skip": true,
+                    "startLocation": {
+                        "source": "fac_fib/fac_fib.rs",
+                        "linenr": 33,
+                        "colnr": 22,
+                        "address": 1022
+                    }
+                },
+                {
+                    "operation": "stepOver",
+                    "description": "step over fac call",
+                    "skip": true,
+                    "startLocation": {
+                        "source": "fac_fib/fac_fib.rs",
+                        "linenr": 33,
+                        "colnr": 22,
+                        "address": 1022
+                    }
+                },
+                {
+                    "operation": "stepInto",
+                    "description": "step into fib call",
+                    "skip": true,
+                    "startLocation": {
+                        "source": "fac_fib/fac_fib.rs",
+                        "linenr": 37,
+                        "colnr": 13,
+                        "address": 1072
+                    }
+                },
+                {
+                    "operation": "stepOver",
+                    "description": "step over fib call",
+                    "skip": true,
+                    "startLocation": {
+                        "source": "fac_fib/fac_fib.rs",
+                        "linenr": 37,
+                        "colnr": 13,
+                        "address": 1072
+                    }
+                },
+                {
+                    "operation": "stepInto",
+                    "description": "step into the true of false branch of an if",
+                    "skip": true,
+                    "startLocation": {
+                        "source": "fac_fib/fac_fib.rs",
+                        "linenr": 33,
+                        "colnr": 12,
+                        "address": 1036
+                    }
+                },
+                {
+                    "operation": "stepInto",
+                    "description": "step into the start of the while-loop",
+                    "skip": false,
+                    "startLocation": {
+                        "source": "fac_fib/fac_fib.rs",
+                        "linenr": 33,
+                        "colnr": 9,
+                        "address": 1147
+                    }
+                }
+            ]
+        },
+        {
+            "wasm": "blink/blink.wasm",
+            "mappings": "blink/mappings.json",
+            "skip": true,
+            "operations": [
+                {
+                    "operation": "stepInto",
+                    "description" : "step into digital_write call",
+                    "skip": false,
+                    "startLocation": {
+                        "source": "blink/blink.rs",
+                        "linenr": 45,
+                        "colnr": 9,
+                        "address": 465
+                    }
+                },
+                {
+                    "operation": "stepOver",
+                    "description" : "step over digital_write call",
+                    "skip": false,
+                    "startLocation": {
+                        "source": "blink/blink.rs",
+                        "linenr": 45,
+                        "colnr": 9,
+                        "address": 465
+                    }
+                },
+                {
+                    "operation": "stepInto",
+                    "description" : "step into delay call",
+                    "skip": false,
+                    "startLocation": {
+                        "source": "blink/blink.rs",
+                        "linenr": 46,
+                        "colnr": 9,
+                        "address": 483
+                    }
+                },
+                {
+                    "operation": "stepOver",
+                    "description" : "step over delay call",
+                    "skip": false,
+                    "startLocation": {
+                        "source": "blink/blink.rs",
+                        "linenr": 46,
+                        "colnr": 9,
+                        "address": 483
+                    }
+                }
+            ]
+        }
+    ]
+}

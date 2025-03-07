@@ -1,0 +1,206 @@
+import { type RuntimeDebugAPI } from '../runtime_api';
+import {
+  getHookMomentFromString,
+  HookOnWasmAddrMoment,
+  HookOnWasmAddrRequest,
+  RemoveHookOnWasmAddrRequest,
+} from '../../../src/warduino/requests/hook_on_wasm_addr_request';
+import {
+  type APIRequest,
+  createRequestMessage,
+  isSubscriptionMessage,
+  isSuccessfulMessage,
+} from '../../../src/warduino/api/request_interface';
+import { PauseVMHook } from '../../../src/hooks/hook_run_pause';
+import { RunRequest } from '../../../src/warduino/requests/run_request';
+import { StateRequest, StepRequest } from '../../../src/warduino';
+import { type WasmState } from '../../../src/webassembly/wasm';
+import { type Channel } from '../../../src/communication/channel_interface';
+import { Command } from '../../../src/communication/command';
+import { InspectStateHook } from '../../../src/hooks/hook_inspect_state';
+
+export class WasmitoRuntimeDBGAPI implements RuntimeDebugAPI {
+  runtimeName: string;
+  protected channel: Channel;
+  private readonly breakpoints: Set<number>;
+  private listenerActivated: boolean;
+  private readonly hooksOfBreakpoints: Map<number, HookOnWasmAddrRequest[]>;
+  private breakpointListeners: Array<(bpAddr: number) => void>;
+  private readonly removedListeners: Set<(bpAddr: number) => void>;
+
+  constructor(channel: Channel) {
+    this.channel = channel;
+    this.runtimeName = '';
+    this.breakpoints = new Set();
+    this.breakpointListeners = [];
+    this.removedListeners = new Set();
+
+    this.listenerActivated = false;
+    this.hooksOfBreakpoints = new Map();
+  }
+
+  onBreakpoint(handler: (bpAdrr: number) => void): void {
+    this.breakpointListeners.push(handler);
+  }
+
+  removeOnBreakpoint(handler: (bpAdrr: number) => void): void {
+    this.removedListeners.add(handler);
+  }
+
+  private parseBpAddress(data: string): number | undefined {
+    // '{"interrupt":"51","kind":"03","sub":{"moment":"01","addr":"3FE","val":{"pc":1022}}}');
+    const msg = createRequestMessage(data);
+    if (msg === undefined || !isSubscriptionMessage(msg)) {
+      return;
+    }
+    try {
+      let subContent: any = {};
+      if (typeof msg.sub === 'string') {
+        subContent = JSON.parse(msg.sub);
+      } else if (typeof msg.sub === 'object') {
+        subContent = msg.sub;
+      }
+
+      if (
+        typeof subContent.moment !== 'string' ||
+        subContent.val === undefined
+      ) {
+        return;
+      }
+      const hookMoment = getHookMomentFromString(subContent.moment);
+      if (hookMoment !== HookOnWasmAddrMoment.HookBefore) {
+        return;
+      }
+      const hookAddr = parseInt(subContent.addr, 16);
+      if (isNaN(hookAddr)) {
+        throw new Error(
+          `Failed to convert hookOnRequest addr ${subContent.addr} to a number`,
+        );
+      }
+      return hookAddr;
+    } catch (e) {
+      return undefined;
+    }
+  }
+
+  private listenForOnBPReach(data: string): void {
+    const bpAddr = this.parseBpAddress(data);
+    if (bpAddr === undefined) {
+      return;
+    }
+    this.breakpointListeners.forEach((lstnr) => {
+      if (!this.removedListeners.has(lstnr)) {
+        lstnr(bpAddr);
+      }
+    });
+
+    this.breakpointListeners = this.breakpointListeners.filter((h) => {
+      return !this.removedListeners.has(h);
+    });
+    this.removedListeners.clear();
+  }
+
+  async startRuntime(timeout: number): Promise<boolean> {
+    this.breakpointListeners.length = 0;
+    this.removedListeners.clear();
+    this.breakpoints.clear();
+    this.hooksOfBreakpoints.clear();
+    this.listenerActivated = false;
+    return true;
+  }
+
+  async stopRuntime(timeout: number): Promise<boolean> {
+    throw new Error('stopRuntime is not applicable to this class');
+  }
+
+  private async sendRequest<T>(
+    request: APIRequest<T>,
+    timeout?: number,
+  ): Promise<T> {
+    const command = new Command(this.channel, request, timeout);
+    return command.execute();
+  }
+
+  // private subscribeData(s: WasmState): void {
+  //   if (s.pc === undefined) {
+  //     throw new Error(`On breakpoint reached did not return bp addr`);
+  //   }
+  //   for (const bpListener of this.breakpointListeners) {
+  //     if (!this.removedListeners.has(bpListener)) {
+  //       bpListener(s.pc);
+  //     }
+  //   }
+
+  //   this.breakpointListeners = this.breakpointListeners.filter((h) => {
+  //     return !this.removedListeners.has(h);
+  //   });
+  //   this.removedListeners.clear();
+  // }
+
+  async addBreakpoint(addr: number, timeout?: number): Promise<boolean> {
+    if (!this.listenerActivated) {
+      this.channel.addOnData(this.listenForOnBPReach.bind(this));
+      this.listenerActivated = true;
+    }
+    const inspectHook = new InspectStateHook(new StateRequest().includePC());
+    // inspectHook.subscribe(this.subscribeData.bind(this));
+    const hooks = [inspectHook, new PauseVMHook()];
+    let success = true;
+    const reqs: HookOnWasmAddrRequest[] = [];
+    for (const h of hooks) {
+      const req = new HookOnWasmAddrRequest(addr).addHook(h).before();
+      const response = await this.sendRequest(req, timeout);
+      success = isSuccessfulMessage(response) && success;
+      if (!success) {
+        break;
+      }
+      reqs.push(req);
+    }
+    if (success) {
+      this.breakpoints.add(addr);
+      this.hooksOfBreakpoints.set(addr, reqs);
+    }
+    return success;
+  }
+
+  async removeBreakpoint(addr: number, timeout?: number): Promise<boolean> {
+    const req = new RemoveHookOnWasmAddrRequest(addr).before();
+    const response = await this.sendRequest(req, timeout);
+    const success = isSuccessfulMessage(response);
+    if (success) {
+      this.breakpoints.delete(addr);
+      const reqs: HookOnWasmAddrRequest[] =
+        this.hooksOfBreakpoints.get(addr) ?? [];
+      for (const r of reqs) {
+        r.closeSubscription();
+      }
+      this.hooksOfBreakpoints.delete(addr);
+    }
+    return success;
+  }
+
+  async run(timeout?: number): Promise<boolean> {
+    const req = new RunRequest();
+    const response = await this.sendRequest(req, timeout);
+    return response === 'GO!';
+  }
+
+  async step(timeout?: number): Promise<boolean> {
+    const req = new StepRequest();
+    const response = await this.sendRequest(req, timeout);
+    if (response !== 'STEP!') {
+      throw new Error(`Wasmito runtime failed to step`);
+    }
+    return true;
+  }
+
+  async inspectPC(timeout?: number): Promise<number> {
+    const req = new StateRequest();
+    req.includePC();
+    const response: WasmState = await this.sendRequest(req, timeout);
+    if (response.pc === undefined) {
+      throw new Error(`Failed to inpsect PC`);
+    }
+    return response.pc;
+  }
+}

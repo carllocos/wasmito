@@ -1,0 +1,4 @@
+bench_results/
+*.wasm
+mappings.json
+

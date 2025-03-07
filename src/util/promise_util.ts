@@ -44,3 +44,11 @@ export async function maybeTimeoutPromise<T>(
     }
   });
 }
+
+export async function waitMilliSeconds(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, ms);
+  });
+}
