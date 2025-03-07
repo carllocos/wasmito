@@ -63,24 +63,35 @@ export abstract class HookWithSubscription<SubscriptionType>
   implements SubscriptionHook<SubscriptionType>
 {
   private listeners: Array<(data: SubscriptionType) => void>;
+  private oneTimeListeners: Array<(data: SubscriptionType) => void>;
   private readonly removedListeners: Set<(data: SubscriptionType) => void>;
   protected logger: winston.Logger;
 
   constructor(kind: HookKind) {
     super(kind);
     this.listeners = [];
+    this.oneTimeListeners = [];
     this.removedListeners = new Set();
     this.logger = createLogger('SubscriptionHook');
   }
 
-  public subscribe(callback: (data: SubscriptionType) => void): void {
-    const found = this.listeners.find((cb) => cb === callback);
+  public subscribe(
+    callback: (data: SubscriptionType) => void,
+    oneTimeSubscription: boolean = false,
+  ): void {
+    let lstnrs: Array<(data: SubscriptionType) => void> = [];
+    if (oneTimeSubscription) {
+      lstnrs = this.oneTimeListeners;
+    } else {
+      lstnrs = this.listeners;
+    }
+    const found = lstnrs.find((cb) => cb === callback);
     if (found !== undefined) {
       this.logger.warn(`Attempting to add 2 same subscription callbacks`);
       return;
     }
 
-    this.listeners.push(callback);
+    lstnrs.push(callback);
   }
 
   public unSubscribe(callback: (data: SubscriptionType) => void): void {
@@ -100,6 +111,10 @@ export abstract class HookWithSubscription<SubscriptionType>
       return !this.removedListeners.has(cb);
     });
     this.removedListeners.clear();
+    this.oneTimeListeners.forEach((listener) => {
+      listener(value);
+    });
+    this.oneTimeListeners = [];
   }
 
   abstract parseSubscriptionData(input: any): SubscriptionType;
