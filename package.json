@@ -76,7 +76,7 @@
   },
   "dependencies": {
     "@types/uuid": "^9.0.7",
-    "@webassemblyjs/wasm-parser": "^1.12.1",
+    "@webassemblyjs/wasm-parser": "^1.14.1",
     "assemblyscript": "^0.27.24",
     "commander": "^11.0.0",
     "figlet": "^1.6.0",
