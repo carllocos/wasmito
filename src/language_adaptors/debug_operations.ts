@@ -6,28 +6,23 @@ import {
   sourceNodeFirstInstrStartAddr,
 } from '../cfg/source_cfg';
 
-// const logger = createLogger('DebugAgnosticOperations');
+export type DebugOperation = (
+  sourceCFG: SourceControlFlowGraph,
+  node: SourceCFGNode,
+) => Array<[SourceCFGNode, number]>;
 
+// const logger = createLogger('DebugAgnosticOperations');
 export interface AgnosticDebugOperations {
-  stepIn: (
-    sourceCFG: SourceControlFlowGraph,
-    node: SourceCFGNode,
-  ) => Array<[SourceCFGNode, number]>;
+  stepIn: DebugOperation;
 
   /*
    * The semantics of step over is if the current location is a function call
    * then the debugger should run the function call without interruption.
    * And the debugger should stop the first program location after the call.
    */
-  stepOver: (
-    sourceCFG: SourceControlFlowGraph,
-    node: SourceCFGNode,
-  ) => Array<[SourceCFGNode, number]>;
+  stepOver: DebugOperation;
 
-  stepOut: (
-    SourceCFGNode: SourceControlFlowGraph,
-    node: SourceCFGNode,
-  ) => Array<[SourceCFGNode, number]>;
+  stepOut: DebugOperation;
 }
 
 function stepOver(
