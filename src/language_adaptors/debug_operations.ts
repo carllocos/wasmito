@@ -23,6 +23,8 @@ export interface AgnosticDebugOperations {
   stepOver: DebugOperation;
 
   stepOut: DebugOperation;
+
+  stepIteration: DebugOperation;
 }
 
 function stepOver(
@@ -84,10 +86,97 @@ function stepOut(
   return ns;
 }
 
+export function stepIteration(
+  sourceCFG: SourceControlFlowGraph,
+  node: SourceCFGNode,
+): Array<[SourceCFGNode, number]> {
+  // find cycle
+  const visitedNodes = new Set<number>();
+  const q: SourceCFGNode[] = [node];
+  const cycle: SourceCFGNode[] = [];
+  let cycleFound = false;
+  let n: SourceCFGNode | undefined;
+  while ((n = q.pop()) !== undefined) {
+    if (visitedNodes.has(n.nodeId)) {
+      if (n.nodeId === node.nodeId) {
+        cycleFound = true;
+        break;
+      }
+      continue;
+    }
+    cycle.push(n);
+    visitedNodes.add(n.nodeId);
+    for (const [n2] of n.edges) {
+      q.push(n2);
+    }
+  }
+
+  if (!cycleFound) return [];
+
+  // find cycle start
+  const scfg = sourceCFG.getFuntionSourceCFGStrict(node.wasmFunOwner);
+  const visitedNodes2 = new Set<number>();
+  const cycleStart: SourceCFGNode[] = [];
+  for (const entryNode of scfg.entryNodes) {
+    const q2: SourceCFGNode[] = [entryNode];
+    let n2: SourceCFGNode | undefined;
+    while ((n2 = q2.pop()) !== undefined) {
+      if (cycle.includes(n2)) {
+        cycleStart.push(n2);
+        break;
+      }
+      if (visitedNodes2.has(n2.nodeId)) {
+        continue;
+      }
+      visitedNodes2.add(n2.nodeId);
+      for (const [neighbour] of n2.edges) {
+        q2.push(neighbour);
+      }
+    }
+    visitedNodes2.clear();
+  }
+
+  // find cycle end
+  // (3) find loop exit nodes
+  const exitLoop: SourceCFGNode[] = [];
+  for (const c of cycle) {
+    if (c.edges.length <= 1) continue;
+    for (const [n] of c.edges) {
+      if (cycle.includes(n)) continue;
+      exitLoop.push(n);
+      // TODO
+      // case that can occur:
+      // neighbour n is part of the same loop as c
+      // but it is not part of the cyclepath
+      // n is part of another cyclepath
+      // such as (a) -> (c)->(l) or (a)-> (b)->(l):
+      // loop (condition) {(l)
+      // (a)
+      //   if (condition) {
+      //     (b)
+      //   }
+      //  else {
+      //   (c)
+      //  }
+      // }
+      // asuming cyclepath is (a)->(c)->(l)
+      // here (a) has 2 neighbours where (b)
+      // is part of cycle but not cyclepath
+      // then neighbour should not be added.
+      // To know this we need to find all possible cyclepaths.
+      // in part 1 i think already
+      // take blink_intermittent.rs as example
+    }
+  }
+  const destinationNodes = cycleStart.concat(exitLoop);
+  return destinationNodes.map((n) => [n, -1]);
+}
+
 export const DebugOperations: AgnosticDebugOperations = {
   stepIn,
   stepOver,
   stepOut,
+  stepIteration,
 };
 
 export type DebugOperationName = string;
@@ -105,6 +194,9 @@ export function DebugOperationFromName(
     case 'step-out':
     case 'stepOut':
       return stepOut;
+    case 'step-iteration':
+    case 'stepIteration':
+      return stepIteration;
     default:
       return undefined;
   }
