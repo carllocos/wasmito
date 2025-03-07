@@ -11,6 +11,9 @@ export namespace WASM {
     f64,
     i32,
     i64,
+    anyfunc,
+    externref,
+    asyncfuncError,
     unknown,
   }
 
@@ -24,6 +27,12 @@ export namespace WASM {
         return 'i32';
       case Type.i64:
         return 'i64';
+      case Type.anyfunc:
+        return 'anyfunc';
+      case Type.externref:
+        return 'externref';
+      case Type.asyncfuncError:
+        return 'asyncfuncError';
       default:
         return undefined;
     }
@@ -46,6 +55,9 @@ export namespace WASM {
     ['f64', Type.f64],
     ['i32', Type.i32],
     ['i64', Type.i64],
+    ['anyfunc', Type.anyfunc],
+    ['externref', Type.externref],
+    ['asyncfuncEror', Type.asyncfuncError],
   ]);
 
   export const typeToHex = new Map<Type, string>([

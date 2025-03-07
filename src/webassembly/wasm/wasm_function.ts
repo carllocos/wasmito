@@ -5,7 +5,7 @@ import {
   type CallInstruction,
   type WasmInstruction,
 } from './wasm_instruction';
-import { WASMOpcodeNumber } from './wasm_opcode';
+import { WasmOpcodeGetLocal, WasmOpcodeSetLocal } from './wasm_opcode';
 
 export interface WasmLocal {
   index: number;
@@ -91,7 +91,7 @@ export class WASMFunction {
   getLocalGetInstructions(): WasmInstruction[] {
     const localGetInstrs: WasmInstruction[] = [];
     for (const i of this.allInstructions) {
-      if (i.opcodeNr === WASMOpcodeNumber.Get_local) {
+      if (i.opcodeNr === WasmOpcodeGetLocal) {
         localGetInstrs.push(i);
       }
     }
@@ -101,7 +101,7 @@ export class WASMFunction {
   getLocalSetInstructions(): WasmInstruction[] {
     const localSetInstrs: WasmInstruction[] = [];
     for (const i of this.allInstructions) {
-      if (i.opcodeNr === WASMOpcodeNumber.Set_local) {
+      if (i.opcodeNr === WasmOpcodeSetLocal) {
         localSetInstrs.push(i);
       }
     }

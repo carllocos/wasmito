@@ -15,7 +15,7 @@ import {
   WasmInstruction,
 } from '../wasm/wasm_instruction';
 import { WASM } from '../wasm';
-import { WASMOpcodeNumber, wasmOpcodeFromStr } from '../wasm/wasm_opcode';
+import { type WasmOpcodeNumber, wasmOpcodeFromStr } from '../wasm/wasm_opcode';
 import { IsOpcodeWasmVersion1 } from '../wasm/wasm_versions';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const decode = require('@webassemblyjs/wasm-parser');
@@ -250,7 +250,7 @@ function assertFuncSignature(obj: any): asserts obj is FuncSignature {
   }
 }
 
-function tryToOpcodeOrErrorMsg(opcode: string): WASMOpcodeNumber | string {
+function tryToOpcodeOrErrorMsg(opcode: string): WasmOpcodeNumber[] | string {
   try {
     return wasmOpcodeFromStr(opcode);
   } catch (e) {
@@ -275,13 +275,13 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
       assertWasmSourceCodeLocation(obj.loc);
       op = new WasmInstruction(
         'get_local',
-        WASMOpcodeNumber.Get_local,
+        wasmOpcodeFromStr('get_local'),
         obj.args[0].value,
       );
       break;
     }
     case 'set_local': {
-      op = new WasmInstruction('set_local', WASMOpcodeNumber.Set_local);
+      op = new WasmInstruction('set_local', wasmOpcodeFromStr('set_local'));
       op.args = obj.args.map((a: any) => {
         return a.name;
       });
@@ -314,7 +314,7 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
         assertInstructionArg(a);
         return a.value;
       });
-      op = new WasmInstruction('end', WASMOpcodeNumber.End);
+      op = new WasmInstruction('end', wasmOpcodeFromStr('end'));
       op.args = labels;
       break;
     }
@@ -326,7 +326,7 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
       }
       op = new WasmInstruction(
         'get_global',
-        WASMOpcodeNumber.Get_global,
+        wasmOpcodeFromStr('get_global'),
         obj.args[0].value,
       );
       break;
@@ -339,13 +339,13 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
       }
       op = new WasmInstruction(
         'set_global',
-        WASMOpcodeNumber.Set_global,
+        wasmOpcodeFromStr('set_global'),
         obj.args[0].value,
       );
       break;
     }
     case 'drop': {
-      op = new WasmInstruction('drop', WASMOpcodeNumber.Drop);
+      op = new WasmInstruction('drop', wasmOpcodeFromStr('drop'));
       break;
     }
     case 'local': {
@@ -462,7 +462,7 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
           `Handle case where 'gt_s' args has more than one element ${obj.args}`,
         ];
       }
-      const errorOrNr: string | WASMOpcodeNumber =
+      const errorOrNr: string | WasmOpcodeNumber[] =
         tryToOpcodeOrErrorMsg(opcode);
       if (typeof errorOrNr === 'string') {
         return [errorOrNr];
@@ -477,7 +477,7 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
           `Handle case where 'lt_s' args has more than one element ${obj.args}`,
         ];
       }
-      op = new WasmInstruction(opcode, WASMOpcodeNumber.I32LTSigned);
+      op = new WasmInstruction(opcode, wasmOpcodeFromStr(opcode));
       break;
     }
     case 'tee_local': {
@@ -488,7 +488,7 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
       }
       op = new WasmInstruction(
         'tee_local',
-        WASMOpcodeNumber.Tee_local,
+        wasmOpcodeFromStr('tee_local'),
         obj.args[0].value,
       );
       break;
@@ -509,7 +509,7 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
       break;
     }
     case 'nop': {
-      op = new WasmInstruction('nop', WASMOpcodeNumber.Nop);
+      op = new WasmInstruction('nop', wasmOpcodeFromStr('nop'));
       break;
     }
     case 'br_table': {
@@ -587,6 +587,8 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
     case 'shl':
     case 'xor':
     case 'div_u':
+    case 'extend8_s':
+    case 'extend16_s':
     case 'extend_u/i32':
     case 'extend_s/i32':
     case 'rem_u':
@@ -600,9 +602,27 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
     case 'shr_s':
     case 'rotl':
     case 'rotr':
+    case 'memory.fill': // wasm v 2
+    case 'memory.copy': // wasm v 2
+    case 'table.copy': // wasm v 2
+    case 'table.size': // wasm v 2
+    case 'table.init': // wasm v 2
+    case 'table.get': // wasm v 2
+    case 'table.set': // wasm v 2
+    case 'table.grow': // wasm v 2
+    case 'table.fill': // wasm v 2
+    case 'ref.null': // wasm v 2
+    case 'ref.is_null': // wasm v 2
+    case 'ref.func': // wasm v 2
+    case 'extend32_s': // wasm v 2
     case 'ctz': {
-      const opcode = obj.object + `.${obj.id}`;
-      const errorOrNr: string | WASMOpcodeNumber =
+      // let opcode = obj.object + `.${obj.id}`;
+      let opcode = `${obj.id}`;
+      if (obj.object !== undefined) {
+        opcode = obj.object + `.${obj.id}`;
+      }
+
+      const errorOrNr: string | WasmOpcodeNumber[] =
         tryToOpcodeOrErrorMsg(opcode);
       if (typeof errorOrNr === 'string') {
         return [errorOrNr];
@@ -696,11 +716,13 @@ function parseConstValue(valueObj: any, vtype: string): ConstInstr | string {
     )}]`;
   }
   switch (valueObj.type) {
-    case 'NumberLiteral':
+    case 'NumberLiteral': {
       if (typeof valueObj.value !== 'number') {
         return `'value' field of parsed I32Const should be a number. Found: ${valueObj.value}`;
       }
-      return new ConstInstr(WASMOpcodeNumber.I32Const, valueObj.value);
+      const opcodes = wasmOpcodeFromStr('i32.const');
+      return new ConstInstr(opcodes[0], valueObj.value);
+    }
     case 'LongNumberLiteral': {
       const value = valueObj.value;
       if (typeof value !== 'object') {
@@ -713,7 +735,7 @@ function parseConstValue(valueObj: any, vtype: string): ConstInstr | string {
         return `'low' and 'high' fields of parsed I64Const Instr should be numbers. Given low ${low} and high ${high}`;
       }
 
-      return new ConstInstr(WASMOpcodeNumber.I64Const, low, high);
+      return new ConstInstr(wasmOpcodeFromStr('i64.const')[0], low, high);
     }
     case 'FloatLiteral': {
       const value = valueObj.value;
@@ -721,8 +743,10 @@ function parseConstValue(valueObj: any, vtype: string): ConstInstr | string {
         return `'value' of parsed ${vtype} is expected to be an number. Given ${value}`;
       }
       const op =
-        vtype === 'f32' ? WASMOpcodeNumber.F32Const : WASMOpcodeNumber.F64Const;
-      return new ConstInstr(op, value);
+        vtype === 'f32'
+          ? wasmOpcodeFromStr('f32.const')
+          : wasmOpcodeFromStr('f64.const');
+      return new ConstInstr(op[0], value);
     }
     default:
       return `Expected I32,I64,F32, or F64 opcode`;
