@@ -23,7 +23,8 @@
     "test/**/*.ts",
     "tool_examples/**/*.ts",
     "cli/**/*.ts",
-    "wasmito_tester/**/*.ts"
+    "wasmito_tester/**/*.ts",
+    "bench/**/*.ts"
   ],
   "exclude": ["node_modules", "test/data/assemblyscript_examples/**/*.ts"]
 }
