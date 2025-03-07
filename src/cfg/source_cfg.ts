@@ -131,8 +131,7 @@ export class SourceControlFlowGraph {
     }
 
     if (nodes.length > 1) {
-      // console.log(`More than one set of nodes found ignoring the rest`);
-      return nodes[0];
+      return nodes.flat();
     } else if (nodes.length === 1) {
       return nodes[0];
     } else {
