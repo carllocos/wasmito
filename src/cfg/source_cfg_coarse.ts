@@ -52,7 +52,10 @@ export class CoarseGrainedSourceCFGraph {
     return this._funCFGs.get(fId);
   }
 
-  serializeToDot(outputDir: string): string[] {
+  serializeToDot(
+    outputDir: string,
+    prefixFilenameIfDetaultTooLong: string = 'sourcecfg',
+  ): string[] {
     const dots: string[] = [];
     const seenDotFileNames = new Set<string>();
     for (const fid of this._funCFGs.keys()) {
@@ -80,7 +83,21 @@ export class CoarseGrainedSourceCFGraph {
         seenDotFileNames.add(funName);
         const content = coarseSourceControlFlowGraphToDot(fg, funName);
         const p = pathJoin(outputDir, `${funName}.coarse.dot`);
-        writeFileSync(p, content);
+        try {
+          writeFileSync(p, content);
+        } catch (err) {
+          if (err instanceof Error) {
+            if (err.message.includes('ENAMETOOLONG')) {
+              const shorterp = pathJoin(
+                outputDir,
+                `${prefixFilenameIfDetaultTooLong}_fun${fid}.dot`,
+              );
+              writeFileSync(shorterp, content);
+            } else {
+              throw err;
+            }
+          }
+        }
         dots.push(content);
       }
     }
