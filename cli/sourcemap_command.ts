@@ -48,7 +48,7 @@ export function registerSourceMapCommand(program: Command): void {
     )
     .action(async (wasmPath, outputFile, options) => {
       const logger = getGlobalLogger();
-      const dwarfPath = options.dwarf;
+      let dwarfPath = options.dwarf;
       const sourceSpec = options.sourceSpec;
       wasmPath = getAbsolutePath(wasmPath);
       if (!isFilePath(wasmPath)) {
@@ -71,6 +71,7 @@ export function registerSourceMapCommand(program: Command): void {
             '--dwarf <dwarf-path> is not a valid path to a Wasm module containing dwarf',
           );
         }
+        dwarfPath = getAbsolutePath(dwarfPath);
       }
 
       const timeout = Number(options.timeout) * 1000; // convert to millisecs
