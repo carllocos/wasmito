@@ -142,7 +142,7 @@ export async function ArduinoCompile(
   });
 }
 
-async function ArduinoFlash(
+export async function ArduinoFlash(
   pathToArduinoSketch: string,
   port: string,
   fqbn: string,
