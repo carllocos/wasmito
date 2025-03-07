@@ -89,3 +89,23 @@ export const DebugOperations: AgnosticDebugOperations = {
   stepOver,
   stepOut,
 };
+
+export type DebugOperationName = string;
+
+export function DebugOperationFromName(
+  name: DebugOperationName,
+): DebugOperation | undefined {
+  switch (name) {
+    case 'step-into':
+    case 'stepInto':
+      return stepIn;
+    case 'step-over':
+    case 'stepOver':
+      return stepOver;
+    case 'step-out':
+    case 'stepOut':
+      return stepOut;
+    default:
+      return undefined;
+  }
+}
