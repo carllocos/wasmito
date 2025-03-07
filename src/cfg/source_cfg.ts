@@ -575,10 +575,10 @@ function mergeSameLocNodeNeighbours(
 
     // console.log(`Merge #${n.incomingEdges.length} nodes`);
     let mergedNode = n;
-    for (const [inNode] of n.incomingEdges) {
-      // in case of self edges
-      // the incomingEdge may have already been invalidated
-      if (inNode.sourceLocation.address === -1) {
+      if (
+        inNode.sourceLocation.address === -1 ||
+        mergedNode.nodeId === inNode.nodeId
+      ) {
         continue;
       }
       mergedNode = mergeNeighbourNodes(inNode, mergedNode);
