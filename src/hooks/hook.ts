@@ -99,8 +99,7 @@ export abstract class HookWithSubscription<SubscriptionType>
   }
 
   onSubscriptionData(value: SubscriptionType): void {
-    if (this.listeners.length === 0) {
-      this.logger.warn('There is no listener for subscription content');
+    if (this.listeners.length === 0 && this.oneTimeListeners.length === 0) {
     }
     this.listeners.forEach((listener) => {
       if (!this.removedListeners.has(listener)) {
