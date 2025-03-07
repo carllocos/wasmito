@@ -573,8 +573,9 @@ function mergeSameLocNodeNeighbours(
       continue;
     }
 
-    // console.log(`Merge #${n.incomingEdges.length} nodes`);
     let mergedNode = n;
+    for (let j = 0; j < n.incomingEdges.length; j++) {
+      const [inNode] = n.incomingEdges[j];
       if (
         inNode.sourceLocation.address === -1 ||
         mergedNode.nodeId === inNode.nodeId
