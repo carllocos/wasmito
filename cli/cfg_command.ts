@@ -119,7 +119,15 @@ export function registerCFGCommand(program: Command): void {
       }
 
       try {
+        logger.info(`Parsing Wasm Module`);
+        const startTimeParse = Date.now();
         const sm = await timeoutPromise(smPromise, timeoutMs);
+        const endTimeParse = Date.now();
+        const diffParse = endTimeParse - startTimeParse;
+        logger.info(
+          `Parse Time Took ${diffParse} ms, ${diffParse / 1000} secs, ${diffParse / 1000 / 60} mins`,
+        );
+
         createDirectoryIfUnexisting(outputDir);
         logger.info(`Starting construction CFGs`);
         const startTime = Date.now();
