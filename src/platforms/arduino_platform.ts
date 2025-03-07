@@ -96,7 +96,7 @@ interface CompiledCacheConfig {
 export async function ArduinoCompile(
   fqbn: string,
   wasmBinaryPath: string,
-  outputDir: string,
+  arduinoSketchDir: string,
   paused: boolean,
   disableStrictModuleLoad: boolean,
 ): Promise<number> {
@@ -111,7 +111,7 @@ export async function ArduinoCompile(
       makeArgs.push('PAUSED=true');
     }
     const compile = spawn('make', makeArgs, {
-      cwd: outputDir,
+      cwd: arduinoSketchDir,
     });
 
     compile.stdout.on('data', (data) => {
@@ -179,10 +179,10 @@ async function ArduinoFlash(
   });
 }
 
-export async function ArduinoClean(outputDir: string): Promise<number> {
+export async function ArduinoClean(arduinoSketchDir: string): Promise<number> {
   return await new Promise<number>((resolve, reject) => {
     const clean = spawn('make', ['clean'], {
-      cwd: outputDir,
+      cwd: arduinoSketchDir,
     });
 
     clean.stdout.on('data', (data) => {
