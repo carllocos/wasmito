@@ -131,6 +131,10 @@ export class HookOnError extends APIRequest<HookOnErrorResponse> {
     return response;
   }
 
+  override isSubscriptionClosed(): boolean {
+    return false;
+  }
+
   override handleSubscriptionData(data: string): void {
     try {
       const msg = new HookOnErrorSubsriptionMessage(data);

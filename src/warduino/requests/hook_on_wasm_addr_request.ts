@@ -50,6 +50,7 @@ export class HookOnWasmAddrRequest extends APIRequest<HookOnWasmAddrResponse> {
   private moment: HookOnWasmAddrMoment;
   private readonly interruptNr: Instruction;
   protected isaddRequest: boolean; // true for add, false for remove;
+  private subscriptionActive: boolean;
 
   constructor(wasmAddr: number) {
     super();
@@ -59,6 +60,7 @@ export class HookOnWasmAddrRequest extends APIRequest<HookOnWasmAddrResponse> {
     this.interruptNr = Instruction.HookOnWasmAddr;
     this.isaddRequest = true;
     this.logger = createLogger('HookOnWasmAddrRequest');
+    this.subscriptionActive = true;
   }
 
   before(): HookOnWasmAddrRequest {
@@ -117,6 +119,14 @@ export class HookOnWasmAddrRequest extends APIRequest<HookOnWasmAddrResponse> {
     } else {
       throw err;
     }
+  }
+
+  override isSubscriptionClosed(): boolean {
+    return !this.subscriptionActive;
+  }
+
+  closeSubscription(): void {
+    this.subscriptionActive = false;
   }
 
   override handleSubscriptionData(data: string): void {
@@ -178,5 +188,9 @@ export class RemoveHookOnWasmAddrRequest extends HookOnWasmAddrRequest {
   constructor(wasmAddr: number) {
     super(wasmAddr);
     this.isaddRequest = false;
+  }
+
+  override isSubscriptionClosed(): boolean {
+    return true;
   }
 }

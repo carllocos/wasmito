@@ -40,6 +40,10 @@ export abstract class FunCallRequest<R> extends APIRequestNoSubscription<R> {
     return this.encodeRemoteCallRequest();
   }
 
+  override isSubscriptionClosed(): boolean {
+    return true;
+  }
+
   abstract parse(input: string): R;
 
   encodeRemoteCallRequest(): string {

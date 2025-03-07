@@ -190,6 +190,10 @@ export class HookOnEventRequest extends APIRequest<HookOnEventResponse> {
     return response;
   }
 
+  override isSubscriptionClosed(): boolean {
+    return false;
+  }
+
   override handleSubscriptionData(data: string): void {
     try {
       const msg = new HookOnEventSubsriptionMessage(data);

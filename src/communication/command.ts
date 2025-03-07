@@ -1,8 +1,5 @@
 import { getGlobalLogger } from '../logger/logger';
-import {
-  APIRequestNoSubscription,
-  type APIRequest,
-} from '../warduino/api/request_interface';
+import { type APIRequest } from '../warduino/api/request_interface';
 import { type Channel } from './channel_interface';
 
 export class Command<T> {
@@ -22,7 +19,7 @@ export class Command<T> {
     this.rejected = false;
     this.onDataListener = (data: string) => {
       if (this.resolved || this.rejected) {
-        if (this.request instanceof APIRequestNoSubscription) {
+        if (this.request.isSubscriptionClosed()) {
           this.connection.removeOnData(this.onDataListener);
         } else {
           this.request.handleSubscriptionData(data);

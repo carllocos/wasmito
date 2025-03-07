@@ -7,10 +7,14 @@ export abstract class APIRequest<R> {
   abstract getData(): string;
   abstract parse(input: string): R;
   abstract handleSubscriptionData(data: string): void;
+  abstract isSubscriptionClosed(): boolean;
 }
 
 export abstract class APIRequestNoSubscription<R> extends APIRequest<R> {
   override handleSubscriptionData(data: string): void {}
+  override isSubscriptionClosed(): boolean {
+    return true;
+  }
 }
 
 export enum ResponseType {
