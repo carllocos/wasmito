@@ -1,6 +1,6 @@
 import * as net from 'net';
-import { waitForPortToBeUsed } from '../util/socket_util';
 import { AbstractChannel } from './abstract_channel';
+import { waitMilliSeconds } from '../util/promise_util';
 
 function createLoggerName(prefix: string, host: string, port: number): string {
   if (prefix === '') {
@@ -51,38 +51,62 @@ export class ClientSideSocket extends AbstractChannel {
   }
 
   public async open(timeout?: number): Promise<boolean> {
-    const isPortOpen = await waitForPortToBeUsed(this.port, this.host, timeout);
-    if (!isPortOpen) {
-      return false;
-    }
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises, no-async-promise-executor
+    return new Promise(async (resolve) => {
+      const waitBeforeNextAttempt = 1000;
+      await waitMilliSeconds(waitBeforeNextAttempt);
+      this.connection = await this.createConnection();
+      let totalTimeWaited = 0;
+      while (this.connection === undefined) {
+        if (timeout !== undefined && timeout <= totalTimeWaited) {
+          break;
+        }
+        await waitMilliSeconds(waitBeforeNextAttempt);
+        totalTimeWaited += waitBeforeNextAttempt;
+        this.connection = await this.createConnection();
+      }
+
+      if (this.connection !== undefined) {
+        this.connection.on('connect', () => {
+          this.logger.debug('connected');
+        });
+
+        this.connection.on('data', (data: Buffer) => {
+          this.onDataHandler(data);
+        });
+
+        this.connection.on('error', (err) => {
+          this.logger.error(err.toString());
+        });
+
+        this.connection.on('close', (hadError: boolean) => {
+          if (hadError) {
+            this.logger.error('closed with error');
+          } else {
+            this.logger.info('closed');
+          }
+        });
+        this.connection.on('end', () => {
+          this.logger.info('end transmission');
+        });
+      }
+      resolve(this.connection !== undefined);
+    });
+  }
+
+  async createConnection(): Promise<net.Socket | undefined> {
     return new Promise((resolve) => {
       const addr = { port: this.port, host: this.host };
-      this.connection = new net.Socket();
-      this.connection.connect(addr, () => {
+      const s = new net.Socket();
+      s.connect(addr, () => {
         this.logger.info(`connecting to ${this.host}:${this.port}`);
       });
-
-      this.connection.on('data', (data: Buffer) => {
-        this.onDataHandler(data);
+      s.on('connect', () => {
+        resolve(s);
       });
-      this.connection.on('connect', () => {
-        resolve(true);
-      });
-      this.connection.on('error', (err) => {
+      s.on('error', (err) => {
         this.logger.error(err.toString());
-        if (this.connection !== undefined) {
-          resolve(false);
-        }
-      });
-      this.connection.on('close', (hadError: boolean) => {
-        if (hadError) {
-          this.logger.error('closed with error');
-        } else {
-          this.logger.info('closed');
-        }
-      });
-      this.connection.on('end', () => {
-        this.logger.info('end transmission');
+        resolve(undefined);
       });
     });
   }
