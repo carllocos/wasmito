@@ -317,10 +317,9 @@ function makeBreakpointThrowSnapshotAndRun(breakpoint: Breakpoint): Breakpoint {
     h.scheduleOnce();
     newHooks.push(h);
   } else {
-    const h = inspectHook as InspectStateHook;
-    h.stateToInspect.includeAll();
-    h.scheduleOnce();
-    newHooks.push(h);
+    inspectHook.stateToInspect.includeAll();
+    inspectHook.scheduleOnce();
+    newHooks.push(inspectHook);
   }
   breakpoint.hooks = newHooks;
   return breakpoint;

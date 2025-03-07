@@ -99,8 +99,7 @@ export class Breakpoint implements ISubscription<WasmState> {
       throw Error(`One Inspect State Hook is at least required`);
     }
 
-    const hook = inspectHook as InspectStateHook;
-    hook.subscribe(this.fanOutToListeners);
+    inspectHook.subscribe(this.fanOutToListeners);
     this._hooks = newHooks;
   }
 
