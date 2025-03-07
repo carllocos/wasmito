@@ -154,20 +154,29 @@ export function registerCFGCommand(program: Command): void {
         const sourceCFGsOutputDir = path.join(outputDir, `/source/`);
         createDirectoryIfUnexisting(sourceCFGsOutputDir);
         logger.info(`Converting Source CFGs to dot`);
-        langAdaptor.sourceCFG.serializeToDot(sourceCFGsOutputDir, {
-          includeInstructions: false,
-          includeEmptySCFG: false,
-          includeExitNode: options.dotNoExitnode === undefined,
-          includeEntryNode: options.dotNoEntrynode === undefined,
-        });
+        const dotNameIfTooLong = 'sourcecfg';
+        langAdaptor.sourceCFG.serializeToDot(
+          sourceCFGsOutputDir,
+          {
+            includeInstructions: false,
+            includeEmptySCFG: false,
+            includeExitNode: options.dotNoExitnode === undefined,
+            includeEntryNode: options.dotNoEntrynode === undefined,
+          },
+          dotNameIfTooLong,
+        );
         const sourceWithInstrs = path.join(outputDir, `/source_with_instrs/`);
         createDirectoryIfUnexisting(sourceWithInstrs);
-        langAdaptor.sourceCFG.serializeToDot(sourceWithInstrs, {
-          includeInstructions: true,
-          includeEmptySCFG: false,
-          includeExitNode: options.dotNoExitnode === undefined,
-          includeEntryNode: options.dotNoEntrynode === undefined,
-        });
+        langAdaptor.sourceCFG.serializeToDot(
+          sourceWithInstrs,
+          {
+            includeInstructions: true,
+            includeEmptySCFG: false,
+            includeExitNode: options.dotNoExitnode === undefined,
+            includeEntryNode: options.dotNoEntrynode === undefined,
+          },
+          dotNameIfTooLong,
+        );
         if (callgraphOutputPath !== undefined) {
           logger.info(`Converting Callgraph to dot at ${callgraphOutputPath}`);
           langAdaptor.sourceCFG.wasmCFG.callgraph.toDot(callgraphOutputPath);
@@ -188,7 +197,7 @@ export function registerCFGCommand(program: Command): void {
           if (!isDirectoryPath(coarseOutPutDir)) {
             mkdirSync(coarseOutPutDir);
           }
-          coarseCFGs.serializeToDot(coarseOutPutDir);
+          coarseCFGs.serializeToDot(coarseOutPutDir, dotNameIfTooLong);
         }
 
         if (unusedMappings !== undefined) {
