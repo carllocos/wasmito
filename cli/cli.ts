@@ -53,6 +53,7 @@ export function startCLI(): void {
   registerDevicesCommand(program);
   registerUploadCommand(program);
   registerDebugOpCommand(program);
+  registerWasmParseCommand(program);
 
   program.parse(process.argv);
 
