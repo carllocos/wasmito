@@ -17,6 +17,7 @@ import {
 } from '../parsers/obj-dump_parser';
 import { getPath2ObjDump } from '../../project_config';
 import { isCallInstruction, type WasmInstruction } from './wasm_instruction';
+import { wasmOpcodeNameFromNumber } from './wasm_opcode';
 
 const logger = createLogger('WasmModule');
 export interface WasmGlobal {
@@ -237,6 +238,36 @@ export class WasmModule {
     }
 
     return undefined;
+  }
+
+  toJSON(): object {
+    const functions: object[] = [];
+
+    for (const f of this.functions) {
+      const allInstructions: object[] = [];
+      for (const instr of f.allInstructions) {
+        allInstructions.push({
+          name: wasmOpcodeNameFromNumber(instr.opcodeNr),
+          opcode: instr.opcodeNr,
+          opcodeHex: `0x${instr.opcodeNr.toString(16)}`,
+          start: instr.startAddress,
+          end: instr.endAddress,
+          startHex: `0x${instr.startAddress.toString(16)}`,
+          endHex: `0x${instr.endAddress.toString(16)}`,
+          immediate: instr.immediate ?? -1,
+          args: instr.args,
+        });
+      }
+      functions.push({
+        name: f.name,
+        idx: f.id,
+        body: allInstructions,
+      });
+    }
+    return {
+      wasmPath: this.wasmPath,
+      functions,
+    };
   }
 }
 
