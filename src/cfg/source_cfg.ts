@@ -103,7 +103,7 @@ export class SourceControlFlowGraph {
 
   nodesFromSourceLoc(location: SourceCodeLocation): SourceCFGNode[] {
     logger.debug(
-      `get genereatedPosition for Location {${location.source}, ${location.linenr}, ${location.colnr}}`,
+      `get generatedPosition for Location {${location.source}, ${location.linenr}, ${location.colnr}}`,
     );
 
     let mappings: SourceCodeLocation[] = [];

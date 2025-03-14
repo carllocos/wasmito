@@ -2,9 +2,6 @@
 
 set -e
 
-echo "> WasmiTo: installing"
-yarn install
-
 echo "> WasmiTo: fetching submodules"
 git submodule update --init
 
@@ -57,3 +54,5 @@ fi
 LIBS_PATH=$(eval pwd)/libs
 echo "WARDUINO_SDK=$LIBS_PATH/WARDuino" >> $SDK_CONFIG_FILE
 echo "WABT=$LIBS_PATH/wabt" >> $SDK_CONFIG_FILE
+
+npm install && npm run build
