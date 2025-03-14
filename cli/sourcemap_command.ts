@@ -34,9 +34,12 @@ export function registerSourceMapCommand(program: Command): void {
     .option(
       '-s, --source-spec <path-to-source-spec>',
       `reads the debugging information from the given file that points to a SourceMap Spec
-      of the given wasm module iteself.`,
+      of the given wasm module itself.`,
     )
-    .option('-r, --rebase-locations <path-to-config.json>')
+    .option(
+      '-r, --rebase-locations <path-to-config.json>',
+      'a json file containing one of the following fields:\n{ "absolutePaths": [["old_path1", "new_path2"], ["old_path2", "new_path2"]],\n"prefixSources": "prefix_path"}',
+    )
     .option(
       '--all-mappings',
       'include also the source mappings for files that do not exist on the current machine',
