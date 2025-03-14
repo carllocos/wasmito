@@ -10,8 +10,8 @@ import {
 import {
   equalSourceCodeLocations,
   sourceCodeLocationToString,
+  SourceMap,
   type SourceCodeLocation,
-  type SourceMap,
 } from '../source_mappers/source_map';
 import {
   isBranchingInstruction,
@@ -58,7 +58,9 @@ interface DotMetaData {
 export class SourceControlFlowGraph {
   private readonly _astGraphs: Map<number, BinaryLiftedCFG>;
   private readonly _allGraphNodes: SourceCFGNode[];
-  private readonly _sourceMap: SourceMap;
+
+  private _sourceMap: SourceMap | undefined;
+  public readonly fullSourceMap: SourceMap;
   private readonly _wasmCFG: WasmControlFlowGraph;
 
   constructor(
@@ -66,7 +68,7 @@ export class SourceControlFlowGraph {
     sourceMap: SourceMap,
     cfg: WasmControlFlowGraph,
   ) {
-    this._sourceMap = sourceMap;
+    this.fullSourceMap = sourceMap;
     this._wasmCFG = cfg;
     this._astGraphs = buildSourceCFGraph(sourceMap, cfg);
     let allnodes: SourceCFGNode[] = [];
@@ -77,7 +79,18 @@ export class SourceControlFlowGraph {
   }
 
   get sourceMap(): SourceMap {
+    if (this._sourceMap === undefined) {
+      this._sourceMap = this.keepLocationsOfNodes(this.fullSourceMap);
+    }
     return this._sourceMap;
+  }
+
+  private keepLocationsOfNodes(sourcemap: SourceMap): SourceMap {
+    const mappings = this.allNodes().map((n) =>
+      Object.assign({}, n.sourceLocation),
+    );
+    const sm = new SourceMap(sourcemap, sourcemap.sources, mappings);
+    return sm;
   }
 
   get wasmCFG(): WasmControlFlowGraph {
@@ -108,12 +121,12 @@ export class SourceControlFlowGraph {
 
     let mappings: SourceCodeLocation[] = [];
     if (location.address > 0) {
-      mappings = this._sourceMap.getOriginalPositionFor(location.address);
+      mappings = this.sourceMap.getOriginalPositionFor(location.address);
       logger.debug(
         `#${mappings.length} mappings found for Location ${sourceCodeLocationToString(location)}`,
       );
     } else {
-      mappings = this._sourceMap.generatedPositionFor(location);
+      mappings = this.sourceMap.generatedPositionFor(location);
       logger.debug(
         `#${mappings.length} mappings found for Location {${location.source}, ${location.linenr}, ${location.colnr}}`,
       );
@@ -225,7 +238,7 @@ export class SourceControlFlowGraph {
   ): string[] {
     const funIds = config.funIds ?? [];
     if (funIds.length === 0) {
-      this._sourceMap.wasm.functions.forEach((f) => funIds.push(f.id));
+      this.sourceMap.wasm.functions.forEach((f) => funIds.push(f.id));
     }
 
     const seenDotFileNames = new Set<string>();
@@ -296,7 +309,7 @@ export class SourceControlFlowGraph {
       funID: number;
       graph: object;
     }> = [];
-    for (const f of this._sourceMap.wasm.functions) {
+    for (const f of this.sourceMap.wasm.functions) {
       const g = this._astGraphs.get(f.id);
       if (g !== undefined) {
         fgs.push({
@@ -307,14 +320,14 @@ export class SourceControlFlowGraph {
     }
 
     const content: object = {
-      wasmPath: this._sourceMap.wasm.wasmPath,
+      wasmPath: this.sourceMap.wasm.wasmPath,
       graphs: fgs,
     };
 
     const json = JSON.stringify(content);
     if (outputDir !== undefined) {
       const includeExtension = false;
-      const fn = getFileName(this._sourceMap.wasm.wasmPath, includeExtension);
+      const fn = getFileName(this.sourceMap.wasm.wasmPath, includeExtension);
       const destinationPath = path.join(outputDir, `${fn}.source.json`);
       writeFileSync(destinationPath, json);
     }
