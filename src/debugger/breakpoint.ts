@@ -6,10 +6,11 @@ import { InspectStateHook } from '../hooks/hook_inspect_state';
 import { createLogger } from '../logger/logger';
 import type winston from 'winston';
 import {
-  equalSourceCodeLocations,
   sourceCodeLocationToString,
+  strictEqualSourceCodeLocations,
   type SourceCodeLocation,
 } from '../source_mappers/source_map';
+import { HookOnWasmAddrRequest } from '../warduino/requests/hook_on_wasm_addr_request';
 
 // TODO reimplement as extension to HookWithSub? Although this is bound to an address and should be extensible to support binding to events
 export class Breakpoint implements ISubscription<WasmState> {
@@ -106,7 +107,7 @@ export class Breakpoint implements ISubscription<WasmState> {
   equals(other: Breakpoint): boolean {
     const thisLoc = this.sourceCodeLocation;
     const otherLoc = other.sourceCodeLocation;
-    return equalSourceCodeLocations(thisLoc, otherLoc);
+    return strictEqualSourceCodeLocations(thisLoc, otherLoc);
   }
 
   toString(): string {

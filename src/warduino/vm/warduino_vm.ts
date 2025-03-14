@@ -67,11 +67,14 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   private _breakpointPolicy: BreakpointPolicy;
   private readonly _funcsProxied: Map<WASMFunction, AroundFunctionRequest>;
 
+  public readonly hooksStore: Map<number, HookOnWasmAddrRequest[]>;
+
   constructor(platform: Platform, communicationChannel: Channel) {
     this._platform = platform;
     this._channel = communicationChannel;
     this.onNewEventHook = new EventInspectHook();
     this.onNewEventHookAdded = false;
+    this.hooksStore = new Map();
     this._breakpointPolicy = new BreakpointDefaultPolicy(this);
     this._funcsProxied = new Map();
   }
@@ -411,7 +414,13 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
     }
     const req = new HookOnWasmAddrRequest(addr, moment).addHook(hook);
     const response = await this.sendRequest(req, timeout);
-    return isSuccessfulMessage(response);
+    const s = isSuccessfulMessage(response);
+    if (s) {
+      const requests = this.hooksStore.get(addr) ?? [];
+      requests.push(req);
+      this.hooksStore.set(addr, requests);
+    }
+    return s;
   }
 
   async addHookOnNewEvent(
