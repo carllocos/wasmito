@@ -385,10 +385,15 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
   ): Promise<boolean> {
     const sm = this.sourceMap;
     let addr = -1;
-    let mappings = sm.generatedPositionFor(sourceCodeLocation);
+    let mappings: SourceCodeLocation[] = [];
+    if (sourceCodeLocation.address > 0) {
+      mappings = sm.getOriginalPositionFor(sourceCodeLocation.address);
+    }
     if (mappings.length === 0) {
       mappings = sm.getOriginalPositionFor(sourceCodeLocation.address);
     }
+
+    sm.generatedPositionFor(sourceCodeLocation);
     if (mappings.length !== 0) {
       addr = mappings[0].address;
     } else {

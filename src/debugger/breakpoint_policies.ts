@@ -78,18 +78,22 @@ export abstract class BreakpointPolicy {
       return false;
     }
     const sm = this.vm.sourceMap;
-    let mappings = sm.generatedPositionFor(breakpoint.sourceCodeLocation);
-    let addr = -1;
-    if (mappings.length === 0) {
+
+    let mappings: SourceCodeLocation[] = [];
+    if (breakpoint.sourceCodeLocation.address > 0) {
       mappings = sm.getOriginalPositionFor(
         breakpoint.sourceCodeLocation.address,
       );
     }
+    if (mappings.length === 0) {
+      mappings = sm.generatedPositionFor(breakpoint.sourceCodeLocation);
+    }
 
+    let addr = -1;
     if (mappings.length > 0) {
       addr = mappings[0].address;
     } else {
-      // might not be a sourcemap and user is tagetting a wasm addr
+      // might not be a sourcemap and user is targeting a wasm addr
 
       const instr = sm.wasm.getInstruction(
         breakpoint.sourceCodeLocation.address,
