@@ -118,4 +118,15 @@ export class Breakpoint implements ISubscription<WasmState> {
   toString(): string {
     return sourceCodeLocationToString(this.sourceCodeLocation);
   }
+
+  createRequests(): HookOnWasmAddrRequest[] {
+    const requests: HookOnWasmAddrRequest[] = [];
+    for (const hook of this.hooks) {
+      const req = new HookOnWasmAddrRequest(this.sourceCodeLocation.address)
+        .addHook(hook)
+        .before();
+      requests.push(req);
+    }
+    return requests;
+  }
 }
