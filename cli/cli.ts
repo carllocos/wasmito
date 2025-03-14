@@ -26,6 +26,10 @@ import { registerUploadCommand } from './upload_command';
 import { registerDebugOpCommand } from './debugop_command';
 import { registerWCFGCommand } from './wcfg_command';
 import { registerWasmParseCommand } from './wasmparse_command';
+import { registerEventRequestCommand } from './event_command';
+import { registerBreakpointRequestCommand } from './breakpoint_command';
+import { registerRunningRequestCommand } from './running_command';
+import { registerCompileCommand } from './compile_command';
 
 export function startCLI(): void {
   const projectName = readProjectName();
@@ -52,8 +56,12 @@ export function startCLI(): void {
   registerProjectCommand(program);
   registerDevicesCommand(program);
   registerUploadCommand(program);
+  registerCompileCommand(program);
   registerDebugOpCommand(program);
   registerWasmParseCommand(program);
+  registerEventRequestCommand(program);
+  registerBreakpointRequestCommand(program);
+  registerRunningRequestCommand(program);
 
   program.parse(process.argv);
 
