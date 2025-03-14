@@ -77,9 +77,10 @@ export function startCLI(): void {
   if (logLevel === undefined) {
     getGlobalLogger().error(`Invalid log level '${logLevel}'`);
     process.exit(-1);
-  } else {
-    getGlobalLogger().info(`Setting log-level to '${logLevel}'`);
   }
+  // else {
+  //   getGlobalLogger().info(`Setting log-level to '${logLevel}'`);
+  // }
   setLogLevel(logLevel);
   setGlobalLoggerName('CLI');
 
