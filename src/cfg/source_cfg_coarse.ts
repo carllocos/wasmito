@@ -110,7 +110,7 @@ export class CoarseGrainedSourceCFGraph {
     const m = new Map<number, CoarseFunctionGraph>();
     const funcs = scfgs.sourceMap.wasm.functions.map((f) => f.id);
     for (const fid of funcs) {
-      const funCFG = scfgs.getFuntionSourceCFG(fid);
+      const funCFG = scfgs.getFunctionSourceCFG(fid);
       if (funCFG === undefined) {
         continue;
       }

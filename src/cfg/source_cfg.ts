@@ -232,7 +232,7 @@ export class SourceControlFlowGraph {
     const dots: string[] = [];
     const metadata: DotMetaData[] = [];
     for (const fid of funIds) {
-      const fg = this.getFuntionSourceCFG(fid);
+      const fg = this.getFunctionSourceCFG(fid);
       if (fg === undefined || fg.entryNodes.length === 0) {
         continue;
       }
