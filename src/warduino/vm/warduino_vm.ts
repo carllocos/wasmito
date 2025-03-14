@@ -404,24 +404,12 @@ export abstract class WARDuinoVM implements WARDuinoAPI {
       const instr = sm.wasm.getInstruction(sourceCodeLocation.address);
       if (instr === undefined) {
         throw new this.ErrorClass(
-          `Cannot set hook upon unexisting wasm address derived from source location ${sourceCodeLocationToString(sourceCodeLocation)}`,
+          `Cannot set hook upon inexistent wasm address derived from source location ${sourceCodeLocationToString(sourceCodeLocation)}`,
         );
       }
       addr = instr.startAddress;
     }
-    const req = new HookOnWasmAddrRequest(addr).addHook(hook);
-    switch (moment) {
-      case HookOnWasmAddrMoment.HookBefore:
-        req.before();
-        break;
-      case HookOnWasmAddrMoment.HookAfter:
-        req.after();
-        break;
-      default:
-        throw new this.ErrorClass(
-          'Cannot set hook upon unexisting hook moment',
-        );
-    }
+    const req = new HookOnWasmAddrRequest(addr, moment).addHook(hook);
     const response = await this.sendRequest(req, timeout);
     return isSuccessfulMessage(response);
   }

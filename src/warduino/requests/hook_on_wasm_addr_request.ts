@@ -52,11 +52,11 @@ export class HookOnWasmAddrRequest extends APIRequest<HookOnWasmAddrResponse> {
   protected isaddRequest: boolean; // true for add, false for remove;
   private subscriptionActive: boolean;
 
-  constructor(wasmAddr: number) {
+  constructor(wasmAddr: number, moment?: HookOnWasmAddrMoment) {
     super();
     this.wasmAddr = wasmAddr;
     this.hooks = [];
-    this.moment = HookOnWasmAddrMoment.HookBefore;
+    this.moment = moment ?? HookOnWasmAddrMoment.HookBefore;
     this.interruptNr = Instruction.HookOnWasmAddr;
     this.isaddRequest = true;
     this.logger = createLogger('HookOnWasmAddrRequest');
