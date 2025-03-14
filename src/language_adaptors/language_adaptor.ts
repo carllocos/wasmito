@@ -50,6 +50,13 @@ export class LanguageAdaptor {
     return this._srcCfg;
   }
 
+  get sourceCFGs(): SourceControlFlowGraph {
+    if (this._srcCfg === undefined) {
+      throw new Error(`SourceControlFlowGraphs were not constructed`);
+    }
+    return this._srcCfg;
+  }
+
   async buildComplementaryContext(): Promise<void> {
     await this.buildASTS();
     this.buildSourceCFG();
@@ -121,17 +128,17 @@ export class LanguageAdaptor {
     const availableSources: Array<[string, LanguageConfiguration]> = [];
     for (const s of this.sourceMap.sources) {
       if (!isFilePath(s)) {
-        logger.debug(
-          `Will not create an AST for source file ${s} as such filepath does not exist `,
-        );
+        // logger.debug(
+        //   `Will not create an AST for source file ${s} as such filepath does not exist `,
+        // );
         continue;
       }
 
       const ext = getFileExtension(s);
       if (ext === undefined) {
-        logger.debug(
-          `Will not create an AST for source file ${s} as such filepath has no file extension`,
-        );
+        // logger.debug(
+        //   `Will not create an AST for source file ${s} as such filepath has no file extension`,
+        // );
         continue;
       }
       const conf = getLangConfigFromExtension(ext);
