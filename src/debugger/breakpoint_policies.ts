@@ -111,6 +111,13 @@ export abstract class BreakpointPolicy {
     const response = await this.vm.sendRequest(request, timeout);
     const successful = isSuccessfulMessage(response);
     if (successful) {
+      const hooksRequests = this.vm.hooksStore.get(addr) ?? [];
+      for (const hq of hooksRequests) {
+        hq.closeSubscription();
+      }
+      if (hooksRequests.length > 0) {
+        this.vm.hooksStore.set(addr, []);
+      }
       this._breakpoints = this._breakpoints.filter((b) => {
         return !breakpoint.equals(b);
       });
