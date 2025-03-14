@@ -119,23 +119,23 @@ export class SystemTester {
       }
       await this.setupDevice(scenario, targetDeviceID);
       await this.runTestScenario(targetDeviceID, scenario, scenarioResult);
-      this.reportScenario(scenarioResult);
+      this.reportScenario(targetDeviceID, scenarioResult);
     }
 
     this.reportScenarios(
       this.testScenarios.map((v) => {
-        return v[2];
+        return [v[0], v[2]];
       }),
     );
     await this.systemDeployer.close();
     return this.testScenarios.map((v) => v[2]);
   }
 
-  private reportScenario(result: TestScenarioResult): void {
+  private reportScenario(deviceID: string, result: TestScenarioResult): void {
     // const padding = this.longestDescriptionLength(result);
     const testNameTitle = `${
       result.scenario.testName
-    } [${result.result.toUpperCase()}]`;
+    } [${result.result.toUpperCase()}] [device=${deviceID}]`;
     const titleLength = testNameTitle.length;
     const separator = '='.repeat(titleLength);
     console.log();
@@ -178,13 +178,15 @@ export class SystemTester {
     }
   }
 
-  private reportScenarios(testScenarios: TestScenarioResult[]): void {
+  private reportScenarios(
+    testScenarios: Array<[DeviceID, TestScenarioResult]>,
+  ): void {
     console.log();
     console.log();
     console.log(`Report of #${testScenarios.length} TestScenarios`);
     console.log();
-    for (let i = 0; i < testScenarios.length; i++) {
-      this.reportScenario(testScenarios[i]);
+    for (const [deviceID, scenario] of testScenarios) {
+      this.reportScenario(deviceID, scenario);
     }
     console.log();
   }
@@ -359,9 +361,7 @@ export class SystemTester {
     const valueForCheck = result[0];
     const successfulCheck = await action.checkSetupSuccess(valueForCheck);
     if (successfulCheck) {
-      console.debug(
-        `${logPrefix} #${actionIndex}: successful Subscription setup for '${action.subscriptionID}'`,
-      );
+      console.debug(`${logPrefix} #${actionIndex}: success`);
       const hook = result[1];
       if (action.store === undefined || action.store) {
         hook.subscribe((v: any) => {
@@ -543,7 +543,7 @@ export class SystemTester {
     actionIdx: number,
   ): Promise<[T, boolean]> {
     console.debug(
-      `${logPrefix} #${actionIdx}: setting up subscribe to '${action.subscribeToID}'`,
+      `${logPrefix} #${actionIdx}: subscribe to '${action.subscribeToID}'`,
     );
     const p = new Promise<[T, boolean]>((resolve, reject) => {
       const cb = (r: T): void => {
