@@ -25,6 +25,7 @@ export interface ISubscription<SubscriptionType> {
   readonly unSubscribe: (calllback: (value: SubscriptionType) => void) => void;
   readonly onSubscriptionData: (data: SubscriptionType) => void;
   readonly parseSubscriptionData: (input: any) => SubscriptionType;
+  readonly clearSubscriptions: () => void;
 }
 
 export type SubscriptionHook<SubscriptionType> =
@@ -100,6 +101,7 @@ export abstract class HookWithSubscription<SubscriptionType>
 
   onSubscriptionData(value: SubscriptionType): void {
     if (this.listeners.length === 0 && this.oneTimeListeners.length === 0) {
+      return;
     }
     this.listeners.forEach((listener) => {
       if (!this.removedListeners.has(listener)) {
@@ -114,6 +116,12 @@ export abstract class HookWithSubscription<SubscriptionType>
       listener(value);
     });
     this.oneTimeListeners = [];
+  }
+
+  clearSubscriptions(): void {
+    this.removedListeners.clear();
+    this.oneTimeListeners.length = 0;
+    this.listeners.length = 0;
   }
 
   abstract parseSubscriptionData(input: any): SubscriptionType;

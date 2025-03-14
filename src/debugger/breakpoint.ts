@@ -90,6 +90,11 @@ export class Breakpoint implements ISubscription<WasmState> {
     this.removedListeners.clear();
   }
 
+  clearSubscriptions(): void {
+    this.listeners.length = 0;
+    this.removedListeners.clear();
+  }
+
   get hooks(): Hook[] {
     return this._hooks;
   }

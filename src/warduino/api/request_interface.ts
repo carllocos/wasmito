@@ -1,3 +1,5 @@
+import { type Channel } from '../../communication/channel_interface';
+import { Command } from '../../communication/command';
 import { getInstructionFromString, type Instruction } from './instructions';
 
 export class APIRequestInvalidParse extends Error {}
@@ -111,4 +113,13 @@ function createMessageFromJSON(content: any): RequestMessage | undefined {
 
 export function createRequestMessage(obj: any): RequestMessage | undefined {
   return createMessageFromJSON(obj);
+}
+
+export async function sendRequest<T>(
+  channel: Channel,
+  request: APIRequest<T>,
+  timeout?: number,
+): Promise<T> {
+  const command = new Command(channel, request, timeout);
+  return command.execute();
 }
