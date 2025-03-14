@@ -8,6 +8,7 @@ import { type WARDuinoVM } from '../warduino/vm/warduino_vm';
 import { isSuccessfulMessage } from '../warduino/api/request_interface';
 import { StateRequest } from '../warduino/requests/inspect_request';
 import { PauseVMHook } from '../hooks/hook_run_pause';
+import { type SourceCodeLocation } from '../source_mappers';
 
 export abstract class BreakpointPolicy {
   protected readonly vm: WARDuinoVM;
@@ -40,7 +41,7 @@ export abstract class BreakpointPolicy {
     timeout?: number,
   ): Promise<boolean> {
     if (this.hasBreakpoint(breakpoint)) {
-      this.logger.warn(`breakpoint ${breakpoint.toString()} was already set`);
+      this.logger.warn(`breakpoint was already set ${breakpoint.toString()}`);
       return true;
     }
     let successful = true;
@@ -58,7 +59,7 @@ export abstract class BreakpointPolicy {
     }
 
     if (successful) {
-      this.logger.info(`breakpoint ${breakpoint.toString()} added`);
+      this.logger.info(`breakpoint added ${breakpoint.toString()}`);
       this.breakpoints.push(breakpoint);
       this.informListenersOfAddBp(breakpoint);
     } else {
@@ -100,7 +101,7 @@ export abstract class BreakpointPolicy {
       );
       if (instr === undefined) {
         throw new Error(
-          `Cannot remove breakpoint on an unexisting wasm address derived from breakpoint ${breakpoint.toString()}`,
+          `Cannot remove breakpoint on an inexistent wasm address derived from breakpoint ${breakpoint.toString()}`,
         );
       }
       addr = instr.startAddress;
@@ -121,7 +122,7 @@ export abstract class BreakpointPolicy {
       this._breakpoints = this._breakpoints.filter((b) => {
         return !breakpoint.equals(b);
       });
-      this.logger.info(`breakpoint ${breakpoint.toString()} removed`);
+      this.logger.info(`breakpoint removed ${breakpoint.toString()}`);
       this.informListenersOfRemoveBp(breakpoint);
     }
 
