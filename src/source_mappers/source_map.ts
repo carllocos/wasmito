@@ -19,6 +19,13 @@ export function equalSourceCodeLocations(
   );
 }
 
+export function strictEqualSourceCodeLocations(
+  loc1: SourceCodeLocation,
+  loc2: SourceCodeLocation,
+): boolean {
+  return equalSourceCodeLocations(loc1, loc2) && loc1.address === loc2.address;
+}
+
 export interface SourceCodeLocation {
   source: string;
   address: number;
