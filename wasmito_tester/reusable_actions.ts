@@ -35,7 +35,7 @@ export function addBreakpointSubscription(
   const act: SubscriptionEmitterAction<boolean, WasmState, InspectStateHook> = {
     subscriptionID,
     timeout,
-    description: `add a breakpoint ${breakpoint.toString()}`,
+    description: `add breakpoint ${breakpoint.toString()}`,
     setupSubscription: async (
       device: WARDuinoVM,
     ): Promise<SubActReturn<boolean, WasmState, InspectStateHook>> => {
@@ -488,7 +488,7 @@ export function SubscribeOnBPReached(
   timeout?: number,
   delay?: number,
 ): SubscribeAction<WasmState, InspectStateHook> {
-  const description = `wait ${timeout === undefined ? '' : `max ${timeout}`} for bp reach with id ${id}`;
+  const description = `wait ${timeout === undefined ? '' : `max ${timeout}`} for '${id}'`;
   const act = {
     subscribeToID: id,
     description,
