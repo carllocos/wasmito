@@ -350,11 +350,12 @@ function createWasmFunctions(
             throw new Error(`Could not convert ${local.type} to WASM type`);
           }
           t = newType;
-        } else {
-          logger.warn(
-            `Failed to find type of local index ${l.localIndex} named '${l.value}' of function id ${funID}`,
-          );
         }
+        // else {
+        //   logger.warn(
+        //     `Failed to find type of local index ${l.localIndex} named '${l.value}' of function id ${funID}`,
+        //   );
+        // }
         return {
           index: l.localIndex,
           name: l.value,
