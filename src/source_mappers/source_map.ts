@@ -192,7 +192,9 @@ export class SourceMap {
   }
 
   get mappings(): SourceCodeLocation[] {
-    return this._mappings;
+    return this._mappings.map((m) => {
+      return Object.assign({}, m);
+    });
   }
 
   public generatedPositionFor(
@@ -217,6 +219,10 @@ export class SourceMap {
       `#${positions.length} found for SourceLoc {${location.source}, ${location.linenr}, ${location.colnr}}`,
     );
     return positions;
+  }
+
+  public allMappings(): SourceCodeLocation[] {
+    return this._mappings;
   }
 
   // move next method to AST
