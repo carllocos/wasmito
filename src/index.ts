@@ -13,3 +13,4 @@ export * from './language_adaptors/index';
 export * from './ast/index';
 export * from './cfg/index';
 export * from './tree-sitter/index';
+export * from '../wasmito_tester/index';
