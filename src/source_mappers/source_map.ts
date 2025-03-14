@@ -111,12 +111,13 @@ export class SourceMap {
   public readonly wasm: WasmModule;
 
   constructor(
-    wasmPath: string,
+    wasmPath: string | SourceMap,
     sources: string[],
     mappings: SourceCodeLocation[],
     config?: SourceMapConfig,
   ) {
-    this._wasmPath = wasmPath;
+    this._wasmPath =
+      wasmPath instanceof SourceMap ? wasmPath.wasm.wasmPath : wasmPath;
     this._sourceToAbsPathSource = config?.srcToAbsPath ?? new Map();
     this._ignoreDirs = config?.ignoreDirectories ?? [];
     this._prefixPath = config?.prefixSources;
@@ -184,7 +185,10 @@ export class SourceMap {
     }
 
     this._mappings = cleanedMappings;
-    this.wasm = new WasmModule(this._wasmPath);
+    this.wasm =
+      wasmPath instanceof SourceMap
+        ? wasmPath.wasm
+        : new WasmModule(this._wasmPath);
   }
 
   get sources(): string[] {
