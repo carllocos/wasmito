@@ -59,7 +59,7 @@ export class LanguageAdaptor {
 
   async buildComplementaryContext(): Promise<void> {
     await this.buildASTS();
-    this.buildSourceCFG();
+    this.buildSourceCFGs();
   }
 
   public unusedMappingsToJSON(ouputFile?: string): string {
@@ -160,7 +160,7 @@ export class LanguageAdaptor {
     }
   }
 
-  private buildSourceCFG(): void {
+  private buildSourceCFGs(): void {
     this._srcCfg = new SourceCFGs(this._asts, this.sourceMap, this._wasmCFGs);
   }
 }
