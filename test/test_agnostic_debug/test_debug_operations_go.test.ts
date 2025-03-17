@@ -10,7 +10,7 @@ import {
   sourceNodeFromLoc,
   sourceNodeLoc,
   sourceText,
-} from './resuable_code';
+} from './reusable_code';
 
 describe.skip('Debug Operations on Go Hello World', function () {
   const app = path.resolve('./test/data/go_examples/main.wasm');

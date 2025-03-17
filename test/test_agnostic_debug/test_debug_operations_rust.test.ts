@@ -12,7 +12,7 @@ import {
   sortIncreasingNr,
   sourceNodeFromLoc,
   sourceNodeLoc,
-} from './resuable_code';
+} from './reusable_code';
 
 describe.skip('Debug Operations on Rust AST Blink App', function () {
   const pathToDir = path.resolve('./test/data/rust_examples/blink/');

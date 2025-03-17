@@ -17,7 +17,7 @@ import {
   sortIncreasingNr,
   sourceNodeFromLoc,
   sourceNodeLoc,
-} from './resuable_code';
+} from './reusable_code';
 
 describe.skip('Debug Operations on AssemblyScript Blink App', function () {
   const pathToRootSource = path.resolve(
