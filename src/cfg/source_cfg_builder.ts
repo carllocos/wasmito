@@ -315,7 +315,7 @@ function sourceCFGNodeAndInstrFromDecrInstrAddrs(
  * @param nodes source level CFG nodes
  * @returns Source Level CFG and Wasm Instruction
  */
-function sourceCFGNodeAndInstrFromIncrInstrAddrs(
+export function sourceCFGNodeAndInstrFromIncrInstrAddrs(
   n: CFGNode,
   nodes: SourceCFGNode[],
 ): [SourceCFGNode, WasmInstruction] | undefined {
@@ -498,7 +498,7 @@ function binaryLiftWasmEdges(
  * @param nodesToIgnore a set of already visited node ids. This prevents to loop infinitely.
  * @returns nodes IDs that no longer need to be visited after return and the closets nodes
  */
-function closetNeighboursWithSourceNodes(
+export function closetNeighboursWithSourceNodes(
   g: WasmAddrToNodeMap,
   n: CFGNode,
   nodes: SourceCFGNode[],
