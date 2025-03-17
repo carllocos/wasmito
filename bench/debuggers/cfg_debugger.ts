@@ -45,8 +45,8 @@ export class ControlFlowGraphDBG implements DebugAPI {
         `CFGStepInto: No node found for location ${sourceCodeLocationToString(location)}`,
       );
     }
-    const destinatioNodes = DebugOperations.stepIn(this.scfgs, nodes[0]);
-    return await this.runningToDestinationNodes(destinatioNodes, timeout);
+    const destinationNodes = DebugOperations.stepIn(this.scfgs, nodes[0]);
+    return await this.runningToDestinationNodes(destinationNodes, timeout);
   }
 
   async stepOut(
