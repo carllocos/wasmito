@@ -159,7 +159,7 @@ export function stepIteration(
       //   (c)
       //  }
       // }
-      // asuming cyclepath is (a)->(c)->(l)
+      // assuming cyclepath is (a)->(c)->(l)
       // here (a) has 2 neighbours where (b)
       // is part of cycle but not cyclepath
       // then neighbour should not be added.
