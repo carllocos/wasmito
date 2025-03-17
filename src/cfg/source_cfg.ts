@@ -22,6 +22,7 @@ import { writeFileSync } from 'fs';
 import { createLogger } from '../logger/logger';
 import path from 'path';
 import { buildSourceCFGraph } from './source_cfg_builder';
+import { searchForNextReachableSourceNodes } from './source_cfg_helper';
 
 const logger = createLogger('ASTControlFlowGraph');
 export interface DotSerializationConfig {
@@ -216,6 +217,22 @@ export class SourceCFGs {
     return undefined;
   }
 
+  nextReachableSourceNodes(addr: number): Array<[SourceCFGNode, number]> {
+    const g = this.wasmCFGs.getCFGFromAddr(addr);
+    const startNode = g?.addrToNode.get(addr);
+    if (g === undefined || startNode === undefined) {
+      return [];
+    }
+
+    const [next] = searchForNextReachableSourceNodes(
+      this._funToSourceCFG,
+      this.wasmCFGs,
+      g,
+      startNode,
+      this.allNodes(),
+    );
+    return next.map(([n, i]) => [n, i.startAddress]);
+  }
 
   serializeToDot(
     outputDir: string,
