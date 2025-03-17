@@ -25,16 +25,11 @@ export class WARDuinoDevVM extends WARDuinoVM {
   protected ErrorClass = WARDuinoDevVMError;
 
   constructor(platform: DevVMPlatform, channel?: Channel) {
-    super(platform, channel ?? new NoChannel());
+    super(platform, channel ?? new ClientSideSocket(-1, 'localhost', ''));
 
     this.logger = createLogger(
       `WARDuinoDevVM ${platform.config.deviceIdentity.fullname}`,
     );
-    if (this.channel instanceof NoChannel) {
-      this.logger.error(
-        `TODO reassing channel to be client-side socket as comment above`,
-      );
-    }
   }
 
   async close(timeout?: number): Promise<boolean> {
