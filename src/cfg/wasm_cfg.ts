@@ -80,7 +80,7 @@ function wasmFuncGraphToJSONObj(cfg: WasmCFG): object {
   };
 }
 
-export class WasmControlFlowGraph {
+export class WasmCFGs {
   private readonly _wasm: WasmModule;
   private readonly _cfgs: Map<number, WasmCFG>;
   private readonly _callSites: Map<number, Set<number>>;

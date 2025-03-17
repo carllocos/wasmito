@@ -2,7 +2,7 @@ import { breadthFirstTraverseWasmCFG } from './traversals_cfg';
 import {
   type WasmAddrToNodeMap,
   type CFGNode,
-  type WasmControlFlowGraph,
+  type WasmCFGs,
   getWasmCFGNode,
   type WasmCFG,
 } from './wasm_cfg';
@@ -31,7 +31,7 @@ const logger = createLogger('BinaryLift');
 export function buildSourceCFGraph(
   sourceMap: SourceMap,
   // asts: AgnosticASTMap,
-  cfg: WasmControlFlowGraph,
+  cfg: WasmCFGs,
 ): Map<number, BinaryLiftedCFG> {
   logger.debug(
     `Building Source Level Control Flow Graph for #${sourceMap.wasm.functions.length}`,
@@ -55,7 +55,7 @@ export function buildSourceCFGraph(
 function binaryLiftWasmCFG(
   f: WASMFunction,
   sourceMap: SourceMap,
-  cfg: WasmControlFlowGraph,
+  cfg: WasmCFGs,
 ): BinaryLiftedCFG {
   /**
    * The process of binary lifting a Wasm CFG is divided into the following steps:

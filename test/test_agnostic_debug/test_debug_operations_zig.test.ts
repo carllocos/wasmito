@@ -7,7 +7,7 @@ import { constructLanguageAdaptor } from '../../src/language_adaptors/language_a
 import assert, { fail } from 'assert';
 import {
   type DotSerializationConfig,
-  type SourceControlFlowGraph,
+  type SourceCFGs,
 } from '../../src/cfg/source_cfg';
 import { type SourceMapConfig } from '../../src';
 
@@ -26,7 +26,7 @@ describe('Debug Operations on Zig App', function () {
     ignoreDirectories: ['/opt/homebrew/'],
   };
 
-  let sourceCFG: SourceControlFlowGraph;
+  let sourceCFGs: SourceCFGs;
 
   this.timeout(10000);
 
@@ -44,15 +44,15 @@ describe('Debug Operations on Zig App', function () {
       );
       const langAdaptor = await constructLanguageAdaptor(sm);
       assert(langAdaptor.sourceCFG !== undefined);
-      sourceCFG = langAdaptor.sourceCFG;
-      sourceCFG.wasmCFG.serializeToDot(pathToDir);
+      sourceCFGs = langAdaptor.sourceCFG;
+      sourceCFGs.wasmCFGs.serializeToDot(pathToDir);
       const config: DotSerializationConfig = {
         includeInstructions: true,
         includeEmptySCFG: false,
         includeExitNode: true,
         includeEntryNode: true,
       };
-      sourceCFG.serializeToDot(pathToDir, config);
+      sourceCFGs.serializeToDot(pathToDir, config);
     } catch (e) {
       fail(`Could not construct sourcemap or langadaptor. Reason ${e}`);
     }

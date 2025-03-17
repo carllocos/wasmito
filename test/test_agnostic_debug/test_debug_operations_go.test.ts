@@ -3,7 +3,7 @@ import path from 'path';
 import { SourceMapfromDWARFWasm } from '../../src/source_mappers/source_map_builder';
 import { constructLanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 import assert, { fail } from 'assert';
-import { type SourceControlFlowGraph } from '../../src/cfg/source_cfg';
+import { type SourceCFGs } from '../../src/cfg/source_cfg';
 import { DebugOperations } from '../../src/language_adaptors/debug_operations';
 import {
   sortIncreasingNr,
@@ -16,7 +16,7 @@ describe.skip('Debug Operations on Go Hello World', function () {
   const app = path.resolve('./test/data/go_examples/main.wasm');
   const sourcePath = path.resolve('./test/data/go_examples/hello_world.go');
 
-  let sourceCFG: SourceControlFlowGraph;
+  let sourceCFGs: SourceCFGs;
 
   before('parse wasm module', async function () {
     try {
@@ -29,14 +29,14 @@ describe.skip('Debug Operations on Go Hello World', function () {
       );
       const langAdaptor = await constructLanguageAdaptor(sm);
       assert(langAdaptor.sourceCFG !== undefined);
-      sourceCFG = langAdaptor.sourceCFG;
+      sourceCFGs = langAdaptor.sourceCFG;
     } catch (e) {
       fail(`Could not construct sourcemap or langadaptor. Reason ${e}`);
     }
   });
 
   it('"step into" "pin_mode" call line (45, 5)', function () {
-    const startNode = sourceNodeFromLoc(sourceCFG, {
+    const startNode = sourceNodeFromLoc(sourceCFGs, {
       source: sourcePath,
       linenr: 45,
       colnr: 5,
@@ -44,7 +44,7 @@ describe.skip('Debug Operations on Go Hello World', function () {
       address: 0,
     });
 
-    const nextNodes = DebugOperations.stepIn(sourceCFG, startNode);
+    const nextNodes = DebugOperations.stepIn(sourceCFGs, startNode);
     expect(nextNodes.length).equal(1);
 
     const [nextNode] = nextNodes[0];
@@ -57,7 +57,7 @@ describe.skip('Debug Operations on Go Hello World', function () {
   });
 
   it('"step into" "1..MAX_SHORT_SLEEPS" std lib call line (48, 1) should be ignored', function () {
-    const startNode = sourceNodeFromLoc(sourceCFG, {
+    const startNode = sourceNodeFromLoc(sourceCFGs, {
       source: sourcePath,
       linenr: 48,
       colnr: 19,
@@ -65,7 +65,7 @@ describe.skip('Debug Operations on Go Hello World', function () {
       address: 0,
     });
 
-    const nextNodes = DebugOperations.stepIn(sourceCFG, startNode);
+    const nextNodes = DebugOperations.stepIn(sourceCFGs, startNode);
     expect(nextNodes.length).equal(2);
     const [n1] = nextNodes[0];
     const srcTxt1 = sourceText(n1);
@@ -83,7 +83,7 @@ describe.skip('Debug Operations on Go Hello World', function () {
   });
 
   it('"step over" "pin_mode" call line (45, 5)', function () {
-    const startNode = sourceNodeFromLoc(sourceCFG, {
+    const startNode = sourceNodeFromLoc(sourceCFGs, {
       source: sourcePath,
       linenr: 45,
       colnr: 5,
@@ -91,7 +91,7 @@ describe.skip('Debug Operations on Go Hello World', function () {
       address: 0,
     });
 
-    const nextNodes = DebugOperations.stepOver(sourceCFG, startNode);
+    const nextNodes = DebugOperations.stepOver(sourceCFGs, startNode);
     expect(nextNodes.length).equal(1);
 
     const [nextNode] = nextNodes[0];
@@ -104,14 +104,14 @@ describe.skip('Debug Operations on Go Hello World', function () {
   });
 
   it('"step out" of a "pin_mode" fun has 1 callside', function () {
-    const startNode = sourceNodeFromLoc(sourceCFG, {
+    const startNode = sourceNodeFromLoc(sourceCFGs, {
       source: sourcePath,
       linenr: 19,
       colnr: 5,
       name: '',
       address: 0,
     });
-    const nextNodes = DebugOperations.stepOut(sourceCFG, startNode);
+    const nextNodes = DebugOperations.stepOut(sourceCFGs, startNode);
     expect(nextNodes.length).equal(1);
     const [n] = nextNodes[0];
     const loc = sourceNodeLoc(n);
@@ -121,7 +121,7 @@ describe.skip('Debug Operations on Go Hello World', function () {
   });
 
   it('"step out" of a "digital_write" fun has 3 callsides', function () {
-    const startNode = sourceNodeFromLoc(sourceCFG, {
+    const startNode = sourceNodeFromLoc(sourceCFGs, {
       source: sourcePath,
       linenr: 25,
       colnr: 5,
@@ -129,7 +129,7 @@ describe.skip('Debug Operations on Go Hello World', function () {
       address: 0,
     });
     const nextNodes = sortIncreasingNr(
-      DebugOperations.stepOut(sourceCFG, startNode),
+      DebugOperations.stepOut(sourceCFGs, startNode),
     );
     expect(nextNodes.length).equal(3);
 

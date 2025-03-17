@@ -12,11 +12,7 @@ import {
 import { pathJoin, sanitizeFilename } from '../util/file_util';
 import { coarseSourceControlFlowGraphToDot } from './dot_serialize';
 import { writeFileSync } from 'fs';
-import {
-  isCallNode,
-  type SourceCFGNode,
-  type SourceControlFlowGraph,
-} from './source_cfg';
+import { isCallNode, type SourceCFGNode, type SourceCFGs } from './source_cfg';
 
 export interface DotSerializationConfgig {
   includeInstructions: boolean;
@@ -39,13 +35,13 @@ export interface CoarseFunctionGraph {
 }
 
 export class CoarseGrainedSourceCFGraph {
-  private readonly _scfg: SourceControlFlowGraph;
+  private readonly _scfg: SourceCFGs;
 
   private readonly _funCFGs: Map<number, CoarseFunctionGraph>;
 
-  constructor(sourceCFG: SourceControlFlowGraph) {
-    this._scfg = sourceCFG;
-    this._funCFGs = this.convertToCoarseGrainedCFGs(sourceCFG);
+  constructor(sourceCFGs: SourceCFGs) {
+    this._scfg = sourceCFGs;
+    this._funCFGs = this.convertToCoarseGrainedCFGs(sourceCFGs);
   }
 
   getCoarseCFG(fId: number): CoarseFunctionGraph | undefined {
@@ -105,7 +101,7 @@ export class CoarseGrainedSourceCFGraph {
   }
 
   private convertToCoarseGrainedCFGs(
-    scfgs: SourceControlFlowGraph,
+    scfgs: SourceCFGs,
   ): Map<number, CoarseFunctionGraph> {
     const m = new Map<number, CoarseFunctionGraph>();
     const funcs = scfgs.sourceMap.wasm.functions.map((f) => f.id);

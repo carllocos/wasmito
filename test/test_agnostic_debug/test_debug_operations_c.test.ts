@@ -8,7 +8,7 @@ import { constructLanguageAdaptor } from '../../src/language_adaptors/language_a
 import assert, { fail } from 'assert';
 import {
   type DotSerializationConfig,
-  type SourceControlFlowGraph,
+  type SourceCFGs,
 } from '../../src/cfg/source_cfg';
 
 describe('Debug operations on C Blink Intermittent App', function () {
@@ -17,7 +17,7 @@ describe('Debug operations on C Blink Intermittent App', function () {
   const sourcePath = path.join(pathToDir, 'blink_intermittent.c');
   const pathToSrcMap = path.join(pathToDir, 'main.wasm.map');
 
-  let sourceCFG: SourceControlFlowGraph;
+  let sourceCFGs: SourceCFGs;
   const srcFileMapper = new Map<string, string>([
     ['blink_intermittent.c', sourcePath],
   ]);
@@ -41,18 +41,18 @@ describe('Debug operations on C Blink Intermittent App', function () {
       );
       const langAdaptor = await constructLanguageAdaptor(sm);
       assert(langAdaptor.sourceCFG !== undefined);
-      sourceCFG = langAdaptor.sourceCFG;
+      sourceCFGs = langAdaptor.sourceCFG;
       langAdaptor.sourceMap.storeMappingsToJSON(
         path.resolve(pathToDir, 'mappings.json'),
       );
-      sourceCFG.wasmCFG.serializeToDot(pathToDir);
+      sourceCFGs.wasmCFGs.serializeToDot(pathToDir);
       const config: DotSerializationConfig = {
         includeInstructions: false,
         includeEmptySCFG: false,
         includeExitNode: true,
         includeEntryNode: true,
       };
-      sourceCFG.serializeToDot(pathToDir, config);
+      sourceCFGs.serializeToDot(pathToDir, config);
     } catch (e) {
       fail(`Could not construct sourcemap or langadaptor. Reason ${e}`);
     }

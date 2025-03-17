@@ -149,7 +149,7 @@ export function registerCFGCommand(program: Command): void {
         const wasmOutputDir = path.join(outputDir, `/wasm`);
         createDirectoryIfUnexisting(wasmOutputDir);
         logger.info(`Converting Wasm CFGs to dot`);
-        langAdaptor.sourceCFG.wasmCFG.serializeToDot(wasmOutputDir);
+        langAdaptor.sourceCFG.wasmCFGs.serializeToDot(wasmOutputDir);
 
         const sourceCFGsOutputDir = path.join(outputDir, `/source/`);
         createDirectoryIfUnexisting(sourceCFGsOutputDir);
@@ -179,7 +179,7 @@ export function registerCFGCommand(program: Command): void {
         );
         if (callgraphOutputPath !== undefined) {
           logger.info(`Converting Callgraph to dot at ${callgraphOutputPath}`);
-          langAdaptor.sourceCFG.wasmCFG.callgraph.toDot(callgraphOutputPath);
+          langAdaptor.sourceCFG.wasmCFGs.callgraph.toDot(callgraphOutputPath);
         }
 
         if (options.coarseGrained !== undefined) {

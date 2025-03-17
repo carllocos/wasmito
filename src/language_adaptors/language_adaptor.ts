@@ -6,8 +6,8 @@ import {
   type SourceMap,
 } from '../source_mappers/source_map';
 import { type AgnosticASTMap } from './agnostic_node';
-import { WasmControlFlowGraph } from '../cfg/wasm_cfg';
-import { type SourceCFGNode, SourceControlFlowGraph } from '../cfg/source_cfg';
+import { WasmCFGs } from '../cfg/wasm_cfg';
+import { type SourceCFGNode, SourceCFGs } from '../cfg/source_cfg';
 import { getLangConfigFromExtension } from './languages/all_langs';
 import { type LanguageConfiguration } from './languages/language_config';
 import { writeFileSync } from 'fs';
@@ -33,24 +33,24 @@ export interface CountMappingJson {
 export class LanguageAdaptor {
   public readonly sourceMap: SourceMap;
   private readonly _asts: AgnosticASTMap;
-  private readonly _wasmCfg: WasmControlFlowGraph;
-  private _srcCfg?: SourceControlFlowGraph;
+  private readonly _wasmCFGs: WasmCFGs;
+  private _srcCfg?: SourceCFGs;
 
   constructor(sourceMap: SourceMap) {
     this.sourceMap = sourceMap;
     this._asts = new Map();
-    this._wasmCfg = new WasmControlFlowGraph(sourceMap.wasm);
+    this._wasmCFGs = new WasmCFGs(sourceMap.wasm);
   }
 
   get asts(): AgnosticASTMap {
     return this._asts;
   }
 
-  get sourceCFG(): SourceControlFlowGraph | undefined {
+  get sourceCFG(): SourceCFGs | undefined {
     return this._srcCfg;
   }
 
-  get sourceCFGs(): SourceControlFlowGraph {
+  get sourceCFGs(): SourceCFGs {
     if (this._srcCfg === undefined) {
       throw new Error(`SourceControlFlowGraphs were not constructed`);
     }
@@ -161,10 +161,6 @@ export class LanguageAdaptor {
   }
 
   private buildSourceCFG(): void {
-    this._srcCfg = new SourceControlFlowGraph(
-      this._asts,
-      this.sourceMap,
-      this._wasmCfg,
-    );
+    this._srcCfg = new SourceCFGs(this._asts, this.sourceMap, this._wasmCFGs);
   }
 }

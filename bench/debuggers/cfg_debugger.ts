@@ -5,26 +5,23 @@ import {
 } from '../../src/source_mappers/source_map';
 import { type DebugAPI } from './debug_api';
 import { type RuntimeDebugAPI } from '../runtimes/runtime_api';
-import {
-  type SourceCFGNode,
-  SourceControlFlowGraph,
-} from '../../src/cfg/source_cfg';
-import { WasmControlFlowGraph } from '../../src/cfg/wasm_cfg';
+import { type SourceCFGNode, SourceCFGs } from '../../src/cfg/source_cfg';
+import { WasmCFGs } from '../../src/cfg/wasm_cfg';
 import { DebugOperations } from '../../src/language_adaptors/debug_operations';
 
 export class ControlFlowGraphDBG implements DebugAPI {
   debuggerName: string = 'CFG_DBG';
   sourceMap: SourceMap;
   runtime: RuntimeDebugAPI;
-  private readonly wcfgs: WasmControlFlowGraph;
-  public readonly scfgs: SourceControlFlowGraph;
+  private readonly wcfgs: WasmCFGs;
+  public readonly scfgs: SourceCFGs;
 
   constructor(sourceMap: SourceMap, runtime: RuntimeDebugAPI) {
     this.sourceMap = sourceMap;
     this.runtime = runtime;
 
-    this.wcfgs = new WasmControlFlowGraph(sourceMap.wasm);
-    this.scfgs = new SourceControlFlowGraph(new Map(), sourceMap, this.wcfgs);
+    this.wcfgs = new WasmCFGs(sourceMap.wasm);
+    this.scfgs = new SourceCFGs(new Map(), sourceMap, this.wcfgs);
   }
 
   async startDebugger(timeout: number): Promise<boolean> {

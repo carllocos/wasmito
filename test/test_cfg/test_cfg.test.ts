@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import path from 'path';
 import { WasmModule } from '../../src/webassembly/wasm/wasm_module';
-import { WasmControlFlowGraph } from '../../src/cfg/wasm_cfg';
+import { WasmCFGs } from '../../src/cfg/wasm_cfg';
 import { buildControlFlowGraphFunction } from '../../src/cfg/wasm_cfg_builder';
 
 const exampleFile = path.resolve('./test/data/rust_examples/blink/main.wasm');
@@ -14,7 +14,7 @@ describe('Rust Language Adaptor for Blink App', function () {
 
   it('build cfg for module', () => {
     const outputDir = path.resolve('./test/data/rust_examples/blink');
-    const g = new WasmControlFlowGraph(mod);
+    const g = new WasmCFGs(mod);
     const contents = g.serializeToDot(outputDir);
     expect(contents.length).to.greaterThan(mod.importFuncs.length);
     for (const dotContent of contents) {

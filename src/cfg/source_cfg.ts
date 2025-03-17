@@ -1,4 +1,4 @@
-import { type WasmControlFlowGraph } from './wasm_cfg';
+import { type WasmCFGs } from './wasm_cfg';
 import {
   sourceCodeLocationToString,
   SourceMap,
@@ -38,22 +38,18 @@ interface DotMetaData {
   fid: number;
 }
 
-export class SourceControlFlowGraph {
+export class SourceCFGs {
   private readonly _astGraphs: Map<number, BinaryLiftedCFG>;
   private readonly _allGraphNodes: SourceCFGNode[];
 
   private _sourceMap: SourceMap | undefined;
   public readonly fullSourceMap: SourceMap;
-  private readonly _wasmCFG: WasmControlFlowGraph;
+  private readonly _wasmCFGs: WasmCFGs;
 
-  constructor(
-    asts: AgnosticASTMap,
-    sourceMap: SourceMap,
-    cfg: WasmControlFlowGraph,
-  ) {
+  constructor(asts: AgnosticASTMap, sourceMap: SourceMap, wasmCFGs: WasmCFGs) {
     this.fullSourceMap = sourceMap;
-    this._wasmCFG = cfg;
-    this._astGraphs = buildSourceCFGraph(sourceMap, cfg);
+    this._wasmCFGs = wasmCFGs;
+    this._astGraphs = buildSourceCFGraph(sourceMap, wasmCFGs);
     let allNodes: SourceCFGNode[] = [];
     for (const funGraph of this._astGraphs.values()) {
       allNodes = allNodes.concat(funGraph.allNodes);
@@ -76,8 +72,8 @@ export class SourceControlFlowGraph {
     return sm;
   }
 
-  get wasmCFG(): WasmControlFlowGraph {
-    return this._wasmCFG;
+  get wasmCFGs(): WasmCFGs {
+    return this._wasmCFGs;
   }
 
   nodesFromAddress(addr: number): SourceCFGNode | undefined {

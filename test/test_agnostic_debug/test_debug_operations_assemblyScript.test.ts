@@ -10,7 +10,7 @@ import assert, { fail } from 'assert';
 import {
   type DotSerializationConfig,
   isCallNode,
-  type SourceControlFlowGraph,
+  type SourceCFGs,
 } from '../../src/cfg/source_cfg';
 import { DebugOperations } from '../../src/language_adaptors/debug_operations';
 import {
@@ -31,7 +31,7 @@ describe.skip('Debug Operations on AssemblyScript Blink App', function () {
     srcToAbsPath: srcFileMapper,
   };
 
-  let sourceCFG: SourceControlFlowGraph;
+  let sourceCFGs: SourceCFGs;
 
   before('parse wasm module', async function () {
     try {
@@ -47,7 +47,7 @@ describe.skip('Debug Operations on AssemblyScript Blink App', function () {
       );
       const langAdaptor = await constructLanguageAdaptor(sm);
       assert(langAdaptor.sourceCFG !== undefined);
-      sourceCFG = langAdaptor.sourceCFG;
+      sourceCFGs = langAdaptor.sourceCFG;
       langAdaptor.sourceMap.storeMappingsToJSON(
         path.resolve(pathToRootSource, 'mappings.json'),
       );
@@ -57,7 +57,7 @@ describe.skip('Debug Operations on AssemblyScript Blink App', function () {
   });
 
   it('"step over" pinMode (47, 3) function call', function () {
-    const callNode = sourceCFG.nodesFromSourceLoc({
+    const callNode = sourceCFGs.nodesFromSourceLoc({
       source: srcPath,
       linenr: 47,
       colnr: 3,
@@ -67,13 +67,13 @@ describe.skip('Debug Operations on AssemblyScript Blink App', function () {
 
     expect(callNode.length).to.equal(1);
     const [call] = callNode;
-    const nextPossibleLocations = DebugOperations.stepOver(sourceCFG, call);
+    const nextPossibleLocations = DebugOperations.stepOver(sourceCFGs, call);
 
     expect(nextPossibleLocations.length).to.equal(1);
   });
 
   it('"step over" addTime (51, 23) function call', function () {
-    const callNode = sourceCFG.nodesFromSourceLoc({
+    const callNode = sourceCFGs.nodesFromSourceLoc({
       source: srcPath,
       linenr: 51,
       colnr: 23,
@@ -84,7 +84,7 @@ describe.skip('Debug Operations on AssemblyScript Blink App', function () {
     expect(callNode.length).to.equal(1);
     const [call] = callNode;
     expect(isCallNode(call)).to.be.equal(true);
-    const nextPossibleLocations = DebugOperations.stepOver(sourceCFG, call);
+    const nextPossibleLocations = DebugOperations.stepOver(sourceCFGs, call);
 
     expect(nextPossibleLocations.length).to.equal(2);
   });
@@ -109,7 +109,7 @@ describe('Debug Operations on AS Intermittent Blink', function () {
     srcToAbsPath: srcFileMapper,
   };
 
-  let sourceCFG: SourceControlFlowGraph;
+  let sourceCFGs: SourceCFGs;
 
   before('parse wasm module', async function () {
     try {
@@ -125,7 +125,7 @@ describe('Debug Operations on AS Intermittent Blink', function () {
       );
       const langAdaptor = await constructLanguageAdaptor(sm);
       assert(langAdaptor.sourceCFG !== undefined);
-      sourceCFG = langAdaptor.sourceCFG;
+      sourceCFGs = langAdaptor.sourceCFG;
       langAdaptor.sourceMap.storeMappingsToJSON(
         path.resolve(pathToRootSource, 'mappings.json'),
       );
@@ -135,14 +135,14 @@ describe('Debug Operations on AS Intermittent Blink', function () {
         includeExitNode: true,
         includeEntryNode: true,
       };
-      sourceCFG.serializeToDot(pathToRootSource, config);
+      sourceCFGs.serializeToDot(pathToRootSource, config);
     } catch (e) {
       fail(`Could not construct sourcemap or langadaptor. Reason ${e}`);
     }
   });
 
   it('"step into" "pinMode" call line (27, 5)', function () {
-    const startNode = sourceNodeFromLoc(sourceCFG, {
+    const startNode = sourceNodeFromLoc(sourceCFGs, {
       source: sourcePath,
       linenr: 27,
       colnr: 5,
@@ -150,7 +150,7 @@ describe('Debug Operations on AS Intermittent Blink', function () {
       address: 0,
     });
 
-    const nextNodes = DebugOperations.stepIn(sourceCFG, startNode);
+    const nextNodes = DebugOperations.stepIn(sourceCFGs, startNode);
     expect(nextNodes.length).equal(1);
 
     const [nextNode] = nextNodes[0];
@@ -161,7 +161,7 @@ describe('Debug Operations on AS Intermittent Blink', function () {
   });
 
   it('"step over" "pinMode" call line (27, 5)', function () {
-    const startNode = sourceNodeFromLoc(sourceCFG, {
+    const startNode = sourceNodeFromLoc(sourceCFGs, {
       source: sourcePath,
       linenr: 27,
       colnr: 5,
@@ -169,7 +169,7 @@ describe('Debug Operations on AS Intermittent Blink', function () {
       address: 0,
     });
 
-    const nextNodes = DebugOperations.stepOver(sourceCFG, startNode);
+    const nextNodes = DebugOperations.stepOver(sourceCFGs, startNode);
     expect(nextNodes.length).equal(1);
 
     const [nextNode] = nextNodes[0];
@@ -180,14 +180,14 @@ describe('Debug Operations on AS Intermittent Blink', function () {
   });
 
   it('"step out" of a "pinMode" fun has 1 callside', function () {
-    const startNode = sourceNodeFromLoc(sourceCFG, {
+    const startNode = sourceNodeFromLoc(sourceCFGs, {
       source: sourcePath,
       linenr: 6,
       colnr: 15,
       name: '',
       address: 0,
     });
-    const nextNodes = DebugOperations.stepOut(sourceCFG, startNode);
+    const nextNodes = DebugOperations.stepOut(sourceCFGs, startNode);
     expect(nextNodes.length).equal(1);
     const [n] = nextNodes[0];
     const loc = sourceNodeLoc(n);
@@ -196,7 +196,7 @@ describe('Debug Operations on AS Intermittent Blink', function () {
   });
 
   it('"step out" of a "digitalWrite" fun has 3 callsides', function () {
-    const startNode = sourceNodeFromLoc(sourceCFG, {
+    const startNode = sourceNodeFromLoc(sourceCFGs, {
       source: sourcePath,
       linenr: 14,
       colnr: 20,
@@ -204,7 +204,7 @@ describe('Debug Operations on AS Intermittent Blink', function () {
       address: 0,
     });
     const nextNodes = sortIncreasingNr(
-      DebugOperations.stepOut(sourceCFG, startNode),
+      DebugOperations.stepOut(sourceCFGs, startNode),
     );
     expect(nextNodes.length).equal(3);
 

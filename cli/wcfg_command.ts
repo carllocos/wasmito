@@ -6,7 +6,7 @@ import {
   isFilePath,
 } from '../src/util/file_util';
 import { getGlobalLogger } from '../src/logger/logger';
-import { WasmControlFlowGraph } from '../src/cfg/wasm_cfg';
+import { WasmCFGs } from '../src/cfg/wasm_cfg';
 import { WasmModule } from '../src/webassembly/wasm/wasm_module';
 
 export function registerWCFGCommand(program: Command): void {
@@ -40,7 +40,7 @@ export function registerWCFGCommand(program: Command): void {
         logger.info(`Starting construction WCFGs`);
         const startTime = Date.now();
         const wasm = new WasmModule(wasmPath);
-        const wcfgs = new WasmControlFlowGraph(wasm);
+        const wcfgs = new WasmCFGs(wasm);
         const endTime = Date.now();
 
         const diff = endTime - startTime;

@@ -1,15 +1,12 @@
 import assert from 'assert';
-import {
-  type SourceControlFlowGraph,
-  type SourceCFGNode,
-} from '../../src/cfg/source_cfg';
+import { type SourceCFGs, type SourceCFGNode } from '../../src/cfg/source_cfg';
 import { type SourceCodeLocation } from '../../src/source_mappers/source_map';
 
 export function sourceNodeFromLoc(
-  scfg: SourceControlFlowGraph,
+  scfgs: SourceCFGs,
   loc: SourceCodeLocation,
 ): SourceCFGNode {
-  const ns = scfg.nodesFromSourceLoc(loc);
+  const ns = scfgs.nodesFromSourceLoc(loc);
   assert(
     ns.length === 1,
     `one ASTnode should be found for the given location linenr=${loc.linenr}, colnr=${loc.colnr}`,
