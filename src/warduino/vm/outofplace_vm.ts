@@ -229,7 +229,7 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
       }
     }
 
-    await this.assertExistanceToolPort();
+    await this.assertExistenceToolPort();
     this.createClientSideSocket();
     await this.compileSourceCode();
 

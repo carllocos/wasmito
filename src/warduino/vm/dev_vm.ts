@@ -79,7 +79,7 @@ export class WARDuinoDevVM extends WARDuinoVM {
     sourceCodeCompilationArgs: any,
     maxWaitTime?: number,
   ): Promise<ChildProcess> {
-    await this.assertExistanceToolPort();
+    await this.assertExistenceToolPort();
     const vmConfig = this.platform.config.vmConfig;
 
     this.channel = new ClientSideSocket(
@@ -148,7 +148,7 @@ export class WARDuinoDevVM extends WARDuinoVM {
     return processArgs;
   }
 
-  protected async assertExistanceToolPort(): Promise<void> {
+  protected async assertExistenceToolPort(): Promise<void> {
     if (this.platform.config.vmConfig.hasToolPort()) {
       if (await isPortInUse(this.platform.config.vmConfig.toolPort)) {
         throw new this.ErrorClass(
