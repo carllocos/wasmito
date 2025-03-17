@@ -285,7 +285,7 @@ function binaryLiftWasmNodes(
 /**
  * A helper func that given a `n` Wasm CFG Node will retrieve its binary lifted Source Level CFG Node.
  * The search for the Source Level CFG Node will happen by searching in decreasing order
- * the Source Level node associated to each Wasm instruction beloning to `n`.
+ * the Source Level node associated to each Wasm instruction belonging to `n`.
  * @param n Wasm CFG node
  * @param nodes source level CFG nodes
  * @returns Source Level CFG and Wasm Instruction
@@ -301,7 +301,7 @@ function sourceCFGNodeAndInstrFromDecrInstrAddrs(
 /**
  * A helper func that given a `n` Wasm CFG Node will retrieve its binary lifted Source Level CFG Node.
  * The search for the Source Level CFG Node will happen by searching in increasing order
- * the Source Level node associated to each Wasm instruction beloning to `n`.
+ * the Source Level node associated to each Wasm instruction belonging to `n`.
  * @param n Wasm CFG node
  * @param nodes source level CFG nodes
  * @returns Source Level CFG and Wasm Instruction
@@ -405,9 +405,8 @@ function binaryLiftWasmEdges(
       // need to be added. And this depending on where the toInstr points to. However,
       // this case 2.c can be handled on the next node visit which in that case should be the
       // the first condition to check
-      // console.log(`Adding edges for node ${logNode(ctgn.node)}`);
 
-      const [sourceCFGNFrom, fromInstr] = found;
+      const [sourceCFGNodeFrom, fromInstr] = found;
       for (const e of wasmNode.edges) {
         const toWasmNode = getWasmCFGNode(g, e.instrTo.startAddress);
         const foundToNodeAndInstr = sourceCFGNodeAndInstrFromIncrInstrAddrs(
@@ -418,9 +417,9 @@ function binaryLiftWasmEdges(
         if (foundToNodeAndInstr !== undefined) {
           const [toSourceCFGNode, toInstr] = foundToNodeAndInstr;
 
-          if (sourceCFGNFrom.nodeId !== toSourceCFGNode.nodeId) {
+          if (sourceCFGNodeFrom.nodeId !== toSourceCFGNode.nodeId) {
             // case 1
-            addEdge(sourceCFGNFrom, fromInstr, toSourceCFGNode, toInstr);
+            addEdge(sourceCFGNodeFrom, fromInstr, toSourceCFGNode, toInstr);
           } else if (isWasmInstructionBlockBased(e.instrTo)) {
             // case 2.a
             throw new Error('case 2.a from -> to (to is Block-based instr)');
@@ -440,7 +439,7 @@ function binaryLiftWasmEdges(
           } else if (isBranchingInstruction(e.instrFrom)) {
             // case 2.c
             // TODO generalise to paths
-            addEdge(sourceCFGNFrom, fromInstr, toSourceCFGNode, toInstr);
+            addEdge(sourceCFGNodeFrom, fromInstr, toSourceCFGNode, toInstr);
             // throw new Error('case 2.c from -> to (to is a branch instr)');
             // const branchingNode = getWasmCFGNode(g, e.instrFrom.startAddress);
             // for (const be of branchingNode.edges) {
@@ -463,11 +462,11 @@ function binaryLiftWasmEdges(
           }
         } else {
           // we have to search for all the neighbours of toNode that have a CFG node
-          const [indirectNodes, newWasmNodesToIngore] =
+          const [indirectNodes, newWasmNodesToIgnore] =
             closetsChildrenSourceCFGNodes(g, toWasmNode, sourceNodes);
-          newWasmNodesToIngore.forEach((nid) => wasmNodesToIgnore.add(nid));
-          for (const [indirectCTGN, indirectInstr] of indirectNodes) {
-            addEdge(sourceCFGNFrom, fromInstr, indirectCTGN, indirectInstr);
+          newWasmNodesToIgnore.forEach((nid) => wasmNodesToIgnore.add(nid));
+          for (const [indirectNode, indirectInstr] of indirectNodes) {
+            addEdge(sourceCFGNodeFrom, fromInstr, indirectNode, indirectInstr);
           }
         }
       }
@@ -501,8 +500,8 @@ function closetsChildrenSourceCFGNodes(
     // consider scenario n1 -> n2 -> n3
     //                            -> n4 -> n2
     // if we assume that node n2 and n4 have no source level CFGNodes
-    // then the risk exist that the search for the closests source CFGNodes
-    // loops forever due to the backedge from n4 to n2
+    // then the risk exist that the search for the closest source CFGNodes
+    // loops forever due to the backEdge from n4 to n2
     // to prevent this we need to keep track of the already visited nodes
     // that solves the callstack exhaustion issue
 
@@ -511,30 +510,30 @@ function closetsChildrenSourceCFGNodes(
     // n2 has a self edge and no source level CFG
     //
     // when this function is called for n2 because of the self edge
-    // then the call is stoped given that the id of n2 is
+    // then the call is stopped given that the id of n2 is
     // stored in the nodesToIgnore
     return [[], nodesToIgnore];
   }
 
   nodesToIgnore.add(n.nodeID);
-  const closests: Array<[SourceCFGNode, WasmInstruction]> = [];
+  const closest: Array<[SourceCFGNode, WasmInstruction]> = [];
   for (const e of n.edges) {
     const toWasmNode = getWasmCFGNode(g, e.instrTo.startAddress);
     const found = sourceCFGNodeAndInstrFromIncrInstrAddrs(toWasmNode, nodes);
     if (found === undefined) {
-      const [ns, newNodesToIngore] = closetsChildrenSourceCFGNodes(
+      const [ns, newNodesToIgnore] = closetsChildrenSourceCFGNodes(
         g,
         toWasmNode,
         nodes,
         nodesToIgnore,
       );
-      newNodesToIngore.forEach((nodeid) => nodesToIgnore.add(nodeid));
-      ns.forEach((nf) => closests.push(nf));
+      newNodesToIgnore.forEach((nodeId) => nodesToIgnore.add(nodeId));
+      ns.forEach((nf) => closest.push(nf));
     } else {
-      closests.push(found);
+      closest.push(found);
     }
   }
-  return [closests, nodesToIgnore];
+  return [closest, nodesToIgnore];
 }
 
 function createNodeIfNeeded(
@@ -608,60 +607,60 @@ function removeEdge(
 }
 
 function mergeNeighbourNodes(
-  nfrom: SourceCFGNode,
-  nto: SourceCFGNode,
+  nFrom: SourceCFGNode,
+  nTo: SourceCFGNode,
 ): SourceCFGNode {
-  if (!equalSourceCodeLocations(nfrom.sourceLocation, nto.sourceLocation)) {
+  if (!equalSourceCodeLocations(nFrom.sourceLocation, nTo.sourceLocation)) {
     throw new Error(
-      `Merging two nodes of different source locations: ${sourceCodeLocationToString(nfrom.sourceLocation)} -> ${sourceCodeLocationToString(nto.sourceLocation)} `,
+      `Merging two nodes of different source locations: ${sourceCodeLocationToString(nFrom.sourceLocation)} -> ${sourceCodeLocationToString(nTo.sourceLocation)} `,
     );
   }
 
   // update incoming edges
-  const copyIncoming = nto.incomingEdges.map((n) => n);
+  const copyIncoming = nTo.incomingEdges.map((n) => n);
   for (const [inNode, instrFrom, instrTo] of copyIncoming) {
-    removeEdge(inNode, instrFrom, nto, instrTo);
-    if (inNode.nodeId !== nfrom.nodeId) {
-      if (inNode.nodeId === nto.nodeId) {
+    removeEdge(inNode, instrFrom, nTo, instrTo);
+    if (inNode.nodeId !== nFrom.nodeId) {
+      if (inNode.nodeId === nTo.nodeId) {
         // self edge
-        addEdge(nfrom, instrFrom, nfrom, instrTo);
+        addEdge(nFrom, instrFrom, nFrom, instrTo);
       } else {
-        addEdge(inNode, instrFrom, nfrom, instrTo);
+        addEdge(inNode, instrFrom, nFrom, instrTo);
       }
     }
   }
 
   // update outgoing edges of nto
-  for (const [outgoingEdge, instrFrom, instrTo] of nto.edges) {
-    if (outgoingEdge.nodeId === nto.nodeId) {
+  for (const [outgoingEdge, instrFrom, instrTo] of nTo.edges) {
+    if (outgoingEdge.nodeId === nTo.nodeId) {
       // self edge already handled
       // when handling incoming edges
       continue;
     }
-    removeEdge(nto, instrFrom, outgoingEdge, instrTo);
-    addEdge(nfrom, instrFrom, outgoingEdge, instrTo);
+    removeEdge(nTo, instrFrom, outgoingEdge, instrTo);
+    addEdge(nFrom, instrFrom, outgoingEdge, instrTo);
   }
 
-  nto.instructions.forEach((i) => {
-    nfrom.instructions.push(i);
+  nTo.instructions.forEach((i) => {
+    nFrom.instructions.push(i);
   });
-  nto.instructionsIndexes.forEach((i) => {
-    nfrom.instructionsIndexes.push(i);
+  nTo.instructionsIndexes.forEach((i) => {
+    nFrom.instructionsIndexes.push(i);
   });
-  nfrom.instructions.sort((i1, i2) => i1.startAddress - i2.startAddress);
-  nfrom.instructionsIndexes.sort((i1, i2) => i1 - i2);
-  nfrom.nodeId = nfrom.instructions[0].startAddress;
+  nFrom.instructions.sort((i1, i2) => i1.startAddress - i2.startAddress);
+  nFrom.instructionsIndexes.sort((i1, i2) => i1 - i2);
+  nFrom.nodeId = nFrom.instructions[0].startAddress;
 
   // nullify node
-  nto.nodeId = -1 * nto.nodeId;
-  nto.incomingEdges = [];
-  nto.edges = [];
-  nto.instructionsIndexes = [];
-  nto.node = undefined;
-  nto.sourceLocation = Object.assign({}, nto.sourceLocation); // It is very important to copy! Otherwise we affect oringal source map
-  nto.sourceLocation.address = -1;
+  nTo.nodeId = -1 * nTo.nodeId;
+  nTo.incomingEdges = [];
+  nTo.edges = [];
+  nTo.instructionsIndexes = [];
+  nTo.node = undefined;
+  nTo.sourceLocation = Object.assign({}, nTo.sourceLocation); // It is very important to copy! Otherwise we affect original source map
+  nTo.sourceLocation.address = -1;
 
-  return nfrom;
+  return nFrom;
 }
 
 function findNode(
