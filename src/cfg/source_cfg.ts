@@ -38,8 +38,10 @@ interface DotMetaData {
   fid: number;
 }
 
+export type FunToSourceCFG = Map<number, BinaryLiftedCFG>;
+
 export class SourceCFGs {
-  private readonly _astGraphs: Map<number, BinaryLiftedCFG>;
+  private readonly _funToSourceCFG: FunToSourceCFG;
   private readonly _allGraphNodes: SourceCFGNode[];
 
   private _sourceMap: SourceMap | undefined;
@@ -49,9 +51,9 @@ export class SourceCFGs {
   constructor(asts: AgnosticASTMap, sourceMap: SourceMap, wasmCFGs: WasmCFGs) {
     this.fullSourceMap = sourceMap;
     this._wasmCFGs = wasmCFGs;
-    this._astGraphs = buildSourceCFGraph(sourceMap, wasmCFGs);
+    this._funToSourceCFG = buildSourceCFGraph(sourceMap, wasmCFGs);
     let allNodes: SourceCFGNode[] = [];
-    for (const funGraph of this._astGraphs.values()) {
+    for (const funGraph of this._funToSourceCFG.values()) {
       allNodes = allNodes.concat(funGraph.allNodes);
     }
     this._allGraphNodes = allNodes;
@@ -132,7 +134,7 @@ export class SourceCFGs {
   }
 
   getFunctionSourceCFG(fid: number): BinaryLiftedCFG | undefined {
-    return this._astGraphs.get(fid);
+    return this._funToSourceCFG.get(fid);
   }
 
   getFunctionSourceCFGStrict(fid: number): BinaryLiftedCFG {
@@ -163,7 +165,7 @@ export class SourceCFGs {
       const callInstr = getCallInstructions(n);
       for (const i of callInstr) {
         if (isCallInstruction(i)) {
-          const graph = this._astGraphs.get(i.funIdx);
+          const graph = this._funToSourceCFG.get(i.funIdx);
           if (graph === undefined) {
             // this can happen if funIDX is an imported env fun
             // or a function for which no source file is available
@@ -289,7 +291,7 @@ export class SourceCFGs {
       graph: object;
     }> = [];
     for (const f of this.sourceMap.wasm.functions) {
-      const g = this._astGraphs.get(f.id);
+      const g = this._funToSourceCFG.get(f.id);
       if (g !== undefined) {
         fgs.push({
           funID: f.id,
