@@ -1,6 +1,6 @@
 import path from 'path';
 import {
-  SourceMapfromSourceMapSpec,
+  SourceMapFromSourceMapSpec,
   type SourceOffsetStart,
 } from '../../src/source_mappers/source_map_builder';
 import { constructLanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
@@ -36,7 +36,7 @@ describe('Debug Operations on Zig App', function () {
         colNrStartNumber: 0,
         lineNrStartNumber: 1,
       };
-      const sm = await SourceMapfromSourceMapSpec(
+      const sm = await SourceMapFromSourceMapSpec(
         sourceMapPath,
         wasmPath,
         startPositioning,

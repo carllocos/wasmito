@@ -100,7 +100,7 @@ function getOffsetToApply(
   return [lineNrOffset, colNrOffset];
 }
 
-export async function SourceMapfromSourceMapSpec(
+export async function SourceMapFromSourceMapSpec(
   pathToSourceMap: string,
   wasmPath: string,
   startPositioning: SourceOffsetStart,

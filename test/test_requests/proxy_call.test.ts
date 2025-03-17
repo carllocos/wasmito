@@ -48,7 +48,7 @@ async function checkIfMessageReceived(
   });
 }
 
-describe('Intergation Test: Proxy Calls to a Mocked Target VM produces the right payloads', () => {
+describe('Integration Test: Proxy Calls to a Mocked Target VM produces the right payloads', () => {
   it('Proxy Call a primitive function with 3 arguments', async () => {
     const deviceManager = new DeviceManager();
     const platform = await createDevPlatform({
@@ -121,7 +121,7 @@ describe('Intergation Test: Proxy Calls to a Mocked Target VM produces the right
   it.skip('Proxy Call a function that takes 3 arguments', async () => {});
 });
 
-describe('Intergation Test: Proxy Call handled by a target VM produces expected responses', () => {
+describe('Integration Test: Proxy Call handled by a target VM produces expected responses', () => {
   it('Respond to a Proxy Call of a function that does not return a value', async () => {
     const platform = await createDevPlatform({
       selectedLanguage: {

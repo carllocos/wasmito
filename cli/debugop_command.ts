@@ -7,7 +7,7 @@ import {
 import {
   SourceMapfromDWARFWasm,
   SourceMapFromJSON,
-  SourceMapfromSourceMapSpec,
+  SourceMapFromSourceMapSpec,
   type SourceOffsetStart,
 } from '../src/source_mappers/source_map_builder';
 import { constructLanguageAdaptor } from '../src/language_adaptors/language_adaptor';
@@ -159,7 +159,7 @@ export function registerDebugOpCommand(program: Command): void {
           colNrStartNumber: 0,
           lineNrStartNumber: 1,
         };
-        smPromise = SourceMapfromSourceMapSpec(
+        smPromise = SourceMapFromSourceMapSpec(
           sourceSpecPath,
           wasmPath,
           startPositioning,

@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import path from 'path';
 import {
   type SourceMapConfig,
-  SourceMapfromSourceMapSpec,
+  SourceMapFromSourceMapSpec,
   type SourceOffsetStart,
 } from '../../src/source_mappers/source_map_builder';
 import { constructLanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
@@ -39,7 +39,7 @@ describe.skip('Debug Operations on AssemblyScript Blink App', function () {
         colNrStartNumber: 0,
         lineNrStartNumber: 1,
       };
-      const sm = await SourceMapfromSourceMapSpec(
+      const sm = await SourceMapFromSourceMapSpec(
         sourceMapPath,
         wasmPath,
         startPositioning,
@@ -117,7 +117,7 @@ describe('Debug Operations on AS Intermittent Blink', function () {
         colNrStartNumber: 0,
         lineNrStartNumber: 1,
       };
-      const sm = await SourceMapfromSourceMapSpec(
+      const sm = await SourceMapFromSourceMapSpec(
         sourceMapPath,
         wasmPath,
         startPositioning,

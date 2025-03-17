@@ -1,7 +1,7 @@
 import path from 'path';
 import {
   type SourceMapConfig,
-  SourceMapfromSourceMapSpec,
+  SourceMapFromSourceMapSpec,
   type SourceOffsetStart,
 } from '../../src/source_mappers/source_map_builder';
 import { constructLanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
@@ -33,7 +33,7 @@ describe('Debug operations on C Blink Intermittent App', function () {
         colNrStartNumber: 0,
         lineNrStartNumber: 1,
       };
-      const sm = await SourceMapfromSourceMapSpec(
+      const sm = await SourceMapFromSourceMapSpec(
         pathToSrcMap,
         app,
         startPositioning,

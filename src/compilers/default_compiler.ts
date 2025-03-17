@@ -11,7 +11,7 @@ import {
 import {
   SourceMapfromDWARFWasm,
   SourceMapFromJSON,
-  SourceMapfromSourceMapSpec,
+  SourceMapFromSourceMapSpec,
 } from '../source_mappers/source_map_builder';
 import { type SourceMap } from '../source_mappers';
 
@@ -66,7 +66,7 @@ export class DefaultCompiler extends SourceCodeCompiler {
     this._lastCompileArgs = compilerArgs;
     let sm: SourceMap | undefined;
     if (compilerArgs.pathToSourceMap !== undefined) {
-      sm = await SourceMapfromSourceMapSpec(
+      sm = await SourceMapFromSourceMapSpec(
         compilerArgs.pathToSourceMap,
         compilerArgs.pathToWasm,
         { lineNrStartNumber: 0, colNrStartNumber: 0 },
