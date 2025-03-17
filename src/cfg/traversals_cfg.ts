@@ -9,13 +9,13 @@ export interface TraversalCallBacks {
   onNode?: (n: CFGNode) => void;
   onEdge?: (
     from: CFGNode,
-    fromIstruction: WasmInstruction,
+    fromInstruction: WasmInstruction,
     to: CFGNode,
     toInstruction: WasmInstruction,
   ) => void;
 }
 
-export function breadthFirstTraverseWasmCFGT(
+export function breadthFirstTraverseWasmCFG(
   g: WasmAddrToNodeMap,
   entryNode: CFGNode,
   callbacks: TraversalCallBacks,
@@ -41,11 +41,11 @@ export function breadthFirstTraverseWasmCFGT(
     const edges = n.edges;
     for (const e of edges) {
       const toNode = getWasmCFGNode(g, e.instrTo.startAddress);
-      const hasEdge = visitedEdges.find(([nfID, faddr, ntID, taddr]) => {
+      const hasEdge = visitedEdges.find(([nfID, fAddr, ntID, tAddr]) => {
         return (
           nfID === n.nodeID &&
-          faddr === e.instrFrom.startAddress &&
-          taddr === e.instrTo.startAddress &&
+          fAddr === e.instrFrom.startAddress &&
+          tAddr === e.instrTo.startAddress &&
           ntID === toNode.nodeID
         );
       });

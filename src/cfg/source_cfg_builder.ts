@@ -1,4 +1,4 @@
-import { breadthFirstTraverseWasmCFGT } from './traversals_cfg';
+import { breadthFirstTraverseWasmCFG } from './traversals_cfg';
 import {
   type WasmAddrToNodeMap,
   type CFGNode,
@@ -238,7 +238,7 @@ function binaryLiftWasmNodes(
   const g = funGraph.addrToNode;
   const nodes: SourceCFGNode[] = [];
 
-  breadthFirstTraverseWasmCFGT(g, entryNode, {
+  breadthFirstTraverseWasmCFG(g, entryNode, {
     onNode: (n: CFGNode) => {
       let prevNode: SourceCFGNode | undefined;
       for (let i = 0; i < n.instructions.length; i++) {
@@ -373,7 +373,7 @@ function binaryLiftWasmEdges(
 
   const g = funGraph.addrToNode;
   const wasmNodesToIgnore: Set<number> = new Set<number>();
-  breadthFirstTraverseWasmCFGT(g, funGraph.entryNode, {
+  breadthFirstTraverseWasmCFG(g, funGraph.entryNode, {
     onNode: (wasmNode: CFGNode) => {
       const found = sourceCFGNodeAndInstrFromDecrInstrAddrs(
         wasmNode,
