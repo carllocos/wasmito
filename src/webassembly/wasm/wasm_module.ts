@@ -202,6 +202,14 @@ export class WasmModule {
     }
   }
 
+  public getFunctionFromAddr(addr: number): WASMFunction | undefined {
+    for (const wasmFunc of this.functions) {
+      if (wasmFunc.isAddressInFunction(addr)) {
+        return wasmFunc;
+      }
+    }
+  }
+
   private correctCallInstructionsTypes(): void {
     this.instructions.forEach((i: WasmInstruction) => {
       if (isCallInstruction(i)) {

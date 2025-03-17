@@ -107,4 +107,8 @@ export class WASMFunction {
     }
     return localSetInstrs;
   }
+
+  isAddressInFunction(addr: number): boolean {
+    return this.startAddress <= addr && addr <= this.endAddress; // TODO addr < this.endAddress?
+  }
 }
