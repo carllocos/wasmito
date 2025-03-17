@@ -212,6 +212,11 @@ export class SourceCFGs {
     return ns;
   }
 
+  nodeFromAddr(addr: number): SourceCFGNode | undefined {
+    return undefined;
+  }
+
+
   serializeToDot(
     outputDir: string,
     config: DotSerializationConfig,
