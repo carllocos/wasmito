@@ -83,7 +83,18 @@ export type ProxyCallResponse =
   | ProxyCallSuccessfulResponse
   | ProxyCallFailedRequest;
 
-export function isProxyCallSuccessfulResponse(obj: any): boolean {
+export function isProxyCallFailedRequest(
+  obj: any,
+): obj is ProxyCallFailedRequest {
+  return (
+    typeof obj === 'object' &&
+    typeof obj.errorCode === 'number' &&
+    typeof obj.errorMessage === 'string'
+  );
+}
+export function isProxyCallSuccessfulResponse(
+  obj: any,
+): obj is ProxyCallSuccessfulResponse {
   return (
     typeof obj === 'object' &&
     typeof obj.sucessFullCall === 'boolean' &&
@@ -185,7 +196,7 @@ export class ProxyCallRequest extends FunCallRequest<ProxyCallResponse> {
     if (isNaN(errorCode)) {
       return undefined;
     }
-    const exceptionMsg = getExceptionMsgFromErrorCode(errorCode);
+    const exceptionMsg = errorCodeMessage(errorCode);
     if (exceptionMsg === undefined) {
       logger.error(
         `Did not find a registered exception msg for error code ${errorCode}`,
@@ -194,7 +205,32 @@ export class ProxyCallRequest extends FunCallRequest<ProxyCallResponse> {
 
     return {
       errorCode,
-      errorMessage: exceptionMsg ?? '',
+      errorMessage: exceptionMsg ?? 'unknown error code message',
     };
+  }
+}
+
+function errorCodeMessage(errorCode: number): string | undefined {
+  switch (errorCode) {
+    case 1:
+      return 'Out of memory';
+    case 11:
+      return 'Error when reading/writing From/to Client (TODO fix error code in VM)';
+    case 12:
+      return 'Reply too large';
+    case 13:
+      return 'Client Closed';
+    case 20:
+      return 'Called invalid wasm function';
+    case 21:
+      return 'Malformed Remote call request';
+    case 22:
+      return 'Invalid number of arguments';
+    case 30:
+      return 'Malformed response';
+    case 31:
+      return 'Malformed request interrupt nr';
+    default:
+      return undefined;
   }
 }
