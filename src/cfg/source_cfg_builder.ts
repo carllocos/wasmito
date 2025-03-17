@@ -107,7 +107,7 @@ function findExitNodes(
     return [exitSourceNode];
   }
 
-  const [exitSourceNodes] = closestNeighbours(
+  const [exitSourceNodes] = closestParentsWithSourceNodes(
     wasmCFG.addrToNode,
     exitWasmNode,
     sourceNodes,
@@ -116,7 +116,16 @@ function findExitNodes(
   return exitSourceNodes;
 }
 
-function closestNeighbours(
+/**
+ * Idem as `closestNeighboursWithSourceNodes` but the search happens in the direction
+ * of the parents of node `n`
+ * @param g
+ * @param n
+ * @param sourceNodes
+ * @param wasmNodesVisited
+ * @returns
+ */
+function closestParentsWithSourceNodes(
   g: WasmAddrToNodeMap,
   n: CFGNode,
   sourceNodes: SourceCFGNode[],
@@ -137,7 +146,7 @@ function closestNeighbours(
       sourceNodes,
     );
     if (found === undefined) {
-      const [closest, newlyVisited] = closestNeighbours(
+      const [closest, newlyVisited] = closestParentsWithSourceNodes(
         g,
         fromWasmNode,
         sourceNodes,
@@ -176,7 +185,7 @@ function findEntryNodes(
   // case where Wasm entry node has no associated source CFGNode
   // we have to retrieve the (indirect) children of the entryNode
   // that do have a source CFG node associated to them
-  const [entryNodesAndInstr] = closetsChildrenSourceCFGNodes(
+  const [entryNodesAndInstr] = closetNeighboursWithSourceNodes(
     wasmCFG.addrToNode,
     wasmCFG.entryNode,
     sourceNodes,
@@ -463,7 +472,7 @@ function binaryLiftWasmEdges(
         } else {
           // we have to search for all the neighbours of toNode that have a CFG node
           const [indirectNodes, newWasmNodesToIgnore] =
-            closetsChildrenSourceCFGNodes(g, toWasmNode, sourceNodes);
+            closetNeighboursWithSourceNodes(g, toWasmNode, sourceNodes);
           newWasmNodesToIgnore.forEach((nid) => wasmNodesToIgnore.add(nid));
           for (const [indirectNode, indirectInstr] of indirectNodes) {
             addEdge(sourceCFGNodeFrom, fromInstr, indirectNode, indirectInstr);
@@ -489,7 +498,7 @@ function binaryLiftWasmEdges(
  * @param nodesToIgnore a set of already visited node ids. This prevents to loop infinitely.
  * @returns nodes IDs that no longer need to be visited after return and the closets nodes
  */
-function closetsChildrenSourceCFGNodes(
+function closetNeighboursWithSourceNodes(
   g: WasmAddrToNodeMap,
   n: CFGNode,
   nodes: SourceCFGNode[],
@@ -521,7 +530,7 @@ function closetsChildrenSourceCFGNodes(
     const toWasmNode = getWasmCFGNode(g, e.instrTo.startAddress);
     const found = sourceCFGNodeAndInstrFromIncrInstrAddrs(toWasmNode, nodes);
     if (found === undefined) {
-      const [ns, newNodesToIgnore] = closetsChildrenSourceCFGNodes(
+      const [ns, newNodesToIgnore] = closetNeighboursWithSourceNodes(
         g,
         toWasmNode,
         nodes,
