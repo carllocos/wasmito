@@ -489,7 +489,7 @@ function findExitNodes(
     return [exitSourceNode];
   }
 
-  const [exitSourceNodes] = closestsParentSourceNodes(
+  const [exitSourceNodes] = closestNeighbours(
     wasmCFG.addrToNode,
     exitWasmNode,
     sourceNodes,
@@ -498,7 +498,7 @@ function findExitNodes(
   return exitSourceNodes;
 }
 
-function closestsParentSourceNodes(
+function closestNeighbours(
   g: WasmAddrToNodeMap,
   n: CFGNode,
   sourceNodes: SourceCFGNode[],
@@ -519,13 +519,13 @@ function closestsParentSourceNodes(
       sourceNodes,
     );
     if (found === undefined) {
-      const [closests, newlyVisited] = closestsParentSourceNodes(
+      const [closest, newlyVisited] = closestNeighbours(
         g,
         fromWasmNode,
         sourceNodes,
         wasmNodesVisited,
       );
-      closests.forEach((n) => {
+      closest.forEach((n) => {
         if (!sourceNodesAdded.has(n.nodeId)) {
           exitSourceNodes.push(n);
           sourceNodesAdded.add(n.nodeId);
