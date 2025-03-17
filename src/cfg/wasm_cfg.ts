@@ -8,6 +8,8 @@ import {
   type WasmInstruction,
   instructionToString,
   type CallIndirect,
+  isCallIndirect,
+  isCallInstruction,
 } from '../webassembly/wasm/wasm_instruction';
 import { type WasmModule } from '../webassembly/wasm/wasm_module';
 import { wasmControlFlowGraphToDot } from './dot_serialize';
@@ -80,9 +82,11 @@ function wasmFuncGraphToJSONObj(cfg: WasmCFG): object {
   };
 }
 
+export type WasmFuncToWasmCFG = Map<number, WasmCFG>;
+
 export class WasmCFGs {
   private readonly _wasm: WasmModule;
-  private readonly _cfgs: Map<number, WasmCFG>;
+  private readonly _cfgs: WasmFuncToWasmCFG;
   private readonly _callSites: Map<number, Set<number>>;
   private readonly _callgraph: WasmCallGraph;
 
@@ -102,6 +106,14 @@ export class WasmCFGs {
     return this._cfgs.get(funID);
   }
 
+  getCFGFromAddr(instructionAddr: number): WasmCFG | undefined {
+    const currentFunc = this._wasm.getFunctionFromAddr(instructionAddr);
+    if (currentFunc === undefined) {
+      return;
+    }
+    return this.getCFG(currentFunc.id);
+  }
+
   callSites(funID: number): Set<number> {
     return this._callSites.get(funID) ?? new Set();
   }
@@ -112,6 +124,11 @@ export class WasmCFGs {
       throw new Error(`no CFG found for fun ${funID}`);
     }
     return r;
+  }
+
+  getCFGNodeFromAddr(instructionAddr: number): CFGNode | undefined {
+    const cfg = this.getCFGFromAddr(instructionAddr);
+    return cfg?.addrToNode.get(instructionAddr);
   }
 
   serializeToDot(outputDir: string, funIds: number[] = []): string[] {
@@ -240,4 +257,23 @@ export function nodeToStr(n: CFGNode): string {
     .join(', ');
 
   return `${s} {\n instrs:[${istrs}],\nidxs:[${idxs}],\nedges:[${edgesStr}]}`;
+}
+
+export function isWasmCallNode(n: CFGNode): boolean {
+  const found = n.instructions.find((i) => {
+    return isCallIndirect(i) || isCallInstruction(i);
+  });
+  return found !== undefined;
+}
+
+export function getCalledFunctions(n: CFGNode): number[] {
+  const fids: number[] = [];
+  for (const i of n.instructions) {
+    if (isCallInstruction(i)) {
+      fids.push(i.funIdx);
+    } else if (isCallIndirect(i)) {
+      fids.push(...i.targetFuncs);
+    }
+  }
+  return fids;
 }
