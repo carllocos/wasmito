@@ -49,7 +49,7 @@ async function checkIfMessageReceived(
 }
 
 describe('Integration Test: Proxy Calls to a Mocked Target VM produces the right payloads', () => {
-  it('Proxy Call a primitive function with 3 arguments', async () => {
+  it('Proxy Call primitive functions with 2 and 3 arguments', async () => {
     const deviceManager = new DeviceManager();
     const platform = await createDevPlatform({
       selectedLanguage: {
