@@ -53,6 +53,7 @@ export function buildControlFlowGraphFunction(
 
 export function buildGraphs(
   wasm: WasmModule,
+  linkToExportsWhenNoCFG: boolean = true,
 ): [Map<number, WasmCFG>, Map<number, Set<number>>, WasmCallGraph] {
   const cfgs = new Map();
   let tableAltered: boolean = false;
@@ -66,7 +67,7 @@ export function buildGraphs(
 
   setTargetFunctionForCallIndirects(wasm.functions, fgs, tableAltered);
   const callsites = buildCallSites(cfgs, wasm.functions);
-  const callgraph = buildMainWasmCallGraph(wasm, cfgs);
+  const callgraph = buildMainWasmCallGraph(wasm, cfgs, linkToExportsWhenNoCFG);
   return [cfgs, callsites, callgraph];
 }
 
