@@ -30,7 +30,7 @@ export class WasmCallGraph {
 
 export function buildMainWasmCallGraph(
   wasm: WasmModule,
-  cfg: Map<number, WasmCFG>,
+  cfgs: Map<number, WasmCFG>,
 ): WasmCallGraph {
   // find entry funcs
   const entryFuncs = wasm.getMainFunctions().map((f) => f.id);
@@ -50,7 +50,6 @@ export function buildMainWasmCallGraph(
   // (1) any explicitly exported func in module marked with `export`
   // (2) any func added to a table imported by the host environment
   // (3) any func added to a table exported by the module
-  const importedFuncs = new Set(wasm.importFuncs.map((f) => f.id));
   const allExportedFuncs = wasm.functions
     .filter((f) => f.exported)
     .map((f) => f.id);
@@ -68,22 +67,28 @@ export function buildMainWasmCallGraph(
       }
     }
   }
+  return buildCallGraph(wasm, entryFuncs, cfgs, allExportedFuncs);
+}
+
+export function buildCallGraph(
+  wasm: WasmModule,
+  entryFuncs: number[],
+  cfgs: Map<number, WasmCFG>,
+  linkToFuncsWhenNoCFG: number[],
+): WasmCallGraph {
+  // importedFuncs used for sanity check
+  const importedFuncs = new Set(wasm.importFuncs.map((f) => f.id));
 
   const nodes = new Map<number, CallGraphNode>();
   const funToVisit = entryFuncs.slice(); // copy
   const visited = new Set<number>();
 
-  while (funToVisit.length > 0) {
-    const f = funToVisit.shift();
-    if (f === undefined) {
-      throw new Error(`f should not be undefined ${f}`);
-    }
-    if (visited.has(f)) {
-      continue;
-    }
+  let f: number | undefined;
+  while ((f = funToVisit.shift()) !== undefined) {
+    if (visited.has(f)) continue;
     visited.add(f);
 
-    const fg = cfg.get(f);
+    const fg = cfgs.get(f);
     let calls: number[] = [];
     if (fg === undefined) {
       // f is an import
@@ -92,7 +97,7 @@ export function buildMainWasmCallGraph(
           `Function ${f} that has no CFG is expected to be an imported func`,
         );
       }
-      calls = allExportedFuncs;
+      calls = linkToFuncsWhenNoCFG;
     } else {
       calls = fg.calls
         .map((c) => c.funIdx)
