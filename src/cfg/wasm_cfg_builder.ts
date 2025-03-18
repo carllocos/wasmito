@@ -18,7 +18,7 @@ import {
   isTableSet,
 } from '../webassembly/wasm/wasm_instruction';
 import { type WasmModule } from '../webassembly/wasm/wasm_module';
-import { buildWasmCallGraph, type WasmCallGraph } from './wasm_callgraph';
+import { buildMainWasmCallGraph, type WasmCallGraph } from './wasm_callgraph';
 import {
   getWasmCFGNode,
   type WasmAddrToNodeMap,
@@ -66,7 +66,7 @@ export function buildGraphs(
 
   setTargetFunctionForCallIndirects(wasm.functions, fgs, tableAltered);
   const callsites = buildCallSites(cfgs, wasm.functions);
-  const callgraph = buildWasmCallGraph(wasm, cfgs);
+  const callgraph = buildMainWasmCallGraph(wasm, cfgs);
   return [cfgs, callsites, callgraph];
 }
 
