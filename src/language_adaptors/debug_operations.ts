@@ -168,8 +168,20 @@ export function stepIteration(
       // take blink_intermittent.rs as example
     }
   }
-  const destinationNodes = cycleStart.concat(exitLoop);
-  return destinationNodes.map((n) => [n, -1]);
+
+  const duplicateCheck = new Map<number, number[]>();
+  const destinationNodes: Array<[SourceCFGNode, number]> = [];
+  for (const n of cycleStart.concat(exitLoop)) {
+    const nodeAddresses = duplicateCheck.get(n.nodeId) ?? [];
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    for (const [_fromNode, _fromInstr, toInstr] of n.incomingEdges) {
+      if (nodeAddresses.includes(toInstr.startAddress)) continue;
+      destinationNodes.push([n, toInstr.startAddress]);
+      nodeAddresses.push(toInstr.startAddress);
+    }
+    duplicateCheck.set(n.nodeId, nodeAddresses);
+  }
+  return destinationNodes;
 }
 
 export const DebugOperations: AgnosticDebugOperations = {
