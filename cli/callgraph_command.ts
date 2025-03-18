@@ -35,7 +35,6 @@ export function registerCallgraphCommand(program: Command): void {
       } else {
         timeoutMs = timeoutMs * 1000; // convert to millisecs
       }
-      console.log(options);
 
       let outputFile = options.dotOutput;
       if (options.dotOutput === undefined) {
