@@ -19,6 +19,10 @@ export function registerCallgraphCommand(program: Command): void {
       '-od, --dot-output <output-path>',
       'the location where to store the callgraph. Parent directories are created if needed',
     )
+    .option(
+      '--no-link-to-exports',
+      'Disable automatically link to export functions when a function is encountered without CFG',
+    )
     .action(async (wasmPath, timeout, options) => {
       const logger = getGlobalLogger();
       if (!isFilePath(wasmPath)) {
@@ -42,7 +46,8 @@ export function registerCallgraphCommand(program: Command): void {
         logger.info(`Starting construction callgraph`);
         const startTime = Date.now();
         const wasm = new WasmModule(wasmPath);
-        const [, , callgraph] = buildGraphs(wasm);
+        const linkToExportsWhenNoCFG = options.linkToExports === undefined;
+        const [, , callgraph] = buildGraphs(wasm, linkToExportsWhenNoCFG);
         const endTime = Date.now();
         const diff = endTime - startTime;
         logger.info(
