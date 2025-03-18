@@ -28,7 +28,7 @@ export class WasmCallGraph {
   }
 }
 
-export function buildWasmCallGraph(
+export function buildMainWasmCallGraph(
   wasm: WasmModule,
   cfg: Map<number, WasmCFG>,
 ): WasmCallGraph {
