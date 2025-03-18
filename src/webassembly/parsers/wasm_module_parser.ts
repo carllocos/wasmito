@@ -835,6 +835,11 @@ enum ExportType {
 export interface FunExport {
   name: string;
   id?: number;
+
+  // the name given to inner function that gets exported
+  // with a different name than the inner name
+  // the exported name is stored in name
+  innerName?: string;
 }
 
 function isExportField(obj: any): boolean {
@@ -859,13 +864,23 @@ function parseExportFuncs(fields: any): FunExport[] {
         );
       }
       let id: number | undefined;
-      if (f.descr.id.type === 'NumberLiteral') {
-        id = f.descr.id.value;
+      let innerName: string | undefined;
+      const exportId = f.descr.id;
+      if (exportId.type === 'NumberLiteral') {
+        id = exportId.value;
+      } else if (exportId.type === 'Identifier') {
+        if (typeof exportId.value !== 'string') {
+          throw Error(
+            `encountered a non string identifier value: ${exportId.value}`,
+          );
+        }
+        innerName = exportId.value;
       }
 
       const ef: FunExport = {
         name: f.name,
         id,
+        innerName,
       };
       exports.push(ef);
     }

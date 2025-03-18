@@ -323,7 +323,9 @@ function createWasmFunctions(
 
     const funExported = mod.exportedFuncs.find((ef) => {
       return (
-        ef.name === fun.name.value || (fun.id !== undefined && ef.id === fun.id)
+        ef.name === fun.name.value ||
+        (fun.id !== undefined && ef.id === fun.id) ||
+        (ef.innerName !== undefined && ef.innerName === fun.name.value)
       );
     });
 
