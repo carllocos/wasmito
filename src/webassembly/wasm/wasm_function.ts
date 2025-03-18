@@ -21,6 +21,7 @@ export class WASMFunction {
 
   public readonly id: number;
   public readonly exported: boolean;
+  public readonly exportName: string;
 
   public readonly type: WasmType;
   public readonly locals: WasmLocal[];
@@ -37,10 +38,12 @@ export class WASMFunction {
     funcType: WasmType,
     locals: WasmLocal[],
     exported: boolean,
+    exportName?: string,
   ) {
     this.name = name;
     this.id = id;
     this.exported = exported;
+    this.exportName = exportName ?? '';
     this.type = funcType;
     this.locals = locals;
     this.body = instructions;

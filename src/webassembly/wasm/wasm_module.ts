@@ -375,6 +375,10 @@ function createWasmFunctions(
         };
       });
 
+    let exportName = '';
+    if (funExported?.innerName !== undefined) {
+      exportName = funExported.name;
+    }
     const f = new WASMFunction(
       fun.name.value,
       funID,
@@ -382,6 +386,7 @@ function createWasmFunctions(
       fun.signature,
       locals,
       funExported !== undefined,
+      exportName,
     );
     funcs.push(f);
   }
