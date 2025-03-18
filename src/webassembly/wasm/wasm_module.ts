@@ -210,6 +210,22 @@ export class WasmModule {
     }
   }
 
+  public getMainFunctions(): WASMFunction[] {
+    const mainNames = new Set<string>(['main', '_main', '_start']);
+    const funcs: WASMFunction[] = [];
+    const added = new Set<number>();
+    for (const f of this.functions) {
+      if (
+        !added.has(f.id) &&
+        (mainNames.has(f.name) || (f.exported && mainNames.has(f.exportName)))
+      ) {
+        funcs.push(f);
+        added.add(f.id);
+      }
+    }
+    return funcs;
+  }
+
   private correctCallInstructionsTypes(): void {
     this.instructions.forEach((i: WasmInstruction) => {
       if (isCallInstruction(i)) {
