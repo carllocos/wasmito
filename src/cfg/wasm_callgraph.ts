@@ -67,15 +67,27 @@ export function buildMainWasmCallGraph(
       }
     }
   }
-  return buildCallGraph(wasm, entryFuncs, cfgs, allExportedFuncs);
+  const [g] = buildCallGraph(wasm, entryFuncs, cfgs, allExportedFuncs);
+  return g;
 }
 
+/**
+ * build a call graph for the given entry funcs in a Wasm module.
+ * While building the callgraph we may encounter a function that has no CFG.
+ * These functions are automatically linked to `linkToFuncsWhenNoCFG`.
+ * This can be used to create sound call graphs.
+ * @param wasm
+ * @param entryFuncs
+ * @param cfgs
+ * @param linkToFuncsWhenNoCFG
+ * @returns a tuple containing the call graph and a set of all function identities part of the callgraph
+ */
 export function buildCallGraph(
   wasm: WasmModule,
   entryFuncs: number[],
   cfgs: Map<number, WasmCFG>,
   linkToFuncsWhenNoCFG: number[],
-): WasmCallGraph {
+): [WasmCallGraph, Set<number>] {
   // importedFuncs used for sanity check
   const importedFuncs = new Set(wasm.importFuncs.map((f) => f.id));
 
@@ -116,7 +128,7 @@ export function buildCallGraph(
   for (const f of entryFuncs) {
     entryNodes.push(getNodeOrCreate(nodes, f));
   }
-  return new WasmCallGraph(entryNodes, nodes);
+  return [new WasmCallGraph(entryNodes, nodes), visited];
 }
 
 function addEdge(
