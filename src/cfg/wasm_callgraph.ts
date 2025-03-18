@@ -33,10 +33,7 @@ export function buildMainWasmCallGraph(
   cfg: Map<number, WasmCFG>,
 ): WasmCallGraph {
   // find entry funcs
-  const mainNames = new Set<string>(['main', '_main']);
-  const entryFuncs = wasm.functions
-    .filter((f) => mainNames.has(f.name))
-    .map((f) => f.id);
+  const entryFuncs = wasm.getMainFunctions().map((f) => f.id);
 
   // if no entry funcs found
   // consider all exported funcs
