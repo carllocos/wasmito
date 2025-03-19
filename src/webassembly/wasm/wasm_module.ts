@@ -36,7 +36,7 @@ export class WasmModule {
   public readonly types: WasmType[];
   public readonly importFuncs: WASMFunction[];
   public readonly globals: WasmGlobal[];
-  public readonly functions: WASMFunction[];
+  public readonly _functions: WASMFunction[];
   private readonly ast: object;
   public readonly wasmBuffer: Buffer;
   private readonly _instructions: WasmInstruction[];
@@ -56,7 +56,7 @@ export class WasmModule {
     }
     this.wasmPath = wasmPath;
     this._sections = createSections(mod);
-    this.functions = createWasmFunctions(wasmPath, mod);
+    this._functions = createWasmFunctions(wasmPath, mod);
     this.importFuncs = createImportedFunctions(mod);
     this.globals = createWasmGlobals(mod);
     this.types = createWasmTypes(mod);
@@ -68,6 +68,15 @@ export class WasmModule {
     this.tableImports = mod.tableImports;
     this.tableExports = mod.tableExports;
     this.elements = mod.elements;
+  }
+
+  /**
+   * get the functions defined in the module.
+   * These functions exclude the imported functions.
+   * To access the imported functions do `importFuncs`
+   */
+  get functions(): WASMFunction[] {
+    return this._functions;
   }
 
   get instructions(): WasmInstruction[] {
