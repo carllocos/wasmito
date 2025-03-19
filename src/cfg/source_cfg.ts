@@ -24,6 +24,7 @@ import path from 'path';
 import { buildSourceCFGraph } from './source_cfg_builder';
 import { searchForNextReachableSourceNodes } from './source_cfg_helper';
 import { searchCallbacksCFGs, type CallbackSCFG } from './callback_cfg';
+import { type DestinationSCFGNodes } from '../language_adaptors';
 
 const logger = createLogger('ASTControlFlowGraph');
 export interface DotSerializationConfig {
