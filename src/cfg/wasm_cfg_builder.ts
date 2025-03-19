@@ -18,7 +18,7 @@ import {
   isTableSet,
 } from '../webassembly/wasm/wasm_instruction';
 import { type WasmModule } from '../webassembly/wasm/wasm_module';
-import { buildMainWasmCallGraph, type CallGraph } from './wasm_callgraph';
+import { buildMainWasmCallGraph, type CallGraph } from './callgraph';
 import {
   getWasmCFGNode,
   type WasmAddrToNodeMap,

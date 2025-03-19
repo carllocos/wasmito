@@ -16,7 +16,7 @@ import { wasmControlFlowGraphToDot } from './dot_serialize';
 import path from 'path';
 import { getFileName } from '../util/file_util';
 import { buildGraphs } from './wasm_cfg_builder';
-import { type CallGraph } from './wasm_callgraph';
+import { type CallGraph } from './callgraph';
 
 export interface CFGEdge {
   instrFrom: WasmInstruction;
