@@ -217,9 +217,7 @@ export class SourceCFGs {
     return undefined;
   }
 
-  nextReachableSourceNodesFromAddr(
-    addr: number,
-  ): Array<[SourceCFGNode, number]> {
+  nextReachableSourceNodesFromAddr(addr: number): DestinationSCFGNodes {
     const g = this.wasmCFGs.getCFGFromAddr(addr);
     const startNode = g?.addrToNode.get(addr);
     if (g === undefined || startNode === undefined) {
@@ -236,9 +234,7 @@ export class SourceCFGs {
     return next.map(([n, i]) => [n, i.startAddress]);
   }
 
-  nextReachableSourceNodesFromFunction(
-    fid: number,
-  ): Array<[SourceCFGNode, number]> {
+  nextReachableSourceNodesFromFunction(fid: number): DestinationSCFGNodes {
     const wcfg = this.wasmCFGs.getCFG(fid);
     if (wcfg === undefined) return [];
     return this.nextReachableSourceNodesFromAddr(wcfg.entryNode.startAddress);
