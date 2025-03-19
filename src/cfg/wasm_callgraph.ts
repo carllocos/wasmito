@@ -11,12 +11,19 @@ export interface CallGraphNode {
 }
 
 export class WasmCallGraph {
-  public readonly entryNodes: CallGraphNode[];
+  private readonly _entryNodes: CallGraphNode[];
   public readonly nodes: Map<number, CallGraphNode>;
 
   constructor(entryNodes: CallGraphNode[], nodes: Map<number, CallGraphNode>) {
-    this.entryNodes = entryNodes;
+    this._entryNodes = entryNodes;
     this.nodes = nodes;
+
+  }
+
+  get entryNodes(): CallGraphNode[] {
+    return this._entryNodes.map((en) => en);
+  }
+
   }
 
   toDot(outputFile?: string): string {
