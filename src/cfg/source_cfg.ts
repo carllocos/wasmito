@@ -236,6 +236,14 @@ export class SourceCFGs {
     return next.map(([n, i]) => [n, i.startAddress]);
   }
 
+  nextReachableSourceNodesFromFunction(
+    fid: number,
+  ): Array<[SourceCFGNode, number]> {
+    const wcfg = this.wasmCFGs.getCFG(fid);
+    if (wcfg === undefined) return [];
+    return this.nextReachableSourceNodesFromAddr(wcfg.entryNode.startAddress);
+  }
+
   serializeToDot(
     outputDir: string,
     config: DotSerializationConfig,
