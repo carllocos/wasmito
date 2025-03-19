@@ -13,17 +13,44 @@ export interface CallGraphNode {
 export class WasmCallGraph {
   private readonly _entryNodes: CallGraphNode[];
   public readonly nodes: Map<number, CallGraphNode>;
+  private _allnodes: CallGraphNode[];
+  private _allNodesAccessed: boolean;
 
   constructor(entryNodes: CallGraphNode[], nodes: Map<number, CallGraphNode>) {
     this._entryNodes = entryNodes;
     this.nodes = nodes;
 
+    this._allNodesAccessed = false;
+    this._allnodes = [];
   }
 
   get entryNodes(): CallGraphNode[] {
     return this._entryNodes.map((en) => en);
   }
 
+  get allNodes(): CallGraphNode[] {
+    if (!this._allNodesAccessed) {
+      this._allNodesAccessed = true;
+      this._allnodes = this.visitAllNodes();
+    }
+    return this.allNodes;
+  }
+
+  private visitAllNodes(): CallGraphNode[] {
+    const ns: CallGraphNode[] = [];
+    const visited = new Set<number>();
+    const q = this.entryNodes;
+    let n: CallGraphNode | undefined;
+    while ((n = q.shift()) !== undefined) {
+      if (visited.has(n.fid)) {
+        continue;
+      }
+      visited.add(n.fid);
+      ns.push(n);
+      q.push(...n.edges);
+    }
+
+    return ns;
   }
 
   toDot(outputFile?: string): string {
