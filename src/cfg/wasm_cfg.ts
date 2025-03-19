@@ -16,7 +16,7 @@ import { wasmControlFlowGraphToDot } from './dot_serialize';
 import path from 'path';
 import { getFileName } from '../util/file_util';
 import { buildGraphs } from './wasm_cfg_builder';
-import { type WasmCallGraph } from './wasm_callgraph';
+import { type CallGraph } from './wasm_callgraph';
 
 export interface CFGEdge {
   instrFrom: WasmInstruction;
@@ -88,7 +88,7 @@ export class WasmCFGs {
   private readonly _wasm: WasmModule;
   private readonly _cfgs: WasmFuncToWasmCFG;
   private readonly _callSites: Map<number, Set<number>>;
-  private readonly _callgraph: WasmCallGraph;
+  private readonly _callgraph: CallGraph;
 
   constructor(wasm: WasmModule) {
     this._wasm = wasm;
@@ -98,7 +98,7 @@ export class WasmCFGs {
     this._callgraph = callgraph;
   }
 
-  get callgraph(): WasmCallGraph {
+  get callgraph(): CallGraph {
     return this._callgraph;
   }
 
