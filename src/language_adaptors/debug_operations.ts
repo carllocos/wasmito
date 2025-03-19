@@ -116,7 +116,7 @@ export function stepIteration(
   if (!cycleFound) return [];
 
   // find cycle start
-  const scfg = sourceCFGs.getFunctionSourceCFGStrict(node.wasmFunOwner);
+  const scfg = sourceCFGs.getFunctionSourceCFGOrError(node.wasmFunOwner);
   const visitedNodes2 = new Set<number>();
   const cycleStart: SourceCFGNode[] = [];
   for (const entryNode of scfg.entryNodes) {

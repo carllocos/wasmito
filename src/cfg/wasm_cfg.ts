@@ -122,7 +122,7 @@ export class WasmCFGs {
     return this._callSites.get(funID) ?? new Set();
   }
 
-  getCFGStrict(funID: number): WasmCFG {
+  getCFGOrError(funID: number): WasmCFG {
     const r = this.getCFG(funID);
     if (r === undefined) {
       throw new Error(`no CFG found for fun ${funID}`);
@@ -142,7 +142,7 @@ export class WasmCFGs {
     }
     for (const fid of funIds) {
       const p = path.join(outputDir, `wasmfun${fid}.dot`);
-      const funGraph = this.getCFGStrict(fid);
+      const funGraph = this.getCFGOrError(fid);
       const content = wasmControlFlowGraphToDot(funGraph, `function ${fid}`);
       writeFileSync(p, content);
       dots.push(content);

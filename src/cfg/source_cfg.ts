@@ -153,7 +153,7 @@ export class SourceCFGs {
     return this._funToSourceCFG.get(fid);
   }
 
-  getFunctionSourceCFGStrict(fid: number): BinaryLiftedCFG {
+  getFunctionSourceCFGOrError(fid: number): BinaryLiftedCFG {
     const f = this.getFunctionSourceCFG(fid);
     if (f === undefined) {
       throw new Error(`Function ${fid} does not have a source CFG`);

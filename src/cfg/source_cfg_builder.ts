@@ -72,7 +72,7 @@ function binaryLiftWasmCFG(
    * visually seems as the debugger is not advancing.
    *
    */
-  const graph = cfg.getCFGStrict(f.id);
+  const graph = cfg.getCFGOrError(f.id);
   const ns = binaryLiftWasmNodes(f.id, sourceMap, graph);
   logger.debug(
     `${ns.length === 0 ? 'No edges to add' : 'Adding Edges'} for function ${f.id}`,

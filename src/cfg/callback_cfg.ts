@@ -120,7 +120,7 @@ export function searchCallbacksCFGs(SCFGs: SourceCFGs): CallbackSCFG[] {
         );
       })
       .flatMap((otherFunc) => {
-        return SCFGs.getFunctionSourceCFGStrict(otherFunc).entryNodes;
+        return SCFGs.getFunctionSourceCFGOrError(otherFunc).entryNodes;
       })
       .map((n) => {
         return [n, sourceNodeFirstInstrStartAddr(n)];
@@ -130,7 +130,7 @@ export function searchCallbacksCFGs(SCFGs: SourceCFGs): CallbackSCFG[] {
     const addedSCFGs = new Set<number>();
     next.forEach(([node]) => {
       if (!addedSCFGs.has(node.wasmFunOwner)) {
-        const scfg = SCFGs.getFunctionSourceCFGStrict(node.wasmFunOwner);
+        const scfg = SCFGs.getFunctionSourceCFGOrError(node.wasmFunOwner);
         scfgs.push(scfg);
         addedSCFGs.add(node.wasmFunOwner);
       }
