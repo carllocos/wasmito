@@ -23,6 +23,7 @@ import { createLogger } from '../logger/logger';
 import path from 'path';
 import { buildSourceCFGraph } from './source_cfg_builder';
 import { searchForNextReachableSourceNodes } from './source_cfg_helper';
+import { searchCallbacksCFGs, type CallbackSCFG } from './callback_cfg';
 
 const logger = createLogger('ASTControlFlowGraph');
 export interface DotSerializationConfig {
@@ -48,6 +49,8 @@ export class SourceCFGs {
   private _sourceMap: SourceMap | undefined;
   public readonly fullSourceMap: SourceMap;
   private readonly _wasmCFGs: WasmCFGs;
+  private _callbacksCFGsSearched: boolean;
+  private _callbacksCFGs: CallbackSCFG[];
 
   constructor(asts: AgnosticASTMap, sourceMap: SourceMap, wasmCFGs: WasmCFGs) {
     this.fullSourceMap = sourceMap;
@@ -58,6 +61,8 @@ export class SourceCFGs {
       allNodes = allNodes.concat(funGraph.allNodes);
     }
     this._allGraphNodes = allNodes;
+    this._callbacksCFGsSearched = false;
+    this._callbacksCFGs = [];
   }
 
   get sourceMap(): SourceMap {
@@ -77,6 +82,15 @@ export class SourceCFGs {
 
   get wasmCFGs(): WasmCFGs {
     return this._wasmCFGs;
+  }
+
+  get callbacksCFGs(): CallbackSCFG[] {
+    if (!this._callbacksCFGsSearched) {
+      this._callbacksCFGs = searchCallbacksCFGs(this);
+      this._callbacksCFGsSearched = true;
+    }
+
+    return this._callbacksCFGs;
   }
 
   nodesFromAddress(addr: number): SourceCFGNode | undefined {
