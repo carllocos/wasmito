@@ -18,7 +18,7 @@ import {
   isTableSet,
 } from '../webassembly/wasm/wasm_instruction';
 import { type WasmModule } from '../webassembly/wasm/wasm_module';
-import { buildMainWasmCallGraph, type WasmCallGraph } from './wasm_callgraph';
+import { buildMainWasmCallGraph, type CallGraph } from './wasm_callgraph';
 import {
   getWasmCFGNode,
   type WasmAddrToNodeMap,
@@ -54,7 +54,7 @@ export function buildControlFlowGraphFunction(
 export function buildGraphs(
   wasm: WasmModule,
   linkToExportsWhenNoCFG: boolean = true,
-): [Map<number, WasmCFG>, Map<number, Set<number>>, WasmCallGraph] {
+): [Map<number, WasmCFG>, Map<number, Set<number>>, CallGraph] {
   const cfgs = new Map();
   let tableAltered: boolean = false;
   const fgs: WasmCFG[] = [];

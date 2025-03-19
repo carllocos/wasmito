@@ -10,7 +10,7 @@ export interface CallGraphNode {
   edges: CallGraphNode[];
 }
 
-export class WasmCallGraph {
+export class CallGraph {
   private readonly _entryNodes: CallGraphNode[];
   public readonly nodes: Map<number, CallGraphNode>;
   private _allnodes: CallGraphNode[];
@@ -66,7 +66,7 @@ export function buildMainWasmCallGraph(
   wasm: WasmModule,
   cfgs: Map<number, WasmCFG>,
   linkToExportsWhenNoCFG?: boolean,
-): WasmCallGraph {
+): CallGraph {
   // find entry funcs
   const entryFuncs = wasm.getMainFunctions().map((f) => f.id);
 
@@ -104,7 +104,7 @@ export function buildCallGraph(
   entryFuncs: number[],
   cfgs: Map<number, WasmCFG>,
   linkToFuncsWhenNoCFG: number[] = [],
-): [WasmCallGraph, Set<number>] {
+): [CallGraph, Set<number>] {
   // importedFuncs used for sanity check
   const importedFuncs = new Set(wasm.importFuncs.map((f) => f.id));
 
@@ -145,7 +145,7 @@ export function buildCallGraph(
   for (const f of entryFuncs) {
     entryNodes.push(getNodeOrCreate(nodes, f));
   }
-  return [new WasmCallGraph(entryNodes, nodes), visited];
+  return [new CallGraph(entryNodes, nodes), visited];
 }
 
 function addEdge(
