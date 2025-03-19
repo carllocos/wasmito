@@ -69,7 +69,7 @@ export function buildCallGraph(
   wasm: WasmModule,
   entryFuncs: number[],
   cfgs: Map<number, WasmCFG>,
-  linkToFuncsWhenNoCFG: number[],
+  linkToFuncsWhenNoCFG: number[] = [],
 ): [WasmCallGraph, Set<number>] {
   // importedFuncs used for sanity check
   const importedFuncs = new Set(wasm.importFuncs.map((f) => f.id));
