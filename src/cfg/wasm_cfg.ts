@@ -102,6 +102,10 @@ export class WasmCFGs {
     return this._callgraph;
   }
 
+  get graphs(): WasmFuncToWasmCFG {
+    return this._cfgs;
+  }
+
   getCFG(funID: number): WasmCFG | undefined {
     return this._cfgs.get(funID);
   }
