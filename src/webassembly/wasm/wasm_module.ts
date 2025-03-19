@@ -202,6 +202,14 @@ export class WasmModule {
     }
   }
 
+  public getFunctionOrError(id: number): WASMFunction {
+    const f = this.getFunction(id);
+    if (f === undefined) {
+      throw new Error(`Could not find Function with id ${id}`);
+    }
+    return f;
+  }
+
   public getFunctionFromAddr(addr: number): WASMFunction | undefined {
     for (const wasmFunc of this.functions) {
       if (wasmFunc.isAddressInFunction(addr)) {
