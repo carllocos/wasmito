@@ -6,10 +6,12 @@ import {
   sourceNodeFirstInstrStartAddr,
 } from '../cfg/source_cfg';
 
+export type DestinationSCFGNodes = Array<[SourceCFGNode, number]>;
+
 export type DebugOperation = (
   sourceCFGs: SourceCFGs,
   node: SourceCFGNode,
-) => Array<[SourceCFGNode, number]>;
+) => DestinationSCFGNodes;
 
 // const logger = createLogger('DebugAgnosticOperations');
 export interface AgnosticDebugOperations {
@@ -30,7 +32,7 @@ export interface AgnosticDebugOperations {
 function stepOver(
   sourceCFGs: SourceCFGs,
   node: SourceCFGNode,
-): Array<[SourceCFGNode, number]> {
+): DestinationSCFGNodes {
   const ignoreExitNodes = true;
   const ns = sourceCFGs.getNodeNeighbours(node, ignoreExitNodes);
   if (ns.length === 0) {
@@ -42,7 +44,7 @@ function stepOver(
 function stepIn(
   sourceCFGs: SourceCFGs,
   node: SourceCFGNode,
-): Array<[SourceCFGNode, number]> {
+): DestinationSCFGNodes {
   let ns: Array<[SourceCFGNode, number]> = [];
   if (isCallNode(node)) {
     const entryNodes = sourceCFGs.getFunctionEntryNodesFromNode(node);
@@ -64,7 +66,7 @@ function stepIn(
 function stepOut(
   sourceCFGs: SourceCFGs,
   node: SourceCFGNode,
-): Array<[SourceCFGNode, number]> {
+): DestinationSCFGNodes {
   const ns: Array<[SourceCFGNode, number]> = [];
   const added = new Set<number>();
   const funID = node.wasmFunOwner;
@@ -89,7 +91,7 @@ function stepOut(
 export function stepIteration(
   sourceCFGs: SourceCFGs,
   node: SourceCFGNode,
-): Array<[SourceCFGNode, number]> {
+): DestinationSCFGNodes {
   // find cycle
   const visitedNodes = new Set<number>();
   const q: SourceCFGNode[] = [node];
