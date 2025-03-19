@@ -40,9 +40,8 @@ export function buildMainWasmCallGraph(
   // consider all exported funcs
   // as possible entry funcs
   if (entryFuncs.length === 0) {
-    const fidMin = wasm.importFuncs.length;
     wasm.functions
-      .filter((f) => f.exported && f.id >= fidMin)
+      .filter((f) => f.exported)
       .map((f) => f.id)
       .forEach((f) => entryFuncs.push(f));
   }
