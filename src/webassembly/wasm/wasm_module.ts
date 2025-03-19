@@ -243,6 +243,40 @@ export class WasmModule {
     return funcs;
   }
 
+  public allExportedFuncs(): WASMFunction[] {
+    // imported host funcs could call
+    // (1) any explicitly exported func in module marked with `export`
+    // (2) any func added to a table imported by the host environment
+    // (3) any func added to a table exported by the module
+    const allExportedFuncs = this.functions.filter((f) => f.exported);
+    const added = new Set<number>();
+    for (const ti of this.tableImports) {
+      for (const el of this.elements) {
+        if (el.tableId === ti.id) {
+          el.funcs.forEach((fid) => {
+            if (!added.has(fid)) {
+              allExportedFuncs.push(this.getFunctionOrError(fid));
+              added.add(fid);
+            }
+          });
+        }
+      }
+    }
+    for (const te of this.tableExports) {
+      for (const el of this.elements) {
+        if (el.tableId === te.id) {
+          el.funcs.forEach((fid) => {
+            if (!added.has(fid)) {
+              allExportedFuncs.push(this.getFunctionOrError(fid));
+              added.add(fid);
+            }
+          });
+        }
+      }
+    }
+    return allExportedFuncs;
+  }
+
   private correctCallInstructionsTypes(): void {
     this.instructions.forEach((i: WasmInstruction) => {
       if (isCallInstruction(i)) {

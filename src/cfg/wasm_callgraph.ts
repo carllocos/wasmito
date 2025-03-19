@@ -49,27 +49,7 @@ export function buildMainWasmCallGraph(
 
   let allExportedFuncs: number[] = [];
   if (linkToExportsWhenNoCFG === undefined || linkToExportsWhenNoCFG) {
-    // imported host funcs could call
-    // (1) any explicitly exported func in module marked with `export`
-    // (2) any func added to a table imported by the host environment
-    // (3) any func added to a table exported by the module
-    allExportedFuncs = wasm.functions
-      .filter((f) => f.exported)
-      .map((f) => f.id);
-    for (const ti of wasm.tableImports) {
-      for (const el of wasm.elements) {
-        if (el.tableId === ti.id) {
-          el.funcs.forEach((f) => allExportedFuncs.push(f));
-        }
-      }
-    }
-    for (const te of wasm.tableExports) {
-      for (const el of wasm.elements) {
-        if (el.tableId === te.id) {
-          el.funcs.forEach((f) => allExportedFuncs.push(f));
-        }
-      }
-    }
+    allExportedFuncs = wasm.allExportedFuncs().map((f) => f.id);
   }
   const [g] = buildCallGraph(wasm, entryFuncs, cfgs, allExportedFuncs);
   return g;
