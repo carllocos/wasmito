@@ -213,10 +213,6 @@ export class SourceCFGs {
     return ns;
   }
 
-  nodeFromAddr(addr: number): SourceCFGNode | undefined {
-    return undefined;
-  }
-
   nextReachableSourceNodesFromAddr(addr: number): DestinationSCFGNodes {
     const g = this.wasmCFGs.getCFGFromAddr(addr);
     const startNode = g?.addrToNode.get(addr);
