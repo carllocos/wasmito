@@ -217,7 +217,9 @@ export class SourceCFGs {
     return undefined;
   }
 
-  nextReachableSourceNodes(addr: number): Array<[SourceCFGNode, number]> {
+  nextReachableSourceNodesFromAddr(
+    addr: number,
+  ): Array<[SourceCFGNode, number]> {
     const g = this.wasmCFGs.getCFGFromAddr(addr);
     const startNode = g?.addrToNode.get(addr);
     if (g === undefined || startNode === undefined) {
