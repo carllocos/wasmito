@@ -5,6 +5,27 @@ set -e
 echo "> WasmiTo: fetching submodules"
 git submodule update --init
 
+
+#RUN curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
+echo "> Wasmito: Installing Arduino Dependency"
+ARDUINO_DIR=./libs/arduino-cli/bin
+ARDUINO_CLI=$(ARDUINO_DIR)/arduino-cli
+curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=$ARDUINO_DIR sh
+
+$ARDUINO_CLI core install esp32:esp32 \
+    && $ARDUINO_CLI lib install "PubSubClient" --save-to ./libs \
+    && ARDUINO_LIBRARY_ENABLE_UNSAFE_INSTALL=true $ARDUINO_CLI lib install --git-url https://github.com/adafruit/Adafruit_NeoPixel.git --save-to ./libs
+#
+# Check if the OS is Linux
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    apt install python3-serial
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+  echo "OSX"
+else
+  echo "Unsupported OS"
+fi
+
+
 echo "> WARDuino: fetching submodules"
 cd libs/WARDuino
 git fetch
