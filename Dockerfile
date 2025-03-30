@@ -1,3 +1,5 @@
+# DOCKERFILE of Benchmarks
+
 FROM ubuntu:latest
 
 RUN apt-get update && apt-get install -y \
@@ -9,17 +11,23 @@ RUN apt-get update && apt-get install -y \
     vim \
     curl \
     && apt-get clean
+# TODO remove curl, vim
+#COPY ./package_m5stack_index.json ./
 
-WORKDIR /home/debugger/
-COPY ./install.sh  ./
-COPY ./dim-led/  ./dim-led
+WORKDIR /benchmarks/
+COPY ./install_all.sh  ./
+COPY ./arduino_config.yml.template  ./arduino_config.yml.template
 
-RUN git clone https://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@github.com/carllocos/wasmito.git
+RUN bash install_all.sh
+#COPY ./install.sh  ./
+#COPY ./dim-led/  ./dim-led
 
-RUN rm ./wasmito/install.sh && mv ./install.sh ./wasmito #TMP line
+#RUN git clone https://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@github.com/carllocos/wasmito.git
 
-Run cd wasmito \
-    && bash install.sh
+#RUN rm ./wasmito/install.sh && mv ./install.sh ./wasmito #TMP line
+
+#Run cd wasmito \
+#&& bash install.sh
 
 # Run cd ./dim-led \
 #   && make clean \
