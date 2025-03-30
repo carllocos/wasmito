@@ -1,4 +1,4 @@
-import { type DestinationSCFGNodes } from '../language_adaptors/debug_operations';
+import { type DestinationSCFGNode } from '../language_adaptors/debug_operations';
 import { type WASMFunction } from '../webassembly';
 import { buildCallGraph } from './callgraph';
 import {
@@ -31,8 +31,8 @@ import assert from 'assert';
 export interface CallbackSCFG {
   callbackId: number;
   SCFGs: BinaryLiftedCFG[];
-  entryNodes: DestinationSCFGNodes;
-  otherReachableCallbacks: DestinationSCFGNodes;
+  entryNodes: DestinationSCFGNode[];
+  otherReachableCallbacks: DestinationSCFGNode[];
 }
 
 /**
@@ -111,7 +111,7 @@ export function searchCallbacksCFGs(SCFGs: SourceCFGs): CallbackSCFG[] {
     // if there were no entry nodes
     // then only consider the exported functions
     const onlyExportedFuncs = entryFuncs.length === 0;
-    const allReachableNodes: DestinationSCFGNodes = Array.from(funcsInGraph)
+    const allReachableNodes: DestinationSCFGNode[] = Array.from(funcsInGraph)
       .filter((otherFunc) => {
         return (
           otherFunc !== f.id &&

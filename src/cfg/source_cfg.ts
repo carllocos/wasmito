@@ -24,7 +24,7 @@ import path from 'path';
 import { buildSourceCFGraph } from './source_cfg_builder';
 import { searchForNextReachableSourceNodes } from './source_cfg_helper';
 import { searchCallbacksCFGs, type CallbackSCFG } from './callback_cfg';
-import { type DestinationSCFGNodes } from '../language_adaptors';
+import { type DestinationSCFGNode } from '../language_adaptors';
 
 const logger = createLogger('ASTControlFlowGraph');
 export interface DotSerializationConfig {
@@ -228,7 +228,7 @@ export class SourceCFGs {
     return ns;
   }
 
-  nextReachableSourceNodesFromAddr(addr: number): DestinationSCFGNodes {
+  nextReachableSourceNodesFromAddr(addr: number): DestinationSCFGNode[] {
     const g = this.wasmCFGs.getCFGFromAddr(addr);
     const startNode = g?.addrToNode.get(addr);
     if (g === undefined || startNode === undefined) {
@@ -245,7 +245,7 @@ export class SourceCFGs {
     return next.map(([n, i]) => [n, i.startAddress]);
   }
 
-  nextReachableSourceNodesFromFunction(fid: number): DestinationSCFGNodes {
+  nextReachableSourceNodesFromFunction(fid: number): DestinationSCFGNode[] {
     const wcfg = this.wasmCFGs.getCFG(fid);
     if (wcfg === undefined) return [];
     return this.nextReachableSourceNodesFromAddr(wcfg.entryNode.startAddress);
