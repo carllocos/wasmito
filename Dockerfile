@@ -10,15 +10,44 @@ RUN apt-get update && apt-get install -y \
     npm \
     vim \
     curl \
+    python3-serial \
     && apt-get clean
 # TODO remove curl, vim
-#COPY ./package_m5stack_index.json ./
 
-WORKDIR /benchmarks/
+# add python to $PATH
+RUN ln -s /usr/bin/python3.12 /usr/bin/python
+
+# keys needed to clone repos
+#RUN mkdir /root/.ssh/ \
+  #&& ssh-keyscan github.com >> /root/.ssh/known_hosts
+
+WORKDIR /benchmarks/libs/wasmito
+# TODO START: replace next with copy recursive project
+COPY ./src/ ./src
+COPY ./cli/ ./cli
+#COPY ./libs/ ./libs
+COPY ./package.json .
+COPY ./package-lock.json .
+COPY ./tool_examples ./tool_examples
+COPY ./wasmito_tester ./wasmito_tester/
+COPY ./mocha.opts .
+COPY ./tsconfig-esm.json .
+COPY ./tsconfig.json .
 COPY ./install_all.sh  ./
 COPY ./arduino_config.yml.template  ./arduino_config.yml.template
+COPY ./.git ./.git
+COPY ./.gitmodules .
+# TODO END: replace next with copy recursive project
 
+# install shared library across benchmarks
 RUN bash install_all.sh
+
+
+# install benchmark debug operations performance
+WORKDIR /benchmarks/debug_ops/
+COPY ./install_bench_debug_ops.sh  ./
+RUN bash install_bench_debug_ops.sh /benchmarks/libs/wasmito/libs/Arduino/
+
 #COPY ./install.sh  ./
 #COPY ./dim-led/  ./dim-led
 
@@ -35,27 +64,5 @@ RUN bash install_all.sh
 #   && make CLI=/home/debugger/wasmito/dist/cjs/cli/cli.cjs
 
 CMD ["bash"]
-
-# packages to remove
-# remove curl
-
-## Arduino dependency install
-# RUN curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
-
-# Install Arduino Libs # here the mcu is called esp32:esp32:m5stack_stickc
-# python3-serial is needed for arduino-cli  Version: 1.1.1 Commit: fa6eafcb Date: 2024-11-22T09:31:36Z
-# RUN arduino-cli core install esp32:esp32 \
-#     && arduino-cli lib install "PubSubClient" \
-#     && ARDUINO_LIBRARY_ENABLE_UNSAFE_INSTALL=true arduino-cli lib install --git-url https://github.com/adafruit/Adafruit_NeoPixel.git \
-#     && apt install python3-serial
-
-
-# RUN arduino-cli core install esp32:esp32@2.0.3 \
-#     && arduino-cli lib install "PubSubClient" \
-#     && ARDUINO_LIBRARY_ENABLE_UNSAFE_INSTALL=true arduino-cli lib install --git-url https://github.com/adafruit/Adafruit_NeoPixel.git
-
-
-# RUN mkdir /root/.ssh/ \
-#     && ssh-keyscan github.com >> /root/.ssh/known_hosts
 
 

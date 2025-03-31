@@ -25,8 +25,61 @@ $ARDUINO_CLI lib install "PubSubClient" --config-file $ARDUINO_CONFIG \
 	&& $ARDUINO_CLI lib install --git-url https://github.com/adafruit/Adafruit_NeoPixel.git  --config-file $ARDUINO_CONFIG \
 	&& $ARDUINO_CLI lib install --git-url https://github.com/m5stack/M5StickC.git#0.2.9 --config-file $ARDUINO_CONFIG
 
-$ARDUINO_CLI core install m5stack:esp32@2.0.0 --config-file $ARDUINO_CONFIG
+echo "> WARDuino: fetching submodules"
+if [ ! -d "$ARDUINO_DIR/WARDuino" ]; then
+  cd $LIBS_DIR
+  echo cloning WARDuino.git
+  git clone https://github.com/carllocos/WARDuino.git
+fi
+cd $LIBS_DIR/WARDuino
+git fetch
+git checkout main
+git submodule update --init
 
+echo "> WARDuino: building emulator"
+mkdir -p build-emu
+cd build-emu
+cmake .. . -DBUILD_EMULATOR=ON
+make
 
-#$ARDUINO_CLI core install esp32:esp32 \
-    #&& ARDUINO_LIBRARY_ENABLE_UNSAFE_INSTALL=true $ARDUINO_CLI lib install --git-url https://github.com/adafruit/Adafruit_NeoPixel.git --save-to ./libs
+echo "> WABT: fetching submodules"
+if [ ! -d "$LIBS_DIR/wabt" ]; then
+  cd $LIBS_DIR
+  echo cloning wabt.git
+  git clone https://github.com/TOPLLab/wabt.git
+fi
+
+cd $LIBS_DIR/wabt
+git submodule update --init
+
+echo "> WABT: building tools"
+mkdir -p build
+cd build
+cmake .. . -DBUILD_TESTS=OFF
+echo building wat2wasm
+make wat2wasm
+echo building wasm-objdump
+make wasm-objdump
+
+echo "> Wasmito: Creating libs config"
+cd $LIBS_DIR/../ # go to root of project
+WASMITO_DIR=.wasmito
+if [ ! -d "$WASMITO_DIR" ]; then
+    mkdir "$WASMITO_DIR"
+    echo "Directory '$WASMITO_DIR' created."
+else
+    echo "Directory '$WASMITO_DIR' already exists."
+fi
+
+SDK_CONFIG_FILE=".wasmito/sdk_config.cfg"
+if [ ! -f "$SDK_CONFIG_FILE" ]; then
+    touch $SDK_CONFIG_FILE
+    echo "File '$SDK_CONFIG_FILE' created."
+else
+    echo "File '$SDK_CONFIG_FILE' already exists."
+fi
+
+echo "WARDUINO_SDK=$LIBS_DIR/WARDuino" >> $SDK_CONFIG_FILE
+echo "WABT=$LIBS_DIR/wabt" >> $SDK_CONFIG_FILE
+
+npm install && npm run build
