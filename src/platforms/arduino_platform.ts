@@ -20,6 +20,7 @@ import { type BoardBaudRate, isSerialPort } from '../util/serial_port';
 import { copyFile, writeFileSync } from 'fs';
 import { type VMConfiguration } from '../device';
 import { wasmStripCustomSection } from '../wasm-tools/wasm_strip';
+import { getPathArduinoCLI, getPathArduinoConfig, getPathArduinoLibsPath } from '../project_config';
 
 const arduinoLogger = createLogger('Arduino');
 
@@ -44,7 +45,9 @@ async function runArduinoCommand(command: string): Promise<string> {
 }
 
 export async function ArduinoListBoards(): Promise<string[]> {
-  const cmdOutput = await runArduinoCommand('arduino-cli board list');
+  const arduino_cli = getPathArduinoCLI();
+  const arduino_config = getPathArduinoConfig();
+  const cmdOutput = await runArduinoCommand(`${arduino_cli} board list --config-file ${arduino_config}`);
   const lines = cmdOutput.split('\n');
   if (lines.length === 1) {
     return [];
@@ -59,7 +62,9 @@ export async function ArduinoListBoards(): Promise<string[]> {
 }
 
 export async function ArduinoListBoardsFQBNs(): Promise<BoardFQBN[]> {
-  const cmdOutput = await runArduinoCommand('arduino-cli board listall');
+  const arduino_cli = getPathArduinoCLI();
+  const arduino_config = getPathArduinoConfig();
+  const cmdOutput = await runArduinoCommand(`${arduino_cli} board listall --config-file ${arduino_config}`);
   const lines = cmdOutput.split('\n');
   if (lines.length === 1) {
     return [];
@@ -106,7 +111,11 @@ export async function ArduinoCompile(
       `FQBN=${fqbn}`,
       `BINARY=${wasmBinaryPath}`,
       `DISABLESTRICTMODULELOAD=${disableStrictModuleLoad}`,
+      `ARDUINO_CLI=${getPathArduinoCLI()}`,
+      `ARDUINO_CONFIG=${getPathArduinoConfig()}`,
+      `ARDUINO_LIBS=${getPathArduinoLibsPath()}`,
     ];
+
     if (paused) {
       makeArgs.push('PAUSED=true');
     }
@@ -148,7 +157,10 @@ export async function ArduinoFlash(
   fqbn: string,
 ): Promise<number> {
   return await new Promise<number>((resolve, reject) => {
-    const flash = spawn('make', ['flash', `PORT=${port}`, `FQBN=${fqbn}`], {
+    const flash = spawn('make', ['flash', `PORT=${port}`, `FQBN=${fqbn}`,
+      `ARDUINO_CLI=${getPathArduinoCLI()}`,
+      `ARDUINO_CONFIG=${getPathArduinoConfig()}`,
+    ], {
       cwd: pathToArduinoSketch,
     });
     flash.stdout.on('data', (data) => {
