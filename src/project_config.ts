@@ -50,6 +50,9 @@ interface SDKPaths {
   WARDUINO_SDK?: string;
   WABT?: string;
   NODE_MODULES?: string;
+  ARDUINO_CLI?: string;
+  ARDUINO_CONFIG?: string;
+  ARDUINO_LIBS?: string;
 }
 
 const sdkPaths: SDKPaths = {};
@@ -101,6 +104,15 @@ function loadSDKConfig(): void {
       if (fp.NODE_MODULES !== undefined) {
         sdkPaths.NODE_MODULES = fp.NODE_MODULES;
       }
+      if (fp.ARDUINO_CLI !== undefined) {
+        sdkPaths.ARDUINO_CLI = fp.ARDUINO_CLI;
+      }
+      if (fp.ARDUINO_CONFIG !== undefined) {
+        sdkPaths.ARDUINO_CONFIG = fp.ARDUINO_CONFIG;
+      }
+      if (fp.ARDUINO_LIBS !== undefined) {
+        sdkPaths.ARDUINO_LIBS = fp.ARDUINO_LIBS;
+      }
     }
   }
 }
@@ -121,19 +133,30 @@ function readSDKPaths(filePath: string): SDKPaths | undefined {
       if (content.length !== 2) {
         return;
       }
-      const [key, path] = content;
-      if (key === 'WARDUINO_SDK') {
-        if (path !== '') {
-          config.WARDUINO_SDK = path;
-        }
-      } else if (key === 'WABT') {
-        if (path !== '') {
-          config.WABT = path;
-        }
-      } else if (key === 'NODE_MODULES') {
-        if (path !== '') {
-          config.NODE_MODULES = path;
-        }
+      const [key, val] = content;
+      if (val === '') return;
+
+      switch (key) {
+        case 'WARDUINO_SDK':
+          config.WARDUINO_SDK = val;
+          break;
+        case 'WABT':
+          config.WABT = val;
+          break;
+        case 'NODE_MODULES':
+          config.NODE_MODULES = val;
+          break;
+        case 'ARDUINO_CLI':
+          config.ARDUINO_CLI = val;
+          break;
+        case 'ARDUINO_CONFIG':
+          config.ARDUINO_CONFIG = val;
+          break;
+        case 'ARDUINO_LIBS':
+          config.ARDUINO_LIBS = val;
+          break;
+        default:
+          return;
       }
     });
 
@@ -231,4 +254,61 @@ export function getPath2AssemblyScriptLib(): string {
 
 export function setPath2NodeModules(path: string): void {
   sdkPaths.NODE_MODULES = path;
+}
+
+export function getPathArduinoCLI(): string {
+  if (sdkPaths.ARDUINO_CLI === undefined) {
+    sdkPaths.ARDUINO_CLI = process.env.ARDUINO_CLI;
+    if (sdkPaths.ARDUINO_CLI !== undefined) {
+      sdkPaths.ARDUINO_CLI = `${sdkPaths.ARDUINO_CLI}`;
+    } else {
+      loadSDKConfig();
+    }
+  }
+
+  if (sdkPaths.ARDUINO_CLI === undefined) {
+    throw new ProjectConfigError(
+      `ARDUINO_CLI path has not been set. Set it either via env variable ARDUINO_CLI, or .wasmito/sdk_config.cfg file.`,
+    );
+  }
+
+  return `${sdkPaths.ARDUINO_CLI}`;
+}
+
+export function getPathArduinoConfig(): string {
+  if (sdkPaths.ARDUINO_CONFIG === undefined) {
+    sdkPaths.ARDUINO_CONFIG = process.env.ARDUINO_CONFIG;
+    if (sdkPaths.ARDUINO_CONFIG !== undefined) {
+      sdkPaths.ARDUINO_CONFIG = `${sdkPaths.ARDUINO_CONFIG}`;
+    } else {
+      loadSDKConfig();
+    }
+  }
+
+  if (sdkPaths.ARDUINO_CONFIG === undefined) {
+    throw new ProjectConfigError(
+      `ARDUINO_CONFIG path has not been set. Set it either via env variable ARDUINO_CONFIG, or .wasmito/sdk_config.cfg file.`,
+    );
+  }
+
+  return `${sdkPaths.ARDUINO_CONFIG}`;
+}
+
+export function getPathArduinoLibsPath(): string {
+  if (sdkPaths.ARDUINO_LIBS === undefined) {
+    sdkPaths.ARDUINO_LIBS = process.env.ARDUINO_LIBS;
+    if (sdkPaths.ARDUINO_LIBS !== undefined) {
+      sdkPaths.ARDUINO_LIBS = `${sdkPaths.ARDUINO_LIBS}`;
+    } else {
+      loadSDKConfig();
+    }
+  }
+
+  if (sdkPaths.ARDUINO_LIBS === undefined) {
+    throw new ProjectConfigError(
+      `ARDUINO_LIBS path has not been set. Set it either via env variable ARDUINO_LIBS, or .wasmito/sdk_config.cfg file.`,
+    );
+  }
+
+  return `${sdkPaths.ARDUINO_LIBS}`;
 }
