@@ -13,7 +13,7 @@ function buildWasmParserName(parserName: string): string {
   return pathJoin(p, parserName);
 }
 
-export async function buildASTParser(parserName: string): Promise<Parser> {
+export async function buildASTParser(parserName: string): Promise<Parser.Parser> {
   const pathToLanguageParser = buildWasmParserName(parserName);
   if (!isFilePath(pathToLanguageParser)) {
     let filesStr = 'failed to find';
