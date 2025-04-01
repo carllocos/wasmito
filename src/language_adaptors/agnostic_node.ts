@@ -14,7 +14,7 @@ export interface ASTNodeSourceLocation {
 }
 
 export class AgnosticNode {
-  private readonly _node: Parser.SyntaxNode;
+  private readonly _node: Parser.Node;
   private readonly _mappings: Map<number, SourceCodeLocation>;
 
   private readonly _addresses: number[];
@@ -22,7 +22,7 @@ export class AgnosticNode {
   private readonly _endPosition: ASTNodeSourceLocation;
   private readonly _source: string;
 
-  constructor(node: Parser.SyntaxNode, src: string) {
+  constructor(node: Parser.Node, src: string) {
     this._node = node;
     this._mappings = new Map();
     this._addresses = [];
@@ -31,7 +31,7 @@ export class AgnosticNode {
     this._source = src;
   }
 
-  get node(): Parser.SyntaxNode {
+  get node(): Parser.Node {
     return this._node;
   }
 
@@ -81,7 +81,7 @@ export function AgnosticNodeFromWasmAddress(
     return undefined;
   }
 
-  const nodes = new Set<[Parser.SyntaxNode, SourceCodeLocation]>();
+  const nodes = new Set<[Parser.Node, SourceCodeLocation]>();
   for (const pos of positions) {
     const ast = asts.get(pos.source);
     if (ast === undefined) {

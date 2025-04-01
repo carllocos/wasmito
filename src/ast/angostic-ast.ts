@@ -1,5 +1,6 @@
 import fs from 'fs';
-import type Parser from 'web-tree-sitter';
+// import type Parser from 'web-tree-sitter';
+import Parser from 'web-tree-sitter';
 import { buildASTParser } from '../tree-sitter/tree-sitter-factory';
 import { isFilePath } from '../util/file_util';
 import {
@@ -13,7 +14,7 @@ import { type LanguageConfiguration } from '../language_adaptors/languages/langu
 export class AgnosticAST {
   public readonly source: string;
   public readonly targetLanguage: LanguageConfiguration;
-  private _parser: Parser | undefined;
+  private _parser: Parser.Parser | undefined;
   private _tree: Parser.Tree | undefined;
 
   constructor(source: string, langConfig: LanguageConfiguration) {
@@ -42,7 +43,7 @@ export class AgnosticAST {
   mostSpecialisedNode(
     lineNr: number,
     colNr: number,
-  ): Parser.SyntaxNode | undefined {
+  ): Parser.Node | undefined {
     const pos = sourceLocationToNodePosition(lineNr, colNr);
     return mostSpecialisedNode(this.ast, pos);
   }
@@ -59,7 +60,7 @@ export class AgnosticAST {
    * @returns
    */
 
-  nextNode(lineNr: number, colNr: number): Parser.SyntaxNode | undefined {
+  nextNode(lineNr: number, colNr: number): Parser.Node | undefined {
     const currentNode = this.mostSpecialisedNode(lineNr, colNr);
     if (currentNode === undefined) {
       return undefined;
@@ -85,7 +86,10 @@ export class AgnosticAST {
     this._parser = await buildASTParser(this.targetLanguage.parserPath);
     const content = await fs.promises.readFile(this.source);
     const sourceCode = content.toString();
-    this._tree = this._parser.parse(sourceCode);
+    const t = this._parser?.parse(sourceCode);
+    if (t !== null) {
+      this._tree = t;
+    }
   }
 
   // following method should be move to AST class and belongs to WAT
@@ -134,7 +138,7 @@ export class AgnosticAST {
   // }
 
   // next method belongs to AST AssemblyScript
-  // private nextLocations(node: Parser.SyntaxNode): SourceCodeMapping[] {
+  // private nextLocations(node: Parser.Node): SourceCodeMapping[] {
   //   let workingNodes = stepOverNode(node);
   //   const mappings: SourceCodeMapping[] = [];
   //   while (workingNodes.length > 0) {
