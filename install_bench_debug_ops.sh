@@ -23,7 +23,3 @@ ARDUINO_CONFIG="$ARDUINO_DIR/arduino_config.yml"
 echo Installing m5stack core platforms....
 $ARDUINO_CLI core install m5stack:esp32@2.0.0 --config-file $ARDUINO_CONFIG
 
-echo Compiling FlappyBird as example
-cp -r $ARDUINO_DIR/libraries/M5StickC/examples/Games/FlappyBird/ . 
-cd ./FlappyBird/          
-$ARDUINO_CLI compile --fqbn m5stack:esp32:m5stick-c --config-file $ARDUINO_CONFIG --verbose -e
