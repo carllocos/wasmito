@@ -1,7 +1,6 @@
 import * as path from 'path';
-import type Parser from 'web-tree-sitter';
 import { isFilePath, listFilesInDirectory, pathJoin } from '../util/file_util';
-import { createLanguageParser } from './tree-sitter-parser';
+import { createLanguageParser, type TreeParser } from './tree-sitter-parser';
 
 function parsersRootPath(): string {
   const d = path.resolve(__dirname);
@@ -13,7 +12,7 @@ function buildWasmParserName(parserName: string): string {
   return pathJoin(p, parserName);
 }
 
-export async function buildASTParser(parserName: string): Promise<Parser.Parser> {
+export async function buildASTParser(parserName: string): Promise<TreeParser> {
   const pathToLanguageParser = buildWasmParserName(parserName);
   if (!isFilePath(pathToLanguageParser)) {
     let filesStr = 'failed to find';

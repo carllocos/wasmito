@@ -1,4 +1,10 @@
-import Parser from 'web-tree-sitter';
+import Parser, { type SyntaxNode } from 'web-tree-sitter';
+
+export type TreeNode = SyntaxNode;
+export type TreeParser = Parser;
+export type TreePoint = Parser.Point;
+export type Tree = Parser.Tree;
+export const TreeSitterParser = Parser;
 
 export interface NodePosition {
   row: number;
@@ -25,23 +31,23 @@ export function nodePositionToSourceLocation(
 let parserInitiallised: boolean = false;
 export async function initParser(): Promise<void> {
   if (!parserInitiallised) {
-    await Parser.Parser.init();
+    await TreeSitterParser.init();
     parserInitiallised = true;
   }
 }
 
 export async function createLanguageParser(
   languageWasmParser: string,
-): Promise<Parser.Parser> {
+): Promise<TreeParser> {
   await initParser();
-  const parser = new Parser.Parser();
-  const lang = await Parser.Language.load(languageWasmParser);
+  const parser = new TreeSitterParser();
+  const lang = await TreeSitterParser.Language.load(languageWasmParser);
   parser.setLanguage(lang);
   return parser;
 }
 
 export function printNodeInfo(
-  node: Parser.Node,
+  node: TreeNode,
   title: string = 'NodeInfo',
 ): void {
   console.log(title);
@@ -59,10 +65,10 @@ export function printNodeInfo(
 }
 
 function searchNodeHelper(
-  node: Parser.Node,
+  node: TreeNode,
   row: number,
   col: number,
-): Parser.Node | undefined {
+): TreeNode | undefined {
   // printNodeInfo(node);
   if (node.startPosition.row === row) {
     if (node.startPosition.column === col) {
@@ -70,7 +76,7 @@ function searchNodeHelper(
     }
   }
 
-  // const nodes: Parser.Node[] = [];
+  // const nodes: TreeNode[] = [];
   for (const child of node.children) {
     if (child === null) {
       continue;
@@ -86,21 +92,21 @@ function searchNodeHelper(
 export function searchNode(
   tree: Parser.Tree,
   pos: NodePosition,
-): Parser.Node | undefined {
+): TreeNode | undefined {
   return searchNodeHelper(tree.rootNode, pos.row, pos.col);
 }
 
 export function mostSpecialisedNode(
   tree: Parser.Tree,
   pos: NodePosition,
-): Parser.Node | undefined {
+): TreeNode | undefined {
   return mostSpecialisedNodeHelper(tree.rootNode, pos);
 }
 
 function mostSpecialisedNodeHelper(
-  node: Parser.Node,
+  node: TreeNode,
   pos: NodePosition,
-): Parser.Node | undefined {
+): TreeNode | undefined {
   for (const child of node.children) {
     if (child === null) {
       continue;
@@ -119,10 +125,7 @@ function mostSpecialisedNodeHelper(
   }
 }
 
-function isPositionOnSameNodeLine(
-  node: Parser.Node,
-  pos: NodePosition,
-): boolean {
+function isPositionOnSameNodeLine(node: TreeNode, pos: NodePosition): boolean {
   return (
     node.startPosition.row === pos.row &&
     node.startPosition.column <= pos.col &&
@@ -131,18 +134,15 @@ function isPositionOnSameNodeLine(
   );
 }
 
-function isPositionOnNodeSpan(
-  node: Parser.Node,
-  pos: NodePosition,
-): boolean {
+function isPositionOnNodeSpan(node: TreeNode, pos: NodePosition): boolean {
   return node.startPosition.row <= pos.row && pos.row <= node.endPosition.row;
 }
 
-export function isNode(n: Parser.Node | null): n is Parser.Node {
+export function isNode(n: TreeNode | null): n is TreeNode {
   return n !== null;
 }
 
-export function firstLeafChild(n: Parser.Node): Parser.Node {
+export function firstLeafChild(n: TreeNode): TreeNode {
   if (isNode(n.firstChild)) {
     return firstLeafChild(n.firstChild);
   }
@@ -152,7 +152,7 @@ export function firstLeafChild(n: Parser.Node): Parser.Node {
 
 // const grammarTypesToSkip = new Set<string>([';', ')']);
 
-function findLeaf(node: Parser.Node): Parser.Node {
+function findLeaf(node: TreeNode): TreeNode {
   if (node.childCount > 0) {
     if (node.firstChild === null) {
       throw new Error(`FirstChild should not be null when childCount > 0`);
@@ -163,9 +163,7 @@ function findLeaf(node: Parser.Node): Parser.Node {
 }
 
 // node is the one where the pc is currently at
-export function nextNodeHelper(
-  node: Parser.Node,
-): Parser.Node | undefined {
+export function nextNodeHelper(node: TreeNode): TreeNode | undefined {
   // first retrieve children
   if (node.childCount > 0) {
     return findLeaf(node);
@@ -211,8 +209,8 @@ export function nextNodeHelper(
 }
 
 // export function stepOverNode(
-//   node: Parser.Node,
-// ): Parser.Node | undefined {
+//   node: TreeNode,
+// ): TreeNode | undefined {
 //   // TODO use onyle named nodes?
 //   printNodeInfo(node, 'Searching Next Node for');
 //   switch (node.grammarType) {
@@ -255,7 +253,7 @@ export function nextNodeHelper(
 //   // return undefined;
 // }
 
-export function stepInto(node: Parser.Node): Parser.Node[] {
+export function stepInto(node: TreeNode): TreeNode[] {
   if (node.nextSibling !== null) {
     return [node.nextSibling];
   }
@@ -272,7 +270,7 @@ export function stepInto(node: Parser.Node): Parser.Node[] {
   return [];
 }
 
-export function stepOverNode(node: Parser.Node): Parser.Node[] {
+export function stepOverNode(node: TreeNode): TreeNode[] {
   const n = nextSiblingOrParentNextSibling(node);
   if (n === undefined) {
     return [];
@@ -280,9 +278,7 @@ export function stepOverNode(node: Parser.Node): Parser.Node[] {
   return [n];
 }
 
-function nextSiblingOrParentNextSibling(
-  node: Parser.Node,
-): Parser.Node | undefined {
+function nextSiblingOrParentNextSibling(node: TreeNode): TreeNode | undefined {
   if (node.nextSibling !== null) {
     return node.nextSibling;
   }
@@ -297,7 +293,7 @@ function nextSiblingOrParentNextSibling(
   return undefined;
 }
 
-function isControlFlowNode(node: Parser.Node): boolean {
+function isControlFlowNode(node: TreeNode): boolean {
   switch (node.grammarType) {
     case GrammarType.WhileStatement:
       return true;
@@ -307,12 +303,14 @@ function isControlFlowNode(node: Parser.Node): boolean {
 }
 
 function getDestinationNodes(
-  node: Parser.Node,
-  alreadyVisited: Parser.Node,
-): Parser.Node[] {
+  node: TreeNode,
+  alreadyVisited: TreeNode,
+): TreeNode[] {
   switch (node.grammarType) {
     case GrammarType.WhileStatement: {
-      const dest = node.children.filter((n) => n !== null && n.id !== alreadyVisited.id) as Parser.Node[];
+      const dest = node.children.filter(
+        (n) => n !== null && n.id !== alreadyVisited.id,
+      );
       if (node.nextSibling !== null) {
         dest.push(node.nextSibling);
       }
@@ -322,7 +320,7 @@ function getDestinationNodes(
   return [];
 }
 
-function getInnerNode(node: Parser.Node): Parser.Node {
+function getInnerNode(node: TreeNode): TreeNode {
   switch (node.grammarType) {
     case GrammarType.StatementBlock:
       if (node.firstChild === null) {

@@ -1,6 +1,4 @@
 import fs from 'fs';
-// import type Parser from 'web-tree-sitter';
-import Parser from 'web-tree-sitter';
 import { buildASTParser } from '../tree-sitter/tree-sitter-factory';
 import { isFilePath } from '../util/file_util';
 import {
@@ -8,14 +6,17 @@ import {
   isNode,
   mostSpecialisedNode,
   sourceLocationToNodePosition,
+  type Tree,
+  type TreeNode,
+  type TreeParser,
 } from '../tree-sitter/tree-sitter-parser';
 import { type LanguageConfiguration } from '../language_adaptors/languages/language_config';
 
 export class AgnosticAST {
   public readonly source: string;
   public readonly targetLanguage: LanguageConfiguration;
-  private _parser: Parser.Parser | undefined;
-  private _tree: Parser.Tree | undefined;
+  private _parser: TreeParser | undefined;
+  private _tree: Tree | undefined;
 
   constructor(source: string, langConfig: LanguageConfiguration) {
     this.source = source;
@@ -25,7 +26,7 @@ export class AgnosticAST {
     this.targetLanguage = langConfig;
   }
 
-  get ast(): Parser.Tree {
+  get ast(): Tree {
     if (this._tree === undefined) {
       throw new Error(`No AST available first construct it`);
     }
@@ -40,10 +41,7 @@ export class AgnosticAST {
    * @returns the most specific node or undefined if none is found
    */
 
-  mostSpecialisedNode(
-    lineNr: number,
-    colNr: number,
-  ): Parser.Node | undefined {
+  mostSpecialisedNode(lineNr: number, colNr: number): TreeNode | undefined {
     const pos = sourceLocationToNodePosition(lineNr, colNr);
     return mostSpecialisedNode(this.ast, pos);
   }
@@ -60,7 +58,7 @@ export class AgnosticAST {
    * @returns
    */
 
-  nextNode(lineNr: number, colNr: number): Parser.Node | undefined {
+  nextNode(lineNr: number, colNr: number): TreeNode | undefined {
     const currentNode = this.mostSpecialisedNode(lineNr, colNr);
     if (currentNode === undefined) {
       return undefined;
@@ -138,7 +136,7 @@ export class AgnosticAST {
   // }
 
   // next method belongs to AST AssemblyScript
-  // private nextLocations(node: Parser.Node): SourceCodeMapping[] {
+  // private nextLocations(node: TreeNode): SourceCodeMapping[] {
   //   let workingNodes = stepOverNode(node);
   //   const mappings: SourceCodeMapping[] = [];
   //   while (workingNodes.length > 0) {

@@ -1,11 +1,14 @@
-import type Parser from 'web-tree-sitter';
 import {
   type SourceCodeLocation,
   type SourceMap,
   sourceCodeLocationToString,
 } from '../source_mappers/source_map';
 import { type AgnosticAST } from '../ast';
-import { nodePositionToSourceLocation } from '../tree-sitter/tree-sitter-parser';
+import {
+  nodePositionToSourceLocation,
+  type TreePoint,
+  type TreeNode,
+} from '../tree-sitter/tree-sitter-parser';
 import { createLogger } from '../logger/logger';
 
 export interface ASTNodeSourceLocation {
@@ -14,7 +17,7 @@ export interface ASTNodeSourceLocation {
 }
 
 export class AgnosticNode {
-  private readonly _node: Parser.Node;
+  private readonly _node: TreeNode;
   private readonly _mappings: Map<number, SourceCodeLocation>;
 
   private readonly _addresses: number[];
@@ -22,7 +25,7 @@ export class AgnosticNode {
   private readonly _endPosition: ASTNodeSourceLocation;
   private readonly _source: string;
 
-  constructor(node: Parser.Node, src: string) {
+  constructor(node: TreeNode, src: string) {
     this._node = node;
     this._mappings = new Map();
     this._addresses = [];
@@ -31,7 +34,7 @@ export class AgnosticNode {
     this._source = src;
   }
 
-  get node(): Parser.Node {
+  get node(): TreeNode {
     return this._node;
   }
 
@@ -55,7 +58,7 @@ export class AgnosticNode {
     }
   }
 
-  getPositionHelper(point: Parser.Point): ASTNodeSourceLocation {
+  getPositionHelper(point: TreePoint): ASTNodeSourceLocation {
     const [linenr, colnr] = nodePositionToSourceLocation(
       point.row,
       point.column,
@@ -81,7 +84,7 @@ export function AgnosticNodeFromWasmAddress(
     return undefined;
   }
 
-  const nodes = new Set<[Parser.Node, SourceCodeLocation]>();
+  const nodes = new Set<[TreeNode, SourceCodeLocation]>();
   for (const pos of positions) {
     const ast = asts.get(pos.source);
     if (ast === undefined) {
