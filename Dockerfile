@@ -55,28 +55,22 @@ COPY ./.gitmodules .
 # install shared library across benchmarks
 RUN bash install_all.sh
 
-# TODO remove
+# Installation Instructions for Benchmarking
 RUN rm /benchmarks/libs/wasmito/libs/WARDuino/platforms/Arduino/Makefile
-COPY ./other_makefile /benchmarks/libs/wasmito/libs/WARDuino/platforms/Arduino/Makefile
-
-# install benchmark debug operations performance
+COPY ./warduino_makefile /benchmarks/libs/wasmito/libs/WARDuino/platforms/Arduino/Makefile
 WORKDIR /benchmarks/debug_ops/
-COPY ./dim/src  ./src
-COPY ./dim/wasm  ./wasm
-COPY ./install_bench_debug_ops.sh  ./
+COPY ./install_m5stack_libs.sh  ./
 RUN alias wcli="node /benchmarks/libs/wasmito/dist/cjs/cli/cli.cjs"
 RUN alias arduino-cli=/benchmarks/libs/wasmito/libs/Arduino/arduino-cli
 RUN alias arduino_config="--config-file /benchmarks/libs/wasmito/libs/Arduino/arduino_config.yml"
 
-RUN bash install_bench_debug_ops.sh /benchmarks/libs/wasmito/libs/Arduino/ /benchmarks/libs/wasmito/dist/cjs/cli/cli.cjs
+RUN bash install_m5stack_libs.sh /benchmarks/libs/wasmito/libs/Arduino/ /benchmarks/libs/wasmito/dist/cjs/cli/cli.cjs
 
+#COPY ./dim/src  ./src
+#COPY ./dim/wasm  ./wasm
 # Run cd ./dim-led \
 #   && make clean \
 #   && npm install \
 #   && make CLI=/home/debugger/wasmito/dist/cjs/cli/cli.cjs
-
-# keys needed to clone repos
-#RUN mkdir /root/.ssh/ \
-  #&& ssh-keyscan github.com >> /root/.ssh/known_hosts
 
 CMD ["bash"]
