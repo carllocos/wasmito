@@ -193,6 +193,8 @@ export class SourceCFGs {
               alreadyAdded.add(n.nodeId);
             }
           });
+        } else if (isCallIndirect(i)) {
+          throw new Error('callindirect todo');
         } else {
           throw new Error(
             `instruction ${instructionToString(i)} is not a call function`,
