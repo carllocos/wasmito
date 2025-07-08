@@ -133,12 +133,12 @@ function buildCallSites(
   const callSitesMap = new Map<number, Set<number>>();
 
   for (const f of funcs) {
-    const fg = cfgs.get(f.id);
-    if (fg === undefined) {
+    const wcfg = cfgs.get(f.id);
+    if (wcfg === undefined) {
       throw new Error(`No CFG found for fun ${f.id}`);
     }
-    const indirectCalls: WasmInstruction[] = fg.callIndirects;
-    const calls: WasmInstruction[] = indirectCalls.concat(fg.calls);
+    const indirectCalls: WasmInstruction[] = wcfg.callIndirects;
+    const calls: WasmInstruction[] = indirectCalls.concat(wcfg.calls);
     for (const c of calls) {
       const funcsCalled: number[] = [];
       if (isCallInstruction(c)) {
