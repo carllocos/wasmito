@@ -50,6 +50,7 @@ COPY ./install_all.sh  ./
 COPY ./arduino_config.yml.template  ./arduino_config.yml.template
 COPY ./.git ./.git
 COPY ./.gitmodules .
+COPY ./scripts/ ./scripts/
 # TODO END: replace next with copy recursive project
 
 # install shared library across benchmarks
