@@ -33,7 +33,6 @@ WORKDIR /benchmarks/libs/wasmito
 COPY ./src/ ./src
 COPY ./test/ ./test/
 COPY ./cli/ ./cli
-#COPY ./libs/ ./libs
 COPY ./package.json .
 COPY ./package-lock.json .
 COPY ./tool_examples ./tool_examples
