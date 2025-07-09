@@ -1,4 +1,5 @@
 import { spawn } from 'child_process';
+import { getPathWasmTools } from '../project_config';
 
 /*
  * This file defines functions read metada of a wasm file through
@@ -54,7 +55,7 @@ async function runShowMetadataCommand(
   wasmFilePath: string,
 ): Promise<[number, string, string]> {
   return new Promise<[number, string, string]>((resolve, reject) => {
-    const command = ['wasm-tools', 'metadata', 'show', wasmFilePath];
+    const command = [getPathWasmTools(), 'metadata', 'show', wasmFilePath];
 
     const process = spawn(command[0], command.slice(1), { stdio: 'pipe' });
     let stdout = '';

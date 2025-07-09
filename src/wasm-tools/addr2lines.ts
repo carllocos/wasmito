@@ -1,5 +1,6 @@
 import { exec } from 'child_process';
 import { createLogger } from '../logger/logger';
+import { getPathWasmTools } from '../project_config';
 
 /*
  * This source file runs `wasm-tools addr2line` command and decodes result
@@ -172,7 +173,7 @@ export async function runAddr2lineCommandHelper(
   addr: number,
 ): Promise<[number, string, string, boolean]> {
   return new Promise<[number, string, string, boolean]>((resolve, reject) => {
-    const command = `wasm-tools addr2line ${wasmFilePath} ${addr}`;
+    const command = `${getPathWasmTools()} addr2line ${wasmFilePath} ${addr}`;
     try {
       const p = exec(command, (error, stdout, stderr) => {
         if (typeof p.exitCode !== 'number') {

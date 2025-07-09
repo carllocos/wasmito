@@ -1,5 +1,6 @@
 import { exec } from 'child_process';
 import { createLogger } from '../logger/logger';
+import { getPathWasmTools } from '../project_config';
 
 const logger = createLogger('wasmStrip');
 
@@ -10,7 +11,7 @@ export async function wasmStripCustomSection(
   return new Promise((resolve, reject) => {
     try {
       const command = [
-        'wasm-tools',
+        getPathWasmTools(),
         'strip',
         wasmFilePath,
         '-o',
