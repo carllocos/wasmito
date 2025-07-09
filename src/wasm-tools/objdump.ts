@@ -1,4 +1,5 @@
 import { spawn } from 'child_process';
+import { getPathWasmTools } from '../project_config';
 
 export interface ObjDumpLine {
   sectionName: string;
@@ -90,7 +91,7 @@ export async function runObjdumpCommand(
   wasmFilePath: string,
 ): Promise<[number, string, string]> {
   return new Promise<[number, string, string]>((resolve, reject) => {
-    const command = ['wasm-tools', 'objdump', wasmFilePath];
+    const command = [getPathWasmTools(), 'objdump', wasmFilePath];
     const process = spawn(command[0], command.slice(1), { stdio: 'pipe' });
     let stdout = '';
     let stderr = '';
