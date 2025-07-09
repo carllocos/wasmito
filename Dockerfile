@@ -10,20 +10,14 @@ RUN apt-get update && apt-get install -y \
     curl \
     python3-serial \
     && apt-get clean
-
-#TODO cargo and wasm-tools
-
 # TODO remove curl, vim
 # add python to $PATH
 RUN ln -s /usr/bin/python3.12 /usr/bin/python
 
-# Install rust
+# Install rust & cargo binaries installer
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 ENV PATH="/root/.cargo/bin:${PATH}"
-# TODO move next to installer script
 RUN curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash -s -- -y
-RUN cargo binstall wasm-tools -y
-
 
 # install latest node and npm
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.2/install.sh | bash
