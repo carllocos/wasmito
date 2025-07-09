@@ -61,11 +61,4 @@ RUN alias arduino_config="--config-file /benchmarks/libs/wasmito/libs/Arduino/ar
 
 RUN bash install_m5stack_libs.sh /benchmarks/libs/wasmito/libs/Arduino/ /benchmarks/libs/wasmito/dist/cjs/cli/cli.cjs
 
-#COPY ./dim/src  ./src
-#COPY ./dim/wasm  ./wasm
-# Run cd ./dim-led \
-#   && make clean \
-#   && npm install \
-#   && make CLI=/home/debugger/wasmito/dist/cjs/cli/cli.cjs
-
 CMD ["bash"]
