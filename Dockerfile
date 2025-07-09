@@ -31,6 +31,7 @@ ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
 WORKDIR /benchmarks/libs/wasmito
 # TODO START: replace next with copy recursive project
 COPY ./src/ ./src
+COPY ./test/ ./test/
 COPY ./cli/ ./cli
 #COPY ./libs/ ./libs
 COPY ./package.json .
