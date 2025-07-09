@@ -47,7 +47,7 @@ COPY ./templates/ ./templates/
 # TODO END: replace next with copy recursive project
 
 # install shared library across benchmarks
-RUN bash scripts/install_all.sh
+RUN bash scripts/install.sh
 
 # Installation Instructions for Benchmarking
 RUN rm /benchmarks/libs/wasmito/libs/WARDuino/platforms/Arduino/Makefile

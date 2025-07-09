@@ -47,6 +47,6 @@ COPY ./templates/ ./templates/
 # TODO END: replace next with copy recursive project
 
 # install shared library across benchmarks
-RUN bash scripts/install_all.sh
+RUN bash scripts/install.sh
 
 ENTRYPOINT [ "node", "/wasmito/dist/cjs/cli/cli.cjs"]
