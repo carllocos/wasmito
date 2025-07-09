@@ -9,7 +9,7 @@ ARDUINO_DIR=$LIBS_DIR/Arduino
 ARDUINO_DIR_ESCAPED=$(echo "$ARDUINO_DIR" | sed 's:/:\\/:g')
 ARDUINO_CLI=$ARDUINO_DIR/arduino-cli
 ARDUINO_CONFIG=$ARDUINO_DIR/arduino_config.yml
-ARDUINO_CONFIG_TEMPLATE=$(realpath .)/arduino_config.yml.template
+ARDUINO_CONFIG_TEMPLATE=$(realpath .)/templates/arduino_config.yml.template
 REPLACE_REGEX='s/%USER_PATH/'${ARDUINO_DIR_ESCAPED}/g
 
 echo Installing shared libs in $LIBS_DIR

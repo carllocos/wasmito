@@ -41,10 +41,10 @@ COPY ./wasmito_tester ./wasmito_tester/
 COPY ./mocha.opts .
 COPY ./tsconfig-esm.json .
 COPY ./tsconfig.json .
-COPY ./arduino_config.yml.template  ./arduino_config.yml.template
 COPY ./.git ./.git
 COPY ./.gitmodules .
 COPY ./scripts/ ./scripts/
+COPY ./templates/ ./templates/
 # TODO END: replace next with copy recursive project
 
 # install shared library across benchmarks
@@ -52,7 +52,7 @@ RUN bash scripts/install_all.sh
 
 # Installation Instructions for Benchmarking
 RUN rm /benchmarks/libs/wasmito/libs/WARDuino/platforms/Arduino/Makefile
-COPY ./warduino_makefile /benchmarks/libs/wasmito/libs/WARDuino/platforms/Arduino/Makefile
+COPY ./templates/warduino_makefile /benchmarks/libs/wasmito/libs/WARDuino/platforms/Arduino/Makefile
 WORKDIR /benchmarks/debug_ops/
 RUN alias wcli="node /benchmarks/libs/wasmito/dist/cjs/cli/cli.cjs"
 RUN alias arduino-cli=/benchmarks/libs/wasmito/libs/Arduino/arduino-cli
