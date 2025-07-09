@@ -1,11 +1,11 @@
-import Parser from 'web-tree-sitter';
+import {type Node, type Point, Tree as TreeSitter, Language as TreeSitterLang, Parser as TreeSitterParser} from 'web-tree-sitter';
 
-export type TreeNode = Parser.Node;
-export type TreeParser = Parser.Parser;
-export type TreePoint = Parser.Point;
-export type Tree = Parser.Tree;
-export const TreeSitterParser = Parser.Parser;
-const Language = Parser.Language;
+export type TreeNode = Node;
+export type TreeParser = TreeSitterParser;
+export type TreePoint = Point;
+export type Tree = TreeSitter;
+export const Parser = TreeSitterParser;
+const Language = TreeSitterLang;
 
 export interface NodePosition {
   row: number;
@@ -91,14 +91,14 @@ function searchNodeHelper(
 }
 
 export function searchNode(
-  tree: Parser.Tree,
+  tree: Tree,
   pos: NodePosition,
 ): TreeNode | undefined {
   return searchNodeHelper(tree.rootNode, pos.row, pos.col);
 }
 
 export function mostSpecialisedNode(
-  tree: Parser.Tree,
+  tree: Tree,
   pos: NodePosition,
 ): TreeNode | undefined {
   return mostSpecialisedNodeHelper(tree.rootNode, pos);
