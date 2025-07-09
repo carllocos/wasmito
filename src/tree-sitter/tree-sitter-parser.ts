@@ -1,10 +1,11 @@
-import Parser, { type SyntaxNode } from 'web-tree-sitter';
+import Parser from 'web-tree-sitter';
 
-export type TreeNode = SyntaxNode;
-export type TreeParser = Parser;
+export type TreeNode = Parser.Node;
+export type TreeParser = Parser.Parser;
 export type TreePoint = Parser.Point;
 export type Tree = Parser.Tree;
-export const TreeSitterParser = Parser;
+export const TreeSitterParser = Parser.Parser;
+const Language = Parser.Language;
 
 export interface NodePosition {
   row: number;
@@ -41,7 +42,7 @@ export async function createLanguageParser(
 ): Promise<TreeParser> {
   await initParser();
   const parser = new TreeSitterParser();
-  const lang = await TreeSitterParser.Language.load(languageWasmParser);
+  const lang = await Language.load(languageWasmParser);
   parser.setLanguage(lang);
   return parser;
 }
@@ -308,9 +309,11 @@ function getDestinationNodes(
 ): TreeNode[] {
   switch (node.grammarType) {
     case GrammarType.WhileStatement: {
-      const dest = node.children.filter(
-        (n) => n !== null && n.id !== alreadyVisited.id,
-      );
+      const dest: TreeNode[] = [];
+      for (const n of node.children) {
+        if (n !== null && n.id !== alreadyVisited.id)
+          dest.push(n);
+      }
       if (node.nextSibling !== null) {
         dest.push(node.nextSibling);
       }
