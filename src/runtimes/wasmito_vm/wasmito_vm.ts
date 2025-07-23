@@ -1,6 +1,6 @@
 import type winston from 'winston';
 import { type Channel } from '../../communication/channel_interface';
-import { type WasmRuntimeAPI } from '../runtime_api';
+import { type RuntimeToolAPI } from '../runtime_api';
 import { RunRequest } from './requests/run_request';
 import { StepRequest } from './requests/step_request';
 import {
@@ -55,7 +55,7 @@ import {
   type SourceCFGNode,
 } from '../../cfg/source_cfg';
 
-export abstract class WasmitoBackendVM implements WasmRuntimeAPI {
+export abstract class WasmitoBackendVM implements RuntimeToolAPI {
   private _channel: Channel;
   protected abstract logger: winston.Logger;
   private _platform: Platform;
