@@ -7,13 +7,13 @@ import { EventInspectHook } from '../src/hooks/hook_event';
 import { EmptyValueSubstitution } from '../src/hooks/hook_value_substitution';
 import { type WasmValuesBuilder } from '../src/webassembly';
 import { type WASM, type WasmState } from '../src/webassembly/wasm';
-import { type ProxyCallResponse } from '../src/warduino';
-import { ResponseType } from '../src/warduino/api/request_interface';
-import { AroundFunctionRequest } from '../src/warduino/requests/around_function_request';
-import { PushEventRequest } from '../src/warduino/requests/inject_event_request';
-import { StateRequest } from '../src/warduino/requests/inspect_request';
-import { UpdateCallbackMappingRequest } from '../src/warduino/requests/update_callbacks_request';
-import { type WasmitoBackendVM } from '../src/warduino/vm/warduino_vm';
+import { type ProxyCallResponse } from '../src/runtimes';
+import { ResponseType } from '../src/runtimes/api/request_interface';
+import { AroundFunctionRequest } from '../src/runtimes/requests/around_function_request';
+import { PushEventRequest } from '../src/runtimes/requests/inject_event_request';
+import { StateRequest } from '../src/runtimes/requests/inspect_request';
+import { UpdateCallbackMappingRequest } from '../src/runtimes/requests/update_callbacks_request';
+import { type WasmitoBackendVM } from '../src/runtimes/vm/warduino_vm';
 import {
   type Action,
   type SubscriptionEmitterAction,

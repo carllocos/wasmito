@@ -8,13 +8,13 @@ import { type SourceMap } from '../src/source_mappers/source_map';
 import {
   type RequestMessage,
   ResponseType,
-} from '../src/warduino/api/request_interface';
+} from '../src/runtimes/api/request_interface';
 import {
   RemoveHookOnWasmAddrRequest,
   type HookOnWasmAddrResponse,
-} from '../src/warduino/requests/hook_on_wasm_addr_request';
-import { StateRequest } from '../src/warduino/requests/inspect_request';
-import { type WasmitoDevVM } from '../src/warduino/vm/dev_vm';
+} from '../src/runtimes/requests/hook_on_wasm_addr_request';
+import { StateRequest } from '../src/runtimes/requests/inspect_request';
+import { type WasmitoDevVM } from '../src/runtimes/vm/dev_vm';
 import { type WasmState } from '../src/webassembly/wasm';
 
 export function allSucceeded(replies: HookOnWasmAddrResponse[]): boolean {

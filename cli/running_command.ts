@@ -1,8 +1,8 @@
 import { type Command } from 'commander';
 import { ClientSideSocket } from '../src/communication/client_socket';
-import { sendRequest } from '../src/warduino/api/request_interface';
-import { PauseRequest } from '../src/warduino/requests/pause_request';
-import { RunRequest } from '../src/warduino/requests/run_request';
+import { sendRequest } from '../src/runtimes/api/request_interface';
+import { PauseRequest } from '../src/runtimes/requests/pause_request';
+import { RunRequest } from '../src/runtimes/requests/run_request';
 
 export function registerRunningRequestCommand(program: Command): void {
   const commandName = 'running';

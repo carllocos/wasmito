@@ -1,12 +1,12 @@
 import type winston from 'winston';
-import { RemoveHookOnWasmAddrRequest } from '../warduino/requests/hook_on_wasm_addr_request';
+import { RemoveHookOnWasmAddrRequest } from '../runtimes/requests/hook_on_wasm_addr_request';
 import { type Breakpoint } from './breakpoint';
 import { createLogger } from '../logger/logger';
 import { InspectStateHook } from '../hooks/hook_inspect_state';
 import { type WasmState } from '../webassembly';
-import { type WasmitoBackendVM } from '../warduino/vm/warduino_vm';
-import { isSuccessfulMessage } from '../warduino/api/request_interface';
-import { StateRequest } from '../warduino/requests/inspect_request';
+import { type WasmitoBackendVM } from '../runtimes/vm/warduino_vm';
+import { isSuccessfulMessage } from '../runtimes/api/request_interface';
+import { StateRequest } from '../runtimes/requests/inspect_request';
 import { PauseVMHook } from '../hooks/hook_run_pause';
 import { type SourceCodeLocation } from '../source_mappers';
 

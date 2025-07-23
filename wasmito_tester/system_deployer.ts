@@ -7,7 +7,7 @@ import {
   getLogLevelFromString,
 } from '../src/logger/logger';
 import { maybeTimeoutPromise, timeoutPromise } from '../src/util/promise_util';
-import { type WasmitoBackendVM } from '../src/warduino/vm/warduino_vm';
+import { type WasmitoBackendVM } from '../src/runtimes/vm/warduino_vm';
 import {
   type DeviceSetup,
   Target,
@@ -20,7 +20,7 @@ import {
   autoBuildArduinoPlatform,
   createDevPlatform,
 } from '../src/platforms/platformbuilder_factory';
-import { type MCUWasmitoVM } from '../src/warduino/vm/mcu_vm';
+import { type MCUWasmitoVM } from '../src/runtimes/vm/mcu_vm';
 
 export class SystemDeployer {
   private readonly setup;

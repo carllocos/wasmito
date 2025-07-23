@@ -15,8 +15,8 @@ import {
   stepAction,
   TriggerInterrupt,
 } from '../reusable_actions';
-import { type WasmitoBackendVM } from '../../src/warduino/vm/warduino_vm';
-import { StateRequest } from '../../src/warduino/requests/inspect_request';
+import { type WasmitoBackendVM } from '../../src/runtimes/vm/warduino_vm';
+import { StateRequest } from '../../src/runtimes/requests/inspect_request';
 import { WasmValuesBuilder } from '../../src/webassembly/wasm_value_array_builder';
 import { type TestProgram, type PostSetupConfig } from '../shared_interfaces';
 import { TargetLanguage } from '../../src/compilers/prog_language_selection';

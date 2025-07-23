@@ -1,16 +1,16 @@
 import type winston from 'winston';
 import { createLogger } from '../logger/logger';
-import { WasmitoDevVM } from '../warduino/vm/dev_vm';
-import { MCUWasmitoVM } from '../warduino/vm/mcu_vm';
+import { WasmitoDevVM } from '../runtimes/vm/dev_vm';
+import { MCUWasmitoVM } from '../runtimes/vm/mcu_vm';
 import { type ChildProcess } from 'child_process';
-import { type WasmitoBackendVM } from '../warduino';
+import { type WasmitoBackendVM } from '../runtimes';
 import {
   InputMode,
   type OutOfPlaceSetupConfig,
   OutOfPlaceVM,
   OutOfThingsMonitor,
   OutputMode,
-} from '../warduino/vm/outofplace_vm';
+} from '../runtimes/vm/outofplace_vm';
 import { type DevVMPlatform, type ArduinoBoardBuilder } from '../platforms';
 import { SerialConnection } from '../communication/serial';
 import { ClientSideSocket } from '../communication/client_socket';

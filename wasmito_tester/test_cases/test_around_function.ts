@@ -7,9 +7,9 @@ import {
 import {
   AroundFunctionRequest,
   type AroundHookResponse,
-} from '../../src/warduino/requests/around_function_request';
-import { type WasmitoBackendVM } from '../../src/warduino/vm/warduino_vm';
-import { ResponseType } from '../../src/warduino/api/request_interface';
+} from '../../src/runtimes/requests/around_function_request';
+import { type WasmitoBackendVM } from '../../src/runtimes/vm/warduino_vm';
+import { ResponseType } from '../../src/runtimes/api/request_interface';
 import {
   type TestScenarioResult,
   type TestProgram,

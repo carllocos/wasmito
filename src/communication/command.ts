@@ -1,5 +1,5 @@
 import { getGlobalLogger } from '../logger/logger';
-import { type APIRequest } from '../warduino/api/request_interface';
+import { type APIRequest } from '../runtimes/api/request_interface';
 import { type Channel } from './channel_interface';
 
 export class Command<T> {

@@ -5,7 +5,7 @@ export * from './communication/index';
 export * from './device/index';
 export * from './source_mappers/index';
 export * from './webassembly/index';
-export * from './warduino/index';
+export * from './runtimes/index';
 export * from './util/index';
 export * from './debugger/index';
 export * from './wasm-tools/index';

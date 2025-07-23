@@ -2,7 +2,7 @@ import { createDevPlatform } from '../../src/platforms/platformbuilder_factory';
 import { DeviceManager } from '../../src/device/device_manager';
 import { TargetLanguage } from '../../src/compilers/prog_language_selection';
 import { type WATCompilerArgs } from '../../src/compilers/wat_compilers';
-import { type WasmitoDevVM } from '../../src/warduino/vm/dev_vm';
+import { type WasmitoDevVM } from '../../src/runtimes/vm/dev_vm';
 
 describe('Resolve Event Request', () => {
   let deviceManager: DeviceManager | undefined;

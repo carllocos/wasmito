@@ -4,16 +4,16 @@ import {
   HookOnWasmAddrMoment,
   HookOnWasmAddrRequest,
   RemoveHookOnWasmAddrRequest,
-} from '../../../src/warduino/requests/hook_on_wasm_addr_request';
+} from '../../../src/runtimes/requests/hook_on_wasm_addr_request';
 import {
   type APIRequest,
   createRequestMessage,
   isSubscriptionMessage,
   isSuccessfulMessage,
-} from '../../../src/warduino/api/request_interface';
+} from '../../../src/runtimes/api/request_interface';
 import { PauseVMHook } from '../../../src/hooks/hook_run_pause';
-import { RunRequest } from '../../../src/warduino/requests/run_request';
-import { StateRequest, StepRequest } from '../../../src/warduino';
+import { RunRequest } from '../../../src/runtimes/requests/run_request';
+import { StateRequest, StepRequest } from '../../../src/runtimes';
 import { type WasmState } from '../../../src/webassembly/wasm';
 import { type Channel } from '../../../src/communication/channel_interface';
 import { Command } from '../../../src/communication/command';

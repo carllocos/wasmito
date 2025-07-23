@@ -1,12 +1,12 @@
 import * as fs from 'fs';
 import { type Logger } from 'winston';
 import { createLogger } from '../../src/logger/logger';
-import { type APIRequest } from '../../src/warduino/api/request_interface';
+import { type APIRequest } from '../../src/runtimes/api/request_interface';
 import { type Command } from '../../src/communication/command';
-import { StateRequest } from '../../src/warduino/requests/inspect_request';
+import { StateRequest } from '../../src/runtimes/requests/inspect_request';
 import { type WasmState } from '../../src/webassembly/wasm';
 import { type Hook } from '../../src/hooks/hook';
-import { WasmitoBackendVM } from '../../src/warduino/vm/warduino_vm';
+import { WasmitoBackendVM } from '../../src/runtimes/vm/warduino_vm';
 import { MockChannel } from './mock_channel';
 import { type Breakpoint } from '../../src/debugger/breakpoint';
 import { type WASMFunction } from '../../src/webassembly/wasm/wasm_function';

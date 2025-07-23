@@ -18,7 +18,7 @@ import {
   type SubscribeAction,
   type DeviceID,
 } from './shared_interfaces';
-import { type WasmitoBackendVM } from '../src/warduino';
+import { type WasmitoBackendVM } from '../src/runtimes';
 import { HookWithSubscription } from '../src/hooks/hook';
 
 type DelayResolver = (value: boolean | PromiseLike<boolean>) => void;
