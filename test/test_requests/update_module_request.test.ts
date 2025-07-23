@@ -1,5 +1,5 @@
 import { DeviceManager } from '../../src/device/device_manager';
-import { type WasmitoDevVM } from '../../src/runtimes/vm/dev_vm';
+import { type WasmitoDevVM } from '../../src/runtimes/wasmito_vm/dev_vm';
 import { TargetLanguage } from '../../src/compilers/prog_language_selection';
 import { type WATCompilerArgs } from '../../src/compilers/wat_compilers';
 import { createDevPlatform } from '../../src/platforms/platformbuilder_factory';

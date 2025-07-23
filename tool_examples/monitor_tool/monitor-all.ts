@@ -3,19 +3,19 @@ import { getGlobalLogger } from '../../src/logger/logger';
 import { type WasmState } from '../../src/webassembly/wasm';
 import { InspectStateHook } from '../../src/hooks/hook_inspect_state';
 import { EmptyValueSubstitution } from '../../src/hooks/hook_value_substitution';
-import { AroundFunctionRequest } from '../../src/runtimes/vm/requests/around_function_request';
+import { AroundFunctionRequest } from '../../src/runtimes/wasmito_vm/requests/around_function_request';
 import {
   type HookOnWasmAddrResponse,
   HookOnWasmAddrRequest,
   HookOnWasmAddrMoment,
-} from '../../src/runtimes/vm/requests/hook_on_wasm_addr_request';
-import { StateRequest } from '../../src/runtimes/vm/requests/inspect_request';
-import { ResponseType } from '../../src/runtimes/vm/requests/request_interface';
+} from '../../src/runtimes/wasmito_vm/requests/hook_on_wasm_addr_request';
+import { StateRequest } from '../../src/runtimes/wasmito_vm/requests/inspect_request';
+import { ResponseType } from '../../src/runtimes/wasmito_vm/requests/request_interface';
 import * as fs from 'fs';
 import { type WasmInstruction } from '../../src/webassembly/wasm/wasm_instruction';
 import { PlaceholderType } from '../../src/webassembly/wasm/opcode_type';
 import { exit } from 'process';
-import { type WasmitoBackendVM } from '../../src/runtimes/vm/wasmito_vm';
+import { type WasmitoBackendVM } from '../../src/runtimes/wasmito_vm/wasmito_vm';
 import path from 'path';
 import { BoardBaudRate } from '../../src/util/serial_port';
 import { TargetLanguage } from '../../src/compilers/prog_language_selection';

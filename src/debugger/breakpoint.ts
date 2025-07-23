@@ -1,5 +1,5 @@
 import { type WasmState } from '../webassembly';
-import { StateRequest } from '../runtimes/vm/requests/inspect_request';
+import { StateRequest } from '../runtimes/wasmito_vm/requests/inspect_request';
 import { PauseVMHook } from '../hooks/hook_run_pause';
 import { type ISubscription, type Hook } from '../hooks/hook';
 import { InspectStateHook } from '../hooks/hook_inspect_state';
@@ -10,7 +10,7 @@ import {
   strictEqualSourceCodeLocations,
   type SourceCodeLocation,
 } from '../source_mappers/source_map';
-import { HookOnWasmAddrRequest } from '../runtimes/vm/requests/hook_on_wasm_addr_request';
+import { HookOnWasmAddrRequest } from '../runtimes/wasmito_vm/requests/hook_on_wasm_addr_request';
 
 // TODO reimplement as extension to HookWithSub? Although this is bound to an address and should be extensible to support binding to events
 export class Breakpoint implements ISubscription<WasmState> {

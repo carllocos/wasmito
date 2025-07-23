@@ -17,7 +17,7 @@ import {
   type TestScenarioResult,
 } from '../shared_interfaces';
 import { RemoveAndProceedBreakpointPolicy } from '../../src/debugger/breakpoint_policies';
-import { type WasmitoBackendVM } from '../../src/runtimes/vm/wasmito_vm';
+import { type WasmitoBackendVM } from '../../src/runtimes/wasmito_vm/wasmito_vm';
 import { TargetLanguage } from '../../src/compilers/prog_language_selection';
 import {
   type SourceCodeLocation,

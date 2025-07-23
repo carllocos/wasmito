@@ -1,8 +1,8 @@
 import { type Hook } from '../hooks/hook';
 import { type SourceCodeLocation } from '../source_mappers';
 import { type WASM, type WasmState } from '../webassembly/wasm';
-import { type StateRequest } from './vm/requests/inspect_request';
-import { type ProxyCallResponse } from './vm/requests/fun_call_request';
+import { type StateRequest } from './wasmito_vm/requests/inspect_request';
+import { type ProxyCallResponse } from './wasmito_vm/requests/fun_call_request';
 import { type BreakpointPolicy } from '../debugger/breakpoint_policies';
 import { type Breakpoint } from '../debugger/breakpoint';
 import { type WASMFunction } from '../webassembly/wasm/wasm_function';

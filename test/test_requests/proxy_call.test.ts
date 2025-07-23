@@ -2,14 +2,14 @@ import { DeviceManager } from '../../src/device/device_manager';
 import {
   InputMode,
   type OutOfPlaceVM,
-} from '../../src/runtimes/vm/outofplace_vm';
+} from '../../src/runtimes/wasmito_vm/outofplace_vm';
 import { expect } from 'chai';
 import { MockVM } from '../shared/mock_vm';
 import { type MockChannel } from '../shared/mock_channel';
 import {
   ProxyCallRequest,
   isProxyCallSuccessfulResponse,
-} from '../../src/runtimes/vm/requests/fun_call_request';
+} from '../../src/runtimes/wasmito_vm/requests/fun_call_request';
 import { WasmValuesBuilder } from '../../src/webassembly/wasm_value_array_builder';
 import { timeoutPromise } from '../../src/util/promise_util';
 import { TargetLanguage } from '../../src/compilers/prog_language_selection';

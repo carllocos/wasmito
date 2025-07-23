@@ -2,9 +2,9 @@ import { DeviceManager } from '../src/device/device_manager';
 import { BoardBaudRate } from '../src/util/serial_port';
 import { WasmValuesBuilder } from '../src/webassembly/wasm_value_array_builder';
 import { type WasmState } from '../src/webassembly';
-import { type WasmitoBackendVM } from '../src/runtimes/vm/wasmito_vm';
-import { type MCUWasmitoVM } from '../src/runtimes/vm/mcu_vm';
-import { StateRequest } from '../src/runtimes/vm/requests/inspect_request';
+import { type WasmitoBackendVM } from '../src/runtimes/wasmito_vm/wasmito_vm';
+import { type MCUWasmitoVM } from '../src/runtimes/wasmito_vm/mcu_vm';
+import { StateRequest } from '../src/runtimes/wasmito_vm/requests/inspect_request';
 import { Breakpoint } from '../src/debugger/breakpoint';
 import { TargetLanguage } from '../src/compilers/prog_language_selection';
 import {

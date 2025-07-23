@@ -1,8 +1,8 @@
 import { type Command } from 'commander';
 import { ClientSideSocket } from '../src/communication/client_socket';
-import { sendRequest } from '../src/runtimes/vm/requests/request_interface';
-import { PauseRequest } from '../src/runtimes/vm/requests/pause_request';
-import { RunRequest } from '../src/runtimes/vm/requests/run_request';
+import { sendRequest } from '../src/runtimes/wasmito_vm/requests/request_interface';
+import { PauseRequest } from '../src/runtimes/wasmito_vm/requests/pause_request';
+import { RunRequest } from '../src/runtimes/wasmito_vm/requests/run_request';
 
 export function registerRunningRequestCommand(program: Command): void {
   const commandName = 'running';

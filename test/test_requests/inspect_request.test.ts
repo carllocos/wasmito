@@ -1,6 +1,6 @@
 import { DeviceManager } from '../../src/device/device_manager';
-import { type WasmitoDevVM } from '../../src/runtimes/vm/dev_vm';
-import { StateRequest } from '../../src/runtimes/vm/requests/inspect_request';
+import { type WasmitoDevVM } from '../../src/runtimes/wasmito_vm/dev_vm';
+import { StateRequest } from '../../src/runtimes/wasmito_vm/requests/inspect_request';
 import { TargetLanguage } from '../../src/compilers/prog_language_selection';
 import { createDevPlatform } from '../../src/platforms/platformbuilder_factory';
 import { type WATCompilerArgs } from '../../src';

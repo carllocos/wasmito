@@ -8,12 +8,12 @@ import { EmptyValueSubstitution } from '../src/hooks/hook_value_substitution';
 import { type WasmValuesBuilder } from '../src/webassembly';
 import { type WASM, type WasmState } from '../src/webassembly/wasm';
 import { type ProxyCallResponse } from '../src/runtimes';
-import { ResponseType } from '../src/runtimes/vm/requests/request_interface';
-import { AroundFunctionRequest } from '../src/runtimes/vm/requests/around_function_request';
-import { PushEventRequest } from '../src/runtimes/vm/requests/inject_event_request';
-import { StateRequest } from '../src/runtimes/vm/requests/inspect_request';
-import { UpdateCallbackMappingRequest } from '../src/runtimes/vm/requests/update_callbacks_request';
-import { type WasmitoBackendVM } from '../src/runtimes/vm/wasmito_vm';
+import { ResponseType } from '../src/runtimes/wasmito_vm/requests/request_interface';
+import { AroundFunctionRequest } from '../src/runtimes/wasmito_vm/requests/around_function_request';
+import { PushEventRequest } from '../src/runtimes/wasmito_vm/requests/inject_event_request';
+import { StateRequest } from '../src/runtimes/wasmito_vm/requests/inspect_request';
+import { UpdateCallbackMappingRequest } from '../src/runtimes/wasmito_vm/requests/update_callbacks_request';
+import { type WasmitoBackendVM } from '../src/runtimes/wasmito_vm/wasmito_vm';
 import {
   type Action,
   type SubscriptionEmitterAction,

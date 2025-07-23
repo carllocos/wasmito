@@ -1,6 +1,6 @@
 import { type HookWithSubscription } from '../src/hooks/hook';
 import { type TargetLanguage } from '../src/compilers/prog_language_selection';
-import { type WasmitoBackendVM } from '../src/runtimes/vm/wasmito_vm';
+import { type WasmitoBackendVM } from '../src/runtimes/wasmito_vm/wasmito_vm';
 
 export enum Target {
   mcu = 'mcu',

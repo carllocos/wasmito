@@ -1,6 +1,6 @@
 import { WASM } from '../webassembly/wasm';
 import { isHexaString } from '../util/decoder';
-import { APIRequestInvalidParse } from '../runtimes/vm/requests/request_interface';
+import { APIRequestInvalidParse } from '../runtimes/wasmito_vm/requests/request_interface';
 import {
   HookKind,
   HookWithSubscription,
