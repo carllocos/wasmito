@@ -4,7 +4,7 @@ import { type Breakpoint } from './breakpoint';
 import { createLogger } from '../logger/logger';
 import { InspectStateHook } from '../hooks/hook_inspect_state';
 import { type WasmState } from '../webassembly';
-import { type WasmitoBackendVM } from '../runtimes/vm/warduino_vm';
+import { type WasmitoBackendVM } from '../runtimes/vm/wasmito_vm';
 import { isSuccessfulMessage } from '../runtimes/vm/requests/request_interface';
 import { StateRequest } from '../runtimes/vm/requests/inspect_request';
 import { PauseVMHook } from '../hooks/hook_run_pause';

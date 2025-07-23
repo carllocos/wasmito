@@ -13,7 +13,7 @@ import { AroundFunctionRequest } from '../src/runtimes/vm/requests/around_functi
 import { PushEventRequest } from '../src/runtimes/vm/requests/inject_event_request';
 import { StateRequest } from '../src/runtimes/vm/requests/inspect_request';
 import { UpdateCallbackMappingRequest } from '../src/runtimes/vm/requests/update_callbacks_request';
-import { type WasmitoBackendVM } from '../src/runtimes/vm/warduino_vm';
+import { type WasmitoBackendVM } from '../src/runtimes/vm/wasmito_vm';
 import {
   type Action,
   type SubscriptionEmitterAction,

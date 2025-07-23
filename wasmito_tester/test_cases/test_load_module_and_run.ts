@@ -7,7 +7,7 @@ import {
 import { TargetLanguage } from '../../src/compilers/prog_language_selection';
 import { runVMAction } from '../reusable_actions';
 import { StateRequest } from '../../src/runtimes/vm/requests/inspect_request';
-import { type WasmitoBackendVM } from '../../src/runtimes/vm/warduino_vm';
+import { type WasmitoBackendVM } from '../../src/runtimes/vm/wasmito_vm';
 import { type WasmState } from '../../src/webassembly/wasm';
 
 /*

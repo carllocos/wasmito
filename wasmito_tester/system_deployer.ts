@@ -7,7 +7,7 @@ import {
   getLogLevelFromString,
 } from '../src/logger/logger';
 import { maybeTimeoutPromise, timeoutPromise } from '../src/util/promise_util';
-import { type WasmitoBackendVM } from '../src/runtimes/vm/warduino_vm';
+import { type WasmitoBackendVM } from '../src/runtimes/vm/wasmito_vm';
 import {
   type DeviceSetup,
   Target,

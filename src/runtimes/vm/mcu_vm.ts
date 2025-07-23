@@ -1,5 +1,5 @@
 import { type Logger } from 'winston';
-import { WasmitoBackendVM } from './warduino_vm';
+import { WasmitoBackendVM } from './wasmito_vm';
 import { type Channel } from '../../communication/channel_interface';
 import { createLogger } from '../../logger/logger';
 import { timeoutPromise } from '../../util/promise_util';

@@ -1,6 +1,6 @@
 import type winston from 'winston';
 import { type Channel } from '../../communication/channel_interface';
-import { type WasmRuntimeAPI } from '../warduino_api';
+import { type WasmRuntimeAPI } from '../runtime_api';
 import { RunRequest } from './requests/run_request';
 import { StepRequest } from './requests/step_request';
 import {

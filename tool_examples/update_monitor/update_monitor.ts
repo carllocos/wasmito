@@ -5,7 +5,7 @@ import { DeviceManager } from '../../src/device';
 import { createLogger } from '../../src/logger/logger';
 import { BoardBaudRate } from '../../src/util';
 import { TargetLanguage } from '../../src/compilers/prog_language_selection';
-import { type WasmitoBackendVM } from '../../src/runtimes/vm/warduino_vm';
+import { type WasmitoBackendVM } from '../../src/runtimes/vm/wasmito_vm';
 import { fs } from 'assemblyscript/util/node.js';
 
 const logger = createLogger('SourceCodeWatcher');

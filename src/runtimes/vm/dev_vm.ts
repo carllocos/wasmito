@@ -1,5 +1,5 @@
 import { spawn, type ChildProcess } from 'child_process';
-import { WasmitoBackendVM } from './warduino_vm';
+import { WasmitoBackendVM } from './wasmito_vm';
 import { type VMConfiguration } from '../../device/vm_config';
 import { ClientSideSocket } from '../../communication/client_socket';
 import type winston from 'winston';

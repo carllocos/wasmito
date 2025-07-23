@@ -15,7 +15,7 @@ import * as fs from 'fs';
 import { type WasmInstruction } from '../../src/webassembly/wasm/wasm_instruction';
 import { PlaceholderType } from '../../src/webassembly/wasm/opcode_type';
 import { exit } from 'process';
-import { type WasmitoBackendVM } from '../../src/runtimes/vm/warduino_vm';
+import { type WasmitoBackendVM } from '../../src/runtimes/vm/wasmito_vm';
 import path from 'path';
 import { BoardBaudRate } from '../../src/util/serial_port';
 import { TargetLanguage } from '../../src/compilers/prog_language_selection';

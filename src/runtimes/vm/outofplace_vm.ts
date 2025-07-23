@@ -1,4 +1,4 @@
-import { type WasmitoBackendVM } from './warduino_vm';
+import { type WasmitoBackendVM } from './wasmito_vm';
 import { type VMConfiguration } from '../../device/vm_config';
 import { WasmitoDevVM } from './dev_vm';
 import { spawn, type ChildProcess } from 'child_process';

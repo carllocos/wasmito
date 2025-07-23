@@ -1,6 +1,6 @@
 export * from './vm/requests/instructions';
 export * from './vm/requests/request_interface';
-export * from './warduino_api';
+export * from './runtime_api';
 export * from './vm/requests/around_function_request';
 export * from './vm/requests/inspect_request';
 export * from './vm/requests/load_state_request';
@@ -14,6 +14,6 @@ export * from './vm/requests/update_module_request';
 export * from './vm/requests/request_error_code';
 export * from './vm/requests/fun_call_request';
 export * from './vm/dev_vm';
-export * from './vm/warduino_vm';
+export * from './vm/wasmito_vm';
 export * from './vm/mcu_vm';
 export * from './vm/outofplace_vm';

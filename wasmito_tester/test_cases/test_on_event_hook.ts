@@ -15,7 +15,7 @@ import {
   stepAction,
   TriggerInterrupt,
 } from '../reusable_actions';
-import { type WasmitoBackendVM } from '../../src/runtimes/vm/warduino_vm';
+import { type WasmitoBackendVM } from '../../src/runtimes/vm/wasmito_vm';
 import { StateRequest } from '../../src/runtimes/vm/requests/inspect_request';
 import { WasmValuesBuilder } from '../../src/webassembly/wasm_value_array_builder';
 import { type TestProgram, type PostSetupConfig } from '../shared_interfaces';
