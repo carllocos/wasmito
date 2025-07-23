@@ -1,5 +1,5 @@
-import { type Channel } from '../../communication/channel_interface';
-import { Command } from '../../communication/command';
+import { type Channel } from '../../../communication/channel_interface';
+import { Command } from '../../../communication/command';
 import { getInstructionFromString, type Instruction } from './instructions';
 
 export class APIRequestInvalidParse extends Error {}

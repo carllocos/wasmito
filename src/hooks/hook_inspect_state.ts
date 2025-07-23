@@ -1,5 +1,5 @@
 import { type WasmState } from '../webassembly/wasm';
-import { type StateRequest } from '../runtimes/requests/inspect_request';
+import { type StateRequest } from '../runtimes/vm/requests/inspect_request';
 import { HookKind, HookWithSubscription } from './hook';
 
 export class InspectStateHook extends HookWithSubscription<WasmState> {

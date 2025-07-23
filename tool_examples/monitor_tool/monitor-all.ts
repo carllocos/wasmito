@@ -3,14 +3,14 @@ import { getGlobalLogger } from '../../src/logger/logger';
 import { type WasmState } from '../../src/webassembly/wasm';
 import { InspectStateHook } from '../../src/hooks/hook_inspect_state';
 import { EmptyValueSubstitution } from '../../src/hooks/hook_value_substitution';
-import { AroundFunctionRequest } from '../../src/runtimes/requests/around_function_request';
+import { AroundFunctionRequest } from '../../src/runtimes/vm/requests/around_function_request';
 import {
   type HookOnWasmAddrResponse,
   HookOnWasmAddrRequest,
   HookOnWasmAddrMoment,
-} from '../../src/runtimes/requests/hook_on_wasm_addr_request';
-import { StateRequest } from '../../src/runtimes/requests/inspect_request';
-import { ResponseType } from '../../src/runtimes/api/request_interface';
+} from '../../src/runtimes/vm/requests/hook_on_wasm_addr_request';
+import { StateRequest } from '../../src/runtimes/vm/requests/inspect_request';
+import { ResponseType } from '../../src/runtimes/vm/requests/request_interface';
 import * as fs from 'fs';
 import { type WasmInstruction } from '../../src/webassembly/wasm/wasm_instruction';
 import { PlaceholderType } from '../../src/webassembly/wasm/opcode_type';

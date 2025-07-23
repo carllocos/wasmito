@@ -8,11 +8,11 @@ import { EmptyValueSubstitution } from '../src/hooks/hook_value_substitution';
 import { type WasmValuesBuilder } from '../src/webassembly';
 import { type WASM, type WasmState } from '../src/webassembly/wasm';
 import { type ProxyCallResponse } from '../src/runtimes';
-import { ResponseType } from '../src/runtimes/api/request_interface';
-import { AroundFunctionRequest } from '../src/runtimes/requests/around_function_request';
-import { PushEventRequest } from '../src/runtimes/requests/inject_event_request';
-import { StateRequest } from '../src/runtimes/requests/inspect_request';
-import { UpdateCallbackMappingRequest } from '../src/runtimes/requests/update_callbacks_request';
+import { ResponseType } from '../src/runtimes/vm/requests/request_interface';
+import { AroundFunctionRequest } from '../src/runtimes/vm/requests/around_function_request';
+import { PushEventRequest } from '../src/runtimes/vm/requests/inject_event_request';
+import { StateRequest } from '../src/runtimes/vm/requests/inspect_request';
+import { UpdateCallbackMappingRequest } from '../src/runtimes/vm/requests/update_callbacks_request';
 import { type WasmitoBackendVM } from '../src/runtimes/vm/warduino_vm';
 import {
   type Action,

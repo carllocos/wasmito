@@ -1,7 +1,7 @@
 import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
-} from '../api/request_interface';
+} from './request_interface';
 
 export class RebootRequest extends APIRequestNoSubscription<void> {
   description(): string {

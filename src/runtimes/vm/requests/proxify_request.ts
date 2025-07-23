@@ -1,8 +1,8 @@
-import { Instruction } from '../api/instructions';
+import { Instruction } from './instructions';
 import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
-} from '../api/request_interface';
+} from './request_interface';
 
 export class ProxifyRequest extends APIRequestNoSubscription<string> {
   getData(): string {

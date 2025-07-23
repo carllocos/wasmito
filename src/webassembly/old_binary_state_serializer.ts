@@ -3,8 +3,8 @@
  */
 
 import { createLogger } from '../logger/logger';
-import { Instruction } from '../runtimes/api/instructions';
-import { InspectableState } from '../runtimes/requests/inspect_request';
+import { Instruction } from '../runtimes/vm/requests/instructions';
+import { InspectableState } from '../runtimes/vm/requests/inspect_request';
 import { WASM, type WASMValueIndexed, type WasmState } from './wasm';
 const logger = createLogger('BinaryEncoder');
 

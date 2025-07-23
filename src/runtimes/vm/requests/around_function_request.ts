@@ -1,13 +1,13 @@
-import { getGlobalLogger } from '../../logger/logger';
-import { encodeToHexLEB128 } from '../../util/encoder';
+import { getGlobalLogger } from '../../../logger/logger';
+import { encodeToHexLEB128 } from '../../../util/encoder';
 import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
   ResponseType,
   getResponseTypeFromString,
-} from '../api/request_interface';
-import { Instruction, getInstructionFromString } from '../api/instructions';
-import { type Hook } from '../../hooks/hook';
+} from './request_interface';
+import { Instruction, getInstructionFromString } from './instructions';
+import { type Hook } from '../../../hooks/hook';
 
 export interface AroundFunctionJSONResponse {
   interrupt: string;

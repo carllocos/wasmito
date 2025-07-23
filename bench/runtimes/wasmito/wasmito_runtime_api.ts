@@ -4,15 +4,15 @@ import {
   HookOnWasmAddrMoment,
   HookOnWasmAddrRequest,
   RemoveHookOnWasmAddrRequest,
-} from '../../../src/runtimes/requests/hook_on_wasm_addr_request';
+} from '../../../src/runtimes/vm/requests/hook_on_wasm_addr_request';
 import {
   type APIRequest,
   createRequestMessage,
   isSubscriptionMessage,
   isSuccessfulMessage,
-} from '../../../src/runtimes/api/request_interface';
+} from '../../../src/runtimes/vm/requests/request_interface';
 import { PauseVMHook } from '../../../src/hooks/hook_run_pause';
-import { RunRequest } from '../../../src/runtimes/requests/run_request';
+import { RunRequest } from '../../../src/runtimes/vm/requests/run_request';
 import { StateRequest, StepRequest } from '../../../src/runtimes';
 import { type WasmState } from '../../../src/webassembly/wasm';
 import { type Channel } from '../../../src/communication/channel_interface';

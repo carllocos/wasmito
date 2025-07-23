@@ -9,7 +9,7 @@ import { type MockChannel } from '../shared/mock_channel';
 import {
   ProxyCallRequest,
   isProxyCallSuccessfulResponse,
-} from '../../src/runtimes/requests/fun_call_request';
+} from '../../src/runtimes/vm/requests/fun_call_request';
 import { WasmValuesBuilder } from '../../src/webassembly/wasm_value_array_builder';
 import { timeoutPromise } from '../../src/util/promise_util';
 import { TargetLanguage } from '../../src/compilers/prog_language_selection';

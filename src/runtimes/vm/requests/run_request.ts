@@ -1,8 +1,8 @@
 import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
-} from '../api/request_interface';
-import { Instruction } from '../api/instructions';
+} from './request_interface';
+import { Instruction } from './instructions';
 
 export class RunRequest extends APIRequestNoSubscription<string> {
   description(): string {

@@ -4,7 +4,7 @@ import { type VMConfiguration } from '../../device/vm_config';
 import { ClientSideSocket } from '../../communication/client_socket';
 import type winston from 'winston';
 import { createLogger } from '../../logger/logger';
-import { UpdateWasmModuleRequest } from '../requests/update_module_request';
+import { UpdateWasmModuleRequest } from './requests/update_module_request';
 import { getPath2WasmitoSDKVMBinary } from '../../project_config';
 import { getFreePort, isPortInUse } from '../../util/socket_util';
 import { NoChannel } from '../../communication/no_channel';

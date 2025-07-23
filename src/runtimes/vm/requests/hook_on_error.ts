@@ -1,13 +1,13 @@
-import { HookWithSubscription, type Hook } from '../../hooks/hook';
-import { createLogger } from '../../logger/logger';
-import { isHexaString } from '../../util/decoder';
-import { Instruction } from '../api/instructions';
+import { HookWithSubscription, type Hook } from '../../../hooks/hook';
+import { createLogger } from '../../../logger/logger';
+import { isHexaString } from '../../../util/decoder';
+import { Instruction } from './instructions';
 import {
   APIRequest,
   APIRequestInvalidParse,
   ResponseType,
   type RequestMessage,
-} from '../api/request_interface';
+} from './request_interface';
 import { getExceptionMsgFromErrorCode } from './request_error_code';
 
 const logger = createLogger('HookOnError');

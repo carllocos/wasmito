@@ -1,14 +1,14 @@
-import { type WASM } from '../../webassembly';
+import { type WASM } from '../../../webassembly';
 import {
   encodeJSONToHexString,
   encodeStringToHex,
   encodeToHexLEB128,
-} from '../../util/encoder';
-import { Instruction } from '../api/instructions';
+} from '../../../util/encoder';
+import { Instruction } from './instructions';
 import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
-} from '../api/request_interface';
+} from './request_interface';
 
 export class UpdateCallbackMappingRequest extends APIRequestNoSubscription<boolean> {
   private readonly mappings: WASM.CallbackMapping[];

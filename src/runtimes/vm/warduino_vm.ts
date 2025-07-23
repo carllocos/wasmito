@@ -1,36 +1,36 @@
 import type winston from 'winston';
 import { type Channel } from '../../communication/channel_interface';
-import { type WasmRuntimeAPI } from '../api/warduino_api';
-import { RunRequest } from '../requests/run_request';
-import { StepRequest } from '../requests/step_request';
+import { type WasmRuntimeAPI } from '../warduino_api';
+import { RunRequest } from './requests/run_request';
+import { StepRequest } from './requests/step_request';
 import {
   isSuccessfulMessage,
   type APIRequest,
   ResponseType,
-} from '../api/request_interface';
+} from './requests/request_interface';
 import { Command } from '../../communication/command';
 import { type Platform } from '../../platforms/platform';
-import { PauseRequest } from '../requests/pause_request';
-import { ProxifyRequest } from '../requests/proxify_request';
+import { PauseRequest } from './requests/pause_request';
+import { ProxifyRequest } from './requests/proxify_request';
 import { type WASM, type WasmState } from '../../webassembly/wasm';
-import { StateRequest } from '../requests/inspect_request';
-import { LoadStateRequestBuilder } from '../requests/load_state_request';
+import { StateRequest } from './requests/inspect_request';
+import { LoadStateRequestBuilder } from './requests/load_state_request';
 import { timeoutPromise } from '../../util/promise_util';
-import { ResolveEventRequest } from '../requests/resolve_event_request';
+import { ResolveEventRequest } from './requests/resolve_event_request';
 import {
   HookOnWasmAddrMoment,
   HookOnWasmAddrRequest,
-} from '../requests/hook_on_wasm_addr_request';
+} from './requests/hook_on_wasm_addr_request';
 import { ProxyCallHook } from '../../hooks/hook_proxy_call';
-import { AroundFunctionRequest } from '../requests/around_function_request';
+import { AroundFunctionRequest } from './requests/around_function_request';
 import {
   ProxyCallRequest,
   type ProxyCallResponse,
-} from '../requests/fun_call_request';
+} from './requests/fun_call_request';
 import {
   HookOnEventRequest,
   isSuccessfullHookOnEventResponse,
-} from '../requests/hook_on_event_request';
+} from './requests/hook_on_event_request';
 import {
   type BreakpointPolicy,
   BreakpointDefaultPolicy,
@@ -40,7 +40,7 @@ import { type Hook } from '../../hooks/hook';
 import {
   HookOnError,
   isSuccessfullHookOnErrorResponse,
-} from '../requests/hook_on_error';
+} from './requests/hook_on_error';
 import { EventInspectHook } from '../../hooks/hook_event';
 import { type DeviceIdentity } from '../../device';
 import { type WASMFunction } from '../../webassembly/wasm/wasm_function';

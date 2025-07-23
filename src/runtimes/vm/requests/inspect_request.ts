@@ -1,11 +1,11 @@
 import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
-} from '../api/request_interface';
-import { Instruction } from '../api/instructions';
-import { WasmStack } from '../../webassembly/wasm_stack';
-import { serializeUInt16BE } from '../../util/encoder';
-import { WasmState, type WASM } from '../../webassembly/wasm';
+} from './request_interface';
+import { Instruction } from './instructions';
+import { WasmStack } from '../../../webassembly/wasm_stack';
+import { serializeUInt16BE } from '../../../util/encoder';
+import { WasmState, type WASM } from '../../../webassembly/wasm';
 
 export enum InspectableState {
   pcState = '01',

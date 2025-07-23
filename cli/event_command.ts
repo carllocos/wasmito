@@ -1,7 +1,7 @@
 import { type Command } from 'commander';
-import { PushEventRequest } from '../src/runtimes/requests/inject_event_request';
+import { PushEventRequest } from '../src/runtimes/vm/requests/inject_event_request';
 import { ClientSideSocket } from '../src/communication/client_socket';
-import { sendRequest } from '../src/runtimes/api/request_interface';
+import { sendRequest } from '../src/runtimes/vm/requests/request_interface';
 import { isSerialPort } from '../src/util/serial_port';
 import { type Channel } from '../src/communication/channel_interface';
 import { SerialConnection } from '../src/communication/serial';

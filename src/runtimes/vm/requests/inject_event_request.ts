@@ -1,9 +1,9 @@
-import { encodeJSONToHexString } from '../../util/encoder';
-import { Instruction } from '../api/instructions';
+import { encodeJSONToHexString } from '../../../util/encoder';
+import { Instruction } from './instructions';
 import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
-} from '../api/request_interface';
+} from './request_interface';
 
 export class PushEventRequest extends APIRequestNoSubscription<boolean> {
   private readonly topic: string;

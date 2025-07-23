@@ -1,14 +1,14 @@
-import { createLogger } from '../../logger/logger';
-import { encodeToHexLEB128 } from '../../util/encoder';
+import { createLogger } from '../../../logger/logger';
+import { encodeToHexLEB128 } from '../../../util/encoder';
 import {
   APIRequest,
   APIRequestInvalidParse,
   createRequestMessage,
   isSubscriptionMessage,
   type RequestMessage,
-} from '../api/request_interface';
-import { HookWithSubscription, type Hook } from '../../hooks/hook';
-import { Instruction } from '../api/instructions';
+} from './request_interface';
+import { HookWithSubscription, type Hook } from '../../../hooks/hook';
+import { Instruction } from './instructions';
 import type winston from 'winston';
 
 export enum HookOnWasmAddrMoment {

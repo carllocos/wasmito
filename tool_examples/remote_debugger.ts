@@ -8,12 +8,12 @@ import { type SourceMap } from '../src/source_mappers/source_map';
 import {
   type RequestMessage,
   ResponseType,
-} from '../src/runtimes/api/request_interface';
+} from '../src/runtimes/vm/requests/request_interface';
 import {
   RemoveHookOnWasmAddrRequest,
   type HookOnWasmAddrResponse,
-} from '../src/runtimes/requests/hook_on_wasm_addr_request';
-import { StateRequest } from '../src/runtimes/requests/inspect_request';
+} from '../src/runtimes/vm/requests/hook_on_wasm_addr_request';
+import { StateRequest } from '../src/runtimes/vm/requests/inspect_request';
 import { type WasmitoDevVM } from '../src/runtimes/vm/dev_vm';
 import { type WasmState } from '../src/webassembly/wasm';
 

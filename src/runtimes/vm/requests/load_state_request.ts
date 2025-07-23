@@ -1,9 +1,9 @@
-import { StateBinaryEncoder } from '../../webassembly/old_binary_state_serializer';
-import { type WasmState } from '../../webassembly/wasm';
+import { StateBinaryEncoder } from '../../../webassembly/old_binary_state_serializer';
+import { type WasmState } from '../../../webassembly/wasm';
 import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
-} from '../api/request_interface';
+} from './request_interface';
 
 export class LoadStateRequest extends APIRequestNoSubscription<string> {
   private readonly encodedState: string;

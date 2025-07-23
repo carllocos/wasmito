@@ -2,7 +2,7 @@ import { serializeUInt } from '../../../src/util/encoder';
 import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
-} from '../../../src/runtimes/api/request_interface';
+} from '../../../src/runtimes/vm/requests/request_interface';
 
 export class AddBreakpointRequest extends APIRequestNoSubscription<number> {
   private readonly instructionNr: string;

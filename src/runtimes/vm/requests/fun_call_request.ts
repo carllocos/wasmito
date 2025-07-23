@@ -1,11 +1,11 @@
-import { createLogger } from '../../logger/logger';
-import { WASM } from '../../webassembly/wasm';
-import { Instruction, getInstructionFromString } from '../api/instructions';
+import { createLogger } from '../../../logger/logger';
+import { WASM } from '../../../webassembly/wasm';
+import { Instruction, getInstructionFromString } from './instructions';
 import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
   ResponseType,
-} from '../api/request_interface';
+} from './request_interface';
 import { getExceptionMsgFromErrorCode } from './request_error_code';
 
 const logger = createLogger('FunCallRequest');

@@ -6,7 +6,7 @@ import { DeviceManager } from '../src/device/device_manager';
 import { createDevPlatform } from '../src/platforms/platformbuilder_factory';
 import { TargetLanguage } from '../src/compilers/prog_language_selection';
 import { type WasmCompilerArgs } from '../src/compilers/wasm_compiler';
-import { isProxyCallFailedRequest } from '../src/runtimes/requests/fun_call_request';
+import { isProxyCallFailedRequest } from '../src/runtimes/vm/requests/fun_call_request';
 
 export function registerCallRequestCommand(program: Command): void {
   const commandName = 'call';
