@@ -1,34 +1,34 @@
 import { spawn, type ChildProcess } from 'child_process';
-import { WARDuinoVM } from './warduino_vm';
+import { WasmitoBackendVM } from './warduino_vm';
 import { type VMConfiguration } from '../../device/vm_config';
 import { ClientSideSocket } from '../../communication/client_socket';
 import type winston from 'winston';
 import { createLogger } from '../../logger/logger';
 import { UpdateWasmModuleRequest } from '../requests/update_module_request';
-import { getPath2WARDuinoSDKVMBinary } from '../../project_config';
+import { getPath2WasmitoSDKVMBinary } from '../../project_config';
 import { getFreePort, isPortInUse } from '../../util/socket_util';
 import { NoChannel } from '../../communication/no_channel';
 import { type Channel } from '../../communication';
 import { type DevVMPlatform } from '../../platforms';
 
-export class WARDuinoDevVMError extends Error {
+export class WasmitoDevVMError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'WARDuinoDevVMError';
-    Error.captureStackTrace(this, WARDuinoDevVMError);
+    this.name = 'WasmitoDuinoDevVMError';
+    Error.captureStackTrace(this, WasmitoDevVMError);
   }
 }
 
-export class WARDuinoDevVM extends WARDuinoVM {
+export class WasmitoDevVM extends WasmitoBackendVM {
   protected logger: winston.Logger;
   protected process?: ChildProcess;
-  protected ErrorClass = WARDuinoDevVMError;
+  protected ErrorClass = WasmitoDevVMError;
 
   constructor(platform: DevVMPlatform, channel?: Channel) {
     super(platform, channel ?? new ClientSideSocket(-1, 'localhost', ''));
 
     this.logger = createLogger(
-      `WARDuinoDevVM ${platform.config.deviceIdentity.fullname}`,
+      `WasmitoDevVM ${platform.config.deviceIdentity.fullname}`,
     );
   }
 
@@ -96,7 +96,7 @@ export class WARDuinoDevVM extends WARDuinoVM {
       this.sourceMap.wasm.wasmPath,
       this.platform.config.vmConfig,
     );
-    const spawnCommand = getPath2WARDuinoSDKVMBinary();
+    const spawnCommand = getPath2WasmitoSDKVMBinary();
     this.logger.info(
       `starting DevelopmentVM process ${spawnCommand} ${processArgs.join(' ')}`,
     );

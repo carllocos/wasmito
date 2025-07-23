@@ -6,7 +6,7 @@ import { type Command } from '../../src/communication/command';
 import { StateRequest } from '../../src/warduino/requests/inspect_request';
 import { type WasmState } from '../../src/webassembly/wasm';
 import { type Hook } from '../../src/hooks/hook';
-import { WARDuinoVM } from '../../src/warduino/vm/warduino_vm';
+import { WasmitoBackendVM } from '../../src/warduino/vm/warduino_vm';
 import { MockChannel } from './mock_channel';
 import { type Breakpoint } from '../../src/debugger/breakpoint';
 import { type WASMFunction } from '../../src/webassembly/wasm/wasm_function';
@@ -16,7 +16,7 @@ import {
   type SourceMap,
 } from '../../src/source_mappers/source_map';
 
-export class MockVM extends WARDuinoVM {
+export class MockVM extends WasmitoBackendVM {
   protected logger: Logger = createLogger('MockVM');
   protected ErrorClass: new (errorMsg: string) => Error = Error;
   private readonly states: WasmState[];

@@ -7,7 +7,7 @@ import {
 import { TargetLanguage } from '../../src/compilers/prog_language_selection';
 import { runVMAction } from '../reusable_actions';
 import { StateRequest } from '../../src/warduino/requests/inspect_request';
-import { type WARDuinoVM } from '../../src/warduino/vm/warduino_vm';
+import { type WasmitoBackendVM } from '../../src/warduino/vm/warduino_vm';
 import { type WasmState } from '../../src/webassembly/wasm';
 
 /*
@@ -43,7 +43,7 @@ export async function run(
       {
         description: 'Ask for initial pc',
         timeout: milliSecs,
-        doAction: async (dev: WARDuinoVM): Promise<WasmState> => {
+        doAction: async (dev: WasmitoBackendVM): Promise<WasmState> => {
           const request = new StateRequest();
           request.includePC();
           return await dev.inspect(request);
@@ -64,7 +64,7 @@ export async function run(
         description: `Ask for pc after running for ${runningTime} s`,
         delay: milliSecs,
         timeout: milliSecs,
-        doAction: async (dev: WARDuinoVM): Promise<WasmState> => {
+        doAction: async (dev: WasmitoBackendVM): Promise<WasmState> => {
           const request = new StateRequest();
           request.includePC();
           return await dev.inspect(request);

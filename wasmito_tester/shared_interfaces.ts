@@ -1,6 +1,6 @@
 import { type HookWithSubscription } from '../src/hooks/hook';
 import { type TargetLanguage } from '../src/compilers/prog_language_selection';
-import { type WARDuinoVM } from '../src/warduino/vm/warduino_vm';
+import { type WasmitoBackendVM } from '../src/warduino/vm/warduino_vm';
 
 export enum Target {
   mcu = 'mcu',
@@ -24,7 +24,7 @@ export interface Action<ResultType> {
   delay?: number;
 
   description: string;
-  doAction: (device: WARDuinoVM) => Promise<ResultType>; // ignored if subscribeTo set
+  doAction: (device: WasmitoBackendVM) => Promise<ResultType>; // ignored if subscribeTo set
   checkActionSuccess: (actionResult: ResultType) => Promise<boolean>;
 
   subscribeTo?: string;
@@ -90,7 +90,7 @@ export interface SubscriptionEmitterAction<
   subscriptionID: string;
   description: string;
   setupSubscription: (
-    device: WARDuinoVM,
+    device: WasmitoBackendVM,
   ) => Promise<SubActReturn<ActionResultType, SubscriptionType, HookType>>;
   checkSetupSuccess: (actionResult: ActionResultType) => Promise<boolean>;
   ifFail?: FailureHandler<ActionResultType>;

@@ -7,7 +7,7 @@ import {
   getLogLevelFromString,
 } from '../src/logger/logger';
 import { maybeTimeoutPromise, timeoutPromise } from '../src/util/promise_util';
-import { type WARDuinoVM } from '../src/warduino/vm/warduino_vm';
+import { type WasmitoBackendVM } from '../src/warduino/vm/warduino_vm';
 import {
   type DeviceSetup,
   Target,
@@ -20,7 +20,7 @@ import {
   autoBuildArduinoPlatform,
   createDevPlatform,
 } from '../src/platforms/platformbuilder_factory';
-import { type MCUWARDuinoVM } from '../src/warduino/vm/mcu_vm';
+import { type MCUWasmitoVM } from '../src/warduino/vm/mcu_vm';
 
 export class SystemDeployer {
   private readonly setup;
@@ -29,7 +29,7 @@ export class SystemDeployer {
 
   private readonly deviceManager: DeviceManager;
 
-  private readonly vmMap: Map<DeviceID, WARDuinoVM>;
+  private readonly vmMap: Map<DeviceID, WasmitoBackendVM>;
 
   public MAX_WAIT_TIME_DevVM_SPAWN: number;
   private readonly MAX_WAIT_VM_READY;
@@ -71,7 +71,7 @@ export class SystemDeployer {
     return this.vmMap.has(id);
   }
 
-  deviceVM(id: DeviceID): WARDuinoVM {
+  deviceVM(id: DeviceID): WasmitoBackendVM {
     const vm = this.vmMap.get(id);
     if (vm === undefined) {
       throw new Error(`VM for device with id ${id} does not exists`);
@@ -170,7 +170,7 @@ export class SystemDeployer {
   }
 
   private async waitUntilVMReady(
-    vm: MCUWARDuinoVM,
+    vm: MCUWasmitoVM,
     maxWaitTime: number,
   ): Promise<void> {
     let cb: ((d: string) => void) | undefined;
@@ -266,7 +266,7 @@ export class SystemDeployer {
 
   private async applyPostDeployment(
     device: DeviceSetup,
-    vm: WARDuinoVM,
+    vm: WasmitoBackendVM,
   ): Promise<void> {
     const postSetup = device.postSetup;
     if (postSetup.actions !== undefined) {

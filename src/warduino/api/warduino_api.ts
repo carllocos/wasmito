@@ -8,7 +8,7 @@ import { type Breakpoint } from '../../debugger/breakpoint';
 import { type WASMFunction } from '../../webassembly/wasm/wasm_function';
 import { type SourceCFGNode } from '../../cfg';
 
-export interface WARDuinoAPI {
+export interface WasmRuntimeAPI {
   run: (timeout?: number) => Promise<boolean>;
 
   pause: (timeout?: number) => Promise<void>;

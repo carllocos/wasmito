@@ -1,9 +1,9 @@
-import { type WARDuinoVM } from './warduino_vm';
+import { type WasmitoBackendVM } from './warduino_vm';
 import { type VMConfiguration } from '../../device/vm_config';
-import { WARDuinoDevVM } from './dev_vm';
+import { WasmitoDevVM } from './dev_vm';
 import { spawn, type ChildProcess } from 'child_process';
 import { ClientSideSocket, ShareChannel } from '../../communication/index';
-import { getPath2WARDuinoSDKVMBinary } from '../../project_config';
+import { getPath2WasmitoSDKVMBinary } from '../../project_config';
 import { type WASM, type WasmState } from '../../webassembly/wasm';
 import { StateRequest } from '../requests/inspect_request';
 import { UpdateCallbackMappingRequest } from '../requests/update_callbacks_request';
@@ -51,9 +51,9 @@ export interface OutOfPlaceSetupConfig {
 
 // TODO refactor to become just a regular class
 
-export class OutOfPlaceVM extends WARDuinoDevVM {
+export class OutOfPlaceVM extends WasmitoDevVM {
   protected ErrorClass = OutOfPlaceVMError;
-  public readonly targetVM: WARDuinoVM;
+  public readonly targetVM: WasmitoBackendVM;
 
   private readonly shareableChannel: ShareChannel;
 
@@ -61,7 +61,7 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
 
   private constructor(
     platform: DevVMPlatform,
-    targetVM: WARDuinoVM,
+    targetVM: WasmitoBackendVM,
     shareableChannel: ShareChannel,
   ) {
     super(platform, shareableChannel);
@@ -71,7 +71,7 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
   }
 
   static async createVM(
-    vmToProxy: WARDuinoVM,
+    vmToProxy: WasmitoBackendVM,
     setupConfig: OutOfPlaceSetupConfig,
   ): Promise<OutOfPlaceVM> {
     const channel = new ShareChannel(
@@ -237,7 +237,7 @@ export class OutOfPlaceVM extends WARDuinoDevVM {
       this.sourceMap.wasm.wasmPath,
       this.platform.config.vmConfig,
     );
-    const spawnCommand = getPath2WARDuinoSDKVMBinary();
+    const spawnCommand = getPath2WasmitoSDKVMBinary();
     this.logger.info(
       `starting DevelopmentVM process ${spawnCommand} ${processArgs.join(' ')}`,
     );
@@ -491,17 +491,17 @@ export interface OutOfThingsSpawnConfig {
 
 export class OutOfThingsMonitor {
   private readonly logger: winston.Logger;
-  public readonly targetVM: WARDuinoVM;
+  public readonly targetVM: WasmitoBackendVM;
   private readonly _snapshots: WasmState[];
   private readonly _bpPolicy: BreakpointPolicy;
   private readonly _snapshotHook: InspectStateHook;
-  private onSpawnCb: ((vm: WARDuinoDevVM, p: ChildProcess) => void) | undefined;
+  private onSpawnCb: ((vm: WasmitoDevVM, p: ChildProcess) => void) | undefined;
   private snapshotListeners: Array<(snapshot: WasmState) => void>;
   private readonly removedSnapshotListeners: Set<(snapshot: WasmState) => void>;
 
-  private readonly spawnedVMs: WARDuinoDevVM[];
+  private readonly spawnedVMs: WasmitoDevVM[];
 
-  constructor(targetVM: WARDuinoVM) {
+  constructor(targetVM: WasmitoBackendVM) {
     this.targetVM = targetVM;
     this._snapshots = [];
     this._bpPolicy = new SingleStopBreakpointPolicy(targetVM);
@@ -546,7 +546,7 @@ export class OutOfThingsMonitor {
     });
   }
 
-  onSpawn(cb: (vm: WARDuinoDevVM, p: ChildProcess) => void): void {
+  onSpawn(cb: (vm: WasmitoDevVM, p: ChildProcess) => void): void {
     this.onSpawnCb = cb;
   }
 

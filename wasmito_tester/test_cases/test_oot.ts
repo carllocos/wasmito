@@ -13,7 +13,7 @@ import {
   type TestScenarioResult,
 } from '../shared_interfaces';
 import { RemoveAndProceedBreakpointPolicy } from '../../src/debugger/breakpoint_policies';
-import { type WARDuinoVM } from '../../src/warduino/vm/warduino_vm';
+import { type WasmitoBackendVM } from '../../src/warduino/vm/warduino_vm';
 import { TargetLanguage } from '../../src/compilers/prog_language_selection';
 import { type WasmCompilerArgs } from '../../src/compilers/wasm_compiler';
 import {
@@ -104,7 +104,7 @@ const singleStopBp: TestScenario = {
   actions: [
     {
       description: 'Change breakpoint Policy',
-      doAction: async (device: WARDuinoVM): Promise<boolean> => {
+      doAction: async (device: WasmitoBackendVM): Promise<boolean> => {
         const policy = new RemoveAndProceedBreakpointPolicy(device);
         device.changeBreakpointPolicy(policy);
         return true;

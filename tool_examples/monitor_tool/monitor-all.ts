@@ -15,7 +15,7 @@ import * as fs from 'fs';
 import { type WasmInstruction } from '../../src/webassembly/wasm/wasm_instruction';
 import { PlaceholderType } from '../../src/webassembly/wasm/opcode_type';
 import { exit } from 'process';
-import { type WARDuinoVM } from '../../src/warduino/vm/warduino_vm';
+import { type WasmitoBackendVM } from '../../src/warduino/vm/warduino_vm';
 import path from 'path';
 import { BoardBaudRate } from '../../src/util/serial_port';
 import { TargetLanguage } from '../../src/compilers/prog_language_selection';
@@ -301,7 +301,7 @@ function createJSONWriter(
 }
 
 async function registerSubstitueValueHook(
-  em: WARDuinoVM,
+  em: WasmitoBackendVM,
   sourceMap: SourceMap,
 ): Promise<boolean> {
   const chipLedCSetup = sourceMap.getFunction(5);
@@ -332,7 +332,7 @@ async function registerSubstitueValueHook(
 }
 
 async function registerBeforeHooks(
-  em: WARDuinoVM,
+  em: WasmitoBackendVM,
   sourceMap: SourceMap,
 ): Promise<boolean> {
   const opcodesBeforeRequests = sourceMap.wasm.instructions
@@ -382,7 +382,7 @@ async function registerBeforeHooks(
 }
 
 async function registerAfterHooks(
-  em: WARDuinoVM,
+  em: WasmitoBackendVM,
   sourceMap: SourceMap,
 ): Promise<boolean> {
   const opcodesAfterRequests = sourceMap.wasm.instructions
@@ -432,7 +432,7 @@ async function registerAfterHooks(
 }
 
 async function registerAllHooks(
-  em: WARDuinoVM,
+  em: WasmitoBackendVM,
   registerSubstitue: boolean,
 ): Promise<boolean> {
   let s1 = true;
@@ -514,7 +514,7 @@ export async function runMonitorApp(
   Brigadier = new BrigadierJSONWriter(JSONWriter);
 
   const dm = new DeviceManager();
-  let vm: WARDuinoVM | undefined;
+  let vm: WasmitoBackendVM | undefined;
   const compilationArgs: WATCompilerArgs = {
     sourceCodePath: wasmApp,
   };

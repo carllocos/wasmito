@@ -2,8 +2,8 @@ import { DeviceManager } from '../src/device/device_manager';
 import { BoardBaudRate } from '../src/util/serial_port';
 import { WasmValuesBuilder } from '../src/webassembly/wasm_value_array_builder';
 import { type WasmState } from '../src/webassembly';
-import { type WARDuinoVM } from '../src/warduino/vm/warduino_vm';
-import { type MCUWARDuinoVM } from '../src/warduino/vm/mcu_vm';
+import { type WasmitoBackendVM } from '../src/warduino/vm/warduino_vm';
+import { type MCUWasmitoVM } from '../src/warduino/vm/mcu_vm';
 import { StateRequest } from '../src/warduino/requests/inspect_request';
 import { Breakpoint } from '../src/debugger/breakpoint';
 import { TargetLanguage } from '../src/compilers/prog_language_selection';
@@ -14,7 +14,7 @@ import {
 } from '../src/platforms';
 import { type WATCompilerArgs } from '../src/compilers/wat_compilers';
 
-export async function callLedcSetup(vm: WARDuinoVM): Promise<void> {
+export async function callLedcSetup(vm: WasmitoBackendVM): Promise<void> {
   const funcLEDCSetup = 5;
   const argsLEDCSetup = new WasmValuesBuilder();
   argsLEDCSetup.addI32Value(0).addI32Value(5000).addI32Value(12);
@@ -22,7 +22,7 @@ export async function callLedcSetup(vm: WARDuinoVM): Promise<void> {
   console.log(reply);
 }
 
-export async function callLedCAttachPin(vm: WARDuinoVM): Promise<void> {
+export async function callLedCAttachPin(vm: WasmitoBackendVM): Promise<void> {
   const funcLEDCAttachPin = 6;
   const argsLEDCAttachPin = new WasmValuesBuilder();
   argsLEDCAttachPin.addI32Value(10);
@@ -31,7 +31,7 @@ export async function callLedCAttachPin(vm: WARDuinoVM): Promise<void> {
   console.log(reply);
 }
 
-export async function callPinMode(vm: WARDuinoVM): Promise<void> {
+export async function callPinMode(vm: WasmitoBackendVM): Promise<void> {
   const funcPinMode = 1;
   const argsPinMode = new WasmValuesBuilder();
   argsPinMode.addI32Value(39);
@@ -44,7 +44,7 @@ async function setupMCUVM(
   platform: ArduinoBoardBuilder,
   sourceCodeCompilationArgs: any,
   upload: boolean,
-): Promise<MCUWARDuinoVM> {
+): Promise<MCUWasmitoVM> {
   const dm = new DeviceManager();
   if (upload) {
     return await dm.spawnHardwareVM(platform, sourceCodeCompilationArgs);

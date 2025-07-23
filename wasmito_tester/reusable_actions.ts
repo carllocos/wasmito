@@ -13,7 +13,7 @@ import { AroundFunctionRequest } from '../src/warduino/requests/around_function_
 import { PushEventRequest } from '../src/warduino/requests/inject_event_request';
 import { StateRequest } from '../src/warduino/requests/inspect_request';
 import { UpdateCallbackMappingRequest } from '../src/warduino/requests/update_callbacks_request';
-import { type WARDuinoVM } from '../src/warduino/vm/warduino_vm';
+import { type WasmitoBackendVM } from '../src/warduino/vm/warduino_vm';
 import {
   type Action,
   type SubscriptionEmitterAction,
@@ -37,7 +37,7 @@ export function addBreakpointSubscription(
     timeout,
     description: `add breakpoint ${breakpoint.toString()}`,
     setupSubscription: async (
-      device: WARDuinoVM,
+      device: WasmitoBackendVM,
     ): Promise<SubActReturn<boolean, WasmState, InspectStateHook>> => {
       const hook = new InspectStateHook(new StateRequest().includePC());
       breakpoint.subscribe(hook.onSubscriptionData.bind(hook));
@@ -58,7 +58,7 @@ export function addBPAndRunUntil(
 ): Action<boolean> {
   const act: Action<boolean> = {
     description: `add a bp ${sourceCodeLocationToString(loc)}, run until bp, and remove bp`,
-    doAction: async (device: WARDuinoVM): Promise<boolean> => {
+    doAction: async (device: WasmitoBackendVM): Promise<boolean> => {
       return new Promise<boolean>((resolve, reject) => {
         const bp = new Breakpoint(loc);
         bp.subscribe((state: WasmState): void => {
@@ -100,7 +100,7 @@ export function removeBPAt(
   const act: Action<boolean> = {
     timeout,
     description: `remove breakpoint ${sourceCodeLocationToString(loc)}`,
-    doAction: async (device: WARDuinoVM): Promise<boolean> => {
+    doAction: async (device: WasmitoBackendVM): Promise<boolean> => {
       const bp = new Breakpoint(loc);
       return await device.removeBreakpoint(bp);
     },
@@ -120,7 +120,7 @@ export function onNewEventAction(
     subscriptionID: subscriptionId,
     description: 'Hook into new events',
     setupSubscription: async (
-      device: WARDuinoVM,
+      device: WasmitoBackendVM,
     ): Promise<SubActReturn<boolean, WASM.Event, EventInspectHook>> => {
       const hook: HookWithSubscription<WASM.Event> = new EventInspectHook();
       const added = await device.addHookOnNewEvent(hook);
@@ -144,7 +144,7 @@ export function onHandledEventSubscription(
     subscriptionID: subscriptionId,
     description: 'Hook into handled events',
     setupSubscription: async (
-      device: WARDuinoVM,
+      device: WasmitoBackendVM,
     ): Promise<SubActReturn<boolean, WASM.Event, EventInspectHook>> => {
       const hook: HookWithSubscription<WASM.Event> = new EventInspectHook();
       const added = await device.addHookOnEventHandling(hook);
@@ -166,7 +166,7 @@ export function onHandledEventAction(
 ): Action<boolean> {
   const ac = {
     description: 'Apply Hook on handled event',
-    doAction: async (device: WARDuinoVM): Promise<boolean> => {
+    doAction: async (device: WasmitoBackendVM): Promise<boolean> => {
       return await device.addHookOnEventHandling(hook);
     },
 
@@ -186,7 +186,7 @@ export function runVMAction(
   const act: Action<boolean> = {
     description: 'Run VM',
 
-    doAction: async (device: WARDuinoVM): Promise<boolean> => {
+    doAction: async (device: WasmitoBackendVM): Promise<boolean> => {
       return device.run();
     },
 
@@ -209,7 +209,7 @@ export function mockPrimitiveFuncAction(
 ): Action<boolean> {
   const act = {
     description: `mock primitive function ${funcid} with value substitution`,
-    doAction: async (device: WARDuinoVM): Promise<boolean> => {
+    doAction: async (device: WasmitoBackendVM): Promise<boolean> => {
       const sm = device.sourceMap;
       const func = sm.getFunction(funcid);
       if (func === undefined) {
@@ -240,7 +240,7 @@ export function addEventAction(
 ): Action<boolean> {
   const act = {
     description: `Add Event(topic=${topic}, payload=${payload}) to device`,
-    doAction: async (device: WARDuinoVM): Promise<boolean> => {
+    doAction: async (device: WasmitoBackendVM): Promise<boolean> => {
       const req = new PushEventRequest(topic, payload);
       return await device.sendRequest(req);
     },
@@ -261,7 +261,7 @@ export function updateMappingsAction(
 ): Action<boolean> {
   const act = {
     description: 'update callback mappings',
-    doAction: async (device: WARDuinoVM): Promise<boolean> => {
+    doAction: async (device: WasmitoBackendVM): Promise<boolean> => {
       const req = new UpdateCallbackMappingRequest(mappings);
       return await device.sendRequest(req);
     },
@@ -280,7 +280,7 @@ export function updateMappingsAction(
 export function stepAction(timeout: number): Action<boolean> {
   const act = {
     description: 'Step on VM',
-    doAction: async (device: WARDuinoVM): Promise<boolean> => {
+    doAction: async (device: WasmitoBackendVM): Promise<boolean> => {
       await device.step(timeout);
       return true;
     },
@@ -306,7 +306,7 @@ export function proxyCallAction(
     .join(', ')}]`;
   const act = {
     description,
-    doAction: async (device: WARDuinoVM): Promise<ProxyCallResponse> => {
+    doAction: async (device: WasmitoBackendVM): Promise<ProxyCallResponse> => {
       return await device.proxyCall(funcID, args.values);
     },
     checkActionSuccess: async (
@@ -328,7 +328,7 @@ export function registerFuncForProxyCallAction(
   const act = {
     description: `Register func ${funcID} for ProxyCall`,
     doAction: async (
-      device: WARDuinoVM,
+      device: WasmitoBackendVM,
     ): Promise<[boolean, WASMFunction, number, Set<WASMFunction>]> => {
       const func = device.sourceMap.getFunction(funcID);
       if (func === undefined) {
@@ -383,7 +383,7 @@ export function unregisterFuncForProxyCallAction(
     timeout,
     description: `Unregister func ${funcID} for ProxyCall`,
     doAction: async (
-      device: WARDuinoVM,
+      device: WasmitoBackendVM,
     ): Promise<[boolean, WASMFunction, number, Set<WASMFunction>]> => {
       const func = device.sourceMap.getFunction(funcID);
       if (func === undefined) {
@@ -437,7 +437,7 @@ export function createOnErrorActionEmitter(
     subscriptionID,
     description: `Create on error emitter with id ${subscriptionID}`,
     setupSubscription: async (
-      device: WARDuinoVM,
+      device: WasmitoBackendVM,
     ): Promise<SubActReturn<boolean, WasmState, InspectStateHook>> => {
       const req = new StateRequest();
       req.includeAll();
@@ -458,7 +458,7 @@ export function createOnErrorActionEmitter(
 export function PauseAction(timeout?: number, delay?: number): Action<boolean> {
   return {
     description: 'Pause VM',
-    doAction: async (device: WARDuinoVM): Promise<boolean> => {
+    doAction: async (device: WasmitoBackendVM): Promise<boolean> => {
       await device.pause(timeout);
       return true;
     },

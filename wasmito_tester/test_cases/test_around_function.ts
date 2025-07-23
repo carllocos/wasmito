@@ -8,7 +8,7 @@ import {
   AroundFunctionRequest,
   type AroundHookResponse,
 } from '../../src/warduino/requests/around_function_request';
-import { type WARDuinoVM } from '../../src/warduino/vm/warduino_vm';
+import { type WasmitoBackendVM } from '../../src/warduino/vm/warduino_vm';
 import { ResponseType } from '../../src/warduino/api/request_interface';
 import {
   type TestScenarioResult,
@@ -61,7 +61,7 @@ const testFailUnregisterProxyCall: TestScenario = {
     {
       timeout: 3000,
       description: 'unregister a function not yet registered',
-      doAction: async (device: WARDuinoVM): Promise<AroundHookResponse> => {
+      doAction: async (device: WasmitoBackendVM): Promise<AroundHookResponse> => {
         const aroundRequest = new AroundFunctionRequest(2);
         return await device.sendRequest(aroundRequest.removeRequest());
       },

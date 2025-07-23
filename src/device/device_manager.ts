@@ -1,9 +1,9 @@
 import type winston from 'winston';
 import { createLogger } from '../logger/logger';
-import { WARDuinoDevVM } from '../warduino/vm/dev_vm';
-import { MCUWARDuinoVM } from '../warduino/vm/mcu_vm';
+import { WasmitoDevVM } from '../warduino/vm/dev_vm';
+import { MCUWasmitoVM } from '../warduino/vm/mcu_vm';
 import { type ChildProcess } from 'child_process';
-import { type WARDuinoVM } from '../warduino';
+import { type WasmitoBackendVM } from '../warduino';
 import {
   InputMode,
   type OutOfPlaceSetupConfig,
@@ -25,20 +25,20 @@ export class DeviceManagerError extends Error {
 
 export class DeviceManager {
   logger: winston.Logger;
-  localprocesses: Array<[WARDuinoDevVM, ChildProcess?]>;
+  localprocesses: Array<[WasmitoDevVM, ChildProcess?]>;
 
-  private readonly onNewDeviceListeners: Array<(dev: WARDuinoVM) => void>;
+  private readonly onNewDeviceListeners: Array<(dev: WasmitoBackendVM) => void>;
   constructor() {
     this.logger = createLogger('DeviceManager');
     this.localprocesses = [];
     this.onNewDeviceListeners = [];
   }
 
-  subscribeOnNewDevice(cb: (dev: WARDuinoVM) => void): void {
+  subscribeOnNewDevice(cb: (dev: WasmitoBackendVM) => void): void {
     this.onNewDeviceListeners.push(cb);
   }
 
-  private notifyListeners(vm: WARDuinoVM): void {
+  private notifyListeners(vm: WasmitoBackendVM): void {
     this.onNewDeviceListeners.forEach((cb) => {
       cb(vm);
     });
@@ -48,12 +48,12 @@ export class DeviceManager {
     platform: DevVMPlatform,
     sourceCodeCompilationArgs: any,
     maxWaitTime: number,
-  ): Promise<WARDuinoDevVM> {
+  ): Promise<WasmitoDevVM> {
     const tp = platform.config.vmConfig.toolPort;
     const th = platform.config.vmConfig.toolHostIP;
     const n = platform.config.deviceIdentity.fullname;
     const channel = new ClientSideSocket(tp, th, n);
-    const devVM = new WARDuinoDevVM(platform, channel);
+    const devVM = new WasmitoDevVM(platform, channel);
 
     const connected = await devVM.connect(maxWaitTime);
     if (!connected) {
@@ -79,8 +79,8 @@ export class DeviceManager {
     platform: DevVMPlatform,
     sourceCodeCompilationArgs: any,
     maxWaitTime?: number,
-  ): Promise<WARDuinoDevVM> {
-    const devVM = new WARDuinoDevVM(platform);
+  ): Promise<WasmitoDevVM> {
+    const devVM = new WasmitoDevVM(platform);
     const childProcess = await devVM.spawn(
       sourceCodeCompilationArgs,
       maxWaitTime,
@@ -92,7 +92,7 @@ export class DeviceManager {
   }
 
   async spawnOutOfPlaceVM(
-    targetVM: WARDuinoVM,
+    targetVM: WasmitoBackendVM,
     targetInputMode: InputMode,
     maxWaitTime?: number,
     buildOutputDir?: string,
@@ -112,9 +112,9 @@ export class DeviceManager {
     return vm;
   }
 
-  createOutOfThingsMonitor(targetVM: WARDuinoVM): OutOfThingsMonitor {
+  createOutOfThingsMonitor(targetVM: WasmitoBackendVM): OutOfThingsMonitor {
     const monitor = new OutOfThingsMonitor(targetVM);
-    monitor.onSpawn((vm: WARDuinoDevVM, childProcess: ChildProcess) => {
+    monitor.onSpawn((vm: WasmitoDevVM, childProcess: ChildProcess) => {
       this.registerListenersOnVMProcess(childProcess);
       this.localprocesses.push([vm, childProcess]);
       this.notifyListeners(vm);
@@ -124,7 +124,7 @@ export class DeviceManager {
 
   async setupAlreadySpawnedVMForOutOfPlaceVM(
     toolPort: number,
-    targetVM: WARDuinoVM,
+    targetVM: WasmitoBackendVM,
     serverPortForProxyCalls?: number,
     maxWaitTime?: number,
     buildOutputDir?: string,
@@ -148,11 +148,11 @@ export class DeviceManager {
   async connectToExistingMCUVM(
     platform: ArduinoBoardBuilder,
     sourceCodeCompilationArgs: any,
-  ): Promise<MCUWARDuinoVM> {
+  ): Promise<MCUWasmitoVM> {
     const sp = platform.config.vmConfig.serialPort;
     const br = platform.config.vmConfig.baudrate;
     const channel = new SerialConnection(sp, br);
-    const vm = new MCUWARDuinoVM(platform, channel);
+    const vm = new MCUWasmitoVM(platform, channel);
     const connected = await vm.connect();
     if (!connected) {
       throw Error('Could not connect to external MCU VM');
@@ -171,8 +171,8 @@ export class DeviceManager {
   async spawnHardwareVM(
     platform: ArduinoBoardBuilder,
     sourceCodeCompilationArgs: any,
-  ): Promise<MCUWARDuinoVM> {
-    const vm = new MCUWARDuinoVM(platform);
+  ): Promise<MCUWasmitoVM> {
+    const vm = new MCUWasmitoVM(platform);
     const uploaded = await vm.uploadSourceCode(sourceCodeCompilationArgs);
     if (!uploaded) {
       throw new Error(
@@ -184,14 +184,14 @@ export class DeviceManager {
     return vm;
   }
 
-  async closeVM(vm: WARDuinoDevVM, timeout?: number): Promise<boolean> {
+  async closeVM(vm: WasmitoDevVM, timeout?: number): Promise<boolean> {
     return await vm.close(timeout);
   }
 
   private registerListenersOnVMProcess(vmProcess: ChildProcess): void {
     vmProcess.on('close', (code) => {
       const vm = this.localprocesses.find(
-        ([, p]: [WARDuinoDevVM, ChildProcess?]) => {
+        ([, p]: [WasmitoDevVM, ChildProcess?]) => {
           return p === vmProcess;
         },
       )?.[0];
@@ -203,7 +203,7 @@ export class DeviceManager {
       this.logger.debug(`Removing process ${config?.name} from local list`);
 
       this.localprocesses = this.localprocesses.filter(
-        ([, p]: [WARDuinoDevVM, ChildProcess?]) => {
+        ([, p]: [WasmitoDevVM, ChildProcess?]) => {
           return p !== vmProcess;
         },
       );

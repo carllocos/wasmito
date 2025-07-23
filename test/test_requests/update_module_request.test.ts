@@ -1,12 +1,12 @@
 import { DeviceManager } from '../../src/device/device_manager';
-import { type WARDuinoDevVM } from '../../src/warduino/vm/dev_vm';
+import { type WasmitoDevVM } from '../../src/warduino/vm/dev_vm';
 import { TargetLanguage } from '../../src/compilers/prog_language_selection';
 import { type WATCompilerArgs } from '../../src/compilers/wat_compilers';
 import { createDevPlatform } from '../../src/platforms/platformbuilder_factory';
 
 describe('Update Wasm Module Request', () => {
   let deviceManager: DeviceManager | undefined;
-  let vm: WARDuinoDevVM | undefined;
+  let vm: WasmitoDevVM | undefined;
   const sourceCodeCompilerArgs: WATCompilerArgs = {
     sourceCodePath: './test/data/test-example.wat',
   };

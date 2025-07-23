@@ -1,6 +1,6 @@
 import type winston from 'winston';
 import { type Channel } from '../../communication/channel_interface';
-import { type WARDuinoAPI } from '../api/warduino_api';
+import { type WasmRuntimeAPI } from '../api/warduino_api';
 import { RunRequest } from '../requests/run_request';
 import { StepRequest } from '../requests/step_request';
 import {
@@ -55,8 +55,7 @@ import {
   type SourceCFGNode,
 } from '../../cfg/source_cfg';
 
-// TODO Rename to Backend
-export abstract class WARDuinoVM implements WARDuinoAPI {
+export abstract class WasmitoBackendVM implements WasmRuntimeAPI {
   private _channel: Channel;
   protected abstract logger: winston.Logger;
   private _platform: Platform;

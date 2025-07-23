@@ -1,5 +1,5 @@
 import { type Logger } from 'winston';
-import { WARDuinoVM } from './warduino_vm';
+import { WasmitoBackendVM } from './warduino_vm';
 import { type Channel } from '../../communication/channel_interface';
 import { createLogger } from '../../logger/logger';
 import { timeoutPromise } from '../../util/promise_util';
@@ -9,11 +9,11 @@ import { type PlatformConfig } from '../../platforms/platform_config';
 import { type Platform } from '../../platforms/platform';
 import { NoChannel } from '../../communication/no_channel';
 
-export class MCUWARDuinoVMError extends Error {
+export class MCUWasmitoVMError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'MCUWARDuinoVMError';
-    Error.captureStackTrace(this, MCUWARDuinoVMError);
+    this.name = 'MCUWasmitoVMError';
+    Error.captureStackTrace(this, MCUWasmitoVMError);
   }
 }
 
@@ -31,20 +31,20 @@ function createChannel(platformConfig: PlatformConfig): Channel {
       platformConfig.deviceIdentity.fullname,
     );
   } else {
-    throw new MCUWARDuinoVMError(
+    throw new MCUWasmitoVMError(
       `DeviceConfiguration has not been configured to serial or network`,
     );
   }
 }
 
-export class MCUWARDuinoVM extends WARDuinoVM {
+export class MCUWasmitoVM extends WasmitoBackendVM {
   protected logger: Logger;
-  protected ErrorClass = MCUWARDuinoVMError;
+  protected ErrorClass = MCUWasmitoVMError;
 
   constructor(platform: Platform, channel?: Channel) {
     super(platform, channel ?? new NoChannel());
     this.logger = createLogger(
-      `MCUWARDuino ${platform.config.deviceIdentity.fullname}`,
+      `MCUWasmito ${platform.config.deviceIdentity.fullname}`,
     );
 
     if (channel === undefined) {
@@ -82,7 +82,7 @@ export class MCUWARDuinoVM extends WARDuinoVM {
       upload = timeoutPromise(
         upload,
         timeout,
-        new MCUWARDuinoVMError('flashing to MCU timedout'),
+        new MCUWasmitoVMError('flashing to MCU timedout'),
       );
     }
 

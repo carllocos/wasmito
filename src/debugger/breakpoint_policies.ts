@@ -4,14 +4,14 @@ import { type Breakpoint } from './breakpoint';
 import { createLogger } from '../logger/logger';
 import { InspectStateHook } from '../hooks/hook_inspect_state';
 import { type WasmState } from '../webassembly';
-import { type WARDuinoVM } from '../warduino/vm/warduino_vm';
+import { type WasmitoBackendVM } from '../warduino/vm/warduino_vm';
 import { isSuccessfulMessage } from '../warduino/api/request_interface';
 import { StateRequest } from '../warduino/requests/inspect_request';
 import { PauseVMHook } from '../hooks/hook_run_pause';
 import { type SourceCodeLocation } from '../source_mappers';
 
 export abstract class BreakpointPolicy {
-  protected readonly vm: WARDuinoVM;
+  protected readonly vm: WasmitoBackendVM;
   protected readonly MAX_DEFAULT_TIMEOUT: number = 10000;
   protected abstract readonly logger: winston.Logger;
 
@@ -19,7 +19,7 @@ export abstract class BreakpointPolicy {
   private readonly onAddBpListeners: Array<(bp: Breakpoint) => void>;
   private readonly onRemoveBPListeners: Array<(bp: Breakpoint) => void>;
 
-  constructor(vm: WARDuinoVM) {
+  constructor(vm: WasmitoBackendVM) {
     this.vm = vm;
     this._breakpoints = [];
     this.onAddBpListeners = [];
@@ -181,7 +181,7 @@ export class SingleStopBreakpointPolicy extends BreakpointPolicy {
 
   private readonly removeAllBreakpointsCallback: (state: WasmState) => void;
 
-  constructor(vm: WARDuinoVM) {
+  constructor(vm: WasmitoBackendVM) {
     super(vm);
     this.removeAllBreakpointsCallback = (state: WasmState) => {
       this.removeAllBreakpoints();
@@ -255,7 +255,7 @@ export class RemoveAndProceedBreakpointPolicy extends BreakpointPolicy {
     (state: WasmState) => void
   >;
 
-  constructor(vm: WARDuinoVM) {
+  constructor(vm: WasmitoBackendVM) {
     super(vm);
     this.removeBPOnReachMap = new Map();
   }

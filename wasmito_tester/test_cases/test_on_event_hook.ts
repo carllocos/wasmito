@@ -15,7 +15,7 @@ import {
   stepAction,
   TriggerInterrupt,
 } from '../reusable_actions';
-import { type WARDuinoVM } from '../../src/warduino/vm/warduino_vm';
+import { type WasmitoBackendVM } from '../../src/warduino/vm/warduino_vm';
 import { StateRequest } from '../../src/warduino/requests/inspect_request';
 import { WasmValuesBuilder } from '../../src/webassembly/wasm_value_array_builder';
 import { type TestProgram, type PostSetupConfig } from '../shared_interfaces';
@@ -120,7 +120,7 @@ const testAddEvent: TestScenario = {
   actions: [
     {
       description: 'Callbacks mapping',
-      doAction: async (device: WARDuinoVM): Promise<boolean> => {
+      doAction: async (device: WasmitoBackendVM): Promise<boolean> => {
         const ins = new StateRequest().includeCallbackMappings();
         const v = await device.sendRequest(ins);
         return v.callbacks !== undefined;

@@ -5,16 +5,16 @@ import { DeviceManager } from '../../src/device';
 import { createLogger } from '../../src/logger/logger';
 import { BoardBaudRate } from '../../src/util';
 import { TargetLanguage } from '../../src/compilers/prog_language_selection';
-import { type WARDuinoVM } from '../../src/warduino/vm/warduino_vm';
+import { type WasmitoBackendVM } from '../../src/warduino/vm/warduino_vm';
 import { fs } from 'assemblyscript/util/node.js';
 
 const logger = createLogger('SourceCodeWatcher');
 
-export async function compileAndUpload(vm: WARDuinoVM): Promise<void> {
+export async function compileAndUpload(vm: WasmitoBackendVM): Promise<void> {
   await vm.uploadSourceCode(vm.platform.compiler.latestSourceCodeCompilerArgs);
 }
 
-export function monitorDevVMForUpdate(vm: WARDuinoVM): void {
+export function monitorDevVMForUpdate(vm: WasmitoBackendVM): void {
   const dirsSet = new Set(vm.platform.sourceMap.sources.map(path.dirname));
   const dirs = Array.from(dirsSet);
   for (let i = 0; i < dirs.length; i++) {

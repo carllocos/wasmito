@@ -18,7 +18,7 @@ import {
   type SubscribeAction,
   type DeviceID,
 } from './shared_interfaces';
-import { type WARDuinoVM } from '../src/warduino';
+import { type WasmitoBackendVM } from '../src/warduino';
 import { HookWithSubscription } from '../src/hooks/hook';
 
 type DelayResolver = (value: boolean | PromiseLike<boolean>) => void;
@@ -244,7 +244,7 @@ export class SystemTester {
   }
 
   private async runActions(
-    vm: WARDuinoVM,
+    vm: WasmitoBackendVM,
     scenarioName: string,
     actions: Array<Act<any, any, any>>,
     actionRunResults: ActionRunResult[],
@@ -344,7 +344,7 @@ export class SystemTester {
     H,
     S extends HookWithSubscription<H>,
   >(
-    vm: WARDuinoVM,
+    vm: WasmitoBackendVM,
     action: SubscriptionEmitterAction<R, H, S>,
     hookMap: Map<string, HookWithSubscription<any>>,
     logPrefix: string,
@@ -374,7 +374,7 @@ export class SystemTester {
   }
 
   private async runExpects(
-    vm: WARDuinoVM,
+    vm: WasmitoBackendVM,
     scenarioName: string,
     expects: Array<Act<any, any, any>>,
     expectsResults: ActionRunResult[],
@@ -427,7 +427,7 @@ export class SystemTester {
   }
 
   private async runAction<T>(
-    vm: WARDuinoVM,
+    vm: WasmitoBackendVM,
     action: Action<T>,
     logPrefix: string,
     actionIdx: number,
@@ -444,7 +444,7 @@ export class SystemTester {
     scenarioName: string,
     action: Action<T>,
     actionRunResult: ActionRunResult,
-    vm: WARDuinoVM,
+    vm: WasmitoBackendVM,
     resolveDelay: DelayResolver,
     logPrefix: string,
     actionIndex: number,
@@ -478,7 +478,7 @@ export class SystemTester {
     scenarioName: string,
     action: Action<T>,
     actionRunResult: ActionRunResult,
-    vm: WARDuinoVM,
+    vm: WasmitoBackendVM,
     resolveDelay: DelayResolver,
     logPrefix: string,
     actionIndex: number,

@@ -14,7 +14,7 @@ import {
   type HookOnWasmAddrResponse,
 } from '../src/warduino/requests/hook_on_wasm_addr_request';
 import { StateRequest } from '../src/warduino/requests/inspect_request';
-import { type WARDuinoDevVM } from '../src/warduino/vm/dev_vm';
+import { type WasmitoDevVM } from '../src/warduino/vm/dev_vm';
 import { type WasmState } from '../src/webassembly/wasm';
 
 export function allSucceeded(replies: HookOnWasmAddrResponse[]): boolean {
@@ -46,7 +46,7 @@ export function logReplies(replies: RequestMessage[]): void {
 }
 
 function onBreakpointStateUpdate(
-  em: WARDuinoDevVM,
+  em: WasmitoDevVM,
 ): (state: WasmState) => void {
   return (state: WasmState) => {
     em.step()
@@ -61,7 +61,7 @@ function onBreakpointStateUpdate(
 
 export async function addBreakpoint(
   lineNr: number,
-  em: WARDuinoDevVM,
+  em: WasmitoDevVM,
   onBreakPointReached: (data: WasmState) => void,
 ): Promise<boolean> {
   const stateOnBreakpoint = new StateRequest()
@@ -95,7 +95,7 @@ export function snapshotRequest(): StateRequest {
 
 export async function addBreakpointSnapshot(
   linenr: number,
-  em: WARDuinoDevVM,
+  em: WasmitoDevVM,
   onBreakPointReached: (data: WasmState) => void,
 ): Promise<boolean> {
   const bp = new Breakpoint(
@@ -109,7 +109,7 @@ export async function addBreakpointSnapshot(
 export async function removeBreakpoint(
   address: number,
   sourceMap: SourceMap,
-  em: WARDuinoDevVM,
+  em: WasmitoDevVM,
 ): Promise<boolean> {
   const instruction = sourceMap.wasm.instructionFromAddress(address);
   if (instruction === undefined) {
@@ -126,7 +126,7 @@ export async function runDebugScenario(
   wasmApp: string,
   connectToExistingProcess: boolean,
   outputDir: string,
-): Promise<WARDuinoDevVM | undefined> {
+): Promise<WasmitoDevVM | undefined> {
   const toolPort = 8000;
   const maxWaitTime = 3000;
 
