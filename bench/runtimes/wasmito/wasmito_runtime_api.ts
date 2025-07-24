@@ -10,7 +10,7 @@ import {
   createRequestMessage,
   isSubscriptionMessage,
   isSuccessfulMessage,
-} from '../../../src/runtimes/wasmito_vm/requests/request_interface';
+} from '../../../src/runtimes/request_interface';
 import { PauseVMHook } from '../../../src/hooks/hook_run_pause';
 import { RunRequest } from '../../../src/runtimes/wasmito_vm/requests/run_request';
 import { StateRequest, StepRequest } from '../../../src/runtimes';

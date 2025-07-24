@@ -1,5 +1,5 @@
 import { getGlobalLogger } from '../logger/logger';
-import { type APIRequest } from '../runtimes/wasmito_vm/requests/request_interface';
+import { type APIRequest } from '../runtimes/request_interface';
 import { type Channel } from './channel_interface';
 
 export class Command<T> {

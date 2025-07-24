@@ -7,7 +7,7 @@ import {
   APIRequestInvalidParse,
   ResponseType,
   type RequestMessage,
-} from './request_interface';
+} from '../../request_interface';
 import { getExceptionMsgFromErrorCode } from './request_error_code';
 
 const logger = createLogger('HookOnEventRequest');

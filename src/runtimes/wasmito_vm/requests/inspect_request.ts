@@ -1,7 +1,7 @@
 import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
-} from './request_interface';
+} from '../../request_interface';
 import { Instruction } from './instructions';
 import { WasmStack } from '../../../webassembly/wasm_stack';
 import { serializeUInt16BE } from '../../../util/encoder';

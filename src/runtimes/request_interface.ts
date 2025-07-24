@@ -1,6 +1,6 @@
-import { type Channel } from '../../../communication/channel_interface';
-import { Command } from '../../../communication/command';
-import { getInstructionFromString, type Instruction } from './instructions';
+import { type Channel } from '../communication/channel_interface';
+import { Command } from '../communication/command';
+import { getInstructionFromString, type Instruction } from './wasmito_vm/requests/instructions';
 
 export class APIRequestInvalidParse extends Error {}
 

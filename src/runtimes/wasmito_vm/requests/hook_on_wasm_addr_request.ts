@@ -6,7 +6,7 @@ import {
   createRequestMessage,
   isSubscriptionMessage,
   type RequestMessage,
-} from './request_interface';
+} from '../../request_interface';
 import { HookWithSubscription, type Hook } from '../../../hooks/hook';
 import { Instruction } from './instructions';
 import type winston from 'winston';

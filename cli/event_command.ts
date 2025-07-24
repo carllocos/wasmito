@@ -1,7 +1,7 @@
 import { type Command } from 'commander';
 import { PushEventRequest } from '../src/runtimes/wasmito_vm/requests/inject_event_request';
 import { ClientSideSocket } from '../src/communication/client_socket';
-import { sendRequest } from '../src/runtimes/wasmito_vm/requests/request_interface';
+import { sendRequest } from '../src/runtimes/request_interface';
 import { isSerialPort } from '../src/util/serial_port';
 import { type Channel } from '../src/communication/channel_interface';
 import { SerialConnection } from '../src/communication/serial';

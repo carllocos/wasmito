@@ -5,7 +5,7 @@ import {
   APIRequestNoSubscription,
   ResponseType,
   getResponseTypeFromString,
-} from './request_interface';
+} from '../../request_interface';
 import { Instruction, getInstructionFromString } from './instructions';
 import { type Hook } from '../../../hooks/hook';
 

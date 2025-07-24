@@ -5,7 +5,7 @@ import { StateRequest } from '../src/runtimes/wasmito_vm/requests/inspect_reques
 import {
   isSuccessfulMessage,
   sendRequest,
-} from '../src/runtimes/wasmito_vm/requests/request_interface';
+} from '../src/runtimes/request_interface';
 
 export function registerBreakpointRequestCommand(program: Command): void {
   program

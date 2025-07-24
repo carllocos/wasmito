@@ -8,7 +8,7 @@ import { type SourceMap } from '../src/source_mappers/source_map';
 import {
   type RequestMessage,
   ResponseType,
-} from '../src/runtimes/wasmito_vm/requests/request_interface';
+} from '../src/runtimes/request_interface';
 import {
   RemoveHookOnWasmAddrRequest,
   type HookOnWasmAddrResponse,

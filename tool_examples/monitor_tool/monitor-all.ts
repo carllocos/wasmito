@@ -10,7 +10,7 @@ import {
   HookOnWasmAddrMoment,
 } from '../../src/runtimes/wasmito_vm/requests/hook_on_wasm_addr_request';
 import { StateRequest } from '../../src/runtimes/wasmito_vm/requests/inspect_request';
-import { ResponseType } from '../../src/runtimes/wasmito_vm/requests/request_interface';
+import { ResponseType } from '../../src/runtimes/request_interface';
 import * as fs from 'fs';
 import { type WasmInstruction } from '../../src/webassembly/wasm/wasm_instruction';
 import { PlaceholderType } from '../../src/webassembly/wasm/opcode_type';

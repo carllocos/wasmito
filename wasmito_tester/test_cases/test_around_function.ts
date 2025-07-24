@@ -9,7 +9,7 @@ import {
   type AroundHookResponse,
 } from '../../src/runtimes/wasmito_vm/requests/around_function_request';
 import { type WasmitoBackendVM } from '../../src/runtimes/wasmito_vm/wasmito_vm';
-import { ResponseType } from '../../src/runtimes/wasmito_vm/requests/request_interface';
+import { ResponseType } from '../../src/runtimes/request_interface';
 import {
   type TestScenarioResult,
   type TestProgram,

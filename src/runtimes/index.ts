@@ -1,5 +1,5 @@
 export * from './wasmito_vm/requests/instructions';
-export * from './wasmito_vm/requests/request_interface';
+export * from './request_interface';
 export * from './runtime_api';
 export * from './wasmito_vm/requests/around_function_request';
 export * from './wasmito_vm/requests/inspect_request';

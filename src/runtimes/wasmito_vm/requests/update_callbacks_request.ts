@@ -8,7 +8,7 @@ import { Instruction } from './instructions';
 import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
-} from './request_interface';
+} from '../../request_interface';
 
 export class UpdateCallbackMappingRequest extends APIRequestNoSubscription<boolean> {
   private readonly mappings: WASM.CallbackMapping[];

@@ -1,7 +1,7 @@
 import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
-} from './request_interface';
+} from '../../request_interface';
 import { Instruction } from './instructions';
 
 export class StepRequest extends APIRequestNoSubscription<string> {

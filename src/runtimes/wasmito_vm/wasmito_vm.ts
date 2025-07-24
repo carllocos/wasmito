@@ -7,7 +7,7 @@ import {
   isSuccessfulMessage,
   type APIRequest,
   ResponseType,
-} from './requests/request_interface';
+} from '../request_interface';
 import { Command } from '../../communication/command';
 import { type Platform } from '../../platforms/platform';
 import { PauseRequest } from './requests/pause_request';

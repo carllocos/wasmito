@@ -3,7 +3,7 @@ import { type WasmState } from '../../../webassembly/wasm';
 import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
-} from './request_interface';
+} from '../../request_interface';
 
 export class LoadStateRequest extends APIRequestNoSubscription<string> {
   private readonly encodedState: string;

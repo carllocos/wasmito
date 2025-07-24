@@ -1,6 +1,6 @@
 import { type Channel } from '../../../src/communication/channel_interface';
 import { Command } from '../../../src/communication/command';
-import { type APIRequest } from '../../../src/runtimes/wasmito_vm/requests/request_interface';
+import { type APIRequest } from '../../../src/runtimes/request_interface';
 import { StateRequest } from '../../../src/runtimes/wasmito_vm/requests/inspect_request';
 import { RunRequest } from '../../../src/runtimes/wasmito_vm/requests/run_request';
 import { StepRequest } from '../../../src/runtimes/wasmito_vm/requests/step_request';

@@ -3,7 +3,7 @@ import { Instruction } from './instructions';
 import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
-} from './request_interface';
+} from '../../request_interface';
 
 export class UpdateWasmModuleRequest extends APIRequestNoSubscription<string> {
   private readonly wasmBuffer: Buffer;
