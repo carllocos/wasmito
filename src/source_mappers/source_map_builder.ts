@@ -123,12 +123,18 @@ export async function SourceMapfromDWARFWasm(
   return new SourceMap(wasmFilePath, read.sources, read.mappings);
 }
 
-export async function SourceMapFromJSON(jsonPath: string): Promise<SourceMap> {
-  const sm = await readFileAsJSON(jsonPath);
-  if (!isSourceMapJSON(sm)) {
-    throw new Error(
-      `${jsonPath} does not satisfy the expected SourceMapJSON interface`,
-    );
+export async function SourceMapFromJSON(jsonPath: string | SourceMapJSON): Promise<SourceMap> {
+  let sm: SourceMapJSON | undefined = undefined;
+  if (typeof jsonPath === 'string'){
+    const content = await readFileAsJSON(jsonPath);
+    if (!isSourceMapJSON(content)) {
+      throw new Error(
+        `${jsonPath} does not satisfy the expected SourceMapJSON interface`,
+      );
+    }
+    sm =content;
+  }else{
+    sm = jsonPath;
   }
 
   return new SourceMap(sm.wasm, sm.sources, sm.mappings);

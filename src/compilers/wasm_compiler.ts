@@ -6,14 +6,14 @@ import {
   type LanguageAdaptor,
   constructLanguageAdaptor,
 } from '../language_adaptors/language_adaptor';
-import { SourceMap } from '../source_mappers/source_map';
+import { isSourceMapJSON, SourceMap, SourceMapJSON } from '../source_mappers/source_map';
 import { SourceMapFromJSON } from '../source_mappers/source_map_builder';
 
 const logger = createLogger('WasmCompiler');
 
 export interface WasmCompilerArgs {
   wasmPath: string;
-  mappingsJSON?: string;
+  mappingsJSON?: string | SourceMapJSON;
 }
 
 function parseWasmArgs(args: any): WasmCompilerArgs {
@@ -27,8 +27,8 @@ function parseWasmArgs(args: any): WasmCompilerArgs {
   }
 
   const mj = args.mappingsJSON;
-  if (mj !== undefined && typeof mj !== 'string') {
-    throw new Error('mappingsJSON is expected to be a string');
+  if (mj !== undefined && typeof mj !== 'string' && !isSourceMapJSON(mj)) {
+    throw new Error('mappingsJSON is expected to be a string or a SourceMapJSON object');
   }
 
   return {
