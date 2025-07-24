@@ -37,6 +37,10 @@ export class Breakpoint implements ISubscription<WasmState> {
     this._hooks = this.createHooks(stateOnBreakpoint);
   }
 
+  get wasmAddress(): number {
+    return this.sourceCodeLocation.address;
+  }
+
   private createHooks(sttateOnBreakpoint?: StateRequest): Hook[] {
     const stateOnBreakpoint = sttateOnBreakpoint ?? this.createStateRequest();
     const inspectStateHook = new InspectStateHook(stateOnBreakpoint);
