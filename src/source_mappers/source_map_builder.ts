@@ -20,6 +20,11 @@ export interface SourceOffsetStart {
   lineNrStartNumber: number;
 }
 
+export const DefaultSourceOffsetStart: SourceOffsetStart = {
+  colNrStartNumber: 0,
+  lineNrStartNumber: 1,
+};
+
 export interface SourceMapConfig {
   srcToAbsPath?: Map<string, string>;
   ignoreDirectories?: string[];
