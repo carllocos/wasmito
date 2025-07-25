@@ -29,8 +29,10 @@ export function getHookMomentFromString(
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface HookOnWasmAddrJSONResponse extends RequestMessage {}
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface HookOnWasmAddrResponse extends HookOnWasmAddrJSONResponse {}
 
 function isHookOnWasmAddrResponse(response: RequestMessage): boolean {
@@ -166,7 +168,10 @@ export class HookOnWasmAddrRequest extends APIRequest<HookOnWasmAddrResponse> {
           try {
             parsed = hook.parseSubscriptionData(subContent.val);
             successfulParse = true;
-          } catch (e) {}
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          } catch (e) {
+            /* empty */
+          }
 
           if (successfulParse) {
             try {
@@ -177,10 +182,14 @@ export class HookOnWasmAddrRequest extends APIRequest<HookOnWasmAddrResponse> {
           }
         }
       }
-    } catch (e) {}
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (e) {
+      /* empty */
+    }
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface RemoveHookOnWasmAddrResponse
   extends HookOnWasmAddrJSONResponse {}
 

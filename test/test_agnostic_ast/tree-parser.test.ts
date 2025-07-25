@@ -3,6 +3,7 @@ import { buildASTParser } from '../../src/tree-sitter/tree-sitter-factory';
 import assert from 'assert';
 import { RustLangConfig } from '../../src/language_adaptors/languages/rust_config';
 import { AssemblyScriptLangConfig } from '../../src/language_adaptors/languages/assemblyscript_config';
+import { TreeParser } from '../../src/tree-sitter/tree-sitter-parser';
 
 describe('Building Language Parsers', () => {
   it('Construct Parser for Rust', async () => {
@@ -24,12 +25,13 @@ describe('Building Language Parsers', () => {
   });
 
   it('Construct Parser for unexisting language should throw error', async () => {
-    let parser: any;
+    let parser: TreeParser | undefined;
     try {
       parser = await buildASTParser('bloep');
       assert.fail(
         `Parser should have not been constructed. Got value of type ${typeof parser}`,
       );
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
       expect(parser).to.equal(undefined);
     }

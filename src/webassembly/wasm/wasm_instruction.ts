@@ -190,7 +190,6 @@ export class BranchTable extends WasmInstruction {
         `branch_targets of br_table should be an array of at least one number`,
       );
     } else if (
-      // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
       branchTargets.find((bt) => typeof bt !== 'number') !== undefined
     ) {
       throw new Error(

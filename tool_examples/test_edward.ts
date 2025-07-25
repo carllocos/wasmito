@@ -68,9 +68,9 @@ export async function testEventHook(
     { source: '', linenr: 88, colnr: 0, name: '', address: 0 },
     new StateRequest().includePC(),
   );
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   bp.subscribe((state: WasmState) => {
     console.log('breakpoint reached');
-    // vm.run().then(console.log).catch(console.error);
   });
   const added = await vm.addBreakpoint(bp);
   if (!added) {

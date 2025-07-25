@@ -37,7 +37,10 @@ export class Command<T> {
         const parsed = this.request.parse(data);
         this.requestResolver(parsed);
       }
-    } catch (err) {}
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+      /* empty */
+    }
   }
 
   timedout(): void {

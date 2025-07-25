@@ -124,6 +124,7 @@ export function isFilePath(path: string): boolean {
   try {
     const stats = fs.statSync(path);
     return stats.isFile();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     return false;
   }
@@ -133,6 +134,7 @@ export function isDirectoryPath(path: string): boolean {
   try {
     const stats = fs.statSync(path);
     return stats.isDirectory();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     return false;
   }

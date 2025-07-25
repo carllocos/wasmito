@@ -1,6 +1,9 @@
 import { type Channel } from '../communication/channel_interface';
 import { Command } from '../communication/command';
-import { getInstructionFromString, type Instruction } from './wasmito_vm/requests/instructions';
+import {
+  getInstructionFromString,
+  type Instruction,
+} from './wasmito_vm/requests/instructions';
 
 export class APIRequestInvalidParse extends Error {}
 
@@ -13,6 +16,7 @@ export abstract class APIRequest<R> {
 }
 
 export abstract class APIRequestNoSubscription<R> extends APIRequest<R> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   override handleSubscriptionData(data: string): void {}
   override isSubscriptionClosed(): boolean {
     return true;
@@ -71,6 +75,7 @@ function createMessageFromJSON(content: any): RequestMessage | undefined {
   if (typeof content === 'string') {
     try {
       obj = JSON.parse(content);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
       return undefined;
     }

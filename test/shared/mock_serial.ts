@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Channel } from '../../src/communication/channel_interface';
 
 export class MockSerialConnection implements Channel {

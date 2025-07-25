@@ -12,6 +12,7 @@ import { getExceptionMsgFromErrorCode } from './request_error_code';
 
 const logger = createLogger('HookOnError');
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface HookOnErrorJSONResponse extends RequestMessage {}
 
 export abstract class HookOnErrorResponse {
@@ -146,7 +147,10 @@ export class HookOnError extends APIRequest<HookOnErrorResponse> {
           try {
             parsed = hook.parseSubscriptionData(msg.subsriptionData);
             successfulParse = true;
-          } catch (e) {}
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          } catch (e) {
+            /* empty */
+          }
 
           if (successfulParse) {
             try {
@@ -157,7 +161,10 @@ export class HookOnError extends APIRequest<HookOnErrorResponse> {
           }
         }
       }
-    } catch (e) {}
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (e) {
+      /* empty */
+    }
   }
 
   private addHook(hook: Hook): HookOnError {

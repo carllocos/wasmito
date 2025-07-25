@@ -61,6 +61,7 @@ export function addBPAndRunUntil(
     doAction: async (device: WasmitoBackendVM): Promise<boolean> => {
       return new Promise<boolean>((resolve, reject) => {
         const bp = new Breakpoint(loc);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         bp.subscribe((state: WasmState): void => {
           resolve(true);
         });
@@ -492,6 +493,7 @@ export function SubscribeOnBPReached(
   const act = {
     subscribeToID: id,
     description,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     checkSubscription: async (state: WasmState): Promise<boolean> => {
       return true;
     },

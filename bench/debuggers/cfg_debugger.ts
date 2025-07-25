@@ -49,6 +49,7 @@ export class ControlFlowGraphDBG implements DebugAPI {
   async stepOut(
     location: SourceCodeLocation,
     timeout?: number,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     endAddress?: number[],
   ): Promise<SourceCodeLocation> {
     const nodes = this.scfgs.nodesFromSourceLoc(location);
@@ -64,6 +65,7 @@ export class ControlFlowGraphDBG implements DebugAPI {
   async stepOver(
     location: SourceCodeLocation,
     timeout?: number,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     endAddress?: number[],
   ): Promise<SourceCodeLocation> {
     const nodes = this.scfgs.nodesFromSourceLoc(location);
@@ -80,7 +82,7 @@ export class ControlFlowGraphDBG implements DebugAPI {
     nodes: Array<[SourceCFGNode, number]>,
     timeout?: number,
   ): Promise<SourceCodeLocation> {
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises, no-async-promise-executor
+    // eslint-disable-next-line no-async-promise-executor
     return new Promise<SourceCodeLocation>(async (resolve) => {
       const bps = new Set<number>();
       const sourceMap = this.sourceMap;

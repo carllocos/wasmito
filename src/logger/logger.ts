@@ -62,6 +62,7 @@ export function parseLogLevel(value: string): LogLevel | undefined {
   return undefined;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function createLogger(name: string, level?: LogLevel): winston.Logger {
   const cleanedName = name.trim();
   const _logger = winston.createLogger({

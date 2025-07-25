@@ -61,6 +61,7 @@ export class Breakpoint implements ISubscription<WasmState> {
       .includeEvents();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   parseSubscriptionData(input: any): WasmState {
     throw new Error('Method should not be called');
   }

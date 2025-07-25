@@ -241,6 +241,7 @@ export function typeFromWasmOpcode(
   opcode: WasmOpcodeNumber,
   subOpcode: WasmOpcodeNumber | undefined = undefined,
 ): WasmType | undefined {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const found = WasmOpcodes.find(([_, opcodeNumber, subOpcodeNr]) => {
     return opcodeNumber === opcode && subOpcode === subOpcodeNr;
   });
@@ -255,6 +256,7 @@ export function wasmOpcodeFromNr(
   opcode: number,
   subOpcode: number | undefined = undefined,
 ): WasmOpcodeNumber | undefined {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const has = WasmOpcodes.find(([_, opcodeNumber, subOpcodeNr]) => {
     return opcodeNumber === opcode && subOpcode === subOpcodeNr;
   });
@@ -268,6 +270,7 @@ export function wasmOpcodeNameFromNumber(
   opcode: WasmOpcodeNumber,
   subOpcode: WasmOpcodeNumber | undefined = undefined,
 ): WasmOpcodeName | undefined {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const has = WasmOpcodes.find(([_, opcodeNumber, subOpcodeNr]) => {
     return opcodeNumber === opcode && subOpcode === subOpcodeNr;
   });
@@ -280,6 +283,7 @@ export function wasmOpcodeNameFromNumber(
 
 export function wasmOpcodeFromStr(opcode: string): WasmOpcodeNumber[] {
   const fixedOpcode = correctOpcodeName(opcode);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const found = WasmOpcodes.find(([name, _, __]) => {
     return name === fixedOpcode;
   });
@@ -320,6 +324,7 @@ function correctOpcodeName(opcode: string): WasmOpcodeName {
     ['f63.copysing', 'f64.copysign'],
   ];
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const fix = fixes.find(([name1, _]) => {
     return name1 === opcode;
   });

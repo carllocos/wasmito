@@ -23,6 +23,7 @@ export function readProjectVersionNumber(): string {
   try {
     readPackageJSON();
     return packageConfig.version;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     return 'Invalid project nr';
   }
@@ -32,6 +33,7 @@ export function readProjectDescription(): string {
   try {
     readPackageJSON();
     return packageConfig.description;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     return 'Invalid project description';
   }
@@ -41,6 +43,7 @@ export function readProjectName(): string {
   try {
     readPackageJSON();
     return packageConfig.name;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     return 'Error in Name';
   }
@@ -168,6 +171,7 @@ function readSDKPaths(filePath: string): SDKPaths | undefined {
     });
 
     return config;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     return undefined;
   }
@@ -319,7 +323,6 @@ export function getPathArduinoLibsPath(): string {
 
   return `${sdkPaths.ARDUINO_LIBS}`;
 }
-
 
 export function getPathWasmTools(): string {
   if (sdkPaths.WASM_TOOLS === undefined) {

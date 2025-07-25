@@ -62,7 +62,7 @@ export async function stepUntilLineCol(
 }
 
 async function runUntilBreakpoint(dbg: DebugAPI, addr: number): Promise<void> {
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises, no-async-promise-executor
+  // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve) => {
     function onbp(a: number): void {
       if (a !== addr) {

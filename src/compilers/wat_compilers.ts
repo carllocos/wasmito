@@ -256,7 +256,10 @@ function createLineInfoPairs(lines: string[]): LineInfoPairs[] {
         message: lastLineInfo.message,
       };
       result.push({ lineInfo: li, lineAddress: addr });
-    } catch (e) {}
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (e) {
+      /* empty */
+    }
   }
   return result;
 }

@@ -1,4 +1,10 @@
-import {type Node, type Point, Tree as TreeSitter, Language as TreeSitterLang, Parser as TreeSitterParser} from 'web-tree-sitter';
+import {
+  type Node,
+  type Point,
+  Tree as TreeSitter,
+  Language as TreeSitterLang,
+  Parser as TreeSitterParser,
+} from 'web-tree-sitter';
 
 export type TreeNode = Node;
 export type TreeParser = TreeSitterParser;
@@ -311,8 +317,7 @@ function getDestinationNodes(
     case GrammarType.WhileStatement: {
       const dest: TreeNode[] = [];
       for (const n of node.children) {
-        if (n !== null && n.id !== alreadyVisited.id)
-          dest.push(n);
+        if (n !== null && n.id !== alreadyVisited.id) dest.push(n);
       }
       if (node.nextSibling !== null) {
         dest.push(node.nextSibling);

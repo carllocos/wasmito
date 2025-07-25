@@ -61,7 +61,9 @@ const testFailUnregisterProxyCall: TestScenario = {
     {
       timeout: 3000,
       description: 'unregister a function not yet registered',
-      doAction: async (device: WasmitoBackendVM): Promise<AroundHookResponse> => {
+      doAction: async (
+        device: WasmitoBackendVM,
+      ): Promise<AroundHookResponse> => {
         const aroundRequest = new AroundFunctionRequest(2);
         return await device.sendRequest(aroundRequest.removeRequest());
       },

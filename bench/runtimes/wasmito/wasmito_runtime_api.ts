@@ -78,6 +78,7 @@ export class WasmitoRuntimeDBGAPI implements RuntimeDebugAPI {
         );
       }
       return hookAddr;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
       return undefined;
     }
@@ -100,6 +101,7 @@ export class WasmitoRuntimeDBGAPI implements RuntimeDebugAPI {
     this.removedListeners.clear();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async startRuntime(timeout: number): Promise<boolean> {
     this.breakpointListeners.length = 0;
     this.removedListeners.clear();
@@ -109,6 +111,7 @@ export class WasmitoRuntimeDBGAPI implements RuntimeDebugAPI {
     return true;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async stopRuntime(timeout: number): Promise<boolean> {
     throw new Error('stopRuntime is not applicable to this class');
   }

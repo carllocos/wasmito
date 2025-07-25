@@ -38,6 +38,7 @@ export class InspectStack extends APIRequestNoSubscription<WasmStack> {
     try {
       const resp: StackInpsectResponse = JSON.parse(input);
       return new WasmStack(resp.stack);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
       throw new APIRequestInvalidParse('No response for inspect stack');
     }

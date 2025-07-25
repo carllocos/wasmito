@@ -8,14 +8,14 @@ import assert from 'assert';
 
 describe('Loading device config with invalid input', () => {
   it('Input config with only `name` property should not give an error', () => {
-    const config: any = {};
+    const config: { [key: string]: unknown } = {};
     config.name = 'device name';
     const errorsMsgs: string[] = validateDeviceConfig(config);
     assert(errorsMsgs.length === 0, 'The error messages list should be empty');
   });
 
   it('Input config with only `id` property should not give error', () => {
-    const config: any = {};
+    const config: { [key: string]: unknown } = {};
     config.id = 'some id';
     const errorsMsgs: string[] = validateDeviceConfig(config);
     assert(
@@ -27,7 +27,7 @@ describe('Loading device config with invalid input', () => {
 
 describe('Loading device config with valid input', () => {
   it('Input config with all expected fields should give no error', () => {
-    const config: any = {};
+    const config: { [key: string]: unknown } = {};
     config.name = 'some Name';
     config.id = 'some id';
     config.deploymentMode = 'DevVM';
@@ -42,7 +42,7 @@ describe('Loading device config with valid input', () => {
   });
 
   it('The `deploymentMode` property of an input config should be case insensitive', () => {
-    const config: any = {};
+    const config: { [key: string]: unknown } = {};
     config.name = 'some Name';
     config.id = 'some id';
 
@@ -82,7 +82,7 @@ describe('Loading device config with valid input', () => {
 
 describe('Loading multile device configs', () => {
   it('Loading from empty input config should give error', () => {
-    const config: any = {};
+    const config = {};
     const errorsMsgs: string[] = isValidDevicesConfig(config);
     assert(
       errorsMsgs.length > 0,
@@ -91,17 +91,17 @@ describe('Loading multile device configs', () => {
   });
 
   it('One invalid config should give error', () => {
-    const valid: any = {
+    const valid = {
       name: 'a',
       id: 'b',
     };
 
-    const invalid: any = {
+    const invalid = {
       name: 2,
       id: 'b',
     };
 
-    let configs: any = { devices: [valid, invalid] };
+    let configs = { devices: [valid, invalid] };
     let errorsMsgs: string[] = isValidDevicesConfig(configs);
     assert(
       errorsMsgs.length > 0,
@@ -117,17 +117,17 @@ describe('Loading multile device configs', () => {
   });
 
   it('Loading devices from valid input configs should yield same number of devices', () => {
-    const validMCU: any = {
+    const validMCU = {
       name: 'a',
       id: 'b',
     };
 
-    const validDevVM: any = {
+    const validDevVM = {
       name: 'a',
       id: 'b',
     };
 
-    const configs: any = { devices: [validMCU, validDevVM] };
+    const configs = { devices: [validMCU, validDevVM] };
     const errorMsgs = isValidDevicesConfig(configs);
     assert(errorMsgs.length === 0, 'Valid input configs should parse');
   });

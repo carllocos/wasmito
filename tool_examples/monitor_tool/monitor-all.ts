@@ -576,6 +576,4 @@ runMonitorApp(
   outputDir,
   nameMonitorOutputFile,
   PlatformTarget.Arduino,
-)
-  .then((_) => {})
-  .catch(console.error);
+).catch(console.error);

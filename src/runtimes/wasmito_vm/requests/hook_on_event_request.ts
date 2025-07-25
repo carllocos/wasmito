@@ -33,6 +33,7 @@ export function getHookOnEventMomentFromString(
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface HookOnEventJSONResponse extends RequestMessage {}
 
 export abstract class HookOnEventResponse {
@@ -205,7 +206,10 @@ export class HookOnEventRequest extends APIRequest<HookOnEventResponse> {
           try {
             parsed = hook.parseSubscriptionData(msg.subsriptionData);
             successfulParse = true;
-          } catch (e) {}
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          } catch (e) {
+            /* empty */
+          }
 
           if (successfulParse) {
             try {
@@ -216,7 +220,10 @@ export class HookOnEventRequest extends APIRequest<HookOnEventResponse> {
           }
         }
       }
-    } catch (e) {}
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (e) {
+      /* empty */
+    }
   }
 
   private addHook(hook: Hook): HookOnEventRequest {

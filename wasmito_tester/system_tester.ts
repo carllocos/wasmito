@@ -745,6 +745,7 @@ export class SystemTester {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private assertValidScenarioFields(scenario: TestScenario): void {
     this.logger.warn('Test if scenario has all required fields');
   }

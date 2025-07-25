@@ -6,7 +6,6 @@ import {
   APIRequestNoSubscription,
   ResponseType,
 } from '../../request_interface';
-import { getExceptionMsgFromErrorCode } from './request_error_code';
 
 const logger = createLogger('FunCallRequest');
 

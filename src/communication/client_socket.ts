@@ -31,6 +31,7 @@ export class ClientSideSocket extends AbstractChannel {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async close(timeout?: number): Promise<boolean> {
     if (this.connection !== undefined) {
       this.connection.destroy();
@@ -51,7 +52,7 @@ export class ClientSideSocket extends AbstractChannel {
   }
 
   public async open(timeout?: number): Promise<boolean> {
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises, no-async-promise-executor
+    // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve) => {
       const waitBeforeNextAttempt = 1000;
       await waitMilliSeconds(waitBeforeNextAttempt);

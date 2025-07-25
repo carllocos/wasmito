@@ -369,6 +369,7 @@ export interface SourceCFGNode {
 }
 
 function sourceCFGNodeToJSONObj(n: SourceCFGNode): object {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const edges: object[] = n.edges.map(([e, _]) => {
     return { nodeID: e.nodeId };
   });

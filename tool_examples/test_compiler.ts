@@ -63,6 +63,4 @@ async function runBuilder(): Promise<void> {
   await mcuVM.run();
 }
 
-runBuilder()
-  .then((_) => {})
-  .catch(console.error);
+runBuilder().catch(console.error);

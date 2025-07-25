@@ -80,7 +80,10 @@ function parseASConfigTargets(args: any): ASConfigTarget[] {
     try {
       target = parseDebugASConfigTarget(tn, args[tn]);
       break;
-    } catch (e) {}
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (e) {
+      /* empty */
+    }
   }
 
   if (target === undefined) {

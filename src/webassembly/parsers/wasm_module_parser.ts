@@ -17,7 +17,8 @@ import {
 import { WASM } from '../wasm';
 import { type WasmOpcodeNumber, wasmOpcodeFromStr } from '../wasm/wasm_opcode';
 import { IsOpcodeWasmVersion1 } from '../wasm/wasm_versions';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const decode = require('@webassemblyjs/wasm-parser');
 const logger = createLogger('WasmParser');
 
@@ -1559,6 +1560,7 @@ function parseTypes(fields: any): WasmType[] {
     return [loc, funcType];
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   locationsAndTypes.sort(([l1, _t1], [l2, _t2]) => {
     return l1.start.column - l2.start.column;
   });

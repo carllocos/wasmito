@@ -45,11 +45,11 @@ export function logReplies(replies: RequestMessage[]): void {
   });
 }
 
-function onBreakpointStateUpdate(
-  em: WasmitoDevVM,
-): (state: WasmState) => void {
+function onBreakpointStateUpdate(em: WasmitoDevVM): (state: WasmState) => void {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   return (state: WasmState) => {
     em.step()
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       .then(async (v) => {
         const sr = new StateRequest().includePC();
         await em.sendRequest<WasmState>(sr);
@@ -196,6 +196,4 @@ export async function runDebugScenario(
 const app = './src/tool_examples/wat_examples/dimmer-double-button.wat';
 const output = './example-wat/';
 const connectToExistingProcess = false;
-runDebugScenario(app, connectToExistingProcess, output)
-  .then((_) => {})
-  .catch(console.error);
+runDebugScenario(app, connectToExistingProcess, output).catch(console.error);

@@ -15,7 +15,6 @@ import { benchStepOver } from './bench_step_over';
 import { ControlFlowGraphDBG } from '../debuggers/cfg_debugger';
 import { WARDuinoDevBackend } from '../runtimes/warduino/warduino_devvm';
 import { WasmitoDevVM } from '../runtimes/wasmito/wasmito_devm';
-import { WasmitoBackendMCUVM } from '../runtimes/wasmito/wasmito_mcu';
 import {
   type SourceCodeLocation,
   sourceCodeLocationToString,

@@ -20,7 +20,11 @@ import { type BoardBaudRate, isSerialPort } from '../util/serial_port';
 import { copyFile, writeFileSync } from 'fs';
 import { type VMConfiguration } from '../device';
 import { wasmStripCustomSection } from '../wasm-tools/wasm_strip';
-import { getPathArduinoCLI, getPathArduinoConfig, getPathArduinoLibsPath } from '../project_config';
+import {
+  getPathArduinoCLI,
+  getPathArduinoConfig,
+  getPathArduinoLibsPath,
+} from '../project_config';
 
 const arduinoLogger = createLogger('Arduino');
 
@@ -35,6 +39,7 @@ export class ArduinoBuilderError extends Error {
 async function runArduinoCommand(command: string): Promise<string> {
   return await new Promise((resolve, reject) => {
     arduinoLogger.info(`Running command: ${command}`);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     exec(`${command}`, (error, stdout, stderr) => {
       if (error !== null) {
         reject(error);
@@ -47,7 +52,9 @@ async function runArduinoCommand(command: string): Promise<string> {
 export async function ArduinoListBoards(): Promise<string[]> {
   const arduino_cli = getPathArduinoCLI();
   const arduino_config = getPathArduinoConfig();
-  const cmdOutput = await runArduinoCommand(`${arduino_cli} board list --config-file ${arduino_config}`);
+  const cmdOutput = await runArduinoCommand(
+    `${arduino_cli} board list --config-file ${arduino_config}`,
+  );
   const lines = cmdOutput.split('\n');
   if (lines.length === 1) {
     return [];
@@ -64,7 +71,9 @@ export async function ArduinoListBoards(): Promise<string[]> {
 export async function ArduinoListBoardsFQBNs(): Promise<BoardFQBN[]> {
   const arduino_cli = getPathArduinoCLI();
   const arduino_config = getPathArduinoConfig();
-  const cmdOutput = await runArduinoCommand(`${arduino_cli} board listall --config-file ${arduino_config}`);
+  const cmdOutput = await runArduinoCommand(
+    `${arduino_cli} board listall --config-file ${arduino_config}`,
+  );
   const lines = cmdOutput.split('\n');
   if (lines.length === 1) {
     return [];
@@ -157,12 +166,19 @@ export async function ArduinoFlash(
   fqbn: string,
 ): Promise<number> {
   return await new Promise<number>((resolve, reject) => {
-    const flash = spawn('make', ['flash', `PORT=${port}`, `FQBN=${fqbn}`,
-      `ARDUINO_CLI=${getPathArduinoCLI()}`,
-      `ARDUINO_CONFIG=${getPathArduinoConfig()}`,
-    ], {
-      cwd: pathToArduinoSketch,
-    });
+    const flash = spawn(
+      'make',
+      [
+        'flash',
+        `PORT=${port}`,
+        `FQBN=${fqbn}`,
+        `ARDUINO_CLI=${getPathArduinoCLI()}`,
+        `ARDUINO_CONFIG=${getPathArduinoConfig()}`,
+      ],
+      {
+        cwd: pathToArduinoSketch,
+      },
+    );
     flash.stdout.on('data', (data) => {
       const d = data.toString();
       arduinoLogger.debug(d);

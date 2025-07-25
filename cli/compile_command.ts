@@ -16,6 +16,7 @@ import { TargetLanguage } from '../src/compilers/prog_language_selection';
 import { type VMConfigArgs } from '../src/device/vm_config';
 import { resolve } from 'path';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function validateIdOrName(idOrName: any, prev: any): string {
   if (typeof idOrName !== 'string') {
     throw new InvalidArgumentError('Not a string');
@@ -23,6 +24,7 @@ function validateIdOrName(idOrName: any, prev: any): string {
   return idOrName;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function isValidWasmPath(wasmPath: any, prev: any): string {
   if (typeof wasmPath !== 'string') {
     throw new InvalidArgumentError('Is not a string');

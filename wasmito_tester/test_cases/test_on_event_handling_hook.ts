@@ -129,6 +129,7 @@ const testHookOnMCUScenario: TestScenario = {
       subscribeToID: 'breakpoint line 28',
       description:
         'wait max 10000ms breakpoint to be reached after handling event',
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       checkSubscription: async (state: WasmState): Promise<boolean> => {
         return true;
       },
@@ -171,6 +172,7 @@ const testHookOnMCUScenario2: TestScenario = {
       timeout: 10000,
 
       subscribeToID: 'breakpoint line 28',
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       checkSubscription: async (state: WasmState): Promise<boolean> => {
         return true;
       },
@@ -192,6 +194,7 @@ const testHookOnDevScenario: TestScenario = {
     {
       subscribeToID: 'Event handled',
       description: 'wait max 10000ms for a new event to occurr',
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       checkSubscription: async (ev: WASM.Event): Promise<boolean> => {
         return true;
       },

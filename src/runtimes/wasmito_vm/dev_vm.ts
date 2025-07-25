@@ -7,7 +7,6 @@ import { createLogger } from '../../logger/logger';
 import { UpdateWasmModuleRequest } from './requests/update_module_request';
 import { getPath2WasmitoSDKVMBinary } from '../../project_config';
 import { getFreePort, isPortInUse } from '../../util/socket_util';
-import { NoChannel } from '../../communication/no_channel';
 import { type Channel } from '../../communication';
 import { type DevVMPlatform } from '../../platforms';
 

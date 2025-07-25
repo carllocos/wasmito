@@ -16,7 +16,9 @@ export abstract class SourceCodeCompiler {
   abstract compile(compilationArgs: any): Promise<LanguageAdaptor>;
 
   protected static async createCompiler(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     compilerOutputPath: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     compilerArgs?: any,
   ): Promise<SourceCodeCompiler> {
     throw new Error('implement by base class');

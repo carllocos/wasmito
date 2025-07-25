@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { type Channel } from '../../src/communication';
 
 export class MockChannel implements Channel {

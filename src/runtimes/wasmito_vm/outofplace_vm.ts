@@ -193,7 +193,9 @@ export class OutOfPlaceVM extends WasmitoDevVM {
   }
 
   public async spawn(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     sourceCodeCompilationArgs: any,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     maxWaitTime?: number,
   ): Promise<ChildProcess> {
     throw new this.ErrorClass(

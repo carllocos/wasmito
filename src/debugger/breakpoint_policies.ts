@@ -32,6 +32,7 @@ export abstract class BreakpointPolicy {
 
   abstract toString(): string;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   activate(_: Breakpoint[]): void {}
 
   deactivate(): void {}
@@ -183,6 +184,7 @@ export class SingleStopBreakpointPolicy extends BreakpointPolicy {
 
   constructor(vm: WasmitoBackendVM) {
     super(vm);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     this.removeAllBreakpointsCallback = (state: WasmState) => {
       this.removeAllBreakpoints();
     };
@@ -298,6 +300,7 @@ export class RemoveAndProceedBreakpointPolicy extends BreakpointPolicy {
   private createRemoveBPOnReachCallback(
     bp: Breakpoint,
   ): (state: WasmState) => void {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const cb = (_: WasmState): void => {
       this.vm
         .removeBreakpoint(bp, this.MAX_DEFAULT_TIMEOUT)

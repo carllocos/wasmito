@@ -110,4 +110,3 @@ export class WARDuinoDevBackend extends WARDuinoRuntimeAPI {
     return opened;
   }
 }
-

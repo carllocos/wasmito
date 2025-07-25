@@ -1,5 +1,8 @@
-import { serializeUInt } from "../../util/encoder";
-import { APIRequestInvalidParse, APIRequestNoSubscription } from "../request_interface";
+import { serializeUInt } from '../../util/encoder';
+import {
+  APIRequestInvalidParse,
+  APIRequestNoSubscription,
+} from '../request_interface';
 
 export class AddBreakpointRequest extends APIRequestNoSubscription<number> {
   private readonly instructionNr: string;

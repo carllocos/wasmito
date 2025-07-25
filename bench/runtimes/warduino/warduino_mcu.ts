@@ -36,6 +36,7 @@ export class WARDuinoBackendMCU extends WARDuinoRuntimeAPI {
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   override async startRuntime(timeout: number): Promise<boolean> {
     await ArduinoClean(this.arduinoSketchDir);
     await this.compileForMCU(this.wasmPath);
