@@ -66,6 +66,19 @@ export async function readSourceMapConfig(
     config.prefixSources = prefixSources;
   }
 
+  if (Array.isArray(rebase.ignoreDirectories)) {
+    const ignoreDirs = [];
+    for (const ignore of rebase.ignoreDirectories) {
+      if (typeof ignore !== 'string') {
+        throw new Error(
+          'SourceMapConfig: Ignore Directory is expected to be a string',
+        );
+      }
+      ignoreDirs.push(ignore);
+    }
+    config.ignoreDirectories = ignoreDirs;
+  }
+
   return config;
 }
 
@@ -319,7 +332,11 @@ function cleanMappings(
 }
 
 function cleanSources(sources: string[], config?: SourceMapConfig): string[] {
-  return sources.map((s) => cleanSource(s, config));
+  const ignoreDirs = config?.ignoreDirectories ?? [];
+  const ignored = sources.filter((s) => {
+    return ignoreDirs.find((d) => s.startsWith(d)) === undefined;
+  });
+  return ignored.map((s) => cleanSource(s, config));
 }
 
 function cleanSource(source: string, config?: SourceMapConfig): string {
