@@ -279,7 +279,7 @@ function cleanMappings(
       const found = config.ignoreDirectories.find((dir) => {
         return sl.source.startsWith(dir);
       });
-      if (found === undefined) {
+      if (found !== undefined) {
         // we do not add mapping as needs to be ignored
         continue;
       }
