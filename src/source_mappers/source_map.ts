@@ -2,9 +2,8 @@ import { type MappingItem } from 'source-map';
 import { createLogger } from '../logger/logger';
 import { WasmModule } from '../webassembly/wasm/wasm_module';
 import { type WASMFunction } from '../webassembly/wasm/wasm_function';
-import { isFilePath, pathJoin, pathsEqual } from '../util/file_util';
+import { isFilePath, pathsEqual } from '../util/file_util';
 import { writeFileSync } from 'fs';
-import { type SourceMapConfig } from './source_map_builder';
 
 const logger = createLogger('SourceMap');
 
@@ -102,89 +101,20 @@ export function isSourceMapJSON(arg: any): arg is SourceMapJSON {
 }
 
 export class SourceMap {
-  private readonly _sourceToAbsPathSource: Map<string, string>;
-  private readonly _ignoreDirs: string[];
-  private readonly _prefixPath?: string;
   private readonly _sources: string[];
   private readonly _mappings: SourceCodeLocation[];
   private readonly _wasmPath: string;
   public readonly wasm: WasmModule;
 
   constructor(
-    wasmPath: string | SourceMap,
+    wasmPath: string | SourceMap, // TODO get rid of duble type here
     sources: string[],
     mappings: SourceCodeLocation[],
-    config?: SourceMapConfig,
   ) {
     this._wasmPath =
       wasmPath instanceof SourceMap ? wasmPath.wasm.wasmPath : wasmPath;
-    this._sourceToAbsPathSource = config?.srcToAbsPath ?? new Map();
-    this._ignoreDirs = config?.ignoreDirectories ?? [];
-    this._prefixPath = config?.prefixSources;
-    this._sources = [];
-
-    if (
-      config?.prefixSources !== undefined ||
-      config?.srcToAbsPath !== undefined
-    ) {
-      for (const s of sources) {
-        let ps = s;
-        if (config.prefixSources !== undefined) {
-          ps = pathJoin(config.prefixSources, s);
-        } else if (config.srcToAbsPath !== undefined) {
-          ps = config.srcToAbsPath.get(s) ?? '';
-        }
-        this._sources.push(isFilePath(ps) ? ps : s);
-      }
-    } else {
-      this._sources = sources;
-    }
-
-    // remove duplicate mappings
-    // ignore mappings that are supposed to be ignored
-    const tbl = new Map<number, SourceCodeLocation>();
-    const cleanedMappings: SourceCodeLocation[] = [];
-    for (const m of mappings) {
-      if (config?.prefixSources !== undefined) {
-        const newPath = pathJoin(config.prefixSources, m.source);
-        if (isFilePath(newPath)) {
-          m.source = newPath;
-        }
-      } else if (config?.srcToAbsPath !== undefined) {
-        const newPath = config.srcToAbsPath.get(m.source) ?? '';
-        if (isFilePath(newPath)) {
-          m.source = newPath;
-        }
-      }
-      const found = this._ignoreDirs.find((dir) => {
-        return m.source.startsWith(dir);
-      });
-      if (found !== undefined) {
-        continue;
-      }
-
-      const sl = tbl.get(m.address);
-      if (sl === undefined) {
-        cleanedMappings.push(m);
-        tbl.set(m.address, m);
-        continue;
-      }
-
-      if (
-        sl.linenr === m.linenr &&
-        sl.colnr === m.colnr &&
-        sl.name === m.name &&
-        sl.source === m.source
-      ) {
-        continue;
-      }
-      // logger.error(
-      //   `Found 2 different source location for the same Wasm addr ${m.address} loc1 ${sourceCodeLocationToString(m)}
-      //   loc2 ${sourceCodeLocationToString(sl)}`,
-      // );
-    }
-
-    this._mappings = cleanedMappings;
+    this._sources = sources;
+    this._mappings = mappings;
     this.wasm =
       wasmPath instanceof SourceMap
         ? wasmPath.wasm
@@ -243,17 +173,9 @@ export class SourceMap {
   }
 
   public getOriginalPositionFor(wasmAddr: number): SourceCodeLocation[] {
-    const maps = this._mappings
-      .filter((m: SourceCodeLocation) => {
-        return m.address === wasmAddr;
-      })
-      .map((m: SourceCodeLocation) => {
-        const src = this._sourceToAbsPathSource.get(m.source);
-        if (src !== undefined) {
-          m.source = src;
-        }
-        return m;
-      });
+    const maps = this._mappings.filter((m: SourceCodeLocation) => {
+      return m.address === wasmAddr;
+    });
 
     if (maps.length > 1) {
       const mappings: string = maps.map(sourceCodeLocationToString).join(', ');
@@ -273,12 +195,7 @@ export class SourceMap {
       sources: this._sources,
       mappings: this._mappings,
     };
-    StoreMappingsToJSON(
-      filePath,
-      sm,
-      onlyExistingSource,
-      this._sourceToAbsPathSource,
-    );
+    StoreMappingsToJSON(filePath, sm, onlyExistingSource);
   }
 }
 
