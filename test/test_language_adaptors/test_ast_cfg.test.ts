@@ -1,5 +1,8 @@
 import path from 'path';
-import { SourceMapfromDWARFWasm } from '../../src/source_mappers/source_map_builder';
+import {
+  DebugStandard,
+  readSourceMap,
+} from '../../src/source_mappers/source_map_builder';
 import { constructLanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 import assert, { fail } from 'assert';
 import { type SourceCFGs } from '../../src/cfg/source_cfg';
@@ -12,7 +15,11 @@ describe('Rust AST Control Flow Graph for Blink App', function () {
 
   before('parse wasm module', async function () {
     try {
-      const sm = await SourceMapfromDWARFWasm(exampleFile);
+      const sm = await readSourceMap(
+        DebugStandard.DWARF,
+        exampleFile,
+        exampleFile,
+      );
       const langAdaptor = await constructLanguageAdaptor(sm);
       assert(langAdaptor.sourceCFG !== undefined);
       sourceCFGs = langAdaptor.sourceCFG;

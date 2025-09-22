@@ -1,15 +1,19 @@
 import path from 'path';
-import {
-  SourceMapFromSourceMapSpec,
-  type SourceOffsetStart,
-} from '../../src/source_mappers/source_map_builder';
 import { constructLanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 import assert, { fail } from 'assert';
 import {
   type DotSerializationConfig,
   type SourceCFGs,
 } from '../../src/cfg/source_cfg';
-import { type SourceMapConfig } from '../../src';
+import {
+  DefaultColumnStartNumber,
+  DefaultLineStartNumber,
+  SourceMapConfig,
+} from '../../src/source_mappers/source_map_config';
+import {
+  DebugStandard,
+  readSourceMap,
+} from '../../src/source_mappers/source_map_builder';
 
 describe('Debug Operations on Zig App', function () {
   const pathToDir = path.resolve(
@@ -24,6 +28,8 @@ describe('Debug Operations on Zig App', function () {
   const sourceMapConfig: SourceMapConfig = {
     srcToAbsPath,
     ignoreDirectories: ['/opt/homebrew/'],
+    colNrStartNumber: DefaultColumnStartNumber,
+    lineNrStartNumber: DefaultLineStartNumber,
   };
 
   let sourceCFGs: SourceCFGs;
@@ -32,14 +38,10 @@ describe('Debug Operations on Zig App', function () {
 
   before('parse wasm module', async function () {
     try {
-      const startPositioning: SourceOffsetStart = {
-        colNrStartNumber: 0,
-        lineNrStartNumber: 1,
-      };
-      const sm = await SourceMapFromSourceMapSpec(
-        sourceMapPath,
+      const sm = await readSourceMap(
+        DebugStandard.SourceMapSpec,
         wasmPath,
-        startPositioning,
+        sourceMapPath,
         sourceMapConfig,
       );
       const langAdaptor = await constructLanguageAdaptor(sm);

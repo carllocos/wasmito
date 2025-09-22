@@ -1,6 +1,5 @@
 import { expect } from 'chai';
 import path from 'path';
-import { SourceMapfromDWARFWasm } from '../../src/source_mappers/source_map_builder';
 import { constructLanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 import assert, { fail } from 'assert';
 import {
@@ -13,6 +12,10 @@ import {
   sourceNodeFromLoc,
   sourceNodeLoc,
 } from './reusable_code';
+import {
+  DebugStandard,
+  readSourceMap,
+} from '../../src/source_mappers/source_map_builder';
 
 describe.skip('Debug Operations on Rust AST Blink App', function () {
   const pathToDir = path.resolve('./test/data/rust_examples/blink/');
@@ -24,7 +27,7 @@ describe.skip('Debug Operations on Rust AST Blink App', function () {
 
   before('parse wasm module', async function () {
     try {
-      const sm = await SourceMapfromDWARFWasm(blinkApp);
+      const sm = await readSourceMap(DebugStandard.DWARF, blinkApp, blinkApp);
       const langAdaptor = await constructLanguageAdaptor(sm);
       assert(langAdaptor.sourceCFG !== undefined);
       sourceCFGs = langAdaptor.sourceCFG;
@@ -111,7 +114,7 @@ describe.skip('Debug Operations on Rust AST Intermittent Blink', function () {
 
   before('parse wasm module', async function () {
     try {
-      const sm = await SourceMapfromDWARFWasm(app);
+      const sm = await readSourceMap(DebugStandard.DWARF, app, app);
       const langAdaptor = await constructLanguageAdaptor(sm);
       assert(langAdaptor.sourceCFG !== undefined);
       sourceCFGs = langAdaptor.sourceCFG;

@@ -1,15 +1,19 @@
 import path from 'path';
-import {
-  type SourceMapConfig,
-  SourceMapFromSourceMapSpec,
-  type SourceOffsetStart,
-} from '../../src/source_mappers/source_map_builder';
 import { constructLanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 import assert, { fail } from 'assert';
 import {
   type DotSerializationConfig,
   type SourceCFGs,
 } from '../../src/cfg/source_cfg';
+import {
+  DefaultColumnStartNumber,
+  DefaultLineStartNumber,
+  SourceMapConfig,
+} from '../../src/source_mappers/source_map_config';
+import {
+  DebugStandard,
+  readSourceMap,
+} from '../../src/source_mappers/source_map_builder';
 
 describe('Debug operations on C Blink Intermittent App', function () {
   const pathToDir = path.resolve('./test/data/c_examples/blink_intermittent/');
@@ -23,20 +27,18 @@ describe('Debug operations on C Blink Intermittent App', function () {
   ]);
   const sourceMapConfig: SourceMapConfig = {
     srcToAbsPath: srcFileMapper,
+    colNrStartNumber: DefaultColumnStartNumber,
+    lineNrStartNumber: DefaultLineStartNumber,
   };
 
   this.timeout(30000);
 
   before('parse wasm module', async function () {
     try {
-      const startPositioning: SourceOffsetStart = {
-        colNrStartNumber: 0,
-        lineNrStartNumber: 1,
-      };
-      const sm = await SourceMapFromSourceMapSpec(
-        pathToSrcMap,
+      const sm = await readSourceMap(
+        DebugStandard.SourceMapSpec,
         app,
-        startPositioning,
+        pathToSrcMap,
         sourceMapConfig,
       );
       const langAdaptor = await constructLanguageAdaptor(sm);

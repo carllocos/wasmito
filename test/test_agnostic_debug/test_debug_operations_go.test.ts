@@ -1,6 +1,5 @@
 import { expect } from 'chai';
 import path from 'path';
-import { SourceMapfromDWARFWasm } from '../../src/source_mappers/source_map_builder';
 import { constructLanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 import assert, { fail } from 'assert';
 import { type SourceCFGs } from '../../src/cfg/source_cfg';
@@ -11,6 +10,10 @@ import {
   sourceNodeLoc,
   sourceText,
 } from './reusable_code';
+import {
+  DebugStandard,
+  readSourceMap,
+} from '../../src/source_mappers/source_map_builder';
 
 describe.skip('Debug Operations on Go Hello World', function () {
   const app = path.resolve('./test/data/go_examples/main.wasm');
@@ -21,7 +24,7 @@ describe.skip('Debug Operations on Go Hello World', function () {
   before('parse wasm module', async function () {
     try {
       const startTime = new Date();
-      const sm = await SourceMapfromDWARFWasm(app);
+      const sm = await readSourceMap(DebugStandard.DWARF, app, app);
       const endTime = new Date();
       const timeDifference = endTime.getTime() - startTime.getTime();
       console.log(

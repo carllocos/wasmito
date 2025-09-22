@@ -1,10 +1,11 @@
 import assert from 'assert';
 import { expect } from 'chai';
-import {
-  SourceMapfromDWARFWasm,
-  createMappingForAddr,
-} from '../../src/source_mappers/source_map_builder';
 import { type SourceMap } from '../../src/source_mappers/source_map';
+import {
+  DebugStandard,
+  readSourceMap,
+} from '../../src/source_mappers/source_map_builder';
+import { createMappingForAddr } from '../../src/source_mappers/debug_standards/dwarf_reader';
 
 /*
  * Until DWARF library is fully intergated, the generation of SourceMaps happens temporarily
@@ -33,7 +34,11 @@ describe('SourceMap building', function () {
   this.timeout(15000);
 
   it('building sourcemap', async function () {
-    const mapping = await SourceMapfromDWARFWasm(wasmPath);
+    const mapping = await readSourceMap(
+      DebugStandard.DWARF,
+      wasmPath,
+      wasmPath,
+    );
     expect(mapping).not.equal(undefined);
   });
 });
@@ -44,7 +49,7 @@ describe('SourceMap entries', function () {
   this.timeout(15000);
 
   before('Build SourceMap', async function () {
-    sourceMap = await SourceMapfromDWARFWasm(wasmPath);
+    sourceMap = await readSourceMap(DebugStandard.DWARF, wasmPath, wasmPath);
     expect(sourceMap).to.not.equal(undefined);
   });
 

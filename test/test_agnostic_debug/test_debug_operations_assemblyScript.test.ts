@@ -1,9 +1,8 @@
 import { expect } from 'chai';
 import path from 'path';
 import {
-  type SourceMapConfig,
-  SourceMapFromSourceMapSpec,
-  type SourceOffsetStart,
+  DebugStandard,
+  readSourceMap,
 } from '../../src/source_mappers/source_map_builder';
 import { constructLanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 import assert, { fail } from 'assert';
@@ -18,6 +17,11 @@ import {
   sourceNodeFromLoc,
   sourceNodeLoc,
 } from './reusable_code';
+import {
+  DefaultColumnStartNumber,
+  DefaultLineStartNumber,
+  SourceMapConfig,
+} from '../../src/source_mappers/source_map_config';
 
 describe.skip('Debug Operations on AssemblyScript Blink App', function () {
   const pathToRootSource = path.resolve(
@@ -29,20 +33,18 @@ describe.skip('Debug Operations on AssemblyScript Blink App', function () {
   const srcFileMapper = new Map<string, string>([['blink/blink.ts', srcPath]]);
   const sourceMapConfig: SourceMapConfig = {
     srcToAbsPath: srcFileMapper,
+    colNrStartNumber: DefaultColumnStartNumber,
+    lineNrStartNumber: DefaultLineStartNumber,
   };
 
   let sourceCFGs: SourceCFGs;
 
   before('parse wasm module', async function () {
     try {
-      const startPositioning: SourceOffsetStart = {
-        colNrStartNumber: 0,
-        lineNrStartNumber: 1,
-      };
-      const sm = await SourceMapFromSourceMapSpec(
-        sourceMapPath,
+      const sm = await readSourceMap(
+        DebugStandard.SourceMapSpec,
         wasmPath,
-        startPositioning,
+        sourceMapPath,
         sourceMapConfig,
       );
       const langAdaptor = await constructLanguageAdaptor(sm);
@@ -107,20 +109,18 @@ describe('Debug Operations on AS Intermittent Blink', function () {
   ]);
   const sourceMapConfig: SourceMapConfig = {
     srcToAbsPath: srcFileMapper,
+    colNrStartNumber: DefaultColumnStartNumber,
+    lineNrStartNumber: DefaultLineStartNumber,
   };
 
   let sourceCFGs: SourceCFGs;
 
   before('parse wasm module', async function () {
     try {
-      const startPositioning: SourceOffsetStart = {
-        colNrStartNumber: 0,
-        lineNrStartNumber: 1,
-      };
-      const sm = await SourceMapFromSourceMapSpec(
-        sourceMapPath,
+      const sm = await readSourceMap(
+        DebugStandard.SourceMapSpec,
         wasmPath,
-        startPositioning,
+        sourceMapPath,
         sourceMapConfig,
       );
       const langAdaptor = await constructLanguageAdaptor(sm);
