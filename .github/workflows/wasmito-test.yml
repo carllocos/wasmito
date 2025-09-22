@@ -24,6 +24,10 @@ jobs:
           toolchain: stable, 1.76.0
           target: wasm32-unknown-unknown
 
+      - name: Install cargo-binstall
+        run: |
+          curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash -s -- -y
+
       - name: Install wasm-tools v1.205.0
         uses: taiki-e/cache-cargo-install-action@v2
         with:
