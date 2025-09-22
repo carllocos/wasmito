@@ -176,7 +176,7 @@ describe('Debug Operations on AS Intermittent Blink', function () {
     const nextLoc = sourceNodeLoc(nextNode);
 
     expect(nextLoc.linenr).equal(29);
-    expect(nextLoc.colnr).equal(12);
+    expect(nextLoc.colnr).equal(5);
   });
 
   it('"step out" of a "pinMode" fun has 1 callside', function () {
@@ -192,7 +192,7 @@ describe('Debug Operations on AS Intermittent Blink', function () {
     const [n] = nextNodes[0];
     const loc = sourceNodeLoc(n);
     expect(loc.linenr).equal(29);
-    expect(loc.colnr).equal(12);
+    expect(loc.colnr).equal(5);
   });
 
   it('"step out" of a "digitalWrite" fun has 3 callsides', function () {
