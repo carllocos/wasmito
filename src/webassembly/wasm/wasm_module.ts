@@ -307,6 +307,7 @@ export class WasmModule {
           logger.debug(
             `Case where addr is within instr (opcodeNr=${inst.opcodeNr}) but no subinstruction found`,
           );
+          return undefined;
         }
       }
       return inst;
