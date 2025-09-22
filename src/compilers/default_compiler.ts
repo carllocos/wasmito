@@ -9,11 +9,12 @@ import {
   constructLanguageAdaptor,
 } from '../language_adaptors/language_adaptor';
 import {
-  SourceMapfromDWARFWasm,
+  DebugStandard,
+  readSourceMap,
   SourceMapFromJSON,
-  SourceMapFromSourceMapSpec,
 } from '../source_mappers/source_map_builder';
 import { type SourceMap } from '../source_mappers';
+import { SourceMapConfig } from '../source_mappers/source_map_config';
 
 export interface DefaultCompileArgs {
   pathToSrcRoot: string;
@@ -65,16 +66,19 @@ export class DefaultCompiler extends SourceCodeCompiler {
 
     this._lastCompileArgs = compilerArgs;
     let sm: SourceMap | undefined;
-    if (compilerArgs.pathToSourceMap !== undefined) {
-      sm = await SourceMapFromSourceMapSpec(
-        compilerArgs.pathToSourceMap,
-        compilerArgs.pathToWasm,
-        { lineNrStartNumber: 0, colNrStartNumber: 0 },
-      );
-    } else if (compilerArgs.pathToJsonMap !== undefined) {
+    if (compilerArgs.pathToJsonMap !== undefined) {
       sm = await SourceMapFromJSON(compilerArgs.pathToJsonMap);
     } else {
-      sm = await SourceMapfromDWARFWasm(compilerArgs.pathToWasm);
+      let standard = DebugStandard.DWARF;
+      let debugInfo = compilerArgs.pathToWasm;
+      const config: SourceMapConfig = {};
+      if (compilerArgs.pathToSourceMap !== undefined) {
+        standard = DebugStandard.SourceMapSpec;
+        debugInfo = compilerArgs.pathToSourceMap;
+        config.colNrStartNumber = 0;
+        config.lineNrStartNumber = 0; // TODO check if correct
+      }
+      sm = await readSourceMap(standard, compilerArgs.pathToWasm, debugInfo);
     }
     return await constructLanguageAdaptor(sm);
   }
