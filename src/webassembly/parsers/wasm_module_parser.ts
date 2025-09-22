@@ -357,6 +357,7 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
       break;
     }
     case 'block': {
+      obj.loc.start.column = obj.loc.start.column - 1; // Due to bug in @webassemblyjs/wasm-parser see issue #34
       const label = obj.label.value;
       const parsedOpcodes: Array<WasmInstruction | undefined | string[]> =
         obj.instr.map((o: any) => {
@@ -380,6 +381,7 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
       break;
     }
     case 'loop': {
+      obj.loc.start.column = obj.loc.start.column - 1; // Due to bug in @webassemblyjs/wasm-parser see issue #34
       const label = obj.label.value;
       const parsedOpcodes = obj.instr.map((o: any) => {
         return parseInstruction(o);
