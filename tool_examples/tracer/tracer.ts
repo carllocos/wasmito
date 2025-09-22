@@ -12,13 +12,14 @@ import {
   createDevPlatform,
 } from '../../src/platforms/platformbuilder_factory';
 import { PlatformTarget } from '../../src/platforms/platform_config';
-import {
-  DefaultSourceOffsetStart,
-  ReadSourceSpec,
-  SourceMapConfig,
-} from '../../src/source_mappers/source_map_builder';
 import { WasmCompilerArgs } from '../../src/compilers/wasm_compiler';
 import { StoreTrace } from './store_trace';
+import { DebugStandard, readSourceMapJSON } from '../../src';
+import {
+  DefaultColumnStartNumber,
+  DefaultLineStartNumber,
+  SourceMapConfig,
+} from '../../src/source_mappers/source_map_config';
 
 async function registerHooks(
   em: WasmitoBackendVM,
@@ -75,6 +76,8 @@ async function run(): Promise<void> {
   ]);
   const sourceMapConfig: SourceMapConfig = {
     srcToAbsPath: srcFileMapper,
+    colNrStartNumber: DefaultColumnStartNumber,
+    lineNrStartNumber: DefaultLineStartNumber,
   };
   const recordTime = 30; // seconds
   const outputDir = './tool_examples/tracer/';
@@ -85,10 +88,10 @@ async function run(): Promise<void> {
   let vm: WasmitoBackendVM | undefined;
   const compilationArgs: WasmCompilerArgs = {
     wasmPath: wasmApp,
-    mappingsJSON: await ReadSourceSpec(
-      debugInfo,
+    mappingsJSON: await readSourceMapJSON(
+      DebugStandard.SourceMapSpec,
       wasmApp,
-      DefaultSourceOffsetStart,
+      debugInfo,
       sourceMapConfig,
     ),
   };
