@@ -1,15 +1,33 @@
 import { type LineInfoPairs } from '../../webassembly/parsers/obj-dump_parser';
-import { SourceMap, mappingItemToSourceCodeLocation } from '../source_map';
+import {
+  SourceMap,
+  SourceMapJSON,
+  mappingItemToSourceCodeLocation,
+} from '../source_map';
 import { type MappingItem } from 'source-map';
+import { SourceMapFromJSON } from '../source_map_builder';
+import {
+  DefaultColumnStartNumber,
+  DefaultLineStartNumber,
+} from '../source_map_config';
 
-export function createSourceMapForWAT(
+export async function createSourceMapForWAT(
   lines: LineInfoPairs[],
   sourcePath: string,
   wasmPath: string,
-): SourceMap {
+): Promise<SourceMap> {
   const mappings = createWAT2WASMMappings(sourcePath, lines);
   const sourceLocations = mappings.map(mappingItemToSourceCodeLocation);
-  return new SourceMap(wasmPath, [sourcePath], sourceLocations);
+  const sm: SourceMapJSON = {
+    wasm: wasmPath,
+    sources: [sourcePath],
+    mappings: sourceLocations,
+  };
+  return await SourceMapFromJSON(sm, {
+    colNrStartNumber: DefaultColumnStartNumber,
+    lineNrStartNumber: DefaultLineStartNumber,
+    cleanMappings: true,
+  });
 }
 
 function createWAT2WASMMappings(
