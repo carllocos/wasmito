@@ -32,7 +32,7 @@ jobs:
       - name: Build submodules
         run: |
           echo "Running installation script"
-          bash ./scipts/install.sh
+          bash ./scripts/install.sh
 
       - name: Setup Node.js
         uses: actions/setup-node@v2
