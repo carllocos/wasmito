@@ -8,16 +8,14 @@ import {
 } from '../src/util/file_util';
 import { timeoutPromise } from '../src/util/promise_util';
 import {
-  ReadDWARFMappings,
-  readSourceMapConfig,
-  ReadSourceSpec,
-  type SourceMapConfig,
-  type SourceOffsetStart,
+  DebugStandard,
+  readSourceMapJSON,
 } from '../src/source_mappers/source_map_builder';
+import { StoreMappingsToJSON } from '../src/source_mappers/source_map';
 import {
-  type SourceMapJSON,
-  StoreMappingsToJSON,
-} from '../src/source_mappers/source_map';
+  readSourceMapConfig,
+  SourceMapConfig,
+} from '../src/source_mappers/source_map_config';
 
 export function registerSourceMapCommand(program: Command): void {
   program
@@ -49,61 +47,60 @@ export function registerSourceMapCommand(program: Command): void {
       'the maximum seconds allocated to load the sourcemap according to our format',
       '180',
     )
+    .option(
+      '--disable-clean',
+      'Deactivate removing the source mappings that have no associated Wasm instruction',
+    )
     .action(async (wasmPath, outputFile, options) => {
       const logger = getGlobalLogger();
-      let dwarfPath = options.dwarf;
-      const sourceSpec = options.sourceSpec;
+      let debuggingInformationPath = options.dwarf ?? options.sourceSpec;
       wasmPath = getAbsolutePath(wasmPath);
       if (!isFilePath(wasmPath)) {
         program.error('<wasm-path> is not a valid path to a Wasm module');
       }
 
-      if (sourceSpec === undefined && dwarfPath === undefined) {
+      if (debuggingInformationPath === undefined) {
         program.error('either --dwarf or --source-spec is missing');
-      } else if (sourceSpec !== undefined && dwarfPath !== undefined) {
+      } else if (
+        options.sourceSpec !== undefined &&
+        options.dwarf !== undefined
+      ) {
         program.error('only --dwarf or --source-spec is expected');
-      } else if (sourceSpec !== undefined) {
-        if (!isFilePath(sourceSpec)) {
-          program.error(
-            '--source-spec <path-to-source-spec> is not a valid path to a file',
-          );
-        }
-      } else {
-        if (!isFilePath(dwarfPath)) {
-          program.error(
-            '--dwarf <dwarf-path> is not a valid path to a Wasm module containing dwarf',
-          );
-        }
-        dwarfPath = getAbsolutePath(dwarfPath);
       }
+
+      if (!isFilePath(debuggingInformationPath)) {
+        program.error(
+          `The provided debugging information is not a valid path to a file. Given ${debuggingInformationPath}`,
+        );
+      }
+      debuggingInformationPath = getAbsolutePath(debuggingInformationPath);
 
       const timeout = Number(options.timeout) * 1000; // convert to millisecs
       if (isNaN(timeout) || timeout < 0) {
         program.error('`<timeout-secs>` is not a positive number');
       }
 
-      let smJSON: Promise<SourceMapJSON> | undefined;
-      let kindDebuggingFormat = '';
-      if (dwarfPath !== undefined) {
-        kindDebuggingFormat = 'DWARF';
-        smJSON = ReadDWARFMappings(dwarfPath);
-      } else {
-        kindDebuggingFormat = 'SourceSpec';
-        const startPositioning: SourceOffsetStart = {
-          colNrStartNumber: 0,
-          lineNrStartNumber: 1,
-        };
-        let config: SourceMapConfig = {};
-        if (options.rebaseLocations !== undefined) {
-          if (!isFilePath(options.rebaseLocations)) {
-            program.error(
-              `The given source location rebase config '${options.prefixSources}' is not a valid file path`,
-            );
-          }
-          config = await readSourceMapConfig(options.rebaseLocations);
+      let config: SourceMapConfig = {};
+      if (options.rebaseLocations !== undefined) {
+        if (!isFilePath(options.rebaseLocations)) {
+          program.error(
+            `The given source location rebase config '${options.prefixSources}' is not a valid file path`,
+          );
         }
-        smJSON = ReadSourceSpec(sourceSpec, wasmPath, startPositioning, config);
+        config = await readSourceMapConfig(options.rebaseLocations);
       }
+      config.cleanMappings = options.disableClean === undefined;
+
+      const kindDebuggingFormat =
+        options.dwarf !== undefined
+          ? DebugStandard.DWARF
+          : DebugStandard.SourceMapSpec;
+      const smJSON = readSourceMapJSON(
+        kindDebuggingFormat,
+        wasmPath,
+        debuggingInformationPath,
+        config,
+      );
 
       try {
         logger.info(

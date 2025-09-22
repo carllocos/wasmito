@@ -5,10 +5,9 @@ import {
   isFilePath,
 } from '../src/util/file_util';
 import {
-  SourceMapfromDWARFWasm,
+  DebugStandard,
+  readSourceMap,
   SourceMapFromJSON,
-  SourceMapFromSourceMapSpec,
-  type SourceOffsetStart,
 } from '../src/source_mappers/source_map_builder';
 import { constructLanguageAdaptor } from '../src/language_adaptors/language_adaptor';
 import { timeoutPromise } from '../src/util/promise_util';
@@ -20,6 +19,11 @@ import {
 import { DebugOperationFromName } from '../src/language_adaptors/debug_operations';
 import { type SourceCFGNode } from '../src/cfg/source_cfg';
 import { writeFileSync } from 'fs';
+import {
+  DefaultColumnStartNumber,
+  DefaultLineStartNumber,
+  SourceMapConfig,
+} from '../src/source_mappers/source_map_config';
 
 export function registerDebugOpCommand(program: Command): void {
   program
@@ -152,17 +156,18 @@ export function registerDebugOpCommand(program: Command): void {
         smPromise = SourceMapFromJSON(wasmitoPath);
       } else if (dwarfPath !== undefined) {
         dwarfPath = getAbsolutePath(dwarfPath);
-        smPromise = SourceMapfromDWARFWasm(dwarfPath);
+        smPromise = readSourceMap(DebugStandard.DWARF, wasmPath, dwarfPath);
       } else {
         sourceSpecPath = getAbsolutePath(sourceSpecPath);
-        const startPositioning: SourceOffsetStart = {
-          colNrStartNumber: 0,
-          lineNrStartNumber: 1,
+        const config: SourceMapConfig = {
+          colNrStartNumber: DefaultColumnStartNumber,
+          lineNrStartNumber: DefaultLineStartNumber,
         };
-        smPromise = SourceMapFromSourceMapSpec(
-          sourceSpecPath,
+        smPromise = readSourceMap(
+          DebugStandard.SourceMapSpec,
           wasmPath,
-          startPositioning,
+          sourceSpecPath,
+          config,
         );
       }
       try {

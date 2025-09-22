@@ -7,9 +7,9 @@ import {
   pathJoin,
 } from '../src/util/file_util';
 import {
+  DebugStandard,
+  readSourceMap,
   SourceMapFromJSON,
-  SourceMapFromSourceMapSpec,
-  type SourceOffsetStart,
 } from '../src/source_mappers/source_map_builder';
 import { constructLanguageAdaptor } from '../src/language_adaptors/language_adaptor';
 import { timeoutPromise } from '../src/util/promise_util';
@@ -100,16 +100,16 @@ export function registerCFGCommand(program: Command): void {
         }
         smPromise = SourceMapFromJSON(wasmitoPath);
       } else if (dwarfPath !== undefined) {
-        program.error(`dwarf todo`);
+        smPromise = readSourceMap(DebugStandard.DWARF, wasmPath, dwarfPath);
       } else if (sourceSpecPath !== undefined) {
-        const startPositioning: SourceOffsetStart = {
-          colNrStartNumber: 0,
-          lineNrStartNumber: 1,
-        };
-        smPromise = SourceMapFromSourceMapSpec(
-          sourceSpecPath,
+        smPromise = readSourceMap(
+          DebugStandard.SourceMapSpec,
           wasmPath,
-          startPositioning,
+          sourceSpecPath,
+          {
+            colNrStartNumber: 0,
+            lineNrStartNumber: 1,
+          },
         );
       } else {
         program.error('At least one debugging format should be opted for');
