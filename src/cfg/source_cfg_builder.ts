@@ -431,8 +431,8 @@ function binaryLiftWasmEdges(
             addEdge(sourceCFGNodeFrom, fromInstr, toSourceCFGNode, toInstr);
           } else if (isWasmInstructionBlockBased(e.instrTo)) {
             // case 2.a
-            throw new Error('case 2.a from -> to (to is Block-based instr)');
-            // continue;
+            // throw new Error('case 2.a from -> to (to is Block-based instr)');
+            continue;
           } else if (
             isCallInstruction(e.instrTo) ||
             isCallIndirect(e.instrTo)
