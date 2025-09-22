@@ -22,7 +22,7 @@ echo Creating arduino_config with directories.user=$ARDUINO_DIR ESCAPED $ARDUINO
 
 mkdir -p $ARDUINO_DIR
 cp $ARDUINO_CONFIG_TEMPLATE $ARDUINO_CONFIG
-sed -i $REPLACE_REGEX $ARDUINO_CONFIG
+sed -i.backup $REPLACE_REGEX $ARDUINO_CONFIG
 
 curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=$ARDUINO_DIR sh
 
