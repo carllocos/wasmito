@@ -12,13 +12,13 @@ ARDUINO_CONFIG=$ARDUINO_DIR/arduino_config.yml
 ARDUINO_CONFIG_TEMPLATE=$(realpath .)/templates/arduino_config.yml.template
 REPLACE_REGEX='s/%USER_PATH/'${ARDUINO_DIR_ESCAPED}/g
 
-echo Installing shared libs in $LIBS_DIR
-echo Installing wasm-tools in $WASM_TOOLS_DIR
+echo "> Installing shared libs in $LIBS_DIR"
+echo "> Installing wasm-tools in $WASM_TOOLS_DIR"
 mkdir -p $WASM_TOOLS_DIR
 cargo binstall wasm-tools -y --root $WASM_TOOLS_DIR
 
-echo Installing Arduino libs in $ARDUINO_DIR
-echo Creating arduino_config with directories.user=$ARDUINO_DIR ESCAPED $ARDUINO_DIR_ESCAPED
+echo "> Installing Arduino libs in $ARDUINO_DIR"
+echo "> Creating arduino_config with directories.user=$ARDUINO_DIR ESCAPED $ARDUINO_DIR_ESCAPED"
 
 mkdir -p $ARDUINO_DIR
 cp $ARDUINO_CONFIG_TEMPLATE $ARDUINO_CONFIG
