@@ -46,6 +46,9 @@ jobs:
     runs-on: self-hosted
     needs: [test-wasmito]
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
       - name: Install and Build Wasmito
         run: |
           echo "Running installation script"
