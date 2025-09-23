@@ -31,7 +31,7 @@ $ARDUINO_CLI lib install "PubSubClient" --config-file $ARDUINO_CONFIG \
 	&& $ARDUINO_CLI lib install --git-url https://github.com/m5stack/M5StickC.git#0.2.9 --config-file $ARDUINO_CONFIG
 
 echo "> WARDuino: fetching submodules"
-if [ ! -d "$ARDUINO_DIR/WARDuino" ]; then
+if [ ! -d "$LIBS_DIR/WARDuino" ]; then
   cd $LIBS_DIR
   echo cloning WARDuino.git
   git clone https://github.com/carllocos/WARDuino.git
