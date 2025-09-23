@@ -3,8 +3,6 @@ name: Lint check
 on:
   workflow_call:
 
-if: false
-
 jobs:
   lint-and-test:
     runs-on: ubuntu-latest
