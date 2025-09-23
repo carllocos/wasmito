@@ -33,26 +33,19 @@ jobs:
         with:
           tool: wasm-tools@1.205.0
 
-      - name: Build submodules
-        run: |
-          echo "Running installation script"
-          bash ./scripts/install.sh
-
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
           node-version: 23
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: build TS
-        run: npx tsc
-
-      - name: yarn install and test
+      - name: Install and Build Wasmito
         run: |
-          yarn 
-          yarn test
+          echo "Running installation script"
+          bash ./scripts/install.sh
+
+      - name: Test Wasmito
+        run: |
+          npm run test
 
   run-bl-cfg-benchmarks:
     runs-on: ubuntu-latest
