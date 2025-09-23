@@ -42,6 +42,19 @@ jobs:
         run: |
           npm run test
 
+  test-wasmito-hooks:
+    runs-on: self-hosted
+    needs: [test-wasmito]
+    steps:
+      - name: Install and Build Wasmito
+        run: |
+          echo "Running installation script"
+          bash ./scripts/install.sh
+
+      - name: Test Hooks on MCU
+        run: |
+          npm run test-hooks
+
   run-bl-cfg-benchmarks:
     runs-on: ubuntu-latest
     needs: [test-wasmito]
