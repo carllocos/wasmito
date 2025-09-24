@@ -68,9 +68,13 @@ export function registerDevicesCommand(program: Command): void {
     .option('--list', 'display all registered devices')
     .action(async (options) => {
       if (!isProjectDirPresent()) {
-        program.error(
-          `There is no project directory defined in the current working directory. First create a project see 'help project'`,
-        );
+        if (options.listFqbns !== undefined) {
+          await listAllFQBN();
+        } else {
+          program.error(
+            `There is no project directory defined in the current working directory. First create a project see 'help project'`,
+          );
+        }
       }
 
       let actionHandled = false;
