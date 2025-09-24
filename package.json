@@ -34,13 +34,13 @@
     "compileCodeExamples": "bash ./scripts/compile_rust_examples.sh",
     "prepack": "npm run build",
     "test-hooks": "npm run build:cjs && npm run hook:test1 && npm run hook:test2 && npm run hook:test3 && npm run hook:test4 && npm run hook:test5 && npm run hook:test6 && npm run hook:test7",
-    "hook:test1": "LogLevel=off ./wasmito_tester/cli.js ./dist/cjs/wasmito_tester/test_examples/test_isr_button/test/test_scenario.cjs",
-    "hook:test2": "LogLevel=off ./wasmito_tester/cli.js ./dist/cjs/wasmito_tester/test_cases/test_around_function.cjs",
-    "hook:test3": "LogLevel=off ./wasmito_tester/cli.js ./dist/cjs/wasmito_tester/test_cases/test_breakpoints.cjs",
-    "hook:test4": "LogLevel=off ./wasmito_tester/cli.js ./dist/cjs/wasmito_tester/test_cases/test_hook_on_error.cjs",
-    "hook:test5": "LogLevel=off ./wasmito_tester/cli.js ./dist/cjs/wasmito_tester/test_cases/test_on_event_handling_hook.cjs",
-    "hook:test6": "LogLevel=off ./wasmito_tester/cli.js ./dist/cjs/wasmito_tester/test_cases/test_on_event_hook.cjs",
-    "hook:test7": "LogLevel=off ./wasmito_tester/cli.js ./dist/cjs/wasmito_tester/test_cases/test_oot.cjs"
+    "hook:test1": "./wasmito_tester/cli.js ./dist/cjs/wasmito_tester/test_examples/test_isr_button/test/test_scenario.cjs",
+    "hook:test2": "./wasmito_tester/cli.js ./dist/cjs/wasmito_tester/test_cases/test_around_function.cjs",
+    "hook:test3": "./wasmito_tester/cli.js ./dist/cjs/wasmito_tester/test_cases/test_breakpoints.cjs",
+    "hook:test4": "./wasmito_tester/cli.js ./dist/cjs/wasmito_tester/test_cases/test_hook_on_error.cjs",
+    "hook:test5": "./wasmito_tester/cli.js ./dist/cjs/wasmito_tester/test_cases/test_on_event_handling_hook.cjs",
+    "hook:test6": "./wasmito_tester/cli.js ./dist/cjs/wasmito_tester/test_cases/test_on_event_hook.cjs",
+    "hook:test7": "./wasmito_tester/cli.js ./dist/cjs/wasmito_tester/test_cases/test_oot.cjs"
   },
   "repository": {
     "type": "git",
