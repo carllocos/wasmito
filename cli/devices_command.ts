@@ -239,6 +239,11 @@ function devicesToStr(devices: DeviceJSON[]): string {
 
 async function listAllFQBN(): Promise<void> {
   const boards = await ArduinoListBoardsFQBNs();
+  if (boards.length === 0) {
+    console.log('No boards installed');
+    return;
+  }
+
   let max = 0;
   for (const b of boards) {
     max = b.boardName.length > max ? b.boardName.length : max;
@@ -247,12 +252,21 @@ async function listAllFQBN(): Promise<void> {
   const bstr = boards.map((b) => {
     let bn = b.boardName;
     if (bn.length < max) {
-      bn = `${bn}${' '.repeat(max - bn.length)}`;
+      let r = max - bn.length;
+      if (r < 0) {
+        r = 1;
+      }
+      bn = `${bn}${' '.repeat(r)}`;
     }
     return `\t${bn}${b.fqbn}`;
   });
   const bnHeader = 'board name';
-  const header = `${bnHeader}${' '.repeat(max - bnHeader.length)}FQBN`;
+
+  let r = max - bnHeader.length;
+  if (r < 0) {
+    r = 1;
+  }
+  const header = `${bnHeader}${' '.repeat(r)}FQBN`;
   console.log(`boards installed:[\n\t${header}\n${bstr.join('\n')}\n]`);
 }
 
