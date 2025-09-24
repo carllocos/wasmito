@@ -108,6 +108,18 @@ export class WasmitoDevVM extends WasmitoBackendVM {
       this.logger.error(`(stderr) ${data}`);
     });
 
+    childProcess.on('exit', (exitCode: number | null) => {
+      if (exitCode !== null && exitCode !== undefined) {
+        if (exitCode > 0) {
+          this.logger.error(`DevVM exited with exitCode ${exitCode}`);
+        } else {
+          this.logger.info(`DevVM exited with exitCode ${exitCode}`);
+        }
+      } else {
+        this.logger.info(`DevVM exited`);
+      }
+    });
+
     const connected = await this.connect(maxWaitTime);
     if (!connected) {
       this.logger.error(
