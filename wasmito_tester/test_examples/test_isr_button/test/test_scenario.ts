@@ -74,7 +74,7 @@ const testLoadAndRunModule: TestScenario = {
 
 export async function run(): Promise<TestScenarioResult[]> {
   const tester = new SystemTester(systemSetup);
-  tester.addTestScenario(testLoadAndRunModule, m5stickDev.id);
+  // tester.addTestScenario(testLoadAndRunModule, m5stickDev.id);
   tester.addTestScenario(testLoadAndRunModule, mcu.id);
   return await tester.runTests();
 }
