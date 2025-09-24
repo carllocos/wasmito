@@ -145,6 +145,11 @@ export async function readFileAsJSON(filePath: string): Promise<any> {
   return JSON.parse(content.toString());
 }
 
+export function readFileAsJSONSync(filePath: string): any {
+  const content: Buffer = fs.readFileSync(filePath);
+  return JSON.parse(content.toString());
+}
+
 export function pathJoin(dirPath: string, otherPath: string): string {
   return path.join(dirPath, otherPath);
 }

@@ -1,7 +1,7 @@
 import {
   createSystemSetup,
+  M5StickCFromJSON,
   oneM5StickCDev,
-  oneM5StickCMCU,
 } from '../../../reausable_system_setups';
 import { SystemTester, type TestScenario } from '../../../system_tester';
 import {
@@ -29,7 +29,7 @@ const postSetupConfigM5Dev: PostSetupConfig = {
 };
 const m5stickDev = oneM5StickCDev('m5StickCDev', postSetupConfigM5Dev);
 m5stickDev.disableStrictModuleLoad = true;
-const mcu = oneM5StickCMCU('m5stickCMCU', postSetupConfigM5Dev);
+const mcu = M5StickCFromJSON('./wasmito_tester/mcus/m5stickc.json');
 
 const systemSetup = createSystemSetup('DevVM', [m5stickDev, mcu]);
 const arg: WasmCompilerArgs = {
