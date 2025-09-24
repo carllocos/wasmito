@@ -1,0 +1,5 @@
+{
+    "name": "m5stickCMCU",
+    "id": "m5stickCMCU",
+    "fqbn": "m5stack:esp32:m5stick-c"
+}
