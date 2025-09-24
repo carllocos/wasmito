@@ -36,7 +36,7 @@ export class ArduinoBuilderError extends Error {
   }
 }
 
-async function runArduinoCommand(command: string): Promise<string> {
+export async function runArduinoCommand(command: string): Promise<string> {
   return await new Promise((resolve, reject) => {
     arduinoLogger.info(`Running command: ${command}`);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
