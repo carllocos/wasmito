@@ -108,19 +108,24 @@ export class WasmitoDevVM extends WasmitoBackendVM {
       this.logger.error(`(stderr) ${data}`);
     });
 
+    let connected = false;
     childProcess.on('exit', (exitCode: number | null) => {
-      if (exitCode !== null && exitCode !== undefined) {
+      if (!connected) {
+        this.logger.error(
+          `VM Process exited before connection established with exitCode ${exitCode}`,
+        );
+      } else if (exitCode !== null && exitCode !== undefined) {
         if (exitCode > 0) {
-          this.logger.error(`DevVM exited with exitCode ${exitCode}`);
+          this.logger.error(`VM Process exited with exitCode ${exitCode}`);
         } else {
-          this.logger.info(`DevVM exited with exitCode ${exitCode}`);
+          this.logger.info(`VM Process exited with exitCode ${exitCode}`);
         }
       } else {
-        this.logger.info(`DevVM exited`);
+        this.logger.info(`VM Process exited with ${exitCode}`);
       }
     });
 
-    const connected = await this.connect(maxWaitTime);
+    connected = await this.connect(maxWaitTime);
     if (!connected) {
       this.logger.error(
         `Failed to connect to local DevelopmentVM at port ${this.platform.config.vmConfig.toolPort}`,
