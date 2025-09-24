@@ -309,6 +309,7 @@ export function getPathArduinoLibsPath(): string {
     }
   }
 
+  // TODO fix here so it becomes optional
   if (sdkPaths.ARDUINO_LIBS === undefined) {
     throw new ProjectConfigError(
       `ARDUINO_LIBS path has not been set. Set it either via env variable ARDUINO_LIBS, or .wasmito/sdk_config.cfg file.`,
