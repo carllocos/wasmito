@@ -52,9 +52,11 @@ async function runArduinoCommand(command: string): Promise<string> {
 export async function ArduinoListBoards(): Promise<string[]> {
   const arduino_cli = getPathArduinoCLI();
   const arduino_config = getPathArduinoConfig();
-  const cmdOutput = await runArduinoCommand(
-    `${arduino_cli} board list --config-file ${arduino_config}`,
-  );
+  let cmd = `${arduino_cli} board list`;
+  if (arduino_config !== undefined) {
+    cmd = `${cmd} --config-file ${arduino_config}`;
+  }
+  const cmdOutput = await runArduinoCommand(cmd);
   const lines = cmdOutput.split('\n');
   if (lines.length === 1) {
     return [];
@@ -71,9 +73,11 @@ export async function ArduinoListBoards(): Promise<string[]> {
 export async function ArduinoListBoardsFQBNs(): Promise<BoardFQBN[]> {
   const arduino_cli = getPathArduinoCLI();
   const arduino_config = getPathArduinoConfig();
-  const cmdOutput = await runArduinoCommand(
-    `${arduino_cli} board listall --config-file ${arduino_config}`,
-  );
+  let cmd = `${arduino_cli} board listall`;
+  if (arduino_config !== undefined) {
+    cmd = `${cmd} --config-file ${arduino_config}`;
+  }
+  const cmdOutput = await runArduinoCommand(cmd);
   const lines = cmdOutput.split('\n');
   if (lines.length === 1) {
     return [];
@@ -121,9 +125,13 @@ export async function ArduinoCompile(
       `BINARY=${wasmBinaryPath}`,
       `DISABLESTRICTMODULELOAD=${disableStrictModuleLoad}`,
       `ARDUINO_CLI=${getPathArduinoCLI()}`,
-      `ARDUINO_CONFIG=${getPathArduinoConfig()}`,
       `ARDUINO_LIBS=${getPathArduinoLibsPath()}`,
     ];
+
+    const arduinoConfig = getPathArduinoConfig();
+    if (arduinoConfig !== undefined) {
+      makeArgs.push(`ARDUINO_CONFIG=${arduinoConfig}`);
+    }
 
     if (paused) {
       makeArgs.push('PAUSED=true');

@@ -286,7 +286,7 @@ export function getPathArduinoCLI(): string {
   return `${sdkPaths.ARDUINO_CLI}`;
 }
 
-export function getPathArduinoConfig(): string {
+export function getPathArduinoConfig(): string | undefined {
   if (sdkPaths.ARDUINO_CONFIG === undefined) {
     sdkPaths.ARDUINO_CONFIG = process.env.ARDUINO_CONFIG;
     if (sdkPaths.ARDUINO_CONFIG !== undefined) {
@@ -296,13 +296,7 @@ export function getPathArduinoConfig(): string {
     }
   }
 
-  if (sdkPaths.ARDUINO_CONFIG === undefined) {
-    throw new ProjectConfigError(
-      `ARDUINO_CONFIG path has not been set. Set it either via env variable ARDUINO_CONFIG, or .wasmito/sdk_config.cfg file.`,
-    );
-  }
-
-  return `${sdkPaths.ARDUINO_CONFIG}`;
+  return sdkPaths.ARDUINO_CONFIG;
 }
 
 export function getPathArduinoLibsPath(): string {
