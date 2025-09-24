@@ -70,6 +70,7 @@ export function registerDevicesCommand(program: Command): void {
       if (!isProjectDirPresent()) {
         if (options.listFqbns !== undefined) {
           await listAllFQBN();
+          return;
         } else {
           program.error(
             `There is no project directory defined in the current working directory. First create a project see 'help project'`,
