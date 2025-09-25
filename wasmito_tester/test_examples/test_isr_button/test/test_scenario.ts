@@ -44,7 +44,7 @@ const wasmPath = path.resolve(
 const SCFGs = loadSourceCFGs(wasmPath, mappingsPath);
 const node = NodeFromLocation(SCFGs, {
   linenr: 27,
-  colnr: 2,
+  colnr: -1,
   address: 0,
   source: '',
   name: '',
