@@ -196,7 +196,7 @@ function cleanSourcePath(
   if (config.prefixSources !== undefined) {
     cleanedSource = pathJoin(config.prefixSources, source);
   }
-  cleanedSource = config.srcToAbsPath?.get(cleanedSource) ?? source;
+  cleanedSource = config.srcToAbsPath?.get(cleanedSource) ?? cleanedSource;
 
   const ignore = config.ignoreDirectories?.find((d) =>
     cleanedSource.startsWith(d),
