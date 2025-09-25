@@ -142,10 +142,14 @@ export class SourceMap {
       `#${candidates.length} candidates for SourceLoc {${location.source}, ${location.linenr}, ${location.colnr}}`,
     );
 
-    for (const c of candidates) {
-      const colStart = location.colnr;
-      if (colStart === c.colnr) {
-        positions.push(c);
+    if (location.colnr < 0) {
+      candidates.forEach((c) => positions.push(c));
+    } else {
+      for (const c of candidates) {
+        const colStart = location.colnr;
+        if (colStart === c.colnr) {
+          positions.push(c);
+        }
       }
     }
 
