@@ -299,26 +299,6 @@ export function getPathArduinoConfig(): string | undefined {
   return sdkPaths.ARDUINO_CONFIG;
 }
 
-export function getPathArduinoLibsPath(): string {
-  if (sdkPaths.ARDUINO_LIBS === undefined) {
-    sdkPaths.ARDUINO_LIBS = process.env.ARDUINO_LIBS;
-    if (sdkPaths.ARDUINO_LIBS !== undefined) {
-      sdkPaths.ARDUINO_LIBS = `${sdkPaths.ARDUINO_LIBS}`;
-    } else {
-      loadSDKConfig();
-    }
-  }
-
-  // TODO fix here so it becomes optional
-  if (sdkPaths.ARDUINO_LIBS === undefined) {
-    throw new ProjectConfigError(
-      `ARDUINO_LIBS path has not been set. Set it either via env variable ARDUINO_LIBS, or .wasmito/sdk_config.cfg file.`,
-    );
-  }
-
-  return `${sdkPaths.ARDUINO_LIBS}`;
-}
-
 export function getPathWasmTools(): string {
   if (sdkPaths.WASM_TOOLS === undefined) {
     sdkPaths.WASM_TOOLS = process.env.WASM_TOOLS;

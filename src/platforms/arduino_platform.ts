@@ -20,11 +20,7 @@ import { type BoardBaudRate, isSerialPort } from '../util/serial_port';
 import { copyFile, writeFileSync } from 'fs';
 import { type VMConfiguration } from '../device';
 import { wasmStripCustomSection } from '../wasm-tools/wasm_strip';
-import {
-  getPathArduinoCLI,
-  getPathArduinoConfig,
-  getPathArduinoLibsPath,
-} from '../project_config';
+import { getPathArduinoCLI, getPathArduinoConfig } from '../project_config';
 
 const arduinoLogger = createLogger('Arduino');
 
@@ -125,7 +121,6 @@ export async function ArduinoCompile(
       `BINARY=${wasmBinaryPath}`,
       `DISABLESTRICTMODULELOAD=${disableStrictModuleLoad}`,
       `ARDUINO_CLI=${getPathArduinoCLI()}`,
-      `ARDUINO_LIBS=${getPathArduinoLibsPath()}`,
     ];
 
     const arduinoConfig = getPathArduinoConfig();
