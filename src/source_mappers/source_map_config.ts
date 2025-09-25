@@ -12,6 +12,7 @@ export interface SourceMapConfig {
   cleanMappings?: boolean; // rename to removeUnusedMappings
   colNrStartNumber?: number;
   lineNrStartNumber?: number;
+  newWasmPath?: string;
 }
 
 export async function readSourceMapConfig(
@@ -80,6 +81,16 @@ export async function readSourceMapConfig(
     const msg = 'SourceMapConfig: Start Column Number is not a number';
     logger.error(msg);
     throw new Error(msg);
+  }
+
+  const newWasmPath = rebase.newWasmPath;
+  if (newWasmPath !== undefined) {
+    if (typeof newWasmPath !== 'string') {
+      const msg = 'SourceMapConfig: `newWasmPath` is expected to be a string';
+      logger.error(msg);
+      throw new Error(msg);
+    }
+    config.newWasmPath = newWasmPath;
   }
 
   return config;

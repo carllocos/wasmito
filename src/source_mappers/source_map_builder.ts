@@ -87,11 +87,12 @@ function cleanSourceMapJSON(
   config?: SourceMapConfig,
 ): SourceMapJSON {
   let module: undefined | WasmModule;
+  const wasmPath = config?.newWasmPath ?? sourceMap.wasm;
   if (config?.cleanMappings !== undefined && config.cleanMappings) {
-    module = new WasmModule(sourceMap.wasm);
+    module = new WasmModule(wasmPath);
   }
   return {
-    wasm: sourceMap.wasm,
+    wasm: wasmPath,
     // convert to set to remove duplicates
     sources: cleanSources(Array.from(new Set(sourceMap.sources)), config),
     mappings: cleanMappings(sourceMap.mappings, config, module),
