@@ -1,3 +1,4 @@
+import path from 'path';
 import {
   createSystemSetup,
   M5StickCFromJSON,
@@ -19,6 +20,7 @@ import {
 } from '../../../reusable_actions';
 import { Breakpoint } from '../../../../src/debugger/breakpoint';
 import { type WasmCompilerArgs } from '../../../../src/compilers/wasm_compiler';
+import { loadSourceCFGs, NodeFromLocation } from '../../../util_scfgs';
 
 /**
  * Device Config
@@ -32,16 +34,31 @@ m5stickDev.disableStrictModuleLoad = true;
 const mcu = M5StickCFromJSON('./wasmito_tester/mcus/m5stickc.json');
 
 const systemSetup = createSystemSetup('DevVM', [m5stickDev, mcu]);
+const mappingsPath = path.resolve(
+  './wasmito_tester/test_examples/test_isr_button/wasm/isr_mappings.json',
+);
+const wasmPath = path.resolve(
+  './wasmito_tester/test_examples/test_isr_button/wasm/main.wasm',
+);
+
 const arg: WasmCompilerArgs = {
-  wasmPath: './wasmito_tester/test_examples/test_isr_button/wasm/main.wasm',
-  mappingsJSON:
-    './wasmito_tester/test_examples/test_isr_button/wasm/isr_mappings.json',
+  wasmPath: wasmPath,
+  mappingsJSON: mappingsPath,
 };
 
 const program: TestProgram = {
   targetLanguage: TargetLanguage.Wasm,
   sourceCodeCompilationArgs: arg,
 };
+
+const SCFGs = loadSourceCFGs(wasmPath, mappingsPath);
+const node = NodeFromLocation(SCFGs, {
+  linenr: 27,
+  colnr: 2,
+  address: 0,
+  source: '',
+  name: '',
+});
 
 const ButtonPin = 39;
 const subscriptionID = 'break on linenr 27 col 2';
@@ -51,13 +68,7 @@ const testLoadAndRunModule: TestScenario = {
   actions: [
     addBreakpointSubscription(
       subscriptionID,
-      new Breakpoint({
-        linenr: 27,
-        colnr: 2,
-        address: 0,
-        source: '',
-        name: '',
-      }),
+      new Breakpoint(node.sourceLocation),
     ),
     runVMAction(),
     PauseAction(undefined, 3000),
