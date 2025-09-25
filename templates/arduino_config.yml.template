@@ -5,5 +5,8 @@ board_manager:
 directories:
   data: %USER_PATH
   user: %USER_PATH
+  builtin:
+    libraries: %VM_LIB
+
 library:
   enable_unsafe_install: true
