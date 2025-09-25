@@ -197,6 +197,14 @@ export class SourceMap {
     };
     StoreMappingsToJSON(filePath, sm, onlyExistingSource);
   }
+
+  toSourceMapJSON(): SourceMapJSON {
+    return {
+      wasm: this._wasmPath,
+      sources: this._sources,
+      mappings: this._mappings,
+    };
+  }
 }
 
 export function StoreMappingsToJSON(
