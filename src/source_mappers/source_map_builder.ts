@@ -88,7 +88,10 @@ function cleanSourceMapJSON(
 ): SourceMapJSON {
   let module: undefined | WasmModule;
   const wasmPath = config?.newWasmPath ?? sourceMap.wasm;
-  if (config?.cleanMappings !== undefined && config.cleanMappings) {
+  if (
+    config?.removeUnusedMappings !== undefined &&
+    config.removeUnusedMappings
+  ) {
     module = new WasmModule(wasmPath);
   }
   return {

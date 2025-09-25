@@ -26,7 +26,7 @@ export function createSourceMapForWAT(
   return SourceMapFromJSON(sm, {
     colNrStartNumber: DefaultColumnStartNumber,
     lineNrStartNumber: DefaultLineStartNumber,
-    cleanMappings: true,
+    removeUnusedMappings: true,
   });
 }
 

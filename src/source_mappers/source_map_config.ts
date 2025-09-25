@@ -9,7 +9,7 @@ export interface SourceMapConfig {
   srcToAbsPath?: Map<string, string>;
   ignoreDirectories?: string[];
   prefixSources?: string;
-  cleanMappings?: boolean; // rename to removeUnusedMappings
+  removeUnusedMappings?: boolean;
   colNrStartNumber?: number;
   lineNrStartNumber?: number;
   newWasmPath?: string;

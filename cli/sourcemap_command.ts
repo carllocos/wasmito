@@ -89,7 +89,7 @@ export function registerSourceMapCommand(program: Command): void {
         }
         config = await readSourceMapConfig(options.rebaseLocations);
       }
-      config.cleanMappings = options.disableClean === undefined;
+      config.removeUnusedMappings = options.disableClean === undefined;
 
       const kindDebuggingFormat =
         options.dwarf !== undefined
