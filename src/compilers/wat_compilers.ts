@@ -163,7 +163,7 @@ export class WATCompiler extends SourceCodeCompiler {
     if (isFilePath(objDumpDissembleOutputFile)) {
       removeFile(objDumpDissembleOutputFile);
     }
-    const sm = await createSourceMapForWAT(
+    const sm = createSourceMapForWAT(
       lineInfoPairs,
       sourceCodePath,
       wasmOutputFilePath,

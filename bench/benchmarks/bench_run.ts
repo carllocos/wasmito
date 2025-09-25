@@ -31,7 +31,7 @@ async function bench(): Promise<void> {
     if (bench.skip) {
       continue;
     }
-    const sourceMap = await SourceMapFromJSON(bench.mappings);
+    const sourceMap = SourceMapFromJSON(bench.mappings);
     const serialPort = '/dev/cu.usbserial-8952FFEE8B';
     const fqbn = 'm5stack:esp32:m5stick-c';
     const baudrate = 115200;

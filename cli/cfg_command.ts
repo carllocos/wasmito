@@ -14,7 +14,7 @@ import {
 import { constructLanguageAdaptor } from '../src/language_adaptors/language_adaptor';
 import { timeoutPromise } from '../src/util/promise_util';
 import { getGlobalLogger } from '../src/logger/logger';
-import { type SourceMap } from '../src/source_mappers/source_map';
+import { SourceMap } from '../src/source_mappers/source_map';
 import { CoarseGrainedSourceCFGraph } from '../src/cfg/source_cfg_coarse';
 import { mkdirSync } from 'fs';
 
@@ -90,7 +90,7 @@ export function registerCFGCommand(program: Command): void {
       const wasmitoPath = options.wasmitoJson;
       const dwarfPath = options.dwarf;
       const sourceSpecPath = options.sourceSpec;
-      let smPromise: Promise<SourceMap> | undefined;
+      let smPromise: Promise<SourceMap> | SourceMap | undefined;
 
       if (wasmitoPath !== undefined) {
         if (!isFilePath(wasmitoPath)) {
@@ -121,7 +121,10 @@ export function registerCFGCommand(program: Command): void {
       try {
         logger.info(`Parsing Wasm Module`);
         const startTimeParse = Date.now();
-        const sm = await timeoutPromise(smPromise, timeoutMs);
+        const sm =
+          smPromise instanceof SourceMap
+            ? smPromise
+            : await timeoutPromise(smPromise, timeoutMs);
         const endTimeParse = Date.now();
         const diffParse = endTimeParse - startTimeParse;
         logger.info(

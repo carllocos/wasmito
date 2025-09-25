@@ -11,11 +11,11 @@ import {
   DefaultLineStartNumber,
 } from '../source_map_config';
 
-export async function createSourceMapForWAT(
+export function createSourceMapForWAT(
   lines: LineInfoPairs[],
   sourcePath: string,
   wasmPath: string,
-): Promise<SourceMap> {
+): SourceMap {
   const mappings = createWAT2WASMMappings(sourcePath, lines);
   const sourceLocations = mappings.map(mappingItemToSourceCodeLocation);
   const sm: SourceMapJSON = {
@@ -23,7 +23,7 @@ export async function createSourceMapForWAT(
     sources: [sourcePath],
     mappings: sourceLocations,
   };
-  return await SourceMapFromJSON(sm, {
+  return SourceMapFromJSON(sm, {
     colNrStartNumber: DefaultColumnStartNumber,
     lineNrStartNumber: DefaultLineStartNumber,
     cleanMappings: true,

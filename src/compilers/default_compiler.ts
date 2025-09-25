@@ -67,7 +67,7 @@ export class DefaultCompiler extends SourceCodeCompiler {
     this._lastCompileArgs = compilerArgs;
     let sm: SourceMap | undefined;
     if (compilerArgs.pathToJsonMap !== undefined) {
-      sm = await SourceMapFromJSON(compilerArgs.pathToJsonMap);
+      sm = SourceMapFromJSON(compilerArgs.pathToJsonMap);
     } else {
       let standard = DebugStandard.DWARF;
       let debugInfo = compilerArgs.pathToWasm;

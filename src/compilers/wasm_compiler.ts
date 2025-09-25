@@ -63,7 +63,7 @@ export class WasmCompiler extends SourceCodeCompiler {
     this._lastCompileArgs = parseWasmArgs(compilerArgs);
     const sm =
       this._lastCompileArgs.mappingsJSON !== undefined
-        ? await SourceMapFromJSON(this._lastCompileArgs.mappingsJSON)
+        ? SourceMapFromJSON(this._lastCompileArgs.mappingsJSON)
         : new SourceMap(this._lastCompileArgs.wasmPath, [], []);
     return await constructLanguageAdaptor(sm);
   }

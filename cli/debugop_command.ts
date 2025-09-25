@@ -14,7 +14,7 @@ import { timeoutPromise } from '../src/util/promise_util';
 import { getGlobalLogger } from '../src/logger/logger';
 import {
   sourceCodeLocationToString,
-  type SourceMap,
+  SourceMap,
 } from '../src/source_mappers/source_map';
 import { DebugOperationFromName } from '../src/language_adaptors/debug_operations';
 import { type SourceCFGNode } from '../src/cfg/source_cfg';
@@ -150,7 +150,7 @@ export function registerDebugOpCommand(program: Command): void {
         );
       }
 
-      let smPromise: Promise<SourceMap> | undefined;
+      let smPromise: Promise<SourceMap> | SourceMap | undefined;
       if (wasmitoPath !== undefined) {
         wasmitoPath = getAbsolutePath(wasmitoPath);
         smPromise = SourceMapFromJSON(wasmitoPath);
@@ -173,7 +173,10 @@ export function registerDebugOpCommand(program: Command): void {
       try {
         logger.info(`Parsing Wasm Module`);
         const startTimeParse = Date.now();
-        const sm = await timeoutPromise(smPromise, timeoutMs);
+        const sm =
+          smPromise instanceof SourceMap
+            ? smPromise
+            : await timeoutPromise(smPromise!, timeoutMs);
         const endTimeParse = Date.now();
         const diffParse = endTimeParse - startTimeParse;
         logger.info(

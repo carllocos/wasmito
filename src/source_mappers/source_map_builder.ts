@@ -6,7 +6,7 @@ import {
   sourceCodeLocationToString,
 } from './source_map';
 import { createLogger } from '../logger/logger';
-import { isFilePath, pathJoin, readFileAsJSON } from '../util/file_util';
+import { isFilePath, pathJoin, readFileAsJSONSync } from '../util/file_util';
 import { WasmModule } from '../webassembly/wasm/wasm_module';
 import { ReadDWARFMappings } from './debug_standards/dwarf_reader';
 import { SourceMapConfig } from './source_map_config';
@@ -42,7 +42,7 @@ export async function readSourceMapJSON(
     throw new Error(`Could not construct SourceMapJSON from ${standard}`);
   }
 
-  return await cleanSourceMapJSON(sourceMapJSON, config);
+  return cleanSourceMapJSON(sourceMapJSON, config);
 }
 export async function readSourceMap(
   standard: DebugStandard,
@@ -59,13 +59,13 @@ export async function readSourceMap(
   return new SourceMap(sm.wasm, sm.sources, sm.mappings);
 }
 
-export async function SourceMapFromJSON(
+export function SourceMapFromJSON(
   jsonPath: string | SourceMapJSON,
   config?: SourceMapConfig,
-): Promise<SourceMap> {
+): SourceMap {
   let sm: SourceMapJSON | undefined = undefined;
   if (typeof jsonPath === 'string') {
-    const content = await readFileAsJSON(jsonPath);
+    const content = readFileAsJSONSync(jsonPath);
     if (!isSourceMapJSON(content)) {
       throw new Error(
         `${jsonPath} does not satisfy the expected SourceMapJSON interface`,
@@ -76,16 +76,16 @@ export async function SourceMapFromJSON(
     sm = jsonPath;
   }
   if (config !== undefined) {
-    sm = await cleanSourceMapJSON(sm, config);
+    sm = cleanSourceMapJSON(sm, config);
   }
 
   return new SourceMap(sm.wasm, sm.sources, sm.mappings);
 }
 
-async function cleanSourceMapJSON(
+function cleanSourceMapJSON(
   sourceMap: SourceMapJSON,
   config?: SourceMapConfig,
-): Promise<SourceMapJSON> {
+): SourceMapJSON {
   let module: undefined | WasmModule;
   if (config?.cleanMappings !== undefined && config.cleanMappings) {
     module = new WasmModule(sourceMap.wasm);
