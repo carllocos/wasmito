@@ -1,8 +1,8 @@
 import { type WasmState } from '../../src/webassembly/wasm';
 import {
   createSystemSetup,
+  M5StickCFromJSON,
   oneM5StickCDev,
-  oneM5StickCMCU,
 } from '../reausable_system_setups';
 import { SystemTester, type TestScenario } from '../system_tester';
 import {
@@ -37,7 +37,7 @@ const program: TestProgram = {
 };
 
 // hardware m5stick C
-const m5stickcMCU = oneM5StickCMCU('1');
+const m5stickcMCU = M5StickCFromJSON('./wasmito_tester/mcus/m5stickc.json');
 
 // Dev m5stick C
 const postSetupConfigM5Dev: PostSetupConfig = {
@@ -152,7 +152,9 @@ export async function run(): Promise<TestScenarioResult[]> {
   // or changing the test order succeeds both test
   // for now skipping test SingleBP
   const tester = new SystemTester(systemSetup);
-  tester.addTestScenario(normalBP, m5stickDev.id);
-  tester.addTestScenario(singleStopBp, m5stickDev.id);
+  // tester.addTestScenario(normalBP, m5stickDev.id);
+  // tester.addTestScenario(singleStopBp, m5stickDev.id);
+  tester.addTestScenario(normalBP, m5stickcMCU.id);
+  tester.addTestScenario(singleStopBp, m5stickcMCU.id);
   return await tester.runTests();
 }

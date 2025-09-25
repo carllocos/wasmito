@@ -1,8 +1,8 @@
 import { type WasmState, type WASM } from '../../src/webassembly/wasm';
 import {
   createSystemSetup,
+  M5StickCFromJSON,
   oneM5StickCDev,
-  oneM5StickCMCU,
 } from '../reausable_system_setups';
 import { SystemTester, type TestScenario } from '../system_tester';
 import {
@@ -57,8 +57,7 @@ const program: TestProgram = {
 };
 
 // hardware m5stick C
-const m5stickcMCU = oneM5StickCMCU('1');
-
+const m5stickcMCU = M5StickCFromJSON('./wasmito_tester/mcus/m5stickc.json');
 // Dev m5stick C
 const postSetupConfigM5Dev: PostSetupConfig = {
   pauseAfterSetup: true,
@@ -208,7 +207,11 @@ export async function run(): Promise<TestScenarioResult[]> {
   const tester = new SystemTester(systemSetup);
 
   // testHookOnDevScenario fails event is oonhandledEventSubscription
-  tester.addTestScenario(testHookOnDevScenario, m5stickDev.id);
+  // tester.addTestScenario(testHookOnDevScenario, m5stickDev.id);
+  // tester.addTestScenario(testHookOnMCUScenario, m5stickcMCU.id);
+  // tester.addTestScenario(testHookOnMCUScenario2, m5stickcMCU.id);
+
+  tester.addTestScenario(testHookOnDevScenario, m5stickcMCU.id);
   tester.addTestScenario(testHookOnMCUScenario, m5stickcMCU.id);
   tester.addTestScenario(testHookOnMCUScenario2, m5stickcMCU.id);
 

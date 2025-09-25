@@ -1,4 +1,8 @@
-import { createSystemSetup, oneM5StickCDev } from '../reausable_system_setups';
+import {
+  createSystemSetup,
+  M5StickCFromJSON,
+  oneM5StickCDev,
+} from '../reausable_system_setups';
 import { SystemTester, type TestScenario } from '../system_tester';
 import {
   registerFuncForProxyCallAction,
@@ -32,9 +36,10 @@ const program: TestProgram = {
 // Dev m5stick C
 
 const m5stickDev = oneM5StickCDev('2');
-
-const systemSetup = createSystemSetup('System with one M5StickCDev', [
+const mcu = M5StickCFromJSON('./wasmito_tester/mcus/m5stickc.json');
+const systemSetup = createSystemSetup('System Dev and MCU M5StickC', [
   m5stickDev,
+  mcu,
 ]);
 /*
  * Test Cases
@@ -85,7 +90,9 @@ const testFailUnregisterProxyCall: TestScenario = {
 // m5stickDev.target = Target.devExternal;
 export async function run(): Promise<TestScenarioResult[]> {
   const tester = new SystemTester(systemSetup);
-  tester.addTestScenario(testRegisterProxyCall, m5stickDev.id);
-  tester.addTestScenario(testFailUnregisterProxyCall, m5stickDev.id);
+  // tester.addTestScenario(testRegisterProxyCall, m5stickDev.id);
+  // tester.addTestScenario(testFailUnregisterProxyCall, m5stickDev.id);
+  tester.addTestScenario(testRegisterProxyCall, mcu.id);
+  tester.addTestScenario(testFailUnregisterProxyCall, mcu.id);
   return await tester.runTests();
 }

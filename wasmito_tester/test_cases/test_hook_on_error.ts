@@ -1,4 +1,8 @@
-import { createSystemSetup, oneM5StickCDev } from '../reausable_system_setups';
+import {
+  createSystemSetup,
+  M5StickCFromJSON,
+  oneM5StickCDev,
+} from '../reausable_system_setups';
 import { SystemTester, type TestScenario } from '../system_tester';
 import { createOnErrorActionEmitter, runVMAction } from '../reusable_actions';
 import { type WasmState } from '../../src/webassembly';
@@ -32,9 +36,12 @@ const program: TestProgram = {
 
 const m5stickDev = oneM5StickCDev('2');
 
+// MCU m5stick C
+const m5stickcMCU = M5StickCFromJSON('./wasmito_tester/mcus/m5stickc.json');
+
 const systemSetup = createSystemSetup(
   'System with M5stickCMCU and one M5StickCDev',
-  [m5stickDev],
+  [m5stickDev, m5stickcMCU],
 );
 
 /*
@@ -72,6 +79,7 @@ export async function run(): Promise<TestScenarioResult[]> {
   // m5stickDev.toolPort = 8300;
   // m5stickDev.target = Target.devExternal;
   const tester = new SystemTester(systemSetup);
-  tester.addTestScenario(testAddHookOnError, m5stickDev.id);
+  //tester.addTestScenario(testAddHookOnError, m5stickDev.id);
+  tester.addTestScenario(testAddHookOnError, m5stickcMCU.id);
   return await tester.runTests();
 }

@@ -1,8 +1,8 @@
 import { type WASM } from '../../src/webassembly/wasm';
 import {
   createSystemSetup,
+  M5StickCFromJSON,
   oneM5StickCDev,
-  oneM5StickCMCU,
 } from '../reausable_system_setups';
 import { SystemTester, type TestScenario } from '../system_tester';
 import {
@@ -54,15 +54,14 @@ const getBrightness: SourceCodeLocation = {
   name: '',
 };
 
-const psM5StickCMCU: PostSetupConfig = {
+const m5stickcMCU = M5StickCFromJSON('./wasmito_tester/mcus/m5stickc.json');
+m5stickcMCU.postSetup = {
   pauseAfterSetup: true,
   actions: [
     addBPAndRunUntil(getBrightness, 5000),
     removeBPAt(getBrightness, 3000),
   ],
 };
-
-const m5stickcMCU = oneM5StickCMCU('1', psM5StickCMCU);
 
 const postSetupConfigM5Dev: PostSetupConfig = {
   pauseAfterSetup: true,
@@ -166,10 +165,14 @@ const testRemoteCallPrimitiveDelayVM: TestScenario = {
 
 export async function run(): Promise<void> {
   const tester = new SystemTester(systemSetup);
-  tester.addTestScenario(testHookScenario, m5stickDev.id);
-  tester.addTestScenario(testAddEvent, m5stickDev.id);
-  tester.addTestScenario(testPrimitiveDelayVM, m5stickDev.id);
-  tester.addTestScenario(testRemoteCallPrimitiveDelayVM, m5stickDev.id);
+  // tester.addTestScenario(testHookScenario, m5stickDev.id);
+  // tester.addTestScenario(testAddEvent, m5stickDev.id);
+  // tester.addTestScenario(testPrimitiveDelayVM, m5stickDev.id);
+  // tester.addTestScenario(testRemoteCallPrimitiveDelayVM, m5stickDev.id);
+  tester.addTestScenario(testHookScenario, m5stickcMCU.id);
+  tester.addTestScenario(testAddEvent, m5stickcMCU.id);
+  tester.addTestScenario(testPrimitiveDelayVM, m5stickcMCU.id);
+  tester.addTestScenario(testRemoteCallPrimitiveDelayVM, m5stickcMCU.id);
   tester.addTestScenario(testHookScenario, m5stickcMCU.id); // fails leads to a block stack underflow Warduino.cpp:236
   await tester.runTests();
 }
