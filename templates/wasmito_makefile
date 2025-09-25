@@ -42,7 +42,11 @@ endif
 ifndef FQBN
 	$(error FQBN is not set. Use a .config file)
 endif
+ifndef ARDUINO_CONFIG 
 	arduino-cli upload -p $(PORT) --fqbn $(FQBN) Arduino.ino
+else
+	arduino-cli upload -p $(PORT) --fqbn $(FQBN) --config-file $(ARDUINO_CONFIG) Arduino.ino
+endif
 
 compile: Arduino.ino
 ifndef FQBN
