@@ -41,16 +41,6 @@ const wasmPath = path.resolve(
   './wasmito_tester/test_examples/test_isr_button/wasm/main.wasm',
 );
 
-const arg: WasmCompilerArgs = {
-  wasmPath: wasmPath,
-  mappingsJSON: mappingsPath,
-};
-
-const program: TestProgram = {
-  targetLanguage: TargetLanguage.Wasm,
-  sourceCodeCompilationArgs: arg,
-};
-
 const SCFGs = loadSourceCFGs(wasmPath, mappingsPath);
 const node = NodeFromLocation(SCFGs, {
   linenr: 27,
@@ -59,6 +49,16 @@ const node = NodeFromLocation(SCFGs, {
   source: '',
   name: '',
 });
+
+const arg: WasmCompilerArgs = {
+  wasmPath: wasmPath,
+  mappingsJSON: SCFGs.sourceMap.toSourceMapJSON(),
+};
+
+const program: TestProgram = {
+  targetLanguage: TargetLanguage.Wasm,
+  sourceCodeCompilationArgs: arg,
+};
 
 const ButtonPin = 39;
 const subscriptionID = 'break on linenr 27 col 2';
