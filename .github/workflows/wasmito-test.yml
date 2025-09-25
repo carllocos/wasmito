@@ -69,6 +69,11 @@ jobs:
           echo "Running installation script"
           bash ./scripts/install.sh
 
+      - name: Install M5StickC dependency
+        run: |
+          echo "Running installation script M5StickC"
+          bash ./scripts/install_arduino_m5stickc.sh
+
       - name: Test Hooks on MCU
         run: |
           npm run test-hooks
