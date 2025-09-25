@@ -11,6 +11,7 @@ ARDUINO_CLI=$ARDUINO_DIR/arduino-cli
 ARDUINO_CONFIG=$ARDUINO_DIR/arduino_config.yml
 ARDUINO_CONFIG_TEMPLATE=$(realpath .)/templates/arduino_config.yml.template
 REPLACE_REGEX='s/%USER_PATH/'${ARDUINO_DIR_ESCAPED}/g
+WASMITO_MAKEFILE_TEMPLATE=$(realpath .)/templates/wasmito_makefile
 
 echo "> Installing shared libs in $LIBS_DIR"
 echo "> Installing wasm-tools in $WASM_TOOLS_DIR"
@@ -23,6 +24,8 @@ echo "> Creating arduino_config with directories.user=$ARDUINO_DIR ESCAPED $ARDU
 mkdir -p $ARDUINO_DIR
 cp $ARDUINO_CONFIG_TEMPLATE $ARDUINO_CONFIG
 sed -i.backup $REPLACE_REGEX $ARDUINO_CONFIG
+LIBS_DIR_ESCAPED=$(echo "$LIBS_DIR" | sed 's:/:\\/:g')
+sed -i.backup 's/%VM_LIB/'${LIBS_DIR_ESCAPED}/g $ARDUINO_CONFIG
 
 curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=$ARDUINO_DIR sh
 
@@ -46,6 +49,10 @@ mkdir -p build-emu
 cd build-emu
 cmake .. . -DBUILD_EMULATOR=ON
 make
+
+echo "> WARDuino: tmp copy makefile"
+rm $LIBS_DIR/WARDuino/platforms/Arduino/Makefile
+cp $WASMITO_MAKEFILE_TEMPLATE $LIBS_DIR/WARDuino/platforms/Arduino/Makefile
 
 echo "> WABT: fetching submodules"
 if [ ! -d "$LIBS_DIR/wabt" ]; then
