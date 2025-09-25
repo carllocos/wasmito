@@ -174,19 +174,21 @@ export async function ArduinoFlash(
   fqbn: string,
 ): Promise<number> {
   return await new Promise<number>((resolve, reject) => {
-    const flash = spawn(
-      'make',
-      [
-        'flash',
-        `PORT=${port}`,
-        `FQBN=${fqbn}`,
-        `ARDUINO_CLI=${getPathArduinoCLI()}`,
-        `ARDUINO_CONFIG=${getPathArduinoConfig()}`,
-      ],
-      {
-        cwd: pathToArduinoSketch,
-      },
-    );
+    const makeArgs = ['flash', `PORT=${port}`, `FQBN=${fqbn}`];
+
+    const arduinoLib = getPathArduinoCLI();
+    if (arduinoLib !== undefined) {
+      makeArgs.push(`ARDUINO_CLI=${arduinoLib}`);
+    }
+
+    const arduinoConfig = getPathArduinoConfig();
+    if (arduinoConfig !== undefined) {
+      makeArgs.push(`ARDUINO_CONFIG=${arduinoConfig}`);
+    }
+
+    const flash = spawn('make', makeArgs, {
+      cwd: pathToArduinoSketch,
+    });
     flash.stdout.on('data', (data) => {
       const d = data.toString();
       arduinoLogger.debug(d);
