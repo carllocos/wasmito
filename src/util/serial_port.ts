@@ -22,6 +22,7 @@ export function isValidBoardBaudRate(value: any): value is BoardBaudRate {
 
 export function isSerialPort(port: string): boolean {
   // TODO use env OS info
-  const unixPattern = /^(\/dev\/ttyS\w+|\/dev\/ttyUSB\w+)$/i;
+  // const unixPattern = /^(\/dev\/ttyS\w+|\/dev\/ttyUSB[0-9]+)$/i;
+  const unixPattern = /^(\/dev\/ttyUSB[0-9]+)$/i;
   return unixPattern.test(port) || port.startsWith('/dev/cu.usbserial-');
 }
