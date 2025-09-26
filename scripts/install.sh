@@ -41,9 +41,12 @@ if [ ! -d "$LIBS_DIR/WARDuino" ]; then
   echo cloning WARDuino.git
   git clone https://github.com/carllocos/WARDuino.git
 fi
+echo "listings libs"
+ls $LIBS_DIR
 echo "updating WARDuino"
 echo "PWD: $(pwd)"
 cd $LIBS_DIR/WARDuino
+echo "PWD: $(pwd)"
 git fetch
 git checkout main
 git submodule update --init
