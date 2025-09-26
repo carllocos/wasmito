@@ -392,10 +392,9 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
       mappings = sm.getOriginalPositionFor(sourceCodeLocation.address);
     }
     if (mappings.length === 0) {
-      mappings = sm.getOriginalPositionFor(sourceCodeLocation.address);
+      mappings = sm.generatedPositionFor(sourceCodeLocation);
     }
 
-    sm.generatedPositionFor(sourceCodeLocation);
     if (mappings.length !== 0) {
       addr = mappings[0].address;
     } else {
