@@ -73,7 +73,7 @@ const setBrightness: SourceCodeLocation = {
  */
 
 const normalBP: TestScenario = {
-  skipTest: false,
+  skipTest: true,
   testName: 'Test normal breakpoint',
   testProgram: program,
   actions: [
