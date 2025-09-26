@@ -36,6 +36,7 @@ $ARDUINO_CLI lib install "PubSubClient" --config-file $ARDUINO_CONFIG \
 echo "> WARDuino: fetching submodules"
 echo "LIBS_DIR: $LIBS_DIR"
 WARDUINO_DIR="$LIBS_DIR/WARDuino"
+echo "checking if dir exists: $WARDUINO_DIR"
 if [ ! -d "$WARDUINO_DIR" ]; then
   echo changing dir to $LIBS_DIR
   cd $LIBS_DIR
