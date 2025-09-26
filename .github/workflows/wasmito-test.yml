@@ -50,20 +50,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # - name: Install Rust v1.76.0
-      #   uses: actions-rust-lang/setup-rust-toolchain@v1
-      #   with:
-      #     toolchain: stable, 1.76.0
-      #     target: wasm32-unknown-unknown
+      - name: Install Rust v1.76.0
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable, 1.76.0
+          target: wasm32-unknown-unknown
 
-      # - name: Install cargo-binstall
-      #   run: |
-      #     curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash -s -- -y
+      - name: Install cargo-binstall
+        run: |
+          curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash -s -- -y
 
-      # - name: Setup Node.js
-      #   uses: actions/setup-node@v2
-      #   with:
-      #     node-version: 23
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 23
 
       - name: Install and Build Wasmito
         run: |
