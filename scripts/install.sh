@@ -61,11 +61,11 @@ rm $LIBS_DIR/WARDuino/platforms/Arduino/Makefile
 cp $WASMITO_MAKEFILE_TEMPLATE $LIBS_DIR/WARDuino/platforms/Arduino/Makefile
 
 echo "> WABT: fetching submodules"
-if [ ! -d "$LIBS_DIR/wabt" ]; then
+# if [ ! -d "$LIBS_DIR/wabt" ]; then
   cd $LIBS_DIR
   echo cloning wabt.git
   git clone https://github.com/TOPLLab/wabt.git
-fi
+# fi
 
 cd $LIBS_DIR/wabt
 git submodule update --init
