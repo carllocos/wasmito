@@ -78,10 +78,10 @@ jobs:
       #   run: |
       #     npm run test-hooks
 
-      - name: Remove Installed libs
-        if: always()
-        run: |
-          rm -rf ./libs/
+      # - name: Remove Installed libs
+      #   if: always()
+      #   run: |
+      #     rm -rf ./libs/
 
   # run-bl-cfg-benchmarks:
   #   runs-on: ubuntu-latest
