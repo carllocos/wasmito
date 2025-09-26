@@ -75,14 +75,9 @@ jobs:
           echo "Running installation script M5StickC"
           bash ./scripts/install_arduino_m5stickc.sh
 
-      # - name: Test Hooks on MCU
-      #   run: |
-      #     npm run test-hooks
-
-      # - name: Remove Installed libs
-      #   if: always()
-      #   run: |
-      #     rm -rf ./libs/
+      - name: Test Hooks on MCU
+        run: |
+          npm run test-hooks
 
   # run-bl-cfg-benchmarks:
   #   runs-on: ubuntu-latest
