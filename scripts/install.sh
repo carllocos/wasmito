@@ -35,12 +35,12 @@ $ARDUINO_CLI lib install "PubSubClient" --config-file $ARDUINO_CONFIG \
 
 echo "> WARDuino: fetching submodules"
 echo "LIBS_DIR: $LIBS_DIR"
-if [ ! -d "$LIBS_DIR/WARDuino" ]; then
+# if [ ! -d "$LIBS_DIR/WARDuino" ]; then
   exit 1
   cd $LIBS_DIR
   echo cloning WARDuino.git
   git clone https://github.com/carllocos/WARDuino.git
-fi
+# fi
 echo "listings libs"
 ls $LIBS_DIR
 echo "updating WARDuino"
