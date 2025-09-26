@@ -35,7 +35,7 @@ echo "> Creating arduino_config with directories.user=$ARDUINO_DIR ESCAPED $ARDU
 
 echo "> WARDuino: fetching submodules"
 echo "LIBS_DIR: $LIBS_DIR"
-WARDUINO_DIR="$LIBS_DIR/WARDuino"
+WARDUINO_DIR="$LIBS_DIR/WARDuino/src"
 echo "checking if dir exists: $WARDUINO_DIR"
 if [ ! -d "$WARDUINO_DIR" ]; then
   echo changing dir to $LIBS_DIR
