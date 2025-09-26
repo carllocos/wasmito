@@ -1,4 +1,4 @@
-import { exec, spawn } from 'child_process';
+import { spawn } from 'child_process';
 import { createLogger } from '../logger/logger';
 import { type PlatformConfig, type BoardFQBN } from './platform_config';
 import { Platform } from './platform';
@@ -32,27 +32,61 @@ export class ArduinoBuilderError extends Error {
   }
 }
 
-export async function runArduinoCommand(command: string): Promise<string> {
+export async function runArduinoCommand(
+  args: string[],
+  cwd?: string,
+): Promise<[string, number]> {
   return await new Promise((resolve, reject) => {
-    arduinoLogger.info(`Running command: ${command}`);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    exec(`${command}`, (error, stdout, stderr) => {
-      if (error !== null) {
-        reject(error);
+    const arduino_cli = getPathArduinoCLI();
+    const arduino_config = getPathArduinoConfig();
+    if (arduino_config !== undefined) {
+      args.push('--config-file');
+      args.push(arduino_config);
+    }
+
+    const cmd = `${arduino_cli} ${args.join(' ')}`;
+    arduinoLogger.info(`Running command: ${cmd}`);
+
+    let errorOccurred = false;
+    let stdout = '';
+    let child;
+    if (cwd === undefined) {
+      child = spawn(arduino_cli, args);
+    } else {
+      child = spawn(arduino_cli, args, {
+        cwd: cwd,
+      });
+    }
+
+    child.stdout.on('data', (data) => {
+      const l = data.toString();
+      arduinoLogger.debug(l);
+      stdout += l;
+    });
+
+    child.stderr.on('data', (data) => {
+      arduinoLogger.error(data.toString());
+    });
+
+    child.on('error', (error) => {
+      errorOccurred = true;
+      arduinoLogger.error(error.toString());
+    });
+
+    child.on('close', (code) => {
+      if (errorOccurred) {
+        reject(`Command ${cmd} exited with code ${code}`);
+      } else {
+        const exitCode = code === null ? 0 : code;
+        resolve([stdout.trim(), exitCode]);
       }
-      resolve(stdout.trim());
     });
   });
 }
 
 export async function ArduinoListBoards(): Promise<string[]> {
-  const arduino_cli = getPathArduinoCLI();
-  const arduino_config = getPathArduinoConfig();
-  let cmd = `${arduino_cli} board list`;
-  if (arduino_config !== undefined) {
-    cmd = `${cmd} --config-file ${arduino_config}`;
-  }
-  const cmdOutput = await runArduinoCommand(cmd);
+  const args: string[] = ['board', 'list'];
+  const [cmdOutput] = await runArduinoCommand(args);
   const lines = cmdOutput.split('\n');
   if (lines.length === 1) {
     return [];
@@ -67,13 +101,8 @@ export async function ArduinoListBoards(): Promise<string[]> {
 }
 
 export async function ArduinoListBoardsFQBNs(): Promise<BoardFQBN[]> {
-  const arduino_cli = getPathArduinoCLI();
-  const arduino_config = getPathArduinoConfig();
-  let cmd = `${arduino_cli} board listall`;
-  if (arduino_config !== undefined) {
-    cmd = `${cmd} --config-file ${arduino_config}`;
-  }
-  const cmdOutput = await runArduinoCommand(cmd);
+  const args: string[] = ['board', 'listall'];
+  const [cmdOutput] = await runArduinoCommand(args);
   const lines = cmdOutput.split('\n');
   if (lines.length === 1) {
     return [];
@@ -168,48 +197,9 @@ export async function ArduinoFlash(
   port: string,
   fqbn: string,
 ): Promise<number> {
-  return await new Promise<number>((resolve, reject) => {
-    const makeArgs = ['flash', `PORT=${port}`, `FQBN=${fqbn}`];
-
-    const arduinoLib = getPathArduinoCLI();
-    if (arduinoLib !== undefined) {
-      makeArgs.push(`ARDUINO_CLI=${arduinoLib}`);
-    }
-
-    const arduinoConfig = getPathArduinoConfig();
-    if (arduinoConfig !== undefined) {
-      makeArgs.push(`ARDUINO_CONFIG=${arduinoConfig}`);
-    }
-
-    const flash = spawn('make', makeArgs, {
-      cwd: pathToArduinoSketch,
-    });
-    flash.stdout.on('data', (data) => {
-      const d = data.toString();
-      arduinoLogger.debug(d);
-    });
-
-    flash.stderr.on('data', (data: string) => {
-      const errMsg = data.toString();
-      arduinoLogger.error(errMsg);
-    });
-
-    flash.on('close', (code) => {
-      if (code !== null) {
-        const msg = `Arduino flashing exited with code ${code}`;
-        if (code === 0) {
-          arduinoLogger.info(msg);
-        } else {
-          arduinoLogger.error(msg);
-        }
-        resolve(code);
-      } else {
-        reject(
-          new Error(`Arduino flashing exit code is not a number: ${code}`),
-        );
-      }
-    });
-  });
+  const args: string[] = ['upload', '-p', port, '--fqbn', fqbn, 'Arduino.ino'];
+  const [, exitCode] = await runArduinoCommand(args, pathToArduinoSketch);
+  return exitCode;
 }
 
 export async function ArduinoClean(arduinoSketchDir: string): Promise<number> {
