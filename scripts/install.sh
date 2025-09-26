@@ -15,23 +15,23 @@ WASMITO_MAKEFILE_TEMPLATE=$(realpath .)/templates/wasmito_makefile
 
 echo "> Installing shared libs in $LIBS_DIR"
 echo "> Installing wasm-tools in $WASM_TOOLS_DIR"
-# mkdir -p $WASM_TOOLS_DIR
-# cargo binstall wasm-tools -y --root $WASM_TOOLS_DIR
+mkdir -p $WASM_TOOLS_DIR
+cargo binstall wasm-tools -y --root $WASM_TOOLS_DIR
 
 echo "> Installing Arduino libs in $ARDUINO_DIR"
 echo "> Creating arduino_config with directories.user=$ARDUINO_DIR ESCAPED $ARDUINO_DIR_ESCAPED"
 
-# mkdir -p $ARDUINO_DIR
-# cp $ARDUINO_CONFIG_TEMPLATE $ARDUINO_CONFIG
-# sed -i.backup $REPLACE_REGEX $ARDUINO_CONFIG
-# LIBS_DIR_ESCAPED=$(echo "$LIBS_DIR" | sed 's:/:\\/:g')
-# sed -i.backup 's/%VM_LIB/'${LIBS_DIR_ESCAPED}/g $ARDUINO_CONFIG
+mkdir -p $ARDUINO_DIR
+cp $ARDUINO_CONFIG_TEMPLATE $ARDUINO_CONFIG
+sed -i.backup $REPLACE_REGEX $ARDUINO_CONFIG
+LIBS_DIR_ESCAPED=$(echo "$LIBS_DIR" | sed 's:/:\\/:g')
+sed -i.backup 's/%VM_LIB/'${LIBS_DIR_ESCAPED}/g $ARDUINO_CONFIG
 
-# curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=$ARDUINO_DIR sh
+curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=$ARDUINO_DIR sh
 
-# $ARDUINO_CLI lib install "PubSubClient" --config-file $ARDUINO_CONFIG \
-# 	&& $ARDUINO_CLI lib install --git-url https://github.com/adafruit/Adafruit_NeoPixel.git  --config-file $ARDUINO_CONFIG \
-# 	&& $ARDUINO_CLI lib install --git-url https://github.com/m5stack/M5StickC.git#0.2.9 --config-file $ARDUINO_CONFIG
+$ARDUINO_CLI lib install "PubSubClient" --config-file $ARDUINO_CONFIG \
+	&& $ARDUINO_CLI lib install --git-url https://github.com/adafruit/Adafruit_NeoPixel.git  --config-file $ARDUINO_CONFIG \
+	&& $ARDUINO_CLI lib install --git-url https://github.com/m5stack/M5StickC.git#0.2.9 --config-file $ARDUINO_CONFIG
 
 echo "> WARDuino: fetching submodules"
 echo "LIBS_DIR: $LIBS_DIR"
@@ -44,8 +44,6 @@ if [ ! -d "$WARDUINO_DIR" ]; then
   git clone https://github.com/carllocos/WARDuino.git
 fi
 
-echo exiting
-exit 1
 echo "listings libs"
 ls $LIBS_DIR
 echo "updating WARDuino"
@@ -67,11 +65,11 @@ rm $LIBS_DIR/WARDuino/platforms/Arduino/Makefile
 cp $WASMITO_MAKEFILE_TEMPLATE $LIBS_DIR/WARDuino/platforms/Arduino/Makefile
 
 echo "> WABT: fetching submodules"
-# if [ ! -d "$LIBS_DIR/wabt" ]; then
+if [ ! -d "$LIBS_DIR/wabt/src" ]; then
   cd $LIBS_DIR
   echo cloning wabt.git
   git clone https://github.com/TOPLLab/wabt.git
-# fi
+fi
 
 cd $LIBS_DIR/wabt
 git submodule update --init
