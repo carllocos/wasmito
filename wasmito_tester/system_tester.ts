@@ -102,6 +102,7 @@ export class SystemTester {
     scenario: TestScenario,
     deviceID: DeviceID,
   ): Promise<void> {
+    this.logger.info(`Setup device ${deviceID}`);
     try {
       await this.systemDeployer.deployOnDevice(scenario, deviceID);
     } catch (e) {
@@ -112,6 +113,7 @@ export class SystemTester {
   }
 
   async runTests(): Promise<TestScenarioResult[]> {
+    this.logger.info('running tests');
     for (let i = 0; i < this.testScenarios.length; i++) {
       const [targetDeviceID, scenario, scenarioResult] = this.testScenarios[i];
       if (scenario.skipTest !== undefined && scenario.skipTest) {
@@ -213,6 +215,7 @@ export class SystemTester {
     scenario: TestScenario,
     scenarioResult: TestScenarioResult,
   ): Promise<void> {
+    this.logger.info(`run test scenario ${scenario.testName}`);
     this.assertVMOfDeviceIDExists(targetDeviceID);
     const vm = this.systemDeployer.deviceVM(targetDeviceID);
     const actionHooksMap = new Map<string, HookWithSubscription<any>>();
