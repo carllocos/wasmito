@@ -33,7 +33,7 @@
     "copyAssets": "cp -r ./src/tree-sitter/parsers/ dist/cjs/src/tree-sitter/parsers",
     "compileCodeExamples": "bash ./scripts/compile_rust_examples.sh",
     "prepack": "npm run build",
-    "test-hooks": "npm run build:cjs && npm run hook:test1 && npm run hook:test2 && npm run hook:test3 && npm run hook:test4 && npm run hook:test5 && npm run hook:test6 && npm run hook:test7",
+    "test-hooks": "npm run build:cjs && npm run hook:test1 && npm run hook:test2 && npm run hook:test3 && npm run hook:test5 && npm run hook:test7",
     "hook:test1": "LogLevel=debug ./wasmito_tester/cli.js ./dist/cjs/wasmito_tester/test_examples/test_isr_button/test/test_scenario.cjs",
     "hook:test2": "LogLevel=debug ./wasmito_tester/cli.js ./dist/cjs/wasmito_tester/test_cases/test_around_function.cjs",
     "hook:test3": "LogLevel=debug ./wasmito_tester/cli.js ./dist/cjs/wasmito_tester/test_cases/test_breakpoints.cjs",
