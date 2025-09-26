@@ -16,7 +16,7 @@ WASMITO_MAKEFILE_TEMPLATE=$(realpath .)/templates/wasmito_makefile
 echo "> Installing shared libs in $LIBS_DIR"
 echo "> Installing wasm-tools in $WASM_TOOLS_DIR"
 mkdir -p $WASM_TOOLS_DIR
-cargo binstall wasm-tools -y --root $WASM_TOOLS_DIR
+# cargo binstall wasm-tools -y --root $WASM_TOOLS_DIR
 
 echo "> Installing Arduino libs in $ARDUINO_DIR"
 echo "> Creating arduino_config with directories.user=$ARDUINO_DIR ESCAPED $ARDUINO_DIR_ESCAPED"
