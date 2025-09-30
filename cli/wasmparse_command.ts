@@ -6,12 +6,14 @@ import { writeFileSync } from 'fs';
 
 export function registerWasmParseCommand(program: Command): void {
   program
-    .command('checkwasmparse')
-    .description(`check if wasm version 1 is used`)
+    .command('wasmparser')
+    .description(
+      `Parse the given Wasm to implicitly check if wasm version 1 is used.`,
+    )
     .argument('<wasm-path>', 'the wasm for which the check needs to occur')
     .option(
-      '--store-instructions <output-path.json>',
-      `store the instructions of the wasm module in a json file`,
+      '-s,--store-instructions <output-path.json>',
+      `store the instructions of the wasm module in a JSON file`,
     )
     .action(async (wasmPath, options) => {
       const logger = getGlobalLogger();

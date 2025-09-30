@@ -40,7 +40,7 @@ function isValidWasmPath(wasmPath: any, prev: any): string {
 export function registerUploadCommand(program: Command): void {
   program
     .command('upload')
-    .description(`upload a WebAssembly module to a device`)
+    .description(`upload a WebAssembly module to a device.`)
     .argument(
       '<id-or-name>',
       'the id or name of the device in the project to which the action applies',

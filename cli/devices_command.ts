@@ -47,24 +47,24 @@ function createNewDevice(platform: PlatformTarget, name?: string): DeviceJSON {
 export function registerDevicesCommand(program: Command): void {
   program
     .command('devices')
-    .description(`manage MCUs or DevBoards part of your project`)
+    .description(`manage MCUs or DevBoards part of your project.`)
     .requiredOption(
       '--d <id-or-name>',
-      'The id or name of the device to which the actions will apply',
+      'The id or name of the device to which the actions will apply.',
       '',
     )
-    .option('--add [name]', `add a device with [name]`)
-    .option('--rmv', `remove <id-or-name> from the project config`)
-    .option('--serial <port>', `configure the serial <port> of <id-or-name>`)
+    .option('--add [name]', `add a device with [name].`)
+    .option('--rmv', `remove <id-or-name> from the project config.`)
+    .option('--serial <port>', `set the serial <port> of <id-or-name>`)
     .addOption(
       new Option('-p, --platform <platform>', 'platform of choice').choices([
         PlatformTarget.Arduino,
         PlatformTarget.DevVM,
       ]),
     )
-    .option('--fqbn <fqbn>', `configure the fqbn of <id-or-name>`)
-    .option('--baudrate <baudrate>', `configure the baudrate of <id-or-name>`)
-    .option('--list-fqbns', 'display all currently avaiable boards')
+    .option('--fqbn <fqbn>', `set the fqbn of <id-or-name>.`)
+    .option('--baudrate <baudrate>', `set the baudrate of <id-or-name>`)
+    .option('--list-fqbns', 'display all currently avaiable boards') // TODO remove this command as arduino-cli was added
     .option('--list', 'display all registered devices')
     .action(async (options) => {
       if (!isProjectDirPresent()) {

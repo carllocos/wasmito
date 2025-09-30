@@ -6,7 +6,7 @@ import { mkdirSync, rmdirSync } from 'fs';
 export function registerProjectCommand(program: Command): void {
   program
     .command('project')
-    .description(`create and deploy a project on a mcu`)
+    .description(`create and deploy a project on a MCU.`)
     .option('--new', `create an empty project in the current working directory`)
     .option(
       '--rmv',

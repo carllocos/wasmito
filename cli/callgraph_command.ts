@@ -12,16 +12,19 @@ import path from 'path';
 export function registerCallgraphCommand(program: Command): void {
   program
     .command('callgraph')
-    .description(`Build a Callgraph for a given Wasm module`)
+    .description(
+      `Build the call graph for the entry function of the given Wasm module.`,
+    )
     .argument('<wasm-path>', 'the wasm for which we build the callgraph')
-    .argument('<timeout-secs>', 'the maximum time allocated to the callgraph')
+    .argument('<timeout-secs>', 'the maximum time allocated to the callgraph') // TODO make arg optional
     .option(
       '-od, --dot-output <output-path>',
-      'the location where to store the callgraph. Parent directories are created if needed',
+      'the location where to store the call graph. Parent directories are created if needed.',
+      // TODO make arg mandatory
     )
     .option(
       '--no-link-to-exports',
-      'Disable automatically link to export functions when a function is encountered without CFG',
+      'Disable automatically link to export functions when a function is encountered without CFG.',
     )
     .action(async (wasmPath, timeout, options) => {
       const logger = getGlobalLogger();

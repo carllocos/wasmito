@@ -12,15 +12,17 @@ import { WasmModule } from '../src/webassembly/wasm/wasm_module';
 export function registerWCFGCommand(program: Command): void {
   program
     .command('wcfg')
-    .description(`Build Wasm Control-Flow Graphs (WCFGs)`)
-    .argument('<wasm-path>', 'the wasm for which we build the CFGs')
+    .description(
+      `Build Wasm Control-Flow Graphs (WCFGs). The constructed graphs are stored in <output-dir> in dot format.`,
+    )
+    .argument('<wasm-path>', 'the wasm for which we build the CFGs.')
     .argument(
       '<output-dir>',
-      'the location where to store all the generated CFGs',
+      'the location where to store all the generated CFGs.',
     )
     .option(
       '-t, --timeout <timeout-secs>',
-      'the maximum seconds allocated to the build of the CFGs',
+      'the maximum seconds allocated to the build of the CFGs.',
       '180',
     )
     .action(async (wasmPath, outputDir, options) => {

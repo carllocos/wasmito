@@ -21,35 +21,33 @@ export function registerSourceMapCommand(program: Command): void {
   program
     .command('sourcemap <wasm-path> <output-file.json>')
     .description(
-      `build a JSON sourcemap as used by the Source Control Flow graph builder from the <wasm-path>.
-      The generated JSON will be stored it in <output-file.json> creating parent directories if needed.
-      Specify also a max build time allowed <timeout-secs> expressed in secs.`,
+      `extract the source mappings from debugging information and store them as JSON in <output-file.json>. Parent directories are created if needed.`,
     )
     .option(
       '-d, --dwarf <dwarf-path>',
-      `reads the DWARF debugging information from either the path to a DWARF encoded file or the wasm module iteself.`,
+      `use DWARF to construct the source mappings. If the argument is omitted, DWARF is extracted from the wasm module itself.`,
     )
     .option(
       '-s, --source-spec <path-to-source-spec>',
-      `reads the debugging information from the given file that points to a SourceMap Spec
-      of the given wasm module itself.`,
+      `use Source Map Spec to extract the source mappings.`,
     )
     .option(
       '-r, --rebase-locations <path-to-config.json>',
-      'a json file containing one of the following fields:\n{ "absolutePaths": [["old_path1", "new_path2"], ["old_path2", "new_path2"]],\n"prefixSources": "prefix_path",\n"ignoreDirectories":["prefix_dir1","prefix_dir2"]}',
+      'a JSON configuration file that allows to alter the source mappings.',
+      //  the following fields:\n{ "absolutePaths": [["old_path1", "new_path2"], ["old_path2", "new_path2"]],\n"prefixSources": "prefix_path",\n"ignoreDirectories":["prefix_dir1","prefix_dir2"]}',
     )
     .option(
-      '--all-mappings',
-      'include also the source mappings for files that do not exist on the current machine',
+      '-a, --all-mappings',
+      'include all the source mappings in the output JSON files. The produces JSON may contain source mappings pointing to source files (e.g., standard lib) that do not exist on the local machine.',
     )
     .option(
       '-t, --timeout <timeout-secs>',
-      'the maximum seconds allocated to load the sourcemap according to our format',
+      'the maximum seconds allocated to extract the source mappings.',
       '180',
     )
     .option(
       '--disable-clean',
-      'Deactivate removing the source mappings that have no associated Wasm instruction',
+      'Deactivate removing the source mappings from the output file that have no associated Wasm instruction.',
     )
     .action(async (wasmPath, outputFile, options) => {
       const logger = getGlobalLogger();
