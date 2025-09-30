@@ -43,10 +43,6 @@ export function startCLI(): void {
     .name(projectName)
     .description(readProjectDescription())
     .version(readProjectVersionNumber())
-    .option(
-      '-dc, --devices-config <string>',
-      'path to json that describes the devices part of the analysis',
-    )
     .option('-log, --log-level <type>', 'set the log-level');
 
   // registerDeviceManagerCommands(dm, program);
