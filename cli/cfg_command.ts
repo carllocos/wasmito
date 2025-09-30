@@ -22,48 +22,45 @@ export function registerCFGCommand(program: Command): void {
   program
     .command('cfg')
     .description(
-      `Build SourceCode and Wasm-Level Control Flow Graphs(CFGs) as-well-as Callgraphs.`,
+      `Build Source-Level Control Flow Graphs (CFGs) and call graphs. The constructed graphs are stored in the given <output-dir> in dot format.`,
     )
     .argument('<wasm-path>', 'the wasm for which we build the CFGs')
     .argument(
       '<output-dir>',
-      'the location where to store all the generated CFGs',
+      'the location where to store all the generated CFGs.',
     )
     .option(
       '-t, --timeout <timeout-secs>',
-      'the maximum seconds allocated to the build of the CFGs',
+      'the maximum seconds allocated to the build of the CFGs.',
       '180',
     )
     .option(
       '-d, --dwarf <dwarf-path>',
-      `reads the DWARF debugging information from either the path to a DWARF encoded file or the wasm module iteself.`,
+      `reads the DWARF debugging information from either the path to a DWARF encoded file or, if the argument is omitted, from the wasm module itself.`,
     )
     .option(
       '-w, --wasmito-json <path-to-wasmito-sourcemap-json>',
-      `use as debugging format wasmito internal debugging format`,
+      `read the debugging information from the json file which follows wasmito's internal debugging format.`,
     )
     .option(
       '-s, --source-spec <path-to-source-spec>',
-      `reads the debugging information from the given file that points to a SourceMap Spec
-      of the given wasm module iteself.`,
+      `read the debugging information from the given path to a Source Map Spec.`,
     )
     .option(
       '-cg, --callgraph <callgraph-name.dot>',
-      'enable the build of the callgraph for the wasm and store it in the <output-dir> as <callgraph-name.dot>',
+      'enable the build of the callgraph for the wasm and store it in the <output-dir> as <callgraph-name.dot>.',
     )
     .option(
       '--unused-mappings <output-name.json>',
-      `will generate a json containing the source mappings that were not used when building the CFGs.
-      This can be helpful to assess soundness of the generated Source level CFGs.
-      Unused mappings can be an indicator that the Source CFG is missing nodes.`,
+      `generate a json containing the source mappings that were not used when building the CFGs.`,
     )
     .option(
       '--dot-no-exitnode',
-      'do not include the exit node in the generated dot file',
+      'do not include the exit node in the generated CFGs dot files.',
     )
     .option(
       '--dot-no-entrynode',
-      'do not include the entry node in the generated dot file',
+      'do not include the entry node in the generated CFGs dot files.',
     )
     .action(async (wasmPath, outputDir, options) => {
       const logger = getGlobalLogger();
