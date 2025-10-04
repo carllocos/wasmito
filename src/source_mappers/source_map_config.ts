@@ -13,6 +13,7 @@ export interface SourceMapConfig {
   colNrStartNumber?: number;
   lineNrStartNumber?: number;
   newWasmPath?: string;
+  keepAllMappings?: boolean;
 }
 
 export async function readSourceMapConfig(

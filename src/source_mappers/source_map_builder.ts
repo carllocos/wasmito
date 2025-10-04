@@ -107,6 +107,9 @@ function cleanMappings(
   config?: SourceMapConfig,
   module?: WasmModule,
 ): SourceCodeLocation[] {
+  if (config?.keepAllMappings !== undefined && config.keepAllMappings) {
+    return sourceCodeLocations;
+  }
   const [lineNrOffset, colNrOffset] = getOffsetToApply(config);
   const seenLocs = new Map<number, SourceCodeLocation[]>();
   const cleaned: SourceCodeLocation[] = [];
@@ -162,6 +165,9 @@ function cleanMappings(
 }
 
 function cleanSources(sources: string[], config?: SourceMapConfig): string[] {
+  if (config?.keepAllMappings !== undefined && config.keepAllMappings) {
+    return sources;
+  }
   const sourcesSeen = new Set<string>();
   const cleanedSources: string[] = [];
   for (const s of sources) {
