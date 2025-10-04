@@ -93,6 +93,7 @@ export function registerSourceMapCommand(program: Command): void {
       if (config.colNrStartNumber === undefined) {
         config.colNrStartNumber = 1;
       }
+      config.keepAllMappings = !!options.allMappings;
       const kindDebuggingFormat =
         options.dwarf !== undefined
           ? DebugStandard.DWARF
