@@ -120,8 +120,7 @@ export function registerSourceMapCommand(program: Command): void {
         logger.info(`Storing json at ${outputFile}`);
         const outputDir = path.dirname(outputFile);
         createDirectoryIfUnexisting(outputDir);
-        const onlyExistingMappings = options.allMappings === undefined;
-        StoreMappingsToJSON(outputFile, sm, onlyExistingMappings);
+        StoreMappingsToJSON(outputFile, sm);
       } catch (e) {
         const errMsg = e instanceof Error ? e.message : e;
         program.error(`Could not build the SourceMap error occured: ${errMsg}`);

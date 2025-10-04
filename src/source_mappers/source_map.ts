@@ -190,16 +190,13 @@ export class SourceMap {
     return maps;
   }
 
-  storeMappingsToJSON(
-    filePath: string,
-    onlyExistingSource: boolean = false,
-  ): void {
+  storeMappingsToJSON(filePath: string): void {
     const sm: SourceMapJSON = {
       wasm: this._wasmPath,
       sources: this._sources,
       mappings: this._mappings,
     };
-    StoreMappingsToJSON(filePath, sm, onlyExistingSource);
+    StoreMappingsToJSON(filePath, sm);
   }
 
   toSourceMapJSON(): SourceMapJSON {
@@ -214,19 +211,15 @@ export class SourceMap {
 export function StoreMappingsToJSON(
   filePath: string,
   sourceMap: SourceMapJSON,
-  onlyExistingSource: boolean = false,
   sourceToAbsPathSource = new Map<string, string>(),
 ): void {
-  let maps = sourceMap.mappings.map((m: SourceCodeLocation) => {
+  const maps = sourceMap.mappings.map((m: SourceCodeLocation) => {
     const src = sourceToAbsPathSource.get(m.source);
     if (src !== undefined) {
       m.source = src;
     }
     return m;
   });
-  if (onlyExistingSource) {
-    maps = maps.filter((m) => isFilePath(m.source));
-  }
   const mpsStr = maps.map(sourceCodeLocationToString).join(',');
   const sourcesStr = sourceMap.sources
     .map((s) => {
