@@ -17,6 +17,10 @@ import { getGlobalLogger } from '../src/logger/logger';
 import { SourceMap } from '../src/source_mappers/source_map';
 import { CoarseGrainedSourceCFGraph } from '../src/cfg/source_cfg_coarse';
 import { mkdirSync } from 'fs';
+import {
+  DefaultColumnStartNumber,
+  DefaultLineStartNumber,
+} from '../src/source_mappers/source_map_config';
 
 export function registerCFGCommand(program: Command): void {
   program
@@ -97,7 +101,10 @@ export function registerCFGCommand(program: Command): void {
         }
         smPromise = SourceMapFromJSON(wasmitoPath);
       } else if (dwarfPath !== undefined) {
-        smPromise = readSourceMap(DebugStandard.DWARF, wasmPath, dwarfPath);
+        smPromise = readSourceMap(DebugStandard.DWARF, wasmPath, dwarfPath, {
+          colNrStartNumber: DefaultColumnStartNumber,
+          lineNrStartNumber: DefaultLineStartNumber,
+        });
       } else if (sourceSpecPath !== undefined) {
         smPromise = readSourceMap(
           DebugStandard.SourceMapSpec,
