@@ -325,6 +325,7 @@ export function DebugOperationFromName(
     case 'stepIteration':
       return stepIteration;
     case 'step-until-call':
+    case 'stepUntilCall':
       return stepUntilCall;
     case 'step-recursive-call':
     case 'stepRecursiveCall':
