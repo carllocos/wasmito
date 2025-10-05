@@ -1,10 +1,17 @@
-// import { createLogger } from '../logger/logger';
+import { createLogger } from '../logger/logger';
 import {
   type SourceCFGs,
   type SourceCFGNode,
   isCallNode,
   sourceNodeFirstInstrStartAddr,
+  getCallInstructions,
+  isSCFGEmpty,
 } from '../cfg/source_cfg';
+import {
+  CallIndirect,
+  CallInstruction,
+  isCallInstruction,
+} from '../webassembly/wasm/wasm_instruction';
 
 export type DestinationSCFGNode = [SourceCFGNode, number];
 
@@ -13,7 +20,7 @@ export type DebugOperation = (
   node: SourceCFGNode,
 ) => DestinationSCFGNode[];
 
-// const logger = createLogger('DebugAgnosticOperations');
+const logger = createLogger('DebugAgnosticOperations');
 export interface AgnosticDebugOperations {
   /*
    * stepIn resumes the execution of the program until the next source code location is reached.
@@ -41,6 +48,12 @@ export interface AgnosticDebugOperations {
    * or exit of the loop.
    */
   stepIteration: DebugOperation;
+
+  /**
+   * stepUntilCall: Debug operation that continues execution until just before a function call is reached.
+   */
+
+  stepUntilCall: DebugOperation;
 }
 
 function stepOver(
@@ -200,11 +213,62 @@ export function stepIteration(
   return destinationNodes;
 }
 
+function stepUntilCall(
+  scfgs: SourceCFGs,
+  startNode: SourceCFGNode,
+): DestinationSCFGNode[] {
+  const visitedNodes = new Set<number>();
+  const q: SourceCFGNode[] = [startNode];
+  let n: SourceCFGNode | undefined;
+  const priorCalls: DestinationSCFGNode[] = [];
+  while ((n = q.pop()) !== undefined) {
+    if (visitedNodes.has(n.nodeId)) {
+      continue;
+    }
+    visitedNodes.add(n.nodeId);
+
+    if (isCallNode(n)) {
+      const calls = getCallInstructions(n);
+      const callsFound: Array<CallInstruction | CallIndirect> = [];
+      for (const call of calls) {
+        if (isCallInstruction(call)) {
+          const SCFGs = scfgs.getFunctionSourceCFG(call.funIdx);
+          if (SCFGs !== undefined && !isSCFGEmpty(SCFGs)) {
+            callsFound.push(call);
+          }
+        } else {
+          logger.warn(
+            `untilCall: ignoring call_indirect instruction at address ${call.startAddress} in node ${n.nodeId}`,
+          );
+        }
+      }
+
+      // TODO: handle the case where PC is currently pointing to an instruction in startNode
+      // and that instruction is after a call instruction and before another call instruction
+      // this debug operation should advance just until the next call instruction
+      if (callsFound.length > 1) {
+        logger.warn(
+          `untilCall: multiple call instructions in node ${n.nodeId}, taking the first one`,
+        );
+      } else if (callsFound.length === 1) {
+        priorCalls.push([n, callsFound[0].startAddress]);
+        continue;
+      }
+    }
+
+    for (const [n2] of n.edges) {
+      q.push(n2);
+    }
+  }
+  return priorCalls;
+}
+
 export const DebugOperations: AgnosticDebugOperations = {
   stepIn,
   stepOver,
   stepOut,
   stepIteration,
+  stepUntilCall: stepUntilCall,
 };
 
 export type DebugOperationName = string;
@@ -225,6 +289,8 @@ export function DebugOperationFromName(
     case 'step-iteration':
     case 'stepIteration':
       return stepIteration;
+    case 'step-until-call':
+      return stepUntilCall;
     default:
       return undefined;
   }
