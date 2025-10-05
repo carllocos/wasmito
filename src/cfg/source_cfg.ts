@@ -426,6 +426,10 @@ export interface BinaryLiftedCFG {
   exitNodes: SourceCFGNode[];
 }
 
+export function isSCFGEmpty(f: BinaryLiftedCFG): boolean {
+  return f.allNodes.length === 0;
+}
+
 function functionTreeGraphToJSONObj(f: BinaryLiftedCFG): object {
   return {
     entryNodes: f.entryNodes.map((en) => en.nodeId),
