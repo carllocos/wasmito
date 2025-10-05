@@ -54,6 +54,14 @@ export interface AgnosticDebugOperations {
    */
 
   stepUntilCall: DebugOperation;
+
+  /**
+   * stepRecursiveCall
+   * This debug operation is supposed to be called from within a function that is recursively called.
+   * If executed, the debug operation returns the entry nodes of this current function.
+   */
+
+  stepRecursiveCall: DebugOperation;
 }
 
 function stepOver(
@@ -263,12 +271,39 @@ function stepUntilCall(
   return priorCalls;
 }
 
+function stepRecursiveCall(
+  scfgs: SourceCFGs,
+  startNode: SourceCFGNode,
+): DestinationSCFGNode[] {
+  // TODO use call sites to find if recursive call
+  // const callSites = scfgs.wasmCFGs.callSites(startNode.wasmFunOwner);
+  // if (!callSites.has(startNode.wasmFunOwner)) {
+  //   return [];
+  // }
+  const wcfg = scfgs.wasmCFGs.getCFGOrError(startNode.wasmFunOwner);
+  let isRecursive = false;
+  for (const call of wcfg.calls) {
+    if (call.funIdx === startNode.wasmFunOwner) {
+      isRecursive = true;
+      break;
+    }
+  }
+
+  if (!isRecursive) {
+    return [];
+  }
+  const entryNodes =
+    scfgs.getFunctionSourceCFG(startNode.wasmFunOwner)?.entryNodes ?? [];
+  return entryNodes.map((n) => [n, sourceNodeFirstInstrStartAddr(n)]);
+}
+
 export const DebugOperations: AgnosticDebugOperations = {
   stepIn,
   stepOver,
   stepOut,
   stepIteration,
   stepUntilCall: stepUntilCall,
+  stepRecursiveCall: stepRecursiveCall,
 };
 
 export type DebugOperationName = string;
@@ -291,6 +326,9 @@ export function DebugOperationFromName(
       return stepIteration;
     case 'step-until-call':
       return stepUntilCall;
+    case 'step-recursive-call':
+    case 'stepRecursiveCall':
+      return stepRecursiveCall;
     default:
       return undefined;
   }
