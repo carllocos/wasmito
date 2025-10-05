@@ -15,6 +15,10 @@ export type DebugOperation = (
 
 // const logger = createLogger('DebugAgnosticOperations');
 export interface AgnosticDebugOperations {
+  /*
+   * stepIn resumes the execution of the program until the next source code location is reached.
+   * The next source code location may be the entry of a called function.
+   */
   stepIn: DebugOperation;
 
   /*
@@ -24,8 +28,18 @@ export interface AgnosticDebugOperations {
    */
   stepOver: DebugOperation;
 
+  /*
+   * step out completes the execution of the current function and stops the execution
+   * at the first source code location that is reached after exiting the function call.
+   */
   stepOut: DebugOperation;
 
+  /*
+   * Debug operation is called from within a loop (e.g., while, for).
+   * This operation ensures that program execution resumes until the next iteration of the loop.
+   * Concretely, this operation finds the SCFG nodes that correspond to the entry of the loop
+   * or exit of the loop.
+   */
   stepIteration: DebugOperation;
 }
 
