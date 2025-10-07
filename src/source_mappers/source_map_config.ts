@@ -2,7 +2,7 @@ import { createLogger } from '../logger/logger';
 import { readFileAsJSON } from '../util/file_util';
 
 const logger = createLogger('SourceMapConfig');
-export const DefaultColumnStartNumber = 0;
+export const DefaultColumnStartNumber = 1;
 export const DefaultLineStartNumber = 1;
 
 export interface SourceMapConfig {
