@@ -204,9 +204,7 @@ function cleanSourcePath(
   }
   cleanedSource = config.srcToAbsPath?.get(cleanedSource) ?? cleanedSource;
 
-  const ignore = config.ignoreDirectories?.find((d) =>
-    cleanedSource.startsWith(d),
-  );
+  const ignore = config.ignore?.find((d) => cleanedSource.startsWith(d));
   if (ignore !== undefined) {
     // we do not add mapping as needs to be ignored
     return undefined;

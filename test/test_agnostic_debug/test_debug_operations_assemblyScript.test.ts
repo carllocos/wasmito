@@ -109,8 +109,8 @@ describe('Debug Operations on AS Intermittent Blink', function () {
   ]);
   const sourceMapConfig: SourceMapConfig = {
     srcToAbsPath: srcFileMapper,
-    colNrStartNumber: DefaultColumnStartNumber,
-    lineNrStartNumber: DefaultLineStartNumber,
+    colNrStartNumber: 0,
+    lineNrStartNumber: 1,
   };
 
   let sourceCFGs: SourceCFGs;

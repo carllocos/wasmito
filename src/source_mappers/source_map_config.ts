@@ -7,7 +7,7 @@ export const DefaultLineStartNumber = 1;
 
 export interface SourceMapConfig {
   srcToAbsPath?: Map<string, string>;
-  ignoreDirectories?: string[];
+  ignore?: string[];
   prefixSources?: string;
   removeUnusedMappings?: boolean;
   colNrStartNumber?: number;
@@ -53,18 +53,18 @@ export async function readSourceMapConfig(
     config.prefixSources = prefixSources;
   }
 
-  if (Array.isArray(rebase.ignoreDirectories)) {
-    const ignoreDirs = [];
-    for (const ignore of rebase.ignoreDirectories) {
-      if (typeof ignore !== 'string') {
+  if (Array.isArray(rebase.ignore)) {
+    const ignore = [];
+    for (const ignoreDirOrFile of rebase.ignore) {
+      if (typeof ignoreDirOrFile !== 'string') {
         const msg =
-          'SourceMapConfig: Ignore Directory is expected to be a string';
+          'SourceMapConfig: Ignore Directory or source file is expected to be a string';
         logger.error(msg);
         throw new Error(msg);
       }
-      ignoreDirs.push(ignore);
+      ignore.push(ignoreDirOrFile);
     }
-    config.ignoreDirectories = ignoreDirs;
+    config.ignore = ignore;
   }
 
   config.lineNrStartNumber = Number(

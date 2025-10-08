@@ -27,7 +27,7 @@ describe('Debug Operations on Zig App', function () {
   ]);
   const sourceMapConfig: SourceMapConfig = {
     srcToAbsPath,
-    ignoreDirectories: ['/opt/homebrew/'],
+    ignore: ['/opt/homebrew/'],
     colNrStartNumber: DefaultColumnStartNumber,
     lineNrStartNumber: DefaultLineStartNumber,
   };
