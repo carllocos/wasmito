@@ -340,9 +340,16 @@ export class WasmModule {
         body: allInstructions,
       });
     }
+    const imports: object[] = this.importFuncs.map((im) => {
+      return {
+        name: im.name,
+        idx: im.id,
+      };
+    });
     return {
       wasmPath: this.wasmPath,
       functions,
+      imports,
     };
   }
 }
