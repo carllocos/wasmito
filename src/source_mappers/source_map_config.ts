@@ -67,21 +67,21 @@ export async function readSourceMapConfig(
     config.ignore = ignore;
   }
 
-  config.lineNrStartNumber = Number(
-    rebase.lineNrStartNumber ?? DefaultLineStartNumber,
-  );
-  if (isNaN(config.lineNrStartNumber)) {
-    const msg = 'SourceMapConfig: Start Line Number is not a number';
-    logger.error(msg);
-    throw new Error(msg);
+  if (rebase.lineOffset !== undefined) {
+    config.lineOffset = Number(rebase.lineOffset);
+    if (isNaN(config.lineOffset)) {
+      const msg = 'SourceMapConfig: Line Offset Number is not a number';
+      logger.error(msg);
+      throw new Error(msg);
+    }
   }
-  config.colNrStartNumber = Number(
-    rebase.colNrStartNumber ?? DefaultColumnStartNumber,
-  );
-  if (isNaN(config.colNrStartNumber)) {
-    const msg = 'SourceMapConfig: Start Column Number is not a number';
-    logger.error(msg);
-    throw new Error(msg);
+  if (rebase.columnOffset !== undefined) {
+    config.columnOffset = Number(rebase.columnOffset);
+    if (isNaN(config.columnOffset)) {
+      const msg = 'SourceMapConfig: Column Offset is not a number';
+      logger.error(msg);
+      throw new Error(msg);
+    }
   }
 
   const newWasmPath = rebase.newWasmPath;
