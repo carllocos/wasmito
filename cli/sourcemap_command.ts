@@ -33,7 +33,7 @@ export function registerSourceMapCommand(program: Command): void {
     )
     .option(
       '-r, --rebase-locations <path-to-config.json>',
-      'a JSON configuration file that allows to alter the source mappings.\nThe following fields can be configured:\n{ "absolutePaths": [["old_path1", "new_path2"], ["old_path2", "new_path2"]],\n"prefixSources": "prefix_path",\n"ignoreDirectories":["prefix_dir1","prefix_dir2"],\n"colNrStartNumber": 1,\n"lineNrStartNumber": 1}',
+      'a JSON configuration file that allows to alter the source mappings.\nThe following fields can be configured:\n{ "absolutePaths": [["old_path1", "new_path2"], ["old_path2", "new_path2"]],\n"prefixSources": "prefix_path",\n"ignore":["prefix_dir1","prefix_dir2","file_path"],\n"colNrStartNumber": 1,\n"lineNrStartNumber": 1}',
     )
     .option(
       '-a, --all-mappings',
