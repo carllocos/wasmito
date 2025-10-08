@@ -79,9 +79,7 @@ export function SourceMapFromJSON(
   } else {
     sm = jsonPath;
   }
-  if (config !== undefined) {
-    sm = cleanSourceMapJSON(sm, config);
-  }
+  sm = cleanSourceMapJSON(sm, config);
 
   return new SourceMap(sm.wasm, sm.sources, sm.mappings);
 }
