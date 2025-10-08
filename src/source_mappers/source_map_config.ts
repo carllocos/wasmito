@@ -2,16 +2,16 @@ import { createLogger } from '../logger/logger';
 import { readFileAsJSON } from '../util/file_util';
 
 const logger = createLogger('SourceMapConfig');
-export const DefaultColumnStartNumber = 1;
-export const DefaultLineStartNumber = 1;
+export const DefaultColumnOffset = 0;
+export const DefaultLineOffset = 0;
 
 export interface SourceMapConfig {
   srcToAbsPath?: Map<string, string>;
   ignore?: string[];
   prefixSources?: string;
   removeUnusedMappings?: boolean;
-  colNrStartNumber?: number;
-  lineNrStartNumber?: number;
+  columnOffset?: number;
+  lineOffset?: number;
   newWasmPath?: string;
   keepAllMappings?: boolean;
 }
