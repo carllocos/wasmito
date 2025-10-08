@@ -3,18 +3,35 @@ import { isFilePath } from '../src/util/file_util';
 import { WasmModule } from '../src/webassembly/wasm/wasm_module';
 import { WasmValuesBuilder } from '../src/webassembly/wasm_value_array_builder';
 import { DeviceManager } from '../src/device/device_manager';
-import { createDevPlatform } from '../src/platforms/platformbuilder_factory';
+import {
+  createArduinoPlatform,
+  createDevPlatform,
+  FactoryArgs,
+} from '../src/platforms/platformbuilder_factory';
 import { TargetLanguage } from '../src/compilers/prog_language_selection';
 import { type WasmCompilerArgs } from '../src/compilers/wasm_compiler';
 import { isProxyCallFailedRequest } from '../src/runtimes/wasmito_vm/requests/fun_call_request';
+import { isSerialPort } from '../src/util/serial_port';
+import { DevVMPlatform } from '../src/platforms/dev_vm_platform';
+import { ArduinoBoardBuilder } from '../src/platforms/arduino_platform';
+import { WasmitoBackendVM } from '../src/runtimes/wasmito_vm/wasmito_vm';
 
 export function registerCallRequestCommand(program: Command): void {
   const commandName = 'call';
   program
     .command(`${commandName} <wasmPath> <fid> [args...]`)
-    .description('Perform Wasm calls on a module running on the VM')
+    .description(
+      'Perform a Wasm call on a function defined in the given module. Optionally, the module is either running on local VM or MCU VM',
+    )
     // .option('--proxy', 'the call is a proxy call')
-    .option('--port <portnr>', 'the port number of an already deployed vm')
+    .option(
+      '--port <portnr>',
+      'If provided, perform a call on an already existing VM. For local VM `port` is a socket port number. For MCU, `port` is a serial port.',
+    )
+    .option(
+      '-b <baudrate>',
+      'only required if --port is provided an is a serial port',
+    )
     .action(async (wasmPath, functionID, callArgs, options) => {
       if (!isFilePath(wasmPath)) {
         program.error(`${wasmPath} does not exist`);
@@ -50,42 +67,61 @@ export function registerCallRequestCommand(program: Command): void {
         wasmArgs.addI32Value(a);
       }
 
-      let toolPort;
-      const connectToExistingVM = options.port !== undefined;
-      if (connectToExistingVM) {
-        toolPort = Number(options.port);
-        if (isNaN(toolPort)) {
-          program.error(`given an invalid port number`);
-        }
-      }
+      const toolPort = Number(options.port);
+      const baudRate = Number(options.b);
+      const connectToExistingVM = toolPort !== undefined;
+      let platform: DevVMPlatform | ArduinoBoardBuilder | undefined;
+      const compilationArgs: WasmCompilerArgs = {
+        wasmPath,
+      };
 
-      const platform = await createDevPlatform({
+      const factoryArgs: FactoryArgs = {
         selectedLanguage: {
           targetLanguage: TargetLanguage.Wasm,
         },
         vmConfig: {
           disableStrictModuleLoad: true,
-          toolPort,
         },
-      });
-      const compilationArgs: WasmCompilerArgs = {
-        wasmPath,
       };
+
+      if (connectToExistingVM && isNaN(toolPort)) {
+        if (!isSerialPort(options.port)) {
+          program.error(`not a valid (Serial) port`);
+        }
+        if (isNaN(baudRate)) {
+          program.error(
+            `baudrate number is required when port is a serial port. Use -b to provide baudrate`,
+          );
+        }
+        factoryArgs.vmConfig!.serialPort = options.port;
+        factoryArgs.vmConfig!.baudrate = baudRate;
+        platform = await createArduinoPlatform(factoryArgs);
+      } else {
+        factoryArgs.vmConfig!.toolPort = toolPort;
+        platform = await createDevPlatform(factoryArgs);
+      }
 
       const timeout = 60 * 1000;
       const deviceManager = new DeviceManager();
-      const vm = connectToExistingVM
-        ? await deviceManager.connectToExistingDevVM(
-            platform,
-            compilationArgs,
-            timeout,
-          )
-        : await deviceManager.spawnDevelopmentVM(
-            platform,
-            compilationArgs,
-            timeout,
-          );
-
+      let vm: WasmitoBackendVM | undefined;
+      if (!connectToExistingVM) {
+        vm = await deviceManager.spawnDevelopmentVM(
+          platform as DevVMPlatform,
+          compilationArgs,
+          timeout,
+        );
+      } else if (!isNaN(toolPort)) {
+        vm = await deviceManager.connectToExistingDevVM(
+          platform as DevVMPlatform,
+          compilationArgs,
+          timeout,
+        );
+      } else {
+        vm = await deviceManager.connectToExistingMCUVM(
+          platform as ArduinoBoardBuilder,
+          compilationArgs,
+        );
+      }
       try {
         const response = await vm.proxyCall(fID, wasmArgs.values, timeout);
         // const req = new PushEventRequest(`interrupt_${interruptNr}`, '');

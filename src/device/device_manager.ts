@@ -184,7 +184,7 @@ export class DeviceManager {
     return vm;
   }
 
-  async closeVM(vm: WasmitoDevVM, timeout?: number): Promise<boolean> {
+  async closeVM(vm: WasmitoBackendVM, timeout?: number): Promise<boolean> {
     return await vm.close(timeout);
   }
 
