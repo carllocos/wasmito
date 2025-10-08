@@ -32,7 +32,7 @@ export function registerSourceMapCommand(program: Command): void {
       `use Source Map Spec to extract the source mappings.`,
     )
     .option(
-      '-r, --rebase-locations <path-to-config.json>',
+      '-c, --config-locations <path-to-config.json>',
       'a JSON configuration file that allows to alter the source mappings.\nThe following fields can be configured:\n{ "absolutePaths": [["old_path1", "new_path2"], ["old_path2", "new_path2"]],\n"prefixSources": "prefix_path",\n"ignore":["prefix_dir1","prefix_dir2","file_path"],\n"columnOffset": 1,\n"lineOffset": 1}',
     )
     .option(
@@ -78,13 +78,13 @@ export function registerSourceMapCommand(program: Command): void {
       }
 
       let config: SourceMapConfig = {};
-      if (options.rebaseLocations !== undefined) {
-        if (!isFilePath(options.rebaseLocations)) {
+      if (options.configLocations !== undefined) {
+        if (!isFilePath(options.configLocations)) {
           program.error(
-            `The given source location rebase config '${options.prefixSources}' is not a valid file path`,
+            `The given source location config '${options.prefixSources}' is not a valid file path`,
           );
         }
-        config = await readSourceMapConfig(options.rebaseLocations);
+        config = await readSourceMapConfig(options.configLocations);
       }
       config.removeUnusedMappings = options.disableClean === undefined;
       config.keepAllMappings = !!options.allMappings;
