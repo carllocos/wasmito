@@ -114,6 +114,9 @@ function cleanMappings(
   }
   const lineNrOffset = config?.lineOffset ?? DefaultLineOffset;
   const colNrOffset = config?.columnOffset ?? DefaultColumnOffset;
+  logger.debug(
+    `Line numbers offset with ${lineNrOffset}, Column numbers offset with ${colNrOffset}`,
+  );
   const seenLocs = new Map<number, SourceCodeLocation[]>();
   const cleaned: SourceCodeLocation[] = [];
   for (const sl of sourceCodeLocations) {
