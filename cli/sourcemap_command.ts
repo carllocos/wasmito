@@ -92,6 +92,13 @@ export function registerSourceMapCommand(program: Command): void {
         options.dwarf !== undefined
           ? DebugStandard.DWARF
           : DebugStandard.SourceMapSpec;
+      if (
+        kindDebuggingFormat === DebugStandard.SourceMapSpec &&
+        config.columnOffset === undefined
+      ) {
+        // Source Map Spec defaults to 0 so offset with 1
+        config.columnOffset = 1;
+      }
       const smJSON = readSourceMapJSON(
         kindDebuggingFormat,
         wasmPath,
