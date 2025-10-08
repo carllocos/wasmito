@@ -111,7 +111,9 @@ export function registerSourceMapCommand(program: Command): void {
         logger.info(
           `Took ${diff} ms, ${diff / 1000} secs, ${diff / 1000 / 60} mins`,
         );
-        logger.info(`Storing json at ${outputFile}`);
+        logger.info(
+          `Storing #${sm.mappings.length} Mappings as JSON at ${outputFile}`,
+        );
         const outputDir = path.dirname(outputFile);
         createDirectoryIfUnexisting(outputDir);
         StoreMappingsToJSON(outputFile, sm);
