@@ -17,11 +17,7 @@ import {
   sourceNodeFromLoc,
   sourceNodeLoc,
 } from './reusable_code';
-import {
-  DefaultColumnStartNumber,
-  DefaultLineStartNumber,
-  SourceMapConfig,
-} from '../../src/source_mappers/source_map_config';
+import { SourceMapConfig } from '../../src/source_mappers/source_map_config';
 
 describe.skip('Debug Operations on AssemblyScript Blink App', function () {
   const pathToRootSource = path.resolve(
@@ -33,8 +29,6 @@ describe.skip('Debug Operations on AssemblyScript Blink App', function () {
   const srcFileMapper = new Map<string, string>([['blink/blink.ts', srcPath]]);
   const sourceMapConfig: SourceMapConfig = {
     srcToAbsPath: srcFileMapper,
-    colNrStartNumber: DefaultColumnStartNumber,
-    lineNrStartNumber: DefaultLineStartNumber,
   };
 
   let sourceCFGs: SourceCFGs;

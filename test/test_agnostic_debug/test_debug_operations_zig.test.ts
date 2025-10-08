@@ -5,11 +5,7 @@ import {
   type DotSerializationConfig,
   type SourceCFGs,
 } from '../../src/cfg/source_cfg';
-import {
-  DefaultColumnStartNumber,
-  DefaultLineStartNumber,
-  SourceMapConfig,
-} from '../../src/source_mappers/source_map_config';
+import { SourceMapConfig } from '../../src/source_mappers/source_map_config';
 import {
   DebugStandard,
   readSourceMap,
@@ -28,8 +24,6 @@ describe('Debug Operations on Zig App', function () {
   const sourceMapConfig: SourceMapConfig = {
     srcToAbsPath,
     ignore: ['/opt/homebrew/'],
-    colNrStartNumber: DefaultColumnStartNumber,
-    lineNrStartNumber: DefaultLineStartNumber,
   };
 
   let sourceCFGs: SourceCFGs;

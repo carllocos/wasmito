@@ -15,11 +15,7 @@ import { PlatformTarget } from '../../src/platforms/platform_config';
 import { WasmCompilerArgs } from '../../src/compilers/wasm_compiler';
 import { StoreTrace } from './store_trace';
 import { DebugStandard, readSourceMapJSON } from '../../src';
-import {
-  DefaultColumnStartNumber,
-  DefaultLineStartNumber,
-  SourceMapConfig,
-} from '../../src/source_mappers/source_map_config';
+import { SourceMapConfig } from '../../src/source_mappers/source_map_config';
 
 async function registerHooks(
   em: WasmitoBackendVM,
@@ -76,8 +72,6 @@ async function run(): Promise<void> {
   ]);
   const sourceMapConfig: SourceMapConfig = {
     srcToAbsPath: srcFileMapper,
-    colNrStartNumber: DefaultColumnStartNumber,
-    lineNrStartNumber: DefaultLineStartNumber,
   };
   const recordTime = 30; // seconds
   const outputDir = './tool_examples/tracer/';

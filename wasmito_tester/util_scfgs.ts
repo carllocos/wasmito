@@ -2,11 +2,7 @@ import path from 'path';
 import { SourceCFGNode, SourceCFGs } from '../src/cfg/source_cfg';
 import { WasmCFGs } from '../src/cfg/wasm_cfg';
 import { SourceMapFromJSON } from '../src/source_mappers/source_map_builder';
-import {
-  DefaultColumnStartNumber,
-  DefaultLineStartNumber,
-  SourceMapConfig,
-} from '../src/source_mappers/source_map_config';
+import { SourceMapConfig } from '../src/source_mappers/source_map_config';
 import {
   SourceCodeLocation,
   sourceCodeLocationToString,
@@ -20,8 +16,6 @@ export function loadSourceCFGs(
   if (config === undefined) {
     config = {
       newWasmPath: wasmPath,
-      lineNrStartNumber: DefaultLineStartNumber,
-      colNrStartNumber: DefaultColumnStartNumber,
       prefixSources: path.resolve('./'),
       removeUnusedMappings: true,
     };

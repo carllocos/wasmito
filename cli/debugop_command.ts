@@ -19,11 +19,6 @@ import {
 import { DebugOperationFromName } from '../src/language_adaptors/debug_operations';
 import { type SourceCFGNode } from '../src/cfg/source_cfg';
 import { writeFileSync } from 'fs';
-import {
-  DefaultColumnStartNumber,
-  DefaultLineStartNumber,
-  SourceMapConfig,
-} from '../src/source_mappers/source_map_config';
 
 export function registerDebugOpCommand(program: Command): void {
   program
@@ -159,15 +154,10 @@ export function registerDebugOpCommand(program: Command): void {
         smPromise = readSourceMap(DebugStandard.DWARF, wasmPath, dwarfPath);
       } else {
         sourceSpecPath = getAbsolutePath(sourceSpecPath);
-        const config: SourceMapConfig = {
-          colNrStartNumber: DefaultColumnStartNumber,
-          lineNrStartNumber: DefaultLineStartNumber,
-        };
         smPromise = readSourceMap(
           DebugStandard.SourceMapSpec,
           wasmPath,
           sourceSpecPath,
-          config,
         );
       }
       try {
