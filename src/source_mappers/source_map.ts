@@ -2,7 +2,7 @@ import { type MappingItem } from 'source-map';
 import { createLogger } from '../logger/logger';
 import { WasmModule } from '../webassembly/wasm/wasm_module';
 import { type WASMFunction } from '../webassembly/wasm/wasm_function';
-import { isFilePath, pathsEqual } from '../util/file_util';
+import { pathsEqual } from '../util/file_util';
 import { writeFileSync } from 'fs';
 
 const logger = createLogger('SourceMap');
