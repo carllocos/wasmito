@@ -32,6 +32,7 @@ import { registerRunningRequestCommand } from './running_command';
 import { registerCompileCommand } from './compile_command';
 import { registerCallRequestCommand } from './call_command';
 import { registerArduinoCLICommand } from './arduinocli_command';
+import { registerInspectRequestCommand } from './inspect_command';
 
 export function startCLI(): void {
   const projectName = readProjectName();
@@ -59,6 +60,7 @@ export function startCLI(): void {
   registerWasmParseCommand(program);
   registerEventRequestCommand(program);
   registerBreakpointRequestCommand(program);
+  registerInspectRequestCommand(program);
   registerRunningRequestCommand(program);
   registerCallRequestCommand(program);
   registerArduinoCLICommand(program);
