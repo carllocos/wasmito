@@ -5,11 +5,7 @@ import {
   type DotSerializationConfig,
   type SourceCFGs,
 } from '../../src/cfg/source_cfg';
-import {
-  DefaultColumnStartNumber,
-  DefaultLineStartNumber,
-  SourceMapConfig,
-} from '../../src/source_mappers/source_map_config';
+import { SourceMapConfig } from '../../src/source_mappers/source_map_config';
 import {
   DebugStandard,
   readSourceMap,
@@ -27,8 +23,6 @@ describe('Debug operations on C Blink Intermittent App', function () {
   ]);
   const sourceMapConfig: SourceMapConfig = {
     srcToAbsPath: srcFileMapper,
-    colNrStartNumber: DefaultColumnStartNumber,
-    lineNrStartNumber: DefaultLineStartNumber,
   };
 
   this.timeout(30000);

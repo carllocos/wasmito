@@ -8,11 +8,7 @@ import { constructLanguageAdaptor } from '../../src/language_adaptors/language_a
 import assert, { fail } from 'assert';
 import { type SourceCFGs } from '../../src/cfg/source_cfg';
 import { DebugOperations } from '../../src/language_adaptors/debug_operations';
-import {
-  DefaultColumnStartNumber,
-  DefaultLineStartNumber,
-  SourceMapConfig,
-} from '../../src/source_mappers/source_map_config';
+import { SourceMapConfig } from '../../src/source_mappers/source_map_config';
 
 describe('Debug Until Call Operation on AssemblyScript Blink App', function () {
   const pathToRootSource = path.resolve(
@@ -24,8 +20,6 @@ describe('Debug Until Call Operation on AssemblyScript Blink App', function () {
   const srcFileMapper = new Map<string, string>([['blink/blink.ts', srcPath]]);
   const sourceMapConfig: SourceMapConfig = {
     srcToAbsPath: srcFileMapper,
-    colNrStartNumber: DefaultColumnStartNumber,
-    lineNrStartNumber: DefaultLineStartNumber,
   };
 
   let sourceCFGs: SourceCFGs;

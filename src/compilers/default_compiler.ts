@@ -14,7 +14,6 @@ import {
   SourceMapFromJSON,
 } from '../source_mappers/source_map_builder';
 import { type SourceMap } from '../source_mappers';
-import { SourceMapConfig } from '../source_mappers/source_map_config';
 
 export interface DefaultCompileArgs {
   pathToSrcRoot: string;
@@ -71,12 +70,9 @@ export class DefaultCompiler extends SourceCodeCompiler {
     } else {
       let standard = DebugStandard.DWARF;
       let debugInfo = compilerArgs.pathToWasm;
-      const config: SourceMapConfig = {};
       if (compilerArgs.pathToSourceMap !== undefined) {
         standard = DebugStandard.SourceMapSpec;
         debugInfo = compilerArgs.pathToSourceMap;
-        config.colNrStartNumber = 0;
-        config.lineNrStartNumber = 0; // TODO check if correct
       }
       sm = await readSourceMap(standard, compilerArgs.pathToWasm, debugInfo);
     }

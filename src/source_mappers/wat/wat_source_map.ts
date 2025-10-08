@@ -6,10 +6,6 @@ import {
 } from '../source_map';
 import { type MappingItem } from 'source-map';
 import { SourceMapFromJSON } from '../source_map_builder';
-import {
-  DefaultColumnStartNumber,
-  DefaultLineStartNumber,
-} from '../source_map_config';
 
 export function createSourceMapForWAT(
   lines: LineInfoPairs[],
@@ -24,8 +20,6 @@ export function createSourceMapForWAT(
     mappings: sourceLocations,
   };
   return SourceMapFromJSON(sm, {
-    colNrStartNumber: DefaultColumnStartNumber,
-    lineNrStartNumber: DefaultLineStartNumber,
     removeUnusedMappings: true,
   });
 }

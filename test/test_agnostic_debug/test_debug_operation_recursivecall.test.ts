@@ -9,11 +9,7 @@ import { constructLanguageAdaptor } from '../../src/language_adaptors/language_a
 import assert, { fail } from 'assert';
 import { type SourceCFGs } from '../../src/cfg/source_cfg';
 import { DebugOperations } from '../../src/language_adaptors/debug_operations';
-import {
-  DefaultColumnStartNumber,
-  DefaultLineStartNumber,
-  SourceMapConfig,
-} from '../../src/source_mappers/source_map_config';
+import { SourceMapConfig } from '../../src/source_mappers/source_map_config';
 
 describe('Step Recursive Call on AssemblyScript Blink App', function () {
   const pathToRootSource = path.resolve(
@@ -25,8 +21,6 @@ describe('Step Recursive Call on AssemblyScript Blink App', function () {
   const srcFileMapper = new Map<string, string>([['blink/blink.ts', srcPath]]);
   const sourceMapConfig: SourceMapConfig = {
     srcToAbsPath: srcFileMapper,
-    colNrStartNumber: DefaultColumnStartNumber,
-    lineNrStartNumber: DefaultLineStartNumber,
   };
 
   let sourceCFGs: SourceCFGs;
@@ -78,8 +72,6 @@ describe('Step Recursive Call in Rust Factorial', function () {
   const wasmPath = path.resolve(pathToRootSource, 'fac.wasm');
   const sourceMapConfig: SourceMapConfig = {
     prefixSources: rootDir,
-    colNrStartNumber: DefaultColumnStartNumber,
-    lineNrStartNumber: DefaultLineStartNumber,
     newWasmPath: wasmPath,
   };
 
