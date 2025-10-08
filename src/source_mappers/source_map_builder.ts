@@ -9,7 +9,11 @@ import { createLogger } from '../logger/logger';
 import { isFilePath, pathJoin, readFileAsJSONSync } from '../util/file_util';
 import { WasmModule } from '../webassembly/wasm/wasm_module';
 import { ReadDWARFMappings } from './debug_standards/dwarf_reader';
-import { SourceMapConfig } from './source_map_config';
+import {
+  DefaultColumnOffset,
+  DefaultLineOffset,
+  SourceMapConfig,
+} from './source_map_config';
 import { ReadSourceSpec } from './debug_standards/source_map_spec_reader';
 
 const logger = createLogger('SourceMapBuilder');
@@ -110,7 +114,8 @@ function cleanMappings(
   if (config?.keepAllMappings !== undefined && config.keepAllMappings) {
     return sourceCodeLocations;
   }
-  const [lineNrOffset, colNrOffset] = getOffsetToApply(config);
+  const lineNrOffset = config?.lineOffset ?? DefaultLineOffset;
+  const colNrOffset = config?.columnOffset ?? DefaultColumnOffset;
   const seenLocs = new Map<number, SourceCodeLocation[]>();
   const cleaned: SourceCodeLocation[] = [];
   for (const sl of sourceCodeLocations) {
@@ -218,38 +223,4 @@ function cleanSourcePath(
   } else {
     return undefined;
   }
-}
-
-function getOffsetToApply(config?: SourceMapConfig): [number, number] {
-  if (config === undefined) {
-    return [0, 0];
-  }
-  const colNrStartNumber = config.colNrStartNumber!;
-  const lineNrStartNumber = config.lineNrStartNumber!;
-
-  let colNrOffset = 0;
-  if (colNrStartNumber > 1) {
-    throw new Error(`We have a startColnr greater than 1 ${colNrStartNumber}`);
-  } else if (colNrStartNumber === 0) {
-    colNrOffset = 1;
-  } else if (colNrStartNumber === 1) {
-    colNrOffset = 0;
-  } else {
-    throw new Error(`We have a negative startColnr ${colNrStartNumber}`);
-  }
-
-  let lineNrOffset = 0;
-  if (lineNrStartNumber > 1) {
-    throw new Error(
-      `We have a startLinenr greater than 1 ${lineNrStartNumber}`,
-    );
-  } else if (lineNrStartNumber === 0) {
-    lineNrOffset = 1;
-  } else if (lineNrStartNumber === 1) {
-    lineNrOffset = 0;
-  } else {
-    throw new Error(`We have a negative startLineNr ${lineNrStartNumber}`);
-  }
-
-  return [lineNrOffset, colNrOffset];
 }
