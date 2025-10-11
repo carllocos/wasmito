@@ -105,7 +105,7 @@ This will produce three files in directory `wasm`:
 
 ###  Deploy Blink.wasm
 
-To deploy a Wasm module to a MCU, you can use the Wasmito CLI. Note that the following commands was purely introduced for convenience. It is perfectly possible to deploy the Wasm module by using `arduino-cli` and giving it access to the config file present in `wasmito/libs/Arduino/arduino_config.yml`.
+To deploy a Wasm module to a MCU, you can use the Wasmito CLI. Note that the following commands were purely introduced for convenience. It is perfectly possible to deploy the Wasm module by using `arduino-cli` and giving it access to the config file present in `wasmito/libs/Arduino/arduino_config.yml`.
 
 The following uses Wasmito CLI to deploy a Wasm module.
 Moreover, the following assumes that `wcli` is an alias for `node path_to_wasmito/dist/cjs/cli/cli.cjs
@@ -123,8 +123,17 @@ Then add one MCU to your project and give it a name
 ```
 wcli devices --add m5stickc 
 ```
-Install the needed libraries to target the M5StickC
+Install the needed libraries to target the M5StickC.
 
+Add the URL to the M5StickC board
+
+```bash
+wcli arduino-cli config add \
+    board_manager.additional_urls \
+    https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/arduino/package_m5stack_index.json
+```
+
+Then install the core libraries
 ```bash
 wcli arduino-cli core install m5stack:esp32@2.0.0
 ```
