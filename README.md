@@ -2,32 +2,36 @@
 
 Wasmito is a library that enables the creation of language-agnostic dynamic tools (e.g., debuggers, testing tools, monitoring tools) for applications that compile to WebAssembly and that run on MCUs using the [WARDuino Wasm VM](https://github.com/carllocos/WARDuino).
 
-The **primary goal** of this project is to investigate novel tool development techniques for the creation of language-agnostic dynamic tools tailored to MCUs.
-Thus this project is **highly experimental** i.e., you can expect bugs.
-The tools that emerge from this library serve as evaluation of the proposed techniques.
+The **primary goal** of this project is to explore novel techniques for building language-agnostic dynamic tools tailored for MCUs.
+As such, this project is **highly experimental** - you can expect bugs.
+The tools developed using this library serve as an evaluation of the proposed techniques.
 
-This is a non-exhaustive list of functionality provided by the library:
-- Deploy a Wasm module into a WARDuino VM. The VM could either be running on a MCU, locally on a desktop machine, or out-of-place as introduced companion research work ...
-- Hook infrastructure to hook into function calls, MCU events, and so on.
-- call graph construction.
-- control-flow graph construction at a Wasm level or Source level.
+Here is a non-exhaustive list of functionality provided by the library:
+- Deploy a Wasm module into a WARDuino VM. The VM can be running on an MCU, locally on a desktop machine, or out-of-place as introduced in the companion research paper.
+- Hook infrastructure to intercep function calls, MCU events, and more.
+- Call graph construction.
+- Control-flow graph construction at the Wasm level or Source level.
 - Language-agnostic debugging operations as introduced in companion research paper.
 - ...
 
-The CLI provided in this project  exposes some of the above functionality.
+The CLI provided in this project exposes some of the above functionality.
 
 ## Installation
 
-Make sure to install the following dependencies:
-- Python 3 and make it accessible via the $PATH environment variable
+Before running the installation script, make sure the following dependencies are properly installed:
+- Python 3: required by `arduino-cli`. Ensure Python 3 is accessible via the $PATH environment variable as `python`.
 - python3-serial
 - cargo
 - cargo binstall
 - node version 23.11
 - cmake
-- make sure to have permissions for /dev/*
+- permissions to access `/dev/*`
 
-After installing the dependencies, run the installation script `scripts/install.sh`.
+Once all dependencies are installed, run the installation script
+
+```bash
+bash scripts/install.sh
+```
 
 After the installation completes, the `libs` directory should contain the following directories:
 - wabt
@@ -36,7 +40,10 @@ After the installation completes, the `libs` directory should contain the follow
 
 ## Tests
 
-To run the tests simply run `npm run test` from within the root of the directory.
+To run the tests locally, execute the following command from within the root directory
+```bash
+npm run test
+```
 
 TODO: explain how to run the tests on the MCU.
 
@@ -44,7 +51,9 @@ TODO: explain how to run the tests on the MCU.
 
 You can access the CLI as follow:
 
-> node dist/cjs/cli/cli.cjs --help
+```bash
+node dist/cjs/cli/cli.cjs --help
+```
 
 
 ## Deploy a Wasm module
@@ -53,11 +62,11 @@ see `docs/deploy_wasm.md`
 
 ## Building Dynamic Tools
 
-See the toy examples in directory `tool_examples`.
+See the toy examples in the `tool_examples` directory.
 
 
 ## Research
-Research that enabled language-agnostic debugging of WebAssembyl on MCUs.
+Research that enabled language-agnostic debugging of WebAssembly on MCUs.
 
 ```bibtex
 to appear on MPLR
