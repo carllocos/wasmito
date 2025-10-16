@@ -69,7 +69,22 @@ See the toy examples in the `tool_examples` directory.
 Research that enabled language-agnostic debugging of WebAssembly on MCUs.
 
 ```bibtex
-to appear on MPLR
+@inproceedings{10.1145/3759426.3760979,
+    author = {Rojas Castillo, Carlos and Marra, Matteo and Gonzalez Boix, Elisa},
+    title = {A Control-Flow Graph Approach to Language-Agnostic Debugging for Microcontrollers},
+    year = {2025},
+    isbn = {9798400721496},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    url = {https://doi.org/10.1145/3759426.3760979},
+    doi = {10.1145/3759426.3760979},
+    booktitle = {Proceedings of the 22nd ACM SIGPLAN International Conference on Managed Programming Languages and Runtimes},
+    pages = {38–56},
+    numpages = {19},
+    keywords = {Breakpoints, Debugging, IoT, Stepping, WebAssembly, microcontrollers},
+    location = {Singapore, Singapore},
+    series = {MPLR '25}
+}
 ```
 
 Research that enabled out-of-things debugging.
