@@ -184,6 +184,9 @@ async function compileWAT2WASM(
     `${wat2wasm} --no-canonicalize-leb128s --disable-bulk-memory --debug-names -v -o ${wasmOutputFile} ` +
     sourcefilePath;
   const [linesSourceMap, errorMsg, error] = await runCommand(command);
+  logger.error(
+    `LINES SOURCEMAP LENGTH =${linesSourceMap.length}, ERROR_MSG=${errorMsg.length}`,
+  );
   if (errorMsg !== '' || error !== null) {
     let msg = `Command ${command} failed reason: `;
     if (errorMsg !== '') {
