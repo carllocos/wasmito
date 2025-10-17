@@ -184,10 +184,8 @@ async function compileWAT2WASM(
     `${wat2wasm} --no-canonicalize-leb128s --disable-bulk-memory --debug-names -v -o ${wasmOutputFile} ` +
     sourcefilePath;
   const [linesSourceMap, errorMsg, error] = await runCommand(command);
-  logger.error(
-    `LINES SOURCEMAP LENGTH =${linesSourceMap.length}, ERROR_MSG=${errorMsg.length}`,
-  );
-  if (errorMsg !== '' || error !== null) {
+  const lines = linesSourceMap !== '' ? linesSourceMap : errorMsg;
+  if (lines === '' || error !== null) {
     let msg = `Command ${command} failed reason: `;
     if (errorMsg !== '') {
       msg += errorMsg;
@@ -197,9 +195,16 @@ async function compileWAT2WASM(
     logger.error(msg);
     throw new WATCompilerError(msg);
   }
-  logger.info(`Saving wabt_sourcemap to filepath: ${linesInfoOutputFile}`);
-  writeFileSync(linesInfoOutputFile, linesSourceMap);
-  return makeLineInfoPairs(linesSourceMap);
+  try {
+    const sourceMap = makeLineInfoPairs(linesSourceMap);
+    logger.info(`Saving wabt_sourcemap to filepath: ${linesInfoOutputFile}`);
+    writeFileSync(linesInfoOutputFile, linesSourceMap);
+    return sourceMap;
+  } catch (e) {
+    const errmsg = `failed to produce SourceMap. Error given ${e} for lines ${lines}`;
+    logger.error(errmsg);
+    throw new WATCompilerError(errmsg);
+  }
 }
 
 async function createCHeaderFile(
