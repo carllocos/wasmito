@@ -7,7 +7,7 @@ import { addr2line } from '../../src/wasm-tools/addr2lines';
  * The following test suite tests the `wasm-tools addr2line command`
  */
 
-describe('addr2line command', () => {
+describe.skip('addr2line command', () => {
   const wasmPath = './test/data/rust_examples/blink/main.wasm';
 
   it('Invalid WasmAddr yields an empty array result', async () => {

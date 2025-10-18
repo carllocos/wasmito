@@ -1,52 +1,32 @@
 import { expect } from 'chai';
 import path from 'path';
-import {
-  DebugStandard,
-  readSourceMap,
-} from '../../src/source_mappers/source_map_builder';
+import { SourceMapFromJSON } from '../../src/source_mappers/source_map_builder';
 import { constructLanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 import assert, { fail } from 'assert';
-import {
-  type DotSerializationConfig,
-  isCallNode,
-  type SourceCFGs,
-} from '../../src/cfg/source_cfg';
+import { isCallNode, type SourceCFGs } from '../../src/cfg/source_cfg';
 import { DebugOperations } from '../../src/language_adaptors/debug_operations';
 import {
   sortIncreasingNr,
   sourceNodeFromLoc,
   sourceNodeLoc,
 } from './reusable_code';
-import { SourceMapConfig } from '../../src/source_mappers/source_map_config';
 
-describe.skip('Debug Operations on AssemblyScript Blink App', function () {
+describe('Debug Operations on AssemblyScript Blink App', function () {
   const pathToRootSource = path.resolve(
     './test/data/assemblyscript_examples/blink/',
   );
-  const sourceMapPath = path.resolve(pathToRootSource, 'blink.wasm.map');
-  const wasmPath = path.resolve(pathToRootSource, 'blink.wasm');
+  const mappingsPath = path.resolve(pathToRootSource, 'mappings.json');
   const srcPath = path.resolve(pathToRootSource, 'blink.ts');
-  const srcFileMapper = new Map<string, string>([['blink/blink.ts', srcPath]]);
-  const sourceMapConfig: SourceMapConfig = {
-    srcToAbsPath: srcFileMapper,
-  };
-
   let sourceCFGs: SourceCFGs;
 
   before('parse wasm module', async function () {
     try {
-      const sm = await readSourceMap(
-        DebugStandard.SourceMapSpec,
-        wasmPath,
-        sourceMapPath,
-        sourceMapConfig,
-      );
+      const sm = SourceMapFromJSON(mappingsPath, {
+        columnOffset: 1,
+      });
       const langAdaptor = await constructLanguageAdaptor(sm);
       assert(langAdaptor.sourceCFG !== undefined);
       sourceCFGs = langAdaptor.sourceCFG;
-      langAdaptor.sourceMap.storeMappingsToJSON(
-        path.resolve(pathToRootSource, 'mappings.json'),
-      );
     } catch (e) {
       fail(`Could not construct sourcemap or langadaptor. Reason ${e}`);
     }
@@ -63,13 +43,14 @@ describe.skip('Debug Operations on AssemblyScript Blink App', function () {
 
     expect(callNode.length).to.equal(1);
     const [call] = callNode;
+    expect(isCallNode(call));
     const nextPossibleLocations = DebugOperations.stepOver(sourceCFGs, call);
 
     expect(nextPossibleLocations.length).to.equal(1);
   });
 
   it('"step over" addTime (51, 23) function call', function () {
-    const callNode = sourceCFGs.nodesFromSourceLoc({
+    const nodes = sourceCFGs.nodesFromSourceLoc({
       source: srcPath,
       linenr: 51,
       colnr: 23,
@@ -77,12 +58,19 @@ describe.skip('Debug Operations on AssemblyScript Blink App', function () {
       address: 0,
     });
 
-    expect(callNode.length).to.equal(1);
-    const [call] = callNode;
-    expect(isCallNode(call)).to.be.equal(true);
-    const nextPossibleLocations = DebugOperations.stepOver(sourceCFGs, call);
-
-    expect(nextPossibleLocations.length).to.equal(2);
+    expect(nodes.length).to.equal(2);
+    let foundCallNode = false;
+    for (const n of nodes) {
+      if (isCallNode(n)) {
+        foundCallNode = true;
+        const nextPossibleLocations = DebugOperations.stepOver(sourceCFGs, n);
+        expect(nextPossibleLocations.length).to.equal(1);
+      }
+    }
+    expect(foundCallNode).to.be.equal(
+      true,
+      'No callNode found at location (51,23)',
+    );
   });
 });
 
@@ -92,43 +80,16 @@ describe('Debug Operations on AS Intermittent Blink', function () {
   const pathToRootSource = path.resolve(
     './test/data/assemblyscript_examples/blink_intermittent/',
   );
-  const sourceMapPath = path.resolve(pathToRootSource, 'main.wasm.map');
-  const wasmPath = path.resolve(pathToRootSource, 'main.wasm');
+  const mappingsPath = path.resolve(pathToRootSource, 'mappings.json');
   const sourcePath = path.resolve(pathToRootSource, 'blink_intermittent.ts');
-  const srcFileMapper = new Map<string, string>([
-    [
-      'mainblinkintermt.debug/assembly-blink-intermittent/blink_intermittent.ts',
-      sourcePath,
-    ],
-  ]);
-  const sourceMapConfig: SourceMapConfig = {
-    srcToAbsPath: srcFileMapper,
-    columnOffset: 1,
-  };
-
   let sourceCFGs: SourceCFGs;
 
   before('parse wasm module', async function () {
     try {
-      const sm = await readSourceMap(
-        DebugStandard.SourceMapSpec,
-        wasmPath,
-        sourceMapPath,
-        sourceMapConfig,
-      );
+      const sm = SourceMapFromJSON(mappingsPath);
       const langAdaptor = await constructLanguageAdaptor(sm);
       assert(langAdaptor.sourceCFG !== undefined);
       sourceCFGs = langAdaptor.sourceCFG;
-      langAdaptor.sourceMap.storeMappingsToJSON(
-        path.resolve(pathToRootSource, 'mappings.json'),
-      );
-      const config: DotSerializationConfig = {
-        includeInstructions: false,
-        includeEmptySCFG: false,
-        includeExitNode: true,
-        includeEntryNode: true,
-      };
-      sourceCFGs.serializeToDot(pathToRootSource, config);
     } catch (e) {
       fail(`Could not construct sourcemap or langadaptor. Reason ${e}`);
     }
