@@ -62,6 +62,10 @@ export function registerCFGCommand(program: Command): void {
       '--dot-no-entrynode',
       'do not include the entry node in the generated CFGs dot files.',
     )
+    .option(
+      '--allow-missing-sources',
+      'nodes pointing to unexisting source files will be included in the emitted CFG',
+    )
     .action(async (wasmPath, outputDir, options) => {
       const logger = getGlobalLogger();
       if (!isFilePath(wasmPath)) {
@@ -126,9 +130,11 @@ export function registerCFGCommand(program: Command): void {
 
         createDirectoryIfUnexisting(outputDir);
         logger.info(`Starting construction CFGs`);
+
+        const allowMissingSources = options.allowMissingSources !== undefined;
         const startTime = Date.now();
         const langAdaptor = await timeoutPromise(
-          constructLanguageAdaptor(sm),
+          constructLanguageAdaptor(sm, allowMissingSources),
           timeoutMs,
         );
         const endTime = Date.now();

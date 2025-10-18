@@ -32,6 +32,7 @@ export function buildSourceCFGraph(
   sourceMap: SourceMap,
   // asts: AgnosticASTMap,
   cfg: WasmCFGs,
+  includeUnavailableSourceFiles: boolean,
 ): Map<number, BinaryLiftedCFG> {
   logger.debug(
     `Building Source Level Control Flow Graph for #${sourceMap.wasm.functions.length}`,
@@ -43,7 +44,12 @@ export function buildSourceCFGraph(
     logger.debug(
       `[${idx}/${funcs.length - 1}] Building SCFG for function ${f.id}`,
     );
-    const funGraph = binaryLiftWasmCFG(f, sourceMap, cfg);
+    const funGraph = binaryLiftWasmCFG(
+      f,
+      sourceMap,
+      cfg,
+      includeUnavailableSourceFiles,
+    );
     logger.debug(
       `[${idx}/${funcs.length - 1}] Storing SCFG of function ${f.id} to Map`,
     );
@@ -56,6 +62,7 @@ function binaryLiftWasmCFG(
   f: WASMFunction,
   sourceMap: SourceMap,
   cfg: WasmCFGs,
+  includeUnavailableSourceFiles: boolean,
 ): BinaryLiftedCFG {
   /**
    * The process of binary lifting a Wasm CFG is divided into the following steps:
@@ -73,7 +80,12 @@ function binaryLiftWasmCFG(
    *
    */
   const graph = cfg.getCFGOrError(f.id);
-  const ns = binaryLiftWasmNodes(f.id, sourceMap, graph);
+  const ns = binaryLiftWasmNodes(
+    f.id,
+    sourceMap,
+    graph,
+    includeUnavailableSourceFiles,
+  );
   logger.debug(
     `${ns.length === 0 ? 'No edges to add' : 'Adding Edges'} for function ${f.id}`,
   );
@@ -241,6 +253,7 @@ function binaryLiftWasmNodes(
   funID: number,
   sourceMap: SourceMap,
   funGraph: WasmCFG,
+  includeUnavailableSourceFiles: boolean,
 ): SourceCFGNode[] {
   logger.debug(`Creating all nodes for ${funID}`);
   const entryNode = funGraph.entryNode;
@@ -255,7 +268,7 @@ function binaryLiftWasmNodes(
         const sourceLocations = sourceMap
           .getOriginalPositionFor(instr.startAddress)
           .filter((s) => {
-            return isFilePath(s.source);
+            return includeUnavailableSourceFiles || isFilePath(s.source);
           });
 
         if (sourceLocations.length > 1) {

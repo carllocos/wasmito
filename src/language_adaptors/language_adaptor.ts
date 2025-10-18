@@ -16,9 +16,10 @@ const logger = createLogger('LanguageAdaptor');
 
 export async function constructLanguageAdaptor(
   sourceMap: SourceMap,
+  includeUnavailableSourceFiles: boolean = false,
 ): Promise<LanguageAdaptor> {
   const la = new LanguageAdaptor(sourceMap);
-  await la.buildComplementaryContext();
+  await la.buildComplementaryContext(includeUnavailableSourceFiles);
   return la;
 }
 
@@ -57,9 +58,11 @@ export class LanguageAdaptor {
     return this._srcCfg;
   }
 
-  async buildComplementaryContext(): Promise<void> {
+  async buildComplementaryContext(
+    includeUnavailableSourceFiles: boolean,
+  ): Promise<void> {
     await this.buildASTS();
-    this.buildSourceCFGs();
+    this.buildSourceCFGs(includeUnavailableSourceFiles);
   }
 
   public unusedMappingsToJSON(ouputFile?: string): string {
@@ -160,7 +163,12 @@ export class LanguageAdaptor {
     }
   }
 
-  private buildSourceCFGs(): void {
-    this._srcCfg = new SourceCFGs(this._asts, this.sourceMap, this._wasmCFGs);
+  private buildSourceCFGs(includeUnavailableSourceFiles: boolean): void {
+    this._srcCfg = new SourceCFGs(
+      this._asts,
+      this.sourceMap,
+      this._wasmCFGs,
+      includeUnavailableSourceFiles,
+    );
   }
 }

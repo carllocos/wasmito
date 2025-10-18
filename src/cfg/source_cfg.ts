@@ -53,10 +53,19 @@ export class SourceCFGs {
   private _callbacksCFGsSearched: boolean;
   private _callbacksCFGs: CallbackSCFG[];
 
-  constructor(asts: AgnosticASTMap, sourceMap: SourceMap, wasmCFGs: WasmCFGs) {
+  constructor(
+    asts: AgnosticASTMap,
+    sourceMap: SourceMap,
+    wasmCFGs: WasmCFGs,
+    includeUnavailableSourcefiles: boolean = false,
+  ) {
     this.fullSourceMap = sourceMap;
     this._wasmCFGs = wasmCFGs;
-    this._funToSourceCFG = buildSourceCFGraph(sourceMap, wasmCFGs);
+    this._funToSourceCFG = buildSourceCFGraph(
+      sourceMap,
+      wasmCFGs,
+      includeUnavailableSourcefiles,
+    );
     let allNodes: SourceCFGNode[] = [];
     for (const funGraph of this._funToSourceCFG.values()) {
       allNodes = allNodes.concat(funGraph.allNodes);
