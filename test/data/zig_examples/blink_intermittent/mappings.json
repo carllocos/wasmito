@@ -1,0 +1,175 @@
+{
+  "wasm": "test/data/zig_examples/blink_intermittent/blink_intermittent.wasm",
+  "sources": ["test/data/zig_examples/blink_intermittent/blink_intermittent.zig"],
+  "mappings": [
+    {
+      "source": "test/data/zig_examples/blink_intermittent/blink_intermittent.zig",
+      "address": 431,
+      "linenr": 18,
+      "colnr": 5,
+      "name": ""
+    },
+    {
+      "source": "test/data/zig_examples/blink_intermittent/blink_intermittent.zig",
+      "address": 442,
+      "linenr": 19,
+      "colnr": 5,
+      "name": ""
+    },
+    {
+      "source": "test/data/zig_examples/blink_intermittent/blink_intermittent.zig",
+      "address": 453,
+      "linenr": 20,
+      "colnr": 5,
+      "name": ""
+    },
+    {
+      "source": "test/data/zig_examples/blink_intermittent/blink_intermittent.zig",
+      "address": 464,
+      "linenr": 21,
+      "colnr": 5,
+      "name": ""
+    },
+    {
+      "source": "test/data/zig_examples/blink_intermittent/blink_intermittent.zig",
+      "address": 475,
+      "linenr": 22,
+      "colnr": 5,
+      "name": ""
+    },
+    {
+      "source": "test/data/zig_examples/blink_intermittent/blink_intermittent.zig",
+      "address": 487,
+      "linenr": 23,
+      "colnr": 5,
+      "name": ""
+    },
+    {
+      "source": "test/data/zig_examples/blink_intermittent/blink_intermittent.zig",
+      "address": 499,
+      "linenr": 24,
+      "colnr": 5,
+      "name": ""
+    },
+    {
+      "source": "test/data/zig_examples/blink_intermittent/blink_intermittent.zig",
+      "address": 510,
+      "linenr": 26,
+      "colnr": 18,
+      "name": ""
+    },
+    {
+      "source": "test/data/zig_examples/blink_intermittent/blink_intermittent.zig",
+      "address": 528,
+      "linenr": 28,
+      "colnr": 18,
+      "name": ""
+    },
+    {
+      "source": "test/data/zig_examples/blink_intermittent/blink_intermittent.zig",
+      "address": 541,
+      "linenr": 29,
+      "colnr": 14,
+      "name": ""
+    },
+    {
+      "source": "test/data/zig_examples/blink_intermittent/blink_intermittent.zig",
+      "address": 591,
+      "linenr": 30,
+      "colnr": 31,
+      "name": ""
+    },
+    {
+      "source": "test/data/zig_examples/blink_intermittent/blink_intermittent.zig",
+      "address": 609,
+      "linenr": 31,
+      "colnr": 23,
+      "name": ""
+    },
+    {
+      "source": "test/data/zig_examples/blink_intermittent/blink_intermittent.zig",
+      "address": 622,
+      "linenr": 32,
+      "colnr": 31,
+      "name": ""
+    },
+    {
+      "source": "test/data/zig_examples/blink_intermittent/blink_intermittent.zig",
+      "address": 640,
+      "linenr": 33,
+      "colnr": 23,
+      "name": ""
+    },
+    {
+      "source": "test/data/zig_examples/blink_intermittent/blink_intermittent.zig",
+      "address": 656,
+      "linenr": 33,
+      "colnr": 23,
+      "name": ""
+    },
+    {
+      "source": "test/data/zig_examples/blink_intermittent/blink_intermittent.zig",
+      "address": 659,
+      "linenr": 33,
+      "colnr": 23,
+      "name": ""
+    },
+    {
+      "source": "test/data/zig_examples/blink_intermittent/blink_intermittent.zig",
+      "address": 681,
+      "linenr": 36,
+      "colnr": 27,
+      "name": ""
+    },
+    {
+      "source": "test/data/zig_examples/blink_intermittent/blink_intermittent.zig",
+      "address": 699,
+      "linenr": 37,
+      "colnr": 19,
+      "name": ""
+    },
+    {
+      "source": "test/data/zig_examples/blink_intermittent/blink_intermittent.zig",
+      "address": 858,
+      "linenr": 6,
+      "colnr": 22,
+      "name": ""
+    },
+    {
+      "source": "test/data/zig_examples/blink_intermittent/blink_intermittent.zig",
+      "address": 912,
+      "linenr": 6,
+      "colnr": 22,
+      "name": ""
+    },
+    {
+      "source": "test/data/zig_examples/blink_intermittent/blink_intermittent.zig",
+      "address": 958,
+      "linenr": 10,
+      "colnr": 27,
+      "name": ""
+    },
+    {
+      "source": "test/data/zig_examples/blink_intermittent/blink_intermittent.zig",
+      "address": 1012,
+      "linenr": 10,
+      "colnr": 27,
+      "name": ""
+    },
+    {
+      "source": "test/data/zig_examples/blink_intermittent/blink_intermittent.zig",
+      "address": 1051,
+      "linenr": 14,
+      "colnr": 19,
+      "name": ""
+    },
+    {
+      "source": "test/data/zig_examples/blink_intermittent/blink_intermittent.zig",
+      "address": 1079,
+      "linenr": 14,
+      "colnr": 19,
+      "name": ""
+    }
+  ]
+}
+
