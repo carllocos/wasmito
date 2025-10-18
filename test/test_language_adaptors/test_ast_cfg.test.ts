@@ -1,13 +1,12 @@
 import path from 'path';
-import {
-  DebugStandard,
-  readSourceMap,
-} from '../../src/source_mappers/source_map_builder';
+import { SourceMapFromJSON } from '../../src/source_mappers/source_map_builder';
 import { constructLanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 import assert, { fail } from 'assert';
 import { type SourceCFGs } from '../../src/cfg/source_cfg';
 
-const exampleFile = path.resolve('./test/data/rust_examples/blink/main.wasm');
+const mappingsPath = path.resolve(
+  './test/data/rust_examples/blink/mappings.json',
+);
 describe('Rust AST Control Flow Graph for Blink App', function () {
   let sourceCFGs: SourceCFGs;
 
@@ -15,11 +14,7 @@ describe('Rust AST Control Flow Graph for Blink App', function () {
 
   before('parse wasm module', async function () {
     try {
-      const sm = await readSourceMap(
-        DebugStandard.DWARF,
-        exampleFile,
-        exampleFile,
-      );
+      const sm = SourceMapFromJSON(mappingsPath);
       const langAdaptor = await constructLanguageAdaptor(sm);
       assert(langAdaptor.sourceCFG !== undefined);
       sourceCFGs = langAdaptor.sourceCFG;

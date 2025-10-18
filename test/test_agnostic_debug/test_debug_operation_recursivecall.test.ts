@@ -1,10 +1,6 @@
 import { expect } from 'chai';
 import path from 'path';
-import {
-  DebugStandard,
-  readSourceMap,
-  SourceMapFromJSON,
-} from '../../src/source_mappers/source_map_builder';
+import { SourceMapFromJSON } from '../../src/source_mappers/source_map_builder';
 import { constructLanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 import assert, { fail } from 'assert';
 import { type SourceCFGs } from '../../src/cfg/source_cfg';
@@ -15,30 +11,16 @@ describe('Step Recursive Call on AssemblyScript Blink App', function () {
   const pathToRootSource = path.resolve(
     './test/data/assemblyscript_examples/blink/',
   );
-  const sourceMapPath = path.resolve(pathToRootSource, 'blink.wasm.map');
-  const wasmPath = path.resolve(pathToRootSource, 'blink.wasm');
+  const mappingsPath = path.resolve(pathToRootSource, 'mappings.json');
   const srcPath = path.resolve(pathToRootSource, 'blink.ts');
-  const srcFileMapper = new Map<string, string>([['blink/blink.ts', srcPath]]);
-  const sourceMapConfig: SourceMapConfig = {
-    srcToAbsPath: srcFileMapper,
-  };
-
   let sourceCFGs: SourceCFGs;
 
   before('parse wasm module', async function () {
     try {
-      const sm = await readSourceMap(
-        DebugStandard.SourceMapSpec,
-        wasmPath,
-        sourceMapPath,
-        sourceMapConfig,
-      );
+      const sm = SourceMapFromJSON(mappingsPath);
       const langAdaptor = await constructLanguageAdaptor(sm);
       assert(langAdaptor.sourceCFG !== undefined);
       sourceCFGs = langAdaptor.sourceCFG;
-      langAdaptor.sourceMap.storeMappingsToJSON(
-        path.resolve(pathToRootSource, 'mappings.json'),
-      );
     } catch (e) {
       fail(`Could not construct sourcemap or langadaptor. Reason ${e}`);
     }

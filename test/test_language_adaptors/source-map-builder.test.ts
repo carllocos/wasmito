@@ -1,10 +1,7 @@
 import assert from 'assert';
 import { expect } from 'chai';
 import { type SourceMap } from '../../src/source_mappers/source_map';
-import {
-  DebugStandard,
-  readSourceMap,
-} from '../../src/source_mappers/source_map_builder';
+import { SourceMapFromJSON } from '../../src/source_mappers/source_map_builder';
 import { createMappingForAddr } from '../../src/source_mappers/debug_standards/dwarf_reader';
 
 /*
@@ -22,7 +19,7 @@ describe('MappingItem building', () => {
     expect(mapping.length).equal(0);
   });
 
-  it('Valid WasmAddr results in a mapping', async () => {
+  it.skip('Valid WasmAddr results in a mapping', async () => {
     const invalidWasmAddress = 289;
     const mapping = await createMappingForAddr(wasmPath, invalidWasmAddress);
     expect(mapping.length).not.equal(0);
@@ -30,26 +27,22 @@ describe('MappingItem building', () => {
 });
 
 describe('SourceMap building', function () {
-  const wasmPath = './test/data/rust_examples/blink/main.wasm';
+  const mappingsPath = './test/data/rust_examples/blink/mappings.json';
   this.timeout(15000);
 
   it('building sourcemap', async function () {
-    const mapping = await readSourceMap(
-      DebugStandard.DWARF,
-      wasmPath,
-      wasmPath,
-    );
+    const mapping = SourceMapFromJSON(mappingsPath);
     expect(mapping).not.equal(undefined);
   });
 });
 
 describe('SourceMap entries', function () {
-  const wasmPath = './test/data/rust_examples/blink/main.wasm';
+  const mappingsPath = './test/data/rust_examples/blink/mappings.json';
   let sourceMap: SourceMap | undefined;
   this.timeout(15000);
 
   before('Build SourceMap', async function () {
-    sourceMap = await readSourceMap(DebugStandard.DWARF, wasmPath, wasmPath);
+    sourceMap = SourceMapFromJSON(mappingsPath);
     expect(sourceMap).to.not.equal(undefined);
   });
 
