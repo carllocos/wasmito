@@ -1,10 +1,7 @@
 import { type Command } from 'commander';
 import { ClientSideSocket } from '../src/communication/client_socket';
 import { StateRequest } from '../src/runtimes/wasmito_vm/requests/inspect_request';
-import {
-  isSuccessfulMessage,
-  sendRequest,
-} from '../src/runtimes/request_interface';
+import { sendRequest } from '../src/runtimes/request_interface';
 import { isSerialPort } from '../src/util/serial_port';
 import { SourceMap } from '../src/source_mappers/source_map';
 import { isFilePath } from '../src/util/file_util';
@@ -18,7 +15,7 @@ export function registerInspectRequestCommand(program: Command): void {
       'Inspect program state either on Local VM or MCU VM. For local VM `port` is a socket port. For MCU, `port` is a serial port. If -w option is provided, then provide source level state',
     )
     .option('-b <baudrate>', 'baudrate only required if port is a serial port')
-    .option('-pc', 'inspect program counter')
+    .option('--pc', 'inspect program counter')
     .option('-w <path>', 'provide source mapping stored as JSON')
     .action(async (port, options) => {
       const portNr = Number(port);

@@ -18,7 +18,7 @@ export function registerCallgraphCommand(program: Command): void {
     .argument('<wasm-path>', 'the wasm for which we build the callgraph')
     .argument('<timeout-secs>', 'the maximum time allocated to the callgraph') // TODO make arg optional
     .option(
-      '-od, --dot-output <output-path>',
+      '--dot-output <output-path>',
       'the location where to store the call graph. Parent directories are created if needed.',
       // TODO make arg mandatory
     )

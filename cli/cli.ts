@@ -44,7 +44,7 @@ export function startCLI(): void {
     .name(projectName)
     .description(readProjectDescription())
     .version(readProjectVersionNumber())
-    .option('-log, --log-level <type>', 'set the log-level');
+    .option('-l, --log-level <type>', 'set the log-level');
 
   // registerDeviceManagerCommands(dm, program);
 
