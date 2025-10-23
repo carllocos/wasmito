@@ -4,7 +4,7 @@ import {
   SourceMapJSON,
   mappingItemToSourceCodeLocation,
 } from '../source_map';
-import { type MappingItem } from 'source-map';
+import { MappingItem } from '../sourcespec';
 import { SourceMapFromJSON } from '../source_map_builder';
 
 export function createSourceMapForWAT(

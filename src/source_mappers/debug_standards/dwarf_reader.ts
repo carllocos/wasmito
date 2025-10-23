@@ -3,7 +3,7 @@ import {
   type SourceMapJSON,
   mappingItemToSourceCodeLocation,
 } from '../source_map';
-import { type MappingItem } from 'source-map';
+import { MappingItem } from '../sourcespec';
 // import { createLogger } from '../../logger/logger';
 import { addr2line } from '../../wasm-tools/addr2lines';
 import { wasmToolsObjdump } from '../../wasm-tools/objdump';
