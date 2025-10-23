@@ -1,5 +1,5 @@
 {
-  "wasm": "test/data/rust_examples/blink/main_original.wasm",
+  "wasm": "test/data/rust_examples/blink/main.wasm",
   "sources": [
     "test/data/rust_examples/blink/main.rs"
   ],
