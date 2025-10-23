@@ -1,0 +1,113 @@
+{
+    "wasm": "test/data/assemblyscript_examples/object_example/object_example.wasm",
+    "sources": [
+        "test/data/assemblyscript_examples/object_example/object_example.ts"
+    ],
+    "mappings": [
+        {
+            "source": "test/data/assemblyscript_examples/object_example/object_example.ts",
+            "address": 4985,
+            "linenr": 9,
+            "colnr": 17,
+            "name": ""
+        },
+        {
+            "source": "test/data/assemblyscript_examples/object_example/object_example.ts",
+            "address": 4999,
+            "linenr": 9,
+            "colnr": 11,
+            "name": ""
+        },
+        {
+            "source": "test/data/assemblyscript_examples/object_example/object_example.ts",
+            "address": 5006,
+            "linenr": 11,
+            "colnr": 15,
+            "name": ""
+        },
+        {
+            "source": "test/data/assemblyscript_examples/object_example/object_example.ts",
+            "address": 5008,
+            "linenr": 11,
+            "colnr": 3,
+            "name": ""
+        },
+        {
+            "source": "test/data/assemblyscript_examples/object_example/object_example.ts",
+            "address": 5010,
+            "linenr": 12,
+            "colnr": 3,
+            "name": ""
+        },
+        {
+            "source": "test/data/assemblyscript_examples/object_example/object_example.ts",
+            "address": 5014,
+            "linenr": 12,
+            "colnr": 9,
+            "name": ""
+        },
+        {
+            "source": "test/data/assemblyscript_examples/object_example/object_example.ts",
+            "address": 5016,
+            "linenr": 12,
+            "colnr": 13,
+            "name": ""
+        },
+        {
+            "source": "test/data/assemblyscript_examples/object_example/object_example.ts",
+            "address": 5018,
+            "linenr": 12,
+            "colnr": 9,
+            "name": ""
+        },
+        {
+            "source": "test/data/assemblyscript_examples/object_example/object_example.ts",
+            "address": 5021,
+            "linenr": 13,
+            "colnr": 7,
+            "name": ""
+        },
+        {
+            "source": "test/data/assemblyscript_examples/object_example/object_example.ts",
+            "address": 5023,
+            "linenr": 13,
+            "colnr": 11,
+            "name": ""
+        },
+        {
+            "source": "test/data/assemblyscript_examples/object_example/object_example.ts",
+            "address": 5026,
+            "linenr": 13,
+            "colnr": 7,
+            "name": ""
+        },
+        {
+            "source": "test/data/assemblyscript_examples/object_example/object_example.ts",
+            "address": 5037,
+            "linenr": 15,
+            "colnr": 13,
+            "name": ""
+        },
+        {
+            "source": "test/data/assemblyscript_examples/object_example/object_example.ts",
+            "address": 5051,
+            "linenr": 15,
+            "colnr": 7,
+            "name": ""
+        },
+        {
+            "source": "test/data/assemblyscript_examples/object_example/object_example.ts",
+            "address": 5058,
+            "linenr": 16,
+            "colnr": 15,
+            "name": ""
+        },
+        {
+            "source": "test/data/assemblyscript_examples/object_example/object_example.ts",
+            "address": 5084,
+            "linenr": 16,
+            "colnr": 3,
+            "name": ""
+        }
+    ]
+}
