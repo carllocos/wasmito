@@ -2,7 +2,7 @@ import { type MappingItem } from 'source-map';
 import { createLogger } from '../logger/logger';
 import { WasmModule } from '../webassembly/wasm/wasm_module';
 import { type WASMFunction } from '../webassembly/wasm/wasm_function';
-import { pathsEqual } from '../util/file_util';
+import { isAbsolutePath, pathsEqual } from '../util/file_util';
 import { writeFileSync } from 'fs';
 
 const logger = createLogger('SourceMap');
@@ -131,12 +131,26 @@ export class SourceMap {
     });
   }
 
+  /**
+   * Find and return all the source locations that match the given argument location.
+   * If either the `source` or `colnr` is equal to respectively an empty string or a number smaller than zero.
+   * The fields are then ignored when finding the locations.
+   *
+   * @param location
+   * @returns the source code locations matching the given location
+   */
   public generatedPositionFor(
     location: SourceCodeLocation,
   ): SourceCodeLocation[] {
     const positions: SourceCodeLocation[] = [];
     const candidates = this._mappings.filter((m) => {
-      return m.linenr === location.linenr;
+      if (m.linenr !== location.linenr) return false;
+      if (location.source === '') return true;
+      if (isAbsolutePath(location.source)) {
+        return location.source.endsWith(m.source);
+      } else {
+        return m.source.endsWith(location.source);
+      }
     });
     logger.debug(
       `#${candidates.length} candidates for SourceLoc {${location.source}, ${location.linenr}, ${location.colnr}}`,
