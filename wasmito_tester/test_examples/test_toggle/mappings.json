@@ -1,0 +1,252 @@
+{
+  "wasm": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/dbg/toggle.wasm",
+  "sources": [
+    "toggle/~lib/rt/common.ts",
+    "toggle/~lib/rt/tlsf.ts",
+    "toggle/~lib/shared/typeinfo.ts",
+    "toggle/~lib/rt/itcms.ts",
+    "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+    "toggle/~lib/function.ts"
+  ],
+  "mappings": [
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 322,
+      "linenr": 7,
+      "colnr": 19,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 324,
+      "linenr": 7,
+      "colnr": 24,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 326,
+      "linenr": 7,
+      "colnr": 5,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 331,
+      "linenr": 11,
+      "colnr": 24,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 333,
+      "linenr": 11,
+      "colnr": 29,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 335,
+      "linenr": 11,
+      "colnr": 5,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 342,
+      "linenr": 39,
+      "colnr": 14,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 344,
+      "linenr": 39,
+      "colnr": 13,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 345,
+      "linenr": 39,
+      "colnr": 5,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 347,
+      "linenr": 40,
+      "colnr": 16,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 351,
+      "linenr": 40,
+      "colnr": 24,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 354,
+      "linenr": 40,
+      "colnr": 28,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 357,
+      "linenr": 40,
+      "colnr": 5,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 359,
+      "linenr": 41,
+      "colnr": 18,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 361,
+      "linenr": 41,
+      "colnr": 23,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 363,
+      "linenr": 41,
+      "colnr": 5,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 368,
+      "linenr": 15,
+      "colnr": 16,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 370,
+      "linenr": 15,
+      "colnr": 5,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 375,
+      "linenr": 45,
+      "colnr": 5,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 377,
+      "linenr": 46,
+      "colnr": 5,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 381,
+      "linenr": 46,
+      "colnr": 11,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 385,
+      "linenr": 47,
+      "colnr": 15,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 387,
+      "linenr": 47,
+      "colnr": 9,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 443,
+      "linenr": 19,
+      "colnr": 25,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 445,
+      "linenr": 19,
+      "colnr": 30,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 460,
+      "linenr": 19,
+      "colnr": 40,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 462,
+      "linenr": 19,
+      "colnr": 5,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 492,
+      "linenr": 34,
+      "colnr": 13,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 494,
+      "linenr": 34,
+      "colnr": 18,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 496,
+      "linenr": 34,
+      "colnr": 5,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 498,
+      "linenr": 35,
+      "colnr": 17,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 500,
+      "linenr": 35,
+      "colnr": 25,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 502,
+      "linenr": 35,
+      "colnr": 36,
+      "name": ""
+    },
+    {
+      "source": "/Users/crojcas/Documents/projects/dimmer-m5stickc/toggle-led/src/toggle.ts",
+      "address": 515,
+      "linenr": 35,
+      "colnr": 5,
+      "name": ""
+    }
+  ]
+}
+
