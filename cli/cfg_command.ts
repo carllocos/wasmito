@@ -47,7 +47,7 @@ export function registerCFGCommand(program: Command): void {
       `read the debugging information from the given path to a Source Map Spec.`,
     )
     .option(
-      '-cg, --callgraph <callgraph-name.dot>',
+      '--callgraph <callgraph-name.dot>',
       'enable the build of the callgraph for the wasm and store it in the <output-dir> as <callgraph-name.dot>.',
     )
     .option(
