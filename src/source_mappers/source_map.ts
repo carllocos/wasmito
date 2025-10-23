@@ -1,4 +1,4 @@
-import { type MappingItem } from 'source-map';
+import { MappingItem } from './sourcespec';
 import { createLogger } from '../logger/logger';
 import { WasmModule } from '../webassembly/wasm/wasm_module';
 import { type WASMFunction } from '../webassembly/wasm/wasm_function';
