@@ -4,14 +4,12 @@ import {
   type SourceCFGNode,
   isCallNode,
   sourceNodeFirstInstrStartAddr,
+  BinaryLiftedCFG,
   getCallInstructions,
+  sourceNodeFirstInstruction,
   isSCFGEmpty,
 } from '../cfg/source_cfg';
-import {
-  CallIndirect,
-  CallInstruction,
-  isCallInstruction,
-} from '../webassembly/wasm/wasm_instruction';
+import { isCallInstruction } from '../webassembly/wasm/wasm_instruction';
 
 export type DestinationSCFGNode = [SourceCFGNode, number];
 
@@ -221,54 +219,108 @@ export function stepIteration(
   return destinationNodes;
 }
 
+// TODO a function that navigates the CFG node per node
+// the idea is that somehow that function does step into, step over, etc,
+// it advances computation as if it would be at runtime
+// the computation should keep track of possible multipaths
+
+function cleanDuplicates(ns: DestinationSCFGNode[]): DestinationSCFGNode[] {
+  return ns;
+}
+
+function getLinkedSCFGs(
+  scfgs: SourceCFGs,
+  callNode: SourceCFGNode,
+): [BinaryLiftedCFG[], Set<number>] {
+  const linked: BinaryLiftedCFG[] = [];
+  const unlinked: Set<number> = new Set();
+  const calls = getCallInstructions(callNode);
+  for (const call of calls) {
+    const calledFuncs: number[] = [];
+    if (isCallInstruction(call)) {
+      calledFuncs.push(call.funIdx);
+    } else {
+      logger.warn(
+        `untilCall: ignoring call_indirect instruction at address ${call.startAddress} in node ${callNode.nodeId}`,
+      );
+      throw new Error(`Handle call indirect case`);
+    }
+
+    for (const f of calledFuncs) {
+      const scfg = scfgs.getFunctionSourceCFG(f);
+      if (scfg === undefined || isSCFGEmpty(scfg)) {
+        unlinked.add(call.funIdx);
+      } else {
+        linked.push(scfg);
+      }
+    }
+  }
+
+  return [linked, unlinked];
+}
+
 function stepUntilCall(
   scfgs: SourceCFGs,
   startNode: SourceCFGNode,
 ): DestinationSCFGNode[] {
-  const visitedNodes = new Set<number>();
+  // TODO: this function should account for possible loops in the CFG.
+  // scenario: startNode is a callNode
+  // scenario: follow loop
+  // for each function called check if SCFG exists
+  // if not check if needed to stop
+  // if yes stop there
+
+  // you are already at the start node
+  if (isCallNode(startNode)) {
+    const [calledFuncs] = getLinkedSCFGs(scfgs, startNode);
+    if (calledFuncs.length > 0) {
+      return [];
+    }
+  }
+
   const q: SourceCFGNode[] = [startNode];
+  const visitedNodes = new Set<number>();
   let n: SourceCFGNode | undefined;
   const priorCalls: DestinationSCFGNode[] = [];
   while ((n = q.pop()) !== undefined) {
-    if (visitedNodes.has(n.nodeId)) {
-      continue;
-    }
+    if (visitedNodes.has(n.nodeId)) continue;
+
     visitedNodes.add(n.nodeId);
 
     if (isCallNode(n)) {
-      const calls = getCallInstructions(n);
-      const callsFound: Array<CallInstruction | CallIndirect> = [];
-      for (const call of calls) {
-        if (isCallInstruction(call)) {
-          const SCFGs = scfgs.getFunctionSourceCFG(call.funIdx);
-          if (SCFGs !== undefined && !isSCFGEmpty(SCFGs)) {
-            callsFound.push(call);
-          }
-        } else {
-          logger.warn(
-            `untilCall: ignoring call_indirect instruction at address ${call.startAddress} in node ${n.nodeId}`,
-          );
-        }
+      const [calledFuncs, unlinked] = getLinkedSCFGs(scfgs, n);
+      let found = false;
+      if (calledFuncs.length > 0) {
+        found = true;
       }
 
-      // TODO: handle the case where PC is currently pointing to an instruction in startNode
-      // and that instruction is after a call instruction and before another call instruction
-      // this debug operation should advance just until the next call instruction
-      if (callsFound.length > 1) {
-        logger.warn(
-          `untilCall: multiple call instructions in node ${n.nodeId}, taking the first one`,
-        );
-      } else if (callsFound.length === 1) {
-        priorCalls.push([n, callsFound[0].startAddress]);
+      const imported = scfgs.sourceMap.wasm.importFuncs.filter((f) =>
+        unlinked.has(f.id),
+      );
+      if (found || imported.length > 0) {
+        const instr = sourceNodeFirstInstruction(n);
+        priorCalls.push([n, instr.startAddress]);
         continue;
       }
     }
+
+    // TODO: handle the case where PC is currently pointing to an instruction in startNode
+    // and that instruction is after a call instruction and before another call instruction
+    // this debug operation should advance just until the next call instruction
+    // if (callsFound.length > 1) {
+    //   logger.warn(
+    //     `untilCall: multiple call instructions in node ${n.nodeId}, taking the first one`,
+    //   );
+    // } else if (callsFound.length === 1) {
+    //   priorCalls.push([n, callsFound[0].startAddress]);
+    //   continue;
+    // }
 
     for (const [n2] of n.edges) {
       q.push(n2);
     }
   }
-  return priorCalls;
+  return cleanDuplicates(priorCalls);
 }
 
 function stepRecursiveCall(
