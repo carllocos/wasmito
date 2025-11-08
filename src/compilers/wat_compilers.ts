@@ -1,6 +1,6 @@
 import { createLogger } from '../logger/logger';
 import { SourceCodeCompiler } from './compiler';
-import { getPath2WAT2WASM, getPath2XXD } from '../project_config';
+import { getPath2XXD } from '../project_config';
 import { createSourceMapForWAT } from '../source_mappers/wat/wat_source_map';
 import {
   getAbsolutePath,
@@ -11,18 +11,16 @@ import {
   removeFileExtension,
 } from '../util/file_util';
 import path from 'path';
-import {
-  extractAddressInformation,
-  type LineInfoPairs,
-  type LineInfo,
-} from '../webassembly/parsers/obj-dump_parser';
-import { writeFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
+
 import { runCommand } from '../util/process_command';
 import { TargetLanguage } from './prog_language_selection';
 import {
   type LanguageAdaptor,
   constructLanguageAdaptor,
 } from '../language_adaptors/language_adaptor';
+import { Module, ParseError } from 'wasmito-tools';
+import { SourceCodeLocation } from '../source_mappers';
 
 const logger = createLogger('WATCompiler');
 
@@ -134,7 +132,7 @@ export class WATCompiler extends SourceCodeCompiler {
       removeFile(sourceMapFileOutput);
     }
 
-    const lineInfoPairs = await compileWAT2WASM(
+    const mappings = await compileWAT2WASM(
       sourceCodePath,
       wasmOutputFilePath,
       sourceMapFileOutput,
@@ -164,7 +162,7 @@ export class WATCompiler extends SourceCodeCompiler {
       removeFile(objDumpDissembleOutputFile);
     }
     const sm = createSourceMapForWAT(
-      lineInfoPairs,
+      mappings,
       sourceCodePath,
       wasmOutputFilePath,
     );
@@ -176,34 +174,44 @@ export class WATCompiler extends SourceCodeCompiler {
 async function compileWAT2WASM(
   sourcefilePath: string,
   wasmOutputFile: string,
-  linesInfoOutputFile: string,
-): Promise<LineInfoPairs[]> {
+  _linesInfoOutputFile: string,
+): Promise<SourceCodeLocation[]> {
   logger.info(`Compiling wat to wasm: ${sourcefilePath} -> ${wasmOutputFile}`);
-  const wat2wasm = getPath2WAT2WASM();
-  const command =
-    `${wat2wasm} --no-canonicalize-leb128s --disable-bulk-memory --debug-names -v -o ${wasmOutputFile} ` +
-    sourcefilePath;
-  const [linesSourceMap, errorMsg, error] = await runCommand(command);
-  const lines = linesSourceMap !== '' ? linesSourceMap : errorMsg;
-  if (lines === '' || error !== null) {
-    let msg = `Command ${command} failed reason: `;
-    if (errorMsg !== '') {
-      msg += errorMsg;
-    } else {
-      msg += `${error?.name}: ${error?.message}`;
-    }
-    logger.error(msg);
-    throw new WATCompilerError(msg);
-  }
+  const watContent = readFileSync(sourcefilePath, 'utf-8');
   try {
-    const sourceMap = makeLineInfoPairs(linesSourceMap);
-    logger.info(`Saving wabt_sourcemap to filepath: ${linesInfoOutputFile}`);
-    writeFileSync(linesInfoOutputFile, linesSourceMap);
-    return sourceMap;
-  } catch (e) {
-    const errmsg = `failed to produce SourceMap. Error given ${e} for lines ${lines}`;
-    logger.error(errmsg);
-    throw new WATCompilerError(errmsg);
+    const wasm = Module.from_wat(sourcefilePath, watContent);
+    const mappings: SourceCodeLocation[] = [];
+    for (const m of wasm.addr2line_mappings()) {
+      const source = m.file;
+      if (source === undefined) {
+        continue;
+      }
+
+      const linenr = m.line;
+      if (linenr === undefined) {
+        continue;
+      }
+
+      mappings.push({
+        source,
+        address: Number(m.address),
+        linenr,
+        colnr: m.column ?? 0,
+        name: '',
+      });
+    }
+    writeFileSync(wasmOutputFile, Buffer.from(wasm.bytes));
+    //   logger.info(`Saving wabt_sourcemap to filepath: ${linesInfoOutputFile}`);
+    //   writeFileSync(linesInfoOutputFile, linesSourceMap);
+    return mappings;
+  } catch (error) {
+    let msg = `Parsing WAT failed failed reason: `;
+    if (error instanceof ParseError) {
+      msg += error.context;
+    } else {
+      msg += error;
+    }
+    throw new WATCompilerError(msg);
   }
 }
 
@@ -227,62 +235,4 @@ async function createCHeaderFile(
     logger.error(errMsg);
     throw new WATCompilerError(errMsg);
   }
-}
-
-function makeLineInfoPairs(sourceMapInput: string): LineInfoPairs[] {
-  const lines = sourceMapInput.split('\n');
-  return createLineInfoPairs(lines);
-}
-
-function createLineInfoPairs(lines: string[]): LineInfoPairs[] {
-  const result = [];
-  let lastLineInfo: LineInfo = {
-    line: -1,
-    columnStart: -1,
-    columnEnd: -1,
-    message: 'unexisting line',
-  };
-
-  let foundFirstLineInfo = false;
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    const newLine = line.match(/@ {/);
-    if (newLine !== null) {
-      lastLineInfo = extractLineInfo(line);
-      foundFirstLineInfo = true;
-      continue;
-    }
-    try {
-      if (!foundFirstLineInfo) {
-        continue;
-      }
-      const addr = extractAddressInformation(line);
-      const li = {
-        line: lastLineInfo.line,
-        columnStart: lastLineInfo.columnStart,
-        columnEnd: lastLineInfo.columnEnd,
-        message: lastLineInfo.message,
-      };
-      result.push({ lineInfo: li, lineAddress: addr });
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (e) {
-      /* empty */
-    }
-  }
-  return result;
-}
-
-function extractLineInfo(lineString: string): LineInfo {
-  const obj = JSON.parse(lineString.substring(2));
-  // ('@ { "line": 18, "col_start": 21, "col_end": 30 }');
-  let msg = '';
-  if (typeof obj.message === 'string') {
-    msg = obj.message;
-  }
-  return {
-    line: obj.line,
-    columnStart: obj.col_start,
-    columnEnd: obj.col_end,
-    message: msg,
-  };
 }

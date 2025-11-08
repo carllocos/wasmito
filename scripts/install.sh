@@ -64,25 +64,6 @@ echo "> WARDuino: tmp copy makefile"
 rm $LIBS_DIR/WARDuino/platforms/Arduino/Makefile
 cp $WASMITO_MAKEFILE_TEMPLATE $LIBS_DIR/WARDuino/platforms/Arduino/Makefile
 
-echo "> WABT: fetching submodules"
-if [ ! -d "$LIBS_DIR/wabt/src" ]; then
-  cd $LIBS_DIR
-  echo cloning wabt.git
-  git clone https://github.com/TOPLLab/wabt.git
-fi
-
-cd $LIBS_DIR/wabt
-git submodule update --init
-
-echo "> WABT: building tools"
-mkdir -p build
-cd build
-cmake .. . -DBUILD_TESTS=OFF
-echo building wat2wasm
-make wat2wasm
-echo building wasm-objdump
-make wasm-objdump
-
 # build project config file
 cd $LIBS_DIR/../ # go to root of project
 /bin/sh ./scripts/project_config.sh $LIBS_DIR $ARDUINO_CLI $ARDUINO_CONFIG $WASM_TOOLS_DIR/bin/wasm-tools
