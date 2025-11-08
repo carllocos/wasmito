@@ -1562,7 +1562,6 @@ function parseTypes(fields: any): WasmType[] {
     return [loc, funcType];
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   locationsAndTypes.sort(([l1, _t1], [l2, _t2]) => {
     return l1.start.column - l2.start.column;
   });

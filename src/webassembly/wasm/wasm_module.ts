@@ -37,7 +37,7 @@ export class WasmModule {
   public readonly importFuncs: WASMFunction[];
   public readonly globals: WasmGlobal[];
   public readonly _functions: WASMFunction[];
-  private readonly ast: object;
+  private readonly _ast: object;
   public readonly wasmBuffer: Buffer;
   private readonly _instructions: WasmInstruction[];
   private readonly _globalInstructions: WasmInstruction[];
@@ -60,7 +60,7 @@ export class WasmModule {
     this.importFuncs = createImportedFunctions(mod);
     this.globals = createWasmGlobals(mod);
     this.types = createWasmTypes(mod);
-    this.ast = mod.ast;
+    this._ast = mod.ast;
     this.wasmBuffer = mod.wasmBuffer;
     this._globalInstructions = retrieveGlobalInstructions(mod);
     this._instructions = retrieveAllInstructions(mod, this.functions);

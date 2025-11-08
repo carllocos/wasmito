@@ -220,7 +220,6 @@ export class SourceCFGs {
   ): Array<[SourceCFGNode, number]> {
     const alreadyAdded = new Set<number>();
     const ns: Array<[SourceCFGNode, number]> = [];
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     for (const [e, _iFrom, ito] of n.edges) {
       if (!alreadyAdded.has(ito.startAddress)) {
         ns.push([e, ito.startAddress]);
@@ -378,7 +377,6 @@ export interface SourceCFGNode {
 }
 
 function sourceCFGNodeToJSONObj(n: SourceCFGNode): object {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const edges: object[] = n.edges.map(([e, _]) => {
     return { nodeID: e.nodeId };
   });

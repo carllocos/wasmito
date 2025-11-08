@@ -49,8 +49,7 @@ export class ControlFlowGraphDBG implements DebugAPI {
   async stepOut(
     location: SourceCodeLocation,
     timeout?: number,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    endAddress?: number[],
+    _endAddress?: number[],
   ): Promise<SourceCodeLocation> {
     const nodes = this.scfgs.nodesFromSourceLoc(location);
     if (nodes.length === 0) {
@@ -65,8 +64,7 @@ export class ControlFlowGraphDBG implements DebugAPI {
   async stepOver(
     location: SourceCodeLocation,
     timeout?: number,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    endAddress?: number[],
+    _endAddress?: number[],
   ): Promise<SourceCodeLocation> {
     const nodes = this.scfgs.nodesFromSourceLoc(location);
     if (nodes.length === 0) {
@@ -97,7 +95,6 @@ export class ControlFlowGraphDBG implements DebugAPI {
             );
           }
           let idxRmv = 0;
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           for (const [_, addr] of nodes) {
             runtime
               .removeBreakpoint(addr, timeout)
@@ -127,7 +124,6 @@ export class ControlFlowGraphDBG implements DebugAPI {
           );
         }
       }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       for (const [_, addr] of nodes) {
         const added = await this.runtime.addBreakpoint(addr, timeout);
         if (added) {

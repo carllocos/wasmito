@@ -32,14 +32,14 @@ export function registerInspectRequestCommand(program: Command): void {
       }
 
       const mappingsPath = options.w;
-      let sourceMap: undefined | SourceMap;
+      let _sourceMap: undefined | SourceMap;
       if (mappingsPath !== undefined) {
         if (!isFilePath(mappingsPath)) {
           program.error(
             `-w not a valid path to source mapping JSON. Given ${mappingsPath}`,
           );
         }
-        sourceMap = SourceMapFromJSON(mappingsPath);
+        _sourceMap = SourceMapFromJSON(mappingsPath);
       }
 
       const req = new StateRequest();

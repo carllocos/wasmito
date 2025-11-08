@@ -125,7 +125,6 @@ class BrigadierJSONWriter {
       return;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [addr, opcode, labels, _args] = val;
     const opcodeType = opcode.signature;
     if (opcodeType instanceof PlaceholderType) {
