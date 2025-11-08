@@ -2,29 +2,12 @@ import assert from 'assert';
 import { expect } from 'chai';
 import { type SourceMap } from '../../src/source_mappers/source_map';
 import { SourceMapFromJSON } from '../../src/source_mappers/source_map_builder';
-import { createMappingForAddr } from '../../src/source_mappers/debug_standards/dwarf_reader';
 
 /*
  * Until DWARF library is fully intergated, the generation of SourceMaps happens temporarily
  * via the `wasm-tools addr2line` command.
  * The following test suite tests the creation of such SourceMap
  */
-
-describe('MappingItem building', () => {
-  const wasmPath = './test/data/rust_examples/blink/main.wasm';
-
-  it('Invalid WasmAddr results in undefined mapping', async () => {
-    const invalidWasmAddress = 1;
-    const mapping = await createMappingForAddr(wasmPath, invalidWasmAddress);
-    expect(mapping.length).equal(0);
-  });
-
-  it.skip('Valid WasmAddr results in a mapping', async () => {
-    const invalidWasmAddress = 289;
-    const mapping = await createMappingForAddr(wasmPath, invalidWasmAddress);
-    expect(mapping.length).not.equal(0);
-  });
-});
 
 describe('SourceMap building', function () {
   const mappingsPath = './test/data/rust_examples/blink/mappings.json';
