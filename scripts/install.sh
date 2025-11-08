@@ -4,7 +4,6 @@
 
 set -e
 LIBS_DIR=$(realpath .)/libs
-WASM_TOOLS_DIR=$LIBS_DIR/wasm-tools
 ARDUINO_DIR=$LIBS_DIR/Arduino
 ARDUINO_DIR_ESCAPED=$(echo "$ARDUINO_DIR" | sed 's:/:\\/:g')
 ARDUINO_CLI=$ARDUINO_DIR/arduino-cli
@@ -14,9 +13,6 @@ REPLACE_REGEX='s/%USER_PATH/'${ARDUINO_DIR_ESCAPED}/g
 WASMITO_MAKEFILE_TEMPLATE=$(realpath .)/templates/wasmito_makefile
 
 echo "> Installing shared libs in $LIBS_DIR"
-echo "> Installing wasm-tools in $WASM_TOOLS_DIR"
-mkdir -p $WASM_TOOLS_DIR
-cargo binstall wasm-tools -y --root $WASM_TOOLS_DIR -V 1.205.0
 
 echo "> Installing Arduino libs in $ARDUINO_DIR"
 echo "> Creating arduino_config with directories.user=$ARDUINO_DIR ESCAPED $ARDUINO_DIR_ESCAPED"
@@ -66,6 +62,6 @@ cp $WASMITO_MAKEFILE_TEMPLATE $LIBS_DIR/WARDuino/platforms/Arduino/Makefile
 
 # build project config file
 cd $LIBS_DIR/../ # go to root of project
-/bin/sh ./scripts/project_config.sh $LIBS_DIR $ARDUINO_CLI $ARDUINO_CONFIG $WASM_TOOLS_DIR/bin/wasm-tools
+/bin/sh ./scripts/project_config.sh $LIBS_DIR $ARDUINO_CLI $ARDUINO_CONFIG
 
 npm install && npm run build
