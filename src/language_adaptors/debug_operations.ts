@@ -208,7 +208,6 @@ export function stepIteration(
   const destinationNodes: Array<[SourceCFGNode, number]> = [];
   for (const n of cycleStart.concat(exitLoop)) {
     const nodeAddresses = duplicateCheck.get(n.nodeId) ?? [];
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     for (const [_fromNode, _fromInstr, toInstr] of n.incomingEdges) {
       if (nodeAddresses.includes(toInstr.startAddress)) continue;
       destinationNodes.push([n, toInstr.startAddress]);

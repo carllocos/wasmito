@@ -51,7 +51,6 @@ export function isDelayedAction<ResultType>(
 
 export interface SubscribeAction<
   ResultType,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _Hook extends HookWithSubscription<ResultType>,
 > {
   description: string;
