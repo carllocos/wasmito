@@ -17,10 +17,10 @@ import path from 'path';
 import { type ProgLangSelectionArgs } from '../compilers/prog_language_selection';
 import { maybeTimeoutPromise } from '../util/promise_util';
 import { type BoardBaudRate, isSerialPort } from '../util/serial_port';
-import { copyFile, writeFileSync } from 'fs';
+import { copyFile, readFileSync, writeFileSync } from 'fs';
 import { type VMConfiguration } from '../device';
-import { wasmStripCustomSection } from '../wasm-tools/wasm_strip';
 import { getPathArduinoCLI, getPathArduinoConfig } from '../project_config';
+import { StripConfig, StripError } from 'wasmito-tools';
 
 const arduinoLogger = createLogger('Arduino');
 
@@ -462,15 +462,17 @@ export class ArduinoBoardBuilder extends Platform {
 
   private async reduceWasmInSize(wasmPath: string): Promise<string> {
     const outputFile = pathJoin(this.pathToWasms, 'no_custom_sec.wasm');
-    const [exitCode, stdout, stderr] = await wasmStripCustomSection(
-      wasmPath,
-      outputFile,
-    );
-    if (exitCode !== 0) {
-      this.logger.error(
-        `wasm-tools strip give error: ${stderr}\n\nstdout of wasm-tools strip ${stdout}`,
-      );
-      throw new Error(`wasm-tools 'strip' failed on ${wasmPath}`);
+
+    try {
+      const wasmBuffer = readFileSync(wasmPath);
+      const allCustomSection = true;
+      const stripConfig = new StripConfig(allCustomSection, []);
+      const wasmStripped = stripConfig.strip(wasmBuffer);
+      writeFileSync(outputFile, wasmStripped);
+    } catch (error) {
+      const errMsg = `failed to strip custom section of ${wasmPath}. reason: ${error instanceof StripError ? error.context : error}`;
+      this.logger.error(errMsg);
+      throw new Error(errMsg);
     }
     return outputFile;
   }
