@@ -21,8 +21,6 @@ The CLI provided in this project exposes some of the above functionality.
 Before running the installation script, make sure the following dependencies are properly installed:
 - Python 3: required by `arduino-cli`. Ensure Python 3 is accessible via the $PATH environment variable as `python`.
 - python3-serial
-- cargo
-- cargo binstall
 - node version 23.11
 - cmake
 - permissions to access `/dev/*`
@@ -34,7 +32,6 @@ bash scripts/install.sh
 ```
 
 After the installation completes, the `libs` directory should contain the following directories:
-- wabt
 - Arduino
 - WARDuino
 
