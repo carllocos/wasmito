@@ -85,6 +85,7 @@
     "serialport": "^13.0.0",
     "source-map": "^0.7.6",
     "uuid": "^13.0.0",
+    "wasmito-tools": "github:aaronmunsters/wasmito-tools#pkg",
     "web-tree-sitter": "^0.25.10",
     "winston": "^3.18.3",
     "yarn": "^1.22.22"
