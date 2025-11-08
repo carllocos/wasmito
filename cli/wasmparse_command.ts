@@ -4,13 +4,11 @@ import { getGlobalLogger } from '../src/logger/logger';
 import { WasmModule } from '../src/webassembly/wasm/wasm_module';
 import { writeFileSync } from 'fs';
 
-export function registerWasmParseCommand(program: Command): void {
+export function registerWasmModuleCommand(program: Command): void {
   program
-    .command('wasmparser')
-    .description(
-      `Parse the given Wasm to implicitly check if wasm version 1 is used.`,
-    )
-    .argument('<wasm-path>', 'the wasm for which the check needs to occur')
+    .command('wasm')
+    .description(`Manipulate a Wasm module that adheres to Wasm version 1.`)
+    .argument('<wasm-path>', 'the path to a Wasm version 1')
     .option(
       '-s,--store-instructions <output-path.json>',
       `store the instructions of the wasm module in a JSON file`,
