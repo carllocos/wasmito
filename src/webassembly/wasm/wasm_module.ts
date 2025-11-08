@@ -10,12 +10,6 @@ import {
   type Section,
   type TableExport,
 } from '../parsers/wasm_module_parser';
-import { execSync } from 'child_process';
-import {
-  type VariableInfo,
-  getLocalTypesFromDissambleOutput,
-} from '../parsers/obj-dump_parser';
-import { getPath2ObjDump } from '../../project_config';
 import { isCallInstruction, type WasmInstruction } from './wasm_instruction';
 import { wasmOpcodeNameFromNumber } from './wasm_opcode';
 
@@ -499,37 +493,17 @@ function retrieveGlobalInstructions(mod: ParsedModule): WasmInstruction[] {
   });
 }
 
-/*
- * The Wasm module parser library does not retrieve the global names so we need to retrieve that
- */
-// function getGlobalNames(wasmFilePath: string): string[] {
-//   const objDump = getPath2ObjDump();
-//   const cmd = `${objDump} -x -m ${wasmFilePath}`;
-//   const outputCmd = execSync(cmd).toString();
-//   return getGlobalInfos(outputCmd)
-//     .sort((g1, g2) => {
-//       return g1.index - g2.index;
-//     })
-//     .map((s) => s.name);
-// }
+export interface VariableInfo {
+  index: number;
+  name: string;
+  type: string; // todo use real type
+  mutable: boolean;
+  value: string; // todo use real value
+}
 
 /*
  * The Wasm module parser library does not retrieve the types of the locals so we need to retrieve that
  */
-function getLocalsTypes(wasmFilePath: string): Map<number, VariableInfo[]> {
-  const objDump = getPath2ObjDump();
-  const outputCmdDetails = `${objDump} -d ${wasmFilePath}`;
-  try {
-    const result = execSync(outputCmdDetails).toString();
-    return getLocalTypesFromDissambleOutput(result);
-  } catch (err) {
-    if (err instanceof Error) {
-      if (err.message.includes('ENOBUFS')) {
-        return new Map();
-      } else {
-        err.message = `wabt/wasm-objdump failed with error: ${err.message}`;
-      }
-    }
-    throw err;
-  }
+function getLocalsTypes(_wasmFilePath: string): Map<number, VariableInfo[]> {
+  return new Map();
 }

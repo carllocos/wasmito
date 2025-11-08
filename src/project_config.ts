@@ -51,7 +51,6 @@ export function readProjectName(): string {
 
 interface SDKPaths {
   WARDUINO_SDK?: string;
-  WABT?: string;
   NODE_MODULES?: string;
   ARDUINO_CLI?: string;
   ARDUINO_CONFIG?: string;
@@ -102,9 +101,6 @@ function loadSDKConfig(): void {
       if (fp.WARDUINO_SDK !== undefined) {
         sdkPaths.WARDUINO_SDK = fp.WARDUINO_SDK;
       }
-      if (fp.WABT !== undefined) {
-        sdkPaths.WABT = fp.WABT;
-      }
       if (fp.NODE_MODULES !== undefined) {
         sdkPaths.NODE_MODULES = fp.NODE_MODULES;
       }
@@ -146,9 +142,6 @@ function readSDKPaths(filePath: string): SDKPaths | undefined {
       switch (key) {
         case 'WARDUINO_SDK':
           config.WARDUINO_SDK = val;
-          break;
-        case 'WABT':
-          config.WABT = val;
           break;
         case 'NODE_MODULES':
           config.NODE_MODULES = val;
@@ -199,39 +192,6 @@ function findFileInParentDirectory(
   }
 
   return undefined;
-}
-
-export function getPath2WABT(): string {
-  if (sdkPaths.WABT === undefined) {
-    sdkPaths.WABT = process.env.WABT;
-    if (sdkPaths.WABT !== undefined) {
-      sdkPaths.WABT = `${sdkPaths.WABT}/bin`;
-    } else {
-      loadSDKConfig();
-    }
-  }
-
-  if (sdkPaths.WABT === undefined) {
-    throw new ProjectConfigError(
-      `WABT path has not been set. Set it either via env variable WABT, call to setPath2WABT, or .wasmito/adk_config.cfg file.`,
-    );
-  }
-
-  return `${sdkPaths.WABT}/build`;
-}
-
-export function getPath2WAT2WASM(): string {
-  const path = getPath2WABT();
-  return `${path}/wat2wasm`;
-}
-
-export function setPath2WABT(path: string): void {
-  sdkPaths.WABT = path;
-}
-
-export function getPath2ObjDump(): string {
-  const path = getPath2WABT();
-  return `${path}/wasm-objdump`;
 }
 
 export function getPath2XXD(): string {
