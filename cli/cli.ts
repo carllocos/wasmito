@@ -23,7 +23,7 @@ import { registerDevicesCommand } from './devices_command';
 import { registerUploadCommand } from './upload_command';
 import { registerDebugOpCommand } from './debugop_command';
 import { registerWCFGCommand } from './wcfg_command';
-import { registerWasmParseCommand } from './wasmparse_command';
+import { registerWasmModuleCommand } from './wasmparse_command';
 import { registerEventRequestCommand } from './event_command';
 import { registerBreakpointRequestCommand } from './breakpoint_command';
 import { registerRunningRequestCommand } from './running_command';
@@ -50,7 +50,7 @@ export function startCLI(): void {
   registerUploadCommand(program);
   registerCompileCommand(program);
   registerDebugOpCommand(program);
-  registerWasmParseCommand(program);
+  registerWasmModuleCommand(program);
   registerEventRequestCommand(program);
   registerBreakpointRequestCommand(program);
   registerInspectRequestCommand(program);
