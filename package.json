@@ -22,7 +22,7 @@
   "scripts": {
     "start": "tsc --watch",
     "test": "npm run build:cjs && LogLevel=error mocha './dist/cjs/test/**/*.cjs' --recursive",
-    "lint": "eslint . --ext .ts",
+    "lint": "npx eslint .",
     "build": "npm run build:cjs",
     "cli": "LogLevel=error node './dist/cjs/cli/cli.cjs'",
     "test-cli": "npm run build && LogLevel=debug node './dist/cjs/cli/cli.cjs'",
