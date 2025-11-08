@@ -1,11 +1,9 @@
 import { Command } from 'commander';
-// import * as figlet from 'figlet';
 import {
   readProjectVersionNumber,
   readProjectDescription,
   readProjectName,
 } from '../src/project_config';
-// import { type DeviceManager } from '../src/device/device_manager';
 import {
   type DeviceIdentityArgs,
   parseDeviceConfigs,
@@ -36,17 +34,12 @@ import { registerInspectRequestCommand } from './inspect_command';
 
 export function startCLI(): void {
   const projectName = readProjectName();
-  // console.log(figlet.textSync(projectName));
-
-  // const dm = new DeviceManager();
   const program = new Command();
   program
     .name(projectName)
     .description(readProjectDescription())
     .version(readProjectVersionNumber())
     .option('-l, --log-level <type>', 'set the log-level');
-
-  // registerDeviceManagerCommands(dm, program);
 
   registerCFGCommand(program);
   registerWCFGCommand(program);
@@ -97,46 +90,5 @@ export function startCLI(): void {
     }
   }
 }
-
-// function registerDeviceManagerCommands(
-//   manager: DeviceManager,
-//   program: Command,
-// ): void {
-//   program
-//     .command('spawn-vm')
-//     .description('spawn an Development VM locally')
-//     .argument('<string>', 'the path to the Wasm program to run')
-//     .option('-p, --port <number>', 'the port where the VM will listen upon')
-//     .option(
-//       '--pause <boolean>',
-//       'Should the program run on the VM be paused on start',
-//       true,
-//     )
-//     .option(
-//       '-n, --name <string>',
-//       'a human readable name to assign for logging',
-//     )
-//     .option('--id <string>', 'a unique identifier to identify device')
-//     .action(async (wasmApp, options) => {
-//       getGlobalLogger().info(`spawning a DevVM for program ${wasmApp}`);
-//       // const vmConfigArgs: VMConfigArgs = {
-//       //   program: wasmApp,
-//       //   toolPort: options.port,
-//       // };
-
-//       // const maxWaitTime = 3000; // Max waittime for connecting to the DevVM
-//       try {
-//         // await manager.spawnDevelopmentVM(vmConfigArgs, maxWaitTime);
-//       } catch (err: unknown) {
-//         let errMsg = '';
-//         if (err instanceof Error) {
-//           errMsg = `: ${err.message}`;
-//         }
-//         getGlobalLogger().error(`could not spawn DevVM ${errMsg}`);
-//         getGlobalLogger().info('closing CLI');
-//         process.exit(-1);
-//       }
-//     });
-// }
 
 startCLI();
