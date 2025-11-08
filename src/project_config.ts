@@ -55,7 +55,6 @@ interface SDKPaths {
   ARDUINO_CLI?: string;
   ARDUINO_CONFIG?: string;
   ARDUINO_LIBS?: string;
-  WASM_TOOLS?: string;
 }
 
 const sdkPaths: SDKPaths = {};
@@ -113,9 +112,6 @@ function loadSDKConfig(): void {
       if (fp.ARDUINO_LIBS !== undefined) {
         sdkPaths.ARDUINO_LIBS = fp.ARDUINO_LIBS;
       }
-      if (fp.WASM_TOOLS !== undefined) {
-        sdkPaths.WASM_TOOLS = fp.WASM_TOOLS;
-      }
     }
   }
 }
@@ -154,9 +150,6 @@ function readSDKPaths(filePath: string): SDKPaths | undefined {
           break;
         case 'ARDUINO_LIBS':
           config.ARDUINO_LIBS = val;
-          break;
-        case 'WASM_TOOLS':
-          config.WASM_TOOLS = val;
           break;
         default:
           return;
@@ -257,23 +250,4 @@ export function getPathArduinoConfig(): string | undefined {
   }
 
   return sdkPaths.ARDUINO_CONFIG;
-}
-
-export function getPathWasmTools(): string {
-  if (sdkPaths.WASM_TOOLS === undefined) {
-    sdkPaths.WASM_TOOLS = process.env.WASM_TOOLS;
-    if (sdkPaths.WASM_TOOLS !== undefined) {
-      sdkPaths.WASM_TOOLS = `${sdkPaths.WASM_TOOLS}`;
-    } else {
-      loadSDKConfig();
-    }
-  }
-
-  if (sdkPaths.WASM_TOOLS === undefined) {
-    throw new ProjectConfigError(
-      `WASM_TOOLS path has not been set. Set it either via env variable WASM_TOOLS, or .wasmito/sdk_config.cfg file.`,
-    );
-  }
-
-  return `${sdkPaths.WASM_TOOLS}`;
 }
