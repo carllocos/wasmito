@@ -1,13 +1,11 @@
 import {
+  SourceCodeLocation,
   SourceMap,
   type SourceMapJSON,
-  mappingItemToSourceCodeLocation,
 } from '../source_map';
-import { MappingItem } from '../sourcespec';
-// import { createLogger } from '../../logger/logger';
-import { addr2line } from '../../wasm-tools/addr2lines';
-import { wasmToolsObjdump } from '../../wasm-tools/objdump';
-// const logger = createLogger('DWARFSourceMapBuilder');
+import { Module } from 'wasmito-tools';
+import { readFileSync } from 'fs';
+import { WasmModule } from '../../webassembly/wasm/wasm_module';
 
 // Who uses this function?
 export async function SourceMapfromDWARFWasm(
@@ -20,19 +18,33 @@ export async function SourceMapfromDWARFWasm(
 export async function ReadDWARFMappings(
   wasmFilePath: string,
 ): Promise<SourceMapJSON> {
-  const wasmAddresses = await getAddressRangeOffset(wasmFilePath);
-  const mappingsResults: MappingItem[][] = [];
-  for (const addr of wasmAddresses) {
-    const m = await createMappingForAddr(wasmFilePath, addr);
-    if (m.length > 0) {
-      mappingsResults.push(m);
-    }
-  }
+  const buffer = readFileSync(wasmFilePath);
+  const wasm = new Module(buffer);
+  const mappings: SourceCodeLocation[] = [];
+  const sources = new Set<string>();
+  const parsedModule = new WasmModule(wasmFilePath);
+  for (const inst of parsedModule.instructions) {
+    const addr = inst.startAddress;
 
-  let mappings: MappingItem[] = [];
-  for (const m of mappingsResults) {
-    if (m !== undefined) {
-      mappings = mappings.concat(m);
+    try {
+      const m = wasm.addr2line(BigInt(addr));
+      const source = m.file;
+      const linenr = m.line;
+      const colnr = m.column ?? 0;
+      if (source === undefined) continue;
+      if (linenr === undefined) continue;
+
+      mappings.push({
+        source,
+        linenr,
+        colnr,
+        address: addr,
+        name: '',
+      });
+
+      sources.add(source);
+    } catch (_error) {
+      continue;
     }
   }
 
@@ -42,46 +54,7 @@ export async function ReadDWARFMappings(
 
   return {
     wasm: wasmFilePath,
-    sources: Array.from(new Set(mappings.map((m) => m.source))),
-    mappings: mappings.map(mappingItemToSourceCodeLocation),
+    sources: Array.from(sources),
+    mappings,
   };
-}
-
-export async function createMappingForAddr(
-  wasmFilePath: string,
-  addr: number,
-): Promise<MappingItem[]> {
-  const output = await addr2line(wasmFilePath, addr);
-  return output.map((l) => {
-    const generatedLine = 0;
-    return {
-      source: l.sourceFile,
-      generatedLine,
-      generatedColumn: l.address,
-      originalColumn: l.colnr,
-      originalLine: l.linenr,
-      name: l.name,
-    };
-  });
-}
-
-async function getAddressRangeOffset(wasmFilePath: string): Promise<number[]> {
-  const objDump = await wasmToolsObjdump(wasmFilePath);
-  const codeSection = objDump?.find(
-    (dumpLine) => dumpLine.sectionName === 'code',
-  );
-  if (codeSection === undefined) {
-    if (objDump === undefined) {
-      throw new Error(`Objdump failed on file '${wasmFilePath}'`);
-    } else {
-      throw new Error(`No code section found in Objdump'`);
-    }
-  }
-  const startAddr = codeSection.startWasmAddress;
-  const endAddr = codeSection.endWasmAddress;
-  const wasmAddresses: number[] = [];
-  for (let addr = startAddr; addr <= endAddr; addr++) {
-    wasmAddresses.push(addr);
-  }
-  return wasmAddresses;
 }
