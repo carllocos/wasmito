@@ -28,7 +28,7 @@ import { registerEventRequestCommand } from './event_command';
 import { registerBreakpointRequestCommand } from './breakpoint_command';
 import { registerRunningRequestCommand } from './running_command';
 import { registerCompileCommand } from './compile_command';
-import { registerInterpretRequestCommand } from './call_command';
+import { registerInterpretRequestCommand } from './interpret_command';
 import { registerArduinoCLICommand } from './arduinocli_command';
 import { registerInspectRequestCommand } from './inspect_command';
 import { registerWatCommand } from './wat_command';
