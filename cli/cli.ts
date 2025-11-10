@@ -31,6 +31,7 @@ import { registerCompileCommand } from './compile_command';
 import { registerCallRequestCommand } from './call_command';
 import { registerArduinoCLICommand } from './arduinocli_command';
 import { registerInspectRequestCommand } from './inspect_command';
+import { registerWatCommand } from './wat_command';
 
 export function startCLI(): void {
   const projectName = readProjectName();
@@ -51,6 +52,7 @@ export function startCLI(): void {
   registerCompileCommand(program);
   registerDebugOpCommand(program);
   registerWasmModuleCommand(program);
+  registerWatCommand(program);
   registerEventRequestCommand(program);
   registerBreakpointRequestCommand(program);
   registerInspectRequestCommand(program);
