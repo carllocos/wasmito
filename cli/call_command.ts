@@ -16,8 +16,8 @@ import { DevVMPlatform } from '../src/platforms/dev_vm_platform';
 import { ArduinoBoardBuilder } from '../src/platforms/arduino_platform';
 import { WasmitoBackendVM } from '../src/runtimes/wasmito_vm/wasmito_vm';
 
-export function registerCallRequestCommand(program: Command): void {
-  const commandName = 'call';
+export function registerInterpretRequestCommand(program: Command): void {
+  const commandName = 'interpret';
   program
     .command(`${commandName} <wasmPath> <fid> [args...]`)
     .description(
