@@ -216,10 +216,9 @@ function cleanSourcePath(
     return undefined;
   }
 
-  // TODO this should only occurr if requested
-  // because in SourceMap Class we do not remove those mappings
-  // if sourcepath is not a filepath
-  if (isFilePath(cleanedSource)) {
+  if (config.relativePaths) {
+    return cleanedSource;
+  } else if (isFilePath(cleanedSource)) {
     return cleanedSource;
   } else {
     return undefined;

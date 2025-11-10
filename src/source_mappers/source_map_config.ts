@@ -14,6 +14,7 @@ export interface SourceMapConfig {
   lineOffset?: number;
   newWasmPath?: string;
   keepAllMappings?: boolean;
+  relativePaths?: boolean;
 }
 
 export async function readSourceMapConfig(
@@ -94,5 +95,11 @@ export async function readSourceMapConfig(
     config.newWasmPath = newWasmPath;
   }
 
+  config.relativePaths = rebase.relativePaths ?? false;
+  if (typeof config.relativePaths !== 'boolean') {
+    const msg = 'SourceMapConfig: `relativePaths` is expected to be a boolean';
+    logger.error(msg);
+    throw new Error(msg);
+  }
   return config;
 }

@@ -27,6 +27,7 @@ export default tseslint.config(
     'wasmito_tester/cli.js',
     'wasmito_tester/test_framework.ts',
     'wasmito_tester/test_examples/**/src/*.ts',
+    'tool_examples/as_examples/**/*.ts',
   ]),
   eslint.configs.recommended,
   tseslint.configs.recommended,
