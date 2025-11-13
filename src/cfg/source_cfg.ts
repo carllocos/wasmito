@@ -25,6 +25,7 @@ import { buildSourceCFGraph } from './source_cfg_builder';
 import { searchForNextReachableSourceNodes } from './source_cfg_helper';
 import { searchCallbacksCFGs, type CallbackSCFG } from './callback_cfg';
 import { type DestinationSCFGNode } from '../language_adaptors';
+import { CFGOperations } from '../tool_api/cfg_util';
 
 const logger = createLogger('ASTControlFlowGraph');
 export interface DotSerializationConfig {
@@ -54,7 +55,7 @@ export class SourceCFGs {
   private _callbacksCFGs: CallbackSCFG[];
 
   constructor(
-    asts: AgnosticASTMap,
+    _asts: AgnosticASTMap,
     sourceMap: SourceMap,
     wasmCFGs: WasmCFGs,
     includeUnavailableSourcefiles: boolean = false,
@@ -186,7 +187,7 @@ export class SourceCFGs {
   getFunctionEntryNodesFromNode(n: SourceCFGNode): SourceCFGNode[] {
     const entryNodes: SourceCFGNode[] = [];
     const alreadyAdded = new Set<number>();
-    if (isCallNode(n)) {
+    if (CFGOperations.isCallNode(n)) {
       const callInstr = getCallInstructions(n);
       for (const i of callInstr) {
         if (isCallInstruction(i)) {
@@ -226,7 +227,7 @@ export class SourceCFGs {
         alreadyAdded.add(ito.startAddress);
       }
     }
-    if (!ignoreExitNodes && isCallNode(n)) {
+    if (!ignoreExitNodes && CFGOperations.isCallNode(n)) {
       this.getFunctionEntryNodesFromNode(n).forEach((en) => {
         const startAddress = sourceNodeFirstInstrStartAddr(en);
         if (!alreadyAdded.has(startAddress)) {
@@ -403,11 +404,6 @@ function sourceCFGNodeToJSONObj(n: SourceCFGNode): object {
     instructionsIndexes: n.instructionsIndexes,
     edges,
   };
-}
-
-export function isCallNode(n: SourceCFGNode): boolean {
-  // TODO improve speed
-  return getCallInstructions(n).length > 0;
 }
 
 export function getCallInstructions(

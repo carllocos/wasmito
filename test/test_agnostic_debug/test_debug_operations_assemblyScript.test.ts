@@ -3,13 +3,14 @@ import path from 'path';
 import { SourceMapFromJSON } from '../../src/source_mappers/source_map_builder';
 import { constructLanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 import assert, { fail } from 'assert';
-import { isCallNode, type SourceCFGs } from '../../src/cfg/source_cfg';
+import { type SourceCFGs } from '../../src/cfg/source_cfg';
 import { DebugOperations } from '../../src/language_adaptors/debug_operations';
 import {
   sortIncreasingNr,
   sourceNodeFromLoc,
   sourceNodeLoc,
 } from './reusable_code';
+import { CFGOperations } from '../../src/tool_api/cfg_util';
 
 describe('Debug Operations on AssemblyScript Blink App', function () {
   const pathToRootSource = path.resolve(
@@ -43,7 +44,7 @@ describe('Debug Operations on AssemblyScript Blink App', function () {
 
     expect(callNode.length).to.equal(1);
     const [call] = callNode;
-    expect(isCallNode(call));
+    expect(CFGOperations.isCallNode(call));
     const nextPossibleLocations = DebugOperations.stepOver(sourceCFGs, call);
 
     expect(nextPossibleLocations.length).to.equal(1);
@@ -61,7 +62,7 @@ describe('Debug Operations on AssemblyScript Blink App', function () {
     expect(nodes.length).to.equal(2);
     let foundCallNode = false;
     for (const n of nodes) {
-      if (isCallNode(n)) {
+      if (CFGOperations.isCallNode(n)) {
         foundCallNode = true;
         const nextPossibleLocations = DebugOperations.stepOver(sourceCFGs, n);
         expect(nextPossibleLocations.length).to.equal(1);

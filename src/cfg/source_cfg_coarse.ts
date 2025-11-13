@@ -12,7 +12,8 @@ import {
 import { pathJoin, sanitizeFilename } from '../util/file_util';
 import { coarseSourceControlFlowGraphToDot } from './dot_serialize';
 import { writeFileSync } from 'fs';
-import { isCallNode, type SourceCFGNode, type SourceCFGs } from './source_cfg';
+import { type SourceCFGNode, type SourceCFGs } from './source_cfg';
+import { CFGOperations } from '../tool_api/cfg_util';
 
 export interface DotSerializationConfgig {
   includeInstructions: boolean;
@@ -173,8 +174,8 @@ export class CoarseGrainedSourceCFGraph {
         }
         if (
           nrIncomingEdges === 1 &&
-          !isCallNode(entryNode) &&
-          !isCallNode(neighbour)
+          !CFGOperations.isCallNode(entryNode) &&
+          !CFGOperations.isCallNode(neighbour)
         ) {
           mergeSourceNodes(coarseNodes, entryNode, neighbour);
         } else {
@@ -215,8 +216,8 @@ export class CoarseGrainedSourceCFGraph {
         }
         if (
           nrIncomingEdges > 1 ||
-          isCallNode(nodeToVist) ||
-          isCallNode(neighbour)
+          CFGOperations.isCallNode(nodeToVist) ||
+          CFGOperations.isCallNode(neighbour)
         ) {
           // cannot merge as one of the nodes is a fun call
           // or incoming edges of neighbour is not 1
