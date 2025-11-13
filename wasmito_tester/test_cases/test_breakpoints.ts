@@ -87,8 +87,7 @@ const normalBP: TestScenario = {
     {
       subscribeToID: 'BP line 91',
       description: 'wait max 10000ms for bp reach',
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      checkSubscription: async (state: WasmState): Promise<boolean> => {
+      checkSubscription: async (_state: WasmState): Promise<boolean> => {
         return true;
       },
       ifFail: 'Did not hit breakpoint',

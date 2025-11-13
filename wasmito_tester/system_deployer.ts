@@ -92,8 +92,7 @@ export class SystemDeployer {
     scenario: TestScenario,
     deviceID: DeviceID,
   ): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const device = this.setup.devices.find((d: DeviceSetup, idx: number) => {
+    const device = this.setup.devices.find((d: DeviceSetup, _idx: number) => {
       return d.id === deviceID;
     });
     if (device === undefined) {

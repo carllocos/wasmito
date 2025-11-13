@@ -45,11 +45,9 @@ export function logReplies(replies: RequestMessage[]): void {
 }
 
 function onBreakpointStateUpdate(em: WasmitoDevVM): (state: WasmState) => void {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  return (state: WasmState) => {
+  return (_state: WasmState) => {
     em.step()
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      .then(async (v) => {
+      .then(async (_v) => {
         const sr = new StateRequest().includePC();
         await em.sendRequest<WasmState>(sr);
         await em.run();

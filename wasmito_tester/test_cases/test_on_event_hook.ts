@@ -94,8 +94,7 @@ const testHookScenario: TestScenario = {
     {
       subscribeToID: 'OnNewEventHook',
       description: 'wait max 10000ms for a new event to occurr',
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      checkSubscription: async (ev: WASM.Event): Promise<boolean> => {
+      checkSubscription: async (_ev: WASM.Event): Promise<boolean> => {
         return true;
       },
       ifFail: 'Did not receive event in expected time',
