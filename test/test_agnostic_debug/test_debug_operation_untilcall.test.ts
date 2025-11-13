@@ -3,8 +3,9 @@ import path from 'path';
 import { SourceMapFromJSON } from '../../src/source_mappers/source_map_builder';
 import { constructLanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 import assert, { fail } from 'assert';
-import { isCallNode, type SourceCFGs } from '../../src/cfg/source_cfg';
+import { type SourceCFGs } from '../../src/cfg/source_cfg';
 import { DebugOperations } from '../../src/language_adaptors/debug_operations';
+import { CFGOperations } from '../../src/tool_api/cfg_util';
 
 describe('Debug Until Call Operation on AssemblyScript Blink App', function () {
   const pathToRootSource = path.resolve(
@@ -109,7 +110,7 @@ describe('Debug Until Call Operation on C and linked Zig Blink App', function ()
     expect(nextPossibleLocations.length).to.equal(1);
     const [nextNode] = nextPossibleLocations[0];
 
-    expect(isCallNode(nextNode));
+    expect(CFGOperations.isCallNode(nextNode));
     expect(nextNode.sourceLocation.linenr).to.equal(12);
     expect(nextNode.sourceLocation.colnr).to.lessThanOrEqual(5);
   });
@@ -125,7 +126,7 @@ describe('Debug Until Call Operation on C and linked Zig Blink App', function ()
 
     expect(callNode.length).to.equal(1);
     const [call] = callNode;
-    expect(isCallNode(call));
+    expect(CFGOperations.isCallNode(call));
     const nextPossibleLocations = DebugOperations.stepUntilCall(
       sourceCFGs,
       call,

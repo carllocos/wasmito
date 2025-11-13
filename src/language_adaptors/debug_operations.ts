@@ -2,7 +2,6 @@ import { createLogger } from '../logger/logger';
 import {
   type SourceCFGs,
   type SourceCFGNode,
-  isCallNode,
   sourceNodeFirstInstrStartAddr,
   BinaryLiftedCFG,
   getCallInstructions,
@@ -10,6 +9,7 @@ import {
   isSCFGEmpty,
 } from '../cfg/source_cfg';
 import { isCallInstruction } from '../webassembly/wasm/wasm_instruction';
+import { CFGOperations } from '../tool_api/cfg_util';
 
 export type DestinationSCFGNode = [SourceCFGNode, number];
 
@@ -79,7 +79,7 @@ function stepIn(
   node: SourceCFGNode,
 ): DestinationSCFGNode[] {
   let ns: Array<[SourceCFGNode, number]> = [];
-  if (isCallNode(node)) {
+  if (CFGOperations.isCallNode(node)) {
     const entryNodes = sourceCFGs.getFunctionEntryNodesFromNode(node);
     ns = entryNodes.map((n) => [n, sourceNodeFirstInstrStartAddr(n)]);
   }
@@ -270,7 +270,7 @@ function stepUntilCall(
   // if yes stop there
 
   // you are already at the start node
-  if (isCallNode(startNode)) {
+  if (CFGOperations.isCallNode(startNode)) {
     const [calledFuncs] = getLinkedSCFGs(scfgs, startNode);
     if (calledFuncs.length > 0) {
       return [];
@@ -286,7 +286,7 @@ function stepUntilCall(
 
     visitedNodes.add(n.nodeId);
 
-    if (isCallNode(n)) {
+    if (CFGOperations.isCallNode(n)) {
       const [calledFuncs, unlinked] = getLinkedSCFGs(scfgs, n);
       let found = false;
       if (calledFuncs.length > 0) {

@@ -1,10 +1,10 @@
+import { CFGOperations } from '../tool_api/cfg_util';
 import {
   isCallIndirect,
   isCallInstruction,
 } from '../webassembly/wasm/wasm_instruction';
 import {
   type BinaryLiftedCFG,
-  isCallNode,
   getCallInstructions,
   type DotSerializationConfig,
 } from './source_cfg';
@@ -100,7 +100,7 @@ export function sourceControlFlowGraphToDot(
     const record = n.instructions.length > 1 ? 'Mrecord' : 'record';
 
     let c = '';
-    if (isCallNode(n)) {
+    if (CFGOperations.isCallNode(n)) {
       const calls = getCallInstructions(n);
       const direct: number[] = [];
       const indirect: number[] = [];
