@@ -11,7 +11,7 @@ import {
   createArduinoPlatform,
   type ArduinoBoardBuilder,
 } from '../src/platforms';
-import { LanguageAdaptor } from '../src';
+import { LanguageAdaptor } from '../src/language_adaptors/language_adaptor';
 
 export async function callLedcSetup(vm: WasmitoBackendVM): Promise<void> {
   const funcLEDCSetup = 5;

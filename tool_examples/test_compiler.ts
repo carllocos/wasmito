@@ -6,7 +6,7 @@ import { createLogger } from '../src/logger/logger';
 import { DeviceManager } from '../src/device/device_manager';
 import { BoardBaudRate } from '../src/util/serial_port';
 import { createArduinoPlatform } from '../src/platforms/platformbuilder_factory';
-import { LanguageAdaptor } from '../src';
+import { LanguageAdaptor } from '../src/language_adaptors/language_adaptor';
 
 const testCompilerLogger = createLogger('TestCompiler');
 
