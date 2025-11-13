@@ -9,7 +9,6 @@ import {
   FactoryArgs,
 } from '../src/platforms/platformbuilder_factory';
 import { TargetLanguage } from '../src/compilers/prog_language_selection';
-import { type WasmCompilerArgs } from '../src/compilers/wasm_compiler';
 import { isProxyCallFailedRequest } from '../src/runtimes/wasmito_vm/requests/fun_call_request';
 import { isSerialPort } from '../src/util/serial_port';
 import { DevVMPlatform } from '../src/platforms/dev_vm_platform';
@@ -71,10 +70,6 @@ export function registerInterpretRequestCommand(program: Command): void {
       const baudRate = Number(options.b);
       const connectToExistingVM = toolPort !== undefined;
       let platform: DevVMPlatform | ArduinoBoardBuilder | undefined;
-      const compilationArgs: WasmCompilerArgs = {
-        wasmPath,
-      };
-
       const factoryArgs: FactoryArgs = {
         selectedLanguage: {
           targetLanguage: TargetLanguage.Wasm,

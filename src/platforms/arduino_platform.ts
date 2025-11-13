@@ -12,7 +12,6 @@ import {
   readFileAsJSON,
   sha256ForFile,
 } from '../util/file_util';
-import { makeSourceCodeCompiler } from '../compilers/compiler_factory';
 import path from 'path';
 import { type ProgLangSelectionArgs } from '../compilers/prog_language_selection';
 import { maybeTimeoutPromise } from '../util/promise_util';
@@ -297,37 +296,13 @@ export class ArduinoBoardBuilder extends Platform {
 
     // compile the source code
     createDirectoryIfUnexisting(this.pathToArduinoWasmBinaryDir);
-    this._sourceCodeCompiler = makeSourceCodeCompiler(
-      selectedLanguage,
-      this.pathToArduinoWasmBinaryDir,
-    );
-  }
-
-  async compileSourceCode(
-    compilationArgs: any,
-    maxWaitTime?: number,
-  ): Promise<number> {
-    this._languageAdaptor = await maybeTimeoutPromise(
-      this.compiler.compile(compilationArgs),
-      maxWaitTime,
-    );
-    if (this._languageAdaptor === undefined) {
-      this.logger.info(`Could not compile source code for file`);
-      return -1;
-    }
-    return 0;
   }
 
   async buildForPlatform(
     compilerArgs: any,
     maxWaitTime?: number,
   ): Promise<number> {
-    const exitCodeSourceCodeComp = await this.compileSourceCode(
-      compilerArgs,
-      maxWaitTime,
-    );
-    if (exitCodeSourceCodeComp !== 0) {
-      return exitCodeSourceCodeComp;
+    this.createArduinoRepoIfNeeded();
     }
 
     if (this._languageAdaptor === undefined) {

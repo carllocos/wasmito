@@ -11,8 +11,6 @@ import { PlatformTarget } from '../src/platforms/platform_config';
 import { ArduinoBoardBuilder } from '../src/platforms/arduino_platform';
 import { DevVMPlatform } from '../src/platforms/dev_vm_platform';
 import { type DeviceIdentity } from '../src/device/device_config';
-import { type WasmCompilerArgs } from '../src/compilers/wasm_compiler';
-import { TargetLanguage } from '../src/compilers/prog_language_selection';
 import { type VMConfigArgs } from '../src/device/vm_config';
 import { resolve } from 'path';
 
@@ -100,20 +98,12 @@ export function registerCompileCommand(program: Command): void {
           ? new ArduinoBoardBuilder(dev, dest)
           : new DevVMPlatform(dev, dest);
 
-      await platform.createCompiler({
-        targetLanguage: TargetLanguage.Wasm,
-      });
-
       const wasmPath = options.wasm ?? (await platform.getUploadedWasm());
       if (wasmPath === undefined) {
         program.error(`No previously uploaded wasm found`);
         return;
       }
-
-      const arg: WasmCompilerArgs = {
-        wasmPath,
-      };
-      const build = await platform.buildForPlatform(arg, maxWaitTime);
+      const build = await platform.buildForPlatform(wasmPath, maxWaitTime);
       if (build !== 0) {
         program.error(`Failed to compile source code`);
       }

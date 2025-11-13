@@ -176,7 +176,6 @@ export class OutOfPlaceVM extends WasmitoDevVM {
     }
     this.platform.config.vmConfig.toolPort = toolPort;
     this.createClientSideSocket();
-    await this.compileSourceCode();
     this.logger.debug('Connecting to external VM...');
     const connected = await this.connect(config.maxWaitTime);
     if (!connected) {
@@ -233,7 +232,6 @@ export class OutOfPlaceVM extends WasmitoDevVM {
 
     await this.assertExistenceToolPort();
     this.createClientSideSocket();
-    await this.compileSourceCode();
 
     const processArgs = this.buildProcessArguments(
       this.sourceMap.wasm.wasmPath,
@@ -321,21 +319,6 @@ export class OutOfPlaceVM extends WasmitoDevVM {
     snapshot.events = [];
 
     return snapshot;
-  }
-
-  private async compileSourceCode(): Promise<void> {
-    const args = this.targetVM.platform.compiler.latestSourceCodeCompilerArgs;
-    if (args === undefined) {
-      throw new this.ErrorClass(
-        'The Source code on the target VM has no yet been compiler so there is no way of starting DevVM',
-      );
-    }
-    const exitCode = await this.platform.compileSourceCode(args);
-    if (exitCode !== 0) {
-      throw new this.ErrorClass(
-        `Could not start DevVM. Compilation exited with code: ${exitCode}`,
-      );
-    }
   }
 
   private async setupTargetVM(
