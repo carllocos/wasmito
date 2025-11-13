@@ -13,7 +13,6 @@
   "files": [
     "dist/",
     ".wasmito/",
-    "libs/",
     "package.json"
   ],
   "directories": {
