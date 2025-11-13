@@ -1,10 +1,10 @@
 import { createLogger } from '../logger/logger';
 import {
-  type SourceCFGs,
   type SourceCFGNode,
   sourceNodeFirstInstrStartAddr,
   BinaryLiftedCFG,
   getCallInstructions,
+  SourceCFGs,
   sourceNodeFirstInstruction,
   isSCFGEmpty,
 } from '../cfg/source_cfg';

@@ -7,10 +7,10 @@ import {
 import {
   isCallIndirect,
   isCallInstruction,
-  instructionToString,
   type WasmInstruction,
   type CallInstruction,
   type CallIndirect,
+  instructionToString,
 } from '../webassembly/wasm/wasm_instruction';
 import {
   type AgnosticASTMap,
