@@ -18,6 +18,7 @@ import { Hook } from '../../hooks';
 import { SourceCodeLocation } from '../../source_mappers';
 import { WASMFunction } from '../../webassembly';
 import { ProxyCallResponse } from '../wasmito_vm/requests/fun_call_request';
+import { HookOnWasmAddrMoment } from '../wasmito_vm/requests/hook_on_wasm_addr_request';
 import { LanguageAdaptor } from '../../language_adaptors';
 
 export class WARDuinoRuntimeAPI implements RuntimeToolAPI {
@@ -237,5 +238,14 @@ export class WARDuinoRuntimeAPI implements RuntimeToolAPI {
     timeout?: number,
   ): Promise<boolean> {
     throw new Error('To implement');
+  }
+
+  addHookOnAddr(
+    addr: number,
+    hook: Hook,
+    moment: HookOnWasmAddrMoment,
+    timeout?: number,
+  ): Promise<boolean> {
+    throw new Error('Operation not supported');
   }
 }

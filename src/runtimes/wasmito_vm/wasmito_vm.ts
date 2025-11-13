@@ -352,18 +352,6 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
     }
   }
 
-  async addHookBeforeSrcNode(
-    node: SourceCFGNode,
-    hook: Hook,
-    timeout?: number | undefined,
-  ): Promise<boolean> {
-    const addr = sourceNodeFirstInstrStartAddr(node);
-    const req = new HookOnWasmAddrRequest(addr).addHook(hook);
-    req.before();
-    const response = await this.sendRequest(req, timeout);
-    return isSuccessfulMessage(response);
-  }
-
   async addHookBefore(
     sourceCodeLocation: SourceCodeLocation,
     hook: Hook,
@@ -388,6 +376,23 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
       HookOnWasmAddrMoment.HookAfter,
       timeout,
     );
+  }
+
+  async addHookOnAddr(
+    addr: number,
+    hook: Hook,
+    moment: HookOnWasmAddrMoment,
+    timeout?: number,
+  ): Promise<boolean> {
+    const req = new HookOnWasmAddrRequest(addr, moment).addHook(hook);
+    const response = await this.sendRequest(req, timeout);
+    const s = isSuccessfulMessage(response);
+    if (s) {
+      const requests = this.hooksStore.get(addr) ?? [];
+      requests.push(req);
+      this.hooksStore.set(addr, requests);
+    }
+    return s;
   }
 
   private async addHook(
@@ -421,15 +426,7 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
       }
       addr = instr.startAddress;
     }
-    const req = new HookOnWasmAddrRequest(addr, moment).addHook(hook);
-    const response = await this.sendRequest(req, timeout);
-    const s = isSuccessfulMessage(response);
-    if (s) {
-      const requests = this.hooksStore.get(addr) ?? [];
-      requests.push(req);
-      this.hooksStore.set(addr, requests);
-    }
-    return s;
+    return await this.addHookOnAddr(addr, hook, moment, timeout);
   }
 
   async addHookOnNewEvent(

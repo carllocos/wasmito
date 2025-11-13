@@ -6,7 +6,7 @@ import { type ProxyCallResponse } from './wasmito_vm/requests/fun_call_request';
 import { type BreakpointPolicy } from '../debugger/breakpoint_policies';
 import { type Breakpoint } from '../debugger/breakpoint';
 import { type WASMFunction } from '../webassembly/wasm/wasm_function';
-import { type SourceCFGNode } from '../cfg';
+import { HookOnWasmAddrMoment } from './wasmito_vm/requests/hook_on_wasm_addr_request';
 import { LanguageAdaptor } from '../language_adaptors';
 
 export interface RuntimeToolAPI {
@@ -73,9 +73,10 @@ export interface RuntimeToolAPI {
     timeout?: number,
   ) => Promise<boolean>;
 
-  addHookBeforeSrcNode: (
-    node: SourceCFGNode,
+  addHookOnAddr: (
+    addr: number,
     hook: Hook,
+    moment: HookOnWasmAddrMoment,
     timeout?: number,
   ) => Promise<boolean>;
 
