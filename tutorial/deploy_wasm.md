@@ -147,7 +147,7 @@ wcli devices --d m5stickc -p Arduino --serial /dev/pathToDevice --fqbn m5stack:e
 Deploy the module using
 
 ```bash
-Wcli upload m5stickc --wasm wasm/blink.wasm
+wcli upload m5stickc --wasm wasm/blink.wasm
 ```
 
 The command will take some time to complete since it compile the binary including the WARDuino VM and then flashes it into the M5StickC.
