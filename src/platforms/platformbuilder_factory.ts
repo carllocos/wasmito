@@ -35,11 +35,7 @@ export async function createDevPlatform(
     PlatformTarget.DevVM,
     args,
   );
-  const platform = new DevVMPlatform(config, outputDir);
-  if (args.selectedLanguage !== undefined) {
-    await platform.createCompiler(args.selectedLanguage);
-  }
-  return platform;
+  return new DevVMPlatform(config, outputDir);
 }
 
 export async function createArduinoPlatform(
@@ -51,11 +47,7 @@ export async function createArduinoPlatform(
     PlatformTarget.Arduino,
     args,
   );
-  const platform = new ArduinoBoardBuilder(config, outputDir);
-  if (args.selectedLanguage !== undefined) {
-    await platform.createCompiler(args.selectedLanguage);
-  }
-  return platform;
+  return new ArduinoBoardBuilder(config, outputDir);
 }
 
 export async function autoBuildArduinoPlatform(

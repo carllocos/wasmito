@@ -1,6 +1,5 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { isDirectoryPath } from './util/file_util';
 
 export class ProjectConfigError extends Error {
   constructor(message: string) {
@@ -51,7 +50,6 @@ export function readProjectName(): string {
 
 interface SDKPaths {
   WARDUINO_SDK?: string;
-  NODE_MODULES?: string;
   ARDUINO_CLI?: string;
   ARDUINO_CONFIG?: string;
   ARDUINO_LIBS?: string;
@@ -100,9 +98,6 @@ function loadSDKConfig(): void {
       if (fp.WARDUINO_SDK !== undefined) {
         sdkPaths.WARDUINO_SDK = fp.WARDUINO_SDK;
       }
-      if (fp.NODE_MODULES !== undefined) {
-        sdkPaths.NODE_MODULES = fp.NODE_MODULES;
-      }
       if (fp.ARDUINO_CLI !== undefined) {
         sdkPaths.ARDUINO_CLI = fp.ARDUINO_CLI;
       }
@@ -138,9 +133,6 @@ function readSDKPaths(filePath: string): SDKPaths | undefined {
       switch (key) {
         case 'WARDUINO_SDK':
           config.WARDUINO_SDK = val;
-          break;
-        case 'NODE_MODULES':
-          config.NODE_MODULES = val;
           break;
         case 'ARDUINO_CLI':
           config.ARDUINO_CLI = val;
@@ -197,27 +189,6 @@ export function getPath2AssemblyScriptCompiler(): string {
 
 export function getPath2NPX(): string {
   return 'npx';
-}
-
-export function getPath2AssemblyScriptLib(): string {
-  if (sdkPaths.NODE_MODULES === undefined) {
-    loadSDKConfig();
-  }
-  if (sdkPaths.NODE_MODULES === undefined) {
-    throw new ProjectConfigError(
-      "Path to wasmito used node modules NODE_MODULES is not set. You can set it via env variable 'call to setPath2NODEMODULES, or .wasmito/adk_config.cfg file.",
-    );
-  }
-
-  const p = path.join(sdkPaths.NODE_MODULES, 'assemblyscript/');
-  if (!isDirectoryPath(p)) {
-    throw new ProjectConfigError(`Path to AssemblyScript does not exist ${p}`);
-  }
-  return p;
-}
-
-export function setPath2NodeModules(path: string): void {
-  sdkPaths.NODE_MODULES = path;
 }
 
 export function getPathArduinoCLI(): string {
