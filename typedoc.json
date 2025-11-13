@@ -1,0 +1,7 @@
+{
+  "plugin": ["typedoc-plugin-markdown"],
+  "entryPoints": ["src"],
+  "out": "docs",
+  "includeVersion": true
+}
+
