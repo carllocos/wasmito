@@ -6,16 +6,15 @@ import { exit } from 'process';
 import { type WasmitoBackendVM } from '../../src/runtimes/wasmito_vm/wasmito_vm';
 import path from 'path';
 import { BoardBaudRate } from '../../src/util/serial_port';
-import { TargetLanguage } from '../../src/compilers/prog_language_selection';
 import {
   createArduinoPlatform,
   createDevPlatform,
 } from '../../src/platforms/platformbuilder_factory';
 import { PlatformTarget } from '../../src/platforms/platform_config';
-import { WasmCompilerArgs } from '../../src/compilers/wasm_compiler';
 import { StoreTrace } from './store_trace';
-import { DebugStandard, readSourceMapJSON } from '../../src';
-import { SourceMapConfig } from '../../src/source_mappers/source_map_config';
+import { CFGTOOLOperations } from '../../src/tool_api/cfg_tool_api';
+import { SourceMapFromJSON } from '../../src/source_mappers/source_map_builder';
+import { constructLanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 
 async function registerHooks(
   em: WasmitoBackendVM,
@@ -25,7 +24,14 @@ async function registerHooks(
     const inspectStackRequest = new StateRequest().includeStack().includePC();
     const inspectStack = new InspectStateHook(inspectStackRequest);
     inspectStack.onSubscriptionData = writer.write(n);
-    const success = await em.addHookBeforeSrcNode(n, inspectStack);
+
+    const secsToWaitUntilResponse = 10000;
+    const success = await CFGTOOLOperations.onNodeEntry(
+      n,
+      em,
+      [inspectStack],
+      secsToWaitUntilResponse,
+    );
     if (!success) {
       return false;
     }
@@ -64,15 +70,12 @@ async function run(): Promise<void> {
   const pathToRootSource = path.resolve(
     './test/data/assemblyscript_examples/blink/',
   );
-  const wasmApp = path.resolve(pathToRootSource, 'blink.wasm');
-  const sourcePath = path.resolve(pathToRootSource, 'blink.ts');
-  const debugInfo = path.resolve(pathToRootSource, 'blink.wasm.map');
-  const srcFileMapper = new Map<string, string>([
-    ['blink/blink.ts', sourcePath],
-  ]);
-  const sourceMapConfig: SourceMapConfig = {
-    srcToAbsPath: srcFileMapper,
-  };
+  const mappingsPath = path.resolve(pathToRootSource, 'blink.wasm');
+  const sm = SourceMapFromJSON(mappingsPath, {
+    prefixSources: pathToRootSource,
+  });
+  const la = await constructLanguageAdaptor(sm);
+
   const recordTime = 30; // seconds
   const outputDir = './tool_examples/tracer/';
   const output = 'trace.csv';
@@ -80,28 +83,12 @@ async function run(): Promise<void> {
 
   const dm = new DeviceManager();
   let vm: WasmitoBackendVM | undefined;
-  const compilationArgs: WasmCompilerArgs = {
-    wasmPath: wasmApp,
-    mappingsJSON: await readSourceMapJSON(
-      DebugStandard.SourceMapSpec,
-      wasmApp,
-      debugInfo,
-      sourceMapConfig,
-    ),
-  };
 
   if (monitorMode === PlatformTarget.DevVM) {
-    const platform = await createDevPlatform({
-      selectedLanguage: {
-        targetLanguage: TargetLanguage.Wasm,
-      },
-    });
-    vm = await dm.spawnDevelopmentVM(platform, compilationArgs, 8000);
+    const platform = await createDevPlatform();
+    vm = await dm.spawnDevelopmentVM(la, platform, 8000);
   } else if (monitorMode === PlatformTarget.Arduino) {
     const platform = await createArduinoPlatform({
-      selectedLanguage: {
-        targetLanguage: TargetLanguage.Wasm,
-      },
       vmConfig: {
         baudrate: BoardBaudRate.BD_115200,
         serialPort: '/dev/ttyUSB0',
@@ -111,7 +98,7 @@ async function run(): Promise<void> {
         },
       },
     });
-    vm = await dm.spawnHardwareVM(platform, compilationArgs);
+    vm = await dm.spawnHardwareVM(la, platform);
     await sleep(5000); // sleep to let MCU load module first
   } else {
     getGlobalLogger().error(`unsupported mode ${monitorMode}`);
