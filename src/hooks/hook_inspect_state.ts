@@ -3,15 +3,19 @@ import { type StateRequest } from '../runtimes/wasmito_vm/requests/inspect_reque
 import { HookKind, HookWithSubscription } from './hook';
 
 export class InspectStateHook extends HookWithSubscription<WasmState> {
-  public readonly stateToInspect: StateRequest;
+  private readonly _stateToInspect: StateRequest;
   public readonly wasmAddress?: number;
   constructor(stateRequest: StateRequest, wasmAddress?: number) {
     super(HookKind.StateToInspect);
-    this.stateToInspect = stateRequest;
+    this._stateToInspect = stateRequest;
     this.wasmAddress = wasmAddress;
     if (this.wasmAddress !== undefined) {
-      this.stateToInspect.includePC(); // include pc is mandatory
+      this._stateToInspect.includePC(); // include pc is mandatory
     }
+  }
+
+  get stateToInspect(): StateRequest {
+    return this._stateToInspect;
   }
 
   public serializeBinary(): string {
