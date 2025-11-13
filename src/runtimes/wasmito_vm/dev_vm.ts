@@ -2,8 +2,7 @@ import { spawn, type ChildProcess } from 'child_process';
 import { WasmitoBackendVM } from './wasmito_vm';
 import { type VMConfiguration } from '../../device/vm_config';
 import { ClientSideSocket } from '../../communication/client_socket';
-import type winston from 'winston';
-import { createLogger } from '../../logger/logger';
+import { createLogger, Logger } from '../../logger/logger';
 import { UpdateWasmModuleRequest } from './requests/update_module_request';
 import { getPath2WasmitoSDKVMBinary } from '../../project_config';
 import { getFreePort, isPortInUse } from '../../util/socket_util';
@@ -20,7 +19,7 @@ export class WasmitoDevVMError extends Error {
 }
 
 export class WasmitoDevVM extends WasmitoBackendVM {
-  protected logger: winston.Logger;
+  protected logger: Logger;
   protected process?: ChildProcess;
   protected ErrorClass = WasmitoDevVMError;
 

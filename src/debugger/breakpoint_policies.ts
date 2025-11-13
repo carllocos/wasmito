@@ -1,7 +1,6 @@
-import type winston from 'winston';
 import { RemoveHookOnWasmAddrRequest } from '../runtimes/wasmito_vm/requests/hook_on_wasm_addr_request';
 import { type Breakpoint } from './breakpoint';
-import { createLogger } from '../logger/logger';
+import { createLogger, Logger } from '../logger/logger';
 import { InspectStateHook } from '../hooks/hook_inspect_state';
 import { type WasmState } from '../webassembly';
 import { type WasmitoBackendVM } from '../runtimes/wasmito_vm/wasmito_vm';
@@ -13,7 +12,7 @@ import { type SourceCodeLocation } from '../source_mappers';
 export abstract class BreakpointPolicy {
   protected readonly vm: WasmitoBackendVM;
   protected readonly MAX_DEFAULT_TIMEOUT: number = 10000;
-  protected abstract readonly logger: winston.Logger;
+  protected abstract readonly logger: Logger;
 
   protected _breakpoints: Breakpoint[];
   private readonly onAddBpListeners: Array<(bp: Breakpoint) => void>;
@@ -161,7 +160,7 @@ export abstract class BreakpointPolicy {
 }
 
 export class BreakpointDefaultPolicy extends BreakpointPolicy {
-  readonly logger: winston.Logger = createLogger('DefaultBreakpointPolicy');
+  readonly logger: Logger = createLogger('DefaultBreakpointPolicy');
 
   toString(): string {
     return 'Default Breakpoint Policy';
@@ -177,7 +176,7 @@ export class BreakpointDefaultPolicy extends BreakpointPolicy {
  * 4. Removes all the other breakpoints from the VM.
  */
 export class SingleStopBreakpointPolicy extends BreakpointPolicy {
-  readonly logger: winston.Logger = createLogger('SingleStopBreakpointPolicy');
+  readonly logger: Logger = createLogger('SingleStopBreakpointPolicy');
 
   private readonly removeAllBreakpointsCallback: (state: WasmState) => void;
 
@@ -246,9 +245,7 @@ export class SingleStopBreakpointPolicy extends BreakpointPolicy {
  * 3. Keep the application running where the breakpoint got hit
  */
 export class RemoveAndProceedBreakpointPolicy extends BreakpointPolicy {
-  readonly logger: winston.Logger = createLogger(
-    'RemoveAndProceedBreakpointPolicy',
-  );
+  readonly logger: Logger = createLogger('RemoveAndProceedBreakpointPolicy');
 
   private readonly removeBPOnReachMap: Map<
     Breakpoint,

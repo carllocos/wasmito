@@ -1,5 +1,4 @@
-import type winston from 'winston';
-import { createLogger } from '../logger/logger';
+import { createLogger, Logger } from '../logger/logger';
 import { WasmitoDevVM } from '../runtimes/wasmito_vm/dev_vm';
 import { MCUWasmitoVM } from '../runtimes/wasmito_vm/mcu_vm';
 import { type ChildProcess } from 'child_process';
@@ -27,7 +26,7 @@ export class DeviceManagerError extends Error {
 }
 
 export class DeviceManager {
-  logger: winston.Logger;
+  logger: Logger;
   localprocesses: Array<[WasmitoDevVM, ChildProcess?]>;
 
   private readonly onNewDeviceListeners: Array<(dev: WasmitoBackendVM) => void>;

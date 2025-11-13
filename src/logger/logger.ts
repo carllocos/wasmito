@@ -87,9 +87,9 @@ export function createLogger(name: string, _level?: LogLevel): Logger {
   return _logger;
 }
 
-let globalLogger: winston.Logger | undefined;
+let globalLogger: Logger | undefined;
 
-export function getGlobalLogger(): winston.Logger {
+export function getGlobalLogger(): Logger {
   if (
     globalLogger === undefined ||
     globalLogger.level !== logLevel.toString()

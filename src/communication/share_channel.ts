@@ -1,8 +1,7 @@
 import * as net from 'net';
-import { createLogger } from '../logger/logger';
+import { createLogger, Logger } from '../logger/logger';
 import { getFreePort, isPortInUse } from '../util/socket_util';
 import { type Channel } from './channel_interface';
-import type winston from 'winston';
 import { timeoutPromise } from '../util/promise_util';
 
 export class ShareChannelError extends Error {
@@ -18,7 +17,7 @@ export class ShareChannel implements Channel {
   public readonly channelToShare: Channel;
   private readonly _initialServerPort: number;
   private _serverPort: number;
-  private readonly logger: winston.Logger;
+  private readonly logger: Logger;
   private clients: net.Socket[];
 
   readonly channelName: string;

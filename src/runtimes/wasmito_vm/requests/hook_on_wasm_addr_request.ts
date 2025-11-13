@@ -1,4 +1,4 @@
-import { createLogger } from '../../../logger/logger';
+import { createLogger, Logger } from '../../../logger/logger';
 import { encodeToHexLEB128 } from '../../../util/encoder';
 import {
   APIRequest,
@@ -9,7 +9,6 @@ import {
 } from '../../request_interface';
 import { HookWithSubscription, type Hook } from '../../../hooks/hook';
 import { Instruction } from './instructions';
-import type winston from 'winston';
 
 export enum HookOnWasmAddrMoment {
   HookBefore = '01',
@@ -46,7 +45,7 @@ export function createHookOnWasmAddrResponse(
 }
 
 export class HookOnWasmAddrRequest extends APIRequest<HookOnWasmAddrResponse> {
-  private readonly logger: winston.Logger;
+  private readonly logger: Logger;
   public readonly wasmAddr;
   public readonly hooks: Hook[];
   private moment: HookOnWasmAddrMoment;
