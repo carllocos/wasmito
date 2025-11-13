@@ -7,3 +7,5 @@ example-wat/
 .wasmito*/
 *.dot
 .helix/
+libs/Arduino/
+libs/ArduinoWARDuino
