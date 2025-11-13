@@ -14,7 +14,7 @@ import {
 import { StateRequest } from '../src/runtimes/wasmito_vm/requests/inspect_request';
 import { type WasmitoDevVM } from '../src/runtimes/wasmito_vm/dev_vm';
 import { type WasmState } from '../src/webassembly/wasm';
-import { LanguageAdaptor } from '../src';
+import { LanguageAdaptor } from '../src/language_adaptors/language_adaptor';
 
 export function allSucceeded(replies: HookOnWasmAddrResponse[]): boolean {
   let idx = 0;
