@@ -1,20 +1,20 @@
 import { type WasmState } from '../webassembly';
 import { StateRequest } from '../runtimes/wasmito_vm/requests/inspect_request';
 import { PauseVMHook } from '../hooks/hook_run_pause';
-import { type ISubscription, type Hook } from '../hooks/hook';
+import { type Hook } from '../hooks/hook';
 import { InspectStateHook } from '../hooks/hook_inspect_state';
-import { createLogger } from '../logger/logger';
-import type winston from 'winston';
+import { createLogger, Logger } from '../logger/logger';
 import {
   sourceCodeLocationToString,
   strictEqualSourceCodeLocations,
   type SourceCodeLocation,
 } from '../source_mappers/source_map';
 import { HookOnWasmAddrRequest } from '../runtimes/wasmito_vm/requests/hook_on_wasm_addr_request';
+import { ISubscription } from '../hooks/isubscribe';
 
 // TODO reimplement as extension to HookWithSub? Although this is bound to an address and should be extensible to support binding to events
 export class Breakpoint implements ISubscription<WasmState> {
-  protected logger: winston.Logger;
+  protected logger: Logger;
 
   public readonly sourceCodeLocation: SourceCodeLocation;
   private _hooks: Hook[];
@@ -61,8 +61,7 @@ export class Breakpoint implements ISubscription<WasmState> {
       .includeEvents();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  parseSubscriptionData(input: any): WasmState {
+  parseSubscriptionData(_input: any): WasmState {
     throw new Error('Method should not be called');
   }
 
