@@ -12,6 +12,7 @@ import { getLangConfigFromExtension } from './languages/all_langs';
 import { type LanguageConfiguration } from './languages/language_config';
 import { writeFileSync } from 'fs';
 import { SourceMapFromJSON } from '../source_mappers/source_map_builder';
+import { SourceMapConfig } from '../source_mappers/source_map_config';
 
 const logger = createLogger('LanguageAdaptor');
 
@@ -179,9 +180,10 @@ export class LanguageAdaptor {
 
   static fromMappingsPath(
     mappingsPath: string,
-    allowUnavailableSourceFiles: boolean = false,
+    config?: SourceMapConfig,
   ): LanguageAdaptor {
-    const sm = SourceMapFromJSON(mappingsPath);
+    const sm = SourceMapFromJSON(mappingsPath, config);
+    const allowUnavailableSourceFiles = !!config?.relativePaths;
     const la = new LanguageAdaptor(sm);
     la.buildSourceCFGs(allowUnavailableSourceFiles);
     return la;
