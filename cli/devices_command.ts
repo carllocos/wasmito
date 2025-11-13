@@ -174,11 +174,11 @@ async function listDevices(devicesPath: string): Promise<void> {
 
   const dstr = devices
     .map((d) => {
-      return `${d.identity.name}\t${d.identity.id}\t${d.platform}`;
+      return `${d.identity.name}\t${d.platform}\t${d.baudrate}\t${d.serial}\t${d.identity.id}`;
     })
     .join('\n');
 
-  const header = `name\tid\tplatform`;
+  const header = `name\tplatform\tbaudrate\tport\tid`;
   console.log(`registerd devices:\n${header}\n${dstr}`);
 }
 async function addDevice(dev: DeviceJSON, devicesPath: string): Promise<void> {
