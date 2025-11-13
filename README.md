@@ -55,7 +55,7 @@ node dist/cjs/cli/cli.cjs --help
 
 ## Deploy a Wasm module
 
-see `docs/deploy_wasm.md`
+see `tutorial/deploy_wasm.md`
 
 ## Building Dynamic Tools
 
