@@ -5,7 +5,7 @@ import { createLogger } from '../../src/logger/logger';
 import { BoardBaudRate } from '../../src/util';
 import { type WasmitoBackendVM } from '../../src/runtimes/wasmito_vm/wasmito_vm';
 import { fs } from 'assemblyscript/util/node.js';
-import { LanguageAdaptor } from '../../src';
+import { LanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 
 const logger = createLogger('SourceCodeWatcher');
 
