@@ -106,7 +106,7 @@ export class LexicalScopeRequest extends HookWithSubscription<LexicalScope> {
 
     const locs = this.sourceMap.getOriginalPositionFor(pc);
     if (locs.length === 0) return;
-    if (locs.length > 0) {
+    if (locs.length > 1) {
       const strs = locs.map(sourceCodeLocationToString).join(', ');
       logger.warn(
         `Found more than one location for address ${pc}. Locs: [${strs}]`,
