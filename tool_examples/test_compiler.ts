@@ -5,12 +5,8 @@ import {
 import { createLogger } from '../src/logger/logger';
 import { DeviceManager } from '../src/device/device_manager';
 import { BoardBaudRate } from '../src/util/serial_port';
-import {
-  type ProgLangSelectionArgs,
-  TargetLanguage,
-} from '../src/compilers/prog_language_selection';
 import { createArduinoPlatform } from '../src/platforms/platformbuilder_factory';
-import { type WATCompilerArgs } from '../src/compilers/wat_compilers';
+import { LanguageAdaptor } from '../src';
 
 const testCompilerLogger = createLogger('TestCompiler');
 
@@ -33,15 +29,6 @@ async function runBuilder(): Promise<void> {
     return;
   }
 
-  const sourceFilePath =
-    './src/tool_examples/wat_examples/dimmer-double-button.wat';
-  const selectedLang: ProgLangSelectionArgs = {
-    targetLanguage: TargetLanguage.WAT,
-  };
-  const sourceCodeCompilerArgs: WATCompilerArgs = {
-    sourceCodePath: sourceFilePath,
-  };
-
   const compileOutputDirectory = './example-wat/platform_arduino/';
   const platform = await createArduinoPlatform(
     {
@@ -50,16 +37,14 @@ async function runBuilder(): Promise<void> {
         fqbn: targetBoard,
         serialPort: boardPort,
       },
-      selectedLanguage: selectedLang,
     },
     compileOutputDirectory,
   );
 
+  const wasmPath = './src/tool_examples/wat_examples/dimmer-double-button.wasm';
+  const la = LanguageAdaptor.emptyAdaptor(wasmPath);
   const deviceManager = new DeviceManager();
-  const mcuVM = await deviceManager.spawnHardwareVM(
-    platform,
-    sourceCodeCompilerArgs,
-  );
+  const mcuVM = await deviceManager.spawnHardwareVM(la, platform);
   await mcuVM.run();
 }
 

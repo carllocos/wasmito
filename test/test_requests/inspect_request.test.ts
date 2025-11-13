@@ -1,30 +1,19 @@
 import { DeviceManager } from '../../src/device/device_manager';
 import { type WasmitoDevVM } from '../../src/runtimes/wasmito_vm/dev_vm';
 import { StateRequest } from '../../src/runtimes/wasmito_vm/requests/inspect_request';
-import { TargetLanguage } from '../../src/compilers/prog_language_selection';
 import { createDevPlatform } from '../../src/platforms/platformbuilder_factory';
-import { type WATCompilerArgs } from '../../src';
+import { LanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 
 describe('Snapshot Request', () => {
   let deviceManager: DeviceManager | undefined;
   let vm: WasmitoDevVM | undefined;
-  const program = './test/data/test-example.wat';
+  const program = './test/data/test-example.wasm';
 
   before(async () => {
     deviceManager = new DeviceManager();
-    const platform = await createDevPlatform({
-      selectedLanguage: {
-        targetLanguage: TargetLanguage.WAT,
-      },
-    });
-    const compilationArgs: WATCompilerArgs = {
-      sourceCodePath: program,
-    };
-    vm = await deviceManager.spawnDevelopmentVM(
-      platform,
-      compilationArgs,
-      3000,
-    );
+    const langAdaptor = LanguageAdaptor.emptyAdaptor(program);
+    const platform = await createDevPlatform();
+    vm = await deviceManager.spawnDevelopmentVM(langAdaptor, platform, 3000);
   });
 
   it('Inspecting pc', async () => {

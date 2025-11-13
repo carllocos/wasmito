@@ -1,8 +1,7 @@
 import { DeviceManager } from '../../src/device/device_manager';
 import { type WasmitoDevVM } from '../../src/runtimes/wasmito_vm/dev_vm';
-import { TargetLanguage } from '../../src/compilers/prog_language_selection';
 import { createDevPlatform } from '../../src/platforms/platformbuilder_factory';
-import { type WATCompilerArgs } from '../../src/compilers/wat_compilers';
+import { LanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 
 describe('Snapshot Request', () => {
   let deviceManager: DeviceManager | undefined;
@@ -10,20 +9,10 @@ describe('Snapshot Request', () => {
 
   before(async () => {
     deviceManager = new DeviceManager();
-    const program = './test/data/test-example.wat';
-    const platform = await createDevPlatform({
-      selectedLanguage: {
-        targetLanguage: TargetLanguage.WAT,
-      },
-    });
-    const compilationArgs: WATCompilerArgs = {
-      sourceCodePath: program,
-    };
-    vm = await deviceManager.spawnDevelopmentVM(
-      platform,
-      compilationArgs,
-      5000,
-    );
+    const platform = await createDevPlatform();
+    const program = './test/data/test-example.wasm';
+    const langAdaptor = LanguageAdaptor.emptyAdaptor(program);
+    vm = await deviceManager.spawnDevelopmentVM(langAdaptor, platform, 5000);
   });
 
   it('Request should resolve on DevVM', async () => {

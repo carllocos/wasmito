@@ -18,6 +18,7 @@ import { Hook } from '../../hooks';
 import { SourceCodeLocation } from '../../source_mappers';
 import { WASMFunction } from '../../webassembly';
 import { ProxyCallResponse } from '../wasmito_vm/requests/fun_call_request';
+import { LanguageAdaptor } from '../../language_adaptors';
 
 export class WARDuinoRuntimeAPI implements RuntimeToolAPI {
   runtimeName: string;
@@ -162,7 +163,7 @@ export class WARDuinoRuntimeAPI implements RuntimeToolAPI {
     throw new Error('To implement');
   }
   uploadSourceCode(
-    sourceCodeCompilationArgs: any,
+    languageAdaptor: LanguageAdaptor,
     timeout?: number,
   ): Promise<boolean> {
     throw new Error('To implement');

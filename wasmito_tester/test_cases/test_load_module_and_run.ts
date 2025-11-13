@@ -4,11 +4,11 @@ import {
   type TestScenarioResult,
   type TestProgram,
 } from '../shared_interfaces';
-import { TargetLanguage } from '../../src/compilers/prog_language_selection';
 import { runVMAction } from '../reusable_actions';
 import { StateRequest } from '../../src/runtimes/wasmito_vm/requests/inspect_request';
 import { type WasmitoBackendVM } from '../../src/runtimes/wasmito_vm/wasmito_vm';
 import { type WasmState } from '../../src/webassembly/wasm';
+import { LanguageAdaptor } from '../../src';
 
 /*
  * Test case that will deploy a wasm module on a DevVM
@@ -27,12 +27,7 @@ export async function run(
     level: 'debug',
   };
 
-  const program: TestProgram = {
-    targetLanguage: TargetLanguage.Wasm,
-    sourceCodeCompilationArgs: {
-      wasmPath,
-    },
-  };
+  const program: TestProgram = LanguageAdaptor.emptyAdaptor(wasmPath);
 
   let firstPC: number | undefined;
   const milliSecs = runningTime * 1000;

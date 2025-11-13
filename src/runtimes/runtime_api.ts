@@ -7,6 +7,7 @@ import { type BreakpointPolicy } from '../debugger/breakpoint_policies';
 import { type Breakpoint } from '../debugger/breakpoint';
 import { type WASMFunction } from '../webassembly/wasm/wasm_function';
 import { type SourceCFGNode } from '../cfg';
+import { LanguageAdaptor } from '../language_adaptors';
 
 export interface RuntimeToolAPI {
   run: (timeout?: number) => Promise<boolean>;
@@ -29,7 +30,7 @@ export interface RuntimeToolAPI {
   proxify: (timeout?: number) => Promise<void>;
 
   uploadSourceCode: (
-    sourceCodeCompilationArgs: any,
+    languageAdaptor: LanguageAdaptor,
     timeout?: number,
   ) => Promise<boolean>;
 

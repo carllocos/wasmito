@@ -6,10 +6,9 @@ import {
 import { SystemTester, type TestScenario } from '../../../system_tester';
 import {
   type TestScenarioResult,
-  type TestProgram,
   type PostSetupConfig,
+  TestProgram,
 } from '../../../shared_interfaces';
-import { TargetLanguage } from '../../../../src/compilers/prog_language_selection';
 import {
   addBreakpointSubscription,
   PauseAction,
@@ -18,7 +17,8 @@ import {
   TriggerInterrupt,
 } from '../../../reusable_actions';
 import { Breakpoint } from '../../../../src/debugger/breakpoint';
-import { type WasmCompilerArgs } from '../../../../src/compilers/wasm_compiler';
+import { SourceMapFromJSON } from '../../../../src/source_mappers/source_map_builder';
+import { LanguageAdaptor } from '../../../../src/language_adaptors/language_adaptor';
 
 /**
  * Device Config
@@ -35,15 +35,10 @@ mcu.serialPort = '/dev/cu.usbserial-8952FFEE8B';
 mcu.fqbn = 'm5stack:esp32:m5stick-c';
 
 const systemSetup = createSystemSetup('DevVM', [m5stickDev, mcu]);
-const arg: WasmCompilerArgs = {
-  wasmPath: './wasmito_tester/test_examples/test_toggle/wasm/toggle.wasm',
-  mappingsJSON: './wasmito_tester/test_examples/test_toggle/wasm/mappings.json',
-};
-
-const program: TestProgram = {
-  targetLanguage: TargetLanguage.Wasm,
-  sourceCodeCompilationArgs: arg,
-};
+const mappingsJSON =
+  './wasmito_tester/test_examples/test_toggle/wasm/mappings.json';
+const sourceMap = SourceMapFromJSON(mappingsJSON);
+const program: TestProgram = new LanguageAdaptor(sourceMap);
 
 const ButtonPin = 37;
 const subscriptionID = 'break on linenr 41 col 5';

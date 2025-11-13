@@ -518,9 +518,9 @@ export async function getDeviceConfiguration(
   vmConfig.pauseOnStart = updatesOnTheFly?.pauseOnStart ?? false;
   vmConfig.disableStrictModuleLoad =
     updatesOnTheFly?.disableStrictModuleLoad ?? true;
-  const args: object = {
+  return await PlatformConfig.fromConfigArgs(
+    device.platform,
     vmConfig,
-    deviceIdentity: device.identity,
-  };
-  return await PlatformConfig.fromConfigArgs(device.platform, args);
+    device.identity,
+  );
 }
