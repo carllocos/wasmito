@@ -1,0 +1,3 @@
+npm run lint
+node ./dist/cjs/cli/cli.cjs --version
+npm test

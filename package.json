@@ -38,7 +38,8 @@
     "hook:test4": "LogLevel=debug ./wasmito_tester/cli.js ./dist/cjs/wasmito_tester/test_cases/test_hook_on_error.cjs",
     "hook:test5": "LogLevel=debug ./wasmito_tester/cli.js ./dist/cjs/wasmito_tester/test_cases/test_on_event_handling_hook.cjs",
     "hook:test6": "LogLevel=debug ./wasmito_tester/cli.js ./dist/cjs/wasmito_tester/test_cases/test_on_event_hook.cjs",
-    "hook:test7": "LogLevel=debug ./wasmito_tester/cli.js ./dist/cjs/wasmito_tester/test_cases/test_oot.cjs"
+    "hook:test7": "LogLevel=debug ./wasmito_tester/cli.js ./dist/cjs/wasmito_tester/test_cases/test_oot.cjs",
+    "prepare": "husky"
   },
   "repository": {
     "type": "git",
@@ -67,6 +68,7 @@
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-promise": "^7.2.1",
     "globals": "^16.4.0",
+    "husky": "^9.1.7",
     "mocha": "^11.7.4",
     "prettier": "^3.6.2",
     "ts-mockito": "^2.6.1",
