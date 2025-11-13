@@ -138,6 +138,11 @@ Then install the core libraries
 wcli arduino-cli core install m5stack:esp32@2.0.0
 ```
 
+The installation completed successfully if you can find the `m5stack:esp32:m5stick-c` FQBN when listing all the available boards:
+```bash
+wcli arduino-cli board listall | grep m5stack:esp32:m5stick-c
+```
+
 Then set the serial path, fqbn, and baudrate of the MCU:
 
 ```bash
