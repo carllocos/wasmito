@@ -221,7 +221,7 @@ export class OutOfPlaceVM extends WasmitoDevVM {
         );
       } else {
         throw new this.ErrorClass(
-          'Cannot setup a VM for OutOfPlace whitout a first snapshot. Either provide one via arg ol the request failed to retrieve the first snapshot',
+          'Cannot setup a VM for OutOfPlace whitout a first snapshot. Either provide one via arg or the request failed to retrieve the first snapshot',
         );
       }
     }
