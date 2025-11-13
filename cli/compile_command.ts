@@ -14,16 +14,14 @@ import { type DeviceIdentity } from '../src/device/device_config';
 import { type VMConfigArgs } from '../src/device/vm_config';
 import { resolve } from 'path';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function validateIdOrName(idOrName: any, prev: any): string {
+function validateIdOrName(idOrName: any, _prev: any): string {
   if (typeof idOrName !== 'string') {
     throw new InvalidArgumentError('Not a string');
   }
   return idOrName;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function isValidWasmPath(wasmPath: any, prev: any): string {
+function isValidWasmPath(wasmPath: any, _prev: any): string {
   if (typeof wasmPath !== 'string') {
     throw new InvalidArgumentError('Is not a string');
   }
