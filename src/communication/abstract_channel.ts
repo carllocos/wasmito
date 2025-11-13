@@ -1,7 +1,6 @@
 import type * as net from 'net';
 import { type Channel } from './channel_interface';
-import { createLogger } from '../logger/logger';
-import type winston from 'winston';
+import { createLogger, Logger } from '../logger/logger';
 
 export abstract class AbstractChannel implements Channel {
   readonly channelName: string;
@@ -9,7 +8,7 @@ export abstract class AbstractChannel implements Channel {
   private dataBuffered: string = '';
   private listeners: Array<(data: string) => void>;
   private readonly removedListeners: Set<(data: string) => void>;
-  protected logger: winston.Logger;
+  protected logger: Logger;
 
   constructor(channelName: string) {
     this.channelName = channelName;

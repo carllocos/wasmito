@@ -1,8 +1,7 @@
 import { SerialPort } from 'serialport';
 import { type Channel } from './channel_interface';
-import { createLogger } from '../logger/logger';
+import { createLogger, Logger } from '../logger/logger';
 import { timeoutPromise } from '../util/promise_util';
-import type winston from 'winston';
 
 // TODO remove code duplication from client-side socket
 
@@ -20,7 +19,7 @@ export class SerialConnection implements Channel {
   private readonly baudRate: number;
   private callbacks: Array<(data: string) => void> = [];
   private dataBuffered: string = '';
-  private readonly logger: winston.Logger;
+  private readonly logger: Logger;
   private readonly removedListeners: Set<(data: string) => void>;
 
   readonly channelName: string;

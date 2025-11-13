@@ -1,7 +1,6 @@
-import { type Logger } from 'winston';
 import { WasmitoBackendVM } from './wasmito_vm';
 import { type Channel } from '../../communication/channel_interface';
-import { createLogger } from '../../logger/logger';
+import { createLogger, Logger } from '../../logger/logger';
 import { timeoutPromise } from '../../util/promise_util';
 import { ClientSideSocket } from '../../communication/client_socket';
 import { SerialConnection } from '../../communication/serial';

@@ -14,8 +14,7 @@ import {
 } from '../../debugger/breakpoint_policies';
 import { InspectStateHook } from '../../hooks/hook_inspect_state';
 import { type Breakpoint } from '../../debugger/breakpoint';
-import type winston from 'winston';
-import { createLogger } from '../../logger/logger';
+import { createLogger, Logger } from '../../logger/logger';
 import { type DevVMPlatform } from '../../platforms/dev_vm_platform';
 import { createDevPlatform } from '../../platforms/platformbuilder_factory';
 import { LanguageAdaptor } from '../../language_adaptors';
@@ -471,7 +470,7 @@ export interface OutOfThingsSpawnConfig {
 }
 
 export class OutOfThingsMonitor {
-  private readonly logger: winston.Logger;
+  private readonly logger: Logger;
   public readonly targetVM: WasmitoBackendVM;
   private readonly _snapshots: WasmState[];
   private readonly _bpPolicy: BreakpointPolicy;
