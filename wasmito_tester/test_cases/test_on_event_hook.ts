@@ -19,30 +19,21 @@ import { type WasmitoBackendVM } from '../../src/runtimes/wasmito_vm/wasmito_vm'
 import { StateRequest } from '../../src/runtimes/wasmito_vm/requests/inspect_request';
 import { WasmValuesBuilder } from '../../src/webassembly/wasm_value_array_builder';
 import { type TestProgram, type PostSetupConfig } from '../shared_interfaces';
-import { TargetLanguage } from '../../src/compilers/prog_language_selection';
-import { type WasmCompilerArgs } from '../../src/compilers/wasm_compiler';
-import {
-  type SourceCodeLocation,
-  SourceMap,
-} from '../../src/source_mappers/source_map';
+import { type SourceCodeLocation } from '../../src/source_mappers/source_map';
+import { LanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 
 /*
  * System Setup
  */
 
-const wasmArgs: WasmCompilerArgs = {
-  wasmPath: './tool_examples/wat_examples/dimmer-double-button.wasm',
-};
+const program: TestProgram = LanguageAdaptor.emptyAdaptor(
+  './tool_examples/wat_examples/dimmer-double-button.wasm',
+);
 
-const program: TestProgram = {
-  targetLanguage: TargetLanguage.Wasm,
-  sourceCodeCompilationArgs: wasmArgs,
-};
-
-const sm = new SourceMap(wasmArgs.wasmPath, [], []);
+const sm = program.sourceMap;
 const mainFunc = sm.wasm.getFunction(12); // fun id 12 is the main func
 if (mainFunc === undefined) {
-  throw new Error(`Failed to find main fun 12 in module ${wasmArgs.wasmPath}`);
+  throw new Error(`Failed to find main fun 12 in module ${sm.wasm.wasmPath}`);
 }
 
 const [localGetBrightness] = mainFunc.getLocalGetInstructions();

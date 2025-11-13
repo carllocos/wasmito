@@ -1,21 +1,22 @@
 import * as path from 'path';
-import { type WATCompilerArgs } from '../../src/compilers/wat_compilers';
 import { createArduinoPlatform, createDevPlatform } from '../../src/platforms';
 import { DeviceManager } from '../../src/device';
 import { createLogger } from '../../src/logger/logger';
 import { BoardBaudRate } from '../../src/util';
-import { TargetLanguage } from '../../src/compilers/prog_language_selection';
 import { type WasmitoBackendVM } from '../../src/runtimes/wasmito_vm/wasmito_vm';
 import { fs } from 'assemblyscript/util/node.js';
+import { LanguageAdaptor } from '../../src';
 
 const logger = createLogger('SourceCodeWatcher');
 
 export async function compileAndUpload(vm: WasmitoBackendVM): Promise<void> {
-  await vm.uploadSourceCode(vm.platform.compiler.latestSourceCodeCompilerArgs);
+  await vm.uploadSourceCode(vm.languageAdaptor);
 }
 
 export function monitorDevVMForUpdate(vm: WasmitoBackendVM): void {
-  const dirsSet = new Set(vm.platform.sourceMap.sources.map(path.dirname));
+  const dirsSet = new Set(
+    vm.languageAdaptor.sourceMap.sources.map(path.dirname),
+  );
   const dirs = Array.from(dirsSet);
   for (let i = 0; i < dirs.length; i++) {
     const dir = dirs[i];
@@ -37,19 +38,15 @@ export function monitorDevVMForUpdate(vm: WasmitoBackendVM): void {
 
 export async function doTestDev(): Promise<void> {
   const dm = new DeviceManager();
-  const watArgs: WATCompilerArgs = {
-    sourceCodePath: './src/tool_examples/wat_examples/dimmer-double-button.wat',
-  };
+  const wasmPath = './src/tool_examples/wat_examples/dimmer-double-button.wasm';
+  const la = LanguageAdaptor.emptyAdaptor(wasmPath);
 
   const platform = await createDevPlatform({
-    selectedLanguage: {
-      targetLanguage: TargetLanguage.WAT,
-    },
     vmConfig: {
       pauseOnStart: false,
     },
   });
-  const devVM = await dm.spawnDevelopmentVM(platform, watArgs);
+  const devVM = await dm.spawnDevelopmentVM(la, platform);
   monitorDevVMForUpdate(devVM);
 }
 
@@ -57,14 +54,10 @@ export async function doTestDev(): Promise<void> {
 
 export async function doTestArduino(): Promise<void> {
   const dm = new DeviceManager();
-  const watArgs: WATCompilerArgs = {
-    sourceCodePath: './src/tool_examples/wat_examples/dimmer-double-button.wat',
-  };
+  const wasmPath = './src/tool_examples/wat_examples/dimmer-double-button.wasm';
+  const la = LanguageAdaptor.emptyAdaptor(wasmPath);
 
   const platform = await createArduinoPlatform({
-    selectedLanguage: {
-      targetLanguage: TargetLanguage.WAT,
-    },
     vmConfig: {
       pauseOnStart: false,
       serialPort: '/dev/cu.usbserial-8952FFEE8B',
@@ -75,7 +68,7 @@ export async function doTestArduino(): Promise<void> {
       },
     },
   });
-  const devVM = await dm.spawnHardwareVM(platform, watArgs);
+  const devVM = await dm.spawnHardwareVM(la, platform);
   monitorDevVMForUpdate(devVM);
 }
 

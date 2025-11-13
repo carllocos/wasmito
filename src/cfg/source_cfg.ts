@@ -1,4 +1,4 @@
-import { type WasmCFGs } from './wasm_cfg';
+import { WasmCFGs } from './wasm_cfg';
 import {
   sourceCodeLocationToString,
   SourceMap,
@@ -362,6 +362,19 @@ export class SourceCFGs {
       writeFileSync(destinationPath, json);
     }
     return json;
+  }
+
+  static buildFromSourceMap(
+    sourceMap: SourceMap,
+    includeUnavailableSourceFiles = true,
+  ): SourceCFGs {
+    const wcfgs = new WasmCFGs(sourceMap.wasm);
+    return new SourceCFGs(
+      new Map(),
+      sourceMap,
+      wcfgs,
+      includeUnavailableSourceFiles,
+    );
   }
 }
 

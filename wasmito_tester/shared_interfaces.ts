@@ -1,5 +1,5 @@
 import { type HookWithSubscription } from '../src/hooks/hook';
-import { type TargetLanguage } from '../src/compilers/prog_language_selection';
+import { LanguageAdaptor } from '../src/language_adaptors/language_adaptor';
 import { type WasmitoBackendVM } from '../src/runtimes/wasmito_vm/wasmito_vm';
 
 export enum Target {
@@ -134,10 +134,7 @@ export type Act<V, Y, Z extends HookWithSubscription<Y>> =
   | SubscriptionEmitterAction<V, Y, Z>
   | SubscribeAction<Y, Z>;
 
-export interface TestProgram {
-  targetLanguage: TargetLanguage;
-  sourceCodeCompilationArgs?: any;
-}
+export type TestProgram = LanguageAdaptor;
 
 export interface TestScenario {
   skipTest?: boolean;

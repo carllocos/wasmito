@@ -1,5 +1,3 @@
-import { TargetLanguage } from '../src/compilers/prog_language_selection';
-import { type WATCompilerArgs } from '../src/compilers/wat_compilers';
 import { Breakpoint } from '../src/debugger/breakpoint';
 import { DeviceManager } from '../src/device/device_manager';
 import { getGlobalLogger } from '../src/logger/logger';
@@ -16,6 +14,7 @@ import {
 import { StateRequest } from '../src/runtimes/wasmito_vm/requests/inspect_request';
 import { type WasmitoDevVM } from '../src/runtimes/wasmito_vm/dev_vm';
 import { type WasmState } from '../src/webassembly/wasm';
+import { LanguageAdaptor } from '../src';
 
 export function allSucceeded(replies: HookOnWasmAddrResponse[]): boolean {
   let idx = 0;
@@ -130,29 +129,20 @@ export async function runDebugScenario(
   const toolPort = 8000;
   const maxWaitTime = 3000;
 
-  const sourceCodeCompilerArgs: WATCompilerArgs = {
-    sourceCodePath: wasmApp,
-  };
   const platform = await createDevPlatform(
     {
-      selectedLanguage: {
-        targetLanguage: TargetLanguage.WAT,
-      },
       vmConfig: {
         toolPort,
       },
     },
     outputDir,
   );
+  const la = LanguageAdaptor.emptyAdaptor(wasmApp);
 
   const dm = new DeviceManager();
   const em = connectToExistingProcess
-    ? await dm.connectToExistingDevVM(
-        platform,
-        sourceCodeCompilerArgs,
-        maxWaitTime,
-      )
-    : await dm.spawnDevelopmentVM(platform, sourceCodeCompilerArgs);
+    ? await dm.connectToExistingDevVM(la, platform, maxWaitTime)
+    : await dm.spawnDevelopmentVM(la, platform);
   const funcCallHardwareSetup = 29;
   if (
     !(await addBreakpoint(

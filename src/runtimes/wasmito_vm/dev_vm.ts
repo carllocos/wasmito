@@ -9,6 +9,7 @@ import { getPath2WasmitoSDKVMBinary } from '../../project_config';
 import { getFreePort, isPortInUse } from '../../util/socket_util';
 import { type Channel } from '../../communication';
 import { type DevVMPlatform } from '../../platforms';
+import { LanguageAdaptor } from '../../language_adaptors';
 
 export class WasmitoDevVMError extends Error {
   constructor(message: string) {
@@ -53,11 +54,11 @@ export class WasmitoDevVM extends WasmitoBackendVM {
   }
 
   public async uploadSourceCode(
-    sourceCodeCompilerArgs: any,
+    languageAdaptor: LanguageAdaptor,
     timeout?: number,
   ): Promise<boolean> {
     const exitCode = await this.platform.buildForPlatform(
-      sourceCodeCompilerArgs,
+      languageAdaptor.sourceMap.wasm.wasmPath,
     );
     if (exitCode !== 0) {
       return false;
@@ -70,7 +71,7 @@ export class WasmitoDevVM extends WasmitoBackendVM {
   }
 
   public async spawn(
-    sourceCodeCompilationArgs: any,
+    adaptor: LanguageAdaptor,
     maxWaitTime?: number,
   ): Promise<ChildProcess> {
     await this.assertExistenceToolPort();
@@ -83,7 +84,7 @@ export class WasmitoDevVM extends WasmitoBackendVM {
     );
 
     const exitCode = await this.platform.buildForPlatform(
-      sourceCodeCompilationArgs,
+      adaptor.sourceMap.wasm.wasmPath,
     );
     if (exitCode !== 0) {
       throw new this.ErrorClass(
@@ -92,7 +93,7 @@ export class WasmitoDevVM extends WasmitoBackendVM {
     }
 
     const processArgs = this.buildProcessArguments(
-      this.sourceMap.wasm.wasmPath,
+      adaptor.sourceMap.wasm.wasmPath,
       this.platform.config.vmConfig,
     );
     const spawnCommand = getPath2WasmitoSDKVMBinary();
@@ -136,6 +137,7 @@ export class WasmitoDevVM extends WasmitoBackendVM {
     }
 
     this.process = childProcess;
+    this.languageAdaptor = adaptor;
 
     return childProcess;
   }

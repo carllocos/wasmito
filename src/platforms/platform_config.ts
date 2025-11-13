@@ -103,25 +103,14 @@ export class PlatformConfig {
 
   static async fromConfigArgs(
     target: PlatformTarget,
-    args: any,
+    vmConfigArgs?: VMConfigArgs,
+    deviceIdentityArgs?: DeviceIdentityArgs,
   ): Promise<PlatformConfig> {
-    return await createPlatformConfig(target, args);
+    if (!isPlatformTarget(target)) {
+      throw new Error('Expected a valid platformtarget');
+    }
+    const vmConfig = await VMConfiguration.fromArgs(vmConfigArgs ?? {});
+    const id = new DeviceIdentity(deviceIdentityArgs ?? {});
+    return new PlatformConfig(target, id, vmConfig);
   }
-}
-
-async function createPlatformConfig(
-  target: PlatformTarget,
-  args: any,
-): Promise<PlatformConfig> {
-  if (typeof args !== 'object') {
-    throw new Error('args is expected to be an object');
-  }
-  if (!isPlatformTarget(target)) {
-    throw new Error('Expected a valid platformtarget');
-  }
-
-  const vmConfig = await VMConfiguration.fromArgs(args.vmConfig ?? {});
-  const id = new DeviceIdentity(args.deviceIdentity ?? {});
-
-  return new PlatformConfig(target, id, vmConfig);
 }

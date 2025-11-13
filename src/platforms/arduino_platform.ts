@@ -13,8 +13,6 @@ import {
   sha256ForFile,
 } from '../util/file_util';
 import path from 'path';
-import { type ProgLangSelectionArgs } from '../compilers/prog_language_selection';
-import { maybeTimeoutPromise } from '../util/promise_util';
 import { type BoardBaudRate, isSerialPort } from '../util/serial_port';
 import { copyFile, readFileSync, writeFileSync } from 'fs';
 import { type VMConfiguration } from '../device';
@@ -266,7 +264,7 @@ export class ArduinoBoardBuilder extends Platform {
     this.pathToWasms = path.join(this.pathToArduinoSketchDir, 'wasms');
   }
 
-  async createCompiler(selectedLanguage: ProgLangSelectionArgs): Promise<void> {
+  private createArduinoRepoIfNeeded(): void {
     if (!this.hasAllTemplateFiles()) {
       // copy Arduino template
       this.logger.info(
@@ -287,6 +285,15 @@ export class ArduinoBoardBuilder extends Platform {
 
     createDirectoryIfUnexisting(this.pathToWasms);
 
+    // compile the source code
+    createDirectoryIfUnexisting(this.pathToArduinoWasmBinaryDir);
+  }
+
+  async buildForPlatform(
+    wasmPath: string,
+    _maxWaitTime?: number,
+  ): Promise<number> {
+    this.createArduinoRepoIfNeeded();
     if (!this.cachePlatformBuild) {
       const exitCodeClean = await ArduinoClean(this.pathToArduinoSketchDir);
       if (exitCodeClean !== 0) {
@@ -294,22 +301,6 @@ export class ArduinoBoardBuilder extends Platform {
       }
     }
 
-    // compile the source code
-    createDirectoryIfUnexisting(this.pathToArduinoWasmBinaryDir);
-  }
-
-  async buildForPlatform(
-    compilerArgs: any,
-    maxWaitTime?: number,
-  ): Promise<number> {
-    this.createArduinoRepoIfNeeded();
-    }
-
-    if (this._languageAdaptor === undefined) {
-      return -1;
-    }
-
-    const wasmPath = this._languageAdaptor.sourceMap.wasm.wasmPath;
     const di = this.config.deviceIdentity;
     let exitCodeCompile = 0;
     let wasmNoCustomSec = '';
@@ -322,9 +313,7 @@ export class ArduinoBoardBuilder extends Platform {
         throw new Error(`Failed to perform ArduinoClean`);
       }
 
-      wasmNoCustomSec = await this.prepareWasm(
-        this._languageAdaptor.sourceMap.wasm.wasmPath,
-      );
+      wasmNoCustomSec = await this.prepareWasm(wasmPath);
       this.logger.info(
         `Arduino compiling sketch ${this.pathToArduinoSketchDir} for ${di.name} (board=${this.config.vmConfig.fqbn.boardName}, ID=${di.id})`,
       );
@@ -342,8 +331,7 @@ export class ArduinoBoardBuilder extends Platform {
     }
 
     if (exitCodeCompile === 0) {
-      this.config.vmConfig.program =
-        this._languageAdaptor.sourceMap.wasm.wasmPath;
+      this.config.vmConfig.program = wasmPath;
       this.saveCompileConfig(di.id, wasmNoCustomSec, this.config.vmConfig);
     }
 
@@ -553,9 +541,7 @@ export class ArduinoBoardBuilder extends Platform {
   }
 
   async getUploadedWasm(): Promise<string | undefined> {
-    if (this._languageAdaptor !== undefined) {
-      return this._languageAdaptor.sourceMap.wasm.wasmPath;
-    } else if (this.config.vmConfig.hasWasmPath()) {
+    if (this.config.vmConfig.hasWasmPath()) {
       return this.config.vmConfig.program;
     }
     if (!isFilePath(this.lastCompiledCacheConfigPath)) {

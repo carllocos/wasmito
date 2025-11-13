@@ -2,8 +2,8 @@ import { AgnosticAST } from '../ast/angostic-ast';
 import { getFileExtension, isFilePath } from '../util/file_util';
 import { createLogger } from '../logger/logger';
 import {
+  SourceMap,
   type SourceCodeLocation,
-  type SourceMap,
 } from '../source_mappers/source_map';
 import { type AgnosticASTMap } from './agnostic_node';
 import { WasmCFGs } from '../cfg/wasm_cfg';
@@ -11,6 +11,7 @@ import { type SourceCFGNode, SourceCFGs } from '../cfg/source_cfg';
 import { getLangConfigFromExtension } from './languages/all_langs';
 import { type LanguageConfiguration } from './languages/language_config';
 import { writeFileSync } from 'fs';
+import { SourceMapFromJSON } from '../source_mappers/source_map_builder';
 
 const logger = createLogger('LanguageAdaptor');
 
@@ -170,5 +171,19 @@ export class LanguageAdaptor {
       this._wasmCFGs,
       includeUnavailableSourceFiles,
     );
+  }
+
+  static emptyAdaptor(wasmPath: string): LanguageAdaptor {
+    return new LanguageAdaptor(new SourceMap(wasmPath, [], []));
+  }
+
+  static fromMappingsPath(
+    mappingsPath: string,
+    allowUnavailableSourceFiles: boolean = false,
+  ): LanguageAdaptor {
+    const sm = SourceMapFromJSON(mappingsPath);
+    const la = new LanguageAdaptor(sm);
+    la.buildSourceCFGs(allowUnavailableSourceFiles);
+    return la;
   }
 }

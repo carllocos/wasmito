@@ -1,7 +1,6 @@
 import { type DeviceIdentityArgs } from '../device/device_config';
 import { type VMConfigArgs } from '../device/vm_config';
 import { getGlobalLogger } from '../logger/logger';
-import { type ProgLangSelectionArgs } from '../compilers/prog_language_selection';
 import { BoardBaudRate } from '../util/serial_port';
 import {
   type BoardFQBN,
@@ -23,17 +22,17 @@ export class BoardBuilderFactoryError extends Error {
 export interface FactoryArgs {
   vmConfig?: VMConfigArgs;
   deviceIdentity?: DeviceIdentityArgs;
-  selectedLanguage?: ProgLangSelectionArgs;
 }
 
 export async function createDevPlatform(
-  args: FactoryArgs,
+  args?: FactoryArgs,
   outputDir?: string,
 ): Promise<DevVMPlatform> {
   getGlobalLogger().info(`Creating Development Platform...`);
   const config: PlatformConfig = await PlatformConfig.fromConfigArgs(
     PlatformTarget.DevVM,
-    args,
+    args?.vmConfig,
+    args?.deviceIdentity,
   );
   return new DevVMPlatform(config, outputDir);
 }
@@ -45,7 +44,8 @@ export async function createArduinoPlatform(
   getGlobalLogger().info(`Creating ArduinoPlatform...`);
   const config: PlatformConfig = await PlatformConfig.fromConfigArgs(
     PlatformTarget.Arduino,
-    args,
+    args.vmConfig,
+    args.deviceIdentity,
   );
   return new ArduinoBoardBuilder(config, outputDir);
 }
@@ -120,7 +120,6 @@ export async function autoBuildArduinoPlatform(
         baudrate,
         serialPort,
       },
-      selectedLanguage: args.selectedLanguage,
       deviceIdentity: args.deviceIdentity,
     },
     outputDir,

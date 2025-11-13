@@ -21,26 +21,22 @@ import {
   type TestScenarioResult,
 } from '../shared_interfaces';
 import { Breakpoint } from '../../src/debugger/breakpoint';
-import { TargetLanguage } from '../../src/compilers/prog_language_selection';
-import { type WasmCompilerArgs } from '../../src/compilers/wasm_compiler';
-import {
-  type SourceCodeLocation,
-  SourceMap,
-} from '../../src/source_mappers/source_map';
+import { type SourceCodeLocation } from '../../src/source_mappers/source_map';
 import { isConst } from '../../src/webassembly/wasm/wasm_instruction';
+import { LanguageAdaptor } from '../../src';
 
 /*
  * System Setup
  */
 
-const wasmArgs: WasmCompilerArgs = {
-  wasmPath: './tool_examples/wat_examples/dimmer-double-button.wasm',
-};
+const program: TestProgram = LanguageAdaptor.emptyAdaptor(
+  './tool_examples/wat_examples/dimmer-double-button.wasm',
+);
 
-const sm = new SourceMap(wasmArgs.wasmPath, [], []);
+const sm = program.sourceMap;
 const mainFunc = sm.wasm.getFunction(12); // fun id 12 is the main func
 if (mainFunc === undefined) {
-  throw new Error(`Failed to find main fun 12 in module ${wasmArgs.wasmPath}`);
+  throw new Error(`Failed to find main fun 12 in module ${sm.wasm.wasmPath}`);
 }
 
 const [localGetBrightness] = mainFunc.getLocalGetInstructions();
@@ -50,10 +46,6 @@ const getBrightness: SourceCodeLocation = {
   colnr: -1,
   address: localGetBrightness.startAddress,
   name: '',
-};
-const program: TestProgram = {
-  targetLanguage: TargetLanguage.Wasm,
-  sourceCodeCompilationArgs: wasmArgs,
 };
 
 // hardware m5stick C
@@ -82,7 +74,7 @@ const systemSetup = createSystemSetup(
 const decreateDeltaFun = sm.wasm.getFunction(8);
 if (decreateDeltaFun === undefined) {
   throw new Error(
-    `Failed to find decreaseDeltaFun 8 in module ${wasmArgs.wasmPath}`,
+    `Failed to find decreaseDeltaFun 8 in module ${sm.wasm.wasmPath}`,
   );
 }
 

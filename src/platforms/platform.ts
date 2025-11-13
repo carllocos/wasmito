@@ -1,12 +1,7 @@
-import type winston from 'winston';
-import { createLogger } from '../logger/logger';
+import { createLogger, Logger } from '../logger/logger';
 import { getPath2WARDuinoSDK, readProjectName } from '../project_config';
 import { type PlatformConfig } from './platform_config';
 import { createTempDirectory, getAbsolutePath } from '../util/file_util';
-import { type SourceCodeCompiler } from '../compilers/compiler';
-import { type ProgLangSelectionArgs } from '../compilers/prog_language_selection';
-import { type LanguageAdaptor } from '../language_adaptors/language_adaptor';
-import { type SourceMap } from '../source_mappers/source_map';
 
 export class PlatformError extends Error {
   constructor(message: string) {
@@ -17,13 +12,11 @@ export class PlatformError extends Error {
 }
 
 export abstract class Platform {
-  protected readonly logger: winston.Logger;
+  protected readonly logger: Logger;
   public readonly config: PlatformConfig;
   protected readonly sdkPath: string;
   protected readonly tmpDirPrefix: string;
   protected readonly outputDirectory: string;
-  protected _sourceCodeCompiler?: SourceCodeCompiler;
-  protected _languageAdaptor?: LanguageAdaptor;
 
   constructor(config: PlatformConfig, outputDir: string = '') {
     this.config = config;
@@ -47,58 +40,16 @@ export abstract class Platform {
     this.logger.info(`Using output directory: ${this.outputDirectory}`);
   }
 
-  get languageAdaptor(): LanguageAdaptor {
-    if (this._languageAdaptor === undefined) {
-      throw new Error(
-        `No LanguageAdaptor available for the platform. Compile some source code first`,
-      );
-    }
-    return this._languageAdaptor;
-  }
-
-  get sourceMap(): SourceMap {
-    if (this._languageAdaptor === undefined) {
-      throw new Error(
-        `No SourceMap available for the platform. Compile some source code first`,
-      );
-    }
-    return this._languageAdaptor.sourceMap;
-  }
-
   get compilationOutputPath(): string {
     return this.outputDirectory;
   }
 
-  get compiler(): SourceCodeCompiler {
-    if (this._sourceCodeCompiler === undefined) {
-      throw new PlatformError(`No compiler has set for this Platform yet`);
-    }
-    return this._sourceCodeCompiler;
-  }
-
-  set compiler(c: SourceCodeCompiler) {
-    this._sourceCodeCompiler = c;
-  }
-
-  abstract createCompiler(
-    selectedLanguage: ProgLangSelectionArgs,
-  ): Promise<void>;
-
   abstract buildForPlatform(
-    sourceCodeCompilationArgs: any,
-    maxWaitTime?: number,
-  ): Promise<number>;
-
-  abstract compileSourceCode(
-    sourceCodeCompilationArgs: any,
+    wasmPath: string,
     maxWaitTime?: number,
   ): Promise<number>;
 
   abstract upload(): Promise<number>;
-
-  public getSourceMap(): SourceMap | undefined {
-    return this._languageAdaptor?.sourceMap;
-  }
 
   abstract getUploadedWasm(): Promise<string | undefined>;
 }

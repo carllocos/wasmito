@@ -1,33 +1,23 @@
 import { DeviceManager } from '../../src/device/device_manager';
 import { type WasmitoDevVM } from '../../src/runtimes/wasmito_vm/dev_vm';
-import { TargetLanguage } from '../../src/compilers/prog_language_selection';
-import { type WATCompilerArgs } from '../../src/compilers/wat_compilers';
 import { createDevPlatform } from '../../src/platforms/platformbuilder_factory';
+import { LanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 
 describe('Update Wasm Module Request', () => {
   let deviceManager: DeviceManager | undefined;
   let vm: WasmitoDevVM | undefined;
-  const sourceCodeCompilerArgs: WATCompilerArgs = {
-    sourceCodePath: './test/data/test-example.wat',
-  };
+  let langAdaptor: LanguageAdaptor;
 
   before(async () => {
     deviceManager = new DeviceManager();
-    const platform = await createDevPlatform({
-      selectedLanguage: {
-        targetLanguage: TargetLanguage.WAT,
-      },
-    });
-
-    vm = await deviceManager.spawnDevelopmentVM(
-      platform,
-      sourceCodeCompilerArgs,
-      5000,
-    );
+    const platform = await createDevPlatform();
+    const program = './test/data/test-example.wasm';
+    langAdaptor = LanguageAdaptor.emptyAdaptor(program);
+    vm = await deviceManager.spawnDevelopmentVM(langAdaptor, platform, 3000);
   });
 
   it('Request should resolve on DevVM', async () => {
-    await vm?.uploadSourceCode(sourceCodeCompilerArgs);
+    await vm?.uploadSourceCode(langAdaptor);
   });
 
   after(async () => {

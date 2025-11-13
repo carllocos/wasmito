@@ -142,9 +142,6 @@ export class SystemDeployer {
 
     const platform = await autoBuildArduinoPlatform(
       {
-        selectedLanguage: {
-          targetLanguage: program.targetLanguage,
-        },
         deviceIdentity: {
           name: device.name,
         },
@@ -157,10 +154,7 @@ export class SystemDeployer {
       },
       this.usedSerialPorts,
     );
-    const vm = await this.deviceManager.spawnHardwareVM(
-      platform,
-      program.sourceCodeCompilationArgs,
-    );
+    const vm = await this.deviceManager.spawnHardwareVM(program, platform);
     vm.channel.addOnData(this.onDataLogger.bind(this));
     this.usedSerialPorts.add(platform.config.vmConfig.serialPort);
     await this.waitUntilVMReady(
@@ -217,9 +211,6 @@ export class SystemDeployer {
       );
     }
     const platform = await createDevPlatform({
-      selectedLanguage: {
-        targetLanguage: testProgram.targetLanguage,
-      },
       vmConfig: {
         toolPort: device.toolPort,
         disableStrictModuleLoad: device.disableStrictModuleLoad,
@@ -228,26 +219,16 @@ export class SystemDeployer {
 
     const vm = externalProcess
       ? await this.deviceManager.connectToExistingDevVM(
+          testProgram,
           platform,
-          testProgram.sourceCodeCompilationArgs,
           this.MAX_WAIT_TIME_DevVM_SPAWN,
         )
       : await this.deviceManager.spawnDevelopmentVM(
+          testProgram,
           platform,
-          testProgram.sourceCodeCompilationArgs,
           this.MAX_WAIT_TIME_DevVM_SPAWN,
         );
 
-    if (externalProcess) {
-      const exitCode = await vm.platform.compileSourceCode(
-        testProgram.sourceCodeCompilationArgs,
-      );
-      if (exitCode !== 0) {
-        throw Error(
-          `Could not compile program ${testProgram.sourceCodeCompilationArgs} exit code ${exitCode}`,
-        );
-      }
-    }
     await this.applyPostDeployment(device, vm);
   }
 

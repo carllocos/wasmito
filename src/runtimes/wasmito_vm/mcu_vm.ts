@@ -8,6 +8,7 @@ import { SerialConnection } from '../../communication/serial';
 import { type PlatformConfig } from '../../platforms/platform_config';
 import { type Platform } from '../../platforms/platform';
 import { NoChannel } from '../../communication/no_channel';
+import { LanguageAdaptor } from '../../language_adaptors';
 
 export class MCUWasmitoVMError extends Error {
   constructor(message: string) {
@@ -64,11 +65,11 @@ export class MCUWasmitoVM extends WasmitoBackendVM {
   }
 
   async uploadSourceCode(
-    sourceCodeCompilerArgs: any,
+    languageAdaptor: LanguageAdaptor,
     timeout?: number | undefined,
   ): Promise<boolean> {
     const exitCode = await this.platform.buildForPlatform(
-      sourceCodeCompilerArgs,
+      languageAdaptor.sourceMap.wasm.wasmPath,
     );
     if (exitCode !== 0) {
       return false;

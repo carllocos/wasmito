@@ -18,6 +18,7 @@ import type winston from 'winston';
 import { createLogger } from '../../logger/logger';
 import { type DevVMPlatform } from '../../platforms/dev_vm_platform';
 import { createDevPlatform } from '../../platforms/platformbuilder_factory';
+import { LanguageAdaptor } from '../../language_adaptors';
 
 export class OutOfPlaceVMError extends Error {
   constructor(message: string) {
@@ -68,6 +69,7 @@ export class OutOfPlaceVM extends WasmitoDevVM {
     this.targetVM = targetVM;
     this.shareableChannel = shareableChannel;
     this.eventsToHandle = [];
+    this.languageAdaptor = targetVM.languageAdaptor;
   }
 
   static async createVM(
@@ -80,10 +82,6 @@ export class OutOfPlaceVM extends WasmitoDevVM {
     );
     const platform = await createDevPlatform(
       {
-        selectedLanguage: {
-          targetLanguage: vmToProxy.platform.compiler.targetLanguage,
-        },
-        vmConfig: {},
         deviceIdentity: {
           name: `${vmToProxy.platform.config.deviceIdentity.name} (Proxied)`,
         },
@@ -192,10 +190,8 @@ export class OutOfPlaceVM extends WasmitoDevVM {
   }
 
   public async spawn(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    sourceCodeCompilationArgs: any,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    maxWaitTime?: number,
+    _adaptor: LanguageAdaptor,
+    _maxWaitTime?: number,
   ): Promise<ChildProcess> {
     throw new this.ErrorClass(
       'Spawn is not supported for OutOfPlace use instead spawnWithConfig',

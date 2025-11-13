@@ -1,4 +1,3 @@
-import type winston from 'winston';
 import { type Channel } from '../../communication/channel_interface';
 import { type RuntimeToolAPI } from '../runtime_api';
 import { RunRequest } from './requests/run_request';
@@ -50,15 +49,13 @@ import {
   type SourceMap,
 } from '../../source_mappers/source_map';
 import { type LanguageAdaptor } from '../../language_adaptors';
-import {
-  sourceNodeFirstInstrStartAddr,
-  type SourceCFGNode,
-} from '../../cfg/source_cfg';
+import { Logger } from '../../logger/logger';
 
 export abstract class WasmitoBackendVM implements RuntimeToolAPI {
   private _channel: Channel;
-  protected abstract logger: winston.Logger;
+  protected abstract logger: Logger;
   private _platform: Platform;
+  private _languageAdaptor?: LanguageAdaptor;
   protected abstract readonly ErrorClass: new (errorMsg: string) => Error;
 
   protected readonly onNewEventHook: EventInspectHook;
@@ -125,11 +122,25 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
   }
 
   get languageAdaptor(): LanguageAdaptor {
-    return this.platform.languageAdaptor;
+    if (this._languageAdaptor === undefined) {
+      throw new Error(
+        `No LanguageAdaptor available for the platform. Compile some source code first`,
+      );
+    }
+    return this._languageAdaptor;
+  }
+
+  set languageAdaptor(a: LanguageAdaptor) {
+    this._languageAdaptor = a;
   }
 
   get sourceMap(): SourceMap {
-    return this.platform.sourceMap;
+    if (this._languageAdaptor === undefined) {
+      throw new Error(
+        `No SourceMap available for the platform. Compile some source code first`,
+      );
+    }
+    return this._languageAdaptor.sourceMap;
   }
 
   get breakpoints(): Breakpoint[] {
@@ -209,7 +220,7 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
   }
 
   abstract uploadSourceCode(
-    sourceCodeCompilerArgs: any,
+    languageAdator: LanguageAdaptor,
     timeout?: number,
   ): Promise<boolean>;
 

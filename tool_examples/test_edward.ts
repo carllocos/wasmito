@@ -6,13 +6,12 @@ import { type WasmitoBackendVM } from '../src/runtimes/wasmito_vm/wasmito_vm';
 import { type MCUWasmitoVM } from '../src/runtimes/wasmito_vm/mcu_vm';
 import { StateRequest } from '../src/runtimes/wasmito_vm/requests/inspect_request';
 import { Breakpoint } from '../src/debugger/breakpoint';
-import { TargetLanguage } from '../src/compilers/prog_language_selection';
 import {
   type FactoryArgs,
   createArduinoPlatform,
   type ArduinoBoardBuilder,
 } from '../src/platforms';
-import { type WATCompilerArgs } from '../src/compilers/wat_compilers';
+import { LanguageAdaptor } from '../src';
 
 export async function callLedcSetup(vm: WasmitoBackendVM): Promise<void> {
   const funcLEDCSetup = 5;
@@ -42,12 +41,12 @@ export async function callPinMode(vm: WasmitoBackendVM): Promise<void> {
 
 async function setupMCUVM(
   platform: ArduinoBoardBuilder,
-  sourceCodeCompilationArgs: any,
+  la: LanguageAdaptor,
   upload: boolean,
 ): Promise<MCUWasmitoVM> {
   const dm = new DeviceManager();
   if (upload) {
-    return await dm.spawnHardwareVM(platform, sourceCodeCompilationArgs);
+    return await dm.spawnHardwareVM(la, platform);
   } else {
     throw new Error(`TODO`);
   }
@@ -55,15 +54,11 @@ async function setupMCUVM(
 
 export async function testEventHook(
   args: FactoryArgs,
-  sourceCodeCompilationArgs: any,
+  la: LanguageAdaptor,
   uploadSourceCode: boolean,
 ): Promise<void> {
   const platform = await createArduinoPlatform(args);
-  const vm = await setupMCUVM(
-    platform,
-    sourceCodeCompilationArgs,
-    uploadSourceCode,
-  );
+  const vm = await setupMCUVM(platform, la, uploadSourceCode);
   const bp = new Breakpoint(
     { source: '', linenr: 88, colnr: 0, name: '', address: 0 },
     new StateRequest().includePC(),
@@ -83,9 +78,6 @@ export async function testEventHook(
 
 const updateSourceCode = true;
 const config: FactoryArgs = {
-  selectedLanguage: {
-    targetLanguage: TargetLanguage.WAT,
-  },
   vmConfig: {
     fqbn: {
       fqbn: 'esp32:esp32:m5stick-c',
@@ -96,10 +88,9 @@ const config: FactoryArgs = {
     // serialPort: '/dev/ttyUSB0',
   },
 };
-const sourceCodeCompilationArgs: WATCompilerArgs = {
-  sourceCodePath: './src/tool_examples/wat_examples/dimmer-double-button.wat',
-};
 
-testEventHook(config, sourceCodeCompilationArgs, updateSourceCode)
+const wasmPath = './src/tool_examples/wat_examples/dimmer-double-button.wasm';
+const languageAdaptor = LanguageAdaptor.emptyAdaptor(wasmPath);
+testEventHook(config, languageAdaptor, updateSourceCode)
   .then(console.log)
   .catch(console.error);

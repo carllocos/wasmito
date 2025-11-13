@@ -12,6 +12,8 @@ export enum LogLevel {
   LogOff = 'off',
 }
 
+export type Logger = winston.Logger;
+
 export function getLogLevelFromString(
   levelString: string,
 ): LogLevel | undefined {

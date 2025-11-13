@@ -8,12 +8,12 @@ import {
   createDevPlatform,
   FactoryArgs,
 } from '../src/platforms/platformbuilder_factory';
-import { TargetLanguage } from '../src/compilers/prog_language_selection';
 import { isProxyCallFailedRequest } from '../src/runtimes/wasmito_vm/requests/fun_call_request';
 import { isSerialPort } from '../src/util/serial_port';
 import { DevVMPlatform } from '../src/platforms/dev_vm_platform';
 import { ArduinoBoardBuilder } from '../src/platforms/arduino_platform';
 import { WasmitoBackendVM } from '../src/runtimes/wasmito_vm/wasmito_vm';
+import { LanguageAdaptor } from '../src/language_adaptors/language_adaptor';
 
 export function registerInterpretRequestCommand(program: Command): void {
   const commandName = 'interpret';
@@ -71,9 +71,6 @@ export function registerInterpretRequestCommand(program: Command): void {
       const connectToExistingVM = toolPort !== undefined;
       let platform: DevVMPlatform | ArduinoBoardBuilder | undefined;
       const factoryArgs: FactoryArgs = {
-        selectedLanguage: {
-          targetLanguage: TargetLanguage.Wasm,
-        },
         vmConfig: {
           disableStrictModuleLoad: true,
         },
@@ -99,22 +96,23 @@ export function registerInterpretRequestCommand(program: Command): void {
       const timeout = 60 * 1000;
       const deviceManager = new DeviceManager();
       let vm: WasmitoBackendVM | undefined;
+      const langAdaptor = LanguageAdaptor.emptyAdaptor(wasmPath);
       if (!connectToExistingVM) {
         vm = await deviceManager.spawnDevelopmentVM(
+          langAdaptor,
           platform as DevVMPlatform,
-          compilationArgs,
           timeout,
         );
       } else if (!isNaN(toolPort)) {
         vm = await deviceManager.connectToExistingDevVM(
+          langAdaptor,
           platform as DevVMPlatform,
-          compilationArgs,
           timeout,
         );
       } else {
         vm = await deviceManager.connectToExistingMCUVM(
+          langAdaptor,
           platform as ArduinoBoardBuilder,
-          compilationArgs,
         );
       }
       try {

@@ -18,16 +18,10 @@ import {
   type TestScenarioResult,
   type TestProgram,
 } from '../shared_interfaces';
-import { TargetLanguage } from '../../src/compilers/prog_language_selection';
-import { type WasmCompilerArgs } from '../../src/compilers/wasm_compiler';
+import { LanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 
-const wasmArgs: WasmCompilerArgs = {
-  wasmPath: './tool_examples/wat_examples/dimmer-double-button.wasm',
-};
-const program: TestProgram = {
-  targetLanguage: TargetLanguage.Wasm,
-  sourceCodeCompilationArgs: wasmArgs,
-};
+const wasmPath = './tool_examples/wat_examples/dimmer-double-button.wasm';
+const program: TestProgram = LanguageAdaptor.emptyAdaptor(wasmPath);
 
 /*
  * System Setup

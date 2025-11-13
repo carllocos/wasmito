@@ -11,9 +11,12 @@ import {
   OutOfThingsMonitor,
   OutputMode,
 } from '../runtimes/wasmito_vm/outofplace_vm';
-import { type DevVMPlatform, type ArduinoBoardBuilder } from '../platforms';
 import { SerialConnection } from '../communication/serial';
 import { ClientSideSocket } from '../communication/client_socket';
+import { LanguageAdaptor } from '../language_adaptors';
+import { DevVMPlatform } from '../platforms/dev_vm_platform';
+import { createDevPlatform } from '../platforms/platformbuilder_factory';
+import { ArduinoBoardBuilder } from '../platforms/arduino_platform';
 
 export class DeviceManagerError extends Error {
   constructor(message: string) {
@@ -45,8 +48,8 @@ export class DeviceManager {
   }
 
   async connectToExistingDevVM(
+    languageAdaptor: LanguageAdaptor,
     platform: DevVMPlatform,
-    sourceCodeCompilationArgs: any,
     maxWaitTime: number,
   ): Promise<WasmitoDevVM> {
     const tp = platform.config.vmConfig.toolPort;
@@ -54,6 +57,7 @@ export class DeviceManager {
     const n = platform.config.deviceIdentity.fullname;
     const channel = new ClientSideSocket(tp, th, n);
     const devVM = new WasmitoDevVM(platform, channel);
+    devVM.languageAdaptor = languageAdaptor;
 
     const connected = await devVM.connect(maxWaitTime);
     if (!connected) {
@@ -62,13 +66,6 @@ export class DeviceManager {
       );
       throw new DeviceManagerError('timed out connecting to DevVM process');
     }
-    const exitCode = await devVM.platform.compileSourceCode(
-      sourceCodeCompilationArgs,
-      maxWaitTime,
-    );
-    if (exitCode !== 0) {
-      throw Error('Could not compile source code');
-    }
     const noProcess = undefined;
     this.localprocesses.push([devVM, noProcess]);
     this.notifyListeners(devVM);
@@ -76,15 +73,16 @@ export class DeviceManager {
   }
 
   async spawnDevelopmentVM(
-    platform: DevVMPlatform,
-    sourceCodeCompilationArgs: any,
+    langAdaptor: LanguageAdaptor,
+    platform?: DevVMPlatform,
     maxWaitTime?: number,
   ): Promise<WasmitoDevVM> {
+    // todo fix this adaptor
+    if (platform === undefined) {
+      platform = await createDevPlatform({});
+    }
     const devVM = new WasmitoDevVM(platform);
-    const childProcess = await devVM.spawn(
-      sourceCodeCompilationArgs,
-      maxWaitTime,
-    );
+    const childProcess = await devVM.spawn(langAdaptor, maxWaitTime);
     this.registerListenersOnVMProcess(childProcess);
     this.localprocesses.push([devVM, childProcess]);
     this.notifyListeners(devVM);
@@ -146,22 +144,17 @@ export class DeviceManager {
   }
 
   async connectToExistingMCUVM(
+    languageAdaptor: LanguageAdaptor,
     platform: ArduinoBoardBuilder,
-    sourceCodeCompilationArgs: any,
   ): Promise<MCUWasmitoVM> {
     const sp = platform.config.vmConfig.serialPort;
     const br = platform.config.vmConfig.baudrate;
     const channel = new SerialConnection(sp, br);
     const vm = new MCUWasmitoVM(platform, channel);
+    vm.languageAdaptor = languageAdaptor;
     const connected = await vm.connect();
     if (!connected) {
       throw Error('Could not connect to external MCU VM');
-    }
-    const exitCode = await vm.platform.compileSourceCode(
-      sourceCodeCompilationArgs,
-    );
-    if (exitCode !== 0) {
-      throw Error('Could not compile source code');
     }
 
     this.notifyListeners(vm);
@@ -169,11 +162,11 @@ export class DeviceManager {
   }
 
   async spawnHardwareVM(
+    languageAdaptor: LanguageAdaptor,
     platform: ArduinoBoardBuilder,
-    sourceCodeCompilationArgs: any,
   ): Promise<MCUWasmitoVM> {
     const vm = new MCUWasmitoVM(platform);
-    const uploaded = await vm.uploadSourceCode(sourceCodeCompilationArgs);
+    const uploaded = await vm.uploadSourceCode(languageAdaptor);
     if (!uploaded) {
       throw new Error(
         `failed to upload source code ${platform.config.deviceIdentity.name}`,

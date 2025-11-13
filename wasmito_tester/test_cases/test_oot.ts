@@ -14,25 +14,16 @@ import {
 } from '../shared_interfaces';
 import { RemoveAndProceedBreakpointPolicy } from '../../src/debugger/breakpoint_policies';
 import { type WasmitoBackendVM } from '../../src/runtimes/wasmito_vm/wasmito_vm';
-import { TargetLanguage } from '../../src/compilers/prog_language_selection';
-import { type WasmCompilerArgs } from '../../src/compilers/wasm_compiler';
-import {
-  type SourceCodeLocation,
-  SourceMap,
-} from '../../src/source_mappers/source_map';
+import { type SourceCodeLocation } from '../../src/source_mappers/source_map';
+import { LanguageAdaptor } from '../../src';
 
 /*
  * System Setup
  */
 
-const wasmArgs: WasmCompilerArgs = {
-  wasmPath: './tool_examples/wat_examples/dimmer-double-button.wasm',
-};
-
-const program: TestProgram = {
-  targetLanguage: TargetLanguage.Wasm,
-  sourceCodeCompilationArgs: wasmArgs,
-};
+const program: TestProgram = LanguageAdaptor.emptyAdaptor(
+  './tool_examples/wat_examples/dimmer-double-button.wasm',
+);
 
 const postSetupConfigM5Dev: PostSetupConfig = {
   pauseAfterSetup: true,
@@ -53,10 +44,10 @@ const systemSetup = createSystemSetup('System with one M5StickCDev', [
 //   level: 'debug',
 // };
 
-const sm = new SourceMap(wasmArgs.wasmPath, [], []);
+const sm = program.sourceMap;
 const mainFunc = sm.wasm.getFunction(12); // fun id 12 is the main func
 if (mainFunc === undefined) {
-  throw new Error(`Failed to find main fun 12 in module ${wasmArgs.wasmPath}`);
+  throw new Error(`Failed to find main fun 12 in module ${sm.wasm.wasmPath}`);
 }
 
 const [localSetBrightness] = mainFunc.getLocalSetInstructions();

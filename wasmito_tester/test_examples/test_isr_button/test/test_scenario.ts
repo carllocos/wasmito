@@ -10,7 +10,6 @@ import {
   type TestProgram,
   type PostSetupConfig,
 } from '../../../shared_interfaces';
-import { TargetLanguage } from '../../../../src/compilers/prog_language_selection';
 import {
   addBreakpointSubscription,
   PauseAction,
@@ -19,8 +18,8 @@ import {
   TriggerInterrupt,
 } from '../../../reusable_actions';
 import { Breakpoint } from '../../../../src/debugger/breakpoint';
-import { type WasmCompilerArgs } from '../../../../src/compilers/wasm_compiler';
 import { loadSourceCFGs, NodeFromLocation } from '../../../util_scfgs';
+import { LanguageAdaptor, SourceMapFromJSON } from '../../../../src';
 
 /**
  * Device Config
@@ -37,9 +36,10 @@ const systemSetup = createSystemSetup('DevVM', [m5stickDev, mcu]);
 const mappingsPath = path.resolve(
   './wasmito_tester/test_examples/test_isr_button/wasm/isr_mappings.json',
 );
-const wasmPath = path.resolve(
-  './wasmito_tester/test_examples/test_isr_button/wasm/main.wasm',
-);
+const sourceMap = SourceMapFromJSON(mappingsPath, {
+  prefixSources: './wasmito_tester/test_examples/',
+});
+const wasmPath = path.resolve();
 
 const SCFGs = loadSourceCFGs(wasmPath, mappingsPath);
 const node = NodeFromLocation(SCFGs, {
@@ -50,15 +50,7 @@ const node = NodeFromLocation(SCFGs, {
   name: '',
 });
 
-const arg: WasmCompilerArgs = {
-  wasmPath: wasmPath,
-  mappingsJSON: SCFGs.sourceMap.toSourceMapJSON(),
-};
-
-const program: TestProgram = {
-  targetLanguage: TargetLanguage.Wasm,
-  sourceCodeCompilationArgs: arg,
-};
+const program: TestProgram = new LanguageAdaptor(sourceMap);
 
 const ButtonPin = 39;
 const subscriptionID = 'break on linenr 27 col 2';

@@ -10,8 +10,7 @@ import {
   type TestScenarioResult,
   type TestProgram,
 } from '../shared_interfaces';
-import { TargetLanguage } from '../../src/compilers/prog_language_selection';
-import { type WasmCompilerArgs } from '../../src/compilers/wasm_compiler';
+import { LanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 
 /*
  * Note on the program
@@ -20,13 +19,9 @@ import { type WasmCompilerArgs } from '../../src/compilers/wasm_compiler';
  * The triggered error is exactly what we are testing here.
  */
 
-const watArgs: WasmCompilerArgs = {
-  wasmPath: './tool_examples/wat_examples/dimmer-double-button.wasm',
-};
-const program: TestProgram = {
-  targetLanguage: TargetLanguage.Wasm,
-  sourceCodeCompilationArgs: watArgs,
-};
+const program: TestProgram = LanguageAdaptor.emptyAdaptor(
+  './tool_examples/wat_examples/dimmer-double-button.wasm',
+);
 
 /*
  * System Setup
