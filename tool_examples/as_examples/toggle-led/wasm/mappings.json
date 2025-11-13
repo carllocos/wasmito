@@ -1,6 +1,6 @@
 {
   "wasm": "wasm/toggle-led.wasm",
-  "sources": ["src/arduino.ts", "src/toggle.ts"],
+  "sources": ["src/arduino.ts", "src/toggle-led.ts"],
   "mappings": [
     {
       "source": "src/arduino.ts",
@@ -45,84 +45,84 @@
       "name": ""
     },
     {
-      "source": "src/toggle.ts",
+      "source": "src/toggle-led.ts",
       "address": 334,
       "linenr": 17,
       "colnr": 14,
       "name": ""
     },
     {
-      "source": "src/toggle.ts",
+      "source": "src/toggle-led.ts",
       "address": 336,
       "linenr": 17,
       "colnr": 13,
       "name": ""
     },
     {
-      "source": "src/toggle.ts",
+      "source": "src/toggle-led.ts",
       "address": 337,
       "linenr": 17,
       "colnr": 5,
       "name": ""
     },
     {
-      "source": "src/toggle.ts",
+      "source": "src/toggle-led.ts",
       "address": 339,
       "linenr": 18,
       "colnr": 18,
       "name": ""
     },
     {
-      "source": "src/toggle.ts",
+      "source": "src/toggle-led.ts",
       "address": 341,
       "linenr": 18,
       "colnr": 23,
       "name": ""
     },
     {
-      "source": "src/toggle.ts",
+      "source": "src/toggle-led.ts",
       "address": 348,
       "linenr": 18,
       "colnr": 40,
       "name": ""
     },
     {
-      "source": "src/toggle.ts",
+      "source": "src/toggle-led.ts",
       "address": 351,
       "linenr": 18,
       "colnr": 5,
       "name": ""
     },
     {
-      "source": "src/toggle.ts",
+      "source": "src/toggle-led.ts",
       "address": 372,
       "linenr": 22,
       "colnr": 5,
       "name": ""
     },
     {
-      "source": "src/toggle.ts",
+      "source": "src/toggle-led.ts",
       "address": 374,
       "linenr": 23,
       "colnr": 5,
       "name": ""
     },
     {
-      "source": "src/toggle.ts",
+      "source": "src/toggle-led.ts",
       "address": 378,
       "linenr": 23,
       "colnr": 11,
       "name": ""
     },
     {
-      "source": "src/toggle.ts",
+      "source": "src/toggle-led.ts",
       "address": 382,
       "linenr": 24,
       "colnr": 15,
       "name": ""
     },
     {
-      "source": "src/toggle.ts",
+      "source": "src/toggle-led.ts",
       "address": 384,
       "linenr": 24,
       "colnr": 9,
@@ -157,70 +157,70 @@
       "name": ""
     },
     {
-      "source": "src/toggle.ts",
+      "source": "src/toggle-led.ts",
       "address": 489,
       "linenr": 11,
       "colnr": 13,
       "name": ""
     },
     {
-      "source": "src/toggle.ts",
+      "source": "src/toggle-led.ts",
       "address": 491,
       "linenr": 11,
       "colnr": 18,
       "name": ""
     },
     {
-      "source": "src/toggle.ts",
+      "source": "src/toggle-led.ts",
       "address": 493,
       "linenr": 11,
       "colnr": 5,
       "name": ""
     },
     {
-      "source": "src/toggle.ts",
+      "source": "src/toggle-led.ts",
       "address": 495,
       "linenr": 12,
       "colnr": 13,
       "name": ""
     },
     {
-      "source": "src/toggle.ts",
+      "source": "src/toggle-led.ts",
       "address": 497,
       "linenr": 12,
       "colnr": 22,
       "name": ""
     },
     {
-      "source": "src/toggle.ts",
+      "source": "src/toggle-led.ts",
       "address": 499,
       "linenr": 12,
       "colnr": 5,
       "name": ""
     },
     {
-      "source": "src/toggle.ts",
+      "source": "src/toggle-led.ts",
       "address": 501,
       "linenr": 13,
       "colnr": 17,
       "name": ""
     },
     {
-      "source": "src/toggle.ts",
+      "source": "src/toggle-led.ts",
       "address": 503,
       "linenr": 13,
       "colnr": 26,
       "name": ""
     },
     {
-      "source": "src/toggle.ts",
+      "source": "src/toggle-led.ts",
       "address": 505,
       "linenr": 13,
       "colnr": 35,
       "name": ""
     },
     {
-      "source": "src/toggle.ts",
+      "source": "src/toggle-led.ts",
       "address": 518,
       "linenr": 13,
       "colnr": 5,

@@ -84,6 +84,13 @@ export class LexicalScopeRequest extends HookWithSubscription<LexicalScope> {
     this.parsers.push([missingStateAllowed, this.parseLocation.bind(this)]);
   }
 
+  includeSourceLocation(): LexicalScopeRequest {
+    this.req.includePC();
+    const missingStateAllowed = false;
+    this.parsers.push([missingStateAllowed, this.parseLocation.bind(this)]);
+    return this;
+  }
+
   parseSubscriptionData(input: WasmState): LexicalScope {
     const b = new LexicalScopeBuilder();
     for (const [missingStateAllowed, parser] of this.parsers) {
