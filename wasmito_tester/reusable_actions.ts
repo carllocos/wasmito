@@ -66,7 +66,7 @@ export function addBPAndRunUntil(
     doAction: async (device: WasmitoBackendVM): Promise<boolean> => {
       return new Promise<boolean>((resolve, reject) => {
         const bp = new Breakpoint(loc);
-        bp.subscribe((state: WasmState): void => {
+        bp.subscribe((_state: WasmState): void => {
           resolve(true);
         });
 
@@ -494,8 +494,7 @@ export function SubscribeOnBPReached(
   const act = {
     subscribeToID: id,
     description,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    checkSubscription: async (state: WasmState): Promise<boolean> => {
+    checkSubscription: async (_state: WasmState): Promise<boolean> => {
       return true;
     },
     ifFail: 'Failed to hit breakpoint',
