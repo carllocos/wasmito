@@ -27,6 +27,11 @@ import {
   type SourceCodeLocation,
 } from '../src/source_mappers/source_map';
 
+export interface ActionArgs {
+  timeoutMs?: number;
+  executeAfterMs?: number;
+}
+
 export function addBreakpointSubscription(
   subscriptionID: string,
   breakpoint: Breakpoint,
@@ -61,7 +66,6 @@ export function addBPAndRunUntil(
     doAction: async (device: WasmitoBackendVM): Promise<boolean> => {
       return new Promise<boolean>((resolve, reject) => {
         const bp = new Breakpoint(loc);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         bp.subscribe((state: WasmState): void => {
           resolve(true);
         });
@@ -180,10 +184,7 @@ export function onHandledEventAction(
   return ac;
 }
 
-export function runVMAction(
-  timeout?: number,
-  delayTime?: number,
-): Action<boolean> {
+export function runVMAction(opts?: ActionArgs): Action<boolean> {
   const act: Action<boolean> = {
     description: 'Run VM',
 
@@ -195,11 +196,11 @@ export function runVMAction(
       return running;
     },
     ifFail: 'Failed to run device',
-    timeout,
+    timeout: opts?.timeoutMs,
   };
 
-  if (delayTime !== undefined) {
-    act.delay = delayTime;
+  if (opts?.executeAfterMs !== undefined) {
+    act.delay = opts.executeAfterMs;
   }
   return act;
 }
@@ -456,11 +457,11 @@ export function createOnErrorActionEmitter(
   return ac;
 }
 
-export function PauseAction(timeout?: number, delay?: number): Action<boolean> {
+export function PauseAction(opts?: ActionArgs): Action<boolean> {
   return {
     description: 'Pause VM',
     doAction: async (device: WasmitoBackendVM): Promise<boolean> => {
-      await device.pause(timeout);
+      await device.pause(opts?.timeoutMs);
       return true;
     },
     checkActionSuccess: async (
@@ -469,26 +470,26 @@ export function PauseAction(timeout?: number, delay?: number): Action<boolean> {
       return successfullResponse;
     },
     ifFail: `failed to pause the VM`,
-    timeout,
-    delay,
+    timeout: opts?.timeoutMs,
+    delay: opts?.executeAfterMs,
   };
 }
 
 export function TriggerInterrupt(
   pin: number,
-  timeout?: number,
-  delay?: number,
+  opts?: ActionArgs,
 ): Action<boolean> {
-  const a = addEventAction(`interrupt_${pin}`, '', timeout);
-  a.delay = delay;
+  const a = addEventAction(`interrupt_${pin}`, '', opts?.timeoutMs);
+  a.delay = opts?.executeAfterMs;
   return a;
 }
 
 export function SubscribeOnBPReached(
   id: string,
-  timeout?: number,
-  delay?: number,
+  args?: ActionArgs,
 ): SubscribeAction<WasmState, InspectStateHook> {
+  const timeout = args?.timeoutMs;
+  const delay = args?.executeAfterMs;
   const description = `wait ${timeout === undefined ? '' : `max ${timeout}`} for '${id}'`;
   const act = {
     subscribeToID: id,

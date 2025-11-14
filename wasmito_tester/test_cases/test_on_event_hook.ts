@@ -88,7 +88,7 @@ const testHookScenario: TestScenario = {
   actions: [
     onNewEventAction('OnNewEventHook', 3000),
     TriggerInterrupt(39),
-    runVMAction(3000),
+    runVMAction({ timeoutMs: 3000 }),
   ],
   expect: [
     {

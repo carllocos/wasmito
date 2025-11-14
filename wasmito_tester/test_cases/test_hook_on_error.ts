@@ -49,7 +49,7 @@ const testAddHookOnError: TestScenario = {
   testProgram: program,
   expect: [
     createOnErrorActionEmitter('OnError', 3000),
-    runVMAction(1000, 1000),
+    runVMAction({ timeoutMs: 1000, executeAfterMs: 1000 }),
     {
       subscribeToID: 'OnError',
       description: 'wait max 10000ms for a new error to occurr',

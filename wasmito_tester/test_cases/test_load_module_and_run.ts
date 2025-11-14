@@ -52,7 +52,7 @@ export async function run(
           return success;
         },
       },
-      runVMAction(milliSecs),
+      runVMAction({ timeoutMs: milliSecs }),
     ],
     expect: [
       {

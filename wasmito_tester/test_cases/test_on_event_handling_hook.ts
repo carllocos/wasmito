@@ -104,7 +104,7 @@ const testHookOnMCUScenario: TestScenario = {
       new Breakpoint(i32ConstLoc),
       10000,
     ),
-    runVMAction(3000),
+    runVMAction({ timeoutMs: 3000 }),
   ],
   expect: [
     {
@@ -143,7 +143,7 @@ const testHookOnMCUScenario2: TestScenario = {
       new Breakpoint(i32ConstLoc),
       10000,
     ),
-    runVMAction(3000),
+    runVMAction({ timeoutMs: 3000 }),
   ],
   expect: [
     {
@@ -176,8 +176,8 @@ const testHookOnDevScenario: TestScenario = {
   testProgram: program,
   actions: [
     onHandledEventSubscription('Event handled', 3000),
-    runVMAction(3000),
-    TriggerInterrupt(39, 3000, 3000),
+    runVMAction({ timeoutMs: 3000 }),
+    TriggerInterrupt(39, { timeoutMs: 3000, executeAfterMs: 3000 }),
   ],
   expect: [
     {

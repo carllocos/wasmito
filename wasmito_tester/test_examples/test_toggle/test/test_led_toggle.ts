@@ -57,15 +57,17 @@ const testLoadAndRunModule: TestScenario = {
       }),
     ),
     runVMAction(),
-    PauseAction(undefined, 3000),
-    TriggerInterrupt(ButtonPin, 3000),
+    PauseAction({
+      executeAfterMs: 3000,
+    }),
+    TriggerInterrupt(ButtonPin, { timeoutMs: 3000 }),
   ],
   expect: [
-    runVMAction(undefined, 5000),
-    SubscribeOnBPReached(subscriptionID, 3000),
-    runVMAction(undefined, 3000),
-    TriggerInterrupt(ButtonPin, undefined, 5000),
-    SubscribeOnBPReached(subscriptionID, 3000),
+    runVMAction({ executeAfterMs: 5000 }),
+    SubscribeOnBPReached(subscriptionID, { timeoutMs: 3000 }),
+    runVMAction({ executeAfterMs: 3000 }),
+    TriggerInterrupt(ButtonPin, { executeAfterMs: 5000 }),
+    SubscribeOnBPReached(subscriptionID, { timeoutMs: 3000 }),
   ],
 };
 

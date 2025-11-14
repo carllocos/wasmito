@@ -81,7 +81,7 @@ const normalBP: TestScenario = {
       new Breakpoint(setBrightness),
       3000,
     ),
-    runVMAction(3000, 3000),
+    runVMAction({ timeoutMs: 3000, executeAfterMs: 3000 }),
   ],
   expect: [
     {
@@ -120,7 +120,7 @@ const singleStopBp: TestScenario = {
       new Breakpoint(setBrightness),
       3000,
     ),
-    runVMAction(3000, 3000), // wait 3 seconds before executing runVMAction
+    runVMAction({ timeoutMs: 3000, executeAfterMs: 3000 }), // wait 3 seconds before executing runVMAction
   ],
   expect: [
     {
