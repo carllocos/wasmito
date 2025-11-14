@@ -90,6 +90,7 @@ export class MCUWasmitoVM extends WasmitoBackendVM {
     if (exitCodeUpload !== 0) {
       return false;
     }
+    this.languageAdaptor = languageAdaptor;
 
     // open connection after flashing
     return await this.channel.open();
