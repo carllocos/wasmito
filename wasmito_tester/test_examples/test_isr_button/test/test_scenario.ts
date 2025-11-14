@@ -18,8 +18,8 @@ import {
   TriggerInterrupt,
 } from '../../../reusable_actions';
 import { Breakpoint } from '../../../../src/debugger/breakpoint';
-import { loadSourceCFGs, NodeFromLocation } from '../../../util_scfgs';
-import { LanguageAdaptor, SourceMapFromJSON } from '../../../../src';
+import { NodeFromLocation } from '../../../util_scfgs';
+import { LanguageAdaptor } from '../../../../src/language_adaptors/language_adaptor';
 
 /**
  * Device Config
@@ -33,15 +33,21 @@ m5stickDev.disableStrictModuleLoad = true;
 const mcu = M5StickCFromJSON('./wasmito_tester/mcus/m5stickc.json');
 
 const systemSetup = createSystemSetup('DevVM', [m5stickDev, mcu]);
+const rootDir = path.resolve('.');
+const wasmPath = path.resolve(
+  rootDir,
+  './wasmito_tester/test_examples/test_isr_button/wasm/main.wasm',
+);
 const mappingsPath = path.resolve(
+  rootDir,
   './wasmito_tester/test_examples/test_isr_button/wasm/isr_mappings.json',
 );
-const sourceMap = SourceMapFromJSON(mappingsPath, {
-  prefixSources: './wasmito_tester/test_examples/',
-});
-const wasmPath = path.resolve();
 
-const SCFGs = loadSourceCFGs(wasmPath, mappingsPath);
+const program: TestProgram = LanguageAdaptor.fromMappingsPath(mappingsPath, {
+  newWasmPath: wasmPath,
+});
+
+const SCFGs = program.sourceCFG!;
 const node = NodeFromLocation(SCFGs, {
   linenr: 27,
   colnr: -1,
@@ -50,11 +56,9 @@ const node = NodeFromLocation(SCFGs, {
   name: '',
 });
 
-const program: TestProgram = new LanguageAdaptor(sourceMap);
-
 const ButtonPin = 39;
 const subscriptionID = 'break on linenr 27 col 2';
-const testLoadAndRunModule: TestScenario = {
+const testButtonTrigger: TestScenario = {
   testName: 'Test If `ToggleLed` updates `LED_STATE`',
   testProgram: program,
   actions: [
@@ -63,21 +67,25 @@ const testLoadAndRunModule: TestScenario = {
       new Breakpoint(node.sourceLocation),
     ),
     runVMAction(),
-    PauseAction(undefined, 3000),
-    TriggerInterrupt(ButtonPin, 3000),
+    PauseAction({
+      executeAfterMs: 3000,
+    }),
+    TriggerInterrupt(ButtonPin, { timeoutMs: 3000 }),
   ],
   expect: [
-    runVMAction(undefined, 5000),
-    SubscribeOnBPReached(subscriptionID, 3000),
-    runVMAction(undefined, 5000),
-    TriggerInterrupt(ButtonPin, undefined, 5000),
-    SubscribeOnBPReached(subscriptionID, 3000),
+    runVMAction({
+      executeAfterMs: 5000,
+    }),
+    SubscribeOnBPReached(subscriptionID, { timeoutMs: 3000 }),
+    runVMAction({ executeAfterMs: 5000 }),
+    TriggerInterrupt(ButtonPin, { executeAfterMs: 5000 }),
+    SubscribeOnBPReached(subscriptionID, { timeoutMs: 3000 }),
   ],
 };
 
 export async function run(): Promise<TestScenarioResult[]> {
   const tester = new SystemTester(systemSetup);
-  // tester.addTestScenario(testLoadAndRunModule, m5stickDev.id);
-  tester.addTestScenario(testLoadAndRunModule, mcu.id);
+  //tester.addTestScenario(testButtonTrigger, m5stickDev.id);
+  tester.addTestScenario(testButtonTrigger, mcu.id);
   return await tester.runTests();
 }
