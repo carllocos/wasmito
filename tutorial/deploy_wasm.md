@@ -94,7 +94,7 @@ Add the following lines to the `package.json`:
 Then you can compile the Wasm module by running
 
 ```bash
-npm run
+npm run build
 ```
 
 This will produce three files in directory `wasm`:
