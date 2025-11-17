@@ -64,18 +64,12 @@ export function registerDevicesCommand(program: Command): void {
     )
     .option('--fqbn <fqbn>', `set the fqbn of <id-or-name>.`)
     .option('--baudrate <baudrate>', `set the baudrate of <id-or-name>`)
-    .option('--list-fqbns', 'display all currently avaiable boards') // TODO remove this command as arduino-cli was added
     .option('--list', 'display all registered devices')
     .action(async (options) => {
       if (!isProjectDirPresent()) {
-        if (options.listFqbns !== undefined) {
-          await listAllFQBN();
-          return;
-        } else {
-          program.error(
-            `There is no project directory defined in the current working directory. First create a project see 'help project'`,
-          );
-        }
+        program.error(
+          `There is no project directory defined in the current working directory. First create a project see 'help project'`,
+        );
       }
 
       let actionHandled = false;
@@ -129,11 +123,6 @@ export function registerDevicesCommand(program: Command): void {
         }
 
         await removeDevice(program, idOrName, devicesPath);
-      }
-
-      if (options.listFqbns !== undefined) {
-        actionHandled = true;
-        await listAllFQBN();
       }
 
       if (options.fqbn !== undefined) {
@@ -240,39 +229,6 @@ function devicesToStr(devices: DeviceJSON[]): string {
     .join('\n');
   const header = 'name\tid';
   return `${header}\n${devicesStr}`;
-}
-
-async function listAllFQBN(): Promise<void> {
-  const boards = await ArduinoListBoardsFQBNs();
-  if (boards.length === 0) {
-    console.log('No boards installed');
-    return;
-  }
-
-  let max = 0;
-  for (const b of boards) {
-    max = b.boardName.length > max ? b.boardName.length : max;
-  }
-  max += 2;
-  const bstr = boards.map((b) => {
-    let bn = b.boardName;
-    if (bn.length < max) {
-      let r = max - bn.length;
-      if (r < 0) {
-        r = 1;
-      }
-      bn = `${bn}${' '.repeat(r)}`;
-    }
-    return `\t${bn}${b.fqbn}`;
-  });
-  const bnHeader = 'board name';
-
-  let r = max - bnHeader.length;
-  if (r < 0) {
-    r = 1;
-  }
-  const header = `${bnHeader}${' '.repeat(r)}FQBN`;
-  console.log(`boards installed:[\n\t${header}\n${bstr.join('\n')}\n]`);
 }
 
 async function addFQBN(
