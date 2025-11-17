@@ -4,7 +4,7 @@ import { StateRequest } from '../../src/runtimes/wasmito_vm/requests/inspect_req
 import { createDevPlatform } from '../../src/platforms/platformbuilder_factory';
 import { LanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 
-describe('Snapshot Request', () => {
+describe('Inspect Request', () => {
   let deviceManager: DeviceManager | undefined;
   let vm: WasmitoDevVM | undefined;
   const program = './test/data/test-example.wasm';
