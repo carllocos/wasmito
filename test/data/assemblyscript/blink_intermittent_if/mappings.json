@@ -1,403 +1,403 @@
 {
-  "wasm": "test/data/assemblyscript_examples/blink/blink.wasm",
+  "wasm": "blink_intermittent_if.wasm",
   "sources": [
-    "test/data/assemblyscript_examples/blink/blink.ts"
+    "blink_intermittent_if.ts"
   ],
   "mappings": [
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 435,
       "linenr": 16,
       "colnr": 14,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 437,
       "linenr": 16,
       "colnr": 19,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 439,
       "linenr": 16,
       "colnr": 4,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 444,
       "linenr": 20,
       "colnr": 11,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 446,
       "linenr": 20,
       "colnr": 4,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 451,
       "linenr": 24,
       "colnr": 19,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 453,
       "linenr": 24,
       "colnr": 24,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 455,
       "linenr": 24,
       "colnr": 4,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 3280,
       "linenr": 39,
       "colnr": 11,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 3282,
       "linenr": 39,
       "colnr": 15,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 3284,
       "linenr": 39,
       "colnr": 11,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 3285,
       "linenr": 39,
       "colnr": 4,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 3289,
       "linenr": 29,
       "colnr": 7,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 3291,
       "linenr": 29,
       "colnr": 17,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 3294,
       "linenr": 29,
       "colnr": 7,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 3295,
       "linenr": 29,
       "colnr": 4,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 3297,
       "linenr": 30,
       "colnr": 15,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 3299,
       "linenr": 30,
       "colnr": 8,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 3301,
       "linenr": 33,
       "colnr": 15,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 3303,
       "linenr": 33,
       "colnr": 25,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 3305,
       "linenr": 33,
       "colnr": 15,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 3306,
       "linenr": 33,
       "colnr": 8,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4302,
       "linenr": 45,
       "colnr": 28,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4304,
       "linenr": 45,
       "colnr": 2,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4306,
       "linenr": 47,
       "colnr": 10,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4308,
       "linenr": 47,
       "colnr": 15,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4310,
       "linenr": 47,
       "colnr": 2,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4312,
       "linenr": 49,
       "colnr": 2,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4316,
       "linenr": 49,
       "colnr": 9,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4320,
       "linenr": 50,
       "colnr": 17,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4322,
       "linenr": 50,
       "colnr": 9,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4326,
       "linenr": 50,
       "colnr": 20,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4328,
       "linenr": 50,
       "colnr": 24,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4332,
       "linenr": 50,
       "colnr": 20,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4335,
       "linenr": 51,
       "colnr": 30,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4337,
       "linenr": 51,
       "colnr": 41,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4339,
       "linenr": 51,
       "colnr": 30,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4341,
       "linenr": 51,
       "colnr": 22,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4343,
       "linenr": 51,
       "colnr": 55,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4346,
       "linenr": 51,
       "colnr": 47,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4348,
       "linenr": 51,
       "colnr": 22,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4349,
       "linenr": 51,
       "colnr": 8,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4351,
       "linenr": 52,
       "colnr": 21,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4353,
       "linenr": 52,
       "colnr": 26,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4355,
       "linenr": 52,
       "colnr": 8,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4357,
       "linenr": 53,
       "colnr": 14,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4359,
       "linenr": 53,
       "colnr": 8,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4361,
       "linenr": 54,
       "colnr": 21,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4363,
       "linenr": 54,
       "colnr": 26,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4365,
       "linenr": 54,
       "colnr": 8,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4367,
       "linenr": 55,
       "colnr": 8,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4369,
       "linenr": 55,
       "colnr": 19,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4371,
       "linenr": 55,
       "colnr": 32,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4373,
       "linenr": 55,
       "colnr": 24,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4375,
       "linenr": 55,
       "colnr": 8,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4377,
       "linenr": 50,
       "colnr": 43,
       "name": ""
     },
     {
-      "source": "test/data/assemblyscript_examples/blink/blink.ts",
+      "source": "blink_intermittent_if.ts",
       "address": 4382,
       "linenr": 50,
       "colnr": 43,

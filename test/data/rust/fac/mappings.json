@@ -1,6598 +1,6598 @@
 {
-  "wasm": "test/data/rust_examples/fac/fac.wasm",
+  "wasm": "fac.wasm",
   "sources": [
-    "test/data/rust_examples/fac/fac.rs"
+    "fac.rs"
   ],
   "mappings": [
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 205,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 206,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 207,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 208,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 209,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 210,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 211,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 212,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 213,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 214,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 215,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 216,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 217,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 218,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 219,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 220,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 221,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 222,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 223,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 224,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 225,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 226,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 227,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 228,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 229,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 230,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 231,
       "linenr": 8,
       "colnr": 5,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 233,
       "linenr": 8,
       "colnr": 5,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 234,
       "linenr": 8,
       "colnr": 5,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 235,
       "linenr": 5,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 236,
       "linenr": 5,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 241,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 242,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 243,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 244,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 245,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 246,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 247,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 248,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 249,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 250,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 251,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 252,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 253,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 254,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 255,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 256,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 257,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 258,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 259,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 260,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 261,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 262,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 263,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 264,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 265,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 266,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 267,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 268,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 269,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 270,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 271,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 272,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 273,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 274,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 275,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 276,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 277,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 278,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 279,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 280,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 281,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 282,
       "linenr": 19,
       "colnr": 5,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 283,
       "linenr": 19,
       "colnr": 5,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 284,
       "linenr": 19,
       "colnr": 5,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 285,
       "linenr": 19,
       "colnr": 5,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 286,
       "linenr": 19,
       "colnr": 5,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 287,
       "linenr": 19,
       "colnr": 5,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 288,
       "linenr": 19,
       "colnr": 5,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 289,
       "linenr": 19,
       "colnr": 5,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 290,
       "linenr": 19,
       "colnr": 5,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 291,
       "linenr": 19,
       "colnr": 5,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 292,
       "linenr": 19,
       "colnr": 5,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 293,
       "linenr": 19,
       "colnr": 5,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 294,
       "linenr": 19,
       "colnr": 5,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 295,
       "linenr": 19,
       "colnr": 5,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 296,
       "linenr": 19,
       "colnr": 5,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 297,
       "linenr": 19,
       "colnr": 5,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 298,
       "linenr": 19,
       "colnr": 5,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 299,
       "linenr": 19,
       "colnr": 5,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 300,
       "linenr": 19,
       "colnr": 5,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 301,
       "linenr": 19,
       "colnr": 5,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 302,
       "linenr": 19,
       "colnr": 5,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 303,
       "linenr": 19,
       "colnr": 5,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 304,
       "linenr": 21,
       "colnr": 2,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 305,
       "linenr": 21,
       "colnr": 2,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 306,
       "linenr": 21,
       "colnr": 2,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 307,
       "linenr": 21,
       "colnr": 2,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 308,
       "linenr": 21,
       "colnr": 2,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 309,
       "linenr": 21,
       "colnr": 2,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 310,
       "linenr": 21,
       "colnr": 2,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 311,
       "linenr": 21,
       "colnr": 2,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 312,
       "linenr": 21,
       "colnr": 2,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 313,
       "linenr": 21,
       "colnr": 2,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 314,
       "linenr": 21,
       "colnr": 2,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 315,
       "linenr": 21,
       "colnr": 2,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 316,
       "linenr": 21,
       "colnr": 2,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 317,
       "linenr": 21,
       "colnr": 2,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 318,
       "linenr": 21,
       "colnr": 2,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 319,
       "linenr": 21,
       "colnr": 2,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 320,
       "linenr": 21,
       "colnr": 2,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 321,
       "linenr": 21,
       "colnr": 2,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 322,
       "linenr": 21,
       "colnr": 2,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 323,
       "linenr": 21,
       "colnr": 2,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 324,
       "linenr": 21,
       "colnr": 2,
       "name": "fac::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 329,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 330,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 331,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 332,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 333,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 334,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 335,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 336,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 337,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 338,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 339,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 340,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 341,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 342,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 343,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 344,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 345,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 346,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 347,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 348,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 349,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 350,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 351,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 352,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 353,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 354,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 355,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 356,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 357,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 358,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 359,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 360,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 361,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 362,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 363,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 364,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 365,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 366,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 367,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 368,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 369,
       "linenr": 23,
       "colnr": 1,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 370,
       "linenr": 25,
       "colnr": 5,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 371,
       "linenr": 25,
       "colnr": 5,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 372,
       "linenr": 25,
       "colnr": 5,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 373,
       "linenr": 25,
       "colnr": 5,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 374,
       "linenr": 25,
       "colnr": 5,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 375,
       "linenr": 25,
       "colnr": 5,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 376,
       "linenr": 25,
       "colnr": 5,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 377,
       "linenr": 25,
       "colnr": 5,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 378,
       "linenr": 25,
       "colnr": 5,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 379,
       "linenr": 25,
       "colnr": 5,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 380,
       "linenr": 25,
       "colnr": 5,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 381,
       "linenr": 25,
       "colnr": 5,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 382,
       "linenr": 25,
       "colnr": 5,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 383,
       "linenr": 25,
       "colnr": 5,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 384,
       "linenr": 25,
       "colnr": 5,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 385,
       "linenr": 25,
       "colnr": 5,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 386,
       "linenr": 25,
       "colnr": 5,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 387,
       "linenr": 25,
       "colnr": 5,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 388,
       "linenr": 25,
       "colnr": 5,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 389,
       "linenr": 25,
       "colnr": 5,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 390,
       "linenr": 25,
       "colnr": 5,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 391,
       "linenr": 25,
       "colnr": 5,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 392,
       "linenr": 27,
       "colnr": 2,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 393,
       "linenr": 27,
       "colnr": 2,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 394,
       "linenr": 27,
       "colnr": 2,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 395,
       "linenr": 27,
       "colnr": 2,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 396,
       "linenr": 27,
       "colnr": 2,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 397,
       "linenr": 27,
       "colnr": 2,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 398,
       "linenr": 27,
       "colnr": 2,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 399,
       "linenr": 27,
       "colnr": 2,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 400,
       "linenr": 27,
       "colnr": 2,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 401,
       "linenr": 27,
       "colnr": 2,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 402,
       "linenr": 27,
       "colnr": 2,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 403,
       "linenr": 27,
       "colnr": 2,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 404,
       "linenr": 27,
       "colnr": 2,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 405,
       "linenr": 27,
       "colnr": 2,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 406,
       "linenr": 27,
       "colnr": 2,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 407,
       "linenr": 27,
       "colnr": 2,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 408,
       "linenr": 27,
       "colnr": 2,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 409,
       "linenr": 27,
       "colnr": 2,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 410,
       "linenr": 27,
       "colnr": 2,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 411,
       "linenr": 27,
       "colnr": 2,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 412,
       "linenr": 27,
       "colnr": 2,
       "name": "fac::digital_write"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 417,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 418,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 419,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 420,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 421,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 422,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 423,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 424,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 425,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 426,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 427,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 428,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 429,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 430,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 431,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 432,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 433,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 434,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 435,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 436,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 437,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 438,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 439,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 440,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 441,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 442,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 443,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 444,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 445,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 446,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 447,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 448,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 449,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 450,
       "linenr": 29,
       "colnr": 1,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 451,
       "linenr": 31,
       "colnr": 5,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 452,
       "linenr": 31,
       "colnr": 5,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 453,
       "linenr": 31,
       "colnr": 5,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 454,
       "linenr": 31,
       "colnr": 5,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 455,
       "linenr": 31,
       "colnr": 5,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 456,
       "linenr": 31,
       "colnr": 5,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 457,
       "linenr": 31,
       "colnr": 5,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 458,
       "linenr": 31,
       "colnr": 5,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 459,
       "linenr": 33,
       "colnr": 2,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 460,
       "linenr": 33,
       "colnr": 2,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 461,
       "linenr": 33,
       "colnr": 2,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 462,
       "linenr": 33,
       "colnr": 2,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 463,
       "linenr": 33,
       "colnr": 2,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 464,
       "linenr": 33,
       "colnr": 2,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 465,
       "linenr": 33,
       "colnr": 2,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 466,
       "linenr": 33,
       "colnr": 2,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 467,
       "linenr": 33,
       "colnr": 2,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 468,
       "linenr": 33,
       "colnr": 2,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 469,
       "linenr": 33,
       "colnr": 2,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 470,
       "linenr": 33,
       "colnr": 2,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 471,
       "linenr": 33,
       "colnr": 2,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 472,
       "linenr": 33,
       "colnr": 2,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 473,
       "linenr": 33,
       "colnr": 2,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 474,
       "linenr": 33,
       "colnr": 2,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 475,
       "linenr": 33,
       "colnr": 2,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 476,
       "linenr": 33,
       "colnr": 2,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 477,
       "linenr": 33,
       "colnr": 2,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 478,
       "linenr": 33,
       "colnr": 2,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 479,
       "linenr": 33,
       "colnr": 2,
       "name": "fac::delay"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 509,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 510,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 511,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 512,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 513,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 514,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 515,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 516,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 517,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 518,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 519,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 520,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 521,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 522,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 523,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 524,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 525,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 526,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 527,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 528,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 529,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 530,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 531,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 532,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 533,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 534,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 535,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 536,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 537,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 538,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 539,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 540,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 541,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 542,
       "linenr": 35,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 543,
       "linenr": 36,
       "colnr": 8,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 544,
       "linenr": 36,
       "colnr": 8,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 545,
       "linenr": 36,
       "colnr": 8,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 546,
       "linenr": 36,
       "colnr": 8,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 547,
       "linenr": 36,
       "colnr": 8,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 548,
       "linenr": 36,
       "colnr": 8,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 549,
       "linenr": 36,
       "colnr": 8,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 550,
       "linenr": 36,
       "colnr": 8,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 551,
       "linenr": 36,
       "colnr": 8,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 552,
       "linenr": 36,
       "colnr": 8,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 553,
       "linenr": 36,
       "colnr": 8,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 554,
       "linenr": 36,
       "colnr": 8,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 555,
       "linenr": 36,
       "colnr": 8,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 556,
       "linenr": 36,
       "colnr": 8,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 557,
       "linenr": 36,
       "colnr": 8,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 558,
       "linenr": 36,
       "colnr": 8,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 559,
       "linenr": 36,
       "colnr": 8,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 560,
       "linenr": 36,
       "colnr": 8,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 561,
       "linenr": 36,
       "colnr": 8,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 562,
       "linenr": 36,
       "colnr": 8,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 563,
       "linenr": 36,
       "colnr": 8,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 564,
       "linenr": 36,
       "colnr": 8,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 565,
       "linenr": 36,
       "colnr": 8,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 567,
       "linenr": 36,
       "colnr": 8,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 569,
       "linenr": 36,
       "colnr": 8,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 570,
       "linenr": 36,
       "colnr": 8,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 571,
       "linenr": 36,
       "colnr": 8,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 572,
       "linenr": 36,
       "colnr": 8,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 573,
       "linenr": 36,
       "colnr": 18,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 574,
       "linenr": 36,
       "colnr": 18,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 575,
       "linenr": 36,
       "colnr": 18,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 576,
       "linenr": 36,
       "colnr": 18,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 577,
       "linenr": 36,
       "colnr": 18,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 578,
       "linenr": 36,
       "colnr": 18,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 579,
       "linenr": 36,
       "colnr": 18,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 580,
       "linenr": 36,
       "colnr": 18,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 581,
       "linenr": 36,
       "colnr": 18,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 582,
       "linenr": 36,
       "colnr": 18,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 583,
       "linenr": 36,
       "colnr": 18,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 584,
       "linenr": 36,
       "colnr": 18,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 585,
       "linenr": 36,
       "colnr": 18,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 586,
       "linenr": 36,
       "colnr": 18,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 587,
       "linenr": 36,
       "colnr": 18,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 588,
       "linenr": 36,
       "colnr": 18,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 589,
       "linenr": 36,
       "colnr": 18,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 590,
       "linenr": 36,
       "colnr": 18,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 591,
       "linenr": 36,
       "colnr": 18,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 592,
       "linenr": 36,
       "colnr": 18,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 593,
       "linenr": 36,
       "colnr": 18,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 594,
       "linenr": 36,
       "colnr": 18,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 595,
       "linenr": 36,
       "colnr": 18,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 596,
       "linenr": 36,
       "colnr": 18,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 597,
       "linenr": 36,
       "colnr": 18,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 598,
       "linenr": 36,
       "colnr": 18,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 599,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 600,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 601,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 602,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 603,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 604,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 605,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 606,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 607,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 608,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 609,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 610,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 611,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 612,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 613,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 614,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 615,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 616,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 617,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 618,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 619,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 620,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 621,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 622,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 623,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 624,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 625,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 626,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 627,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 628,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 629,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 630,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 631,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 632,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 634,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 636,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 638,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 639,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 640,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 641,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 642,
       "linenr": 39,
       "colnr": 13,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 643,
       "linenr": 39,
       "colnr": 13,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 644,
       "linenr": 39,
       "colnr": 13,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 645,
       "linenr": 39,
       "colnr": 13,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 646,
       "linenr": 39,
       "colnr": 13,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 647,
       "linenr": 39,
       "colnr": 13,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 648,
       "linenr": 39,
       "colnr": 13,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 649,
       "linenr": 39,
       "colnr": 13,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 650,
       "linenr": 39,
       "colnr": 13,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 651,
       "linenr": 39,
       "colnr": 13,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 652,
       "linenr": 39,
       "colnr": 13,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 653,
       "linenr": 39,
       "colnr": 13,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 654,
       "linenr": 39,
       "colnr": 13,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 655,
       "linenr": 39,
       "colnr": 13,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 656,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 657,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 658,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 659,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 660,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 661,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 662,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 663,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 664,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 665,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 666,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 667,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 668,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 669,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 670,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 671,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 672,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 673,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 674,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 675,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 676,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 677,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 678,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 679,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 680,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 681,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 682,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 683,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 684,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 685,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 686,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 687,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 688,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 689,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 690,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 691,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 692,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 693,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 694,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 695,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 696,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 697,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 698,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 699,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 700,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 701,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 702,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 703,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 704,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 705,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 706,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 707,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 708,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 709,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 710,
       "linenr": 9,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 711,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 712,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 713,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 714,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 715,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 716,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 717,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 718,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 719,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 720,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 721,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 722,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 723,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 724,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 725,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 726,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 727,
       "linenr": 39,
       "colnr": 17,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 728,
       "linenr": 17,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 729,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 730,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 731,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 732,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 733,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 734,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 735,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 736,
       "linenr": 36,
       "colnr": 5,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 737,
       "linenr": 36,
       "colnr": 5,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 738,
       "linenr": 5,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 739,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 740,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 741,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 742,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 743,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 744,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 745,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 746,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 747,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 748,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 749,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 750,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 751,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 752,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 753,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 754,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 755,
       "linenr": 39,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 756,
       "linenr": 9,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 757,
       "linenr": 37,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 758,
       "linenr": 37,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 759,
       "linenr": 37,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 760,
       "linenr": 37,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 761,
       "linenr": 37,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 762,
       "linenr": 37,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 763,
       "linenr": 37,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 764,
       "linenr": 37,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 765,
       "linenr": 37,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 766,
       "linenr": 37,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 767,
       "linenr": 37,
       "colnr": 9,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 768,
       "linenr": 9,
       "colnr": 1,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 769,
       "linenr": 41,
       "colnr": 2,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 770,
       "linenr": 41,
       "colnr": 2,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 771,
       "linenr": 41,
       "colnr": 2,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 772,
       "linenr": 41,
       "colnr": 2,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 773,
       "linenr": 41,
       "colnr": 2,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 774,
       "linenr": 41,
       "colnr": 2,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 775,
       "linenr": 41,
       "colnr": 2,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 776,
       "linenr": 41,
       "colnr": 2,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 777,
       "linenr": 41,
       "colnr": 2,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 778,
       "linenr": 41,
       "colnr": 2,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 779,
       "linenr": 41,
       "colnr": 2,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 780,
       "linenr": 41,
       "colnr": 2,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 781,
       "linenr": 41,
       "colnr": 2,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 782,
       "linenr": 41,
       "colnr": 2,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 783,
       "linenr": 41,
       "colnr": 2,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 784,
       "linenr": 41,
       "colnr": 2,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 785,
       "linenr": 41,
       "colnr": 2,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 786,
       "linenr": 41,
       "colnr": 2,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 787,
       "linenr": 41,
       "colnr": 2,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 788,
       "linenr": 41,
       "colnr": 2,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 789,
       "linenr": 41,
       "colnr": 2,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 790,
       "linenr": 41,
       "colnr": 2,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 791,
       "linenr": 41,
       "colnr": 2,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 792,
       "linenr": 41,
       "colnr": 2,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 793,
       "linenr": 41,
       "colnr": 2,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 794,
       "linenr": 41,
       "colnr": 2,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 795,
       "linenr": 41,
       "colnr": 2,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 796,
       "linenr": 41,
       "colnr": 2,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 797,
       "linenr": 41,
       "colnr": 2,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 798,
       "linenr": 41,
       "colnr": 2,
       "name": "fac::fac"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 824,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 825,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 826,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 827,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 828,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 829,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 830,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 831,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 832,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 833,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 834,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 835,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 836,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 837,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 838,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 839,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 840,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 841,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 842,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 843,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 844,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 845,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 846,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 847,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 848,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 849,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 850,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 851,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 852,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 853,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 854,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 855,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 856,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 857,
       "linenr": 43,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 858,
       "linenr": 44,
       "colnr": 22,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 859,
       "linenr": 44,
       "colnr": 22,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 860,
       "linenr": 44,
       "colnr": 22,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 861,
       "linenr": 44,
       "colnr": 22,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 862,
       "linenr": 44,
       "colnr": 22,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 863,
       "linenr": 44,
       "colnr": 22,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 864,
       "linenr": 44,
       "colnr": 22,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 865,
       "linenr": 44,
       "colnr": 22,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 866,
       "linenr": 44,
       "colnr": 22,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 867,
       "linenr": 44,
       "colnr": 22,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 868,
       "linenr": 44,
       "colnr": 22,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 869,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 871,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 872,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 873,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 874,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 875,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 876,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 877,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 878,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 879,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 880,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 881,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 882,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 883,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 884,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 885,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 886,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 887,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 888,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 889,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 890,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 891,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 892,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 893,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 894,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 895,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 896,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 897,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 898,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 899,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 900,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 902,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 903,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 904,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 905,
       "linenr": 46,
       "colnr": 11,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 906,
       "linenr": 51,
       "colnr": 5,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 907,
       "linenr": 51,
       "colnr": 5,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 908,
       "linenr": 51,
       "colnr": 5,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 909,
       "linenr": 51,
       "colnr": 5,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 910,
       "linenr": 51,
       "colnr": 5,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 911,
       "linenr": 51,
       "colnr": 5,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 912,
       "linenr": 51,
       "colnr": 5,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 913,
       "linenr": 52,
       "colnr": 2,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 914,
       "linenr": 52,
       "colnr": 2,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 915,
       "linenr": 52,
       "colnr": 2,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 916,
       "linenr": 52,
       "colnr": 2,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 917,
       "linenr": 52,
       "colnr": 2,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 918,
       "linenr": 52,
       "colnr": 2,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 919,
       "linenr": 52,
       "colnr": 2,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 920,
       "linenr": 52,
       "colnr": 2,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 921,
       "linenr": 52,
       "colnr": 2,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 922,
       "linenr": 52,
       "colnr": 2,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 923,
       "linenr": 52,
       "colnr": 2,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 924,
       "linenr": 52,
       "colnr": 2,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 925,
       "linenr": 52,
       "colnr": 2,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 926,
       "linenr": 52,
       "colnr": 2,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 927,
       "linenr": 52,
       "colnr": 2,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 928,
       "linenr": 52,
       "colnr": 2,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 929,
       "linenr": 52,
       "colnr": 2,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 930,
       "linenr": 52,
       "colnr": 2,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 931,
       "linenr": 52,
       "colnr": 2,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 932,
       "linenr": 52,
       "colnr": 2,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 933,
       "linenr": 52,
       "colnr": 2,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 934,
       "linenr": 52,
       "colnr": 2,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 935,
       "linenr": 2,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 936,
       "linenr": 47,
       "colnr": 19,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 937,
       "linenr": 47,
       "colnr": 19,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 938,
       "linenr": 47,
       "colnr": 19,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 939,
       "linenr": 47,
       "colnr": 19,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 940,
       "linenr": 47,
       "colnr": 19,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 941,
       "linenr": 47,
       "colnr": 19,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 942,
       "linenr": 47,
       "colnr": 19,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 943,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 944,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 945,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 946,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 947,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 948,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 949,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 950,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 951,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 952,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 953,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 954,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 955,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 956,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 957,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 958,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 959,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 960,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 961,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 962,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 963,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 964,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 965,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 966,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 967,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 968,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 969,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 970,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 971,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 972,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 973,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 974,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 975,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 976,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 977,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 978,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 979,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 980,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 981,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 982,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 983,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 984,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 985,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 986,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 987,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 988,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 989,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 990,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 991,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 992,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 993,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 994,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 995,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 996,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 997,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 998,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 999,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1000,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1001,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1002,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1004,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1006,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1008,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1009,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1010,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1011,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1012,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1013,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1014,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1015,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1016,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1017,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1018,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1019,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1020,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1021,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1022,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1023,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1024,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1025,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1026,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1027,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1028,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1029,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1030,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1031,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1032,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1033,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1034,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1035,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1036,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1037,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1038,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1039,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1040,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1041,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1042,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1043,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1044,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1045,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1046,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1047,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1048,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1049,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1050,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1051,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1052,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1053,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1054,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1055,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1056,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1057,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1058,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1059,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1060,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1061,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1062,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1063,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1064,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1065,
       "linenr": 9,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1066,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1067,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1068,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1069,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1070,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1071,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1072,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1073,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1074,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1075,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1076,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1077,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1078,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1079,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1080,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1081,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1082,
       "linenr": 47,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1083,
       "linenr": 9,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1084,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1085,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1086,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1087,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1088,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1089,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1090,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1091,
       "linenr": 46,
       "colnr": 5,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1092,
       "linenr": 46,
       "colnr": 5,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1093,
       "linenr": 5,
       "colnr": 1,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1094,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1095,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1096,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1097,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1098,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1099,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1100,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1101,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1102,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1103,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1104,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1105,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1106,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1107,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1108,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1109,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1110,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1111,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1112,
       "linenr": 48,
       "colnr": 9,
       "name": "fac::fac_while"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1121,
       "linenr": 62,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1122,
       "linenr": 62,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1123,
       "linenr": 62,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1124,
       "linenr": 62,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1125,
       "linenr": 62,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1126,
       "linenr": 62,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1127,
       "linenr": 62,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1128,
       "linenr": 62,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1129,
       "linenr": 62,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1130,
       "linenr": 62,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1131,
       "linenr": 62,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1132,
       "linenr": 62,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1133,
       "linenr": 62,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1134,
       "linenr": 62,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1135,
       "linenr": 62,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1136,
       "linenr": 62,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1137,
       "linenr": 62,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1138,
       "linenr": 62,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1139,
       "linenr": 64,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1141,
       "linenr": 64,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1142,
       "linenr": 64,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1143,
       "linenr": 64,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1144,
       "linenr": 64,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1145,
       "linenr": 64,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1146,
       "linenr": 64,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1147,
       "linenr": 64,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1148,
       "linenr": 64,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1149,
       "linenr": 64,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1150,
       "linenr": 64,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1151,
       "linenr": 64,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1152,
       "linenr": 64,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1153,
       "linenr": 64,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1154,
       "linenr": 64,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1155,
       "linenr": 64,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1156,
       "linenr": 64,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1157,
       "linenr": 64,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1158,
       "linenr": 64,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1159,
       "linenr": 65,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1160,
       "linenr": 65,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1161,
       "linenr": 65,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1162,
       "linenr": 65,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1163,
       "linenr": 65,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1164,
       "linenr": 65,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1165,
       "linenr": 65,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1166,
       "linenr": 65,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1167,
       "linenr": 65,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1168,
       "linenr": 65,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1169,
       "linenr": 65,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1170,
       "linenr": 65,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1171,
       "linenr": 65,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1172,
       "linenr": 66,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1173,
       "linenr": 66,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1174,
       "linenr": 66,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1175,
       "linenr": 66,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1176,
       "linenr": 66,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1177,
       "linenr": 66,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1178,
       "linenr": 66,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1179,
       "linenr": 66,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1180,
       "linenr": 66,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1181,
       "linenr": 66,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1182,
       "linenr": 66,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1183,
       "linenr": 66,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1184,
       "linenr": 66,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1185,
       "linenr": 67,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1186,
       "linenr": 67,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1187,
       "linenr": 67,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1188,
       "linenr": 67,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1189,
       "linenr": 67,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1190,
       "linenr": 67,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1191,
       "linenr": 67,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1192,
       "linenr": 67,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1193,
       "linenr": 67,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1194,
       "linenr": 67,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1195,
       "linenr": 67,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1196,
       "linenr": 67,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1197,
       "linenr": 67,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1198,
       "linenr": 68,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1199,
       "linenr": 68,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1200,
       "linenr": 68,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1201,
       "linenr": 68,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1202,
       "linenr": 68,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1203,
       "linenr": 68,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1204,
       "linenr": 68,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1205,
       "linenr": 68,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1206,
       "linenr": 68,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1207,
       "linenr": 68,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1208,
       "linenr": 68,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1209,
       "linenr": 68,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1210,
       "linenr": 68,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1211,
       "linenr": 68,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1212,
       "linenr": 68,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1213,
       "linenr": 68,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1214,
       "linenr": 68,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1215,
       "linenr": 68,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1216,
       "linenr": 69,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1217,
       "linenr": 69,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1218,
       "linenr": 69,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1219,
       "linenr": 69,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1220,
       "linenr": 69,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1221,
       "linenr": 69,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1222,
       "linenr": 69,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1223,
       "linenr": 69,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1224,
       "linenr": 69,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1225,
       "linenr": 69,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1226,
       "linenr": 69,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1227,
       "linenr": 69,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1228,
       "linenr": 69,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1229,
       "linenr": 69,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1230,
       "linenr": 69,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1231,
       "linenr": 9,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/fac/fac.rs",
+      "source": "fac.rs",
       "address": 1232,
       "linenr": 9,
       "colnr": 1,

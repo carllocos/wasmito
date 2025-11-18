@@ -1,4141 +1,4141 @@
 {
-  "wasm": "test/data/rust_examples/blink_intermittent/blink_intermittent.wasm",
+  "wasm": "blink_intermittent.wasm",
   "sources": [
-    "test/data/rust_examples/blink_intermittent/blink_intermittent.rs"
+    "blink_intermittent.rs"
   ],
   "mappings": [
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1010,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1011,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1012,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1013,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1014,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1015,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1016,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1017,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1018,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1019,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1020,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1021,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1022,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1023,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1024,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1025,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1026,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1027,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1028,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1029,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1030,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1031,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1032,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1033,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1034,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1035,
       "linenr": 7,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1036,
       "linenr": 8,
       "colnr": 5,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1038,
       "linenr": 8,
       "colnr": 5,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1039,
       "linenr": 8,
       "colnr": 5,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1040,
       "linenr": 5,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1041,
       "linenr": 5,
       "colnr": 1,
       "name": "__rustc::rust_begin_unwind"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1046,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1047,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1048,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1049,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1050,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1051,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1052,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1053,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1054,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1055,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1056,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1057,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1058,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1059,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1060,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1061,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1062,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1063,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1064,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1065,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1066,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1067,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1068,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1069,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1070,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1071,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1072,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1073,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1074,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1075,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1076,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1077,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1078,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1079,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1080,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1081,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1082,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1083,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1084,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1085,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1086,
       "linenr": 17,
       "colnr": 1,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1087,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1088,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1089,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1090,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1091,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1092,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1093,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1094,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1095,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1096,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1097,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1098,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1099,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1100,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1101,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1102,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1103,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1104,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1105,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1106,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1107,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1108,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1109,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1110,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1111,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1112,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1113,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1114,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1115,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1116,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1117,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1118,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1119,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1120,
       "linenr": 19,
       "colnr": 5,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1121,
       "linenr": 21,
       "colnr": 2,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1122,
       "linenr": 21,
       "colnr": 2,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1123,
       "linenr": 21,
       "colnr": 2,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1124,
       "linenr": 21,
       "colnr": 2,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1125,
       "linenr": 21,
       "colnr": 2,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1126,
       "linenr": 21,
       "colnr": 2,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1127,
       "linenr": 21,
       "colnr": 2,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1128,
       "linenr": 21,
       "colnr": 2,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1129,
       "linenr": 21,
       "colnr": 2,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1130,
       "linenr": 21,
       "colnr": 2,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1131,
       "linenr": 21,
       "colnr": 2,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1132,
       "linenr": 21,
       "colnr": 2,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1133,
       "linenr": 21,
       "colnr": 2,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1134,
       "linenr": 21,
       "colnr": 2,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1135,
       "linenr": 21,
       "colnr": 2,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1136,
       "linenr": 21,
       "colnr": 2,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1137,
       "linenr": 21,
       "colnr": 2,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1138,
       "linenr": 21,
       "colnr": 2,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1139,
       "linenr": 21,
       "colnr": 2,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1140,
       "linenr": 21,
       "colnr": 2,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1141,
       "linenr": 21,
       "colnr": 2,
       "name": "blink_intermittent::pin_mode"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1146,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1147,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1148,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1149,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1150,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1151,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1152,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1153,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1154,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1155,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1156,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1157,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1158,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1159,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1160,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1161,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1162,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1163,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1164,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1165,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1166,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1167,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1168,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1169,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1170,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1171,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1172,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1173,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1174,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1175,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1176,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1177,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1178,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1179,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1180,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1181,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1182,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1183,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1184,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1185,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1186,
       "linenr": 23,
       "colnr": 1,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1187,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1188,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1189,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1190,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1191,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1192,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1193,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1194,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1195,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1196,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1197,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1198,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1199,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1200,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1201,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1202,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1203,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1204,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1205,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1206,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1207,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1208,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1209,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1210,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1211,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1212,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1213,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1214,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1215,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1216,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1217,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1218,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1219,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1220,
       "linenr": 25,
       "colnr": 5,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1221,
       "linenr": 27,
       "colnr": 2,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1222,
       "linenr": 27,
       "colnr": 2,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1223,
       "linenr": 27,
       "colnr": 2,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1224,
       "linenr": 27,
       "colnr": 2,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1225,
       "linenr": 27,
       "colnr": 2,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1226,
       "linenr": 27,
       "colnr": 2,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1227,
       "linenr": 27,
       "colnr": 2,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1228,
       "linenr": 27,
       "colnr": 2,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1229,
       "linenr": 27,
       "colnr": 2,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1230,
       "linenr": 27,
       "colnr": 2,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1231,
       "linenr": 27,
       "colnr": 2,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1232,
       "linenr": 27,
       "colnr": 2,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1233,
       "linenr": 27,
       "colnr": 2,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1234,
       "linenr": 27,
       "colnr": 2,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1235,
       "linenr": 27,
       "colnr": 2,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1236,
       "linenr": 27,
       "colnr": 2,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1237,
       "linenr": 27,
       "colnr": 2,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1238,
       "linenr": 27,
       "colnr": 2,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1239,
       "linenr": 27,
       "colnr": 2,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1240,
       "linenr": 27,
       "colnr": 2,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1241,
       "linenr": 27,
       "colnr": 2,
       "name": "blink_intermittent::digital_write"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1246,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1247,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1248,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1249,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1250,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1251,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1252,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1253,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1254,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1255,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1256,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1257,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1258,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1259,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1260,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1261,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1262,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1263,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1264,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1265,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1266,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1267,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1268,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1269,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1270,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1271,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1272,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1273,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1274,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1275,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1276,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1277,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1278,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1279,
       "linenr": 29,
       "colnr": 1,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1280,
       "linenr": 31,
       "colnr": 5,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1281,
       "linenr": 31,
       "colnr": 5,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1282,
       "linenr": 31,
       "colnr": 5,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1283,
       "linenr": 31,
       "colnr": 5,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1284,
       "linenr": 31,
       "colnr": 5,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1285,
       "linenr": 31,
       "colnr": 5,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1286,
       "linenr": 31,
       "colnr": 5,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1287,
       "linenr": 31,
       "colnr": 5,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1288,
       "linenr": 33,
       "colnr": 2,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1289,
       "linenr": 33,
       "colnr": 2,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1290,
       "linenr": 33,
       "colnr": 2,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1291,
       "linenr": 33,
       "colnr": 2,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1292,
       "linenr": 33,
       "colnr": 2,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1293,
       "linenr": 33,
       "colnr": 2,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1294,
       "linenr": 33,
       "colnr": 2,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1295,
       "linenr": 33,
       "colnr": 2,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1296,
       "linenr": 33,
       "colnr": 2,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1297,
       "linenr": 33,
       "colnr": 2,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1298,
       "linenr": 33,
       "colnr": 2,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1299,
       "linenr": 33,
       "colnr": 2,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1300,
       "linenr": 33,
       "colnr": 2,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1301,
       "linenr": 33,
       "colnr": 2,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1302,
       "linenr": 33,
       "colnr": 2,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1303,
       "linenr": 33,
       "colnr": 2,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1304,
       "linenr": 33,
       "colnr": 2,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1305,
       "linenr": 33,
       "colnr": 2,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1306,
       "linenr": 33,
       "colnr": 2,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1307,
       "linenr": 33,
       "colnr": 2,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1308,
       "linenr": 33,
       "colnr": 2,
       "name": "blink_intermittent::delay"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1314,
       "linenr": 36,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1315,
       "linenr": 36,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1316,
       "linenr": 36,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1317,
       "linenr": 36,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1318,
       "linenr": 36,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1319,
       "linenr": 36,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1320,
       "linenr": 36,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1321,
       "linenr": 36,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1322,
       "linenr": 36,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1323,
       "linenr": 36,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1324,
       "linenr": 36,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1325,
       "linenr": 36,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1326,
       "linenr": 36,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1327,
       "linenr": 36,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1328,
       "linenr": 36,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1329,
       "linenr": 36,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1330,
       "linenr": 36,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1331,
       "linenr": 36,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1332,
       "linenr": 36,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1333,
       "linenr": 36,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1334,
       "linenr": 36,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1335,
       "linenr": 36,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1336,
       "linenr": 36,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1337,
       "linenr": 36,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1338,
       "linenr": 36,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1339,
       "linenr": 36,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1340,
       "linenr": 36,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1341,
       "linenr": 45,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1342,
       "linenr": 45,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1343,
       "linenr": 45,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1344,
       "linenr": 45,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1345,
       "linenr": 45,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1346,
       "linenr": 45,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1347,
       "linenr": 45,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1348,
       "linenr": 45,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1349,
       "linenr": 45,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1350,
       "linenr": 45,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1351,
       "linenr": 45,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1352,
       "linenr": 45,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1353,
       "linenr": 45,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1354,
       "linenr": 45,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1355,
       "linenr": 45,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1356,
       "linenr": 45,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1357,
       "linenr": 45,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1358,
       "linenr": 45,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1359,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1361,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1362,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1363,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1364,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1365,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1366,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1367,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1368,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1369,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1370,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1371,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1372,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1373,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1374,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1375,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1376,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1377,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1378,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1379,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1380,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1381,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1382,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1383,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1384,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1385,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1386,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1387,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1388,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1389,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1390,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1391,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1392,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1393,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1394,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1395,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1396,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1397,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1398,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1399,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1400,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1401,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1402,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1403,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1404,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1405,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1406,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1407,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1408,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1409,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1410,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1411,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1412,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1413,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1414,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1415,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1416,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1417,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1418,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1419,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1420,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1422,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1424,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1425,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1426,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1427,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1428,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1429,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1430,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1431,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1432,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1433,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1434,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1435,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1436,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1437,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1438,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1439,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1440,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1441,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1442,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1443,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1444,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1445,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1446,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1447,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1448,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1449,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1450,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1451,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1452,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1453,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1454,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1455,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1456,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1457,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1458,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1459,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1460,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1461,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1462,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1463,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1464,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1465,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1466,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1467,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1468,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1469,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1470,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1471,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1472,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1473,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1474,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1475,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1476,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1477,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1478,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1479,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1480,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1481,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1482,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1483,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1484,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1485,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1486,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1487,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1488,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1489,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1490,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1491,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1492,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1493,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1494,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1495,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1496,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1497,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1498,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1499,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1500,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1501,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1502,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1503,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1504,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1505,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1506,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1507,
       "linenr": 48,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1508,
       "linenr": 48,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1509,
       "linenr": 48,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1510,
       "linenr": 48,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1511,
       "linenr": 48,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1512,
       "linenr": 48,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1513,
       "linenr": 48,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1514,
       "linenr": 48,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1515,
       "linenr": 48,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1516,
       "linenr": 48,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1517,
       "linenr": 48,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1518,
       "linenr": 48,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1519,
       "linenr": 48,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1520,
       "linenr": 48,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1521,
       "linenr": 49,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1522,
       "linenr": 49,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1523,
       "linenr": 49,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1524,
       "linenr": 49,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1525,
       "linenr": 49,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1526,
       "linenr": 49,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1527,
       "linenr": 49,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1528,
       "linenr": 49,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1529,
       "linenr": 49,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1530,
       "linenr": 49,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1531,
       "linenr": 49,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1532,
       "linenr": 49,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1533,
       "linenr": 49,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1534,
       "linenr": 49,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1535,
       "linenr": 49,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1536,
       "linenr": 49,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1537,
       "linenr": 49,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1538,
       "linenr": 49,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1539,
       "linenr": 50,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1540,
       "linenr": 50,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1541,
       "linenr": 50,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1542,
       "linenr": 50,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1543,
       "linenr": 50,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1544,
       "linenr": 50,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1545,
       "linenr": 50,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1546,
       "linenr": 50,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1547,
       "linenr": 50,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1548,
       "linenr": 50,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1549,
       "linenr": 50,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1550,
       "linenr": 50,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1551,
       "linenr": 50,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1552,
       "linenr": 51,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1553,
       "linenr": 51,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1554,
       "linenr": 51,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1555,
       "linenr": 51,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1556,
       "linenr": 51,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1557,
       "linenr": 51,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1558,
       "linenr": 51,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1559,
       "linenr": 51,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1560,
       "linenr": 51,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1561,
       "linenr": 51,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1562,
       "linenr": 51,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1563,
       "linenr": 51,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1564,
       "linenr": 51,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1565,
       "linenr": 51,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1566,
       "linenr": 51,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1567,
       "linenr": 51,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1568,
       "linenr": 51,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1569,
       "linenr": 51,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1570,
       "linenr": 52,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1571,
       "linenr": 52,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1572,
       "linenr": 52,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1573,
       "linenr": 52,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1574,
       "linenr": 52,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1575,
       "linenr": 52,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1576,
       "linenr": 52,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1577,
       "linenr": 52,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1578,
       "linenr": 52,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1579,
       "linenr": 52,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1580,
       "linenr": 52,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1581,
       "linenr": 52,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1582,
       "linenr": 52,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1583,
       "linenr": 52,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1584,
       "linenr": 52,
       "colnr": 13,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1585,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1586,
       "linenr": 48,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1587,
       "linenr": 55,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1588,
       "linenr": 55,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1589,
       "linenr": 55,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1590,
       "linenr": 55,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1591,
       "linenr": 55,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1592,
       "linenr": 55,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1593,
       "linenr": 55,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1594,
       "linenr": 55,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1595,
       "linenr": 55,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1596,
       "linenr": 55,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1597,
       "linenr": 55,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1598,
       "linenr": 55,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1599,
       "linenr": 55,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1600,
       "linenr": 55,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1601,
       "linenr": 55,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1602,
       "linenr": 55,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1603,
       "linenr": 55,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1604,
       "linenr": 55,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1605,
       "linenr": 56,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1606,
       "linenr": 56,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1607,
       "linenr": 56,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1608,
       "linenr": 56,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1609,
       "linenr": 56,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1610,
       "linenr": 56,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1611,
       "linenr": 56,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1612,
       "linenr": 56,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1613,
       "linenr": 56,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1614,
       "linenr": 56,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1615,
       "linenr": 56,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1616,
       "linenr": 56,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1617,
       "linenr": 56,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1618,
       "linenr": 56,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1619,
       "linenr": 56,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1620,
       "linenr": 9,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/rust_examples/blink_intermittent/blink_intermittent.rs",
+      "source": "blink_intermittent.rs",
       "address": 1621,
       "linenr": 9,
       "colnr": 1,

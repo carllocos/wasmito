@@ -6,10 +6,10 @@ import { AgnosticAST } from '../../src/ast/angostic-ast';
 import { sourceLocationToNodePosition } from '../../src/tree-sitter/tree-sitter-parser';
 import { RustLangConfig } from '../../src/language_adaptors/languages/rust_config';
 
-const rustExamplesPath = path.resolve('./test/data/rust_examples/');
+const rustExamplesPath = path.resolve('./test/data/rust/');
 
 describe('Rust Blink App AST Building and Operations on AST', () => {
-  const blinkApp = pathJoin(rustExamplesPath, 'blink/main.rs');
+  const blinkApp = pathJoin(rustExamplesPath, 'blink_lambda/blink_lambda.rs');
   const blinkAST = new AgnosticAST(blinkApp, RustLangConfig);
 
   before('Build Blink AST', async () => {
