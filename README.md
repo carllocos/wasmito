@@ -61,6 +61,9 @@ For a list of example applications that you can deploy on an MCU, take a look at
 
 See the toy examples in the `tool_examples` directory.
 
+## Debugging An Application
+
+For information, on how to debug an application see [debugging](tutorial/debugging.md)
 
 ## Research
 Research that enabled language-agnostic debugging of WebAssembly on MCUs.
