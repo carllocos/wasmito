@@ -9,18 +9,23 @@ import { SourceMapConfig } from '../../src/source_mappers/source_map_config';
 
 describe('Step Recursive Call on AssemblyScript Blink App', function () {
   const pathToRootSource = path.resolve(
-    './test/data/assemblyscript_examples/blink/',
+    './test/data/assemblyscript/blink_intermittent_if/',
   );
   const mappingsPath = path.resolve(pathToRootSource, 'mappings.json');
-  const srcPath = path.resolve(pathToRootSource, 'blink.ts');
+  const srcPath = path.resolve(pathToRootSource, 'blink_intermittent_if.ts');
+  const wasmPath = path.resolve(pathToRootSource, 'blink_intermittent_if.wasm');
   let sourceCFGs: SourceCFGs;
 
   before('parse wasm module', async function () {
     try {
-      const sm = SourceMapFromJSON(mappingsPath);
+      const sm = SourceMapFromJSON(mappingsPath, {
+        newWasmPath: wasmPath,
+        prefixSources: pathToRootSource,
+      });
       const langAdaptor = await constructLanguageAdaptor(sm);
       assert(langAdaptor.sourceCFG !== undefined);
       sourceCFGs = langAdaptor.sourceCFG;
+      assert(langAdaptor.sourceCFG.sourceMap.mappings.length > 0);
     } catch (e) {
       fail(`Could not construct sourcemap or langadaptor. Reason ${e}`);
     }
@@ -47,13 +52,12 @@ describe('Step Recursive Call on AssemblyScript Blink App', function () {
 });
 
 describe('Step Recursive Call in Rust Factorial', function () {
-  const rootDir = path.resolve('.');
-  const pathToRootSource = path.resolve('./test/data/rust_examples/fac/');
-  const srcPath = path.resolve('./test/data/rust_examples/fac/fac.rs');
+  const pathToRootSource = path.resolve('./test/data/rust/fac/');
+  const srcPath = path.resolve('./test/data/rust/fac/fac.rs');
   const mappings = path.resolve(pathToRootSource, 'mappings.json');
   const wasmPath = path.resolve(pathToRootSource, 'fac.wasm');
   const sourceMapConfig: SourceMapConfig = {
-    prefixSources: rootDir,
+    prefixSources: pathToRootSource,
     newWasmPath: wasmPath,
   };
 
@@ -65,6 +69,7 @@ describe('Step Recursive Call in Rust Factorial', function () {
       const langAdaptor = await constructLanguageAdaptor(sm);
       assert(langAdaptor.sourceCFG !== undefined);
       sourceCFGs = langAdaptor.sourceCFG;
+      assert(langAdaptor.sourceCFG.sourceMap.mappings.length > 0);
     } catch (e) {
       fail(`Could not construct sourcemap or langadaptor. Reason ${e}`);
     }

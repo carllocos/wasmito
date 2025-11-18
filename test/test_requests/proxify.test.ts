@@ -9,7 +9,7 @@ describe('Proxify Request', () => {
 
   before(async () => {
     deviceManager = new DeviceManager();
-    const program = './test/data/test-example.wasm';
+    const program = './test/data/wat/dimmer/dimmer.wasm';
     const platform = await createDevPlatform();
     const langAdaptor = LanguageAdaptor.emptyAdaptor(program);
     vm = await deviceManager.spawnDevelopmentVM(langAdaptor, platform, 3000);

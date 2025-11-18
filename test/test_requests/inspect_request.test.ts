@@ -3,11 +3,12 @@ import { type WasmitoDevVM } from '../../src/runtimes/wasmito_vm/dev_vm';
 import { StateRequest } from '../../src/runtimes/wasmito_vm/requests/inspect_request';
 import { createDevPlatform } from '../../src/platforms/platformbuilder_factory';
 import { LanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
+import { resolve } from 'path';
 
 describe('Inspect Request', () => {
   let deviceManager: DeviceManager | undefined;
   let vm: WasmitoDevVM | undefined;
-  const program = './test/data/test-example.wasm';
+  const program = resolve('./test/data/wat/dimmer/dimmer.wasm');
 
   before(async () => {
     deviceManager = new DeviceManager();

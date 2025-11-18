@@ -4,9 +4,9 @@ import { pathJoin } from '../../src/util/file_util';
 import path from 'path';
 import { WasmModule } from '../../src/webassembly/wasm/wasm_module';
 
-const rustExamplesPath = path.resolve('./test/data/rust_examples/');
+const rustExamplesPath = path.resolve('./test/data/rust/');
 describe('WasmModule Parser', function () {
-  const blinkApp = pathJoin(rustExamplesPath, 'blink/main.wasm');
+  const blinkApp = pathJoin(rustExamplesPath, 'blink_lambda/blink_lambda.wasm');
   let mod: WasmModule;
 
   before('parse wasm module', () => {

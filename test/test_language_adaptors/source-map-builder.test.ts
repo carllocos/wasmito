@@ -2,6 +2,7 @@ import assert from 'assert';
 import { expect } from 'chai';
 import { type SourceMap } from '../../src/source_mappers/source_map';
 import { SourceMapFromJSON } from '../../src/source_mappers/source_map_builder';
+import { resolve } from 'path';
 
 /*
  * Until DWARF library is fully intergated, the generation of SourceMaps happens temporarily
@@ -10,22 +11,26 @@ import { SourceMapFromJSON } from '../../src/source_mappers/source_map_builder';
  */
 
 describe('SourceMap building', function () {
-  const mappingsPath = './test/data/rust_examples/blink/mappings.json';
+  const appRoot = resolve('./test/data/rust/blink_lambda/');
+  const mappingsPath = resolve(appRoot, 'mappings.json');
+  const wasmPath = resolve(appRoot, 'blink_lambda.wasm');
   this.timeout(15000);
 
   it('building sourcemap', async function () {
-    const mapping = SourceMapFromJSON(mappingsPath);
+    const mapping = SourceMapFromJSON(mappingsPath, { newWasmPath: wasmPath });
     expect(mapping).not.equal(undefined);
   });
 });
 
 describe('SourceMap entries', function () {
-  const mappingsPath = './test/data/rust_examples/blink/mappings.json';
+  const appRoot = resolve('./test/data/rust/blink_lambda/');
+  const mappingsPath = resolve(appRoot, 'mappings.json');
+  const wasmPath = resolve(appRoot, 'blink_lambda.wasm');
   let sourceMap: SourceMap | undefined;
   this.timeout(15000);
 
   before('Build SourceMap', async function () {
-    sourceMap = SourceMapFromJSON(mappingsPath);
+    sourceMap = SourceMapFromJSON(mappingsPath, { newWasmPath: wasmPath });
     expect(sourceMap).to.not.equal(undefined);
   });
 

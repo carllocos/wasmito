@@ -1,3197 +1,3197 @@
 {
-  "wasm": "test/data/c_zig/blink/blink.wasm",
+  "wasm": "blink.wasm",
   "sources": [
-    "test/data/c_zig/blink/blink.c",
-    "test/data/c_zig/blink/arduino.zig"
+    "blink_zig.c",
+    "arduino.zig"
   ],
   "mappings": [
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 153,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 154,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 155,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 156,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 157,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 158,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 159,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 160,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 161,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 162,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 163,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 164,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 165,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 166,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 167,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 168,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 169,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 170,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 171,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 172,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 173,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 174,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 175,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 176,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 177,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 178,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 179,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 180,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 181,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 182,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 183,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 184,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 185,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 186,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 187,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 188,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 189,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 190,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 191,
       "linenr": 6,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 192,
       "linenr": 6,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 193,
       "linenr": 6,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 194,
       "linenr": 6,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 195,
       "linenr": 6,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 196,
       "linenr": 6,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 197,
       "linenr": 6,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 198,
       "linenr": 6,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 199,
       "linenr": 6,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 200,
       "linenr": 6,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 201,
       "linenr": 6,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 202,
       "linenr": 7,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 203,
       "linenr": 7,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 204,
       "linenr": 7,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 205,
       "linenr": 7,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 206,
       "linenr": 7,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 207,
       "linenr": 7,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 208,
       "linenr": 7,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 209,
       "linenr": 7,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 210,
       "linenr": 7,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 211,
       "linenr": 7,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 212,
       "linenr": 7,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 213,
       "linenr": 8,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 214,
       "linenr": 8,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 215,
       "linenr": 8,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 216,
       "linenr": 8,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 217,
       "linenr": 8,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 218,
       "linenr": 8,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 219,
       "linenr": 8,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 220,
       "linenr": 8,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 221,
       "linenr": 8,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 222,
       "linenr": 8,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 223,
       "linenr": 8,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 224,
       "linenr": 9,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 225,
       "linenr": 9,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 226,
       "linenr": 9,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 227,
       "linenr": 9,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 228,
       "linenr": 9,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 229,
       "linenr": 9,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 230,
       "linenr": 9,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 231,
       "linenr": 9,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 232,
       "linenr": 9,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 233,
       "linenr": 9,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 234,
       "linenr": 9,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 235,
       "linenr": 10,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 236,
       "linenr": 10,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 237,
       "linenr": 10,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 238,
       "linenr": 10,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 239,
       "linenr": 10,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 240,
       "linenr": 10,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 241,
       "linenr": 10,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 242,
       "linenr": 10,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 243,
       "linenr": 10,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 244,
       "linenr": 10,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 245,
       "linenr": 10,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 246,
       "linenr": 10,
       "colnr": 18,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 247,
       "linenr": 12,
       "colnr": 14,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 248,
       "linenr": 12,
       "colnr": 14,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 249,
       "linenr": 12,
       "colnr": 14,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 250,
       "linenr": 12,
       "colnr": 14,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 251,
       "linenr": 12,
       "colnr": 14,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 252,
       "linenr": 12,
       "colnr": 14,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 253,
       "linenr": 12,
       "colnr": 14,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 254,
       "linenr": 12,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 255,
       "linenr": 12,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 256,
       "linenr": 12,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 257,
       "linenr": 12,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 258,
       "linenr": 12,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 259,
       "linenr": 12,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 260,
       "linenr": 12,
       "colnr": 19,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 261,
       "linenr": 12,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 262,
       "linenr": 12,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 263,
       "linenr": 12,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 264,
       "linenr": 12,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 265,
       "linenr": 12,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 266,
       "linenr": 12,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 267,
       "linenr": 12,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 268,
       "linenr": 12,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 269,
       "linenr": 12,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 270,
       "linenr": 12,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 271,
       "linenr": 15,
       "colnr": 23,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 273,
       "linenr": 15,
       "colnr": 23,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 274,
       "linenr": 15,
       "colnr": 23,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 275,
       "linenr": 15,
       "colnr": 23,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 276,
       "linenr": 15,
       "colnr": 23,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 277,
       "linenr": 15,
       "colnr": 23,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 278,
       "linenr": 15,
       "colnr": 23,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 279,
       "linenr": 15,
       "colnr": 23,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 280,
       "linenr": 15,
       "colnr": 28,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 281,
       "linenr": 15,
       "colnr": 28,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 282,
       "linenr": 15,
       "colnr": 28,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 283,
       "linenr": 15,
       "colnr": 28,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 284,
       "linenr": 15,
       "colnr": 28,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 285,
       "linenr": 15,
       "colnr": 28,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 286,
       "linenr": 15,
       "colnr": 28,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 287,
       "linenr": 15,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 288,
       "linenr": 15,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 289,
       "linenr": 15,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 290,
       "linenr": 15,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 291,
       "linenr": 15,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 292,
       "linenr": 15,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 293,
       "linenr": 15,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 294,
       "linenr": 15,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 295,
       "linenr": 15,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 296,
       "linenr": 15,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 297,
       "linenr": 16,
       "colnr": 15,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 298,
       "linenr": 16,
       "colnr": 15,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 299,
       "linenr": 16,
       "colnr": 15,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 300,
       "linenr": 16,
       "colnr": 15,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 301,
       "linenr": 16,
       "colnr": 15,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 302,
       "linenr": 16,
       "colnr": 15,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 303,
       "linenr": 16,
       "colnr": 15,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 304,
       "linenr": 16,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 305,
       "linenr": 16,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 306,
       "linenr": 16,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 307,
       "linenr": 16,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 308,
       "linenr": 16,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 309,
       "linenr": 16,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 310,
       "linenr": 16,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 311,
       "linenr": 16,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 312,
       "linenr": 17,
       "colnr": 23,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 313,
       "linenr": 17,
       "colnr": 23,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 314,
       "linenr": 17,
       "colnr": 23,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 315,
       "linenr": 17,
       "colnr": 23,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 316,
       "linenr": 17,
       "colnr": 23,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 317,
       "linenr": 17,
       "colnr": 23,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 318,
       "linenr": 17,
       "colnr": 23,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 319,
       "linenr": 17,
       "colnr": 28,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 320,
       "linenr": 17,
       "colnr": 28,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 321,
       "linenr": 17,
       "colnr": 28,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 322,
       "linenr": 17,
       "colnr": 28,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 323,
       "linenr": 17,
       "colnr": 28,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 324,
       "linenr": 17,
       "colnr": 28,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 325,
       "linenr": 17,
       "colnr": 28,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 326,
       "linenr": 17,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 327,
       "linenr": 17,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 328,
       "linenr": 17,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 329,
       "linenr": 17,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 330,
       "linenr": 17,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 331,
       "linenr": 17,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 332,
       "linenr": 17,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 333,
       "linenr": 17,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 334,
       "linenr": 17,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 335,
       "linenr": 17,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 336,
       "linenr": 18,
       "colnr": 15,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 337,
       "linenr": 18,
       "colnr": 15,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 338,
       "linenr": 18,
       "colnr": 15,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 339,
       "linenr": 18,
       "colnr": 15,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 340,
       "linenr": 18,
       "colnr": 15,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 341,
       "linenr": 18,
       "colnr": 15,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 342,
       "linenr": 18,
       "colnr": 15,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 343,
       "linenr": 18,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 344,
       "linenr": 18,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 345,
       "linenr": 18,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 346,
       "linenr": 18,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 347,
       "linenr": 18,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 348,
       "linenr": 18,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 349,
       "linenr": 18,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 350,
       "linenr": 18,
       "colnr": 9,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 351,
       "linenr": 14,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 352,
       "linenr": 14,
       "colnr": 5,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 353,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/blink.c",
+      "source": "blink_zig.c",
       "address": 354,
       "linenr": 5,
       "colnr": 1,
       "name": "main"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 375,
       "linenr": 5,
       "colnr": 1,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 376,
       "linenr": 5,
       "colnr": 1,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 377,
       "linenr": 5,
       "colnr": 1,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 378,
       "linenr": 5,
       "colnr": 1,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 379,
       "linenr": 5,
       "colnr": 1,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 380,
       "linenr": 5,
       "colnr": 1,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 381,
       "linenr": 5,
       "colnr": 1,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 382,
       "linenr": 5,
       "colnr": 1,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 383,
       "linenr": 5,
       "colnr": 1,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 384,
       "linenr": 5,
       "colnr": 1,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 385,
       "linenr": 5,
       "colnr": 1,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 386,
       "linenr": 5,
       "colnr": 1,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 387,
       "linenr": 5,
       "colnr": 1,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 388,
       "linenr": 5,
       "colnr": 1,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 389,
       "linenr": 5,
       "colnr": 1,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 390,
       "linenr": 5,
       "colnr": 1,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 391,
       "linenr": 5,
       "colnr": 1,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 392,
       "linenr": 5,
       "colnr": 1,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 393,
       "linenr": 5,
       "colnr": 1,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 394,
       "linenr": 5,
       "colnr": 1,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 395,
       "linenr": 5,
       "colnr": 1,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 396,
       "linenr": 5,
       "colnr": 1,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 397,
       "linenr": 5,
       "colnr": 1,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 398,
       "linenr": 5,
       "colnr": 1,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 399,
       "linenr": 5,
       "colnr": 1,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 400,
       "linenr": 5,
       "colnr": 1,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 401,
       "linenr": 5,
       "colnr": 1,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 402,
       "linenr": 5,
       "colnr": 50,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 403,
       "linenr": 5,
       "colnr": 50,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 404,
       "linenr": 5,
       "colnr": 50,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 405,
       "linenr": 5,
       "colnr": 50,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 406,
       "linenr": 5,
       "colnr": 50,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 407,
       "linenr": 5,
       "colnr": 50,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 408,
       "linenr": 5,
       "colnr": 50,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 409,
       "linenr": 5,
       "colnr": 50,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 410,
       "linenr": 5,
       "colnr": 50,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 411,
       "linenr": 5,
       "colnr": 50,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 412,
       "linenr": 5,
       "colnr": 50,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 413,
       "linenr": 5,
       "colnr": 50,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 414,
       "linenr": 5,
       "colnr": 50,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 415,
       "linenr": 5,
       "colnr": 50,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 416,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 417,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 418,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 419,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 420,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 421,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 422,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 423,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 424,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 425,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 426,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 427,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 428,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 429,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 430,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 431,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 432,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 433,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 434,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 435,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 436,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 437,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 438,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 439,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 440,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 441,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 442,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 443,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 444,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 445,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 446,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 447,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 448,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 449,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 450,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 451,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 452,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 453,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 454,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 455,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 456,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 457,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 458,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 459,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 460,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 461,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 462,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 463,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 464,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 465,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 466,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 467,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 468,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 469,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 470,
       "linenr": 6,
       "colnr": 23,
       "name": "arduino.digital_write"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 475,
       "linenr": 9,
       "colnr": 1,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 476,
       "linenr": 9,
       "colnr": 1,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 477,
       "linenr": 9,
       "colnr": 1,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 478,
       "linenr": 9,
       "colnr": 1,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 479,
       "linenr": 9,
       "colnr": 1,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 480,
       "linenr": 9,
       "colnr": 1,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 481,
       "linenr": 9,
       "colnr": 1,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 482,
       "linenr": 9,
       "colnr": 1,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 483,
       "linenr": 9,
       "colnr": 1,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 484,
       "linenr": 9,
       "colnr": 1,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 485,
       "linenr": 9,
       "colnr": 1,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 486,
       "linenr": 9,
       "colnr": 1,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 487,
       "linenr": 9,
       "colnr": 1,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 488,
       "linenr": 9,
       "colnr": 1,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 489,
       "linenr": 9,
       "colnr": 1,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 490,
       "linenr": 9,
       "colnr": 1,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 491,
       "linenr": 9,
       "colnr": 1,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 492,
       "linenr": 9,
       "colnr": 1,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 493,
       "linenr": 9,
       "colnr": 1,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 494,
       "linenr": 9,
       "colnr": 1,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 495,
       "linenr": 9,
       "colnr": 1,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 496,
       "linenr": 9,
       "colnr": 1,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 497,
       "linenr": 9,
       "colnr": 1,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 498,
       "linenr": 9,
       "colnr": 1,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 499,
       "linenr": 9,
       "colnr": 1,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 500,
       "linenr": 9,
       "colnr": 1,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 501,
       "linenr": 9,
       "colnr": 1,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 502,
       "linenr": 9,
       "colnr": 31,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 503,
       "linenr": 9,
       "colnr": 31,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 504,
       "linenr": 9,
       "colnr": 31,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 505,
       "linenr": 9,
       "colnr": 31,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 506,
       "linenr": 9,
       "colnr": 31,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 507,
       "linenr": 9,
       "colnr": 31,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 508,
       "linenr": 9,
       "colnr": 31,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 509,
       "linenr": 10,
       "colnr": 15,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 510,
       "linenr": 10,
       "colnr": 15,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 511,
       "linenr": 10,
       "colnr": 15,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 512,
       "linenr": 10,
       "colnr": 15,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 513,
       "linenr": 10,
       "colnr": 15,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 514,
       "linenr": 10,
       "colnr": 15,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 515,
       "linenr": 10,
       "colnr": 15,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 516,
       "linenr": 10,
       "colnr": 15,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 517,
       "linenr": 10,
       "colnr": 15,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 518,
       "linenr": 10,
       "colnr": 15,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 519,
       "linenr": 10,
       "colnr": 15,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 520,
       "linenr": 10,
       "colnr": 15,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 521,
       "linenr": 10,
       "colnr": 15,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 522,
       "linenr": 10,
       "colnr": 15,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 523,
       "linenr": 10,
       "colnr": 15,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 524,
       "linenr": 10,
       "colnr": 15,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 525,
       "linenr": 10,
       "colnr": 15,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 526,
       "linenr": 10,
       "colnr": 15,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 527,
       "linenr": 10,
       "colnr": 15,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 528,
       "linenr": 10,
       "colnr": 15,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 529,
       "linenr": 10,
       "colnr": 15,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 530,
       "linenr": 10,
       "colnr": 15,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 531,
       "linenr": 10,
       "colnr": 15,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 532,
       "linenr": 10,
       "colnr": 15,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 533,
       "linenr": 10,
       "colnr": 15,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 534,
       "linenr": 10,
       "colnr": 15,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 535,
       "linenr": 10,
       "colnr": 15,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 536,
       "linenr": 10,
       "colnr": 15,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 537,
       "linenr": 10,
       "colnr": 15,
       "name": "arduino.delay"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 542,
       "linenr": 13,
       "colnr": 1,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 543,
       "linenr": 13,
       "colnr": 1,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 544,
       "linenr": 13,
       "colnr": 1,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 545,
       "linenr": 13,
       "colnr": 1,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 546,
       "linenr": 13,
       "colnr": 1,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 547,
       "linenr": 13,
       "colnr": 1,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 548,
       "linenr": 13,
       "colnr": 1,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 549,
       "linenr": 13,
       "colnr": 1,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 550,
       "linenr": 13,
       "colnr": 1,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 551,
       "linenr": 13,
       "colnr": 1,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 552,
       "linenr": 13,
       "colnr": 1,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 553,
       "linenr": 13,
       "colnr": 1,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 554,
       "linenr": 13,
       "colnr": 1,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 555,
       "linenr": 13,
       "colnr": 1,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 556,
       "linenr": 13,
       "colnr": 1,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 557,
       "linenr": 13,
       "colnr": 1,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 558,
       "linenr": 13,
       "colnr": 1,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 559,
       "linenr": 13,
       "colnr": 1,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 560,
       "linenr": 13,
       "colnr": 1,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 561,
       "linenr": 13,
       "colnr": 1,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 562,
       "linenr": 13,
       "colnr": 1,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 563,
       "linenr": 13,
       "colnr": 1,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 564,
       "linenr": 13,
       "colnr": 1,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 565,
       "linenr": 13,
       "colnr": 1,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 566,
       "linenr": 13,
       "colnr": 1,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 567,
       "linenr": 13,
       "colnr": 1,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 568,
       "linenr": 13,
       "colnr": 1,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 569,
       "linenr": 13,
       "colnr": 44,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 570,
       "linenr": 13,
       "colnr": 44,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 571,
       "linenr": 13,
       "colnr": 44,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 572,
       "linenr": 13,
       "colnr": 44,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 573,
       "linenr": 13,
       "colnr": 44,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 574,
       "linenr": 13,
       "colnr": 44,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 575,
       "linenr": 13,
       "colnr": 44,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 576,
       "linenr": 13,
       "colnr": 44,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 577,
       "linenr": 13,
       "colnr": 44,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 578,
       "linenr": 13,
       "colnr": 44,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 579,
       "linenr": 13,
       "colnr": 44,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 580,
       "linenr": 13,
       "colnr": 44,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 581,
       "linenr": 13,
       "colnr": 44,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 582,
       "linenr": 13,
       "colnr": 44,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 583,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 584,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 585,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 586,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 587,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 588,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 589,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 590,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 591,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 592,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 593,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 594,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 595,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 596,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 597,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 598,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 599,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 600,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 601,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 602,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 603,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 604,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 605,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 606,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 607,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 608,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 609,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 610,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 611,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 612,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 613,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 614,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 615,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 616,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 617,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 618,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 619,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 620,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 621,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 622,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 623,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 624,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 625,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 626,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 627,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 628,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 629,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 630,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 631,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 632,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 633,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 634,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 635,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 636,
       "linenr": 14,
       "colnr": 18,
       "name": "arduino.pin_mode"
     },
     {
-      "source": "test/data/c_zig/blink/arduino.zig",
+      "source": "arduino.zig",
       "address": 637,
       "linenr": 14,
       "colnr": 18,

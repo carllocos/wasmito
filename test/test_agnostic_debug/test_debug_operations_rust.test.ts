@@ -12,19 +12,24 @@ import {
 import { SourceMapFromJSON } from '../../src/source_mappers/source_map_builder';
 
 describe('Debug Operations on Rust AST Blink App', function () {
-  const pathToDir = path.resolve('./test/data/rust_examples/blink/');
-  const sourcePath = path.join(pathToDir, 'main.rs');
+  const pathToDir = path.resolve('./test/data/rust/blink_lambda/');
+  const sourcePath = path.join(pathToDir, 'blink_lambda.rs');
   const mappingsPath = path.join(pathToDir, 'mappings.json');
+  const wasmPath = path.join(pathToDir, 'blink_lambda.wasm');
   let sourceCFGs: SourceCFGs;
 
   this.timeout(10000);
 
   before('parse wasm module', async function () {
     try {
-      const sm = SourceMapFromJSON(mappingsPath);
+      const sm = SourceMapFromJSON(mappingsPath, {
+        newWasmPath: wasmPath,
+        prefixSources: pathToDir,
+      });
       const langAdaptor = await constructLanguageAdaptor(sm);
       assert(langAdaptor.sourceCFG !== undefined);
       sourceCFGs = langAdaptor.sourceCFG;
+      assert(langAdaptor.sourceMap.mappings.length > 0);
     } catch (e) {
       fail(`Could not construct sourcemap or langadaptor. Reason ${e}`);
     }
@@ -86,21 +91,24 @@ describe('Debug Operations on Rust AST Blink App', function () {
 });
 
 describe('Debug Operations on Rust AST Intermittent Blink', function () {
-  const pathToDir = path.resolve(
-    './test/data/rust_examples/blink_intermittent/',
-  );
+  const pathToDir = path.resolve('./test/data/rust/blink_intermittent/');
   const sourcePath = path.join(pathToDir, 'blink_intermittent.rs');
   const mappingsPath = path.join(pathToDir, 'mappings.json');
+  const wasmPath = path.join(pathToDir, 'blink_intermittent.wasm');
   let sourceCFGs: SourceCFGs;
 
   this.timeout(30000);
 
   before('parse wasm module', async function () {
     try {
-      const sm = SourceMapFromJSON(mappingsPath);
+      const sm = SourceMapFromJSON(mappingsPath, {
+        newWasmPath: wasmPath,
+        prefixSources: pathToDir,
+      });
       const langAdaptor = await constructLanguageAdaptor(sm);
       assert(langAdaptor.sourceCFG !== undefined);
       sourceCFGs = langAdaptor.sourceCFG;
+      assert(langAdaptor.sourceMap.mappings.length > 0);
     } catch (e) {
       fail(`Could not construct sourcemap or langadaptor. Reason ${e}`);
     }

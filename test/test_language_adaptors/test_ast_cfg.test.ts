@@ -4,9 +4,9 @@ import { constructLanguageAdaptor } from '../../src/language_adaptors/language_a
 import assert, { fail } from 'assert';
 import { type SourceCFGs } from '../../src/cfg/source_cfg';
 
-const mappingsPath = path.resolve(
-  './test/data/rust_examples/blink/mappings.json',
-);
+const appRoot = path.resolve('./test/data/rust/blink_lambda/');
+const mappingsPath = path.resolve(appRoot, 'mappings.json');
+const wasmPath = path.resolve(appRoot, 'blink_lambda.wasm');
 describe('Rust AST Control Flow Graph for Blink App', function () {
   let sourceCFGs: SourceCFGs;
 
@@ -14,7 +14,7 @@ describe('Rust AST Control Flow Graph for Blink App', function () {
 
   before('parse wasm module', async function () {
     try {
-      const sm = SourceMapFromJSON(mappingsPath);
+      const sm = SourceMapFromJSON(mappingsPath, { newWasmPath: wasmPath });
       const langAdaptor = await constructLanguageAdaptor(sm);
       assert(langAdaptor.sourceCFG !== undefined);
       sourceCFGs = langAdaptor.sourceCFG;

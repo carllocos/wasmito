@@ -9,18 +9,23 @@ import { CFGOperations } from '../../src/tool_api/cfg_util';
 
 describe('Debug Until Call Operation on AssemblyScript Blink App', function () {
   const pathToRootSource = path.resolve(
-    './test/data/assemblyscript_examples/blink/',
+    './test/data/assemblyscript/blink_intermittent_if/',
   );
   const mappingsPath = path.resolve(pathToRootSource, 'mappings.json');
-  const srcPath = path.resolve(pathToRootSource, 'blink.ts');
+  const srcPath = path.resolve(pathToRootSource, 'blink_intermittent_if.ts');
+  const wasmPath = path.resolve(pathToRootSource, 'blink_intermittent_if.wasm');
   let sourceCFGs: SourceCFGs;
 
   before('parse wasm module', async function () {
     try {
-      const sm = SourceMapFromJSON(mappingsPath);
+      const sm = SourceMapFromJSON(mappingsPath, {
+        newWasmPath: wasmPath,
+        prefixSources: pathToRootSource,
+      });
       const langAdaptor = await constructLanguageAdaptor(sm);
       assert(langAdaptor.sourceCFG !== undefined);
       sourceCFGs = langAdaptor.sourceCFG;
+      assert(langAdaptor.sourceCFG.sourceMap.mappings.length > 0);
     } catch (e) {
       fail(`Could not construct sourcemap or langadaptor. Reason ${e}`);
     }
@@ -74,18 +79,23 @@ describe('Debug Until Call Operation on AssemblyScript Blink App', function () {
 });
 
 describe('Debug Until Call Operation on C and linked Zig Blink App', function () {
-  const pathToRootSource = path.resolve('./test/data/c_zig/blink/');
+  const pathToRootSource = path.resolve('./test/data/c/blink_zig/');
   const mappingsPath = path.resolve(pathToRootSource, 'mappings.json');
-  const cSource = path.resolve(pathToRootSource, 'blink.c');
+  const wasmPath = path.resolve(pathToRootSource, 'blink_zig.wasm');
+  const cSource = path.resolve(pathToRootSource, 'blink_zig.c');
   const zigSource = path.resolve(pathToRootSource, 'arduino.zig');
   let sourceCFGs: SourceCFGs;
 
   before('parse wasm module', async function () {
     try {
-      const sm = SourceMapFromJSON(mappingsPath);
+      const sm = SourceMapFromJSON(mappingsPath, {
+        newWasmPath: wasmPath,
+        prefixSources: pathToRootSource,
+      });
       const langAdaptor = await constructLanguageAdaptor(sm);
       assert(langAdaptor.sourceCFG !== undefined);
       sourceCFGs = langAdaptor.sourceCFG;
+      assert(langAdaptor.sourceCFG.sourceMap.mappings.length > 0);
     } catch (e) {
       fail(`Could not construct sourcemap or langadaptor. Reason ${e}`);
     }
