@@ -55,7 +55,7 @@ node dist/cjs/cli/cli.cjs --help
 
 ## Deploy a Wasm module
 
-see `tutorial/deploy_wasm.md`
+For a list of example applications that you can deploy on an MCU, take a look at [app examples](https://github.com/carllocos/app_examples).
 
 ## Building Dynamic Tools
 
