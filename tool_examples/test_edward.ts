@@ -12,6 +12,7 @@ import {
   type ArduinoBoardBuilder,
 } from '../src/platforms';
 import { LanguageAdaptor } from '../src/language_adaptors/language_adaptor';
+import { resolve } from 'path';
 
 export async function callLedcSetup(vm: WasmitoBackendVM): Promise<void> {
   const funcLEDCSetup = 5;
@@ -88,7 +89,8 @@ const config: FactoryArgs = {
   },
 };
 
-const wasmPath = './src/tool_examples/wat_examples/dimmer-double-button.wasm';
+const appDir = resolve('./app_examples/wat/dimmer/');
+const wasmPath = resolve(appDir, 'dimmer.wasm');
 const languageAdaptor = LanguageAdaptor.emptyAdaptor(wasmPath);
 testEventHook(config, languageAdaptor, updateSourceCode)
   .then(console.log)

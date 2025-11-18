@@ -13,8 +13,7 @@ import {
 import { PlatformTarget } from '../../src/platforms/platform_config';
 import { StoreTrace } from './store_trace';
 import { CFGTOOLOperations } from '../../src/tool_api/cfg_tool_api';
-import { SourceMapFromJSON } from '../../src/source_mappers/source_map_builder';
-import { constructLanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
+import { LanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 
 async function registerHooks(
   em: WasmitoBackendVM,
@@ -68,13 +67,14 @@ export async function runTrace(
 
 async function run(): Promise<void> {
   const pathToRootSource = path.resolve(
-    './test/data/assemblyscript_examples/blink/',
+    './app_examples/assemblyscript/toggle_led/',
   );
-  const mappingsPath = path.resolve(pathToRootSource, 'blink.wasm');
-  const sm = SourceMapFromJSON(mappingsPath, {
-    prefixSources: pathToRootSource,
+  const wasmPath = path.resolve(pathToRootSource, 'wasm/blink.wasm');
+  const mappingsPath = path.resolve(pathToRootSource, 'wasm/mappings.json');
+  const la = LanguageAdaptor.fromMappingsPath(mappingsPath, {
+    newWasmPath: wasmPath,
+    relativePaths: true,
   });
-  const la = await constructLanguageAdaptor(sm);
 
   const recordTime = 30; // seconds
   const outputDir = './tool_examples/tracer/';

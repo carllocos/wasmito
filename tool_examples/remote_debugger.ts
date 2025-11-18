@@ -15,6 +15,7 @@ import { StateRequest } from '../src/runtimes/wasmito_vm/requests/inspect_reques
 import { type WasmitoDevVM } from '../src/runtimes/wasmito_vm/dev_vm';
 import { type WasmState } from '../src/webassembly/wasm';
 import { LanguageAdaptor } from '../src/language_adaptors/language_adaptor';
+import { resolve } from 'path';
 
 export function allSucceeded(replies: HookOnWasmAddrResponse[]): boolean {
   let idx = 0;
@@ -181,7 +182,8 @@ export async function runDebugScenario(
   return em;
 }
 
-const app = './src/tool_examples/wat_examples/dimmer-double-button.wat';
-const output = './example-wat/';
+const appDir = resolve('./app_examples/wat/dimmer/');
+const app = resolve(appDir, 'dimmer.wasm');
+const output = resolve(appDir, '/wasm/');
 const connectToExistingProcess = false;
 runDebugScenario(app, connectToExistingProcess, output).catch(console.error);
