@@ -23,7 +23,7 @@ export default tseslint.config(
   globalIgnores([
     'dist/*',
     '**/libs/',
-    '**/assemblyscript_examples/',
+    'test/data/assemblyscript/',
     'wasmito_tester/cli.js',
     'wasmito_tester/test_framework.ts',
     'wasmito_tester/test_examples/**/src/*.ts',
