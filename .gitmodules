@@ -1,3 +1,6 @@
 [submodule "libs/WARDuino"]
 	path = libs/WARDuino
 	url = https://github.com/carllocos/WARDuino.git
+[submodule "app_examples"]
+	path = app_examples
+	url = https://github.com/carllocos/app_examples.git
