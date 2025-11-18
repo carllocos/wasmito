@@ -3,23 +3,23 @@ import {
   createSystemSetup,
   M5StickCFromJSON,
   oneM5StickCDev,
-} from '../../../reausable_system_setups';
-import { SystemTester, type TestScenario } from '../../../system_tester';
+} from '../reausable_system_setups';
+import { SystemTester, type TestScenario } from '../system_tester';
 import {
   type TestScenarioResult,
   type TestProgram,
   type PostSetupConfig,
-} from '../../../shared_interfaces';
+} from '../shared_interfaces';
 import {
   addBreakpointSubscription,
   PauseAction,
   runVMAction,
   SubscribeOnBPReached,
   TriggerInterrupt,
-} from '../../../reusable_actions';
-import { Breakpoint } from '../../../../src/debugger/breakpoint';
-import { NodeFromLocation } from '../../../util_scfgs';
-import { LanguageAdaptor } from '../../../../src/language_adaptors/language_adaptor';
+} from '../reusable_actions';
+import { Breakpoint } from '../../src/debugger/breakpoint';
+import { NodeFromLocation } from '../util_scfgs';
+import { LanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 
 /**
  * Device Config
@@ -33,18 +33,13 @@ m5stickDev.disableStrictModuleLoad = true;
 const mcu = M5StickCFromJSON('./wasmito_tester/mcus/m5stickc.json');
 
 const systemSetup = createSystemSetup('DevVM', [m5stickDev, mcu]);
-const rootDir = path.resolve('.');
-const wasmPath = path.resolve(
-  rootDir,
-  './wasmito_tester/test_examples/test_isr_button/wasm/main.wasm',
-);
-const mappingsPath = path.resolve(
-  rootDir,
-  './wasmito_tester/test_examples/test_isr_button/wasm/isr_mappings.json',
-);
+const rootDir = path.resolve('./app_examples/rust/toggle_led');
+const wasmPath = path.resolve(rootDir, 'wasm/toggle_led.wasm');
+const mappingsPath = path.resolve(rootDir, 'wasm/mappings.json');
 
 const program: TestProgram = LanguageAdaptor.fromMappingsPath(mappingsPath, {
   newWasmPath: wasmPath,
+  relativePaths: true,
 });
 
 const SCFGs = program.sourceCFG!;
