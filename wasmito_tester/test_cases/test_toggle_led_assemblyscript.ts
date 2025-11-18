@@ -2,23 +2,27 @@ import {
   createSystemSetup,
   oneM5StickCDev,
   oneM5StickCMCU,
-} from '../../../reausable_system_setups';
-import { SystemTester, type TestScenario } from '../../../system_tester';
+} from '../reausable_system_setups';
+import { SystemTester, type TestScenario } from '../system_tester';
 import {
   type TestScenarioResult,
   type PostSetupConfig,
   TestProgram,
-} from '../../../shared_interfaces';
+} from '../shared_interfaces';
 import {
   addBreakpointSubscription,
   PauseAction,
   runVMAction,
   SubscribeOnBPReached,
   TriggerInterrupt,
-} from '../../../reusable_actions';
-import { Breakpoint } from '../../../../src/debugger/breakpoint';
-import { SourceMapFromJSON } from '../../../../src/source_mappers/source_map_builder';
-import { LanguageAdaptor } from '../../../../src/language_adaptors/language_adaptor';
+} from '../reusable_actions';
+import { Breakpoint } from '../../src/debugger/breakpoint';
+import { LanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
+import { resolve } from 'path';
+import {
+  SourceCodeLocation,
+  sourceCodeLocationToString,
+} from '../../src/source_mappers/source_map';
 
 /**
  * Device Config
@@ -35,27 +39,32 @@ mcu.serialPort = '/dev/cu.usbserial-8952FFEE8B';
 mcu.fqbn = 'm5stack:esp32:m5stick-c';
 
 const systemSetup = createSystemSetup('DevVM', [m5stickDev, mcu]);
-const mappingsJSON =
-  './wasmito_tester/test_examples/test_toggle/wasm/mappings.json';
-const sourceMap = SourceMapFromJSON(mappingsJSON);
-const program: TestProgram = new LanguageAdaptor(sourceMap);
+const appRoot = resolve('./app_examples/assemblyscript/toggle_led');
+// const sourceFile = resolve(
+// './app_examples/assemblyscript/toggle_led/toggle_led.ts',
+// );
+const sourceFile = 'toggle_led.ts';
+const mappingsJSON = resolve(appRoot, 'wasm/mappings.json');
+const wasmPath = resolve(appRoot, 'wasm/toggle_led.wasm');
+const program: TestProgram = LanguageAdaptor.fromMappingsPath(mappingsJSON, {
+  newWasmPath: wasmPath,
+  relativePaths: true,
+});
 
 const ButtonPin = 37;
-const subscriptionID = 'break on linenr 41 col 5';
+const sl: SourceCodeLocation = {
+  linenr: 28,
+  colnr: 3,
+  address: 0,
+  source: sourceFile,
+  name: '',
+};
+const subscriptionID = `break on ${sourceCodeLocationToString(sl)}`;
 const testLoadAndRunModule: TestScenario = {
   testName: 'Test If `ToggleLed` updates `LED_STATE`',
   testProgram: program,
   actions: [
-    addBreakpointSubscription(
-      subscriptionID,
-      new Breakpoint({
-        linenr: 41,
-        colnr: 5,
-        address: 0,
-        source: '',
-        name: '',
-      }),
-    ),
+    addBreakpointSubscription(subscriptionID, new Breakpoint(sl)),
     runVMAction(),
     PauseAction({
       executeAfterMs: 3000,
