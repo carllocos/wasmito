@@ -91,14 +91,14 @@ async function exampleMonitorAllNodesOnMCU(
   await monitorAllNodes(langAdaptor.sourceCFGs, monitorTimeSecs, vm);
 }
 
-const appDir = path.resolve('./tool_examples/as_examples/toggle-led/');
-const wasmPath = path.resolve(appDir, 'wasm/toggle-led.wasm');
+const appDir = path.resolve('./app_examples/assemblyscript/toggle-led/');
+const wasmPath = path.resolve(appDir, 'wasm/toggle_led.wasm');
 const mappingsPath = path.resolve(appDir, 'wasm/mappings.json');
 const monitorTimeSecs = 30; // seconds
 
 const langAdaptor = LanguageAdaptor.fromMappingsPath(mappingsPath, {
   newWasmPath: wasmPath,
-  prefixSources: appDir,
+  relativePaths: true,
 });
 
 exampleMonitorAllNodesOnDevVM(langAdaptor).catch(console.error);

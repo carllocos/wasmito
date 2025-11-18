@@ -6,6 +6,7 @@ import { BoardBaudRate } from '../../src/util';
 import { type WasmitoBackendVM } from '../../src/runtimes/wasmito_vm/wasmito_vm';
 import { fs } from 'assemblyscript/util/node.js';
 import { LanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
+import { resolve } from 'path';
 
 const logger = createLogger('SourceCodeWatcher');
 
@@ -54,7 +55,7 @@ export async function doTestDev(): Promise<void> {
 
 export async function doTestArduino(): Promise<void> {
   const dm = new DeviceManager();
-  const wasmPath = './src/tool_examples/wat_examples/dimmer-double-button.wasm';
+  const wasmPath = resolve('./app_examples/wat/dimmer/dimmer.wasm');
   const la = LanguageAdaptor.emptyAdaptor(wasmPath);
 
   const platform = await createArduinoPlatform({

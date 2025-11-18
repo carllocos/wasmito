@@ -7,6 +7,7 @@ import { DeviceManager } from '../src/device/device_manager';
 import { BoardBaudRate } from '../src/util/serial_port';
 import { createArduinoPlatform } from '../src/platforms/platformbuilder_factory';
 import { LanguageAdaptor } from '../src/language_adaptors/language_adaptor';
+import { resolve } from 'path';
 
 const testCompilerLogger = createLogger('TestCompiler');
 
@@ -29,7 +30,8 @@ async function runBuilder(): Promise<void> {
     return;
   }
 
-  const compileOutputDirectory = './example-wat/platform_arduino/';
+  const appDir = resolve('./app_examples/wat/dimmer/');
+  const compileOutputDirectory = resolve(appDir, 'wasm');
   const platform = await createArduinoPlatform(
     {
       vmConfig: {
@@ -41,7 +43,7 @@ async function runBuilder(): Promise<void> {
     compileOutputDirectory,
   );
 
-  const wasmPath = './src/tool_examples/wat_examples/dimmer-double-button.wasm';
+  const wasmPath = resolve(appDir, 'wasm/dimmer.wasm');
   const la = LanguageAdaptor.emptyAdaptor(wasmPath);
   const deviceManager = new DeviceManager();
   const mcuVM = await deviceManager.spawnHardwareVM(la, platform);
