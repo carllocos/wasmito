@@ -24,7 +24,7 @@ export function registerSourceMapCommand(program: Command): void {
       `extract the source mappings from debugging information and store them as JSON in <output-file.json>. Parent directories are created if needed.`,
     )
     .option(
-      '-d, --dwarf <dwarf-path>',
+      '-d, --dwarf [dwarf-path]',
       `use DWARF to construct the source mappings. If the argument is omitted, DWARF is extracted from the wasm module itself.`,
     )
     .option(
@@ -50,19 +50,22 @@ export function registerSourceMapCommand(program: Command): void {
     )
     .action(async (wasmPath, outputFile, options) => {
       const logger = getGlobalLogger();
-      let debuggingInformationPath = options.dwarf ?? options.sourceSpec;
       wasmPath = getAbsolutePath(wasmPath);
       if (!isFilePath(wasmPath)) {
         program.error('<wasm-path> is not a valid path to a Wasm module');
       }
 
-      if (debuggingInformationPath === undefined) {
-        program.error('either --dwarf or --source-spec is missing');
-      } else if (
-        options.sourceSpec !== undefined &&
-        options.dwarf !== undefined
-      ) {
-        program.error('only --dwarf or --source-spec is expected');
+      let debuggingInformationPath: string = '';
+      if (options.sourceSpec === undefined && options.dwarf === undefined) {
+        program.error('--dwarf or --source-spec is missing');
+      }
+      if (options.sourceSpec !== undefined && options.dwarf !== undefined) {
+        program.error('either --dwarf or --source-spec is expected');
+      } else if (options.dwarf !== undefined) {
+        debuggingInformationPath =
+          typeof options.dwarf === 'string' ? options.dwarf : wasmPath;
+      } else if (options.sourceSpec !== undefined) {
+        debuggingInformationPath = options.sourceSpec;
       }
 
       if (!isFilePath(debuggingInformationPath)) {
