@@ -35,7 +35,7 @@ export function registerCFGCommand(program: Command): void {
       '180',
     )
     .option(
-      '-d, --dwarf <dwarf-path>',
+      '-d, --dwarf [dwarf-path]',
       `reads the DWARF debugging information from either the path to a DWARF encoded file or, if the argument is omitted, from the wasm module itself.`,
     )
     .option(
@@ -88,25 +88,33 @@ export function registerCFGCommand(program: Command): void {
       if (options.unusedMappings !== undefined) {
         unusedMappings = pathJoin(outputDir, options.unusedMappings);
       }
-      const wasmitoPath = options.wasmitoJson;
-      const dwarfPath = options.dwarf;
-      const sourceSpecPath = options.sourceSpec;
       let smPromise: Promise<SourceMap> | SourceMap | undefined;
+      const enabledFormats = [
+        !!options.wasmitoJson,
+        !!options.dwarf,
+        !!options.sourceSpec,
+      ];
 
-      if (wasmitoPath !== undefined) {
-        if (!isFilePath(wasmitoPath)) {
+      if (enabledFormats.filter((enabled) => enabled).length > 1) {
+        program.error(
+          'only one debugging format expected. Choose --source-spec, --dwarf, or --wasmito-json',
+        );
+      } else if (options.wasmitoJson !== undefined) {
+        if (!isFilePath(options.wasmitoJson)) {
           program.error(
             '`the <path-to-wasmito-sourcemap-json> is not a path to a file',
           );
         }
-        smPromise = SourceMapFromJSON(wasmitoPath);
-      } else if (dwarfPath !== undefined) {
+        smPromise = SourceMapFromJSON(options.wasmitoJson);
+      } else if (options.dwarf !== undefined) {
+        const dwarfPath =
+          typeof options.dwarf === 'string' ? options.dwarf : wasmPath;
         smPromise = readSourceMap(DebugStandard.DWARF, wasmPath, dwarfPath);
-      } else if (sourceSpecPath !== undefined) {
+      } else if (options.sourceSpec !== undefined) {
         smPromise = readSourceMap(
           DebugStandard.SourceMapSpec,
           wasmPath,
-          sourceSpecPath,
+          options.sourceSpec,
         );
       } else {
         program.error('At least one debugging format should be opted for');
