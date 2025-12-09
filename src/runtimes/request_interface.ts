@@ -70,7 +70,13 @@ export function isSuccessfulMessage(reply: RequestMessage): boolean {
   return reply.responseType === ResponseType.SuccessResponse;
 }
 
-export function isSubscriptionMessage(msg: RequestMessage): boolean {
+export function isErrorMessage(reply: RequestMessage): reply is RequestMessage {
+  return reply.responseType === ResponseType.ErrorResponse;
+}
+
+export function isSubscriptionMessage(
+  msg: RequestMessage,
+): msg is RequestMessage {
   return (
     msg.responseType === ResponseType.SubscriptionResponse &&
     msg.sub !== undefined &&
