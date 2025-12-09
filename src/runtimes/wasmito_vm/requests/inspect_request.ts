@@ -19,6 +19,7 @@ export enum InspectableState {
   callbacksState = '09',
   eventsState = '0a',
   exceptionState = '0b',
+  logicalClock = '0c',
 }
 
 export interface StackInpsectResponse {
@@ -119,6 +120,11 @@ export class StateRequest extends APIRequestNoSubscription<WasmState> {
     return this;
   }
 
+  public includeLogicalClock(): StateRequest {
+    this.pushState(InspectableState.logicalClock);
+    return this;
+  }
+
   public generateInterrupt(): string {
     this.state.sort();
     const numberBytes = serializeUInt16BE(this.state.length);
@@ -213,6 +219,11 @@ export class StateRequest extends APIRequestNoSubscription<WasmState> {
         response.exception === undefined
       ) {
         throw new Error('Exception State is missing');
+      } else if (
+        s === InspectableState.logicalClock &&
+        response.clock === undefined
+      ) {
+        throw new Error('Exception State is missing logicalClock');
       }
     }
   }
