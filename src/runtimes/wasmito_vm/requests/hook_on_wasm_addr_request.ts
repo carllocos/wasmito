@@ -18,6 +18,7 @@ import { Instruction } from './instructions';
 export enum HookOnWasmAddrMoment {
   HookBefore = '01',
   HookAfter = '02',
+  HookAround = '03',
 }
 
 export function getHookMomentFromString(
