@@ -9,6 +9,10 @@ export type WasmOpcode = [
   WasmType,
 ];
 
+export function getWasmOpcodeNr(op: WasmOpcode): WasmOpcodeNumber {
+  return op[1];
+}
+
 export const WasmOpcodeUnreachable = 0x00;
 export const WasmOpcodeI32Const = 0x41;
 export const WasmOpcodeI64Const = 0x42;
@@ -35,16 +39,45 @@ export const WasmOpcodeI32Load = 0x28;
 export const WasmOpcodeF64ReinterpretI64 = 0xbf;
 export const WasmOpcodeTableSet = 0x26;
 
+export namespace WasmCode {
+  export const I32Const: WasmOpcode = [
+    'i32.const',
+    WasmOpcodeI32Const,
+    undefined,
+    new WasmType(0, 1),
+  ];
+  export const GlobalGet: WasmOpcode = [
+    'get_global',
+    WasmOpcodeGetGlobal,
+    undefined,
+    new WasmType(0, 1),
+  ];
+
+  export const BrIf: WasmOpcode = [
+    'br_if',
+    WasmOpcodeBrIf,
+    undefined,
+    new WasmType(1, 0),
+  ];
+
+  export const If: WasmOpcode = [
+    'if',
+    WasmOpcodeIf,
+    undefined,
+    new WasmType(1, 0),
+  ]; // if
+}
+
 export const WasmOpcodes: WasmOpcode[] = [
   ['unreachable', WasmOpcodeUnreachable, undefined, new WasmType(0, 0)],
   ['nop', 1, undefined, new WasmType(0, 0)],
   ['block', WasmOpcodeBlock, undefined, new WasmType(0, 0)],
   ['loop', WasmOpcodeLoop, undefined, new WasmType(0, 0)], // loop
-  ['if', WasmOpcodeIf, undefined, new WasmType(1, 0)], // if
+  WasmCode.If,
   ['else', WasmOpcodeElse, undefined, new WasmType(0, 0)], // else
   ['end', WasmOpcodeEnd, undefined, new WasmType(0, 0)], // end
   ['br', WasmOpcodeBr, undefined, new WasmType(0, 0)], // br
-  ['br_if', WasmOpcodeBrIf, undefined, new WasmType(1, 0)], // br_if
+  WasmCode.BrIf,
   ['br_table', WasmOpcodeBrTable, undefined, new WasmType(1, 0)], // br_table
   ['return', WasmOpcodeReturn, undefined, new WasmType(0, 0)], // return
   ['call', WasmOpcodeCall, undefined, new PlaceholderType()], // call
@@ -54,7 +87,7 @@ export const WasmOpcodes: WasmOpcode[] = [
   ['get_local', WasmOpcodeGetLocal, undefined, new WasmType(0, 1)], // get_local
   ['set_local', WasmOpcodeSetLocal, undefined, new WasmType(1, 0)], // set_local
   ['tee_local', 0x22, undefined, new WasmType(1, 0)], // tee_local
-  ['get_global', WasmOpcodeGetGlobal, undefined, new WasmType(0, 1)], // get_global
+  WasmCode.GlobalGet,
   ['set_global', WasmOpcodeSetGlobal, undefined, new WasmType(1, 0)], // set_global
   ['i32.load', WasmOpcodeI32Load, undefined, new WasmType(1, 1)],
   ['i64.load', 0x29, undefined, new WasmType(1, 1)],
@@ -83,7 +116,8 @@ export const WasmOpcodes: WasmOpcode[] = [
   ['current_memory', 0x3f, undefined, new WasmType(0, 1)],
   ['grow_memory', 0x40, undefined, new WasmType(1, 1)],
 
-  ['i32.const', WasmOpcodeI32Const, undefined, new WasmType(0, 1)], // i32.const
+  WasmCode.I32Const,
+  // ['i32.const', WasmOpcodeI32Const, undefined, new WasmType(0, 1)], // i32.const
   ['i64.const', WasmOpcodeI64Const, undefined, new WasmType(0, 1)], // i64.const
   ['f32.const', WasmOpcodeF32Const, undefined, new WasmType(0, 1)], // f32.const
   ['f64.const', WasmOpcodeF64Const, undefined, new WasmType(0, 1)], // f64.const
