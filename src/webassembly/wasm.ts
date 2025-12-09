@@ -1,3 +1,4 @@
+import { LogicalClock } from '../hooks/logicalclock';
 import { createLogger } from '../logger/logger';
 import { decodeLEB128, hexStringToUint8Array } from '../util/decoder';
 import { encodeToHexLEB128, floatToHexString } from '../util/encoder';
@@ -310,6 +311,7 @@ export class WasmState {
   callbacks?: WASM.CallbackMapping[];
   events?: WASM.Event[];
   exception?: string;
+  logicalClock?: LogicalClock;
 
   private readonly _jsonString?: string;
 
@@ -434,6 +436,31 @@ export class WasmState {
         );
       }
       this.exception = args.exception;
+    }
+
+    if (args.clock !== undefined) {
+      if (typeof args.clock !== 'object') {
+        throw new Error(
+          `LogicalClock should be an object got ${typeof args.clock}`,
+        );
+      }
+      const nrOfInstructions = args.clock.i;
+      if (typeof nrOfInstructions !== 'number') {
+        throw new Error(
+          `LogicalClock nr of instructions should be a number got ${nrOfInstructions}`,
+        );
+      }
+      const nrOfEvents = args.clock.e;
+      if (typeof nrOfEvents !== 'number') {
+        throw new Error(
+          `LogicalClock nr of events should be a number got ${nrOfEvents}`,
+        );
+      }
+
+      this.logicalClock = {
+        nrOfInstructions,
+        nrOfEvents,
+      };
     }
   }
 
