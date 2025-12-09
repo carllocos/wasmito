@@ -1,5 +1,6 @@
 import { type Channel } from '../communication/channel_interface';
 import { Command } from '../communication/command';
+import { errorCodeToMessage } from './error_codes';
 import {
   getInstructionFromString,
   type Instruction,
@@ -55,6 +56,7 @@ export interface RequestMessage {
   interrupt: Instruction;
   responseType: ResponseType;
   error_code?: number;
+  error_msg?: string;
   sub?: any;
 }
 
@@ -66,7 +68,8 @@ export function isSubscriptionMessage(msg: RequestMessage): boolean {
   return (
     msg.responseType === ResponseType.SubscriptionResponse &&
     msg.sub !== undefined &&
-    msg.error_code === undefined
+    msg.error_code === undefined &&
+    msg.error_msg === undefined
   );
 }
 
@@ -103,6 +106,7 @@ function createMessageFromJSON(content: any): RequestMessage | undefined {
       return undefined;
     }
     response.error_code = errorCode;
+    response.error_msg = errorCodeToMessage(errorCode);
     return response;
   } else if (obj.sub !== undefined) {
     if (responseType !== ResponseType.SubscriptionResponse) {
