@@ -31,8 +31,7 @@ export class ClientSideSocket extends AbstractChannel {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public async close(timeout?: number): Promise<boolean> {
+  public async close(_timeout?: number): Promise<boolean> {
     if (this.connection !== undefined) {
       this.connection.destroy();
       this.connection = undefined;

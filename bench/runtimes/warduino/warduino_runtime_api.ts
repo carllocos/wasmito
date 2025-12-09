@@ -111,8 +111,7 @@ export class WARDuinoRuntimeAPI implements RuntimeDebugAPI {
     return resp === 'STEP!';
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async startRuntime(timeout: number): Promise<boolean> {
+  async startRuntime(_timeout: number): Promise<boolean> {
     this.bpListeners.length = 0;
     this.removedListeners.clear();
     this.breakpoints.clear();
@@ -120,8 +119,7 @@ export class WARDuinoRuntimeAPI implements RuntimeDebugAPI {
     return true;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async stopRuntime(timeout: number): Promise<boolean> {
+  async stopRuntime(_timeout: number): Promise<boolean> {
     throw new Error('stopRuntime is not applicable to this class');
   }
 

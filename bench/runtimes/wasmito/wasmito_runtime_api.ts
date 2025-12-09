@@ -101,8 +101,7 @@ export class WasmitoRuntimeDBGAPI implements RuntimeDebugAPI {
     this.removedListeners.clear();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async startRuntime(timeout: number): Promise<boolean> {
+  async startRuntime(_timeout: number): Promise<boolean> {
     this.breakpointListeners.length = 0;
     this.removedListeners.clear();
     this.breakpoints.clear();
@@ -111,8 +110,7 @@ export class WasmitoRuntimeDBGAPI implements RuntimeDebugAPI {
     return true;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async stopRuntime(timeout: number): Promise<boolean> {
+  async stopRuntime(_timeout: number): Promise<boolean> {
     throw new Error('stopRuntime is not applicable to this class');
   }
 
