@@ -16,8 +16,8 @@ import { RunRequest } from '../../../src/runtimes/wasmito_vm/requests/run_reques
 import { StateRequest, StepRequest } from '../../../src/runtimes';
 import { type WasmState } from '../../../src/webassembly/wasm';
 import { type Channel } from '../../../src/communication/channel_interface';
-import { Command } from '../../../src/communication/command';
 import { InspectStateHook } from '../../../src/hooks/hook_inspect_state';
+import { RequestsManager } from '../../../src/communication/requests_manager';
 
 export class WasmitoRuntimeDBGAPI implements RuntimeDebugAPI {
   runtimeName: string;
@@ -118,8 +118,8 @@ export class WasmitoRuntimeDBGAPI implements RuntimeDebugAPI {
     request: APIRequest<T>,
     timeout?: number,
   ): Promise<T> {
-    const command = new Command(this.channel, request, timeout);
-    return command.execute();
+    const command = new RequestsManager();
+    return command.sendRequest(this.channel, request, timeout);
   }
 
   // private subscribeData(s: WasmState): void {
