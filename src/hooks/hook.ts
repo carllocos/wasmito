@@ -3,6 +3,8 @@ import {
   ScheduleAways,
   ScheduleOnTimeStamp,
   ScheduleOnce,
+  ScheduleBeforeTimeStamp,
+  ScheduleAfterTimeStamp,
 } from './schedule';
 import { type LogicalClock } from './logicalclock';
 import { createLogger, Logger } from '../logger/logger';
@@ -33,6 +35,21 @@ export abstract class Hook {
 
   scheduleFor(newSchedule: HookSchedule): Hook {
     this.schedule = newSchedule;
+    return this;
+  }
+
+  scheduleBefore(logicalClock: LogicalClock): Hook {
+    this.schedule = new ScheduleBeforeTimeStamp(logicalClock);
+    return this;
+  }
+
+  scheduleAfter(logicalClock: LogicalClock): Hook {
+    this.schedule = new ScheduleAfterTimeStamp(logicalClock);
+    return this;
+  }
+
+  scheduleOn(logicalClock: LogicalClock): Hook {
+    this.schedule = new ScheduleOnTimeStamp(logicalClock);
     return this;
   }
 
