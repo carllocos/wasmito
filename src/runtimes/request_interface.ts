@@ -100,7 +100,7 @@ function createMessageFromJSON(content: any): RequestMessage | undefined {
   if (obj.error_code !== undefined) {
     const errorCode = parseInt(obj.error_code);
     if (
-      !isNaN(errorCode) ||
+      isNaN(errorCode) ||
       response.responseType !== ResponseType.ErrorResponse
     ) {
       return undefined;
