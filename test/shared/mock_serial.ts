@@ -17,6 +17,14 @@ export class MockSerialConnection implements Channel {
     return true;
   }
 
+  addOnWriteListener(callback: (data: string | Uint8Array) => void): void {
+    throw new Error('to implement');
+  }
+
+  removeOnWriteListener(callback: (data: string | Uint8Array) => void): void {
+    throw new Error('to implement');
+  }
+
   async open(timeout?: number): Promise<boolean> {
     return true;
   }

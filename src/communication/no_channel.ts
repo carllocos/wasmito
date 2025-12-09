@@ -20,6 +20,14 @@ export class NoChannel implements Channel {
     );
   }
 
+  addOnWriteListener(callback: (data: string | Uint8Array) => void): void {
+    throw new Error('to implement');
+  }
+
+  removeOnWriteListener(callback: (data: string | Uint8Array) => void): void {
+    throw new Error('to implement');
+  }
+
   async open(timeout?: number | undefined): Promise<boolean> {
     throw Error(
       'NoChannel has no implementation and serves only as transition channel',

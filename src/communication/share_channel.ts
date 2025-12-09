@@ -3,6 +3,7 @@ import { createLogger, Logger } from '../logger/logger';
 import { getFreePort, isPortInUse } from '../util/socket_util';
 import { type Channel } from './channel_interface';
 import { timeoutPromise } from '../util/promise_util';
+import { Subscription } from '../hooks/isubscribe';
 
 export class ShareChannelError extends Error {
   constructor(message: string) {
@@ -19,6 +20,7 @@ export class ShareChannel implements Channel {
   private _serverPort: number;
   private readonly logger: Logger;
   private clients: net.Socket[];
+  private writeListeners: Subscription<string | Uint8Array>;
 
   readonly channelName: string;
 
@@ -30,6 +32,10 @@ export class ShareChannel implements Channel {
     this.clients = [];
     this.channelName = `SharedChannel for ${this.channelToShare.channelName}`;
     this.logger = createLogger(this.channelName);
+    this.writeListeners = new Subscription(
+      (i: string | Uint8Array) => i,
+      this.logger,
+    );
   }
 
   /*
@@ -52,7 +58,17 @@ export class ShareChannel implements Channel {
     data: string | Uint8Array,
     cb?: ((err?: Error | null | undefined) => void) | undefined,
   ): boolean {
-    return this.channelToShare.write(data, cb);
+    const s = this.channelToShare.write(data, cb);
+    if (s) this.writeListeners.onSubscriptionData(data);
+    return s;
+  }
+
+  addOnWriteListener(callback: (data: string | Uint8Array) => void): void {
+    this.writeListeners.subscribe(callback, false);
+  }
+
+  removeOnWriteListener(callback: (data: string | Uint8Array) => void): void {
+    this.writeListeners.unSubscribe(callback);
   }
 
   async send(data: string): Promise<boolean> {

@@ -1,6 +1,7 @@
 import type * as net from 'net';
 import { type Channel } from './channel_interface';
 import { createLogger, Logger } from '../logger/logger';
+import { Subscription } from '../hooks/isubscribe';
 
 export abstract class AbstractChannel implements Channel {
   readonly channelName: string;
@@ -10,11 +11,17 @@ export abstract class AbstractChannel implements Channel {
   private readonly removedListeners: Set<(data: string) => void>;
   protected logger: Logger;
 
+  private writeListeners: Subscription<string | Uint8Array>;
+
   constructor(channelName: string) {
     this.channelName = channelName;
     this.listeners = [];
     this.removedListeners = new Set();
     this.logger = createLogger(this.channelName);
+    this.writeListeners = new Subscription(
+      (i: string | Uint8Array) => i,
+      this.logger,
+    );
   }
 
   // Abstract methods
@@ -22,6 +29,18 @@ export abstract class AbstractChannel implements Channel {
     data: any,
     cb?: ((err?: Error | null | undefined) => void) | undefined,
   ): boolean;
+
+  addOnWriteListener(callback: (data: string | Uint8Array) => void): void {
+    this.writeListeners.subscribe(callback, false);
+  }
+
+  removeOnWriteListener(callback: (data: string | Uint8Array) => void): void {
+    this.writeListeners.unSubscribe(callback);
+  }
+
+  protected fanout(data: any): void {
+    this.writeListeners.onSubscriptionData(data);
+  }
 
   public abstract open(timeout?: number): Promise<boolean>;
 
