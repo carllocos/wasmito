@@ -6,19 +6,25 @@ import {
   type Instruction,
 } from './wasmito_vm/requests/instructions';
 
+export enum SubscriptionParseOutcome {
+  Successful,
+  Failed,
+}
+
 export class APIRequestInvalidParse extends Error {}
 
 export abstract class APIRequest<R> {
   abstract description(): string;
   abstract getData(): string;
   abstract parse(input: string): R;
-  abstract handleSubscriptionData(data: string): void;
+  abstract handleSubscriptionData(data: string): SubscriptionParseOutcome;
   abstract isSubscriptionClosed(): boolean;
 }
 
 export abstract class APIRequestNoSubscription<R> extends APIRequest<R> {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  override handleSubscriptionData(data: string): void {}
+  override handleSubscriptionData(_data: string): SubscriptionParseOutcome {
+    return SubscriptionParseOutcome.Failed;
+  }
   override isSubscriptionClosed(): boolean {
     return true;
   }
