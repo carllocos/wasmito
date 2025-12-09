@@ -131,29 +131,11 @@ export class HookOnEventRequest extends APIRequest<HookOnEventResponse> {
   private readonly interruptNr: Instruction;
   private hookMoment: HookOnEventMoment;
 
-  constructor() {
+  constructor(moment: HookOnEventMoment) {
     super();
     this.hooks = [];
     this.interruptNr = Instruction.HookOnEvent;
-    this.hookMoment = HookOnEventMoment.onNewEvent;
-  }
-
-  onNewEvent(hook: Hook): HookOnEventRequest {
-    this.hookMoment = HookOnEventMoment.onNewEvent;
-    this.addHook(hook);
-    return this;
-  }
-
-  afterEventHandled(hook: Hook): HookOnEventRequest {
-    this.hookMoment = HookOnEventMoment.afterEventHandled;
-    this.addHook(hook);
-    return this;
-  }
-
-  onEventHandling(hook: Hook): HookOnEventRequest {
-    this.hookMoment = HookOnEventMoment.beforeEventHandled;
-    this.addHook(hook);
-    return this;
+    this.hookMoment = moment;
   }
 
   description(): string {
@@ -226,12 +208,8 @@ export class HookOnEventRequest extends APIRequest<HookOnEventResponse> {
     }
   }
 
-  private addHook(hook: Hook): HookOnEventRequest {
-    if (this.hooks.length === 0) {
-      this.hooks.push(hook);
-    } else {
-      logger.error('Todo support multiple hooks. For now just one hook');
-    }
+  public addHook(hook: Hook): HookOnEventRequest {
+    this.hooks.push(hook);
     return this;
   }
 
