@@ -21,6 +21,8 @@ import {
   wasmOpcodeFromNr,
 } from './wasm_opcode';
 
+export type WasmAddress = number;
+
 export class WasmInstruction {
   public readonly opcodeNr: WasmOpcodeNumber;
   public readonly subOpcode: WasmOpcodeNumber | undefined;
@@ -496,6 +498,30 @@ export class ConstInstr extends WasmInstruction {
   }
 }
 
+export class I32ConstInstruction extends ConstInstr {
+  constructor(value: number) {
+    super(WasmOpcodeI32Const, value);
+  }
+}
+
+export class F32ConstInstruction extends ConstInstr {
+  constructor(value: number) {
+    super(WasmOpcodeF32Const, value);
+  }
+}
+
+export class I64ConstInstruction extends ConstInstr {
+  constructor(value: number, high?: number) {
+    super(WasmOpcodeI64Const, value, high);
+  }
+}
+
+export class F64ConstInstruction extends ConstInstr {
+  constructor(value: number) {
+    super(WasmOpcodeF64Const, value);
+  }
+}
+
 function constOpcodeToString(opcode: WasmOpcodeNumber): string {
   switch (opcode) {
     case WasmOpcodeI32Const:
@@ -543,3 +569,5 @@ export function isConst(instr: WasmInstruction): instr is ConstInstr {
 export function isTableSet(instr: WasmInstruction): boolean {
   return instr.opcodeNr === WasmOpcodeTableSet;
 }
+
+export class GlobalGetInstruction extends WasmInstruction {}

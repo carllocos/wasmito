@@ -5,7 +5,11 @@ import {
   type CallInstruction,
   type WasmInstruction,
 } from './wasm_instruction';
-import { WasmOpcodeGetLocal, WasmOpcodeSetLocal } from './wasm_opcode';
+import {
+  WasmOpcodeGetLocal,
+  WasmOpcodeNumber,
+  WasmOpcodeSetLocal,
+} from './wasm_opcode';
 
 export interface WasmLocal {
   index: number;
@@ -113,5 +117,9 @@ export class WASMFunction {
 
   isAddressInFunction(addr: number): boolean {
     return this.startAddress <= addr && addr <= this.endAddress; // TODO addr < this.endAddress?
+  }
+
+  instructionsFromOpcode(opcode: WasmOpcodeNumber): WasmInstruction[] {
+    return this.allInstructions.filter((i) => i.opcodeNr === opcode);
   }
 }
