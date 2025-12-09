@@ -1,4 +1,8 @@
-import { HookWithSubscription, type Hook } from '../../../hooks/hook';
+import {
+  FatalHookError,
+  parseHookContent,
+  type Hook,
+} from '../../../hooks/hook';
 import { createLogger } from '../../../logger/logger';
 import { isHexaString } from '../../../util/decoder';
 import { Instruction } from './instructions';
@@ -6,6 +10,7 @@ import {
   APIRequest,
   APIRequestInvalidParse,
   ResponseType,
+  SubscriptionParseOutcome,
   type RequestMessage,
 } from '../../request_interface';
 import { getExceptionMsgFromErrorCode } from './request_error_code';
@@ -177,35 +182,16 @@ export class HookOnEventRequest extends APIRequest<HookOnEventResponse> {
     return false;
   }
 
-  override handleSubscriptionData(data: string): void {
+  override handleSubscriptionData(data: string): SubscriptionParseOutcome {
+    let postOnData = SubscriptionParseOutcome.Failed;
     try {
       const msg = new HookOnEventSubsriptionMessage(data);
-      for (let i = 0; i < this.hooks.length; i++) {
-        const hook = this.hooks[i];
-        if (hook instanceof HookWithSubscription) {
-          let parsed: any;
-          let successfulParse = false;
-          try {
-            parsed = hook.parseSubscriptionData(msg.subsriptionData);
-            successfulParse = true;
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          } catch (e) {
-            /* empty */
-          }
-
-          if (successfulParse) {
-            try {
-              hook.onSubscriptionData(parsed);
-            } catch (e) {
-              logger.error(`Hook handler threw error: `, e);
-            }
-          }
-        }
-      }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const s = parseHookContent(this.hooks, msg.subsriptionData, logger);
+      if (s) postOnData = SubscriptionParseOutcome.Successful;
     } catch (e) {
-      /* empty */
+      if (e instanceof FatalHookError) throw e;
     }
+    return postOnData;
   }
 
   public addHook(hook: Hook): HookOnEventRequest {
