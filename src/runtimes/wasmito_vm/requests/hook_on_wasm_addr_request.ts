@@ -5,9 +5,14 @@ import {
   APIRequestInvalidParse,
   createRequestMessage,
   isSubscriptionMessage,
+  SubscriptionParseOutcome,
   type RequestMessage,
 } from '../../request_interface';
-import { HookWithSubscription, type Hook } from '../../../hooks/hook';
+import {
+  FatalHookError,
+  parseHookContent,
+  type Hook,
+} from '../../../hooks/hook';
 import { Instruction } from './instructions';
 
 export enum HookOnWasmAddrMoment {
@@ -84,10 +89,11 @@ export class HookOnWasmAddrRequest extends APIRequest<HookOnWasmAddrResponse> {
   }
 
   description(): string {
+    const hooksDescription = this.hooks.map((h) => h.description()).join(', ');
     if (this.isaddRequest) {
-      return `HookOnWasmAddrRequest for ${this.wasmAddr}`;
+      return `HookOnWasmAddrRequest for ${this.wasmAddr} hooks: [${hooksDescription}]`;
     } else {
-      return `RemoveHookOnWasmAddrRequest for ${this.wasmAddr}`;
+      return `RemoveHookOnWasmAddrRequest for ${this.wasmAddr} hooks: [${hooksDescription}]`;
     }
   }
 
@@ -130,11 +136,10 @@ export class HookOnWasmAddrRequest extends APIRequest<HookOnWasmAddrResponse> {
     this.subscriptionActive = false;
   }
 
-  override handleSubscriptionData(data: string): void {
+  override handleSubscriptionData(data: string): SubscriptionParseOutcome {
     const msg = createRequestMessage(data);
-    if (msg === undefined || !isSubscriptionMessage(msg)) {
-      return;
-    }
+    if (msg === undefined || !isSubscriptionMessage(msg))
+      return SubscriptionParseOutcome.Failed;
     try {
       let subContent: any = {};
       if (typeof msg.sub === 'string') {
@@ -143,48 +148,24 @@ export class HookOnWasmAddrRequest extends APIRequest<HookOnWasmAddrResponse> {
         subContent = msg.sub;
       }
 
-      if (
-        typeof subContent.moment !== 'string' ||
-        subContent.val === undefined
-      ) {
-        return;
-      }
+      if (typeof subContent.moment !== 'string' || subContent.val === undefined)
+        return SubscriptionParseOutcome.Failed;
       const hookMoment = getHookMomentFromString(subContent.moment);
-      if (hookMoment === undefined || hookMoment !== this.moment) {
-        return;
-      }
+      if (hookMoment === undefined || hookMoment !== this.moment)
+        return SubscriptionParseOutcome.Failed;
 
       const hookedAddr = parseInt(subContent.addr, 16);
-      if (isNaN(hookedAddr) || this.wasmAddr !== hookedAddr) {
-        return;
-      }
+      if (isNaN(hookedAddr) || this.wasmAddr !== hookedAddr)
+        return SubscriptionParseOutcome.Failed;
 
-      for (let i = 0; i < this.hooks.length; i++) {
-        const hook = this.hooks[i];
-        if (hook instanceof HookWithSubscription) {
-          let parsed: any;
-          let successfulParse = false;
-          try {
-            parsed = hook.parseSubscriptionData(subContent.val);
-            successfulParse = true;
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          } catch (e) {
-            /* empty */
-          }
-
-          if (successfulParse) {
-            try {
-              hook.onSubscriptionData(parsed);
-            } catch (e) {
-              this.logger.info(`Hook handler threw error: `, e);
-            }
-          }
-        }
-      }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const s = parseHookContent(this.hooks, subContent.val, this.logger);
+      return s
+        ? SubscriptionParseOutcome.Successful
+        : SubscriptionParseOutcome.Failed;
     } catch (e) {
-      /* empty */
+      if (e instanceof FatalHookError) throw e;
     }
+    return SubscriptionParseOutcome.Failed;
   }
 }
 
