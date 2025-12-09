@@ -78,8 +78,7 @@ function createMessageFromJSON(content: any): RequestMessage | undefined {
   if (typeof content === 'string') {
     try {
       obj = JSON.parse(content);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (e) {
+    } catch (_e) {
       return undefined;
     }
   }
