@@ -414,6 +414,7 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
     }
     case 'if': {
       const label = obj.testLabel.value;
+      obj.loc.start.column = obj.loc.start.column - 1; // Due to bug in @webassemblyjs/wasm-parser see issue #34
       let result: WASM.Type | undefined;
       if (obj.result !== null) {
         result = WASM.typing.get(obj.result);
