@@ -47,7 +47,36 @@ export class InspectStack extends APIRequestNoSubscription<WasmStack> {
 }
 
 // TODO split into a class that defines what you want as sate and another one that takes the first class to create a request to ask for that state
-export class StateRequest extends APIRequestNoSubscription<WasmState> {
+export interface WasmStateI<R> {
+  includePC(): R;
+
+  includeStack(): R;
+
+  includeCallstack(): R;
+
+  includeGlobals(): R;
+
+  includeMemory(): R;
+
+  includeTable(): R;
+
+  includeBranchingTable(): R;
+
+  includeBreakpoints(): R;
+
+  includeCallbackMappings(): R;
+
+  includeEvents(): R;
+
+  includeException(): R;
+
+  includeLogicalClock(): R;
+}
+
+export class StateRequest
+  extends APIRequestNoSubscription<WasmState>
+  implements WasmStateI<StateRequest>
+{
   private state: string[] = [];
 
   public includeAll(): StateRequest {
