@@ -1,16 +1,22 @@
-export type LogicalClock = [number, number]; // [nr of instructions, nr of events]
+export interface LogicalClock {
+  nrOfInstructions: number;
+  nrOfEvents: number;
+}
 
 export function logicalClockNrOfInstructions(t: LogicalClock): number {
-  return t[0];
+  return t.nrOfInstructions;
 }
 
 export function logicalClockNrOfEvents(t: LogicalClock): number {
-  return t[1];
+  return t.nrOfEvents;
 }
 
 export function newLogicalClock(
   nrOfIstr: number,
   nrOfevents: number,
 ): LogicalClock {
-  return [nrOfIstr, nrOfevents];
+  return {
+    nrOfInstructions: nrOfIstr,
+    nrOfEvents: nrOfevents,
+  };
 }
