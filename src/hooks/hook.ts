@@ -20,6 +20,7 @@ export enum HookKind {
   // event hooks from 0x10 to 0x1f
   EventInspect = '10',
   EventRemove = '11',
+  EventAdd = '12',
 }
 
 export type SubscriptionHook<SubscriptionType> =
