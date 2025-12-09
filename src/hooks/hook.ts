@@ -105,3 +105,9 @@ export abstract class HookWithSubscription<SubscriptionType>
 
   abstract parseSubscriptionData(input: any): SubscriptionType;
 }
+
+export function isHookWithSubscription<SubscriptionType>(
+  h: Hook,
+): h is HookWithSubscription<SubscriptionType> {
+  return h instanceof HookWithSubscription;
+}
