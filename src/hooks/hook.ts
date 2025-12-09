@@ -112,3 +112,49 @@ export function isHookWithSubscription<SubscriptionType>(
 ): h is HookWithSubscription<SubscriptionType> {
   return h instanceof HookWithSubscription;
 }
+
+export class FatalHookError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'FatalHookError';
+    Error.captureStackTrace(this, FatalHookError);
+  }
+}
+
+export function assertFatalHookError(
+  condition: unknown,
+  message: string,
+): asserts condition {
+  if (!condition) {
+    throw new FatalHookError(message);
+  }
+}
+
+export function parseHookContent(
+  hooks: Hook[],
+  content: any,
+  _logger?: Logger,
+): boolean {
+  let oneSuccessfulParse = false;
+  for (let i = 0; i < hooks.length; i++) {
+    const hook = hooks[i];
+    if (isHookWithSubscription(hook)) {
+      let parsed: any;
+      let successfulParse = false;
+      oneSuccessfulParse = successfulParse || oneSuccessfulParse;
+      try {
+        parsed = hook.parseSubscriptionData(content);
+        successfulParse = true;
+      } catch (_e) {
+        // empty
+      }
+
+      if (successfulParse) {
+        // Perhaps catch the error?
+        hook.onSubscriptionData(parsed);
+        return successfulParse;
+      }
+    }
+  }
+  return oneSuccessfulParse;
+}
