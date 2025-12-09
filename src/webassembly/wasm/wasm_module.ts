@@ -11,7 +11,12 @@ import {
   type TableExport,
 } from '../parsers/wasm_module_parser';
 import { isCallInstruction, type WasmInstruction } from './wasm_instruction';
-import { wasmOpcodeNameFromNumber } from './wasm_opcode';
+import {
+  getWasmOpcodeNr,
+  WasmOpcode,
+  wasmOpcodeNameFromNumber,
+} from './wasm_opcode';
+import assert from 'assert';
 
 const logger = createLogger('WasmModule');
 export interface WasmGlobal {
@@ -64,6 +69,12 @@ export class WasmModule {
     this.elements = mod.elements;
   }
 
+  getMainFunction(): WASMFunction {
+    const fs = this.getMainFunctions();
+    assert(fs.length === 1, 'Only one main function is expected');
+    return fs[0];
+  }
+
   /**
    * get the functions defined in the module.
    * These functions exclude the imported functions.
@@ -92,6 +103,15 @@ export class WasmModule {
     }
 
     return undefined;
+  }
+
+  instructionsFromOpcode(opcode: WasmOpcode): WasmInstruction[] {
+    const nr = getWasmOpcodeNr(opcode);
+    const instrs: WasmInstruction[] = [];
+    for (const f of this.functions) {
+      f.instructionsFromOpcode(nr).forEach((i) => instrs.push(i));
+    }
+    return instrs;
   }
 
   sectionFromAddress(addr: number): Section | undefined {
