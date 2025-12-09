@@ -2,6 +2,7 @@ import { SerialPort } from 'serialport';
 import { type Channel } from './channel_interface';
 import { createLogger, Logger } from '../logger/logger';
 import { timeoutPromise } from '../util/promise_util';
+import { Subscription } from '../hooks/isubscribe';
 
 // TODO remove code duplication from client-side socket
 
@@ -21,6 +22,7 @@ export class SerialConnection implements Channel {
   private dataBuffered: string = '';
   private readonly logger: Logger;
   private readonly removedListeners: Set<(data: string) => void>;
+  private writeListeners: Subscription<string | Uint8Array>;
 
   readonly channelName: string;
 
@@ -30,13 +32,29 @@ export class SerialConnection implements Channel {
     this.channelName = createLoggerName(loggerName, this.portName);
     this.logger = createLogger(this.channelName);
     this.removedListeners = new Set();
+    this.writeListeners = new Subscription(
+      (i: string | Uint8Array) => i,
+      this.logger,
+    );
   }
 
   public write(
     data: any,
     cb?: ((err?: Error | null | undefined) => void) | undefined,
   ): boolean {
-    return this.port?.write(data, cb) ?? false;
+    if (this.port === undefined) return false;
+    const s = this.port.write(data, cb);
+    if (s) this.writeListeners.onSubscriptionData(data);
+    return s;
+  }
+
+  addOnWriteListener(callback: (data: string | Uint8Array) => void): void {
+    const oneTimeListener = false;
+    this.writeListeners.subscribe(callback, oneTimeListener);
+  }
+
+  removeOnWriteListener(callback: (data: string | Uint8Array) => void): void {
+    this.writeListeners.unSubscribe(callback);
   }
 
   addOnData(callback: (data: string) => void): void {

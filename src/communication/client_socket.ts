@@ -24,11 +24,11 @@ export class ClientSideSocket extends AbstractChannel {
     data: string | Uint8Array,
     cb?: ((err?: Error | null | undefined) => void) | undefined,
   ): boolean {
-    if (this.connection !== undefined) {
-      return this.connection.write(data, cb);
-    } else {
-      return false;
-    }
+    if (this.connection === undefined) return false;
+
+    const s = this.connection.write(data, cb);
+    if (s) this.fanout(data);
+    return s;
   }
 
   public async close(_timeout?: number): Promise<boolean> {

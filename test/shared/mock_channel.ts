@@ -1,10 +1,20 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { type Channel } from '../../src/communication';
+import { Subscription } from '../../src/hooks/isubscribe';
+import { createLogger } from '../../src/logger/logger';
 
 export class MockChannel implements Channel {
   readonly channelName: string = 'MockChannel';
   private dataHandler?: (data: string) => void;
   private mockWriteHandler?: (data: any) => boolean;
+  private writeListeners: Subscription<string | Uint8Array>;
+
+  constructor() {
+    this.writeListeners = new Subscription(
+      (i: string | Uint8Array) => i,
+      createLogger('mockShannel'),
+    );
+  }
 
   addMockWriteMethod(cb: (data: any) => boolean): void {
     this.mockWriteHandler = cb;
@@ -24,7 +34,17 @@ export class MockChannel implements Channel {
     if (this.mockWriteHandler === undefined) {
       throw Error('No mock for write registered');
     }
-    return this.mockWriteHandler(data);
+    const s = this.mockWriteHandler(data);
+    if (s) this.writeListeners.onSubscriptionData(data);
+    return s;
+  }
+
+  addOnWriteListener(callback: (data: string | Uint8Array) => void): void {
+    this.writeListeners.subscribe(callback, false);
+  }
+
+  removeOnWriteListener(callback: (data: string | Uint8Array) => void): void {
+    this.writeListeners.unSubscribe(callback);
   }
 
   async open(timeout?: number | undefined): Promise<boolean> {
