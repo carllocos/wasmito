@@ -32,7 +32,9 @@ export class InspectStateHook
   }
 
   description(): string {
-    return 'State Inspecting';
+    const postfix =
+      this.wasmAddress !== undefined ? `on addr ${this.wasmAddress}` : '';
+    return `State Inspecting ${postfix}`;
   }
 
   parseSubscriptionData(input: any): WasmState {
