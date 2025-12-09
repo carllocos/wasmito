@@ -6,6 +6,7 @@ import {
   isSuccessfulMessage,
   type APIRequest,
   ResponseType,
+  isErrorMessage,
 } from '../request_interface';
 import { type Platform } from '../../platforms/platform';
 import { PauseRequest } from './requests/pause_request';
@@ -395,6 +396,10 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
       const requests = this.hooksStore.get(addr) ?? [];
       requests.push(req);
       this.hooksStore.set(addr, requests);
+    } else if (isErrorMessage(response)) {
+      const msg = `HookOnAddress failed to register hook: '${hook.description()}' at address ${addr} failed. Reason: ${response.error_msg} (error code ${response.error_code}))`;
+      this.logger.error(msg);
+      throw new Error(msg);
     }
     return s;
   }
