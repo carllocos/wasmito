@@ -1,5 +1,5 @@
 import { type Channel } from '../communication/channel_interface';
-import { Command } from '../communication/command';
+import { RequestsManager } from '../communication/requests_manager';
 import { errorCodeToMessage } from './error_codes';
 import {
   getInstructionFromString,
@@ -134,6 +134,6 @@ export async function sendRequest<T>(
   request: APIRequest<T>,
   timeout?: number,
 ): Promise<T> {
-  const command = new Command(channel, request, timeout);
-  return command.execute();
+  const m = new RequestsManager();
+  return m.sendRequest(channel, request, timeout);
 }

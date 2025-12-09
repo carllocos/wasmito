@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { type Channel } from '../../communication/channel_interface';
-import { Command } from '../../communication/command';
 import { type APIRequest } from '../request_interface';
 import { StateRequest } from '../../runtimes/wasmito_vm/requests/inspect_request';
 import { RunRequest } from '../../runtimes/wasmito_vm/requests/run_request';
@@ -20,6 +19,7 @@ import { WASMFunction } from '../../webassembly';
 import { ProxyCallResponse } from '../wasmito_vm/requests/fun_call_request';
 import { HookOnWasmAddrMoment } from '../wasmito_vm/requests/hook_on_wasm_addr_request';
 import { LanguageAdaptor } from '../../language_adaptors';
+import { RequestsManager } from '../../communication/requests_manager';
 
 export class WARDuinoRuntimeAPI implements RuntimeToolAPI {
   runtimeName: string;
@@ -147,8 +147,8 @@ export class WARDuinoRuntimeAPI implements RuntimeToolAPI {
     request: APIRequest<T>,
     timeout?: number,
   ): Promise<T> {
-    const command = new Command(this.channel, request, timeout);
-    return command.execute();
+    const command = new RequestsManager();
+    return command.sendRequest(this.channel, request, timeout);
   }
 
   pause(timeout?: number): Promise<void> {

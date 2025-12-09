@@ -7,7 +7,6 @@ import {
   type APIRequest,
   ResponseType,
 } from '../request_interface';
-import { Command } from '../../communication/command';
 import { type Platform } from '../../platforms/platform';
 import { PauseRequest } from './requests/pause_request';
 import { ProxifyRequest } from './requests/proxify_request';
@@ -52,6 +51,7 @@ import {
 import { type LanguageAdaptor } from '../../language_adaptors';
 import { Logger } from '../../logger/logger';
 import { MockPinInterruptRequest } from './requests/inject_event_request';
+import { RequestsManager } from '../../communication/requests_manager';
 
 export abstract class WasmitoBackendVM implements RuntimeToolAPI {
   private _channel: Channel;
@@ -67,6 +67,8 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
 
   public readonly hooksStore: Map<number, HookOnWasmAddrRequest[]>;
 
+  private requestManager: RequestsManager;
+
   constructor(platform: Platform, communicationChannel: Channel) {
     this._platform = platform;
     this._channel = communicationChannel;
@@ -75,6 +77,7 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
     this.hooksStore = new Map();
     this._breakpointPolicy = new BreakpointDefaultPolicy(this);
     this._funcsProxied = new Map();
+    this.requestManager = new RequestsManager();
   }
 
   get platform(): Platform {
@@ -230,12 +233,11 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
     request: APIRequest<T>,
     timeout?: number,
   ): Promise<T> {
-    const command = new Command(this.channel, request, timeout);
-    return command.execute();
-  }
-
-  public async sendCommand<T>(command: Command<T>): Promise<T> {
-    return command.execute();
+    return await this.requestManager.sendRequest(
+      this.channel,
+      request,
+      timeout,
+    );
   }
 
   public async loadWasmState(
