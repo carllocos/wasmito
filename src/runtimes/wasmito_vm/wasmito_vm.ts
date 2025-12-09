@@ -27,6 +27,7 @@ import {
   type ProxyCallResponse,
 } from './requests/fun_call_request';
 import {
+  HookOnEventMoment,
   HookOnEventRequest,
   isSuccessfullHookOnEventResponse,
 } from './requests/hook_on_event_request';
@@ -50,6 +51,7 @@ import {
 } from '../../source_mappers/source_map';
 import { type LanguageAdaptor } from '../../language_adaptors';
 import { Logger } from '../../logger/logger';
+import { MockPinInterruptRequest } from './requests/inject_event_request';
 
 export abstract class WasmitoBackendVM implements RuntimeToolAPI {
   private _channel: Channel;
@@ -433,13 +435,17 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
     hook: Hook,
     timeout?: number | undefined,
   ): Promise<boolean> {
-    const request = new HookOnEventRequest().onNewEvent(hook);
+    const request = new HookOnEventRequest(
+      HookOnEventMoment.onNewEvent,
+    ).addHook(hook);
     const response = await this.sendRequest(request, timeout);
     return isSuccessfullHookOnEventResponse(response);
   }
 
   async addHookOnEventHandling(hook: Hook, timeout?: number): Promise<boolean> {
-    const request = new HookOnEventRequest().onEventHandling(hook);
+    const request = new HookOnEventRequest(
+      HookOnEventMoment.beforeEventHandled,
+    ).addHook(hook);
     const response = await this.sendRequest(request, timeout);
     return isSuccessfullHookOnEventResponse(response);
   }
@@ -448,5 +454,10 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
     const request = new HookOnError().onError(hook);
     const response = await this.sendRequest(request, timeout);
     return isSuccessfullHookOnErrorResponse(response);
+  }
+
+  async mockPinInterrupt(pinNr: number, timeoutMs?: number): Promise<void> {
+    const request = new MockPinInterruptRequest(pinNr);
+    await this.sendRequest(request, timeoutMs);
   }
 }
