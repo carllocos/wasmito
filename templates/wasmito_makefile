@@ -16,6 +16,7 @@ else
 endif
 
 CONFIG_FILE := $(if $(ARDUINO_CONFIG),--config-file $(ARDUINO_CONFIG),)
+COMPILE_EXTRA_FLAGS := $(if $(COMPILE_FLAGS),--build-property compiler.cpp.extra_flags="$(COMPILE_FLAGS)",--build-property compiler.cpp.extra_flags="-DPRIMITIVES_NEOPIXEL -DPRIMITIVES_M5STICKC")
 
 clean:
 	rm -f Arduino.ino 
@@ -56,7 +57,7 @@ endif
 ifndef FQBN
 	$(error FQBN is not set. Use a .config file)
 endif
-	$(ARDUINO_CLI) compile --fqbn $(FQBN) $(CONFIG_FILE) Arduino.ino -e
+	$(ARDUINO_CLI) compile --fqbn $(FQBN) $(CONFIG_FILE) $(COMPILE_EXTRA_FLAGS) Arduino.ino -e
 
 recompile: clean compile
 
