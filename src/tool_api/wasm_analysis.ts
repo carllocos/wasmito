@@ -5,6 +5,7 @@ import {
   WasmInstruction,
   WasmModule,
   WasmOpcode,
+  WasmState,
 } from '../webassembly';
 import {
   ReadOnlyInterrupt,
@@ -14,8 +15,16 @@ import {
 } from './interrupts';
 import { GroupHooks } from './group_hooks';
 import { createLogger, Logger } from '../logger/logger';
-import { instruction } from './util/analyse_instruction';
+import { createCallbackNoArgs, instruction } from './util/analyse_instruction';
 import { interrupt } from './util/analyse_interrupts';
+import { LanguageAdaptor } from '../language_adaptors';
+import {
+  SourceCFGNode,
+  sourceNodeFirstInstruction,
+} from '../cfg/source_cfg_node_edge';
+
+import { assertFatalHookError, Hook, InspectStateHook } from '../hooks';
+import { StateRequest } from '../runtimes/wasmito_vm/requests/inspect_request';
 
 export interface AnalysisConfig {
   name: string;
@@ -249,6 +258,47 @@ export class WasmAnalysis {
     );
   }
 
+  onNodeEntry(
+    node: SourceCFGNode,
+    cb: (
+      n: SourceCFGNode,
+      instr: WasmInstruction,
+      args: ReadOnlyWasmValue[],
+      vm: WasmitoBackendVM,
+    ) => void,
+  ): GroupHooks;
+  onNodeEntry(
+    node: SourceCFGNode,
+    cb: (
+      n: SourceCFGNode,
+      instr: WasmInstruction,
+      args: ReadOnlyWasmValue[],
+    ) => void,
+  ): GroupHooks;
+  onNodeEntry(
+    node: SourceCFGNode,
+    cb: (n: SourceCFGNode, instr: WasmInstruction) => void,
+  ): GroupHooks;
+  onNodeEntry(
+    node: SourceCFGNode,
+    cb: (vm: WasmitoBackendVM) => void,
+  ): GroupHooks;
+  onNodeEntry(node: SourceCFGNode, cb: () => void): GroupHooks;
+  onNodeEntry(node: SourceCFGNode, cb: (...args: any[]) => any): GroupHooks {
+    // TODO fix incomingEdges
+    // const reachableInstrs = node.incomingEdges.map(SourceCFGEdgeToInstruction);
+    const reachableInstrs = [sourceNodeFirstInstruction(node)];
+    assert(reachableInstrs.length > 0);
+    const g = new GroupHooks('before');
+    for (const i of reachableInstrs) {
+      const [actions, actionToSubscribe] = createActionsNode(i, cb.length);
+      const newCB = createCallbackNode(node, this.vm, this.wasm, i, cb);
+      actionToSubscribe.subscribe(newCB);
+      g.addInstructionActions(i, actions);
+    }
+    return this.addGroup(g);
+  }
+
   onError(_cb: (...args: any[]) => any): GroupHooks {
     throw new Error(`TODO`);
 
@@ -356,4 +406,110 @@ export class WasmAnalysis {
   async run(timeoutMs?: number): Promise<void> {
     await this.vm.run(timeoutMs);
   }
+}
+
+function createActionsNode(
+  instr: WasmInstruction,
+  cbNrOfArgs: number,
+): [Hook[], InspectStateHook] {
+  const hooks: Hook[] = [];
+  const inspectAction = new InspectStateHook(
+    new StateRequest(),
+    instr.startAddress,
+  );
+  inspectAction.includePC();
+  switch (cbNrOfArgs) {
+    case 0:
+    case 1:
+    case 2:
+      break;
+    case 3:
+    case 4:
+      if (instr.signature.nrArgs > 0) {
+        inspectAction.includeStack();
+      }
+      break;
+    default:
+      throw new Error(
+        `Callback has not the right type signature. Given nr of arguments ${cbNrOfArgs}. Expected at most 5`,
+      );
+  }
+  hooks.push(inspectAction);
+  return [hooks, inspectAction];
+}
+
+//   cb: (
+//     n: SourceCFGNode,
+//     instr: WasmInstruction,
+//     args: ReadOnlyWasmValue[],
+//     vm: WasmitoBackendVM,
+//   ) => void,
+//   cb: (
+//     n: SourceCFGNode,
+//     instr: WasmInstruction,
+//     args: ReadOnlyWasmValue[],
+//   ) => void,
+function createCallbackNode(
+  node: SourceCFGNode,
+  vm: WasmitoBackendVM,
+  mod: WasmModule,
+  instr: WasmInstruction,
+  cb: (...args: any[]) => any,
+): (s: WasmState) => void {
+  switch (cb.length) {
+    case 0:
+    case 1:
+      return createCallbackNoArgs(vm, cb);
+    case 2:
+      return callbackArgs(node, mod, instr, false, vm, cb);
+    case 3:
+    case 4:
+      return callbackArgs(node, mod, instr, true, vm, cb);
+    default:
+      throw new Error(`Callback has incorrect number of arguments`);
+  }
+}
+
+function callbackArgs(
+  node: SourceCFGNode,
+  mod: WasmModule,
+  instr: WasmInstruction,
+  includeInstrArgs: boolean,
+  vm: WasmitoBackendVM,
+  cb: (...args: any[]) => any,
+): (s: WasmState) => void {
+  return (s: WasmState) => {
+    assertFatalHookError(s.pc !== undefined, 'pc is empty');
+    const i = mod.getInstruction(s.pc);
+    assertFatalHookError(
+      i !== undefined,
+      `No instruction found for address ${s.pc}`,
+    );
+
+    assertFatalHookError(
+      i.signature.nrArgs === instr.signature.nrArgs,
+      `mismatch between expect args of instr ${i.name} and ${instr.name}`,
+    );
+
+    let args: WritableWasmValue[] | ReadOnlyWasmValue[] = [];
+    if (includeInstrArgs && i.signature.nrArgs > 0) {
+      assertFatalHookError(
+        s.stack !== undefined,
+        'VM failed to provide the stack needed to construct args',
+      );
+      assertFatalHookError(
+        s.stack.length >= i.signature.nrArgs,
+        `Stack is expected to have #${i.signature.nrArgs} values but has ${s.stack.length} to reconstruct args for '${i.name}' inst at addr ${i.startAddress}`,
+      );
+
+      const vals = s.stack.slice(-i.signature.nrArgs);
+      args = vals.map((v) => new ReadOnlyWasmValue(v));
+    }
+
+    const newArgs = cb(node, i, args, vm);
+    assertFatalHookError(
+      newArgs === undefined,
+      `Registered callback should not return any value as no update is expected`,
+    );
+  };
 }
