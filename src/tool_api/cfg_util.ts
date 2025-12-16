@@ -1,4 +1,7 @@
-import { getCallInstructions, SourceCFGNode } from '../cfg/source_cfg';
+import {
+  getCallInstructions,
+  SourceCFGNode,
+} from '../cfg/source_cfg_node_edge';
 
 export namespace CFGOperations {
   /**

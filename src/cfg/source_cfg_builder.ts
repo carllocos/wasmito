@@ -23,8 +23,9 @@ import {
 import { isFilePath } from '../util/file_util';
 import { type WASMFunction } from '../webassembly/wasm/wasm_function';
 import assert from 'assert';
-import { type SourceCFGNode, type BinaryLiftedCFG } from './source_cfg';
+import { type BinaryLiftedCFG } from './source_cfg';
 import { createLogger } from '../logger/logger';
+import { SourceCFGNode } from './source_cfg_node_edge';
 
 const logger = createLogger('BinaryLift');
 

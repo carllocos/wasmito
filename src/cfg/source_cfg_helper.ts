@@ -1,10 +1,10 @@
 import { type WasmInstruction } from '../webassembly/wasm/wasm_instruction';
-import {
-  type FunToSourceCFG,
-  sourceNodeFirstInstruction,
-  type SourceCFGNode,
-} from './source_cfg';
+import { type FunToSourceCFG } from './source_cfg';
 import { sourceCFGNodeAndInstrFromIncrInstrAddrs } from './source_cfg_builder';
+import {
+  SourceCFGNode,
+  sourceNodeFirstInstruction,
+} from './source_cfg_node_edge';
 import {
   getCalledFunctions,
   getWasmCFGNode,

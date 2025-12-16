@@ -2,9 +2,9 @@ import { type WasmState } from '../../src/webassembly/wasm';
 import * as fs from 'fs';
 import { type WasmInstruction } from '../../src/webassembly/wasm/wasm_instruction';
 import { PlaceholderType } from '../../src/webassembly/wasm/opcode_type';
-import { SourceCFGNode } from '../../src/cfg/source_cfg';
 import { getGlobalLogger } from '../../src/logger/logger';
 import path from 'path';
+import { SourceCFGNode } from '../../src/cfg/source_cfg_node_edge';
 
 class WriteCSV {
   private readonly maxBuffer: number;

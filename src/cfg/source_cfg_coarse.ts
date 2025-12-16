@@ -12,8 +12,9 @@ import {
 import { pathJoin, sanitizeFilename } from '../util/file_util';
 import { coarseSourceControlFlowGraphToDot } from './dot_serialize';
 import { writeFileSync } from 'fs';
-import { type SourceCFGNode, type SourceCFGs } from './source_cfg';
+import { type SourceCFGs } from './source_cfg';
 import { CFGOperations } from '../tool_api/cfg_util';
+import { SourceCFGNode } from './source_cfg_node_edge';
 
 export interface DotSerializationConfgig {
   includeInstructions: boolean;

@@ -1,5 +1,5 @@
 import path from 'path';
-import { SourceCFGNode, SourceCFGs } from '../src/cfg/source_cfg';
+import { SourceCFGs } from '../src/cfg/source_cfg';
 import { WasmCFGs } from '../src/cfg/wasm_cfg';
 import { SourceMapFromJSON } from '../src/source_mappers/source_map_builder';
 import { SourceMapConfig } from '../src/source_mappers/source_map_config';
@@ -7,6 +7,7 @@ import {
   SourceCodeLocation,
   sourceCodeLocationToString,
 } from '../src/source_mappers/source_map';
+import { SourceCFGNode } from '../src/cfg/source_cfg_node_edge';
 
 export function loadSourceCFGs(
   wasmPath: string,
