@@ -237,7 +237,7 @@ function createActions(
   return [hooks, inspectAction];
 }
 
-function createCallbackNoArgs(
+export function createCallbackNoArgs(
   vm: WasmitoBackendVM,
   cb: // do not care about args, nor return value
   ((vm: WasmitoBackendVM) => void) | (() => void),
