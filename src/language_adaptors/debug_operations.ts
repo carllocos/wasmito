@@ -1,15 +1,13 @@
 import { createLogger } from '../logger/logger';
-import {
-  type SourceCFGNode,
-  sourceNodeFirstInstrStartAddr,
-  BinaryLiftedCFG,
-  getCallInstructions,
-  SourceCFGs,
-  sourceNodeFirstInstruction,
-  isSCFGEmpty,
-} from '../cfg/source_cfg';
+import { BinaryLiftedCFG, SourceCFGs, isSCFGEmpty } from '../cfg/source_cfg';
 import { isCallInstruction } from '../webassembly/wasm/wasm_instruction';
 import { CFGOperations } from '../tool_api/cfg_util';
+import {
+  getCallInstructions,
+  SourceCFGNode,
+  sourceNodeFirstInstrStartAddr,
+  sourceNodeFirstInstruction,
+} from '../cfg/source_cfg_node_edge';
 
 export type DestinationSCFGNode = [SourceCFGNode, number];
 

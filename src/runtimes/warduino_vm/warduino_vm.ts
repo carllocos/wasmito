@@ -11,7 +11,6 @@ import {
 } from './breakpoint_request';
 import { RuntimeToolAPI } from '../runtime_api';
 import { Breakpoint } from '../../debugger/breakpoint';
-import { SourceCFGNode } from '../../cfg';
 import { BreakpointPolicy } from '../../debugger';
 import { Hook } from '../../hooks';
 import { SourceCodeLocation } from '../../source_mappers';
@@ -20,6 +19,7 @@ import { ProxyCallResponse } from '../wasmito_vm/requests/fun_call_request';
 import { HookOnWasmAddrMoment } from '../wasmito_vm/requests/hook_on_wasm_addr_request';
 import { LanguageAdaptor } from '../../language_adaptors';
 import { RequestsManager } from '../../communication/requests_manager';
+import { SourceCFGNode } from '../../cfg/source_cfg_node_edge';
 
 export class WARDuinoRuntimeAPI implements RuntimeToolAPI {
   runtimeName: string;

@@ -1,6 +1,7 @@
 import assert from 'assert';
-import { type SourceCFGs, type SourceCFGNode } from '../../src/cfg/source_cfg';
+import { type SourceCFGs } from '../../src/cfg/source_cfg';
 import { type SourceCodeLocation } from '../../src/source_mappers/source_map';
+import { SourceCFGNode } from '../../src/cfg/source_cfg_node_edge';
 
 export function sourceNodeFromLoc(
   scfgs: SourceCFGs,

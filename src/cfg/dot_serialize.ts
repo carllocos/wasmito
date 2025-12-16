@@ -5,7 +5,6 @@ import {
 } from '../webassembly/wasm/wasm_instruction';
 import {
   type BinaryLiftedCFG,
-  getCallInstructions,
   type DotSerializationConfig,
 } from './source_cfg';
 import {
@@ -13,6 +12,7 @@ import {
   getCallInstructionsCoarseSourceNode,
   type CoarseFunctionGraph,
 } from './source_cfg_coarse';
+import { getCallInstructions } from './source_cfg_node_edge';
 import { getWasmCFGNode, type CFGNode, type WasmCFG } from './wasm_cfg';
 
 export function wasmControlFlowGraphToDot(

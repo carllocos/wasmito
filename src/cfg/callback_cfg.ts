@@ -1,12 +1,9 @@
 import { type DestinationSCFGNode } from '../language_adaptors/debug_operations';
 import { type WASMFunction } from '../webassembly';
 import { buildCallGraph } from './callgraph';
-import {
-  type SourceCFGs,
-  type BinaryLiftedCFG,
-  sourceNodeFirstInstrStartAddr,
-} from './source_cfg';
+import { type SourceCFGs, type BinaryLiftedCFG } from './source_cfg';
 import assert from 'assert';
+import { sourceNodeFirstInstrStartAddr } from './source_cfg_node_edge';
 
 /**
  * An interface associated to a callback of a Wasm module
