@@ -56,7 +56,14 @@ export function mappingItemToString(m: MappingItem): string {
 }
 
 export function sourceCodeLocationToString(m: SourceCodeLocation): string {
-  return `{"source":"${m.source}", "address": ${m.address}, "linenr": ${m.linenr}, "colnr": ${m.colnr},"name": "${m.name}"}`;
+  let s = `{"source":"${m.source}", "address": ${m.address}, "linenr": ${m.linenr}, "colnr": ${m.colnr}`;
+  if (m.name !== '') {
+    s += `,"name": "${m.name}"}`;
+  } else {
+    s += '}';
+  }
+
+  return s;
 }
 
 export interface SourceMapJSON {
