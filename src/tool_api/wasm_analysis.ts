@@ -26,14 +26,24 @@ export class WasmAnalysis {
   private wasm: WasmModule;
   private vm: WasmitoBackendVM;
   private groups: GroupHooks[];
-  private logger: Logger;
+  private _logger: Logger;
   private maxTimeoutMs: number;
+  private _adaptor?: LanguageAdaptor;
 
-  constructor(wasm: WasmModule, vm: WasmitoBackendVM, config?: AnalysisConfig) {
-    this.wasm = wasm;
+  constructor(
+    wasm: WasmModule | LanguageAdaptor,
+    vm: WasmitoBackendVM,
+    config?: AnalysisConfig,
+  ) {
+    if (wasm instanceof WasmModule) {
+      this.wasm = wasm;
+    } else {
+      this._adaptor = wasm;
+      this.wasm = wasm.sourceMap.wasm;
+    }
     this.vm = vm;
     this.groups = [];
-    this.logger = createLogger(config?.name ?? 'WasmAnalyse');
+    this._logger = createLogger(config?.name ?? 'WasmAnalyse');
     this.maxTimeoutMs = config?.maxTimeoutMs ?? 30000;
   }
   private addGroup(g: GroupHooks): GroupHooks {
