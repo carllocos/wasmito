@@ -7,15 +7,9 @@ import {
 import {
   isCallIndirect,
   isCallInstruction,
-  type WasmInstruction,
-  type CallInstruction,
-  type CallIndirect,
   instructionToString,
 } from '../webassembly/wasm/wasm_instruction';
-import {
-  type AgnosticASTMap,
-  type AgnosticNode,
-} from '../language_adaptors/agnostic_node';
+import { type AgnosticASTMap } from '../language_adaptors/agnostic_node';
 import { getFileName, pathJoin, sanitizeFilename } from '../util/file_util';
 import { sourceControlFlowGraphToDot } from './dot_serialize';
 import { writeFileSync } from 'fs';
@@ -26,8 +20,14 @@ import { searchForNextReachableSourceNodes } from './source_cfg_helper';
 import { searchCallbacksCFGs, type CallbackSCFG } from './callback_cfg';
 import { type DestinationSCFGNode } from '../language_adaptors';
 import { CFGOperations } from '../tool_api/cfg_util';
+import {
+  getCallInstructions,
+  SourceCFGNode,
+  sourceCFGNodeToJSONObj,
+  sourceNodeFirstInstrStartAddr,
+} from './source_cfg_node_edge';
 
-const logger = createLogger('ASTControlFlowGraph');
+const logger = createLogger('ControlFlowGraph');
 export interface DotSerializationConfig {
   includeInstructions: boolean;
   includeEmptySCFG: boolean;
@@ -377,63 +377,6 @@ export class SourceCFGs {
       includeUnavailableSourceFiles,
     );
   }
-}
-
-export interface SourceCFGNode {
-  nodeId: number;
-  node?: AgnosticNode;
-  sourceLocation: SourceCodeLocation;
-  edges: Array<[SourceCFGNode, WasmInstruction, WasmInstruction]>;
-  wasmFunOwner: number;
-  instructions: WasmInstruction[];
-  instructionsIndexes: number[];
-  incomingEdges: Array<[SourceCFGNode, WasmInstruction, WasmInstruction]>;
-}
-
-function sourceCFGNodeToJSONObj(n: SourceCFGNode): object {
-  const edges: object[] = n.edges.map(([e, _]) => {
-    return { nodeID: e.nodeId };
-  });
-
-  return {
-    nodeId: n.nodeId,
-    node: 'TODO AgnosticNode',
-    sourceLocation: n.sourceLocation as object,
-    wasmFunOwner: n.wasmFunOwner,
-    instructions: n.instructions.map((i) => i.toJSONObj()),
-    instructionsIndexes: n.instructionsIndexes,
-    edges,
-  };
-}
-
-export function getCallInstructions(
-  n: SourceCFGNode,
-): Array<CallInstruction | CallIndirect> {
-  const calls: Array<CallInstruction | CallIndirect> = [];
-  for (const i of n.instructions) {
-    if (isCallInstruction(i) || isCallIndirect(i)) {
-      calls.push(i);
-    }
-  }
-  return calls;
-}
-
-export function sourceNodeFirstInstruction(n: SourceCFGNode): WasmInstruction {
-  return n.instructions[0];
-}
-
-export function sourceNodeFirstInstrStartAddr(n: SourceCFGNode): number {
-  return n.instructions[0].startAddress;
-}
-
-export function sourceNodeLastInstruction(n: SourceCFGNode): WasmInstruction {
-  return n.instructions[n.instructions.length - 1];
-}
-
-export function sourceNodeLastInstructionStartAddress(
-  n: SourceCFGNode,
-): number {
-  return n.instructions[n.instructions.length - 1].startAddress;
 }
 
 export interface BinaryLiftedCFG {
