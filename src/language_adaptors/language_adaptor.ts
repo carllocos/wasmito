@@ -7,22 +7,39 @@ import {
 } from '../source_mappers/source_map';
 import { type AgnosticASTMap } from './agnostic_node';
 import { WasmCFGs } from '../cfg/wasm_cfg';
-import { type SourceCFGNode, SourceCFGs } from '../cfg/source_cfg';
+import { SourceCFGs } from '../cfg/source_cfg';
 import { getLangConfigFromExtension } from './languages/all_langs';
 import { type LanguageConfiguration } from './languages/language_config';
 import { writeFileSync } from 'fs';
 import { SourceMapFromJSON } from '../source_mappers/source_map_builder';
 import { SourceMapConfig } from '../source_mappers/source_map_config';
+import { SourceCFGNode } from '../cfg/source_cfg_node_edge';
 
 const logger = createLogger('LanguageAdaptor');
 
 export async function constructLanguageAdaptor(
-  sourceMap: SourceMap,
-  includeUnavailableSourceFiles: boolean = false,
+  sourceMap: SourceMap | string,
+  includeUnavailableSourceFiles: boolean | SourceMapConfig = false,
 ): Promise<LanguageAdaptor> {
-  const la = new LanguageAdaptor(sourceMap);
-  await la.buildComplementaryContext(includeUnavailableSourceFiles);
-  return la;
+  if (typeof sourceMap === 'string') {
+    let c: SourceMapConfig = {};
+    if (typeof includeUnavailableSourceFiles === 'boolean') {
+      c.relativePaths = includeUnavailableSourceFiles;
+    } else {
+      c = includeUnavailableSourceFiles;
+    }
+    const la = LanguageAdaptor.fromMappingsPath(sourceMap, c);
+    await la.buildASTS();
+    return la;
+  } else {
+    const include =
+      typeof includeUnavailableSourceFiles === 'boolean'
+        ? includeUnavailableSourceFiles
+        : !!includeUnavailableSourceFiles.relativePaths;
+    const la = new LanguageAdaptor(sourceMap);
+    await la.buildComplementaryContext(include);
+    return la;
+  }
 }
 
 export interface CountMappingJson {
@@ -129,7 +146,7 @@ export class LanguageAdaptor {
     return c;
   }
 
-  private async buildASTS(): Promise<void> {
+  public async buildASTS(): Promise<void> {
     const availableSources: Array<[string, LanguageConfiguration]> = [];
     for (const s of this.sourceMap.sources) {
       if (!isFilePath(s)) {
