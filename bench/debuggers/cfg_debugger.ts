@@ -5,9 +5,10 @@ import {
 } from '../../src/source_mappers/source_map';
 import { type DebugAPI } from './debug_api';
 import { type RuntimeDebugAPI } from '../runtimes/runtime_api';
-import { type SourceCFGNode, SourceCFGs } from '../../src/cfg/source_cfg';
+import { SourceCFGs } from '../../src/cfg/source_cfg';
 import { WasmCFGs } from '../../src/cfg/wasm_cfg';
 import { DebugOperations } from '../../src/language_adaptors/debug_operations';
+import { SourceCFGNode } from '../../src/cfg/source_cfg_node_edge';
 
 export class ControlFlowGraphDBG implements DebugAPI {
   debuggerName: string = 'CFG_DBG';

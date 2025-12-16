@@ -17,8 +17,8 @@ import {
   SourceMap,
 } from '../src/source_mappers/source_map';
 import { DebugOperationFromName } from '../src/language_adaptors/debug_operations';
-import { type SourceCFGNode } from '../src/cfg/source_cfg';
 import { writeFileSync } from 'fs';
+import { SourceCFGNode } from '../src/cfg/source_cfg_node_edge';
 
 export function registerDebugOpCommand(program: Command): void {
   program
