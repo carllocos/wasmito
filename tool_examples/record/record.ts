@@ -115,7 +115,7 @@ async function main(): Promise<void> {
   analysis.beforeHandlingInterrupt(recordInterrupt);
   await analysis.deploy();
   await analysis.run();
-  mockInterrupts(vmConnection, 37, 5);
+  simulateInterrupt(vmConnection, 37, 5);
   stopRecording(vmConnection, analysis, recordSecs);
 }
 
@@ -141,7 +141,7 @@ function logRecordings(): void {
   }
 }
 
-function mockInterrupts(
+function simulateInterrupt(
   vm: WasmitoBackendVM,
   pin: number,
   nrOfInterrupts: number,
@@ -151,8 +151,8 @@ function mockInterrupts(
   const sleepTime = 1000;
   // const sleepTime = Math.floor(Math.random() * (3000 - 1000 + 1)) + 1000;
   setTimeout(() => {
-    vm.mockPinInterrupt(pin);
-    mockInterrupts(vm, pin, nrOfInterrupts - 1);
+    vm.simulateInterrupt(pin);
+    simulateInterrupt(vm, pin, nrOfInterrupts - 1);
   }, sleepTime);
 }
 
