@@ -463,7 +463,7 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
     return isSuccessfullHookOnErrorResponse(response);
   }
 
-  async mockPinInterrupt(pinNr: number, timeoutMs?: number): Promise<void> {
+  async simulateInterrupt(pinNr: number, timeoutMs?: number): Promise<void> {
     const request = new MockPinInterruptRequest(pinNr);
     await this.sendRequest(request, timeoutMs);
   }
