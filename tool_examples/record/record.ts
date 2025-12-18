@@ -97,7 +97,11 @@ function recordInstr(i: WasmInstruction, args: ReadOnlyWasmValue[]): void {
   logRecord(record);
 }
 
-async function record(wasmPath: string, recordSecs: number): Promise<void> {
+async function main(): Promise<void> {
+  const wasmPath = resolve(
+    './app_examples/assemblyscript/toggle_led/wasm/toggle_led.wasm',
+  );
+  const recordSecs = 10;
   const wasm = new WasmModule(wasmPath);
   const vmConnection = await spawnDevVM(wasm);
   const analysis = new WasmAnalysis(wasm, vmConnection);
@@ -165,8 +169,4 @@ async function spawnDevVM(wasm: WasmModule): Promise<WasmitoBackendVM> {
 //   return await dm.connectToExistingDevVM(la, p, 3000);
 // }
 
-const wasmPath = resolve(
-  './app_examples/assemblyscript/toggle_led/wasm/toggle_led.wasm',
-);
-const recordSecs = 10;
-record(wasmPath, recordSecs).catch(console.error);
+main().catch(console.error);
