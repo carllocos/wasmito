@@ -1,13 +1,6 @@
 import assert from 'assert';
 import { WasmitoBackendVM } from '../runtimes/wasmito_vm/wasmito_vm';
 import {
-  WasmAddress,
-  WasmInstruction,
-  WasmModule,
-  WasmOpcode,
-  WasmState,
-} from '../webassembly';
-import {
   ReadOnlyInterrupt,
   ReadOnlyWasmValue,
   WritableInterrupt,
@@ -22,9 +15,16 @@ import {
   SourceCFGNode,
   sourceNodeFirstInstruction,
 } from '../cfg/source_cfg_node_edge';
-
-import { assertFatalHookError, Hook, InspectStateHook } from '../hooks';
 import { StateRequest } from '../runtimes/wasmito_vm/requests/inspect_request';
+import { WasmModule } from '../webassembly/wasm/wasm_module';
+import {
+  WasmAddress,
+  WasmInstruction,
+} from '../webassembly/wasm/wasm_instruction';
+import { WasmOpcode } from '../webassembly/wasm/wasm_opcode';
+import { WasmState } from '../webassembly/wasm';
+import { assertFatalHookError, Hook } from '../hooks/hook';
+import { InspectStateHook } from '../hooks/hook_inspect_state';
 
 export interface AnalysisConfig {
   name: string;
