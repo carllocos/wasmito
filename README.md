@@ -1,7 +1,6 @@
 # Wasmito
 
 Wasmito is a library that enables the creation of language-agnostic dynamic tools (e.g., debuggers, testing tools, monitoring tools) for applications that compile to WebAssembly and that run on MCUs using the [WARDuino Wasm VM](https://github.com/carllocos/WARDuino).
-
 The **primary goal** of this project is to explore novel techniques for building language-agnostic dynamic tools tailored for MCUs.
 As such, this project is **highly experimental** - you can expect bugs.
 The tools developed using this library serve as an evaluation of the proposed techniques.
