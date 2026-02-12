@@ -326,10 +326,13 @@ export class BlockInstruction extends WasmInstruction {
 
 export class CallInstruction extends WasmInstruction {
   public readonly funIdx: number;
+  public readonly funcName: string;
+
   constructor(funName: string, funIdx: number) {
     super('call', WasmOpcodeCall);
     this.args = [funName];
     this.funIdx = funIdx;
+    this.funcName = funName;
   }
 
   public override toJSONObj(): object {
