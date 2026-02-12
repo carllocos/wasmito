@@ -1,6 +1,4 @@
 import { resolve } from 'path';
-import { DeviceManager } from '../../src/device/device_manager';
-import { LanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 import { WasmitoBackendVM } from '../../src/runtimes/wasmito_vm/wasmito_vm';
 import { WasmModule } from '../../src/webassembly/wasm/wasm_module';
 import { WasmAnalysis } from '../../src/tool_api/wasm_analysis';
@@ -10,115 +8,92 @@ import {
 } from '../../src/tool_api/interrupts';
 import { WasmInstruction } from '../../src/webassembly/wasm/wasm_instruction';
 import { exit } from 'process';
-
-interface LogicalClock {
-  instrs: number;
-  interrupts: number;
-}
-
-function copyClock(): LogicalClock {
-  return {
-    instrs: LogicalClock.instrs,
-    interrupts: LogicalClock.interrupts,
-  };
-}
-
-interface RecordInstruction {
-  instrAddr: number;
-  instrName: string;
-  instrArgs: ReadOnlyWasmValue[];
-  clock: LogicalClock;
-}
-
-interface RecordInterrupt {
-  topic: string;
-  payload: string;
-  clock: LogicalClock;
-}
-
-type Record = RecordInterrupt | RecordInstruction;
-
-function isRecordInterrupt(r: any): r is RecordInterrupt {
-  return r.topic !== undefined;
-}
-
-function logRecord(r: Record): void {
-  let s = `LC{instrs=${r.clock.instrs},interrupts=${r.clock.interrupts}}`;
-  if (isRecordInterrupt(r)) {
-    s += ` Interrupt{topic='${r.topic}', payload='${r.payload}'}\n`;
-  } else {
-    const argsStr =
-      r.instrArgs.length === 0
-        ? ''
-        : `[${r.instrArgs.map((a) => a.value).join(', ')}]`;
-    s += ` 0x${r.instrAddr.toString(16)} ${r.instrName} ${argsStr}\n`;
-  }
-  console.log(s);
-}
-
-function logAfter(
-  instr: WasmInstruction,
-  result: ReadOnlyWasmValue | undefined,
-): void {
-  const valStr = result === undefined ? '' : `${result.value}`;
-  let s = `LC{instrs=${LogicalClock.instrs},interrupts=${LogicalClock.interrupts}} (after)`;
-  s += ` 0x${instr.startAddress.toString(16)} ${instr.name} pushed on stack ${valStr}\n`;
-  console.log(s);
-}
-
-const LogicalClock: LogicalClock = {
-  instrs: 0,
-  interrupts: 0,
-};
-
-const Records: Record[] = [];
+import {
+  copyClock,
+  LogicalClock,
+  logRecord,
+  logRecordings,
+  newLogicalClock,
+  type Record,
+} from './logical_clock';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { spawnDevVM, spawnMCUVM } from '../spawn_vm';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { BoardBaudRate } from '../../src/util/serial_port';
 
 function recordInterrupt(interrupt: ReadOnlyInterrupt): void {
-  LogicalClock.interrupts += 1;
+  logicalClock.interrupts += 1;
   const record: Record = {
     topic: interrupt.topic,
     payload: interrupt.payload,
-    clock: copyClock(),
+    clock: copyClock(logicalClock),
   };
-  Records.push(record);
+  records.push(record);
   logRecord(record);
 }
 
 function recordInstr(i: WasmInstruction, args: ReadOnlyWasmValue[]): void {
-  LogicalClock.instrs += 1;
+  logicalClock.instrs += 1;
 
   const record: Record = {
     instrAddr: i.startAddress,
     instrName: i.name,
     instrArgs: args,
-    clock: copyClock(),
+    clock: copyClock(logicalClock),
   };
-  Records.push(record);
+  records.push(record);
   logRecord(record);
 }
+
+const logicalClock: LogicalClock = newLogicalClock();
+const records: Record[] = [];
 
 async function main(): Promise<void> {
   const wasmPath = resolve(
     './app_examples/assemblyscript/toggle_led/wasm/toggle_led.wasm',
   );
-  const recordSecs = 10;
   const wasm = new WasmModule(wasmPath);
+  // uncomment next to run analysis on local VM
   const vmConnection = await spawnDevVM(wasm);
+  // uncomment next to run analysis on MCU VM
+  // const vmConnection = await spawnMCUVM(wasm, {
+  //   vmConfig: {
+  //     pauseOnStart: true, // pause the VM on deploy of the Wasm module
+  //     serialPort: '/dev/cu.usbserial-8952FFEE8B',
+  //     baudrate: BoardBaudRate.BD_115200,
+  //     fqbn: {
+  //       boardName: 'M5Stick-C',
+  //       fqbn: 'm5stack:esp32:m5stick-c',
+  //     },
+  //   },
+  // });
   const analysis = new WasmAnalysis(wasm, vmConnection);
   for (const f of wasm.functions) {
     for (const i of f.allInstructions) {
+      // register advice just before executing Wasm instruction i
       analysis.before(i, recordInstr);
-      analysis.after(i, logAfter);
     }
   }
 
+  //register advice on before handling interrupt
   analysis.beforeHandlingInterrupt(recordInterrupt);
+
   await analysis.deploy();
   await analysis.run();
-  simulateInterrupt(vmConnection, 37, 5);
+  const recordSecs = 10;
   stopRecording(vmConnection, analysis, recordSecs);
+
+  // The following is optional
+  // if you comment, no interrupt will be simulated
+  simulateInterruptEverySecond(vmConnection, 37, 5);
 }
 
+/**
+ * stop recoring on the given VM connection `vm` after `recordSecs`
+ * @param vm the connection to a local WARDuino VM or VM on a MCU
+ * @param analysis The analysis/tool running
+ * @param recordSecs the number of seconds to record
+ */
 function stopRecording(
   vm: WasmitoBackendVM,
   analysis: WasmAnalysis,
@@ -129,19 +104,20 @@ function stopRecording(
     await vm.pause();
     await analysis.remove();
     await vm.close();
-    logRecordings();
+    logRecordings(records);
     exit(0);
   }, ms);
 }
 
-function logRecordings(): void {
-  console.log(`Recorded #${Records.length} entries`);
-  for (const r of Records) {
-    logRecord(r);
-  }
-}
-
-function simulateInterrupt(
+/**
+ * Simulates interrupts on pin number `pin` every second for a certain number of times `nrOfInterrupts`
+ * onto the VM `vm`
+ * @param vm a local or MCU VM connection
+ * @param pin the pin number on which the interrupt is generated.
+ * @param nrOfInterrupts nr of interrupts to simulate
+ * @returns
+ */
+function simulateInterruptEverySecond(
   vm: WasmitoBackendVM,
   pin: number,
   nrOfInterrupts: number,
@@ -149,24 +125,10 @@ function simulateInterrupt(
   if (nrOfInterrupts <= 0) return;
 
   const sleepTime = 1000;
-  // const sleepTime = Math.floor(Math.random() * (3000 - 1000 + 1)) + 1000;
-  setTimeout(() => {
-    vm.simulateInterrupt(pin);
-    simulateInterrupt(vm, pin, nrOfInterrupts - 1);
+  setTimeout(async () => {
+    await vm.simulateInterrupt(pin);
+    simulateInterruptEverySecond(vm, pin, nrOfInterrupts - 1);
   }, sleepTime);
 }
-
-async function spawnDevVM(wasm: WasmModule): Promise<WasmitoBackendVM> {
-  const dm = new DeviceManager();
-  const la = LanguageAdaptor.emptyAdaptor(wasm.wasmPath);
-  return await dm.spawnDevelopmentVM(la);
-}
-
-// async function spawnExitingDevVM(wasm: WasmModule): Promise<WasmitoBackendVM> {
-//   const dm = new DeviceManager();
-//   const la = LanguageAdaptor.emptyAdaptor(wasm.wasmPath);
-//   const p = await createDevPlatform({ vmConfig: { toolPort: 8192 } });
-//   return await dm.connectToExistingDevVM(la, p, 3000);
-// }
 
 main().catch(console.error);
