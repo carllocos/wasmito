@@ -40,15 +40,18 @@ export async function spawnExitingDevVM(
 
 /**
  * Deploy a WARDuino VM onto a ESP32, deploy on it Wasm module `wasm`
- * @param wasm the Wasm module to deploy
+ * @param wasm the Wasm module to deploy or the LanguageAdaptor
  * @param vmArgs
  * @returns
  */
 export async function spawnMCUVM(
-  wasm: WasmModule,
+  wasm: WasmModule | LanguageAdaptor,
   vmArgs: FactoryArgs,
 ): Promise<WasmitoBackendVM> {
-  const la = LanguageAdaptor.emptyAdaptor(wasm.wasmPath);
+  const la =
+    wasm instanceof LanguageAdaptor
+      ? wasm
+      : LanguageAdaptor.emptyAdaptor(wasm.wasmPath);
   const dm = new DeviceManager();
   const platform = await createArduinoPlatform(vmArgs);
   return dm.spawnHardwareVM(la, platform);
