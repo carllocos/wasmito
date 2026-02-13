@@ -3,15 +3,17 @@
  * The tool uses the CFG to log each executed node.
  */
 import path, { resolve } from 'path';
-import { DeviceManager } from '../../src/device/device_manager';
 import { LanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
-import { WasmitoBackendVM } from '../../src/runtimes/wasmito_vm/wasmito_vm';
 import { WasmAnalysis } from '../../src/tool_api/wasm_analysis';
 import { ReadOnlyWasmValue } from '../../src/tool_api/interrupts';
 import assert from 'assert';
 import { WasmInstruction } from '../../src/webassembly/wasm/wasm_instruction';
 import { SourceCFGNode } from '../../src/cfg/source_cfg_node_edge';
 import { sourceCodeLocationToString } from '../../src/source_mappers/source_map';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { spawnDevVM, spawnMCUVM } from '../spawn_vm';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { BoardBaudRate } from '../../src/util/serial_port';
 
 async function main(): Promise<void> {
   /*
@@ -40,6 +42,18 @@ async function main(): Promise<void> {
 
   // Spawn a development VM to run analysis on desktop
   const vmConnection = await spawnDevVM(langAdaptor);
+  // uncomment to run analysis on VM deployed on MCU
+  // const vmConnection = await spawnMCUVM(langAdaptor, {
+  //   vmConfig: {
+  //     pauseOnStart: true, // pause the VM on deploy of the Wasm module
+  //     serialPort: '/dev/cu.usbserial-7D5220948B',
+  //     baudrate: BoardBaudRate.BD_115200,
+  //     fqbn: {
+  //       boardName: 'M5Stick-C',
+  //       fqbn: 'm5stack:esp32:m5stick-c',
+  //     },
+  //   },
+  // });
 
   // Create an empty analysis
   const analysis = new WasmAnalysis(langAdaptor, vmConnection);
@@ -68,11 +82,6 @@ async function main(): Promise<void> {
   }
   await analysis.deploy();
   await analysis.run();
-}
-
-async function spawnDevVM(la: LanguageAdaptor): Promise<WasmitoBackendVM> {
-  const dm = new DeviceManager();
-  return await dm.spawnDevelopmentVM(la);
 }
 
 main().catch(console.error);
