@@ -58,7 +58,7 @@ For a list of example applications that you can deploy on an MCU, take a look at
 
 ## Building Dynamic Tools
 
-See the toy examples in the `tool_examples` directory.
+See [building tools](tutorial/building_tools.md)
 
 ## Debugging An Application
 
