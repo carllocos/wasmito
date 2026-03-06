@@ -82,7 +82,7 @@ class CodeCoverageTool {
 }
 
 async function main() {
-  const exampleName = 'test';
+  const exampleName = 'blink';
 
   const examplesDirectory = resolve('./app_examples/assemblyscript/');
   const exampleDirectory = path.join(examplesDirectory, exampleName);
