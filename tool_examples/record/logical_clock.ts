@@ -1,4 +1,6 @@
 import { ReadOnlyWasmValue } from '../../src/tool_api/interrupts';
+import { writeFile } from 'node:fs';
+import { Buffer } from 'node:buffer';
 
 export interface LogicalClock {
   instrs: number;
@@ -57,4 +59,13 @@ export function logRecord(r: Record): void {
     s += ` 0x${r.instrAddr.toString(16)} ${r.instrName} ${argsStr}\n`;
   }
   console.log(s);
+  fileLogger(s);
+}
+
+async function fileLogger(s: String): Promise<void> {
+  const data = new Uint8Array(Buffer.from(s));
+  writeFile('../../somefile.csv', data, (err) => {
+    if (err) throw err;
+    console.log('The file has been saved!');
+  });
 }

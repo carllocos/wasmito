@@ -21,6 +21,8 @@ import { spawnDevVM, spawnMCUVM } from '../spawn_vm';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { BoardBaudRate } from '../../src/util/serial_port';
 
+console.log("This is a change: 'hello world!'");
+
 function recordInterrupt(interrupt: ReadOnlyInterrupt): void {
   logicalClock.interrupts += 1;
   const record: Record = {
@@ -50,23 +52,23 @@ const records: Record[] = [];
 
 async function main(): Promise<void> {
   const wasmPath = resolve(
-    './app_examples/assemblyscript/toggle_led/wasm/toggle_led.wasm',
+    './app_examples/assemblyscript/blink/wasm/blink.wasm',
   );
   const wasm = new WasmModule(wasmPath);
   // uncomment next to run analysis on local VM
-  const vmConnection = await spawnDevVM(wasm);
+  // const vmConnection = await spawnDevVM(wasm);
   // uncomment next to run analysis on MCU VM
-  // const vmConnection = await spawnMCUVM(wasm, {
-  //   vmConfig: {
-  //     pauseOnStart: true, // pause the VM on deploy of the Wasm module
-  //     serialPort: '/dev/cu.usbserial-8952FFEE8B',
-  //     baudrate: BoardBaudRate.BD_115200,
-  //     fqbn: {
-  //       boardName: 'M5Stick-C',
-  //       fqbn: 'm5stack:esp32:m5stick-c',
-  //     },
-  //   },
-  // });
+  const vmConnection = await spawnMCUVM(wasm, {
+    vmConfig: {
+      pauseOnStart: true, // pause the VM on deploy of the Wasm module
+      serialPort: '/dev/ttyUSB0',
+      baudrate: BoardBaudRate.BD_115200,
+      fqbn: {
+        boardName: 'M5Stick-C',
+        fqbn: 'm5stack:esp32:m5stick-c',
+      },
+    },
+  });
   const analysis = new WasmAnalysis(wasm, vmConnection);
   for (const f of wasm.functions) {
     for (const i of f.allInstructions) {
@@ -85,7 +87,8 @@ async function main(): Promise<void> {
 
   // The following is optional
   // if you comment, no interrupt will be simulated
-  simulateInterruptEverySecond(vmConnection, 37, 5);
+  // ==> no interrupts has to be recorded yet as I am starting with the blink example
+  // simulateInterruptEverySecond(vmConnection, 37, 5);
 }
 
 /**
@@ -107,6 +110,7 @@ function stopRecording(
     logRecordings(records);
     exit(0);
   }, ms);
+  records;
 }
 
 /**
