@@ -34,19 +34,21 @@ class CodeCoverageTool {
   private registerExitHandlers(exitNodes: SourceCFGNode[], totalNodes: number) {
     for (const exitNode of exitNodes) {
       this.analysis.onNodeEntry(exitNode, async () => {
-        const totalVisitedNodes = this.visitedNodes.size;
-        const branchCoverage = (totalVisitedNodes / totalNodes) * 100;
-
-        console.error('Amount of visited nodes: ' + totalVisitedNodes);
-        console.error('Total amount of nodes: ' + totalNodes);
-        console.error('Branch coverage: ' + branchCoverage.toFixed(1) + '%');
-
-        await this.vm.close();
+        this.displayBranchCoverageResults(totalNodes);
       });
     }
   }
 
-  private async runCoverage() {
+  private displayBranchCoverageResults(totalNodes: number) {
+    const totalVisitedNodes = this.visitedNodes.size;
+    const branchCoverage = (totalVisitedNodes / totalNodes) * 100;
+
+    console.error('Amount of visited nodes: ' + totalVisitedNodes);
+    console.error('Total amount of nodes: ' + totalNodes);
+    console.error('Branch coverage: ' + branchCoverage.toFixed(1) + '%');
+  }
+
+  private async runCoverage(maxAnalysisTimeSeconds: number) {
     const sourceCFG = this.languageAdaptor.sourceCFG;
     assert(sourceCFG);
 
@@ -63,17 +65,23 @@ class CodeCoverageTool {
 
     await this.analysis.deploy();
     await this.analysis.run();
+
+    setTimeout(async () => {
+      this.displayBranchCoverageResults(totalNodes);
+      await this.vm.close();
+    }, maxAnalysisTimeSeconds * 1000);
   }
 
   async runOnDevVm() {
     this.vm = await spawnDevVM(this.languageAdaptor);
     this.analysis = new WasmAnalysis(this.languageAdaptor, this.vm);
 
-    await this.runCoverage();
+    const maxAnalysisTimeSeconds = 10;
+    await this.runCoverage(maxAnalysisTimeSeconds);
   }
 }
 
-async function main(): Promise<void> {
+async function main() {
   const exampleName = 'test';
 
   const examplesDirectory = resolve('./app_examples/assemblyscript/');
