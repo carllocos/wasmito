@@ -32,6 +32,7 @@ import { registerInterpretRequestCommand } from './interpret_command';
 import { registerArduinoCLICommand } from './arduinocli_command';
 import { registerInspectRequestCommand } from './inspect_command';
 import { registerWatCommand } from './wat_command';
+import { registerCoverageCommand } from './coverage_command';
 
 export function startCLI(): void {
   const projectName = readProjectName();
@@ -59,6 +60,7 @@ export function startCLI(): void {
   registerRunningRequestCommand(program);
   registerInterpretRequestCommand(program);
   registerArduinoCLICommand(program);
+  registerCoverageCommand(program);
 
   program.parse(process.argv);
 
