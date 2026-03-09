@@ -1,8 +1,15 @@
 import { CodeCoverageTool } from '../tool_examples/code-coverage-tool/CodeCoverageTool';
 import { LanguageAdaptor } from '../src/language_adaptors/language_adaptor';
-import { getAbsolutePath, isFilePath } from '../src/util/file_util';
+import {
+  createDirectoryIfUnexisting,
+  getAbsolutePath,
+  getDirectory,
+  isFilePath,
+} from '../src/util/file_util';
 import { spawnDevVM } from '../tool_examples/spawn_vm';
 import { Command } from 'commander';
+import path from 'path';
+import fs from 'fs';
 
 export function registerCoverageCommand(program: Command) {
   program
@@ -10,7 +17,8 @@ export function registerCoverageCommand(program: Command) {
     .description('Run code coverage')
     .argument('<wasm-path>', 'path to wasm')
     .argument('<mappings-path>', 'path to mappings')
-    .action(async (wasmPath, mappingsPath) => {
+    .option('-o, --output <output-path>', 'path to output')
+    .action(async (wasmPath, mappingsPath, options) => {
       wasmPath = getAbsolutePath(wasmPath);
       mappingsPath = getAbsolutePath(mappingsPath);
 
@@ -27,6 +35,17 @@ export function registerCoverageCommand(program: Command) {
       const vm = await spawnDevVM(languageAdaptor);
 
       const codeCoverageTool = new CodeCoverageTool(languageAdaptor, vm);
-      await codeCoverageTool.run();
+      const coverage = await codeCoverageTool.run();
+
+      const result = JSON.stringify(coverage);
+
+      if (options.output !== undefined) {
+        const outputFile = path.join(process.cwd(), options.output);
+        const parentDirectory = getDirectory(outputFile);
+        createDirectoryIfUnexisting(parentDirectory);
+        fs.writeFileSync(outputFile, result);
+      }
+
+      console.log(result);
     });
 }

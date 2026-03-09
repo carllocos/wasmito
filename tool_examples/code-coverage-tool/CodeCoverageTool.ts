@@ -1,10 +1,10 @@
 import { LanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 import { CodeCoverageToolConfig } from './types/CodeCoverageToolConfig';
+import { CodeCoverageToolResult } from './types/CodeCoverageToolOutput';
 import { SourceCFGNode } from '../../src/cfg/source_cfg_node_edge';
 import { ReadOnlyWasmValue } from '../../src/tool_api/interrupts';
 import { WasmAnalysis } from '../../src/tool_api/wasm_analysis';
 import { WasmInstruction, WasmitoBackendVM } from '../../src';
-import { exit } from 'process';
 import assert from 'assert';
 
 export class CodeCoverageTool {
@@ -41,7 +41,7 @@ export class CodeCoverageTool {
     this.visitedNodes = new Set<SourceCFGNode>();
   }
 
-  private registerBranchCoverageOnNodeEntryCallbacks() {
+  private registerBranchCoverageOnNodeEntryCallbacks(): void {
     for (const node of this.allNodes) {
       this.analysis.onNodeEntry(
         node,
@@ -52,35 +52,39 @@ export class CodeCoverageTool {
     }
   }
 
-  private registerOnExitNodeEntryCallbacks() {
+  private registerOnExitNodeEntryCallbacks(): void {
     for (const exitNode of this.exitNodes) {
       this.analysis.onNodeEntry(exitNode, async () => await this.shutdown());
     }
   }
 
-  private displayCoverageResults() {
+  private getCoverageResults(): CodeCoverageToolResult {
     const totalVisitedNodes = this.visitedNodes.size;
     const totalNodes = this.allNodes.length;
-    const branchCoverage = (totalVisitedNodes / totalNodes) * 100;
+    const branchCoverage = Number((totalVisitedNodes / totalNodes).toFixed(2));
 
-    console.error('Amount of visited nodes: ' + totalVisitedNodes);
-    console.error('Total amount of nodes: ' + totalNodes);
-    console.error('Branch coverage: ' + branchCoverage.toFixed(1) + '%');
+    return {
+      visitedNodes: totalVisitedNodes,
+      totalNodes,
+      branchCoverage,
+    };
   }
 
-  private async shutdown() {
-    this.displayCoverageResults();
+  private async shutdown(): Promise<CodeCoverageToolResult> {
     await this.vm.close();
-    exit();
+    return this.getCoverageResults();
   }
 
-  async run() {
+  sleep(ms: number) {
+    return new Promise((r) => setTimeout(r, ms));
+  }
+
+  async run(): Promise<CodeCoverageToolResult> {
     this.registerBranchCoverageOnNodeEntryCallbacks();
     this.registerOnExitNodeEntryCallbacks();
     await this.analysis.deploy();
     await this.analysis.run();
-    setTimeout(async () => {
-      await this.shutdown();
-    }, this.config.maxAnalysisTimeMs);
+    await this.sleep(this.config.maxAnalysisTimeMs);
+    return await this.shutdown();
   }
 }
