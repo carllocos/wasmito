@@ -30,9 +30,9 @@ export class CodeCoverageTool {
     this.languageAdaptor = languageAdaptor;
     this.vm = vm;
     this.config = {
-      maxAnalysisTimeMs: 1000,
-      includeCoveredSourceCodeLocations: false,
-      ...config,
+      maxAnalysisTimeMs: config?.maxAnalysisTimeMs ?? 1000,
+      includeCoveredSourceCodeLocations:
+        config?.includeCoveredSourceCodeLocations ?? false,
     };
 
     this.analysis = new WasmAnalysis(this.languageAdaptor, this.vm);

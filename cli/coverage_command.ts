@@ -14,23 +14,24 @@ import fs from 'fs';
 export function registerCoverageCommand(program: Command) {
   program
     .command('coverage')
-    .description('Run code coverage')
-    .argument('<wasm-path>', 'Path to Wasm file')
-    .argument('<mappings-path>', 'Path to mappings file')
+    .description('Run code coverage.')
+    .argument('<wasm-path>', 'Path to Wasm file.')
+    .argument('<mappings-path>', 'Path to mappings file.')
     .option(
       '--covered-source-code-locations',
-      'Display sourceFile, lineNr and colNr for each covered line of source code',
+      'Display sourceFile, lineNr and colNr for each covered line of source code.',
     )
+    .option('--max-analysis-time <ms>', 'Maximum analysis time in ms.')
     .option('-o, --output <output-path>', 'Output file path')
     .action(async (wasmPath, mappingsPath, options) => {
       wasmPath = getAbsolutePath(wasmPath);
       mappingsPath = getAbsolutePath(mappingsPath);
 
       if (!isFilePath(wasmPath))
-        program.error('<wasm-path> is not a valid path');
+        program.error('<wasm-path> is not a valid path.');
 
       if (!isFilePath(mappingsPath))
-        program.error('<mappings-path> is not a valid path');
+        program.error('<mappings-path> is not a valid path.');
 
       const languageAdaptor = LanguageAdaptor.fromMappingsPath(mappingsPath, {
         newWasmPath: wasmPath,
@@ -39,8 +40,8 @@ export function registerCoverageCommand(program: Command) {
       const vm = await spawnDevVM(languageAdaptor);
 
       const codeCoverageTool = new CodeCoverageTool(languageAdaptor, vm, {
-        includeCoveredSourceCodeLocations:
-          options.coveredSourceCodeLocations ?? false,
+        maxAnalysisTimeMs: options.maxAnalysisTime,
+        includeCoveredSourceCodeLocations: options.coveredSourceCodeLocations,
       });
       const coverage = await codeCoverageTool.run();
       const result = JSON.stringify(coverage, null, 2);
