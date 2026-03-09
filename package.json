@@ -1,7 +1,7 @@
 {
   "name": "wasmito",
   "version": "1.0.0",
-  "description": "",
+  "description": "Wasmito is a library that enables the creation of language-agnostic dynamic tools (e.g., debuggers, testing tools, monitoring tools) for applications that compile to WebAssembly and that run on MCUs using the [WARDuino Wasm VM](https://github.com/carllocos/WARDuino). The **primary goal** of this project is to explore novel techniques for building language-agnostic dynamic tools tailored for MCUs. As such, this project is **highly experimental** - you can expect bugs. The tools developed using this library serve as an evaluation of the proposed techniques.",
   "type": "commonjs",
   "main": "dist/cjs/src/index.cjs",
   "exports": {
@@ -16,6 +16,7 @@
     "package.json"
   ],
   "directories": {
+    "doc": "docs",
     "test": "test"
   },
   "scripts": {
@@ -66,12 +67,12 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-n": "^17.23.1",
-    "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-promise": "^7.2.1",
     "globals": "^16.4.0",
     "husky": "^9.1.7",
     "mocha": "^11.7.4",
-    "prettier": "^3.6.2",
+    "prettier": "^3.8.1",
     "ts-mockito": "^2.6.1",
     "ts-node": "^10.9.2",
     "typedoc": "^0.28.14",
@@ -84,6 +85,7 @@
     "assemblyscript": "^0.28.9",
     "commander": "^14.0.1",
     "convert-extension": "^0.3.0",
+    "csv-parser": "^3.2.0",
     "figlet": "^1.9.3",
     "portfinder": "^1.0.38",
     "serialport": "^13.0.0",

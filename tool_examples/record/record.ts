@@ -18,10 +18,10 @@ import {
 } from './logical_clock';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { spawnDevVM, spawnMCUVM } from '../spawn_vm';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 import { BoardBaudRate } from '../../src/util/serial_port';
 
-console.log("This is a change: 'hello world!'");
+// import { WriteFileOptions, writeFileSync } from 'node:fs';
 
 function recordInterrupt(interrupt: ReadOnlyInterrupt): void {
   logicalClock.interrupts += 1;
@@ -44,7 +44,7 @@ function recordInstr(i: WasmInstruction, args: ReadOnlyWasmValue[]): void {
     clock: copyClock(logicalClock),
   };
   records.push(record);
-  logRecord(record);
+  // logRecord(record);
 }
 
 const logicalClock: LogicalClock = newLogicalClock();
@@ -110,7 +110,7 @@ function stopRecording(
     logRecordings(records);
     exit(0);
   }, ms);
-  records;
+  // records;
 }
 
 /**
@@ -121,6 +121,7 @@ function stopRecording(
  * @param nrOfInterrupts nr of interrupts to simulate
  * @returns
  */
+/*
 function simulateInterruptEverySecond(
   vm: WasmitoBackendVM,
   pin: number,
@@ -134,5 +135,6 @@ function simulateInterruptEverySecond(
     simulateInterruptEverySecond(vm, pin, nrOfInterrupts - 1);
   }, sleepTime);
 }
+  */
 
 main().catch(console.error);

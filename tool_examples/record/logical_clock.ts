@@ -1,6 +1,5 @@
 import { ReadOnlyWasmValue } from '../../src/tool_api/interrupts';
-import { writeFile } from 'node:fs';
-import { Buffer } from 'node:buffer';
+import { WriteFileOptions, writeFileSync } from 'node:fs';
 
 export interface LogicalClock {
   instrs: number;
@@ -47,25 +46,44 @@ export function logRecordings(records: Record[]): void {
   }
 }
 
+function logToFile(s: string): void {
+  const writeFlags: WriteFileOptions = {
+    encoding: 'utf-8',
+    flag: 'a',
+    mode: 0o666,
+  };
+  // Use a relative path
+  writeFileSync(
+    '/home/bebenk/Desktop/VUB/3BA/bachelorproef/wasmito/recording.csv',
+    s,
+    writeFlags,
+  );
+}
+
 export function logRecord(r: Record): void {
-  let s = `LC{instrs=${r.clock.instrs},interrupts=${r.clock.interrupts}}`;
+  let s = `${r.clock.instrs},${r.clock.interrupts}`;
   if (isRecordInterrupt(r)) {
-    s += ` Interrupt{topic='${r.topic}', payload='${r.payload}'}\n`;
+    s += `,${r.topic},${r.payload},,,`;
   } else {
+    s += ',,';
     const argsStr =
       r.instrArgs.length === 0
         ? ''
-        : `[${r.instrArgs.map((a) => a.value).join(', ')}]`;
-    s += ` 0x${r.instrAddr.toString(16)} ${r.instrName} ${argsStr}\n`;
+        : `${r.instrArgs.map((a) => a.value).join(';')}`;
+    s += `${r.instrAddr.toString(16)},${r.instrName},${argsStr}\n`;
   }
-  console.log(s);
-  fileLogger(s);
+
+  logToFile(s);
 }
 
-async function fileLogger(s: String): Promise<void> {
-  const data = new Uint8Array(Buffer.from(s));
-  writeFile('../../somefile.csv', data, (err) => {
-    if (err) throw err;
-    console.log('The file has been saved!');
-  });
-}
+// initializing the outputfile
+const writeFlags: WriteFileOptions = {
+  encoding: 'utf-8',
+  flag: 'w',
+  mode: 0o666,
+};
+writeFileSync(
+  '/home/bebenk/Desktop/VUB/3BA/bachelorproef/wasmito/recording.csv',
+  'clk,interrupt,topic,payload,addr,instrname,args\n',
+  writeFlags,
+);
