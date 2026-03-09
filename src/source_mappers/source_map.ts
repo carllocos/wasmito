@@ -80,7 +80,7 @@ export function isSourceCodeLocation(v: any): v is SourceCodeLocation {
     typeof v.address === 'number' &&
     typeof v.linenr === 'number' &&
     typeof v.colnr === 'number' &&
-    typeof v.name === 'string'
+    (typeof v.name === 'undefined' || typeof v.name === 'string')
   );
 }
 
