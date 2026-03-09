@@ -11,9 +11,9 @@ export interface ISubscription<SubscriptionType> {
   readonly clearSubscriptions: () => void;
 }
 
-export abstract class ASubscription<SubscriptionType>
-  implements ISubscription<SubscriptionType>
-{
+export abstract class ASubscription<
+  SubscriptionType,
+> implements ISubscription<SubscriptionType> {
   private listeners: Array<(data: SubscriptionType) => void>;
   private oneTimeListeners: Array<(data: SubscriptionType) => void>;
   private readonly removedListeners: Set<(data: SubscriptionType) => void>;

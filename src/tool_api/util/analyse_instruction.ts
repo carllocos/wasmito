@@ -249,7 +249,7 @@ function createActions(
 export function createCallbackNoArgs(
   vm: WasmitoBackendVM,
   cb: // do not care about args, nor return value
-  ((vm: WasmitoBackendVM) => void) | (() => void),
+    ((vm: WasmitoBackendVM) => void) | (() => void),
 ): (s: WasmState) => void {
   return (_s: WasmState) => {
     cb(vm);

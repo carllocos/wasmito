@@ -171,8 +171,7 @@ export class HookOnWasmAddrRequest extends APIRequest<HookOnWasmAddrResponse> {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface RemoveHookOnWasmAddrResponse
-  extends HookOnWasmAddrJSONResponse {}
+export interface RemoveHookOnWasmAddrResponse extends HookOnWasmAddrJSONResponse {}
 
 export class RemoveHookOnWasmAddrRequest extends HookOnWasmAddrRequest {
   constructor(wasmAddr: number) {
