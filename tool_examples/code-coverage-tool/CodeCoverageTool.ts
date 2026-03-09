@@ -1,10 +1,13 @@
 import { LanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
-import { CodeCoverageToolConfig } from './types/CodeCoverageToolConfig';
-import { CodeCoverageToolResult } from './types/CodeCoverageToolOutput';
 import { SourceCFGNode } from '../../src/cfg/source_cfg_node_edge';
 import { ReadOnlyWasmValue } from '../../src/tool_api/interrupts';
 import { WasmAnalysis } from '../../src/tool_api/wasm_analysis';
 import { WasmInstruction, WasmitoBackendVM } from '../../src';
+import {
+  CodeCoverageToolConfig,
+  CodeCoverageToolSourceCodeLocation,
+  CodeCoverageToolResult,
+} from './CodeCoverageToolTypes';
 import assert from 'assert';
 
 export class CodeCoverageTool {
@@ -14,18 +17,23 @@ export class CodeCoverageTool {
 
   private readonly analysis: WasmAnalysis;
 
-  private readonly allNodes;
-  private readonly exitNodes;
-  private readonly visitedNodes;
+  private readonly allNodes: SourceCFGNode[];
+  private readonly exitNodes: SourceCFGNode[];
+  private readonly visitedNodes: Set<SourceCFGNode>;
+  private readonly coveredSourceCodeLocations: Set<CodeCoverageToolSourceCodeLocation>;
 
   constructor(
     languageAdaptor: LanguageAdaptor,
     vm: WasmitoBackendVM,
-    config?: CodeCoverageToolConfig,
+    config?: Partial<CodeCoverageToolConfig>,
   ) {
     this.languageAdaptor = languageAdaptor;
     this.vm = vm;
-    this.config = config || { maxAnalysisTimeMs: 10000 };
+    this.config = {
+      maxAnalysisTimeMs: 1000,
+      includeCoveredSourceCodeLocations: false,
+      ...config,
+    };
 
     this.analysis = new WasmAnalysis(this.languageAdaptor, this.vm);
 
@@ -38,7 +46,8 @@ export class CodeCoverageTool {
     assert(mainFunctionCFG);
     this.exitNodes = mainFunctionCFG.exitNodes;
 
-    this.visitedNodes = new Set<SourceCFGNode>();
+    this.visitedNodes = new Set();
+    this.coveredSourceCodeLocations = new Set();
   }
 
   private registerBranchCoverageOnNodeEntryCallbacks(): void {
@@ -47,6 +56,14 @@ export class CodeCoverageTool {
         node,
         (n: SourceCFGNode, _i: WasmInstruction, _args: ReadOnlyWasmValue[]) => {
           this.visitedNodes.add(n);
+
+          if (!this.config.includeCoveredSourceCodeLocations) return;
+          const sourceLocation = n.sourceLocation;
+          this.coveredSourceCodeLocations.add({
+            sourceFile: sourceLocation.source,
+            lineNr: sourceLocation.linenr,
+            colNr: sourceLocation.colnr,
+          });
         },
       );
     }
@@ -63,11 +80,20 @@ export class CodeCoverageTool {
     const totalNodes = this.allNodes.length;
     const branchCoverage = Number((totalVisitedNodes / totalNodes).toFixed(2));
 
-    return {
-      visitedNodes: totalVisitedNodes,
-      totalNodes,
-      branchCoverage,
-    };
+    return this.config.includeCoveredSourceCodeLocations
+      ? {
+          visitedNodes: totalVisitedNodes,
+          totalNodes,
+          branchCoverage,
+          coveredSourceCodeLocations: Array.from(
+            this.coveredSourceCodeLocations,
+          ),
+        }
+      : {
+          visitedNodes: totalVisitedNodes,
+          totalNodes,
+          branchCoverage,
+        };
   }
 
   private async shutdown(): Promise<CodeCoverageToolResult> {

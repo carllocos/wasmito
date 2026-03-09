@@ -15,9 +15,13 @@ export function registerCoverageCommand(program: Command) {
   program
     .command('coverage')
     .description('Run code coverage')
-    .argument('<wasm-path>', 'path to wasm')
-    .argument('<mappings-path>', 'path to mappings')
-    .option('-o, --output <output-path>', 'path to output')
+    .argument('<wasm-path>', 'Path to Wasm file')
+    .argument('<mappings-path>', 'Path to mappings file')
+    .option(
+      '--covered-source-code-locations',
+      'Display sourceFile, lineNr and colNr for each covered line of source code',
+    )
+    .option('-o, --output <output-path>', 'Output file path')
     .action(async (wasmPath, mappingsPath, options) => {
       wasmPath = getAbsolutePath(wasmPath);
       mappingsPath = getAbsolutePath(mappingsPath);
@@ -34,10 +38,12 @@ export function registerCoverageCommand(program: Command) {
       });
       const vm = await spawnDevVM(languageAdaptor);
 
-      const codeCoverageTool = new CodeCoverageTool(languageAdaptor, vm);
+      const codeCoverageTool = new CodeCoverageTool(languageAdaptor, vm, {
+        includeCoveredSourceCodeLocations:
+          options.coveredSourceCodeLocations ?? false,
+      });
       const coverage = await codeCoverageTool.run();
-
-      const result = JSON.stringify(coverage);
+      const result = JSON.stringify(coverage, null, 2);
 
       if (options.output !== undefined) {
         const outputFile = path.join(process.cwd(), options.output);
