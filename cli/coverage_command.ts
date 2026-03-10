@@ -14,15 +14,26 @@ import fs from 'fs';
 export function registerCoverageCommand(program: Command) {
   program
     .command('coverage')
-    .description('Run code coverage.')
-    .argument('<wasm-path>', 'Path to Wasm file.')
-    .argument('<mappings-path>', 'Path to mappings file.')
+    .description(
+      'Analyse a WebAssembly module (.wasm) and generate a code coverage report.',
+    )
+    .argument(
+      '<wasm-path>',
+      'Path to the WebAssembly module (.wasm) to analyse.',
+    )
+    .argument('<mappings-path>', 'Path to the source mapping file.')
     .option(
       '--covered-source-code-locations',
-      'Display sourceFile, lineNr and colNr for each covered line of source code.',
+      'Include source file, line number and column number for each covered line of source code.',
     )
-    .option('--max-analysis-time <ms>', 'Maximum analysis time in ms.')
-    .option('-o, --output <output-path>', 'Output file path')
+    .option(
+      '--max-analysis-time <ms>',
+      'Maximum time limit for the analysis in milliseconds.',
+    )
+    .option(
+      '-o, --output <output-path>',
+      'Write the coverage report to the specified file instead of stdout.',
+    )
     .action(async (wasmPath, mappingsPath, options) => {
       wasmPath = getAbsolutePath(wasmPath);
       mappingsPath = getAbsolutePath(mappingsPath);
@@ -51,8 +62,8 @@ export function registerCoverageCommand(program: Command) {
         const parentDirectory = getDirectory(outputFile);
         createDirectoryIfUnexisting(parentDirectory);
         fs.writeFileSync(outputFile, result);
+      } else {
+        console.log(result);
       }
-
-      console.log(result);
     });
 }
