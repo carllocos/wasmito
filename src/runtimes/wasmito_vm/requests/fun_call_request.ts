@@ -233,3 +233,112 @@ function errorCodeMessage(errorCode: number): string | undefined {
       return undefined;
   }
 }
+
+export class RemoteCallRequest extends FunCallRequest<ProxyCallResponse> {
+  constructor(funcToCall: number, args: WASM.Value[]) {
+    super(funcToCall, args, false);
+  }
+
+  parse(input: string): ProxyCallResponse {
+    const response = this.decodeHexaStringResponse(input);
+    if (response === undefined) {
+      throw new APIRequestInvalidParse(`No response for ${this.description()}`);
+    }
+    return response;
+  }
+
+  private decodeHexaStringResponse(
+    hexaInput: string,
+  ): ProxyCallResponse | undefined {
+    // input format: header | body 1 or body 2
+    // header: FunCall Instruction Nr (2 chars hexa) | response_type (2 chars hexa)
+    // body1: successfullResponse
+    // body2: errorResponse
+
+    const interruptHexa = hexaInput.slice(0, 2);
+    const instruction = getInstructionFromString(interruptHexa);
+    if (instruction === undefined || instruction !== Instruction.FuncCall) {
+      return undefined;
+    }
+
+    const responseType = hexaInput.slice(2, 4);
+    if (responseType === ResponseType.SuccessResponse) {
+      return this.decodeSuccessfulResponseHexaString(
+        hexaInput.slice(4, hexaInput.length),
+      );
+    } else if (responseType === ResponseType.ErrorResponse) {
+      return this.decodeErrorResponseHexaString(
+        hexaInput.slice(4, hexaInput.length),
+      );
+    } else {
+      return undefined;
+    }
+  }
+
+  decodeSuccessfulResponseHexaString(
+    hexaInput: string,
+  ): ProxyCallSuccessfulResponse | undefined {
+    // input format: header | body 1 or body 2
+    // header: isSuccessfulCall (2 hex char)
+    // body 1: has_value (2 hex char) | Wasm value (optional)
+    // body 2: has_excp_msg (2 hex char) | excp_msg (optional)
+    const parsedDidCallLeadToException = parseInt(hexaInput.slice(0, 2), 16);
+    if (
+      parsedDidCallLeadToException !== 1 &&
+      parsedDidCallLeadToException !== 0
+    ) {
+      return undefined;
+    }
+
+    const didCallLeadToException = parsedDidCallLeadToException === 0;
+    if (didCallLeadToException) {
+      // Call was sucessful but it lead to a runtime exception e.g., devision by zero
+      const response: ProxyCallSuccessfulResponse = {
+        sucessFullCall: false,
+      };
+      const hasExceptionMsg = hexaInput.slice(2, 4);
+      if (hasExceptionMsg === '00') {
+        return response;
+      } else if (hasExceptionMsg === '01') {
+        throw Error(`TODO read exception MSG from hexaInput`);
+      } else {
+        return undefined;
+      }
+    } else {
+      // call was successful
+      const response: ProxyCallSuccessfulResponse = {
+        sucessFullCall: true,
+      };
+
+      const hasResultValue = hexaInput.slice(2, 4);
+      if (hasResultValue === '00') {
+        return response;
+      } else if (hasResultValue === '01') {
+        throw Error(`TODO read resultValue MSG from hexaInput`);
+      } else {
+        return undefined;
+      }
+    }
+  }
+
+  decodeErrorResponseHexaString(
+    hexaInput: string,
+  ): ProxyCallFailedRequest | undefined {
+    // format: error_code (2 hexa char) | has_excep (2 hexa char) | (optional) excp_msg
+    const errorCode = parseInt(hexaInput.slice(0, 2));
+    if (isNaN(errorCode)) {
+      return undefined;
+    }
+    const exceptionMsg = errorCodeMessage(errorCode);
+    if (exceptionMsg === undefined) {
+      logger.error(
+        `Did not find a registered exception msg for error code ${errorCode}`,
+      );
+    }
+
+    return {
+      errorCode,
+      errorMessage: exceptionMsg ?? 'unknown error code message',
+    };
+  }
+}
