@@ -1,21 +1,26 @@
 import { io } from 'socket.io-client';
 
+
 import { resolve } from 'path';
 import { WasmModule } from '../../src/webassembly/wasm/wasm_module';
 import { WasmAnalysis } from '../../src/tool_api/wasm_analysis';
 import { WasmitoBackendVM } from '../../src/runtimes/wasmito_vm/wasmito_vm';
 import { spawnDevVM, spawnMCUVM } from '../spawn_vm';
 import { WasmInstruction } from '../../src/webassembly/wasm/wasm_instruction';
+import { WASMFunction } from '../../src/webassembly/wasm/wasm_function';
 import { ReadOnlyWasmValue } from '../../src/tool_api/interrupts';
 import { BoardBaudRate } from '../../src/util/serial_port';
 
 import { exit, send } from 'process';
+import { createLogger } from '../../src/logger/logger';
+
+const logger = createLogger('SourceCodeWatcher');
 
 // Connection to brigadier server
 const socket = io('http://localhost:3000');
 
 socket.on('connect', () => {
-  console.log('Connected to server');
+  logger.info('Connected to server');
 });
 
 
@@ -43,14 +48,16 @@ async function main(): Promise<void> {
     },
   });
 
+  logger.info('VM connected on MCU');
+
   const analysis = new WasmAnalysis(wasm, vmConnection);
 
   // Add a call before every instruction
   for (const f of wasm.functions) {
     for (const i of f.allInstructions) {
       // analysis.before(i, showInstruction);
-      analysis.before(i, sendToBrigadier);
-      console.log(`Function ${f.name} instruction ${i.name} at address ${i.startAddress} is processed`);
+      analysis.before(i, sendToBrigadier(f));
+      logger.info(`Instruction ${i.name} of function ${f.name} at address ${i.startAddress} is processed`);
     }
   }
 
@@ -60,15 +67,20 @@ async function main(): Promise<void> {
 }
 
 function showInstruction(i: WasmInstruction, args: ReadOnlyWasmValue[]): void {
-  console.log(`Instruction ${i.name} at address ${i.startAddress} is about to execute`);
+  logger.info(`Instruction ${i.name} at address ${i.startAddress} is about to execute`);
 }
 
-function sendToBrigadier(i: WasmInstruction, args: ReadOnlyWasmValue[]): void {
-  socket.emit('wasmInstruction', {
-    name: i.name,
-    address: i.startAddress,
-    args: args.map(arg => arg.value),
-  });
+
+function sendToBrigadier(f: WASMFunction): (i: WasmInstruction, args: ReadOnlyWasmValue[]) => void {
+  return (i: WasmInstruction, args: ReadOnlyWasmValue[]) => {
+    socket.emit('wasmInstruction', {
+      name: i.name,
+      address: i.startAddress,
+      args: args.map(arg => arg.value),
+      function_name: f.name,
+      function_address: f.startAddress
+    });
+  };
 }
 
 /**
