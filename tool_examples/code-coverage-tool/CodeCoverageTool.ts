@@ -25,6 +25,9 @@ export class CodeCoverageTool {
     CodeCoverageToolSourceCodeLocation
   >;
 
+  private resolveExitNodeEnteredPromise!: () => void;
+  private readonly exitNodeEnteredPromise: Promise<void>; // Gets resolved when an exit node is entered.
+
   constructor(
     languageAdaptor: LanguageAdaptor,
     vm: WasmitoBackendVM,
@@ -51,9 +54,13 @@ export class CodeCoverageTool {
 
     this.visitedNodes = new Set();
     this.coveredSourceCodeLocations = new Map();
+
+    this.exitNodeEnteredPromise = new Promise((resolve) => {
+      this.resolveExitNodeEnteredPromise = resolve;
+    });
   }
 
-  private registerBranchCoverageOnNodeEntryCallbacks(): void {
+  private registerOnNodeEntryCallback(): void {
     for (const node of this.allNodes) {
       this.analysis.onNodeEntry(
         node,
@@ -73,9 +80,9 @@ export class CodeCoverageTool {
     }
   }
 
-  private registerOnExitNodeEntryCallbacks(): void {
+  private registerOnExitNodeEntryCallback(): void {
     for (const exitNode of this.exitNodes) {
-      this.analysis.onNodeEntry(exitNode, async () => await this.shutdown());
+      this.analysis.onNodeEntry(exitNode, this.resolveExitNodeEnteredPromise);
     }
   }
 
@@ -100,21 +107,23 @@ export class CodeCoverageTool {
         };
   }
 
-  private async shutdown(): Promise<CodeCoverageToolResult> {
-    await this.vm.close();
-    return this.getCoverageResults();
-  }
+  private async exitNodeEnteredOrTimedOut(): Promise<void> {
+    let timeout;
+    const timeoutPromise = new Promise<void>((resolve) => {
+      timeout = setTimeout(resolve, this.config.maxAnalysisTimeMs);
+    });
 
-  sleep(ms: number) {
-    return new Promise((r) => setTimeout(r, ms));
+    await Promise.race([this.exitNodeEnteredPromise, timeoutPromise]);
+    clearTimeout(timeout);
   }
 
   async run(): Promise<CodeCoverageToolResult> {
-    this.registerBranchCoverageOnNodeEntryCallbacks();
-    this.registerOnExitNodeEntryCallbacks();
+    this.registerOnNodeEntryCallback();
+    this.registerOnExitNodeEntryCallback();
     await this.analysis.deploy();
     await this.analysis.run();
-    await this.sleep(this.config.maxAnalysisTimeMs);
-    return await this.shutdown();
+    await this.exitNodeEnteredOrTimedOut();
+    await this.vm.close();
+    return this.getCoverageResults();
   }
 }
