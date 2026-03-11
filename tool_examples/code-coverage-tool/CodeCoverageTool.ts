@@ -20,7 +20,10 @@ export class CodeCoverageTool {
   private readonly allNodes: SourceCFGNode[];
   private readonly exitNodes: SourceCFGNode[];
   private readonly visitedNodes: Set<SourceCFGNode>;
-  private readonly coveredSourceCodeLocations: Set<CodeCoverageToolSourceCodeLocation>;
+  private readonly coveredSourceCodeLocations: Map<
+    string,
+    CodeCoverageToolSourceCodeLocation
+  >;
 
   constructor(
     languageAdaptor: LanguageAdaptor,
@@ -47,7 +50,7 @@ export class CodeCoverageTool {
     this.exitNodes = mainFunctionCFG.exitNodes;
 
     this.visitedNodes = new Set();
-    this.coveredSourceCodeLocations = new Set();
+    this.coveredSourceCodeLocations = new Map();
   }
 
   private registerBranchCoverageOnNodeEntryCallbacks(): void {
@@ -59,7 +62,8 @@ export class CodeCoverageTool {
 
           if (!this.config.includeCoveredSourceCodeLocations) return;
           const sourceLocation = n.sourceLocation;
-          this.coveredSourceCodeLocations.add({
+          const key = `${sourceLocation.source}:${sourceLocation.linenr}:${sourceLocation.colnr}`;
+          this.coveredSourceCodeLocations.set(key, {
             sourceFile: sourceLocation.source,
             lineNr: sourceLocation.linenr,
             colNr: sourceLocation.colnr,
@@ -86,7 +90,7 @@ export class CodeCoverageTool {
           totalNodes,
           branchCoverage,
           coveredSourceCodeLocations: Array.from(
-            this.coveredSourceCodeLocations,
+            this.coveredSourceCodeLocations.values(),
           ),
         }
       : {
