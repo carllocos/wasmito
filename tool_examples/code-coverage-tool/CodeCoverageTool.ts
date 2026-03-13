@@ -43,8 +43,7 @@ export class CodeCoverageTool {
 
     this.analysis = new WasmAnalysis(this.languageAdaptor, this.vm);
 
-    const sourceCFG = this.languageAdaptor.sourceCFG;
-    assert(sourceCFG);
+    const sourceCFG = this.languageAdaptor.sourceCFGs;
     this.allNodes = sourceCFG.allNodes();
 
     const mainFunction = this.languageAdaptor.sourceMap.wasm.getMainFunction();
