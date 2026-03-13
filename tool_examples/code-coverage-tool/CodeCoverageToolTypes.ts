@@ -10,7 +10,7 @@ export type CodeCoverageToolSourceCodeLocation = Readonly<{
 }>;
 
 export type CodeCoverageToolResult = Readonly<{
-  visitedNodes: number;
+  coveredNodes: number;
   totalNodes: number;
   branchCoverage: number;
   coveredSourceCodeLocations?: CodeCoverageToolSourceCodeLocation[];

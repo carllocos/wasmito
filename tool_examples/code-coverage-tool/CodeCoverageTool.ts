@@ -19,7 +19,7 @@ export class CodeCoverageTool {
 
   private readonly allNodes: SourceCFGNode[];
   private readonly exitNodes: SourceCFGNode[];
-  private readonly visitedNodes: Set<SourceCFGNode>;
+  private readonly coveredNodes: Set<SourceCFGNode>;
   private readonly coveredSourceCodeLocations: Map<
     string,
     CodeCoverageToolSourceCodeLocation
@@ -51,7 +51,7 @@ export class CodeCoverageTool {
     assert(mainFunctionCFG);
     this.exitNodes = mainFunctionCFG.exitNodes;
 
-    this.visitedNodes = new Set();
+    this.coveredNodes = new Set();
     this.coveredSourceCodeLocations = new Map();
 
     this.exitNodeEnteredPromise = new Promise((resolve) => {
@@ -64,7 +64,7 @@ export class CodeCoverageTool {
       this.analysis.onNodeEntry(
         node,
         (n: SourceCFGNode, _i: WasmInstruction, _args: ReadOnlyWasmValue[]) => {
-          this.visitedNodes.add(n);
+          this.coveredNodes.add(n);
 
           if (!this.config.includeCoveredSourceCodeLocations) return;
           const sourceLocation = n.sourceLocation;
@@ -86,13 +86,13 @@ export class CodeCoverageTool {
   }
 
   private getCoverageResults(): CodeCoverageToolResult {
-    const totalVisitedNodes = this.visitedNodes.size;
+    const totalCoveredNodes = this.coveredNodes.size;
     const totalNodes = this.allNodes.length;
-    const branchCoverage = Number((totalVisitedNodes / totalNodes).toFixed(2));
+    const branchCoverage = Number((totalCoveredNodes / totalNodes).toFixed(2));
 
     return this.config.includeCoveredSourceCodeLocations
       ? {
-          visitedNodes: totalVisitedNodes,
+          coveredNodes: totalCoveredNodes,
           totalNodes,
           branchCoverage,
           coveredSourceCodeLocations: Array.from(
@@ -100,7 +100,7 @@ export class CodeCoverageTool {
           ),
         }
       : {
-          visitedNodes: totalVisitedNodes,
+          coveredNodes: totalCoveredNodes,
           totalNodes,
           branchCoverage,
         };
