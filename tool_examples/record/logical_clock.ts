@@ -1,5 +1,6 @@
 import { ReadOnlyWasmValue } from '../../src/tool_api/interrupts';
 import { WriteFileOptions, writeFileSync } from 'node:fs';
+import { resolve } from 'path';
 
 export interface LogicalClock {
   instrs: number;
@@ -53,24 +54,21 @@ function logToFile(s: string): void {
     mode: 0o666,
   };
   // Use a relative path
-  writeFileSync(
-    '/home/bebenk/Desktop/VUB/3BA/bachelorproef/wasmito/recording.csv',
-    s,
-    writeFlags,
-  );
+  writeFileSync(resolve('./tool_examples/record/recording.csv'), s, writeFlags);
 }
 
 export function logRecord(r: Record): void {
-  let s = `${r.clock.instrs},${r.clock.interrupts}`;
+  // topic, payload, instr, args
+  let s: string;
   if (isRecordInterrupt(r)) {
-    s += `,${r.topic},${r.payload},,,`;
+    s = `${r.topic},${r.payload},,\n`;
   } else {
-    s += ',,';
+    s = ',,';
     const argsStr =
       r.instrArgs.length === 0
         ? ''
         : `${r.instrArgs.map((a) => a.value).join(';')}`;
-    s += `${r.instrAddr.toString(16)},${r.instrName},${argsStr}\n`;
+    s += `${r.instrAddr.toString(16)},${argsStr}\n`;
   }
 
   logToFile(s);
@@ -83,7 +81,7 @@ const writeFlags: WriteFileOptions = {
   mode: 0o666,
 };
 writeFileSync(
-  '/home/bebenk/Desktop/VUB/3BA/bachelorproef/wasmito/recording.csv',
-  'clk,interrupt,topic,payload,addr,instrname,args\n',
+  resolve('./tool_examples/record/recording.csv'),
+  'topic,payload,addr,args\n',
   writeFlags,
 );

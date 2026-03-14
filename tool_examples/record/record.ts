@@ -52,9 +52,11 @@ const records: Record[] = [];
 
 async function main(): Promise<void> {
   const wasmPath = resolve(
-    './app_examples/assemblyscript/blink/wasm/blink.wasm',
+    './app_examples/assemblyscript/toggle_led/wasm/toggle_led.wasm',
   );
   const wasm = new WasmModule(wasmPath);
+  //const instr = wasm.getInstruction(0xee);
+  //assert(instr !== undefined);
   // uncomment next to run analysis on local VM
   // const vmConnection = await spawnDevVM(wasm);
   // uncomment next to run analysis on MCU VM
