@@ -68,7 +68,7 @@ export function logRecord(r: Record): void {
       r.instrArgs.length === 0
         ? ''
         : `${r.instrArgs.map((a) => a.value).join(';')}`;
-    s += `${r.instrAddr.toString(16)},${argsStr}\n`;
+    s += `${r.instrAddr},${argsStr}\n`;
   }
 
   logToFile(s);
