@@ -1,5 +1,6 @@
 import { CodeCoverageTool } from '../tool_examples/code-coverage-tool/CodeCoverageTool';
 import { LanguageAdaptor } from '../src/language_adaptors/language_adaptor';
+import { LogLevel, setLogLevel } from '../src/logger/logger';
 import {
   createDirectoryIfUnexisting,
   getAbsolutePath,
@@ -36,6 +37,8 @@ export function registerCoverageCommand(program: Command) {
       'Write the coverage report to the specified file instead of stdout.',
     )
     .action(async (wasmPath, mappingsPath, wasmTestFunctionIds, options) => {
+      setLogLevel(LogLevel.LogOff);
+
       wasmPath = getAbsolutePath(wasmPath);
       mappingsPath = getAbsolutePath(mappingsPath);
 

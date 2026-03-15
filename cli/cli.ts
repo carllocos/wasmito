@@ -11,7 +11,7 @@ import {
 import {
   type LogLevel,
   parseLogLevel,
-  setLogLevel,
+  //setLogLevel,
   getGlobalLogger,
   setGlobalLoggerName,
 } from '../src/logger/logger';
@@ -80,7 +80,7 @@ export function startCLI(): void {
   // else {
   //   getGlobalLogger().info(`Setting log-level to '${logLevel}'`);
   // }
-  setLogLevel(logLevel);
+  //setLogLevel(logLevel);
   setGlobalLoggerName('CLI');
 
   if (options.devicesConfig !== undefined) {
