@@ -1,3 +1,4 @@
+import { RemoteCallRequest } from '../../src/runtimes/wasmito_vm/requests/fun_call_request';
 import { LanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 import { SourceCFGNode } from '../../src/cfg/source_cfg_node_edge';
 import { ReadOnlyWasmValue } from '../../src/tool_api/interrupts';
@@ -13,6 +14,7 @@ import assert from 'assert';
 export class CodeCoverageTool {
   private readonly languageAdaptor: LanguageAdaptor;
   private readonly vm: WasmitoBackendVM;
+  private readonly wasmTestFunctionIds: number[];
   private readonly config: CodeCoverageToolConfig;
 
   private readonly analysis: WasmAnalysis;
@@ -31,10 +33,12 @@ export class CodeCoverageTool {
   constructor(
     languageAdaptor: LanguageAdaptor,
     vm: WasmitoBackendVM,
+    wasmTestFunctionIds: number[],
     config?: Partial<CodeCoverageToolConfig>,
   ) {
     this.languageAdaptor = languageAdaptor;
     this.vm = vm;
+    this.wasmTestFunctionIds = wasmTestFunctionIds;
     this.config = {
       maxAnalysisTimeMs: config?.maxAnalysisTimeMs ?? 1000,
       includeCoveredSourceCodeLocations:
@@ -120,7 +124,12 @@ export class CodeCoverageTool {
     this.registerOnNodeEntryCallback();
     this.registerOnExitNodeEntryCallback();
     await this.analysis.deploy();
-    await this.analysis.run();
+
+    for (const wasmTestFunctionId of this.wasmTestFunctionIds) {
+      const callRequest = new RemoteCallRequest(wasmTestFunctionId, []);
+      await this.vm.sendRequest(callRequest);
+    }
+
     await this.exitNodeEnteredOrTimedOut();
     await this.vm.close();
     return this.getCoverageResults();

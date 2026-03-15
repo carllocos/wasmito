@@ -22,6 +22,7 @@ export function registerCoverageCommand(program: Command) {
       'Path to the WebAssembly module (.wasm) to analyse.',
     )
     .argument('<mappings-path>', 'Path to the source mapping file.')
+    .argument('<wasm-test-function-ids...>', 'List of Wasm test function IDs.')
     .option(
       '--covered-source-code-locations',
       'Include source file, line number and column number for each covered line of source code.',
@@ -34,7 +35,7 @@ export function registerCoverageCommand(program: Command) {
       '-o, --output <output-path>',
       'Write the coverage report to the specified file instead of stdout.',
     )
-    .action(async (wasmPath, mappingsPath, options) => {
+    .action(async (wasmPath, mappingsPath, wasmTestFunctionIds, options) => {
       wasmPath = getAbsolutePath(wasmPath);
       mappingsPath = getAbsolutePath(mappingsPath);
 
@@ -50,10 +51,15 @@ export function registerCoverageCommand(program: Command) {
       });
       const vm = await spawnDevVM(languageAdaptor);
 
-      const codeCoverageTool = new CodeCoverageTool(languageAdaptor, vm, {
-        maxAnalysisTimeMs: options.maxAnalysisTime,
-        includeCoveredSourceCodeLocations: options.coveredSourceCodeLocations,
-      });
+      const codeCoverageTool = new CodeCoverageTool(
+        languageAdaptor,
+        vm,
+        wasmTestFunctionIds,
+        {
+          maxAnalysisTimeMs: options.maxAnalysisTime,
+          includeCoveredSourceCodeLocations: options.coveredSourceCodeLocations,
+        },
+      );
       const coverage = await codeCoverageTool.run();
       const result = JSON.stringify(coverage, null, 2);
 
