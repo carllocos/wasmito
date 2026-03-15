@@ -11,6 +11,8 @@ import {
 } from '../../src/source_mappers/source_map';
 import { readFileSync } from 'fs';
 import { parse } from 'csv-parse/sync';
+import { IndexedSourceMapConsumer } from 'source-map';
+import { readFileAsBuffer } from '../../src';
 
 async function main(): Promise<void> {
   const examplesDir = resolve('./app_examples/assemblyscript');
@@ -39,14 +41,34 @@ async function main(): Promise<void> {
       assert(sourceLocations.length <= 1);
       if (sourceLocations.length == 1) {
         const location = sourceLocations[0];
-        console.log(
-          `line: ${location.linenr}, col: ${location.colnr}, name: ${location.name}, in file: ${location.source}`,
-        );
+        // console.log(sourceCodeLocationToString(location));
+        // console.log(getFunctionName(location));
+        if (record[3] != '') {
+          console.log(
+            `${getFunctionName(location)} with arguments ${record[3].replace(';', ',')}`,
+          );
+        } else {
+          console.log(`${getFunctionName(location)}`);
+        }
       } else {
-        console.log('???');
+        console.log(`???`);
       }
     }
   });
+}
+
+function getFunctionName(location: SourceCodeLocation): string {
+  const src = readFileSync(
+    `./app_examples/assemblyscript/${location.source}`,
+    'utf-8',
+  );
+  const srcCodeLines = src.trim().split('\n');
+  // the -1 is because line counts are mostly beginning at line 1 wheras the slice begins at 0;
+  const srcCodeInstr = srcCodeLines[location.linenr - 1].slice(
+    location.colnr - 1,
+    srcCodeLines[location.linenr - 1].length - 1,
+  );
+  return srcCodeInstr;
 }
 
 main();
