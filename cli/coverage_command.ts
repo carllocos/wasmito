@@ -1,4 +1,4 @@
-import { CodeCoverageTool } from '../tool_examples/code-coverage-tool/CodeCoverageTool';
+import { CodeCoverageTool } from '../tool_examples/code_coverage_tool/CodeCoverageTool';
 import { LanguageAdaptor } from '../src/language_adaptors/language_adaptor';
 import { LogLevel, setLogLevel } from '../src/logger/logger';
 import {
