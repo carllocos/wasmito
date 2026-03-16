@@ -17,27 +17,24 @@ export function registerCoverageCommand(program: Command) {
   program
     .command('coverage')
     .description(
-      'Analyse a WebAssembly module (.wasm) and generate a code coverage report.',
+      'Analyse a WebAssembly (.wasm) module and generate a code coverage report.',
     )
-    .argument(
-      '<wasm-path>',
-      'Path to the WebAssembly module (.wasm) to analyse.',
-    )
-    .argument('<mappings-path>', 'Path to the source mapping file.')
-    .argument('<wasm-test-function-ids...>', 'List of Wasm test function IDs.')
+    .argument('<wasm>', 'Path to the Wasm module (.wasm) to analyse.')
+    .argument('<mappings>', 'Path to the source mappings file.')
+    .argument('<tests...>', 'IDs of Wasm test function to execute.')
     .option(
       '-s, --include-source-locations',
-      'Include source file, line number and column number for each covered line of source code.',
+      'Include source file, line and column information for covered code.',
     )
     .option(
       '-T, --target <type>',
-      'Execution target: "local" or "mcu".',
+      'Execution target: "local" (default) or "mcu".',
       'local',
     )
-    .option('-t, --timeout <ms>', 'Analysis timeout in milliseconds.')
+    .option('-t, --timeout <ms>', 'Maximum analysis time in milliseconds.')
     .option(
       '-o, --output <output-path>',
-      'Write the coverage report to the specified file instead of stdout.',
+      'Write the coverage report to a file instead of stdout.',
     )
     .action(async (wasmPath, mappingsPath, wasmTestFunctionIds, options) => {
       wasmPath = getAbsolutePath(wasmPath);
