@@ -1,13 +1,15 @@
 import { CodeCoverageTool } from '../tool_examples/code_coverage_tool/CodeCoverageTool';
 import { LanguageAdaptor } from '../src/language_adaptors/language_adaptor';
+import { spawnDevVM, spawnMCUVM } from '../tool_examples/spawn_vm';
+import { BoardBaudRate } from '../src/util/serial_port';
+import { WasmitoBackendVM } from '../src';
+import { Command } from 'commander';
 import {
   createDirectoryIfUnexisting,
   getAbsolutePath,
   getDirectory,
   isFilePath,
 } from '../src/util/file_util';
-import { spawnDevVM } from '../tool_examples/spawn_vm';
-import { Command } from 'commander';
 import path from 'path';
 import fs from 'fs';
 
@@ -24,13 +26,15 @@ export function registerCoverageCommand(program: Command) {
     .argument('<mappings-path>', 'Path to the source mapping file.')
     .argument('<wasm-test-function-ids...>', 'List of Wasm test function IDs.')
     .option(
-      '--covered-source-code-locations',
+      '-s, --include-source-locations',
       'Include source file, line number and column number for each covered line of source code.',
     )
     .option(
-      '--max-analysis-time <ms>',
-      'Maximum time limit for the analysis in milliseconds.',
+      '-T, --target <type>',
+      'Execution target: "local" or "mcu".',
+      'local',
     )
+    .option('-t, --timeout <ms>', 'Analysis timeout in milliseconds.')
     .option(
       '-o, --output <output-path>',
       'Write the coverage report to the specified file instead of stdout.',
@@ -49,7 +53,24 @@ export function registerCoverageCommand(program: Command) {
         newWasmPath: wasmPath,
         relativePaths: true,
       });
-      const vm = await spawnDevVM(languageAdaptor);
+      let vm: WasmitoBackendVM;
+      if (options.target === 'local') {
+        vm = await spawnDevVM(languageAdaptor);
+      } else if (options.target === 'mcu') {
+        vm = await spawnMCUVM(languageAdaptor, {
+          vmConfig: {
+            pauseOnStart: true,
+            serialPort: '/dev/cu.usbserial-7D5220948B',
+            baudrate: BoardBaudRate.BD_115200,
+            fqbn: {
+              boardName: 'M5Stick-C',
+              fqbn: 'm5stack:esp32:m5stick-c',
+            },
+          },
+        });
+      } else {
+        program.error('invalid target.');
+      }
 
       const codeCoverageTool = new CodeCoverageTool(
         languageAdaptor,
