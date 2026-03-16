@@ -75,7 +75,7 @@ export function registerCoverageCommand(program: Command) {
         wasmTestFunctionIds,
         {
           maxAnalysisTimeMs: options.maxAnalysisTime,
-          includeCoveredSourceCodeLocations: options.coveredSourceCodeLocations,
+          includeCoveredSourceCodeLocations: options.includeSourceLocations,
         },
       );
       const coverage = await codeCoverageTool.run();
