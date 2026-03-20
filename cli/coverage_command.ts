@@ -19,15 +19,15 @@ function writeOutput(output: string, outputPath?: string): void {
 }
 
 function parseTestsFile(path: string): number[] {
-  const parsed: { wasmTestfunctionIds: number[] } = JSON.parse(
+  const parsed: { wasmTestFunctionIds: number[] } = JSON.parse(
     fs.readFileSync(path, 'utf8'),
   );
 
-  if (!Array.isArray(parsed.wasmTestfunctionIds)) {
-    throw new Error('wasmTestfunctionIds must be an array of numbers.');
+  if (!Array.isArray(parsed.wasmTestFunctionIds)) {
+    throw new Error('wasmTestFunctionIds must be an array of numbers.');
   }
 
-  return parsed.wasmTestfunctionIds;
+  return parsed.wasmTestFunctionIds;
 }
 
 function createVM(
