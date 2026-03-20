@@ -6,8 +6,7 @@ import { BoardBaudRate } from '../src/util/serial_port';
 import { WasmitoBackendVM } from '../src';
 import { Command } from 'commander';
 import fs from 'fs';
-
-type ExecutionTarget = 'local' | 'mcu';
+import { CodeCoverageToolExecutionTarget } from '../tool_examples/code_coverage_tool/CodeCoverageToolTypes';
 
 function writeOutput(output: string, outputPath?: string): void {
   if (outputPath === undefined) {
@@ -31,13 +30,13 @@ function parseTestsFile(path: string): number[] {
 }
 
 function createVM(
-  target: ExecutionTarget,
+  target: CodeCoverageToolExecutionTarget,
   languageAdaptor: LanguageAdaptor,
 ): Promise<WasmitoBackendVM> {
   switch (target) {
-    case 'local':
+    case 'LOCAL':
       return spawnDevVM(languageAdaptor);
-    case 'mcu':
+    case 'MCU':
       return spawnMCUVM(languageAdaptor, {
         vmConfig: {
           pauseOnStart: true,
@@ -90,6 +89,9 @@ export function registerCoverageCommand(program: Command) {
 
       if (!isFilePath(testsPath)) program.error('<tests> is not a valid path.');
 
+      if (options.target !== 'LOCAL' && options.target !== 'MCU')
+        program.error('<target> is not a valid target.');
+
       const languageAdaptor = LanguageAdaptor.fromMappingsPath(mappingsPath, {
         newWasmPath: wasmPath,
         relativePaths: true,
@@ -100,8 +102,8 @@ export function registerCoverageCommand(program: Command) {
         await createVM(options.target, languageAdaptor),
         parseTestsFile(testsPath),
         {
-          maxAnalysisTimeMs: options.maxAnalysisTime,
-          includeCoveredSourceCodeLocations: options.includeSourceLocations,
+          timeoutMs: options.timeout,
+          includeSourceLocations: options.includeSourceLocations,
         },
       );
 

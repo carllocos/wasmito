@@ -6,7 +6,7 @@ import { WasmAnalysis } from '../../src/tool_api/wasm_analysis';
 import { WasmInstruction, WasmitoBackendVM } from '../../src';
 import {
   CodeCoverageToolConfig,
-  CodeCoverageToolSourceCodeLocation,
+  CodeCoverageToolSourceLocation,
   CodeCoverageToolResult,
 } from './CodeCoverageToolTypes';
 import assert from 'assert';
@@ -24,7 +24,7 @@ export class CodeCoverageTool {
   private readonly coveredNodes: Set<SourceCFGNode>;
   private readonly coveredSourceCodeLocations: Map<
     string,
-    CodeCoverageToolSourceCodeLocation
+    CodeCoverageToolSourceLocation
   >;
 
   private resolveExitNodeEnteredPromise!: () => void;
@@ -40,9 +40,8 @@ export class CodeCoverageTool {
     this.vm = vm;
     this.wasmTestFunctionIds = wasmTestFunctionIds;
     this.config = {
-      maxAnalysisTimeMs: config?.maxAnalysisTimeMs ?? 1000,
-      includeCoveredSourceCodeLocations:
-        config?.includeCoveredSourceCodeLocations ?? false,
+      timeoutMs: config?.timeoutMs ?? 1000,
+      includeSourceLocations: config?.includeSourceLocations ?? false,
     };
 
     this.analysis = new WasmAnalysis(this.languageAdaptor, this.vm);
@@ -70,7 +69,7 @@ export class CodeCoverageTool {
         (n: SourceCFGNode, _i: WasmInstruction, _args: ReadOnlyWasmValue[]) => {
           this.coveredNodes.add(n);
 
-          if (!this.config.includeCoveredSourceCodeLocations) return;
+          if (!this.config.includeSourceLocations) return;
           const sourceLocation = n.sourceLocation;
           const key = `${sourceLocation.source}:${sourceLocation.linenr}:${sourceLocation.colnr}`;
           this.coveredSourceCodeLocations.set(key, {
@@ -94,7 +93,7 @@ export class CodeCoverageTool {
     const totalNodes = this.allNodes.length;
     const branchCoverage = Number((totalCoveredNodes / totalNodes).toFixed(2));
 
-    return this.config.includeCoveredSourceCodeLocations
+    return this.config.includeSourceLocations
       ? {
           coveredNodes: totalCoveredNodes,
           totalNodes,
@@ -113,7 +112,7 @@ export class CodeCoverageTool {
   private async exitNodeEnteredOrTimedOut(): Promise<void> {
     let timeout;
     const timeoutPromise = new Promise<void>((resolve) => {
-      timeout = setTimeout(resolve, this.config.maxAnalysisTimeMs);
+      timeout = setTimeout(resolve, this.config.timeoutMs);
     });
 
     await Promise.race([this.exitNodeEnteredPromise, timeoutPromise]);
