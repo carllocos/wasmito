@@ -89,6 +89,7 @@ export function registerCoverageCommand(program: Command) {
 
       if (!isFilePath(testsPath)) program.error('<tests> is not a valid path.');
 
+      options.target = options.target.toUpperCase();
       if (options.target !== 'LOCAL' && options.target !== 'MCU')
         program.error('<target> is not a valid target.');
 
