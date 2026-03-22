@@ -25,7 +25,7 @@ socket.on('connect', () => {
 
 
 async function main(): Promise<void> {
-  const analyseMaxTimeSecs = 4; // stop analysis after this many seconds
+  const analyseMaxTimeSecs = 5; // stop analysis after this many seconds
 
   const wasmPath = resolve(
     './app_examples/assemblyscript/blink/wasm/blink.wasm',
@@ -70,6 +70,19 @@ function showInstruction(i: WasmInstruction, args: ReadOnlyWasmValue[]): void {
   logger.info(`Instruction ${i.name} at address ${i.startAddress} is about to execute`);
 }
 
+function structureForBrigadier(f: WASMFunction, i:WasmInstruction) {
+    const name = i.name;
+    const address = i.startAddress;
+    const args = i.args;
+    const f_name = f.name;
+
+    const event = {
+        type: name,
+        args: args,
+        function: f_name
+    };
+    return event;
+}
 
 function sendToBrigadier(f: WASMFunction): (i: WasmInstruction, args: ReadOnlyWasmValue[]) => void {
   return (i: WasmInstruction, args: ReadOnlyWasmValue[]) => {
