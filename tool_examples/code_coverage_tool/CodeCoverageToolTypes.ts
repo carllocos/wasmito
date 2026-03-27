@@ -1,7 +1,4 @@
-export type CodeCoverageToolConfig = Readonly<{
-  timeoutMs: number;
-  excludeSourceLocations: boolean;
-}>;
+export type CodeCoverageToolConfig = Readonly<{ timeoutMs: number }>;
 
 export type CodeCoverageToolSourceLocation = Readonly<{
   sourceFile: string;
@@ -13,7 +10,9 @@ export type CodeCoverageToolResult = Readonly<{
   coveredNodes: number;
   totalNodes: number;
   branchCoverage: number;
-  coveredSourceCodeLocations?: CodeCoverageToolSourceLocation[];
+  functionCoverage: number;
+  coveredFunctions: number[];
+  coveredSourceCodeLocations: CodeCoverageToolSourceLocation[];
 }>;
 
 export type CodeCoverageToolExecutionTarget = 'LOCAL' | 'MCU';

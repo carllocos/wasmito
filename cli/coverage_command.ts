@@ -102,10 +102,7 @@ export function registerCoverageCommand(program: Command) {
         languageAdaptor,
         await createVM(options.target, languageAdaptor),
         parseTestsFile(testsPath),
-        {
-          timeoutMs: options.timeout,
-          excludeSourceLocations: options.excludeSourceLocations,
-        },
+        { timeoutMs: options.timeout },
       );
 
       const coverage = await codeCoverageTool.run();

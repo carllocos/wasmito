@@ -1,9 +1,9 @@
 import { RemoteCallRequest } from '../../src/runtimes/wasmito_vm/requests/fun_call_request';
 import { LanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
+import { WASMFunction, WasmInstruction, WasmitoBackendVM } from '../../src';
 import { SourceCFGNode } from '../../src/cfg/source_cfg_node_edge';
 import { ReadOnlyWasmValue } from '../../src/tool_api/interrupts';
 import { WasmAnalysis } from '../../src/tool_api/wasm_analysis';
-import { WasmInstruction, WasmitoBackendVM } from '../../src';
 import {
   CodeCoverageToolConfig,
   CodeCoverageToolSourceLocation,
@@ -22,6 +22,9 @@ export class CodeCoverageTool {
   private readonly allNodes: SourceCFGNode[];
   private readonly exitNodes: SourceCFGNode[];
   private readonly coveredNodes: Set<SourceCFGNode>;
+  private readonly allFunctions: WASMFunction[];
+  private readonly allFunctionsExceptTests: WASMFunction[];
+  private readonly coveredFunctions: Set<number>;
   private readonly coveredSourceCodeLocations: Map<
     string,
     CodeCoverageToolSourceLocation
@@ -39,22 +42,29 @@ export class CodeCoverageTool {
     this.languageAdaptor = languageAdaptor;
     this.vm = vm;
     this.wasmTestFunctionIds = wasmTestFunctionIds;
-    this.config = {
-      timeoutMs: config?.timeoutMs ?? 1000,
-      excludeSourceLocations: config?.excludeSourceLocations ?? false,
-    };
+    this.config = { timeoutMs: config?.timeoutMs ?? 1000 };
 
     this.analysis = new WasmAnalysis(this.languageAdaptor, this.vm);
 
     const sourceCFG = this.languageAdaptor.sourceCFGs;
     this.allNodes = sourceCFG.allNodes();
 
-    const mainFunction = this.languageAdaptor.sourceMap.wasm.getMainFunction();
+    const mainFunction =
+      this.languageAdaptor.sourceCFGs.sourceMap.wasm.getMainFunction();
     const mainFunctionCFG = sourceCFG.getFunctionSourceCFG(mainFunction.id);
     assert(mainFunctionCFG);
     this.exitNodes = mainFunctionCFG.exitNodes;
 
     this.coveredNodes = new Set();
+
+    this.allFunctions =
+      this.languageAdaptor.sourceCFGs.sourceMap.wasm.functions;
+    // Exclude test functions
+    this.allFunctionsExceptTests = this.allFunctions.filter((wasmFunction) => {
+      return !this.wasmTestFunctionIds.includes(wasmFunction.id);
+    });
+    this.coveredFunctions = new Set();
+
     this.coveredSourceCodeLocations = new Map();
 
     this.exitNodeEnteredPromise = new Promise((resolve) => {
@@ -69,7 +79,11 @@ export class CodeCoverageTool {
         (n: SourceCFGNode, _i: WasmInstruction, _args: ReadOnlyWasmValue[]) => {
           this.coveredNodes.add(n);
 
-          if (this.config.excludeSourceLocations) return;
+          const functionId = n.wasmFunOwner;
+          // Exclude test functions in function coverage.
+          if (!this.wasmTestFunctionIds.includes(functionId))
+            this.coveredFunctions.add(functionId);
+
           const sourceLocation = n.sourceLocation;
           const key = `${sourceLocation.source}:${sourceLocation.linenr}:${sourceLocation.colnr}`;
           this.coveredSourceCodeLocations.set(key, {
@@ -92,23 +106,23 @@ export class CodeCoverageTool {
     const totalCoveredNodes = this.coveredNodes.size;
     const totalNodes = this.allNodes.length;
     const branchCoverage = Number((totalCoveredNodes / totalNodes).toFixed(2));
+    const totalCoveredFunctions = this.coveredFunctions.size;
+    // Exclude test functions in function coverage.
+    const totalFunctions = this.allFunctionsExceptTests.length;
+    const functionCoverage = Number(
+      (totalCoveredFunctions / totalFunctions).toFixed(2),
+    );
 
-    let result: CodeCoverageToolResult = {
+    return {
       coveredNodes: totalCoveredNodes,
       totalNodes,
       branchCoverage,
+      functionCoverage,
+      coveredFunctions: Array.from(this.coveredFunctions),
+      coveredSourceCodeLocations: Array.from(
+        this.coveredSourceCodeLocations.values(),
+      ),
     };
-
-    if (!this.config.excludeSourceLocations) {
-      result = {
-        ...result,
-        coveredSourceCodeLocations: Array.from(
-          this.coveredSourceCodeLocations.values(),
-        ),
-      };
-    }
-
-    return result;
   }
 
   private async exitNodeEnteredOrTimedOut(): Promise<void> {
