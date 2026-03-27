@@ -11,7 +11,6 @@ export type CodeCoverageToolResult = Readonly<{
     coveredLineNumberCount: number;
     lineNumberCount: number;
     ratio: number;
-    coveredLineNumbers: number[];
   };
   functionCoverage: {
     coveredFunctionCount: number;
