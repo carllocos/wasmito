@@ -1,6 +1,6 @@
 export type CodeCoverageToolConfig = Readonly<{
   timeoutMs: number;
-  includeSourceLocations: boolean;
+  excludeSourceLocations: boolean;
 }>;
 
 export type CodeCoverageToolSourceLocation = Readonly<{

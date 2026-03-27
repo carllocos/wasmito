@@ -64,8 +64,8 @@ export function registerCoverageCommand(program: Command) {
       'Path to the JSON file containing an array of Wasm test function IDs.',
     )
     .option(
-      '-s, --include-source-locations',
-      'Include source file, line and column information for covered code.',
+      '--exclude-source-locations',
+      'Exclude source file, line and column information for covered code.',
     )
     .option(
       '-T, --target <type>',
@@ -104,7 +104,7 @@ export function registerCoverageCommand(program: Command) {
         parseTestsFile(testsPath),
         {
           timeoutMs: options.timeout,
-          includeSourceLocations: options.includeSourceLocations,
+          excludeSourceLocations: options.excludeSourceLocations,
         },
       );
 

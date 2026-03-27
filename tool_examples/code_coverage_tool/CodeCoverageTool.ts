@@ -41,7 +41,7 @@ export class CodeCoverageTool {
     this.wasmTestFunctionIds = wasmTestFunctionIds;
     this.config = {
       timeoutMs: config?.timeoutMs ?? 1000,
-      includeSourceLocations: config?.includeSourceLocations ?? false,
+      excludeSourceLocations: config?.excludeSourceLocations ?? false,
     };
 
     this.analysis = new WasmAnalysis(this.languageAdaptor, this.vm);
@@ -69,7 +69,7 @@ export class CodeCoverageTool {
         (n: SourceCFGNode, _i: WasmInstruction, _args: ReadOnlyWasmValue[]) => {
           this.coveredNodes.add(n);
 
-          if (!this.config.includeSourceLocations) return;
+          if (this.config.excludeSourceLocations) return;
           const sourceLocation = n.sourceLocation;
           const key = `${sourceLocation.source}:${sourceLocation.linenr}:${sourceLocation.colnr}`;
           this.coveredSourceCodeLocations.set(key, {
@@ -93,20 +93,22 @@ export class CodeCoverageTool {
     const totalNodes = this.allNodes.length;
     const branchCoverage = Number((totalCoveredNodes / totalNodes).toFixed(2));
 
-    return this.config.includeSourceLocations
-      ? {
-          coveredNodes: totalCoveredNodes,
-          totalNodes,
-          branchCoverage,
-          coveredSourceCodeLocations: Array.from(
-            this.coveredSourceCodeLocations.values(),
-          ),
-        }
-      : {
-          coveredNodes: totalCoveredNodes,
-          totalNodes,
-          branchCoverage,
-        };
+    let result: CodeCoverageToolResult = {
+      coveredNodes: totalCoveredNodes,
+      totalNodes,
+      branchCoverage,
+    };
+
+    if (!this.config.excludeSourceLocations) {
+      result = {
+        ...result,
+        coveredSourceCodeLocations: Array.from(
+          this.coveredSourceCodeLocations.values(),
+        ),
+      };
+    }
+
+    return result;
   }
 
   private async exitNodeEnteredOrTimedOut(): Promise<void> {
