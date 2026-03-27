@@ -99,6 +99,7 @@ function binaryLiftWasmCFG(
   logger.debug(`Found #${exitNodes.length} ExitNodes for function ${f.id}`);
 
   return {
+    id: f.id,
     entryNodes,
     allNodes: mergedSourceNodes,
     exitNodes,
