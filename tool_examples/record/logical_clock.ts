@@ -58,12 +58,12 @@ function logToFile(s: string): void {
 }
 
 export function logRecord(r: Record): void {
-  // topic, payload, instr, args
-  let s: string;
+  // instrcnt,intrcnt,topic, payload, instr, args
+  let s = `${r.clock.instrs},${r.clock.interrupts}`;
   if (isRecordInterrupt(r)) {
-    s = `${r.topic},${r.payload},,\n`;
+    s += `,${r.topic},${r.payload},,\n`;
   } else {
-    s = ',,';
+    s += ',,,';
     const argsStr =
       r.instrArgs.length === 0
         ? ''
@@ -82,6 +82,6 @@ const writeFlags: WriteFileOptions = {
 };
 writeFileSync(
   resolve('./tool_examples/record/recording.csv'),
-  'topic,payload,addr,args\n',
+  'instr,intrp,topic,payload,addr,args\n',
   writeFlags,
 );
