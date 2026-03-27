@@ -7,12 +7,24 @@ export type CodeCoverageToolSourceLocation = Readonly<{
 }>;
 
 export type CodeCoverageToolResult = Readonly<{
-  coveredNodes: number;
-  totalNodes: number;
-  branchCoverage: number;
-  functionCoverage: number;
-  coveredFunctions: number[];
-  coveredSourceCodeLocations: CodeCoverageToolSourceLocation[];
+  lineCoverage: {
+    coveredLineNumberCount: number;
+    lineNumberCount: number;
+    ratio: number;
+    coveredLineNumbers: number[];
+  };
+  functionCoverage: {
+    coveredFunctionCount: number;
+    functionCount: number;
+    ratio: number;
+    coveredFunctionIds: number[];
+  };
+  branchCoverage: {
+    coveredNodeCount: number;
+    nodeCount: number;
+    ratio: number;
+  };
+  coveredSourceLocations: CodeCoverageToolSourceLocation[];
 }>;
 
 export type CodeCoverageToolExecutionTarget = 'LOCAL' | 'MCU';

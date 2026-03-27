@@ -19,19 +19,27 @@ export class CodeCoverageTool {
 
   private readonly analysis: WasmAnalysis;
 
-  private readonly allNodes: SourceCFGNode[];
-  private readonly exitNodes: SourceCFGNode[];
+  // line coverage.
+  private readonly coveredLineNumbers: Set<number>;
+  private readonly lineNumbers: Set<number>;
+
+  // function coverage.
+  private readonly coveredFunctionIds: Set<number>;
+  private readonly functionNumbersIncludingTestFunctions: WASMFunction[];
+  private readonly functionNumbersExcludingTestFunctions: WASMFunction[];
+
+  // branch coverage.
   private readonly coveredNodes: Set<SourceCFGNode>;
-  private readonly allFunctions: WASMFunction[];
-  private readonly allFunctionsExceptTests: WASMFunction[];
-  private readonly coveredFunctions: Set<number>;
-  private readonly coveredSourceCodeLocations: Map<
+  private readonly nodes: SourceCFGNode[];
+  private readonly coveredSourceLocations: Map<
     string,
     CodeCoverageToolSourceLocation
   >;
 
-  private resolveExitNodeEnteredPromise!: () => void;
-  private readonly exitNodeEnteredPromise: Promise<void>; // Gets resolved when an exit node is entered.
+  // test exit nodes.
+  private readonly testExitNodes: Map<SourceCFGNode, boolean>;
+  private resolveAllTestExitNodesEnteredPromise!: () => void;
+  private readonly allTestExitNodesEnteredPromise: Promise<void>; // Gets resolved when all test exit nodes are entered.
 
   constructor(
     languageAdaptor: LanguageAdaptor,
@@ -46,47 +54,63 @@ export class CodeCoverageTool {
 
     this.analysis = new WasmAnalysis(this.languageAdaptor, this.vm);
 
-    const sourceCFG = this.languageAdaptor.sourceCFGs;
-    this.allNodes = sourceCFG.allNodes();
+    // line coverage.
+    this.coveredLineNumbers = new Set();
+    this.lineNumbers = new Set();
+    for (const sourceLocation of this.languageAdaptor.sourceCFGs.sourceMap.allMappings()) {
+      this.lineNumbers.add(sourceLocation.linenr);
+    }
 
-    const mainFunction =
-      this.languageAdaptor.sourceCFGs.sourceMap.wasm.getMainFunction();
-    const mainFunctionCFG = sourceCFG.getFunctionSourceCFG(mainFunction.id);
-    assert(mainFunctionCFG);
-    this.exitNodes = mainFunctionCFG.exitNodes;
-
-    this.coveredNodes = new Set();
-
-    this.allFunctions =
+    // function coverage.
+    this.coveredFunctionIds = new Set();
+    this.functionNumbersIncludingTestFunctions =
       this.languageAdaptor.sourceCFGs.sourceMap.wasm.functions;
-    // Exclude test functions
-    this.allFunctionsExceptTests = this.allFunctions.filter((wasmFunction) => {
-      return !this.wasmTestFunctionIds.includes(wasmFunction.id);
-    });
-    this.coveredFunctions = new Set();
+    this.functionNumbersExcludingTestFunctions =
+      this.functionNumbersIncludingTestFunctions.filter((wasmFunction) => {
+        return !this.wasmTestFunctionIds.includes(wasmFunction.id); // Exclude test function ids.
+      });
 
-    this.coveredSourceCodeLocations = new Map();
+    // branch coverage.
+    this.coveredNodes = new Set();
+    const sourceCFG = this.languageAdaptor.sourceCFGs;
+    this.nodes = sourceCFG.allNodes();
+    this.coveredSourceLocations = new Map();
 
-    this.exitNodeEnteredPromise = new Promise((resolve) => {
-      this.resolveExitNodeEnteredPromise = resolve;
+    // test exit nodes.
+    this.testExitNodes = new Map<SourceCFGNode, boolean>();
+    for (const wasmTestFunctionId of this.wasmTestFunctionIds) {
+      const testFunctionCFG =
+        sourceCFG.getFunctionSourceCFG(wasmTestFunctionId);
+      assert(testFunctionCFG);
+
+      for (const testExitNode of testFunctionCFG.exitNodes) {
+        this.testExitNodes.set(testExitNode, false);
+      }
+    }
+    this.allTestExitNodesEnteredPromise = new Promise((resolve) => {
+      this.resolveAllTestExitNodesEnteredPromise = resolve;
     });
   }
 
   private registerOnNodeEntryCallback(): void {
-    for (const node of this.allNodes) {
+    for (const node of this.nodes) {
       this.analysis.onNodeEntry(
         node,
         (n: SourceCFGNode, _i: WasmInstruction, _args: ReadOnlyWasmValue[]) => {
-          this.coveredNodes.add(n);
-
-          const functionId = n.wasmFunOwner;
-          // Exclude test functions in function coverage.
-          if (!this.wasmTestFunctionIds.includes(functionId))
-            this.coveredFunctions.add(functionId);
-
           const sourceLocation = n.sourceLocation;
+
+          // line coverage.
+          this.coveredLineNumbers.add(sourceLocation.linenr);
+
+          // function coverage.
+          const functionId = n.wasmFunOwner;
+          if (!this.wasmTestFunctionIds.includes(functionId))
+            this.coveredFunctionIds.add(functionId);
+
+          // branch coverage.
+          this.coveredNodes.add(n);
           const key = `${sourceLocation.source}:${sourceLocation.linenr}:${sourceLocation.colnr}`;
-          this.coveredSourceCodeLocations.set(key, {
+          this.coveredSourceLocations.set(key, {
             sourceFile: sourceLocation.source,
             lineNr: sourceLocation.linenr,
             colNr: sourceLocation.colnr,
@@ -96,48 +120,68 @@ export class CodeCoverageTool {
     }
   }
 
-  private registerOnExitNodeEntryCallback(): void {
-    for (const exitNode of this.exitNodes) {
-      this.analysis.onNodeEntry(exitNode, this.resolveExitNodeEnteredPromise);
+  private registerOnTestExitNodeEntryCallback(): void {
+    for (const testExitNode of this.testExitNodes.keys()) {
+      this.analysis.onNodeEntry(testExitNode, () => {
+        this.testExitNodes.set(testExitNode, true);
+        if ([...this.testExitNodes.values()].every((visited) => visited)) {
+          this.resolveAllTestExitNodesEnteredPromise();
+        }
+      });
     }
   }
 
   private getCoverageResults(): CodeCoverageToolResult {
-    const totalCoveredNodes = this.coveredNodes.size;
-    const totalNodes = this.allNodes.length;
-    const branchCoverage = Number((totalCoveredNodes / totalNodes).toFixed(2));
-    const totalCoveredFunctions = this.coveredFunctions.size;
-    // Exclude test functions in function coverage.
-    const totalFunctions = this.allFunctionsExceptTests.length;
-    const functionCoverage = Number(
-      (totalCoveredFunctions / totalFunctions).toFixed(2),
-    );
+    const lineCoverage = {
+      coveredLineNumberCount: this.coveredLineNumbers.size,
+      lineNumberCount: this.lineNumbers.size,
+      ratio: Number(
+        (this.coveredLineNumbers.size / this.lineNumbers.size).toFixed(2),
+      ),
+      coveredLineNumbers: [...this.coveredLineNumbers.values()],
+    };
+
+    const functionCoverage = {
+      coveredFunctionCount: this.coveredFunctionIds.size,
+      functionCount: this.functionNumbersExcludingTestFunctions.length,
+      ratio: Number(
+        (
+          this.coveredFunctionIds.size /
+          this.functionNumbersExcludingTestFunctions.length
+        ).toFixed(2),
+      ),
+      coveredFunctionIds: [...this.coveredFunctionIds.values()],
+    };
+
+    const branchCoverage = {
+      coveredNodeCount: this.coveredNodes.size,
+      nodeCount: this.nodes.length,
+      ratio: Number((this.coveredNodes.size / this.nodes.length).toFixed(2)),
+    };
+
+    const coveredSourceLocations = [...this.coveredSourceLocations.values()];
 
     return {
-      coveredNodes: totalCoveredNodes,
-      totalNodes,
-      branchCoverage,
+      lineCoverage,
       functionCoverage,
-      coveredFunctions: Array.from(this.coveredFunctions),
-      coveredSourceCodeLocations: Array.from(
-        this.coveredSourceCodeLocations.values(),
-      ),
+      branchCoverage,
+      coveredSourceLocations,
     };
   }
 
-  private async exitNodeEnteredOrTimedOut(): Promise<void> {
+  private async testExitNodeEnteredOrTimedOut(): Promise<void> {
     let timeout;
     const timeoutPromise = new Promise<void>((resolve) => {
       timeout = setTimeout(resolve, this.config.timeoutMs);
     });
 
-    await Promise.race([this.exitNodeEnteredPromise, timeoutPromise]);
+    await Promise.race([this.allTestExitNodesEnteredPromise, timeoutPromise]);
     clearTimeout(timeout);
   }
 
   async run(): Promise<CodeCoverageToolResult> {
     this.registerOnNodeEntryCallback();
-    this.registerOnExitNodeEntryCallback();
+    this.registerOnTestExitNodeEntryCallback();
     await this.analysis.deploy();
 
     for (const wasmTestFunctionId of this.wasmTestFunctionIds) {
@@ -145,7 +189,7 @@ export class CodeCoverageTool {
       await this.vm.sendRequest(callRequest);
     }
 
-    await this.exitNodeEnteredOrTimedOut();
+    await this.testExitNodeEnteredOrTimedOut();
     await this.vm.close();
     return this.getCoverageResults();
   }

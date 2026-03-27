@@ -64,10 +64,6 @@ export function registerCoverageCommand(program: Command) {
       'Path to the JSON file containing an array of Wasm test function IDs.',
     )
     .option(
-      '--exclude-source-locations',
-      'Exclude source file, line and column information for covered code.',
-    )
-    .option(
       '-T, --target <type>',
       'Execution target: "local" (default) or "mcu".',
       'local',
