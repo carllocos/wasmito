@@ -11,6 +11,7 @@ import {
 } from './CodeCoverageToolTypes';
 import assert from 'assert';
 
+// line coverage does not exclude test lines.
 export class CodeCoverageTool {
   private readonly languageAdaptor: LanguageAdaptor;
   private readonly vm: WasmitoBackendVM;
