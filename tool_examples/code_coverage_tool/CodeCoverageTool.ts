@@ -26,8 +26,7 @@ export class CodeCoverageTool {
 
   // function coverage.
   private readonly coveredFunctionIds: Set<number>;
-  private readonly functionNumbersIncludingTestFunctions: WASMFunction[];
-  private readonly functionNumbersExcludingTestFunctions: WASMFunction[];
+  private readonly functionsExcludingTests: Set<WASMFunction>;
 
   // branch coverage.
   private readonly coveredNodes: Set<SourceCFGNode>;
@@ -72,12 +71,13 @@ export class CodeCoverageTool {
 
     // function coverage.
     this.coveredFunctionIds = new Set();
-    this.functionNumbersIncludingTestFunctions =
-      this.languageAdaptor.sourceCFGs.sourceMap.wasm.functions;
-    this.functionNumbersExcludingTestFunctions =
-      this.functionNumbersIncludingTestFunctions.filter((wasmFunction) => {
-        return !this.wasmTestFunctionIds.has(wasmFunction.id); // Exclude test function ids.
-      });
+    this.functionsExcludingTests = new Set();
+    this.languageAdaptor.sourceCFGs.sourceMap.wasm.functions.forEach(
+      (wasmFunction) => {
+        if (!this.wasmTestFunctionIds.has(wasmFunction.id))
+          this.functionsExcludingTests.add(wasmFunction);
+      },
+    );
 
     // branch coverage.
     this.coveredNodes = new Set();
@@ -166,12 +166,18 @@ export class CodeCoverageTool {
 
     // function coverage.
     const coveredFunctionCount = this.coveredFunctionIds.size;
-    const functionCount = this.functionNumbersExcludingTestFunctions.length;
+    const functionCount = this.functionsExcludingTests.size;
     const functionCoverage = {
       coveredFunctionCount,
       functionCount,
       ratio: Number((coveredFunctionCount / functionCount).toFixed(2)),
-      coveredFunctionIds: [...this.coveredFunctionIds.values()],
+      coveredFunctions: [...this.coveredFunctionIds.values()].map(
+        (functionId) => {
+          const wasmFunction =
+            this.languageAdaptor.sourceCFGs.sourceMap.getFunction(functionId)!;
+          return { id: functionId, name: wasmFunction.name };
+        },
+      ),
     };
 
     // branch coverage.

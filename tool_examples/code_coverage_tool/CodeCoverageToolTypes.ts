@@ -16,7 +16,7 @@ export type CodeCoverageToolResult = Readonly<{
     coveredFunctionCount: number;
     functionCount: number;
     ratio: number;
-    coveredFunctionIds: number[];
+    coveredFunctions: { id: number; name: string }[];
   };
   branchCoverage: {
     coveredNodeCount: number;
