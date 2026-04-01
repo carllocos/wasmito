@@ -243,6 +243,20 @@ export namespace WASM {
     };
   }
 
+  export function interruptTopicToPinNumber(topic: string): number | undefined {
+    // e.g, topic="interrupt_33"
+    const vals = topic.split('_');
+    if (vals.length !== 2) {
+      return undefined;
+    }
+    const [, pinStr] = vals;
+    const pin = Number(pinStr);
+    if (isNaN(pin)) {
+      return undefined;
+    }
+    return pin;
+  }
+
   export function leb128(a: number): string {
     // TODO can only handle 32 bit
     a |= 0;
