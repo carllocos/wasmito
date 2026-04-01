@@ -53,6 +53,7 @@ import { type LanguageAdaptor } from '../../language_adaptors';
 import { Logger } from '../../logger/logger';
 import { MockPinInterruptRequest } from './requests/inject_event_request';
 import { RequestsManager } from '../../communication/requests_manager';
+import { UpdateStackValueRequest } from './requests/update_stack_value';
 
 export abstract class WasmitoBackendVM implements RuntimeToolAPI {
   private _channel: Channel;
@@ -166,6 +167,14 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
     this._breakpointPolicy.deactivate();
     newPolicy.activate(this._breakpointPolicy.breakpoints);
     this._breakpointPolicy = newPolicy;
+  }
+
+  async updateStackValue(
+    stackIdx: number,
+    value: WASM.Value,
+  ): Promise<boolean> {
+    const req = new UpdateStackValueRequest(stackIdx, value);
+    return await this.sendRequest(req);
   }
 
   functionsProxied(): Set<WASMFunction> {

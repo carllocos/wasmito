@@ -248,4 +248,8 @@ export class WARDuinoRuntimeAPI implements RuntimeToolAPI {
   ): Promise<boolean> {
     throw new Error('Operation not supported');
   }
+
+  updateStackValue(stackIdx: number, value: WASM.Value): Promise<boolean> {
+    throw new Error('To implement');
+  }
 }
