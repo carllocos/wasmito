@@ -99,9 +99,8 @@ export class CodeCoverageTool {
       for (const testExitNode of testFunctionCFG.exitNodes) {
         this.testExitNodes.add(testExitNode);
       }
-
-      this.testExitNodesRemaining = this.testExitNodes.size;
     }
+    this.testExitNodesRemaining = this.testExitNodes.size;
     this.allTestExitNodesEnteredPromise = new Promise((resolve) => {
       this.resolveAllTestExitNodesEnteredPromise = resolve;
     });
