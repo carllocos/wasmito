@@ -281,7 +281,7 @@ function createCallbackWithArgs(
 
       const vals = s.stack.slice(-i.signature.nrArgs);
       if (mutable) {
-        args = vals.map((v) => new WritableWasmValue(v));
+        args = vals.map((v) => new WritableWasmValue(v, v.idx));
       } else {
         args = vals.map((v) => new ReadOnlyWasmValue(v));
       }
@@ -301,9 +301,11 @@ function createCallbackWithArgs(
       getGlobalLogger().debug(
         `new Values: [${newArgs.map((v) => v.value).join(', ')}]`,
       );
-      getGlobalLogger().error('TODO: implement actual arg update');
-      getGlobalLogger().debug('Resume execution on VM');
-      vm.run(maxTimeoutMs); // TODO await
+      updateArgsStack(newArgs, vm).then((s) => {
+        assert(s, 'failed to update the stack with new values');
+        getGlobalLogger().debug('Resume execution on VM');
+        vm.run(maxTimeoutMs); // TODO await
+      });
     } else {
       assertFatalHookError(
         newArgs === undefined,
@@ -311,6 +313,17 @@ function createCallbackWithArgs(
       );
     }
   };
+}
+
+async function updateArgsStack(
+  args: WritableWasmValue[],
+  vm: WasmitoBackendVM,
+): Promise<boolean> {
+  for (const arg of args) {
+    const s = await vm.updateStackValue(arg.stackIdx, arg);
+    if (!s) return false;
+  }
+  return true;
 }
 
 function createCallbackWithResult(
@@ -339,7 +352,9 @@ function createCallbackWithResult(
       );
 
       const val = s.stack[s.stack.length - 1];
-      result = mutate ? new WritableWasmValue(val) : new ReadOnlyWasmValue(val);
+      result = mutate
+        ? new WritableWasmValue(val, val.idx)
+        : new ReadOnlyWasmValue(val);
     }
 
     const updatedValue = cb(instr, result, vm);
