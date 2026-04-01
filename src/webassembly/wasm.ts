@@ -68,6 +68,13 @@ export namespace WASM {
     [Type.f64, '7c'],
   ]);
 
+  export const hexToType = new Map<string, Type>([
+    ['7f', Type.i32],
+    ['7e', Type.i64],
+    ['7d', Type.f32],
+    ['7c', Type.f64],
+  ]);
+
   export interface Value {
     type: Type;
     value: number;
