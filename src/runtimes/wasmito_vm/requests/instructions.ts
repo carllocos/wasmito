@@ -8,6 +8,7 @@ export enum Instruction {
   FuncCall = '41',
 
   UpdateWasmModule = '22',
+  updateStackValue = '24',
 
   AroundFunction = '50',
   HookOnWasmAddr = '51',

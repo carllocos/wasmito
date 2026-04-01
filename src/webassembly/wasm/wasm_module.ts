@@ -10,7 +10,11 @@ import {
   type Section,
   type TableExport,
 } from '../parsers/wasm_module_parser';
-import { isCallInstruction, type WasmInstruction } from './wasm_instruction';
+import {
+  CallInstruction,
+  isCallInstruction,
+  type WasmInstruction,
+} from './wasm_instruction';
 import {
   getWasmOpcodeNr,
   WasmOpcode,
@@ -239,6 +243,31 @@ export class WasmModule {
         return wasmFunc;
       }
     }
+  }
+
+  /**
+   * This returns all call instructions if no argument is provided
+   * or only returns the call instructions that are equal to the given func ID
+   * or func name
+   * Retrieving calls based on the name of the function called is dependent on the correctness
+   * of the debugging and is does not always reliabily correspond to the source level function names.
+   * @param func
+   * @returns
+   */
+  getCallInstructions(func?: string | number): CallInstruction[] {
+    const calls = this.instructions.filter(isCallInstruction);
+    if (func === undefined) return calls;
+
+    let funID = -1;
+    if (typeof func === 'number') {
+      funID = func;
+    } else {
+      // todo fix: this may produce several funcs
+      const f = this.functions.find((f) => f.name.includes(func));
+      funID = f?.id ?? funID;
+    }
+
+    return calls.filter((c) => c.funIdx === funID);
   }
 
   public getMainFunctions(): WASMFunction[] {

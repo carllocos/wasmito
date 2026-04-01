@@ -60,6 +60,7 @@
     "@types/mocha": "^10.0.10",
     "@types/node": "^24.9.1",
     "@typescript-eslint/eslint-plugin": "^8.46.2",
+    "baseline-browser-mapping": "^2.10.13",
     "chai": "^6.2.0",
     "eslint": "^9.38.0",
     "eslint-config-prettier": "^10.1.8",

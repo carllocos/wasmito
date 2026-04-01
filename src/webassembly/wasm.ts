@@ -68,6 +68,13 @@ export namespace WASM {
     [Type.f64, '7c'],
   ]);
 
+  export const hexToType = new Map<string, Type>([
+    ['7f', Type.i32],
+    ['7e', Type.i64],
+    ['7d', Type.f32],
+    ['7c', Type.f64],
+  ]);
+
   export interface Value {
     type: Type;
     value: number;
@@ -234,6 +241,20 @@ export namespace WASM {
       topic,
       payload,
     };
+  }
+
+  export function interruptTopicToPinNumber(topic: string): number | undefined {
+    // e.g, topic="interrupt_33"
+    const vals = topic.split('_');
+    if (vals.length !== 2) {
+      return undefined;
+    }
+    const [, pinStr] = vals;
+    const pin = Number(pinStr);
+    if (isNaN(pin)) {
+      return undefined;
+    }
+    return pin;
   }
 
   export function leb128(a: number): string {
