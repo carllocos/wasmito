@@ -60,6 +60,8 @@ export interface RuntimeToolAPI {
     timeout?: number,
   ) => Promise<ProxyCallResponse>;
 
+  updateStackValue: (stackIdx: number, value: WASM.Value) => Promise<boolean>;
+
   // Hook API
   addHookBefore: (
     sourceCodeLocation: SourceCodeLocation,
