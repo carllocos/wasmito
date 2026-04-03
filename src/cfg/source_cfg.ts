@@ -380,6 +380,7 @@ export class SourceCFGs {
 }
 
 export interface BinaryLiftedCFG {
+  id: number;
   entryNodes: SourceCFGNode[];
   allNodes: SourceCFGNode[];
   exitNodes: SourceCFGNode[];

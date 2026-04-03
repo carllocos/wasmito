@@ -57,8 +57,17 @@ export class ReadOnlyWasmValue {
 
 export class WritableWasmValue {
   protected v: WASM.Value;
-  constructor(v: WASM.Value) {
+  private _stackIdx: number;
+  constructor(v: WASM.Value, stackIdx = -1) {
     this.v = v;
+    this._stackIdx = stackIdx;
+  }
+
+  get stackIdx(): number {
+    if (this._stackIdx < 0) {
+      throw new Error(`No Stack Index set for WritableWasmValue`);
+    }
+    return this._stackIdx;
   }
 
   get type(): WASM.Type {
