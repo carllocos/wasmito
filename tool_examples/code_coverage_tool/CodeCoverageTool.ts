@@ -193,9 +193,9 @@ export class CodeCoverageTool {
     let totalLineNumberCount = 0;
 
     for (const [sourceFile, linesPerSourceFile] of this.lineNumbers.entries()) {
-      const coveredLines = this.coveredLineNumbers.get(sourceFile);
+      const coveredLines = this.coveredLineNumbers.get(sourceFile)!;
 
-      const coveredLineNumberCount = coveredLines!.size;
+      const coveredLineNumberCount = coveredLines.size;
       const lineNumberCount = linesPerSourceFile.size;
 
       totalCoveredLineNumberCount += coveredLineNumberCount;
@@ -209,6 +209,7 @@ export class CodeCoverageTool {
           lineNumberCount === 0
             ? 0
             : Number((coveredLineNumberCount / lineNumberCount).toFixed(2)),
+        coveredLines: Array.from(coveredLines),
       });
     }
 
@@ -262,9 +263,9 @@ export class CodeCoverageTool {
     let totalNodeCount = 0;
 
     for (const [sourceFile, nodesPerSourceFile] of this.nodes.entries()) {
-      const coveredNodes = this.coveredNodes.get(sourceFile);
+      const coveredNodes = this.coveredNodes.get(sourceFile)!;
 
-      const coveredNodeCount = coveredNodes!.size;
+      const coveredNodeCount = coveredNodes.size;
       const nodeCount = nodesPerSourceFile.size;
 
       totalCoveredNodeCount += coveredNodeCount;

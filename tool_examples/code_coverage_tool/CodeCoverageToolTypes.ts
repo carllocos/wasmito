@@ -13,6 +13,7 @@ export type CodeCoverageToolResult = Readonly<{
       coveredLineNumberCount: number;
       lineNumberCount: number;
       ratio: number;
+      coveredLines: number[];
     }[];
     totalCoveredLineNumberCount: number;
     totalLineNumberCount: number;
