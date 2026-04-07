@@ -25,8 +25,14 @@ export type CodeCoverageToolResult = Readonly<{
     coveredFunctions: { id: number; name: string }[];
   };
   branchCoverage: {
-    coveredNodeCount: number;
-    nodeCount: number;
+    sourceFiles: {
+      name: string;
+      coveredNodeCount: number;
+      nodeCount: number;
+      ratio: number;
+    }[];
+    totalCoveredNodeCount: number;
+    totalNodeCount: number;
     ratio: number;
   };
   coveredSourceLocations: CodeCoverageToolSourceLocation[];

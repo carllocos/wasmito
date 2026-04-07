@@ -28,8 +28,10 @@ export class CodeCoverageTool {
   private readonly functionsExcludingTests: Set<WASMFunction>;
 
   // branch coverage.
-  private readonly coveredNodes: Set<SourceCFGNode>;
-  private readonly nodes: SourceCFGNode[];
+  private readonly coveredNodes: Map<string, Set<SourceCFGNode>>;
+  private readonly nodes: Map<string, Set<SourceCFGNode>>;
+
+  // covered source locations.
   private readonly coveredSourceLocations: Map<
     string,
     CodeCoverageToolSourceLocation
@@ -54,6 +56,10 @@ export class CodeCoverageTool {
 
     this.analysis = new WasmAnalysis(this.languageAdaptor, this.vm);
 
+    // line coverage.
+    this.coveredLineNumbers = new Map();
+    this.lineNumbers = new Map();
+
     // function coverage.
     this.coveredFunctionIds = new Set();
     this.functionsExcludingTests = new Set();
@@ -64,10 +70,13 @@ export class CodeCoverageTool {
       },
     );
 
-    // line coverage.
-    this.coveredLineNumbers = new Map();
-    this.lineNumbers = new Map();
+    // branch coverage.
+    this.coveredNodes = new Map();
+    this.nodes = new Map();
+
+    // all.
     for (const sourceLocation of this.languageAdaptor.sourceCFGs.sourceMap.allMappings()) {
+      // line coverage.
       if (!this.coveredLineNumbers.has(sourceLocation.source)) {
         this.coveredLineNumbers.set(sourceLocation.source, new Set());
       }
@@ -86,15 +95,26 @@ export class CodeCoverageTool {
             .add(sourceLocation.linenr);
         }
       });
+
+      // branch coverage.
+      if (!this.coveredNodes.has(sourceLocation.source)) {
+        this.coveredNodes.set(sourceLocation.source, new Set());
+      }
+
+      if (!this.nodes.has(sourceLocation.source)) {
+        this.nodes.set(sourceLocation.source, new Set());
+      }
     }
 
     // branch coverage.
-    this.coveredNodes = new Set();
     const sourceCFG = this.languageAdaptor.sourceCFGs;
-    this.nodes = sourceCFG.allNodes().filter((sourceCFGNode) => {
+    sourceCFG.allNodes().forEach((sourceCFGNode) => {
       const functionId = sourceCFGNode.wasmFunOwner;
-      return !this.wasmTestFunctionIds.has(functionId);
+      if (!this.wasmTestFunctionIds.has(functionId)) {
+        this.nodes.get(sourceCFGNode.sourceLocation.source)!.add(sourceCFGNode);
+      }
     });
+
     this.coveredSourceLocations = new Map();
 
     // test exit nodes.
@@ -119,33 +139,39 @@ export class CodeCoverageTool {
   }
 
   private registerOnNodeEntryCallback(): void {
-    for (const node of this.nodes) {
-      this.analysis.onNodeEntry(
-        node,
-        (n: SourceCFGNode, _i: WasmInstruction, _args: ReadOnlyWasmValue[]) => {
-          const sourceLocation = n.sourceLocation;
+    for (const nodesPerSourceFile of this.nodes.values()) {
+      for (const node of nodesPerSourceFile) {
+        this.analysis.onNodeEntry(
+          node,
+          (
+            n: SourceCFGNode,
+            _i: WasmInstruction,
+            _args: ReadOnlyWasmValue[],
+          ) => {
+            const sourceLocation = n.sourceLocation;
 
-          // line coverage.
-          this.coveredLineNumbers
-            .get(sourceLocation.source)!
-            .add(sourceLocation.linenr);
+            // line coverage.
+            this.coveredLineNumbers
+              .get(sourceLocation.source)!
+              .add(sourceLocation.linenr);
 
-          // function coverage.
-          const functionId = n.wasmFunOwner;
-          this.coveredFunctionIds.add(functionId);
+            // function coverage.
+            const functionId = n.wasmFunOwner;
+            this.coveredFunctionIds.add(functionId);
 
-          // branch coverage.
-          this.coveredNodes.add(n);
+            // branch coverage.
+            this.coveredNodes.get(sourceLocation.source)!.add(n);
 
-          // covered source locations.
-          const key = `${sourceLocation.source}:${sourceLocation.linenr}:${sourceLocation.colnr}`;
-          this.coveredSourceLocations.set(key, {
-            sourceFile: sourceLocation.source,
-            lineNr: sourceLocation.linenr,
-            colNr: sourceLocation.colnr,
-          });
-        },
-      );
+            // covered source locations.
+            const key = `${sourceLocation.source}:${sourceLocation.linenr}:${sourceLocation.colnr}`;
+            this.coveredSourceLocations.set(key, {
+              sourceFile: sourceLocation.source,
+              lineNr: sourceLocation.linenr,
+              colNr: sourceLocation.colnr,
+            });
+          },
+        );
+      }
     }
   }
 
@@ -159,21 +185,17 @@ export class CodeCoverageTool {
   }
 
   private getLineCoverageResults(): CodeCoverageToolResult['lineCoverage'] {
-    const sourceFiles: {
-      name: string;
-      coveredLineNumberCount: number;
-      lineNumberCount: number;
-      ratio: number;
-    }[] = [];
+    const sourceFiles: CodeCoverageToolResult['lineCoverage']['sourceFiles'] =
+      [];
 
     let totalCoveredLineNumberCount = 0;
     let totalLineNumberCount = 0;
 
-    for (const [sourceFile, allLines] of this.lineNumbers.entries()) {
+    for (const [sourceFile, linesPerSourceFile] of this.lineNumbers.entries()) {
       const coveredLines = this.coveredLineNumbers.get(sourceFile);
 
       const coveredLineNumberCount = coveredLines!.size;
-      const lineNumberCount = allLines.size;
+      const lineNumberCount = linesPerSourceFile.size;
 
       totalCoveredLineNumberCount += coveredLineNumberCount;
       totalLineNumberCount += lineNumberCount;
@@ -223,13 +245,49 @@ export class CodeCoverageTool {
   }
 
   private getBranchCoverageResults(): CodeCoverageToolResult['branchCoverage'] {
-    const coveredNodeCount = this.coveredNodes.size;
-    const nodeCount = this.nodes.length;
+    // const coveredNodeCount = this.coveredNodes.size;
+    // const nodeCount = this.nodes.length;
+    // return {
+    //   coveredNodeCount,
+    //   nodeCount,
+    //   ratio:
+    //     nodeCount === 0 ? 0 : Number((coveredNodeCount / nodeCount).toFixed(2)),
+    // };
+
+    const sourceFiles: CodeCoverageToolResult['branchCoverage']['sourceFiles'] =
+      [];
+
+    let totalCoveredNodeCount = 0;
+    let totalNodeCount = 0;
+
+    for (const [sourceFile, nodesPerSourceFile] of this.nodes.entries()) {
+      const coveredNodes = this.coveredNodes.get(sourceFile);
+
+      const coveredNodeCount = coveredNodes!.size;
+      const nodeCount = nodesPerSourceFile.size;
+
+      totalCoveredNodeCount += coveredNodeCount;
+      totalNodeCount += nodeCount;
+
+      sourceFiles.push({
+        name: sourceFile,
+        coveredNodeCount,
+        nodeCount,
+        ratio:
+          nodeCount === 0
+            ? 0
+            : Number((coveredNodeCount / nodeCount).toFixed(2)),
+      });
+    }
+
     return {
-      coveredNodeCount,
-      nodeCount,
+      sourceFiles,
+      totalCoveredNodeCount,
+      totalNodeCount,
       ratio:
-        nodeCount === 0 ? 0 : Number((coveredNodeCount / nodeCount).toFixed(2)),
+        totalNodeCount === 0
+          ? 0
+          : Number((totalCoveredNodeCount / totalNodeCount).toFixed(2)),
     };
   }
 
