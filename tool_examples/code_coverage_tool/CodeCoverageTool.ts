@@ -28,8 +28,8 @@ export class CodeCoverageTool {
   private readonly functionsExcludingTests: Set<WASMFunction>;
 
   // branch coverage.
-  private readonly coveredNodes: Map<string, Set<SourceCFGNode>>;
-  private readonly nodes: Map<string, Set<SourceCFGNode>>;
+  private readonly coveredNodes: Map<string, Set<SourceCFGNode>>; // K = filename, V = set of covered nodes.
+  private readonly nodes: Map<string, Set<SourceCFGNode>>; // K = filename, V = set of nodes.
 
   // covered source locations.
   private readonly coveredSourceLocations: Map<
@@ -74,7 +74,7 @@ export class CodeCoverageTool {
     this.coveredNodes = new Map();
     this.nodes = new Map();
 
-    // all.
+    // line coverage, function coverage, branch coverage.
     for (const sourceLocation of this.languageAdaptor.sourceCFGs.sourceMap.allMappings()) {
       // line coverage.
       if (!this.coveredLineNumbers.has(sourceLocation.source)) {
@@ -115,6 +115,7 @@ export class CodeCoverageTool {
       }
     });
 
+    // covered source locations.
     this.coveredSourceLocations = new Map();
 
     // test exit nodes.
