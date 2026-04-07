@@ -8,8 +8,14 @@ export type CodeCoverageToolSourceLocation = Readonly<{
 
 export type CodeCoverageToolResult = Readonly<{
   lineCoverage: {
-    coveredLineNumberCount: number;
-    lineNumberCount: number;
+    sourceFiles: {
+      name: string;
+      coveredLineNumberCount: number;
+      lineNumberCount: number;
+      ratio: number;
+    }[];
+    totalCoveredLineNumberCount: number;
+    totalLineNumberCount: number;
     ratio: number;
   };
   functionCoverage: {

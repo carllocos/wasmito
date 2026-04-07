@@ -11,7 +11,6 @@ import {
 } from './CodeCoverageToolTypes';
 import assert from 'assert';
 
-// line coverage does not exclude test lines.
 export class CodeCoverageTool {
   private readonly languageAdaptor: LanguageAdaptor;
   private readonly vm: WasmitoBackendVM;
@@ -55,6 +54,16 @@ export class CodeCoverageTool {
 
     this.analysis = new WasmAnalysis(this.languageAdaptor, this.vm);
 
+    // function coverage.
+    this.coveredFunctionIds = new Set();
+    this.functionsExcludingTests = new Set();
+    this.languageAdaptor.sourceCFGs.sourceMap.wasm.functions.forEach(
+      (wasmFunction) => {
+        if (!this.wasmTestFunctionIds.has(wasmFunction.id))
+          this.functionsExcludingTests.add(wasmFunction);
+      },
+    );
+
     // line coverage.
     this.coveredLineNumbers = new Map();
     this.lineNumbers = new Map();
@@ -66,23 +75,26 @@ export class CodeCoverageTool {
       if (!this.lineNumbers.has(sourceLocation.source)) {
         this.lineNumbers.set(sourceLocation.source, new Set());
       }
-      this.lineNumbers.get(sourceLocation.source)!.add(sourceLocation.linenr);
-    }
 
-    // function coverage.
-    this.coveredFunctionIds = new Set();
-    this.functionsExcludingTests = new Set();
-    this.languageAdaptor.sourceCFGs.sourceMap.wasm.functions.forEach(
-      (wasmFunction) => {
-        if (!this.wasmTestFunctionIds.has(wasmFunction.id))
-          this.functionsExcludingTests.add(wasmFunction);
-      },
-    );
+      this.functionsExcludingTests.forEach((nonTestWasmFunction) => {
+        if (
+          nonTestWasmFunction.startAddress <= sourceLocation.address &&
+          sourceLocation.address <= nonTestWasmFunction.endAddress
+        ) {
+          this.lineNumbers
+            .get(sourceLocation.source)!
+            .add(sourceLocation.linenr);
+        }
+      });
+    }
 
     // branch coverage.
     this.coveredNodes = new Set();
     const sourceCFG = this.languageAdaptor.sourceCFGs;
-    this.nodes = sourceCFG.allNodes();
+    this.nodes = sourceCFG.allNodes().filter((sourceCFGNode) => {
+      const functionId = sourceCFGNode.wasmFunOwner;
+      return !this.wasmTestFunctionIds.has(functionId);
+    });
     this.coveredSourceLocations = new Map();
 
     // test exit nodes.
@@ -120,8 +132,7 @@ export class CodeCoverageTool {
 
           // function coverage.
           const functionId = n.wasmFunOwner;
-          if (!this.wasmTestFunctionIds.has(functionId))
-            this.coveredFunctionIds.add(functionId);
+          this.coveredFunctionIds.add(functionId);
 
           // branch coverage.
           this.coveredNodes.add(n);
@@ -149,18 +160,46 @@ export class CodeCoverageTool {
 
   private getCoverageResults(): CodeCoverageToolResult {
     // line coverage.
-    const coveredLineNumberCount = [...this.coveredLineNumbers.values()].reduce(
-      (sum, current) => sum + current.size,
-      0,
-    );
-    const lineNumberCount = [...this.lineNumbers.values()].reduce(
-      (sum, current) => sum + current.size,
-      0,
-    );
+    const sourceFiles: {
+      name: string;
+      coveredLineNumberCount: number;
+      lineNumberCount: number;
+      ratio: number;
+    }[] = [];
+
+    let totalCoveredLineNumberCount = 0;
+    let totalLineNumberCount = 0;
+
+    for (const [sourceFile, allLines] of this.lineNumbers.entries()) {
+      const coveredLines = this.coveredLineNumbers.get(sourceFile);
+
+      const coveredLineNumberCount = coveredLines!.size;
+      const lineNumberCount = allLines.size;
+
+      totalCoveredLineNumberCount += coveredLineNumberCount;
+      totalLineNumberCount += lineNumberCount;
+
+      sourceFiles.push({
+        name: sourceFile,
+        coveredLineNumberCount,
+        lineNumberCount,
+        ratio:
+          lineNumberCount === 0
+            ? 0
+            : Number((coveredLineNumberCount / lineNumberCount).toFixed(2)),
+      });
+    }
+
     const lineCoverage = {
-      coveredLineNumberCount,
-      lineNumberCount,
-      ratio: Number((coveredLineNumberCount / lineNumberCount).toFixed(2)),
+      sourceFiles,
+      totalCoveredLineNumberCount,
+      totalLineNumberCount,
+      ratio:
+        totalLineNumberCount === 0
+          ? 0
+          : Number(
+              (totalCoveredLineNumberCount / totalLineNumberCount).toFixed(2),
+            ),
     };
 
     // function coverage.
@@ -169,7 +208,10 @@ export class CodeCoverageTool {
     const functionCoverage = {
       coveredFunctionCount,
       functionCount,
-      ratio: Number((coveredFunctionCount / functionCount).toFixed(2)),
+      ratio:
+        functionCount === 0
+          ? 0
+          : Number((coveredFunctionCount / functionCount).toFixed(2)),
       coveredFunctions: [...this.coveredFunctionIds.values()].map(
         (functionId) => {
           const wasmFunction =
@@ -185,7 +227,8 @@ export class CodeCoverageTool {
     const branchCoverage = {
       coveredNodeCount,
       nodeCount,
-      ratio: Number((coveredNodeCount / nodeCount).toFixed(2)),
+      ratio:
+        nodeCount === 0 ? 0 : Number((coveredNodeCount / nodeCount).toFixed(2)),
     };
 
     const coveredSourceLocations = [...this.coveredSourceLocations.values()];
