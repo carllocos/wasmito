@@ -158,8 +158,7 @@ export class CodeCoverageTool {
     }
   }
 
-  private getCoverageResults(): CodeCoverageToolResult {
-    // line coverage.
+  private getLineCoverageResults(): CodeCoverageToolResult['lineCoverage'] {
     const sourceFiles: {
       name: string;
       coveredLineNumberCount: number;
@@ -190,7 +189,7 @@ export class CodeCoverageTool {
       });
     }
 
-    const lineCoverage = {
+    return {
       sourceFiles,
       totalCoveredLineNumberCount,
       totalLineNumberCount,
@@ -201,11 +200,12 @@ export class CodeCoverageTool {
               (totalCoveredLineNumberCount / totalLineNumberCount).toFixed(2),
             ),
     };
+  }
 
-    // function coverage.
+  private getFunctionCoverageResults(): CodeCoverageToolResult['functionCoverage'] {
     const coveredFunctionCount = this.coveredFunctionIds.size;
     const functionCount = this.functionsExcludingTests.size;
-    const functionCoverage = {
+    return {
       coveredFunctionCount,
       functionCount,
       ratio:
@@ -220,18 +220,28 @@ export class CodeCoverageTool {
         },
       ),
     };
+  }
 
-    // branch coverage.
+  private getBranchCoverageResults(): CodeCoverageToolResult['branchCoverage'] {
     const coveredNodeCount = this.coveredNodes.size;
     const nodeCount = this.nodes.length;
-    const branchCoverage = {
+    return {
       coveredNodeCount,
       nodeCount,
       ratio:
         nodeCount === 0 ? 0 : Number((coveredNodeCount / nodeCount).toFixed(2)),
     };
+  }
 
-    const coveredSourceLocations = [...this.coveredSourceLocations.values()];
+  private getCoveredSourceLocationsResults(): CodeCoverageToolResult['coveredSourceLocations'] {
+    return [...this.coveredSourceLocations.values()];
+  }
+
+  private getCoverageResults(): CodeCoverageToolResult {
+    const lineCoverage = this.getLineCoverageResults();
+    const functionCoverage = this.getFunctionCoverageResults();
+    const branchCoverage = this.getBranchCoverageResults();
+    const coveredSourceLocations = this.getCoveredSourceLocationsResults();
 
     return {
       lineCoverage,
