@@ -24,8 +24,8 @@ export class CodeCoverageTool {
   private readonly lineNumbers: Map<string, Set<number>>; // K = filename, V = set of line numbers.
 
   // function coverage.
-  private readonly coveredFunctionIds: Set<number>;
-  private readonly functionsExcludingTests: Set<WASMFunction>;
+  private readonly coveredFunctions: Map<string, Set<WASMFunction>>; // K = filename, V = set of covered functions.
+  private readonly functions: Map<string, Set<WASMFunction>>; // K = filename, V = set of functions.
 
   // branch coverage.
   private readonly coveredNodes: Map<string, Set<SourceCFGNode>>; // K = filename, V = set of covered nodes.
@@ -61,14 +61,8 @@ export class CodeCoverageTool {
     this.lineNumbers = new Map();
 
     // function coverage.
-    this.coveredFunctionIds = new Set();
-    this.functionsExcludingTests = new Set();
-    this.languageAdaptor.sourceCFGs.sourceMap.wasm.functions.forEach(
-      (wasmFunction) => {
-        if (!this.wasmTestFunctionIds.has(wasmFunction.id))
-          this.functionsExcludingTests.add(wasmFunction);
-      },
-    );
+    this.coveredFunctions = new Map();
+    this.functions = new Map();
 
     // branch coverage.
     this.coveredNodes = new Map();
@@ -85,16 +79,32 @@ export class CodeCoverageTool {
         this.lineNumbers.set(sourceLocation.source, new Set());
       }
 
-      this.functionsExcludingTests.forEach((nonTestWasmFunction) => {
-        if (
-          nonTestWasmFunction.startAddress <= sourceLocation.address &&
-          sourceLocation.address <= nonTestWasmFunction.endAddress
-        ) {
-          this.lineNumbers
-            .get(sourceLocation.source)!
-            .add(sourceLocation.linenr);
-        }
-      });
+      // function coverage.
+      if (!this.coveredFunctions.has(sourceLocation.source)) {
+        this.coveredFunctions.set(sourceLocation.source, new Set());
+      }
+
+      if (!this.functions.has(sourceLocation.source)) {
+        this.functions.set(sourceLocation.source, new Set());
+      }
+
+      // line coverage, function coverage.
+      this.languageAdaptor.sourceCFGs.sourceMap.wasm.functions
+        .filter(
+          (wasmFunction) => !this.wasmTestFunctionIds.has(wasmFunction.id),
+        )
+        .forEach((nonTestWasmFunction) => {
+          if (
+            nonTestWasmFunction.startAddress <= sourceLocation.address &&
+            sourceLocation.address <= nonTestWasmFunction.endAddress
+          ) {
+            this.lineNumbers
+              .get(sourceLocation.source)!
+              .add(sourceLocation.linenr);
+
+            this.functions.get(sourceLocation.source)!.add(nonTestWasmFunction);
+          }
+        });
 
       // branch coverage.
       if (!this.coveredNodes.has(sourceLocation.source)) {
@@ -158,7 +168,11 @@ export class CodeCoverageTool {
 
             // function coverage.
             const functionId = n.wasmFunOwner;
-            this.coveredFunctionIds.add(functionId);
+            const wasmFunction =
+              this.languageAdaptor.sourceCFGs.sourceMap.getFunction(
+                functionId,
+              )!;
+            this.coveredFunctions.get(sourceLocation.source)!.add(wasmFunction);
 
             // branch coverage.
             this.coveredNodes.get(sourceLocation.source)!.add(n);
@@ -227,35 +241,53 @@ export class CodeCoverageTool {
   }
 
   private getFunctionCoverageResults(): CodeCoverageToolResult['functionCoverage'] {
-    const coveredFunctionCount = this.coveredFunctionIds.size;
-    const functionCount = this.functionsExcludingTests.size;
+    const sourceFiles: CodeCoverageToolResult['functionCoverage']['sourceFiles'] =
+      [];
+
+    let totalCoveredFunctionCount = 0;
+    let totalFunctionCount = 0;
+
+    for (const [
+      sourceFile,
+      functionsPerSourceFile,
+    ] of this.functions.entries()) {
+      const coveredFunctions = this.coveredFunctions.get(sourceFile)!;
+
+      const coveredFunctionCount = coveredFunctions.size;
+      const functionCount = functionsPerSourceFile.size;
+
+      totalCoveredFunctionCount += coveredFunctionCount;
+      totalFunctionCount += coveredFunctionCount;
+
+      sourceFiles.push({
+        name: sourceFile,
+        coveredFunctionCount,
+        functionCount,
+        ratio:
+          functionCount === 0
+            ? 0
+            : Number((coveredFunctionCount / functionCount).toFixed(2)),
+        coveredFunctions: Array.from(coveredFunctions).map(
+          (coveredFunction) => ({
+            id: coveredFunction.id,
+            name: coveredFunction.name,
+          }),
+        ),
+      });
+    }
+
     return {
-      coveredFunctionCount,
-      functionCount,
+      sourceFiles,
+      totalCoveredFunctionCount,
+      totalFunctionCount,
       ratio:
-        functionCount === 0
+        totalFunctionCount === 0
           ? 0
-          : Number((coveredFunctionCount / functionCount).toFixed(2)),
-      coveredFunctions: [...this.coveredFunctionIds.values()].map(
-        (functionId) => {
-          const wasmFunction =
-            this.languageAdaptor.sourceCFGs.sourceMap.getFunction(functionId)!;
-          return { id: functionId, name: wasmFunction.name };
-        },
-      ),
+          : Number((totalCoveredFunctionCount / totalFunctionCount).toFixed(2)),
     };
   }
 
   private getBranchCoverageResults(): CodeCoverageToolResult['branchCoverage'] {
-    // const coveredNodeCount = this.coveredNodes.size;
-    // const nodeCount = this.nodes.length;
-    // return {
-    //   coveredNodeCount,
-    //   nodeCount,
-    //   ratio:
-    //     nodeCount === 0 ? 0 : Number((coveredNodeCount / nodeCount).toFixed(2)),
-    // };
-
     const sourceFiles: CodeCoverageToolResult['branchCoverage']['sourceFiles'] =
       [];
 

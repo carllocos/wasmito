@@ -20,10 +20,16 @@ export type CodeCoverageToolResult = Readonly<{
     ratio: number;
   };
   functionCoverage: {
-    coveredFunctionCount: number;
-    functionCount: number;
+    sourceFiles: {
+      name: string;
+      coveredFunctionCount: number;
+      functionCount: number;
+      ratio: number;
+      coveredFunctions: { id: number; name: string }[];
+    }[];
+    totalCoveredFunctionCount: number;
+    totalFunctionCount: number;
     ratio: number;
-    coveredFunctions: { id: number; name: string }[];
   };
   branchCoverage: {
     sourceFiles: {
