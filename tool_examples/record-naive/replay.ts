@@ -6,51 +6,68 @@ import assert from 'assert';
 import { SourceCodeLocation } from '../../src/source_mappers/source_map';
 import { readFileSync } from 'fs';
 import { parse } from 'csv-parse/sync';
-import { spawnDevVM, spawnMCUVM } from '../spawn_vm';
+import { spawnMCUVM } from '../spawn_vm';
 import { WasmModule } from '../../src/webassembly/wasm/wasm_module';
 import { WasmAnalysis } from '../../src/tool_api/wasm_analysis';
 import { BoardBaudRate } from '../../src/util/serial_port';
-import {
-  ReadOnlyWasmValue,
-  ReadOnlyInterrupt,
-  WritableWasmValue,
-} from '../../src/tool_api/interrupts';
+import { WritableWasmValue } from '../../src/tool_api/interrupts';
 
 class ReplayInstr {
   public readonly file: NonSharedBuffer;
   private records: string[][];
-  private instrCnt: number;
-  private generalClock: number;
+  private instructionCount: number;
+  private interruptCount: number;
   public readonly vmConnection: WasmitoBackendVM;
   constructor(filename: string, vmConnection: WasmitoBackendVM) {
     this.file = readFileSync(filename);
     this.records = parse(this.file);
-    this.instrCnt = 0;
-    this.generalClock = 0;
+    this.instructionCount = 0;
+    this.interruptCount = 0;
     this.vmConnection = vmConnection;
-    console.log(this.records[this.generalClock]);
+    console.log(this.records[this.instructionCount + this.interruptCount]);
   }
   public checkInstr(instr: WasmInstruction, args: WritableWasmValue[]) {
-    this.generalClock += 1;
-    this.instrCnt += 1;
-    console.log(instr.startAddress);
-    console.log(this.records[this.generalClock]);
-
-    if (this.instrCnt == parseInt(this.records[this.generalClock][0])) {
-      const newArgs = this.records[this.generalClock][5].split(';');
-      for (let i = 0; i < args.length; i++) {
-        args[i].value = parseInt(newArgs[i]);
-        console.log(`set arg ${args[i].value} to ${newArgs[i]}`);
-      }
+    console.log(this.records[this.interruptCount + this.instructionCount + 1]);
+    // if there are no more instructions in the recording
+    if (
+      this.interruptCount + this.instructionCount + 1 >=
+      this.records.length
+    ) {
+      console.log('no more instructions in this recording.');
     } else {
-      console.log('do an interrupt!!!');
-      const pin = parseInt(
-        this.records[this.generalClock][2].slice('interrupt_'.length),
-      );
-      this.vmConnection.simulateInterrupt(pin);
-      this.instrCnt -= 1;
+      // if the instruction number matches, its an instruction, otherwise is must be an interrupt, as we now record everything naively
+      if (
+        this.instructionCount + 1 ==
+        parseInt(
+          this.records[this.instructionCount + this.interruptCount + 1][0],
+        )
+      ) {
+        this.instructionCount += 1;
+        console.log(
+          `${this.records[this.instructionCount + this.interruptCount][4]}, ${instr.startAddress}`,
+        );
+        const newArgs =
+          this.records[this.instructionCount + this.interruptCount][5].split(
+            ';',
+          );
+        // assign all the recorded variables to the stack variables
+        for (let i = 0; i < args.length; i++) {
+          args[i].value = parseInt(newArgs[i]);
+          console.log(`set arg ${args[i].value} to ${newArgs[i]}`);
+        }
+      } else {
+        this.interruptCount += 1;
+        const pin = parseInt(
+          this.records[this.instructionCount + this.interruptCount][2].slice(
+            'interrupt_'.length,
+          ),
+        );
+        setImmediate(async () => {
+          console.log(`do interrupt on pin ${pin}`);
+          await this.vmConnection.simulateInterrupt(pin);
+        });
+      }
     }
-
     return args;
   }
 }
@@ -93,8 +110,8 @@ async function main(): Promise<void> {
     vmConnection,
   );
   function checkInstr(instr: WasmInstruction, args: WritableWasmValue[]) {
-    console.log(`before Mut thing: ${instr}`);
-    return replayInstr.checkInstr(instr, args);
+    args = replayInstr.checkInstr(instr, args);
+    return args;
   }
   for (const func of wasm.functions) {
     for (const instr of func.allInstructions) {
@@ -114,10 +131,10 @@ function printMapping(langAdaptor: LanguageAdaptor): void {
   const records = parse(file);
 
   records.forEach((record) => {
-    const instrCount = record[0];
-    const intrpCount = record[1];
+    // const instrCount = record[0];
+    // const intrpCount = record[1];
     const topic = record[2];
-    const payload = record[3];
+    // const payload = record[3];
     const instrAddr = record[4];
     const args = record[5];
     // console.log(record);
