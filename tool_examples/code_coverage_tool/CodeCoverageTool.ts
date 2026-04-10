@@ -149,6 +149,33 @@ export class CodeCoverageTool {
     });
   }
 
+  private reportCoveredLine(sourceFile: string, lineNumber: number) {
+    this.coveredLineNumbers.get(sourceFile)!.add(lineNumber);
+  }
+
+  private reportCoveredFunction(sourceFile: string, functionId: number) {
+    const wasmFunction =
+      this.languageAdaptor.sourceCFGs.sourceMap.getFunction(functionId)!;
+    this.coveredFunctions.get(sourceFile)!.add(wasmFunction);
+  }
+
+  private reportCoveredNode(sourceFile: string, node: SourceCFGNode) {
+    this.coveredNodes.get(sourceFile)!.add(node);
+  }
+
+  private reportCoveredSourceLocation(
+    sourceFile: string,
+    lineNr: number,
+    colNr: number,
+  ) {
+    const key = `${sourceFile}:${lineNr}:${colNr}`;
+    this.coveredSourceLocations.set(key, {
+      sourceFile,
+      lineNr,
+      colNr,
+    });
+  }
+
   private registerOnNodeEntryCallback(): void {
     for (const nodesPerSourceFile of this.nodes.values()) {
       for (const node of nodesPerSourceFile) {
@@ -162,28 +189,23 @@ export class CodeCoverageTool {
             const sourceLocation = n.sourceLocation;
 
             // line coverage.
-            this.coveredLineNumbers
-              .get(sourceLocation.source)!
-              .add(sourceLocation.linenr);
+            this.reportCoveredLine(
+              sourceLocation.source,
+              sourceLocation.linenr,
+            );
 
             // function coverage.
-            const functionId = n.wasmFunOwner;
-            const wasmFunction =
-              this.languageAdaptor.sourceCFGs.sourceMap.getFunction(
-                functionId,
-              )!;
-            this.coveredFunctions.get(sourceLocation.source)!.add(wasmFunction);
+            this.reportCoveredFunction(sourceLocation.source, n.wasmFunOwner);
 
             // branch coverage.
-            this.coveredNodes.get(sourceLocation.source)!.add(n);
+            this.reportCoveredNode(sourceLocation.source, n);
 
             // covered source locations.
-            const key = `${sourceLocation.source}:${sourceLocation.linenr}:${sourceLocation.colnr}`;
-            this.coveredSourceLocations.set(key, {
-              sourceFile: sourceLocation.source,
-              lineNr: sourceLocation.linenr,
-              colNr: sourceLocation.colnr,
-            });
+            this.reportCoveredSourceLocation(
+              sourceLocation.source,
+              sourceLocation.linenr,
+              sourceLocation.colnr,
+            );
           },
         );
       }
