@@ -279,7 +279,7 @@ export class CodeCoverageTool {
       const functionCount = functionsPerSourceFile.size;
 
       totalCoveredFunctionCount += coveredFunctionCount;
-      totalFunctionCount += coveredFunctionCount;
+      totalFunctionCount += functionCount;
 
       sourceFiles.push({
         name: sourceFile,
