@@ -213,7 +213,7 @@ export class CodeCoverageTool {
   }
 
   private registerOnTestExitNodeEntryCallback(): void {
-    for (const testExitNode of this.testExitNodes.keys()) {
+    for (const testExitNode of this.testExitNodes) {
       this.analysis.onNodeEntry(testExitNode, () => {
         if (--this.testExitNodesRemaining === 0)
           this.resolveAllTestExitNodesEnteredPromise();
