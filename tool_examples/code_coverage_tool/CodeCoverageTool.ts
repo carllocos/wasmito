@@ -69,6 +69,10 @@ export class CodeCoverageTool {
     this.nodes = new Map();
 
     // line coverage, function coverage, branch coverage.
+    const nonTestFunctions =
+      this.languageAdaptor.sourceCFGs.sourceMap.wasm.functions.filter(
+        (wasmFunction) => !this.wasmTestFunctionIds.has(wasmFunction.id),
+      );
     for (const sourceLocation of this.languageAdaptor.sourceCFGs.sourceMap.allMappings()) {
       // line coverage.
       if (!this.coveredLineNumbers.has(sourceLocation.source)) {
@@ -89,22 +93,18 @@ export class CodeCoverageTool {
       }
 
       // line coverage, function coverage.
-      this.languageAdaptor.sourceCFGs.sourceMap.wasm.functions
-        .filter(
-          (wasmFunction) => !this.wasmTestFunctionIds.has(wasmFunction.id),
-        )
-        .forEach((nonTestWasmFunction) => {
-          if (
-            nonTestWasmFunction.startAddress <= sourceLocation.address &&
-            sourceLocation.address <= nonTestWasmFunction.endAddress
-          ) {
-            this.lineNumbers
-              .get(sourceLocation.source)!
-              .add(sourceLocation.linenr);
+      nonTestFunctions.forEach((nonTestWasmFunction) => {
+        if (
+          nonTestWasmFunction.startAddress <= sourceLocation.address &&
+          sourceLocation.address <= nonTestWasmFunction.endAddress
+        ) {
+          this.lineNumbers
+            .get(sourceLocation.source)!
+            .add(sourceLocation.linenr);
 
-            this.functions.get(sourceLocation.source)!.add(nonTestWasmFunction);
-          }
-        });
+          this.functions.get(sourceLocation.source)!.add(nonTestWasmFunction);
+        }
+      });
 
       // branch coverage.
       if (!this.coveredNodes.has(sourceLocation.source)) {
