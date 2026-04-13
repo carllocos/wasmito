@@ -1,15 +1,11 @@
 import { type WasmType } from './opcode_type';
-import { type WASM } from '../wasm';
+import { WASM } from '../wasm';
 import {
   isCallInstruction,
   type CallInstruction,
   type WasmInstruction,
 } from './wasm_instruction';
-import {
-  WasmOpcodeGetLocal,
-  WasmOpcodeNumber,
-  WasmOpcodeSetLocal,
-} from './wasm_opcode';
+import { WasmCode, WasmOpcode } from './wasm_opcode';
 
 export interface WasmLocal {
   index: number;
@@ -69,7 +65,7 @@ export class WASMFunction {
     return this._allInstructions;
   }
 
-  getAllInstructions(ints: WasmInstruction[]): WasmInstruction[] {
+  private getAllInstructions(ints: WasmInstruction[]): WasmInstruction[] {
     let allInts: WasmInstruction[] = [];
 
     for (const i of ints) {
@@ -96,30 +92,18 @@ export class WASMFunction {
   }
 
   getLocalGetInstructions(): WasmInstruction[] {
-    const localGetInstrs: WasmInstruction[] = [];
-    for (const i of this.allInstructions) {
-      if (i.opcodeNr === WasmOpcodeGetLocal) {
-        localGetInstrs.push(i);
-      }
-    }
-    return localGetInstrs;
+    return this.instructionsFromOpcode(WasmCode.LocalGet);
   }
 
   getLocalSetInstructions(): WasmInstruction[] {
-    const localSetInstrs: WasmInstruction[] = [];
-    for (const i of this.allInstructions) {
-      if (i.opcodeNr === WasmOpcodeSetLocal) {
-        localSetInstrs.push(i);
-      }
-    }
-    return localSetInstrs;
+    return this.instructionsFromOpcode(WasmCode.LocalSet);
   }
 
   isAddressInFunction(addr: number): boolean {
     return this.startAddress <= addr && addr <= this.endAddress; // TODO addr < this.endAddress?
   }
 
-  instructionsFromOpcode(opcode: WasmOpcodeNumber): WasmInstruction[] {
-    return this.allInstructions.filter((i) => i.opcodeNr === opcode);
+  instructionsFromOpcode(opcode: WasmOpcode): WasmInstruction[] {
+    return this.allInstructions.filter((i) => i.hasOpcode(opcode));
   }
 }
