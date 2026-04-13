@@ -1,3 +1,4 @@
+import assert from 'assert';
 import { PlaceholderType, WasmType } from './opcode_type';
 
 export type WasmOpcodeName = string;
@@ -1670,60 +1671,39 @@ export const WasmOpcodes: WasmOpcode[] = [
 ];
 
 export function typeFromWasmOpcode(
-  opcode: WasmOpcodeNumber,
-  subOpcode: WasmOpcodeNumber | undefined = undefined,
+  opcode: number,
+  subOpcode: number | undefined = undefined,
 ): WasmType | undefined {
-  const found = WasmOpcodes.find(([_, opcodeNumber, subOpcodeNr]) => {
-    return opcodeNumber === opcode && subOpcode === subOpcodeNr;
+  const found = WasmOpcodes.find((op) => {
+    return (
+      getWasmOpcodeNr(op) === opcode && getWasmSubOpcodeNr(op) === subOpcode
+    );
   });
   if (found === undefined) {
     return undefined;
   } else {
-    return found[3];
+    return getOpcodeType(found);
   }
 }
 
 export function wasmOpcodeFromNr(
   opcode: number,
-  subOpcode: number | undefined = undefined,
-): WasmOpcodeNumber | undefined {
-  const has = WasmOpcodes.find(([_, opcodeNumber, subOpcodeNr]) => {
-    return opcodeNumber === opcode && subOpcode === subOpcodeNr;
+  subOpcode?: number,
+): WasmOpcode | undefined {
+  return WasmOpcodes.find((op) => {
+    return (
+      getWasmOpcodeNr(op) === opcode && getWasmSubOpcodeNr(op) === subOpcode
+    );
   });
-  if (has !== undefined) {
-    return has[1];
-  } else {
-    return undefined;
-  }
-}
-export function wasmOpcodeNameFromNumber(
-  opcode: WasmOpcodeNumber,
-  subOpcode: WasmOpcodeNumber | undefined = undefined,
-): WasmOpcodeName | undefined {
-  const has = WasmOpcodes.find(([_, opcodeNumber, subOpcodeNr]) => {
-    return opcodeNumber === opcode && subOpcode === subOpcodeNr;
-  });
-  if (has !== undefined) {
-    return has[0];
-  } else {
-    return undefined;
-  }
 }
 
-export function wasmOpcodeFromStr(opcode: string): WasmOpcodeNumber[] {
+export function wasmOpcodeFromStr(opcode: string): WasmOpcode {
   const fixedOpcode = correctOpcodeName(opcode);
   const found = WasmOpcodes.find(([name, _, __]) => {
     return name === fixedOpcode;
   });
-  if (found === undefined) {
-    throw new Error(`unsupported opcode ${opcode}`);
-  } else {
-    const opcodes = [found[1]];
-    if (found[2] !== undefined) {
-      opcodes.push(found[2]);
-    }
-    return opcodes;
-  }
+  assert(found !== undefined, `unsupported opcode ${opcode}`);
+  return found;
 }
 
 function correctOpcodeName(opcode: string): WasmOpcodeName {
@@ -1763,8 +1743,8 @@ function correctOpcodeName(opcode: string): WasmOpcodeName {
   }
 }
 
-export function WasmOpcodeHasImmediate(opcode: WasmOpcodeNumber): boolean {
-  switch (opcode) {
+export function WasmOpcodeHasImmediate(opcode: WasmOpcode): boolean {
+  switch (getWasmOpcodeNr(opcode)) {
     case WasmOpcodeI32Const: // 'i32.const'
     case WasmOpcodeI64Const: // 'i64.const'
     case WasmOpcodeF32Const: // 'f32.const'
