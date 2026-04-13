@@ -28,7 +28,7 @@ export async function spawnDevVM(
  * @param wasm the Wasm module running on the spawned VM
  * @returns
  */
-export async function spawnExitingDevVM(
+export async function connectToExistingDevVM(
   wasm: WasmModule,
   toolPort: number,
 ): Promise<WasmitoBackendVM> {
