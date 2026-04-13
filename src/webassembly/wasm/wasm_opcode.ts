@@ -1,16 +1,30 @@
 import { PlaceholderType, WasmType } from './opcode_type';
 
-export type WasmOpcodeNumber = number;
 export type WasmOpcodeName = string;
-export type WasmOpcode = [
-  WasmOpcodeName,
-  WasmOpcodeNumber,
-  WasmOpcodeNumber | undefined,
-  WasmType,
-];
+export type WasmOpcode = [WasmOpcodeName, number, number | undefined, WasmType];
 
-export function getWasmOpcodeNr(op: WasmOpcode): WasmOpcodeNumber {
+export function getOpcodeName(op: WasmOpcode): string {
+  return op[0];
+}
+
+export function getWasmOpcodeNr(op: WasmOpcode): number {
   return op[1];
+}
+
+export function getWasmSubOpcodeNr(op: WasmOpcode): number | undefined {
+  return op[2];
+}
+
+export function getOpcodeType(op: WasmOpcode): WasmType {
+  return op[3];
+}
+
+export function equalOpcodes(op1: WasmOpcode, op2: WasmOpcode): boolean {
+  // TODO fix check
+  return (
+    getWasmOpcodeNr(op1) === getWasmOpcodeNr(op2) &&
+    getWasmSubOpcodeNr(op1) === getWasmSubOpcodeNr(op2)
+  );
 }
 
 export const WasmOpcodeUnreachable = 0x00;
