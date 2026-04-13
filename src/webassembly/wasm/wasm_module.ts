@@ -240,6 +240,23 @@ export class WasmModule {
     }
   }
 
+  public getEnclosingFunction(instr: number | WasmInstruction): WASMFunction {
+    const func = this.getEnclosingFunctionOrUndefined(instr);
+    assert(func !== undefined);
+    return func;
+  }
+
+  public getEnclosingFunctionOrUndefined(
+    instr: number | WasmInstruction,
+  ): WASMFunction | undefined {
+    let addr = 0;
+    if (typeof instr !== 'number') {
+      addr = instr.startAddress;
+    } else {
+      addr = instr;
+    }
+    return this.getFunctionFromAddr(addr);
+  }
   /**
    * This returns all call instructions if no argument is provided
    * or only returns the call instructions that are equal to the given func ID
