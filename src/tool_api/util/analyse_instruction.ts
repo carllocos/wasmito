@@ -5,7 +5,7 @@ import {
   WasmInstruction,
 } from '../../webassembly/wasm/wasm_instruction';
 import { WasmModule } from '../../webassembly/wasm/wasm_module';
-import { WasmOpcode } from '../../webassembly/wasm/wasm_opcode';
+import { WasmCode, WasmOpcode } from '../../webassembly/wasm/wasm_opcode';
 import { ReadOnlyWasmValue, WritableWasmValue } from '../interrupts';
 import { GroupHooks, InstrMoment } from '../group_hooks';
 import { WasmState } from '../../webassembly/wasm';
@@ -15,14 +15,21 @@ import { StateRequest } from '../../runtimes/wasmito_vm/requests/inspect_request
 import { PauseVMHook } from '../../hooks/hook_run_pause';
 import { getGlobalLogger } from '../../logger/logger';
 
-export function getInstructions(
+export function getInstructions<I extends WasmInstruction>(
   wasm: WasmModule,
-  instr: WasmInstruction | WasmAddress | WasmOpcode,
+  instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
 ): WasmInstruction[] {
   const instrs: WasmInstruction[] = [];
   let i: WasmInstruction | undefined;
   if (typeof instr === 'number') {
-    i = wasm.getInstruction(instr);
+    if (instr >= 0) {
+      i = wasm.getInstruction(instr);
+    } else {
+      // group of instructions
+      for (const op of WasmCode.toSingleOpcodes(instr)) {
+        instrs.push(...wasm.instructionsFromOpcode(op));
+      }
+    }
   } else if (instr instanceof WasmInstruction) {
     i = wasm.getInstruction(instr.startAddress);
   } else {
@@ -34,9 +41,9 @@ export function getInstructions(
   return instrs;
 }
 
-export function instruction<I>(
+export function instruction<I extends WasmInstruction>(
   moment: 'before',
-  instr: WasmInstruction | WasmAddress | WasmOpcode,
+  instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
   wasm: WasmModule,
   vm: WasmitoBackendVM,
   maxTimeoutMs: number,
@@ -46,10 +53,10 @@ export function instruction<I>(
     | ((vm: WasmitoBackendVM) => void)
     | (() => void),
   mutate: false,
-): GroupHooks;
-export function instruction<I>(
+): GroupHooks | undefined;
+export function instruction<I extends WasmInstruction>(
   moment: 'before',
-  instr: WasmInstruction | WasmAddress | WasmOpcode,
+  instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
   wasm: WasmModule,
   vm: WasmitoBackendVM,
   maxTimeoutMs: number,
@@ -61,10 +68,10 @@ export function instruction<I>(
       ) => WritableWasmValue[])
     | ((instr: I, args: WritableWasmValue[]) => WritableWasmValue[]),
   mutate: true,
-): GroupHooks;
-export function instruction<I>(
+): GroupHooks | undefined;
+export function instruction<I extends WasmInstruction>(
   moment: 'after',
-  instr: I | WasmAddress | WasmOpcode,
+  instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
   wasm: WasmModule,
   vm: WasmitoBackendVM,
   maxTimeoutMs: number,
@@ -78,10 +85,10 @@ export function instruction<I>(
     | ((vm: WasmitoBackendVM) => void)
     | (() => void),
   mutate: false,
-): GroupHooks;
-export function instruction<I>(
+): GroupHooks | undefined;
+export function instruction<I extends WasmInstruction>(
   moment: 'after',
-  instr: I | WasmAddress | WasmOpcode,
+  instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
   wasm: WasmModule,
   vm: WasmitoBackendVM,
   maxTimeoutMs: number,
@@ -96,10 +103,10 @@ export function instruction<I>(
         result: WritableWasmValue | undefined,
       ) => WritableWasmValue | undefined),
   mutate: true,
-): GroupHooks;
+): GroupHooks | undefined;
 export function instruction<I extends WasmInstruction>(
   moment: InstrMoment,
-  instr: I | WasmAddress | WasmOpcode,
+  instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
   wasm: WasmModule,
   vm: WasmitoBackendVM,
   maxTimeoutMs: number,
@@ -132,9 +139,11 @@ export function instruction<I extends WasmInstruction>(
     | ((vm: WasmitoBackendVM) => void)
     | (() => void),
   mutate: boolean,
-): GroupHooks {
+): GroupHooks | undefined {
   const instrs = getInstructions(wasm, instr);
-  assert(instrs.length > 0, `No instruction(s) found for ${instr}`);
+  if (instrs.length === 0) {
+    return undefined;
+  }
 
   const g = new GroupHooks(moment);
   for (const i of instrs) {

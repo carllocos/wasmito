@@ -7,25 +7,25 @@ import {
   WasmOpcodeBrTable,
   WasmOpcodeCall,
   WasmOpcodeCallIndirect,
-  WasmOpcodeEnd,
   WasmOpcodeF32Const,
   WasmOpcodeF64Const,
   WasmOpcodeI32Const,
   WasmOpcodeI64Const,
   WasmOpcodeIf,
   WasmOpcodeLoop,
-  type WasmOpcodeNumber,
   WasmOpcodeReturn,
-  WasmOpcodeTableSet,
-  typeFromWasmOpcode,
-  wasmOpcodeFromNr,
+  WasmOpcode,
+  getWasmOpcodeNr,
+  getOpcodeName,
+  getOpcodeType,
+  WasmCode,
+  equalOpcodes,
 } from './wasm_opcode';
 
 export type WasmAddress = number;
 
 export class WasmInstruction {
-  public readonly opcodeNr: WasmOpcodeNumber;
-  public readonly subOpcode: WasmOpcodeNumber | undefined;
+  public readonly opcode: WasmOpcode;
   public readonly name: string;
   public immediate?: number;
   private _signature: WasmType;
@@ -37,29 +37,18 @@ export class WasmInstruction {
   private _allSubInstructions: WasmInstruction[];
 
   constructor(
-    opcodeName: string,
-    opcodeNr: number | number[],
+    opcode: WasmOpcode,
     immediate?: number,
     opcodeLabels?: string[],
     signature?: WasmType,
   ) {
     this.startAddress = 0;
     this.endAddress = 0;
-    this.name = opcodeName;
-    if (typeof opcodeNr === 'number') {
-      this.opcodeNr = opcodeNr;
-      this.subOpcode = undefined;
-    } else {
-      this.opcodeNr = opcodeNr[0];
-      this.subOpcode = opcodeNr[1];
-    }
-    const op = wasmOpcodeFromNr(this.opcodeNr, this.subOpcode);
-    if (op === undefined) {
-      throw Error(`invalid opcode ${opcodeName}`);
-    }
-    const t = signature ?? typeFromWasmOpcode(this.opcodeNr, this.subOpcode);
+    this.opcode = opcode;
+    this.name = getOpcodeName(opcode);
+    const t = signature ?? getOpcodeType(opcode);
     if (t === undefined) {
-      throw Error(`inexistent opcode type for ${opcodeName}`);
+      throw Error(`inexistent opcode type for ${this.name}`);
     }
     this._signature = t;
     this.args = opcodeLabels ?? [];
@@ -96,6 +85,10 @@ export class WasmInstruction {
     }
   }
 
+  hasOpcode(opcode: WasmOpcode): boolean {
+    return equalOpcodes(this.opcode, opcode);
+  }
+
   public getArgs(): string[] {
     return this.args;
   }
@@ -105,7 +98,7 @@ export class WasmInstruction {
       startAddress: this.startAddress,
       endAddress: this.endAddress,
       opcodeName: this.name,
-      opcodeNr: this.opcodeNr,
+      opcodeNr: getWasmOpcodeNr(this.opcode),
       immediate: this.immediate ?? -1,
       subInstructions: this.subInstructions.map((i) => i.toJSONObj()),
       allSubInstructions: this.allSubInstructions.map((i) => i.toJSONObj()),
@@ -132,7 +125,7 @@ export function instructionToString(
 export class BranchIf extends WasmInstruction {
   private readonly _branchTarget: number;
   constructor(branchTarget: number, opcodeLabels?: string[]) {
-    super('br_if', WasmOpcodeBrIf, branchTarget, opcodeLabels);
+    super(WasmCode.BrIf, branchTarget, opcodeLabels);
     if (this.immediate === undefined || typeof this.immediate !== 'number') {
       throw new Error(
         `immediate on br_if should be a number given ${this.immediate}`,
@@ -153,13 +146,13 @@ export class BranchIf extends WasmInstruction {
 }
 
 export function isBranchIf(inst: WasmInstruction): inst is BranchIf {
-  return inst.opcodeNr === WasmOpcodeBrIf && inst instanceof BranchIf;
+  return equalOpcodes(inst.opcode, WasmCode.BrIf) && inst instanceof BranchIf;
 }
 
 export class Branch extends WasmInstruction {
   private readonly _branchTarget: number;
   constructor(branchTarget: number, opcodeLabels?: string[]) {
-    super('br', WasmOpcodeBr, branchTarget, opcodeLabels);
+    super(WasmCode.Br, branchTarget, opcodeLabels);
     if (this.immediate === undefined || typeof this.immediate !== 'number') {
       throw new Error(
         `immediate on br should be a number given ${this.immediate}`,
@@ -180,13 +173,13 @@ export class Branch extends WasmInstruction {
 }
 
 export function isBranch(inst: WasmInstruction): inst is Branch {
-  return inst.opcodeNr === WasmOpcodeBr && inst instanceof Branch;
+  return equalOpcodes(inst.opcode, WasmCode.Br) && inst instanceof Branch;
 }
 
 export class BranchTable extends WasmInstruction {
   private readonly _branchTargets: number[];
   constructor(branchTargets: number[]) {
-    super('br_table', WasmOpcodeBrTable, undefined, undefined);
+    super(WasmCode.BrTable, undefined, undefined);
     if (branchTargets.length === 0) {
       throw new Error(
         `branch_targets of br_table should be an array of at least one number`,
@@ -213,17 +206,21 @@ export class BranchTable extends WasmInstruction {
 }
 
 export function isBranchTable(inst: WasmInstruction): inst is BranchTable {
-  return inst.opcodeNr === WasmOpcodeBrTable && inst instanceof BranchTable;
+  return (
+    equalOpcodes(inst.opcode, WasmCode.BrTable) && inst instanceof BranchTable
+  );
 }
 
 export class ReturnBranch extends WasmInstruction {
   constructor() {
-    super('return', WasmOpcodeReturn);
+    super(WasmCode.Return, WasmOpcodeReturn);
   }
 }
 
 export function isReturnBranch(inst: WasmInstruction): inst is ReturnBranch {
-  return inst.opcodeNr === WasmOpcodeReturn && inst instanceof ReturnBranch;
+  return (
+    equalOpcodes(inst.opcode, WasmCode.Return) && inst instanceof ReturnBranch
+  );
 }
 
 export class IfInstruction extends WasmInstruction {
@@ -240,7 +237,7 @@ export class IfInstruction extends WasmInstruction {
     consequence: WasmInstruction[],
     resultType?: WASM.Type,
   ) {
-    super('if', WasmOpcodeIf);
+    super(WasmCode.If);
     this.label = label;
     this.testInstructions = test;
     this.alternative = alternative;
@@ -256,7 +253,7 @@ export class IfInstruction extends WasmInstruction {
     const consequenceMustHaveEnd = this.alternative.length === 0;
     if (consequenceMustHaveEnd) {
       // if there is no alternative then the end instruction must be stored in the consequence block
-      if (lastConseInstr.opcodeNr !== WasmOpcodeEnd) {
+      if (!equalOpcodes(lastConseInstr.opcode, WasmCode.End)) {
         throw new Error(
           `The Last instruction of the if-consequence is expected to be an 'end' instruction got ${lastConseInstr.name}'`,
         );
@@ -266,7 +263,7 @@ export class IfInstruction extends WasmInstruction {
     this.alternative.sort((i1, i2) => i1.startAddress - i2.startAddress);
     if (this.alternative.length > 0) {
       const lastAltInstr = this.alternative[this.alternative.length - 1];
-      if (lastAltInstr.opcodeNr !== WasmOpcodeEnd) {
+      if (!equalOpcodes(lastAltInstr.opcode, WasmCode.End)) {
         throw new Error(
           `The Last instruction of the if-alternative is expected to be an 'end' instruction got '${lastAltInstr.name}'`,
         );
@@ -293,13 +290,15 @@ export class IfInstruction extends WasmInstruction {
 }
 
 export function isIfInstruction(inst: WasmInstruction): inst is IfInstruction {
-  return inst.opcodeNr === WasmOpcodeIf && inst instanceof IfInstruction;
+  return (
+    equalOpcodes(inst.opcode, WasmCode.If) && inst instanceof IfInstruction
+  );
 }
 
 export class BlockInstruction extends WasmInstruction {
   public readonly label: string;
   constructor(label: string, subInstructions: WasmInstruction[]) {
-    super('block', WasmOpcodeBlock);
+    super(WasmCode.Block, WasmOpcodeBlock);
     this.label = label;
     this.subInstructions = subInstructions;
     this.subInstructions.sort((i1, i2) => i1.startAddress - i2.startAddress);
@@ -309,7 +308,7 @@ export class BlockInstruction extends WasmInstruction {
       );
     }
     const lastInstr = this.subInstructions[this.subInstructions.length - 1];
-    if (lastInstr.opcodeNr !== WasmOpcodeEnd) {
+    if (!equalOpcodes(lastInstr.opcode, WasmCode.End)) {
       throw new Error(
         `Last instruction of block instruction is expected to be an 'end' isntruction got ${lastInstr.name}'`,
       );
@@ -329,10 +328,14 @@ export class CallInstruction extends WasmInstruction {
   public readonly funcName: string;
 
   constructor(funName: string, funIdx: number) {
-    super('call', WasmOpcodeCall);
+    super(WasmCode.Call);
     this.args = [funName];
     this.funIdx = funIdx;
     this.funcName = funName;
+  }
+
+  get calledFunc(): number {
+    return this.funIdx;
   }
 
   public override toJSONObj(): object {
@@ -345,7 +348,9 @@ export class CallInstruction extends WasmInstruction {
 export function isCallInstruction(
   inst: WasmInstruction,
 ): inst is CallInstruction {
-  return inst.opcodeNr === WasmOpcodeCall && inst instanceof CallInstruction;
+  return (
+    equalOpcodes(inst.opcode, WasmCode.Call) && inst instanceof CallInstruction
+  );
 }
 
 export class CallIndirect extends WasmInstruction {
@@ -353,13 +358,7 @@ export class CallIndirect extends WasmInstruction {
   private _tblIndex: number;
 
   constructor(signature: WasmType) {
-    super(
-      'callIndirect',
-      WasmOpcodeCallIndirect,
-      undefined,
-      undefined,
-      signature,
-    );
+    super(WasmCode.CallIndirect, undefined, undefined, signature);
     this._targetFuncs = [];
     this._tblIndex = -1;
   }
@@ -394,7 +393,8 @@ export class CallIndirect extends WasmInstruction {
 
 export function isCallIndirect(inst: WasmInstruction): inst is CallIndirect {
   return (
-    inst.opcodeNr === WasmOpcodeCallIndirect && inst instanceof CallIndirect
+    equalOpcodes(inst.opcode, WasmCode.CallIndirect) &&
+    inst instanceof CallIndirect
   );
 }
 
@@ -406,7 +406,7 @@ export class LoopInstruction extends WasmInstruction {
     subInstructions: WasmInstruction[],
     resultType?: WASM.Type,
   ) {
-    super('loop', WasmOpcodeLoop);
+    super(WasmCode.Loop);
     this.label = label;
     this.subInstructions = subInstructions;
     this.resultType = resultType;
@@ -418,7 +418,7 @@ export class LoopInstruction extends WasmInstruction {
       );
     }
     const lastInstr = this.subInstructions[this.subInstructions.length - 1];
-    if (lastInstr.opcodeNr !== WasmOpcodeEnd) {
+    if (!equalOpcodes(lastInstr.opcode, WasmCode.End)) {
       throw new Error(
         `Last instruction of Loop subInstructions is expected to be an 'end' instruction got ${lastInstr.name}'`,
       );
@@ -435,11 +435,11 @@ export class LoopInstruction extends WasmInstruction {
 }
 
 export function isLoopInstruction(i: WasmInstruction): i is LoopInstruction {
-  return i.opcodeNr === WasmOpcodeLoop && i instanceof LoopInstruction;
+  return equalOpcodes(i.opcode, WasmCode.Loop) && i instanceof LoopInstruction;
 }
 
 export function isControlFlowInstruction(instr: WasmInstruction): boolean {
-  switch (instr.opcodeNr) {
+  switch (getWasmOpcodeNr(instr.opcode)) {
     case WasmOpcodeBr:
     case WasmOpcodeBrIf:
     case WasmOpcodeBrTable:
@@ -452,8 +452,8 @@ export function isControlFlowInstruction(instr: WasmInstruction): boolean {
   }
 }
 
-export function isBranchingInstruction(inst: WasmInstruction): boolean {
-  switch (inst.opcodeNr) {
+export function isBranchingInstruction(instr: WasmInstruction): boolean {
+  switch (getWasmOpcodeNr(instr.opcode)) {
     case WasmOpcodeBr:
     case WasmOpcodeBrIf:
     case WasmOpcodeBrTable:
@@ -464,7 +464,7 @@ export function isBranchingInstruction(inst: WasmInstruction): boolean {
 }
 
 export function isWasmInstructionBlockBased(instr: WasmInstruction): boolean {
-  switch (instr.opcodeNr) {
+  switch (getWasmOpcodeNr(instr.opcode)) {
     case WasmOpcodeBlock:
     case WasmOpcodeLoop:
     case WasmOpcodeIf:
@@ -485,8 +485,8 @@ export class ConstInstr extends WasmInstruction {
    * https://www.npmjs.com/package/@xtuc/long/v/4.2.2
    * it is needed because JS can only handle 54bit numbers
    */
-  constructor(opcode: WasmOpcodeNumber, value: number, high?: number) {
-    super(constOpcodeToString(opcode), opcode);
+  constructor(opcode: WasmOpcode, value: number, high?: number) {
+    super(opcode);
     this.type = wasmTypefromConstOpcode(opcode);
     this.value = value;
     this._high = high ?? -1;
@@ -503,45 +503,30 @@ export class ConstInstr extends WasmInstruction {
 
 export class I32ConstInstruction extends ConstInstr {
   constructor(value: number) {
-    super(WasmOpcodeI32Const, value);
+    super(WasmCode.I32Const, value);
   }
 }
 
 export class F32ConstInstruction extends ConstInstr {
   constructor(value: number) {
-    super(WasmOpcodeF32Const, value);
+    super(WasmCode.F32Const, value);
   }
 }
 
 export class I64ConstInstruction extends ConstInstr {
   constructor(value: number, high?: number) {
-    super(WasmOpcodeI64Const, value, high);
+    super(WasmCode.I64Const, value, high);
   }
 }
 
 export class F64ConstInstruction extends ConstInstr {
   constructor(value: number) {
-    super(WasmOpcodeF64Const, value);
+    super(WasmCode.F64Const, value);
   }
 }
 
-function constOpcodeToString(opcode: WasmOpcodeNumber): string {
-  switch (opcode) {
-    case WasmOpcodeI32Const:
-      return 'i32.const';
-    case WasmOpcodeF32Const:
-      return 'f32.const';
-    case WasmOpcodeI64Const:
-      return 'i64.const';
-    case WasmOpcodeF64Const:
-      return 'f64.const';
-    default:
-      throw new Error(`Opcode ${opcode} is not a const`);
-  }
-}
-
-function wasmTypefromConstOpcode(opcode: WasmOpcodeNumber): WASM.Type {
-  switch (opcode) {
+function wasmTypefromConstOpcode(opcode: WasmOpcode): WASM.Type {
+  switch (getWasmOpcodeNr(opcode)) {
     case WasmOpcodeI32Const:
       return WASM.Type.i32;
     case WasmOpcodeF32Const:
@@ -558,19 +543,22 @@ function wasmTypefromConstOpcode(opcode: WasmOpcodeNumber): WASM.Type {
 }
 
 export function isConst(instr: WasmInstruction): instr is ConstInstr {
-  switch (instr.opcodeNr) {
-    case WasmOpcodeI32Const:
-    case WasmOpcodeI64Const:
-    case WasmOpcodeF32Const:
-    case WasmOpcodeF64Const:
-      return true;
-    default:
-      return false;
+  if (instr instanceof ConstInstr) {
+    switch (getWasmOpcodeNr(instr.opcode)) {
+      case WasmOpcodeI32Const:
+      case WasmOpcodeI64Const:
+      case WasmOpcodeF32Const:
+      case WasmOpcodeF64Const:
+        return true;
+      default:
+        return false;
+    }
   }
+  return false;
 }
 
 export function isTableSet(instr: WasmInstruction): boolean {
-  return instr.opcodeNr === WasmOpcodeTableSet;
+  return equalOpcodes(instr.opcode, WasmCode.TableSet);
 }
 
 export class GlobalGetInstruction extends WasmInstruction {}
