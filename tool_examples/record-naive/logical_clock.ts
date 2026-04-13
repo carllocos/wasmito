@@ -54,7 +54,11 @@ function logToFile(s: string): void {
     mode: 0o666,
   };
   // Use a relative path
-  writeFileSync(resolve('./tool_examples/record/recording.csv'), s, writeFlags);
+  writeFileSync(
+    resolve('./tool_examples/record-naive/recording.csv'),
+    s,
+    writeFlags,
+  );
 }
 
 export function logRecord(r: Record): void {
@@ -81,7 +85,7 @@ const writeFlags: WriteFileOptions = {
   mode: 0o666,
 };
 writeFileSync(
-  resolve('./tool_examples/record/recording.csv'),
+  resolve('./tool_examples/record-naive/recording.csv'),
   'instr,intrp,topic,payload,addr,args\n',
   writeFlags,
 );

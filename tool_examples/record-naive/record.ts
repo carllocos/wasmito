@@ -23,6 +23,7 @@ import { BoardBaudRate } from '../../src/util/serial_port';
 
 // import { WriteFileOptions, writeFileSync } from 'node:fs';
 
+let instrumentedCount = 0;
 function recordInterrupt(interrupt: ReadOnlyInterrupt): void {
   logicalClock.interrupts += 1;
   const record: Record = {
@@ -76,8 +77,10 @@ async function main(): Promise<void> {
     for (const i of f.allInstructions) {
       // register advice just before executing Wasm instruction i
       analysis.before(i, recordInstr);
+      instrumentedCount += 1;
     }
   }
+  console.log(`instrumented instructions: #${instrumentedCount}`);
 
   //register advice on before handling interrupt
   analysis.beforeHandlingInterrupt(recordInterrupt);
