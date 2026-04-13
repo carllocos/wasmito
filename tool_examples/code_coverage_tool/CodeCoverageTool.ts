@@ -52,7 +52,10 @@ export class CodeCoverageTool {
     this.languageAdaptor = languageAdaptor;
     this.vm = vm;
     this.wasmTestFunctionIds = new Set(wasmTestFunctionIds);
-    this.config = { timeoutMs: config?.timeoutMs ?? 1000 };
+    this.config = {
+      implementation: config?.implementation ?? 'node',
+      timeoutMs: config?.timeoutMs ?? 1000,
+    };
 
     this.analysis = new WasmAnalysis(this.languageAdaptor, this.vm);
 
@@ -153,9 +156,16 @@ export class CodeCoverageTool {
     this.coveredLineNumbers.get(sourceFile)!.add(lineNumber);
   }
 
-  private reportCoveredFunction(sourceFile: string, functionId: number) {
+  private reportCoveredFunctionById(sourceFile: string, functionId: number) {
     const wasmFunction =
       this.languageAdaptor.sourceCFGs.sourceMap.getFunction(functionId)!;
+    this.coveredFunctions.get(sourceFile)!.add(wasmFunction);
+  }
+
+  private reportCoveredFunction(
+    sourceFile: string,
+    wasmFunction: WASMFunction,
+  ) {
     this.coveredFunctions.get(sourceFile)!.add(wasmFunction);
   }
 
@@ -174,6 +184,43 @@ export class CodeCoverageTool {
       lineNr,
       colNr,
     });
+  }
+
+  private registerAfterInstructionCallback(): void {
+    const wasmFunctions =
+      this.languageAdaptor.sourceCFGs.sourceMap.wasm.functions;
+    for (const wasmFunction of wasmFunctions) {
+      if (!this.wasmTestFunctionIds.has(wasmFunction.id)) {
+        for (const wasmInstruction of wasmFunction.allInstructions) {
+          this.analysis.after(wasmInstruction, () => {
+            // More than one possible mapping for wasmInstruction.
+            const sourceLocation =
+              this.languageAdaptor.sourceCFGs.sourceMap.getOriginalPositionFor(
+                wasmInstruction.startAddress,
+              )[0];
+
+            // line coverage.
+            this.reportCoveredLine(
+              sourceLocation.source,
+              sourceLocation.linenr,
+            );
+
+            // function coverage.
+            this.reportCoveredFunction(sourceLocation.source, wasmFunction);
+
+            // branch coverage.
+            // TODO
+
+            // covered source locations.
+            this.reportCoveredSourceLocation(
+              sourceLocation.source,
+              sourceLocation.linenr,
+              sourceLocation.colnr,
+            );
+          });
+        }
+      }
+    }
   }
 
   private registerOnNodeEntryCallback(): void {
@@ -195,7 +242,10 @@ export class CodeCoverageTool {
             );
 
             // function coverage.
-            this.reportCoveredFunction(sourceLocation.source, n.wasmFunOwner);
+            this.reportCoveredFunctionById(
+              sourceLocation.source,
+              n.wasmFunOwner,
+            );
 
             // branch coverage.
             this.reportCoveredNode(sourceLocation.source, n);
@@ -376,7 +426,11 @@ export class CodeCoverageTool {
   }
 
   async run(): Promise<CodeCoverageToolResult> {
-    this.registerOnNodeEntryCallback();
+    if (this.config.implementation === 'node') {
+      this.registerOnNodeEntryCallback();
+    } else if (this.config.implementation === 'instruction') {
+      this.registerAfterInstructionCallback();
+    }
     this.registerOnTestExitNodeEntryCallback();
     await this.analysis.deploy();
 

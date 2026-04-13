@@ -1,4 +1,7 @@
-export type CodeCoverageToolConfig = Readonly<{ timeoutMs: number }>;
+export type CodeCoverageToolConfig = Readonly<{
+  implementation: 'instruction' | 'node';
+  timeoutMs: number;
+}>;
 
 export type CodeCoverageToolSourceLocation = Readonly<{
   sourceFile: string;
