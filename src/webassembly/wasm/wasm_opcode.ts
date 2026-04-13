@@ -53,7 +53,224 @@ export const WasmOpcodeI32Load = 0x28;
 export const WasmOpcodeF64ReinterpretI64 = 0xbf;
 export const WasmOpcodeTableSet = 0x26;
 
+function multipleWasmOpcodeToSingleOpcodes(
+  m: WasmCode.MultipleOpcode,
+): WasmOpcode[] {
+  switch (m) {
+    case WasmCode.MultipleOpcode.Binary:
+      return [
+        WasmCode.I32Eq,
+        WasmCode.I32Ne,
+        WasmCode.I32LtS,
+        WasmCode.I32LtU,
+        WasmCode.I32GtS,
+        WasmCode.I32GtU,
+        WasmCode.I32LeS,
+        WasmCode.I32LeU,
+        WasmCode.I32GeS,
+        WasmCode.I32GeU,
+
+        WasmCode.I64Eq,
+        WasmCode.I64Ne,
+        WasmCode.I64LtS,
+        WasmCode.I64LtU,
+        WasmCode.I64GtS,
+        WasmCode.I64GtU,
+        WasmCode.I64LeS,
+        WasmCode.I64LeU,
+        WasmCode.I64GeS,
+        WasmCode.I64GeU,
+
+        WasmCode.F32Eq,
+        WasmCode.F32Ne,
+        WasmCode.F32Lt,
+        WasmCode.F32Gt,
+        WasmCode.F32Le,
+        WasmCode.F32Ge,
+
+        WasmCode.F64Eq,
+        WasmCode.F64Ne,
+        WasmCode.F64Lt,
+        WasmCode.F64Gt,
+        WasmCode.F64Le,
+        WasmCode.F64Ge,
+
+        WasmCode.I32Add,
+        WasmCode.I32Sub,
+        WasmCode.I32Mul,
+        WasmCode.I32DivS,
+        WasmCode.I32DivU,
+        WasmCode.I32RemS,
+        WasmCode.I32RemU,
+        WasmCode.I32And,
+        WasmCode.I32Or,
+        WasmCode.I32Xor,
+        WasmCode.I32Shl,
+        WasmCode.I32ShrS,
+        WasmCode.I32ShrU,
+        WasmCode.I32Rotl,
+        WasmCode.I32Rotr,
+
+        WasmCode.I64Add,
+        WasmCode.I64Sub,
+        WasmCode.I64Mul,
+        WasmCode.I64DivS,
+        WasmCode.I64DivU,
+        WasmCode.I64RemS,
+        WasmCode.I64RemU,
+        WasmCode.I64And,
+        WasmCode.I64Or,
+        WasmCode.I64Xor,
+        WasmCode.I64Shl,
+        WasmCode.I64ShrS,
+        WasmCode.I64ShrU,
+        WasmCode.I64Rotl,
+        WasmCode.I64Rotr,
+
+        WasmCode.F32Add,
+        WasmCode.F32Sub,
+        WasmCode.F32Mul,
+        WasmCode.F32Div,
+        WasmCode.F32Min,
+        WasmCode.F32Max,
+        WasmCode.F32Copysign,
+
+        WasmCode.F64Add,
+        WasmCode.F64Sub,
+        WasmCode.F64Mul,
+        WasmCode.F64Div,
+        WasmCode.F64Min,
+        WasmCode.F64Max,
+        WasmCode.F64Copysign,
+      ];
+    case WasmCode.MultipleOpcode.Unary:
+      return [
+        WasmCode.Drop,
+        WasmCode.I32Eqz,
+        WasmCode.I64Eqz,
+
+        WasmCode.I32Clz,
+        WasmCode.I32Ctz,
+        WasmCode.I32Popcnt,
+
+        WasmCode.I64Clz,
+        WasmCode.I64Ctz,
+        WasmCode.I64Popcnt,
+
+        WasmCode.F32Abs,
+        WasmCode.F32Neg,
+        WasmCode.F32Ceil,
+        WasmCode.F32Floor,
+        WasmCode.F32Trunc,
+        WasmCode.F32Nearest,
+        WasmCode.F32Sqrt,
+
+        WasmCode.F64Abs,
+        WasmCode.F64Neg,
+        WasmCode.F64Ceil,
+        WasmCode.F64Floor,
+        WasmCode.F64Trunc,
+        WasmCode.F64Nearest,
+        WasmCode.F64Sqrt,
+
+        WasmCode.I32WrapI64,
+        WasmCode.I32TruncSF32,
+        WasmCode.I32TruncUF32,
+        WasmCode.I32TruncSF64,
+        WasmCode.I32TruncUF64,
+
+        WasmCode.I64ExtendSI32,
+        WasmCode.I64ExtendUI32,
+        WasmCode.I64TruncSF32,
+        WasmCode.I64TruncUF32,
+        WasmCode.I64TruncSF64,
+        WasmCode.I64TruncUF64,
+
+        WasmCode.F32ConvertSI32,
+        WasmCode.F32ConvertUI32,
+        WasmCode.F32ConvertSI64,
+        WasmCode.F32ConvertUI64,
+        WasmCode.F32DemoteF64,
+
+        WasmCode.F64ConvertSI32,
+        WasmCode.F64ConvertUI32,
+        WasmCode.F64ConvertSI64,
+        WasmCode.F64ConvertUI64,
+        WasmCode.F64PromoteF32,
+
+        WasmCode.I32ReinterpretF32,
+        WasmCode.I64ReinterpretF64,
+        WasmCode.F32ReinterpretI32,
+        WasmCode.F64ReinterpretI64,
+
+        WasmCode.I32Extend8S,
+        WasmCode.I32Extend16S,
+        WasmCode.I64Extend8S,
+        WasmCode.I64Extend16S,
+        WasmCode.I64Extend32S,
+      ];
+    case WasmCode.MultipleOpcode.Load:
+      return [
+        WasmCode.I32Load,
+        WasmCode.I64Load,
+        WasmCode.F32Load,
+        WasmCode.F64Load,
+        WasmCode.I32Load8S,
+        WasmCode.I32Load8U,
+        WasmCode.I32Load16S,
+        WasmCode.I32Load16U,
+        WasmCode.I64Load8S,
+        WasmCode.I64Load8U,
+        WasmCode.I64Load16S,
+        WasmCode.I64Load16U,
+        WasmCode.I64Load32S,
+        WasmCode.I64LoadU,
+      ];
+
+    case WasmCode.MultipleOpcode.Store:
+      return [
+        WasmCode.I32Store,
+        WasmCode.I64Store,
+        WasmCode.F32Store,
+        WasmCode.F64Store,
+        WasmCode.I32Store8,
+        WasmCode.I32Store16,
+        WasmCode.I64Store8,
+        WasmCode.I64Store16,
+        WasmCode.I64Store32,
+      ];
+
+    case WasmCode.MultipleOpcode.Const:
+      return [
+        WasmCode.I32Const,
+        WasmCode.I64Const,
+        WasmCode.F32Const,
+        WasmCode.F64Const,
+      ];
+    case WasmCode.MultipleOpcode.Global:
+      return [WasmCode.GlobalGet, WasmCode.GlobalSet];
+    case WasmCode.MultipleOpcode.Local:
+      return [WasmCode.LocalGet, WasmCode.LocalSet];
+  }
+}
+
 export namespace WasmCode {
+  export enum MultipleOpcode {
+    Unary = -1,
+    Binary = -2,
+    Load = -3,
+    Store = -4,
+    Local = -5,
+    Global = -6,
+    Const = -7,
+  }
+  export function isMultipleOpcode(v: any): v is WasmCode.MultipleOpcode {
+    return Object.values(WasmCode.MultipleOpcode).includes(v);
+  }
+  export function toSingleOpcodes(m: WasmCode.MultipleOpcode): WasmOpcode[] {
+    return multipleWasmOpcodeToSingleOpcodes(m);
+  }
+
   export const Unreachable: WasmOpcode = [
     'unreachable',
     WasmOpcodeUnreachable,
