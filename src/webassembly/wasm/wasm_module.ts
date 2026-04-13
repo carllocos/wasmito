@@ -15,11 +15,7 @@ import {
   isCallInstruction,
   type WasmInstruction,
 } from './wasm_instruction';
-import {
-  getWasmOpcodeNr,
-  WasmOpcode,
-  wasmOpcodeNameFromNumber,
-} from './wasm_opcode';
+import { getOpcodeName, getWasmOpcodeNr, WasmOpcode } from './wasm_opcode';
 import assert from 'assert';
 
 const logger = createLogger('WasmModule');
@@ -110,10 +106,9 @@ export class WasmModule {
   }
 
   instructionsFromOpcode(opcode: WasmOpcode): WasmInstruction[] {
-    const nr = getWasmOpcodeNr(opcode);
     const instrs: WasmInstruction[] = [];
     for (const f of this.functions) {
-      f.instructionsFromOpcode(nr).forEach((i) => instrs.push(i));
+      f.instructionsFromOpcode(opcode).forEach((i) => instrs.push(i));
     }
     return instrs;
   }
@@ -348,7 +343,7 @@ export class WasmModule {
         }
         if (startAddress !== wasmAddr && endAddress !== wasmAddr) {
           logger.debug(
-            `Case where addr is within instr (opcodeNr=${inst.opcodeNr}) but no subinstruction found`,
+            `Case where addr is within instr (opcodeNr=${getWasmOpcodeNr(inst.opcode)}) but no subinstruction found`,
           );
           return undefined;
         }
@@ -365,10 +360,11 @@ export class WasmModule {
     for (const f of this.functions) {
       const allInstructions: object[] = [];
       for (const instr of f.allInstructions) {
+        const nr = getWasmOpcodeNr(instr.opcode);
         allInstructions.push({
-          name: wasmOpcodeNameFromNumber(instr.opcodeNr),
-          opcode: instr.opcodeNr,
-          opcodeHex: `0x${instr.opcodeNr.toString(16)}`,
+          name: getOpcodeName(instr.opcode),
+          opcode: nr,
+          opcodeHex: `0x${nr.toString(16)}`,
           start: instr.startAddress,
           end: instr.endAddress,
           startHex: `0x${instr.startAddress.toString(16)}`,
