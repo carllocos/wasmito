@@ -32,7 +32,7 @@ export interface AnalysisConfig {
 }
 
 export class WasmAnalysis {
-  private wasm: WasmModule;
+  public readonly wasm: WasmModule;
   private vm: WasmitoBackendVM;
   private groups: GroupHooks[];
   private _logger: Logger;
