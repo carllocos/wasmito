@@ -79,17 +79,52 @@ async function main(): Promise<void> {
 
   const analysis = new WasmAnalysis(wasm, vmConnection);
 
-  let tobeInstrumentedInstructions: Array<WasmInstruction> = [];
   let instrumentedCount = 0;
   let countingCount = 0;
+  const exportedFunctions = wasm.allExportedFuncs();
+  const exportedFunctionsIds = exportedFunctions.map((value) => value.id);
+  // these functions are the ones that may be counted as they dont belong to the exported funcs.
+  const recordingFunctions = wasm.functions.filter(
+    (outerValue, index, array) => {
+      return (
+        // find the exported function in the functions array
+        exportedFunctionsIds.findIndex(
+          (inner, index, array) => inner == outerValue.id,
+          // if not found this function may be just counted.
+        ) == -1
+      );
+    },
+  );
+
+  for (const f of recordingFunctions) {
+    console.log(`amount of instructions: #${f.allInstructions.length}#`);
+    for (const i of f.allInstructions) {
+      console.log(`    amount of args: #${i.args.length}#`);
+      if (i.args.length > 0) {
+        console.log('        R');
+        analysis.before(i, recordInstr);
+        instrumentedCount += 1;
+      } else {
+        console.log('        C');
+        analysis.before(i, incrementInstrClock);
+        countingCount += 1;
+      }
+    }
+  }
+  for (const f of exportedFunctions) {
+    for (const i of f.allInstructions) {
+      console.log('        R');
+      analysis.before(i, recordInstr);
+      instrumentedCount += 1;
+    }
+  }
+
+  /*
   for (const f of wasm.functions) {
     console.log(`amount of instructions: #${f.allInstructions.length}#`);
     for (const i of f.allInstructions) {
       console.log(`    amount of args: #${i.args.length}#`);
       if (i.args.length > 0) {
-        tobeInstrumentedInstructions = tobeInstrumentedInstructions.concat(
-          Array<WasmInstruction>(i),
-        );
         console.log('        R');
         analysis.before(i, recordInstr);
         instrumentedCount += 1;
@@ -113,6 +148,8 @@ async function main(): Promise<void> {
       analysis.before(i, recordInstr);
     }
   }
+  */
+
   console.log(`counting ${countingCount} and recording ${instrumentedCount}`);
 
   //register advice on before handling interrupt

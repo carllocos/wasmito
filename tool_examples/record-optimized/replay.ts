@@ -17,6 +17,7 @@ class ReplayInstr {
   private records: string[][];
   private instructionCount: number;
   private interruptCount: number;
+  private recordIndex: number;
   public readonly vmConnection: WasmitoBackendVM;
   constructor(filename: string, vmConnection: WasmitoBackendVM) {
     this.file = readFileSync(filename);
@@ -24,49 +25,52 @@ class ReplayInstr {
     this.instructionCount = 0;
     this.interruptCount = 0;
     this.vmConnection = vmConnection;
-    console.log(this.records[this.instructionCount + this.interruptCount]);
+    this.recordIndex = 1;
+    console.log(this.records[this.recordIndex]);
   }
   public checkInstr(instr: WasmInstruction, args: WritableWasmValue[]) {
-    console.log(this.records[this.interruptCount + this.instructionCount + 1]);
-    // if there are no more instructions in the recording
-    if (
-      this.interruptCount + this.instructionCount + 1 >=
-      this.records.length
-    ) {
-      console.log('no more instructions in this recording.');
-    } else {
-      // if the instruction number matches, its an instruction, otherwise is must be an interrupt, as we now record everything naively
+    console.log(this.records[this.recordIndex]);
+    console.log(`idx: ${this.recordIndex}, clk: ${this.instructionCount}`);
+
+    if (this.records[this.recordIndex][2] != '') {
+      console.log('intrpt');
       if (
-        this.instructionCount + 1 ==
-        parseInt(
-          this.records[this.instructionCount + this.interruptCount + 1][0],
-        )
+        this.instructionCount != parseInt(this.records[this.recordIndex][0])
       ) {
+        console.log('interrupt but not right time');
         this.instructionCount += 1;
-        console.log(
-          `${this.records[this.instructionCount + this.interruptCount][4]}, ${instr.startAddress}`,
-        );
-        const newArgs =
-          this.records[this.instructionCount + this.interruptCount][5].split(
-            ';',
-          );
-        // assign all the recorded variables to the stack variables
-        for (let i = 0; i < args.length; i++) {
-          args[i].value = parseInt(newArgs[i]);
-          console.log(`set arg ${args[i].value} to ${newArgs[i]}`);
-        }
-      } else {
-        this.interruptCount += 1;
-        const pin = parseInt(
-          this.records[this.instructionCount + this.interruptCount][2].slice(
-            'interrupt_'.length,
-          ),
-        );
-        setImmediate(async () => {
-          console.log(`do interrupt on pin ${pin}`);
-          await this.vmConnection.simulateInterrupt(pin);
-        });
+        return args;
       }
+      // if its an interrupt and the clock is correct.
+      this.interruptCount += 1;
+      const pin = parseInt(
+        this.records[this.recordIndex][2].slice('interrupt_'.length),
+      );
+      setImmediate(async () => {
+        console.log(`do interrupt on pin ${pin}`);
+        await this.vmConnection.simulateInterrupt(pin);
+      });
+      this.recordIndex += 1;
+    } else if (
+      this.instructionCount + 1 ==
+      parseInt(this.records[this.recordIndex][0])
+    ) {
+      this.instructionCount += 1;
+      console.log(
+        `record: ${this.records[this.recordIndex][4]}, m5: ${instr.startAddress}`,
+      );
+      assert(parseInt(this.records[this.recordIndex][4]) == instr.startAddress);
+
+      const newArgs = this.records[this.recordIndex][5].split(';');
+      // assign all the recorded variables to the stack variables
+      for (let i = 0; i < args.length; i++) {
+        args[i].value = parseInt(newArgs[i]);
+        console.log(`set arg ${args[i].value} to ${newArgs[i]}`);
+      }
+      this.recordIndex += 1;
+    } else {
+      console.log('waiting for something to happen');
+      this.instructionCount += 1;
     }
     return args;
   }
@@ -84,7 +88,7 @@ async function main(): Promise<void> {
     relativePaths: true,
   });
   printMapping(langAdaptor);
-  /*
+
   const wasmPathModule = resolve(
     './app_examples/assemblyscript/toggle_led/wasm/toggle_led.wasm',
   );
@@ -107,7 +111,7 @@ async function main(): Promise<void> {
   });
   const analysis = new WasmAnalysis(wasm, vmConnection);
   const replayInstr = new ReplayInstr(
-    resolve('./tool_examples/record/recording.csv'),
+    resolve('./tool_examples/record-optimized/recording.csv'),
     vmConnection,
   );
   function checkInstr(instr: WasmInstruction, args: WritableWasmValue[]) {
@@ -125,7 +129,6 @@ async function main(): Promise<void> {
   await analysis.deploy();
   console.log('deployed');
   await analysis.run();
-  */
 }
 
 function printMapping(langAdaptor: LanguageAdaptor): void {
