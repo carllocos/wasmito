@@ -5,7 +5,7 @@ import { resolve } from 'path';
 import { WasmModule } from '../../src/webassembly/wasm/wasm_module';
 import { WasmAnalysis } from '../../src/tool_api/wasm_analysis';
 import { WasmitoBackendVM } from '../../src/runtimes/wasmito_vm/wasmito_vm';
-import { spawnDevVM, spawnMCUVM } from '../spawn_vm';
+import { connectToMCUVM, spawnDevVM, spawnMCUVM } from '../spawn_vm';
 import { WasmInstruction } from '../../src/webassembly/wasm/wasm_instruction';
 import { WASMFunction } from '../../src/webassembly/wasm/wasm_function';
 import { ReadOnlyWasmValue } from '../../src/tool_api/interrupts';
@@ -48,6 +48,19 @@ async function main(): Promise<void> {
     },
   });
 
+  // const vmConnection = await connectToMCUVM(wasm, {
+  //   vmConfig: {
+  //     pauseOnStart: true, // pause the VM on deploy of the Wasm module
+  //     serialPort: '/dev/ttyUSB0',
+  //     baudrate: BoardBaudRate.BD_115200,
+  //     fqbn: {
+  //       boardName: 'M5Stick-C',
+  //       fqbn: 'm5stack:esp32:m5stick-c',
+  //     },
+  //   },
+  // });
+
+
   logger.info('VM connected on MCU');
 
   const analysis = new WasmAnalysis(wasm, vmConnection);
@@ -70,18 +83,18 @@ function showInstruction(i: WasmInstruction, args: ReadOnlyWasmValue[]): void {
   logger.info(`Instruction ${i.name} at address ${i.startAddress} is about to execute`);
 }
 
-function structureForBrigadier(f: WASMFunction, i:WasmInstruction) {
-    const name = i.name;
-    const address = i.startAddress;
-    const args = i.args;
-    const f_name = f.name;
+function structureForBrigadier(f: WASMFunction, i: WasmInstruction) {
+  const name = i.name;
+  const address = i.startAddress;
+  const args = i.args;
+  const f_name = f.name;
 
-    const event = {
-        type: name,
-        args: args,
-        function: f_name
-    };
-    return event;
+  const event = {
+    type: name,
+    args: args,
+    function: f_name
+  };
+  return event;
 }
 
 function sendToBrigadier(f: WASMFunction): (i: WasmInstruction, args: ReadOnlyWasmValue[]) => void {

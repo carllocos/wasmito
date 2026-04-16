@@ -56,3 +56,25 @@ export async function spawnMCUVM(
   const platform = await createArduinoPlatform(vmArgs);
   return dm.spawnHardwareVM(la, platform);
 }
+
+
+
+/**
+ * Connect to an MCU running a WARDuino VM and a `wasm` module
+ * @param wasm the Wasm module running on the VM
+ * @param vmArgs
+ * @returns
+ */
+export async function connectToMCUVM(
+  wasm: WasmModule | LanguageAdaptor,
+  vmArgs: FactoryArgs,
+): Promise<WasmitoBackendVM> {
+  const la =
+    wasm instanceof LanguageAdaptor
+      ? wasm
+      : LanguageAdaptor.emptyAdaptor(wasm.wasmPath);
+  const dm = new DeviceManager();
+  const platform = await createArduinoPlatform(vmArgs);
+  return dm.connectToExistingMCUVM(la, platform);
+}
+
