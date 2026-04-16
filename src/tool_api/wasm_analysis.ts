@@ -21,7 +21,7 @@ import {
   WasmAddress,
   WasmInstruction,
 } from '../webassembly/wasm/wasm_instruction';
-import { WasmOpcode } from '../webassembly/wasm/wasm_opcode';
+import { WasmCode, WasmOpcode } from '../webassembly/wasm/wasm_opcode';
 import { WasmState } from '../webassembly/wasm';
 import { assertFatalHookError, Hook } from '../hooks/hook';
 import { InspectStateHook } from '../hooks/hook_inspect_state';
@@ -32,7 +32,7 @@ export interface AnalysisConfig {
 }
 
 export class WasmAnalysis {
-  private wasm: WasmModule;
+  public readonly wasm: WasmModule;
   private vm: WasmitoBackendVM;
   private groups: GroupHooks[];
   private _logger: Logger;
@@ -55,8 +55,10 @@ export class WasmAnalysis {
     this._logger = createLogger(config?.name ?? 'WasmAnalyse');
     this.maxTimeoutMs = config?.maxTimeoutMs ?? 30000;
   }
-  private addGroup(g: GroupHooks): GroupHooks {
-    this.groups.push(g);
+  private addGroup(g: GroupHooks | undefined): GroupHooks | undefined {
+    if (g !== undefined) {
+      this.groups.push(g);
+    }
     return g;
   }
 
@@ -64,14 +66,14 @@ export class WasmAnalysis {
    * Register a callback to be executed `before` the given `instr` is executed on the VM.
    *
    */
-  before<I>(
-    instr: WasmInstruction | WasmAddress | WasmOpcode,
+  before<I extends WasmInstruction>(
+    instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
     cb:
       | ((instr: I, args: ReadOnlyWasmValue[], vm: WasmitoBackendVM) => void)
       | ((instr: I, args: ReadOnlyWasmValue[]) => void)
       | ((vm: WasmitoBackendVM) => void)
       | (() => void),
-  ): GroupHooks {
+  ): GroupHooks | undefined {
     const mutate = false;
     return this.addGroup(
       instruction<I>(
@@ -86,8 +88,8 @@ export class WasmAnalysis {
     );
   }
 
-  beforeMut<I>(
-    instr: WasmInstruction | WasmAddress | WasmOpcode,
+  beforeMut<I extends WasmInstruction>(
+    instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
     cb:
       | ((
           instr: I,
@@ -95,7 +97,7 @@ export class WasmAnalysis {
           vm: WasmitoBackendVM,
         ) => WritableWasmValue[])
       | ((instr: I, args: WritableWasmValue[]) => WritableWasmValue[]),
-  ): GroupHooks {
+  ): GroupHooks | undefined {
     const mutate = true;
     return this.addGroup(
       instruction<I>(
@@ -110,8 +112,8 @@ export class WasmAnalysis {
     );
   }
 
-  after<I>(
-    instr: I | WasmAddress | WasmOpcode,
+  after<I extends WasmInstruction>(
+    instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
     cb:
       | ((
           instr: I,
@@ -121,7 +123,7 @@ export class WasmAnalysis {
       | ((instr: I, result: ReadOnlyWasmValue | undefined) => void)
       | ((vm: WasmitoBackendVM) => void)
       | (() => void),
-  ): GroupHooks {
+  ): GroupHooks | undefined {
     const mutate = false;
     return this.addGroup(
       instruction<I>(
@@ -136,8 +138,8 @@ export class WasmAnalysis {
     );
   }
 
-  afterMut<I>(
-    instr: I | WasmAddress | WasmOpcode,
+  afterMut<I extends WasmInstruction>(
+    instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
     cb:
       | ((
           instr: I,
@@ -148,7 +150,7 @@ export class WasmAnalysis {
           instr: I,
           result: WritableWasmValue | undefined,
         ) => WritableWasmValue | undefined),
-  ): GroupHooks {
+  ): GroupHooks | undefined {
     const mutate = true;
     return this.addGroup(
       instruction<I>(
@@ -170,7 +172,7 @@ export class WasmAnalysis {
       | (() => void),
   ): GroupHooks {
     const mutate = false;
-    return this.addGroup(
+    const gh = this.addGroup(
       interrupt(
         this.vm,
         this.maxTimeoutMs,
@@ -180,6 +182,8 @@ export class WasmAnalysis {
         cb,
       ),
     );
+    assert(gh !== undefined, 'failed to hook upon `onNewInterrupt`');
+    return gh;
   }
 
   onNewInterruptMut(
@@ -189,7 +193,7 @@ export class WasmAnalysis {
       | (() => void),
   ): GroupHooks {
     const mutate = true;
-    return this.addGroup(
+    const gh = this.addGroup(
       interrupt(
         this.vm,
         this.maxTimeoutMs,
@@ -199,6 +203,8 @@ export class WasmAnalysis {
         cb,
       ),
     );
+    assert(gh !== undefined, 'failed to hook upon `onNewInterruptMut`');
+    return gh;
   }
 
   beforeHandlingInterrupt(
@@ -208,7 +214,7 @@ export class WasmAnalysis {
       | (() => void),
   ): GroupHooks {
     const mutate = false;
-    return this.addGroup(
+    const gh = this.addGroup(
       interrupt(
         this.vm,
         this.maxTimeoutMs,
@@ -218,6 +224,8 @@ export class WasmAnalysis {
         cb,
       ),
     );
+    assert(gh !== undefined, 'failed to hook upon `beforeInterruptHandled`');
+    return gh;
   }
 
   beforeHandlingInterruptMut(
@@ -227,7 +235,7 @@ export class WasmAnalysis {
       | (() => void),
   ): GroupHooks {
     const mutate = true;
-    return this.addGroup(
+    const gh = this.addGroup(
       interrupt(
         this.vm,
         this.maxTimeoutMs,
@@ -237,6 +245,8 @@ export class WasmAnalysis {
         cb,
       ),
     );
+    assert(gh !== undefined, 'failed to hook upon `beforeInterruptHandledMut`');
+    return gh;
   }
 
   afterHandlingInterrupt(
@@ -246,7 +256,7 @@ export class WasmAnalysis {
       | (() => void),
   ): GroupHooks {
     const mutate = false;
-    return this.addGroup(
+    const gh = this.addGroup(
       interrupt(
         this.vm,
         this.maxTimeoutMs,
@@ -256,6 +266,8 @@ export class WasmAnalysis {
         cb,
       ),
     );
+    assert(gh !== undefined, 'failed to hook upon `afterHandlingInterrupt`');
+    return gh;
   }
 
   onNodeEntry(
@@ -296,7 +308,9 @@ export class WasmAnalysis {
       actionToSubscribe.subscribe(newCB);
       g.addInstructionActions(i, actions);
     }
-    return this.addGroup(g);
+    const gh = this.addGroup(g);
+    assert(gh !== undefined, 'failed to hook upon `onNodeEntry`');
+    return gh;
   }
 
   onError(_cb: (...args: any[]) => any): GroupHooks {

@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import { WasmInstruction } from '../wasm/wasm_instruction';
 import { WasmOpcodeHasImmediate, wasmOpcodeFromNr } from '../wasm/wasm_opcode';
+import assert from 'assert';
 
 export interface ParsedInstruction {
   address: number;
@@ -104,7 +105,6 @@ export function parseInstructionsFromDissambledOutput(
     }
 
     const splits = keyword.split(' ');
-    const opcodeName = splits.length > 1 ? splits[0] : keyword;
     const parsedOpcodeLabels =
       splits.length > 1 ? splits.splice(1, splits.length) : [];
 
@@ -123,12 +123,9 @@ export function parseInstructionsFromDissambledOutput(
       const op = opcodesWaitingForEnd[opcodesWaitingForEnd.length - 1];
       parsedOpcodeLabels.unshift(`${keyword}_${op}`);
     }
-    const instruction = new WasmInstruction(
-      opcodeName,
-      opcodeNr,
-      immediate,
-      opcodeLabels,
-    );
+    const opcode = wasmOpcodeFromNr(opcodeNr);
+    assert(opcode !== undefined);
+    const instruction = new WasmInstruction(opcode, immediate, opcodeLabels);
 
     funcOpcodes.push({
       address,

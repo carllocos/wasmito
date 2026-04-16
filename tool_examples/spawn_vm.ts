@@ -28,7 +28,7 @@ export async function spawnDevVM(
  * @param wasm the Wasm module running on the spawned VM
  * @returns
  */
-export async function spawnExitingDevVM(
+export async function connectToExistingDevVM(
   wasm: WasmModule,
   toolPort: number,
 ): Promise<WasmitoBackendVM> {
@@ -57,15 +57,13 @@ export async function spawnMCUVM(
   return dm.spawnHardwareVM(la, platform);
 }
 
-
-
 /**
- * Connect to an MCU running a WARDuino VM and a `wasm` module
- * @param wasm the Wasm module running on the VM
+ * Connect to a WARDuino VM already deployed onto an ESP32 running the given Wasm module `wasm`
+ * @param wasm the Wasm module running on the VM deployed on the MCU
  * @param vmArgs
  * @returns
  */
-export async function connectToMCUVM(
+export async function connectToExistingMCUVM(
   wasm: WasmModule | LanguageAdaptor,
   vmArgs: FactoryArgs,
 ): Promise<WasmitoBackendVM> {
@@ -77,4 +75,3 @@ export async function connectToMCUVM(
   const platform = await createArduinoPlatform(vmArgs);
   return dm.connectToExistingMCUVM(la, platform);
 }
-
