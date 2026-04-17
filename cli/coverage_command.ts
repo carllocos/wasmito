@@ -1,3 +1,4 @@
+import { CodeCoverageToolExecutionTarget } from '../tool_examples/code_coverage_tool/CodeCoverageToolTypes';
 import { CodeCoverageTool } from '../tool_examples/code_coverage_tool/CodeCoverageTool';
 import { LanguageAdaptor } from '../src/language_adaptors/language_adaptor';
 import { getAbsolutePath, isFilePath } from '../src/util/file_util';
@@ -6,7 +7,6 @@ import { BoardBaudRate } from '../src/util/serial_port';
 import { WasmitoBackendVM } from '../src';
 import { Command } from 'commander';
 import fs from 'fs';
-import { CodeCoverageToolExecutionTarget } from '../tool_examples/code_coverage_tool/CodeCoverageToolTypes';
 
 function writeOutput(output: string, outputPath?: string): void {
   if (outputPath === undefined) {
@@ -73,6 +73,10 @@ export function registerCoverageCommand(program: Command) {
       '-o, --output <output-path>',
       'Write the coverage report to a file instead of stdout.',
     )
+    .option(
+      '-i, --instruction',
+      'Use instruction level coverage instead of node level coverage.',
+    )
     .action(async (wasmPath, mappingsPath, testsPath, options) => {
       wasmPath = getAbsolutePath(wasmPath);
       mappingsPath = getAbsolutePath(mappingsPath);
@@ -98,7 +102,10 @@ export function registerCoverageCommand(program: Command) {
         languageAdaptor,
         await createVM(options.target, languageAdaptor),
         parseTestsFile(testsPath),
-        { timeoutMs: options.timeout },
+        {
+          timeoutMs: options.timeout,
+          implementation: options.instruction ? 'instruction' : 'node',
+        },
       );
 
       const coverage = await codeCoverageTool.run();
