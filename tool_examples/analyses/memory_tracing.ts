@@ -3,19 +3,27 @@ import { resolve } from 'path';
 import { WasmModule } from '../../src/webassembly/wasm/wasm_module';
 import { WasmAnalysis } from '../../src/tool_api/wasm_analysis';
 import { ReadOnlyWasmValue } from '../../src/tool_api/interrupts';
-import { WasmInstruction } from '../../src/webassembly/wasm/wasm_instruction';
+import {
+  isLoadInstruction,
+  LoadInstruction,
+  StoreInstruction,
+  WasmInstruction,
+} from '../../src/webassembly/wasm/wasm_instruction';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { spawnDevVM, spawnMCUVM } from '../spawn_vm';
 import { WasmCode } from '../../src/webassembly/wasm/wasm_opcode';
 
 type Access = [number, WasmInstruction, number, boolean];
-type Advice = (instr: WasmInstruction, args: ReadOnlyWasmValue[]) => void;
+type Advice = (
+  instr: LoadInstruction | StoreInstruction,
+  args: ReadOnlyWasmValue[],
+) => void;
 
 const accesses: Access[] = [];
 function access(wasm: WasmModule, write: boolean): Advice {
   return (instr, args) => {
     const fid = wasm.getEnclosingFunction(instr).id ?? -1;
-    const addr = args[0].value + args[1].value;
+    const addr = instr.offset + args[isLoadInstruction(instr) ? 0 : 1].value;
     const a: Access = [fid, instr, addr, write];
     accesses.push(a);
     console.log(a);
