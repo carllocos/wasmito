@@ -561,4 +561,48 @@ export function isTableSet(instr: WasmInstruction): boolean {
   return equalOpcodes(instr.opcode, WasmCode.TableSet);
 }
 
-export class GlobalGetInstruction extends WasmInstruction {}
+export class GlobalGetInstruction extends WasmInstruction {
+  private _idx: number;
+  constructor(idx: number) {
+    super(WasmCode.GlobalGet, idx);
+    this._idx = idx;
+  }
+
+  get index(): number {
+    return this._idx;
+  }
+}
+
+export class GlobalSetInstruction extends WasmInstruction {
+  private _idx: number;
+  constructor(idx: number) {
+    super(WasmCode.GlobalSet, idx);
+    this._idx = idx;
+  }
+
+  get index(): number {
+    return this._idx;
+  }
+}
+
+export class LoadInstruction extends WasmInstruction {
+  readonly offset: number;
+
+  constructor(opcode: WasmOpcode, offset: number) {
+    super(opcode);
+    this.offset = offset;
+  }
+}
+
+export function isLoadInstruction(i: any): i is LoadInstruction {
+  return i instanceof LoadInstruction;
+}
+
+export class StoreInstruction extends WasmInstruction {
+  readonly offset: number;
+
+  constructor(opcode: WasmOpcode, offset: number) {
+    super(opcode);
+    this.offset = offset;
+  }
+}
