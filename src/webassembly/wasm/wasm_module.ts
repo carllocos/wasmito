@@ -13,6 +13,7 @@ import {
 import {
   CallInstruction,
   isCallInstruction,
+  isConst,
   type WasmInstruction,
 } from './wasm_instruction';
 import { getOpcodeName, getWasmOpcodeNr, WasmOpcode } from './wasm_opcode';
@@ -27,6 +28,7 @@ export interface WasmGlobal {
   startAddress: number;
   endAddress: number;
   value: number; // might not be needed
+  initInstrs: WasmInstruction[];
 }
 
 export class WasmModule {
@@ -420,14 +422,29 @@ function createWasmGlobals(mod: ParsedModule): WasmGlobal[] {
     if (t === undefined) {
       throw new Error(`Could not convert ${g.globalType.valtype} to WASM type`);
     }
+
+    let initValue = 0;
+    let found = false;
+    for (const i of g.init) {
+      if (isConst(i)) {
+        if (found) {
+          throw new Error(
+            `the initial value for global ${globalID} was already set to ${initValue}. There are in total ${g.init.length} instructions`,
+          );
+        }
+        found = true;
+        initValue = i.value;
+      }
+    }
     return {
       index: globalID,
       name: g.name ?? `global${globalID}`,
       type: t,
       mutable: g.globalType.mutability !== 'const',
-      value: 0,
+      value: initValue,
       startAddress: g.loc.start.column,
       endAddress: g.loc.end.column,
+      initInstrs: g.init,
     };
   });
 }
