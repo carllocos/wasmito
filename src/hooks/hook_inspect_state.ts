@@ -100,4 +100,9 @@ export class InspectStateHook
     this._stateToInspect.includeLogicalClock();
     return this;
   }
+
+  includeHeapFree(): InspectStateHook {
+    this._stateToInspect.includeHeapFree();
+    return this;
+  }
 }

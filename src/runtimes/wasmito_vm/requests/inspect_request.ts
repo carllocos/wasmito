@@ -20,6 +20,7 @@ export enum InspectableState {
   eventsState = '0a',
   exceptionState = '0b',
   logicalClock = '0c',
+  heapFree = '0d',
 }
 
 export interface StackInpsectResponse {
@@ -71,6 +72,8 @@ export interface WasmStateI<R> {
   includeException(): R;
 
   includeLogicalClock(): R;
+
+  includeHeapFree(): R;
 }
 
 export class StateRequest
@@ -151,6 +154,11 @@ export class StateRequest
 
   public includeLogicalClock(): StateRequest {
     this.pushState(InspectableState.logicalClock);
+    return this;
+  }
+
+  public includeHeapFree(): StateRequest {
+    this.pushState(InspectableState.heapFree);
     return this;
   }
 
@@ -253,6 +261,11 @@ export class StateRequest
         response.clock === undefined
       ) {
         throw new Error('Exception State is missing logicalClock');
+      } else if (
+        s === InspectableState.heapFree &&
+        response.heap === undefined
+      ) {
+        throw new Error('Exception State is missing heap');
       }
     }
   }
