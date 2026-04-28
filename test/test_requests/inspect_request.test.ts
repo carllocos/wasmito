@@ -4,6 +4,7 @@ import { StateRequest } from '../../src/runtimes/wasmito_vm/requests/inspect_req
 import { createDevPlatform } from '../../src/platforms/platformbuilder_factory';
 import { LanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 import { resolve } from 'path';
+import { expect } from 'chai';
 
 describe('Inspect Request', () => {
   let deviceManager: DeviceManager | undefined;
@@ -75,6 +76,13 @@ describe('Inspect Request', () => {
     const request = new StateRequest();
     request.includeTable();
     await vm?.inspect(request);
+  });
+
+  it('Inspecting Heap Used', async () => {
+    const request = new StateRequest();
+    request.includeHeapFree();
+    const s = await vm?.inspect(request);
+    expect(s?.heapFree).to.not.equal(undefined);
   });
 
   after(async () => {
