@@ -320,6 +320,24 @@ function parseWasmValueIndex(sv: any): WASMValueIndexed {
   };
 }
 
+function parseHeapFree(v: any): number {
+  if (typeof v !== 'object') {
+    throw new Error(`heap usage should be an object`);
+  }
+
+  const u = v.used;
+  if (u === undefined) {
+    throw new Error(`'used' field of heap usage is missing`);
+  }
+
+  const used = Number(u);
+  if (isNaN(used)) {
+    throw new Error(`'used' value is not a number given ${used}`);
+  }
+
+  return used;
+}
+
 export class WasmState {
   pc?: number;
   breakpoints?: number[];
@@ -333,6 +351,7 @@ export class WasmState {
   events?: WASM.Event[];
   exception?: string;
   logicalClock?: LogicalClock;
+  heapFree?: number;
 
   private readonly _jsonString?: string;
 
@@ -483,6 +502,10 @@ export class WasmState {
         nrOfEvents,
       };
     }
+
+    if (args.heap !== undefined) {
+      this.heapFree = parseHeapFree(args.heap);
+    }
   }
 
   get callbackMappings(): WASM.CallbackMapping[] {
@@ -503,7 +526,8 @@ export class WasmState {
       this.memory !== undefined &&
       this.br_table !== undefined &&
       this.callbacks !== undefined &&
-      this.events !== undefined
+      this.events !== undefined &&
+      this.heapFree !== undefined
     );
   }
 
