@@ -5,7 +5,7 @@ import { resolve } from 'path';
 import { WasmModule } from '../../src/webassembly/wasm/wasm_module';
 import { WasmAnalysis } from '../../src/tool_api/wasm_analysis';
 import { WasmitoBackendVM } from '../../src/runtimes/wasmito_vm/wasmito_vm';
-import { connectToMCUVM, spawnDevVM, spawnMCUVM } from '../spawn_vm';
+import { connectToExistingMCUVM, spawnDevVM, spawnMCUVM } from '../spawn_vm';
 import { WasmInstruction } from '../../src/webassembly/wasm/wasm_instruction';
 import { WASMFunction } from '../../src/webassembly/wasm/wasm_function';
 import { ReadOnlyWasmValue } from '../../src/tool_api/interrupts';
@@ -48,7 +48,7 @@ async function main(): Promise<void> {
     },
   });
 
-  // const vmConnection = await connectToMCUVM(wasm, {
+  // const vmConnection = await connectToExistingMCUVM(wasm, {
   //   vmConfig: {
   //     pauseOnStart: true, // pause the VM on deploy of the Wasm module
   //     serialPort: '/dev/ttyUSB0',
