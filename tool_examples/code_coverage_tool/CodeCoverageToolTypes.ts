@@ -46,6 +46,7 @@ export type CodeCoverageToolResult = Readonly<{
     ratio: number;
   };
   coveredSourceLocations: CodeCoverageToolSourceLocation[];
+  heapBytesUsed: number;
 }>;
 
 export type CodeCoverageToolExecutionTarget = 'LOCAL' | 'MCU';

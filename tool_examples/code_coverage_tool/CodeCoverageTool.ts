@@ -1,6 +1,9 @@
 import { RemoteCallRequest } from '../../src/runtimes/wasmito_vm/requests/fun_call_request';
+import { StateRequest } from '../../src/runtimes/wasmito_vm/requests/inspect_request';
 import { LanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
-import { WASMFunction, WasmInstruction, WasmitoBackendVM } from '../../src';
+import { WasmInstruction } from '../../src/webassembly/wasm/wasm_instruction';
+import { WasmitoBackendVM } from '../../src/runtimes/wasmito_vm/wasmito_vm';
+import { WASMFunction } from '../../src/webassembly/wasm/wasm_function';
 import { SourceCFGNode } from '../../src/cfg/source_cfg_node_edge';
 import { ReadOnlyWasmValue } from '../../src/tool_api/interrupts';
 import { WasmAnalysis } from '../../src/tool_api/wasm_analysis';
@@ -42,6 +45,10 @@ export class CodeCoverageTool {
   private testExitNodesRemaining: number;
   private resolveAllTestExitNodesEnteredPromise!: () => void;
   private readonly allTestExitNodesEnteredPromise: Promise<void>; // Gets resolved when all test exit nodes are entered.
+
+  // memory usage.
+  private usedHeapBytesBefore: number;
+  private usedHeapBytesAfter: number;
 
   constructor(
     languageAdaptor: LanguageAdaptor,
@@ -150,6 +157,10 @@ export class CodeCoverageTool {
     this.allTestExitNodesEnteredPromise = new Promise((resolve) => {
       this.resolveAllTestExitNodesEnteredPromise = resolve;
     });
+
+    // memory usage.
+    this.usedHeapBytesBefore = 0;
+    this.usedHeapBytesAfter = 0;
   }
 
   private reportCoveredLine(sourceFile: string, lineNumber: number) {
@@ -406,12 +417,14 @@ export class CodeCoverageTool {
     const functionCoverage = this.getFunctionCoverageResults();
     const branchCoverage = this.getBranchCoverageResults();
     const coveredSourceLocations = this.getCoveredSourceLocationsResults();
+    const heapBytesUsed = this.usedHeapBytesAfter - this.usedHeapBytesBefore;
 
     return {
       lineCoverage,
       functionCoverage,
       branchCoverage,
       coveredSourceLocations,
+      heapBytesUsed,
     };
   }
 
@@ -425,7 +438,13 @@ export class CodeCoverageTool {
     clearTimeout(timeout);
   }
 
+  private async inspectUsedHeapBytes(): Promise<number> {
+    return (await this.vm.inspect(new StateRequest().includeHeapFree()))
+      .heapFree!;
+  }
+
   async run(): Promise<CodeCoverageToolResult> {
+    this.usedHeapBytesBefore = await this.inspectUsedHeapBytes();
     if (this.config.implementation === 'node') {
       this.registerOnNodeEntryCallback();
     } else if (this.config.implementation === 'instruction') {
@@ -433,6 +452,7 @@ export class CodeCoverageTool {
     }
     this.registerOnTestExitNodeEntryCallback();
     await this.analysis.deploy();
+    this.usedHeapBytesAfter = await this.inspectUsedHeapBytes();
 
     for (const wasmTestFunctionId of this.wasmTestFunctionIds) {
       const callRequest = new RemoteCallRequest(wasmTestFunctionId, []);
