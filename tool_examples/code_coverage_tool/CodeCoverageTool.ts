@@ -456,7 +456,7 @@ export class CodeCoverageTool {
 
     for (const wasmTestFunctionId of this.wasmTestFunctionIds) {
       const callRequest = new RemoteCallRequest(wasmTestFunctionId, []);
-      await this.vm.sendRequest(callRequest);
+      this.vm.sendRequest(callRequest);
     }
 
     await this.testExitNodeEnteredOrTimedOut();
