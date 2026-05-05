@@ -1,3 +1,7 @@
+/***
+ ** This is an implementation of Wasabi's analysis
+ ** Original source file found in: github.com/aaronmunsters/wasabi/tree/master/examples/analyses
+ ***/
 import { exit } from 'process';
 import { resolve } from 'path';
 import { WasmModule } from '../../src/webassembly/wasm/wasm_module';
