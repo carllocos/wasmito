@@ -369,14 +369,24 @@ function createCallbackWithResult(
     const updatedValue = cb(instr, result, vm);
     if (mutate) {
       assertFatalHookError(
-        updatedValue instanceof WritableWasmValue,
+        (updatedValue === undefined && result === undefined) ||
+          updatedValue instanceof WritableWasmValue,
         'The returned user result is not a WritableWasmValue',
       );
       // TODO validate the new value
-      getGlobalLogger().error(
-        `TODO implement update new result value to ${updatedValue.value}`,
-      );
-      vm.run(maxTimeoutMs); // TODO await
+      if (updatedValue !== undefined) {
+        getGlobalLogger().debug(`New value computed ${result?.value}`);
+        updateArgsStack([updatedValue], vm).then((s) => {
+          assert(
+            s,
+            `failed to update the stack with new value ${updatedValue.value} (type ${updatedValue.type})`,
+          );
+          getGlobalLogger().debug('Resume execution on VM');
+          vm.run(maxTimeoutMs); // TODO await
+        });
+      } else {
+        vm.run(maxTimeoutMs); // TODO await
+      }
     } else {
       assertFatalHookError(
         updatedValue === undefined,
