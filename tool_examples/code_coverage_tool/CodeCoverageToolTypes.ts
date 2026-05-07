@@ -34,15 +34,15 @@ export type CodeCoverageToolResult = Readonly<{
     totalFunctionCount: number;
     ratio: number;
   };
-  branchCoverage: {
+  basicBlockCoverage: {
     sourceFiles: {
       name: string;
-      coveredNodeCount: number;
-      nodeCount: number;
+      coveredBasicBlockCount: number;
+      basicBlockCount: number;
       ratio: number;
     }[];
-    totalCoveredNodeCount: number;
-    totalNodeCount: number;
+    totalCoveredBasicBlockCount: number;
+    totalBasicBlockCount: number;
     ratio: number;
   };
   coveredSourceLocations: CodeCoverageToolSourceLocation[];

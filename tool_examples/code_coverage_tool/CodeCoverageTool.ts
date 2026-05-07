@@ -30,9 +30,9 @@ export class CodeCoverageTool {
   private readonly coveredFunctions: Map<string, Set<WASMFunction>>; // K = filename, V = set of covered functions.
   private readonly functions: Map<string, Set<WASMFunction>>; // K = filename, V = set of functions.
 
-  // branch coverage.
-  private readonly coveredNodes: Map<string, Set<SourceCFGNode>>; // K = filename, V = set of covered nodes.
-  private readonly nodes: Map<string, Set<SourceCFGNode>>; // K = filename, V = set of nodes.
+  // basic block coverage.
+  private readonly coveredBasicBlocks: Map<string, Set<SourceCFGNode>>; // K = filename, V = set of covered basic blocks.
+  private readonly basicBlocks: Map<string, Set<SourceCFGNode>>; // K = filename, V = set of basic blocks.
 
   // covered source locations.
   private readonly coveredSourceLocations: Map<
@@ -74,11 +74,11 @@ export class CodeCoverageTool {
     this.coveredFunctions = new Map();
     this.functions = new Map();
 
-    // branch coverage.
-    this.coveredNodes = new Map();
-    this.nodes = new Map();
+    // basic block coverage.
+    this.coveredBasicBlocks = new Map();
+    this.basicBlocks = new Map();
 
-    // line coverage, function coverage, branch coverage.
+    // line coverage, function coverage, basic block coverage.
     const nonTestFunctions =
       this.languageAdaptor.sourceCFGs.sourceMap.wasm.functions.filter(
         (wasmFunction) => !this.wasmTestFunctionIds.has(wasmFunction.id),
@@ -116,22 +116,24 @@ export class CodeCoverageTool {
         }
       });
 
-      // branch coverage.
-      if (!this.coveredNodes.has(sourceLocation.source)) {
-        this.coveredNodes.set(sourceLocation.source, new Set());
+      // basic block coverage.
+      if (!this.coveredBasicBlocks.has(sourceLocation.source)) {
+        this.coveredBasicBlocks.set(sourceLocation.source, new Set());
       }
 
-      if (!this.nodes.has(sourceLocation.source)) {
-        this.nodes.set(sourceLocation.source, new Set());
+      if (!this.basicBlocks.has(sourceLocation.source)) {
+        this.basicBlocks.set(sourceLocation.source, new Set());
       }
     }
 
-    // branch coverage.
+    // basic block coverage.
     const sourceCFG = this.languageAdaptor.sourceCFGs;
     sourceCFG.allNodes().forEach((sourceCFGNode) => {
       const functionId = sourceCFGNode.wasmFunOwner;
       if (!this.wasmTestFunctionIds.has(functionId)) {
-        this.nodes.get(sourceCFGNode.sourceLocation.source)!.add(sourceCFGNode);
+        this.basicBlocks
+          .get(sourceCFGNode.sourceLocation.source)!
+          .add(sourceCFGNode);
       }
     });
 
@@ -180,8 +182,11 @@ export class CodeCoverageTool {
     this.coveredFunctions.get(sourceFile)!.add(wasmFunction);
   }
 
-  private reportCoveredNode(sourceFile: string, node: SourceCFGNode) {
-    this.coveredNodes.get(sourceFile)!.add(node);
+  private reportCoveredBasicBlock(
+    sourceFile: string,
+    basicBlock: SourceCFGNode,
+  ) {
+    this.coveredBasicBlocks.get(sourceFile)!.add(basicBlock);
   }
 
   private reportCoveredSourceLocation(
@@ -219,7 +224,7 @@ export class CodeCoverageTool {
             // function coverage.
             this.reportCoveredFunction(sourceLocation.source, wasmFunction);
 
-            // branch coverage.
+            // basic block coverage.
             // TODO
 
             // covered source locations.
@@ -235,10 +240,10 @@ export class CodeCoverageTool {
   }
 
   private registerOnNodeEntryCallback(): void {
-    for (const nodesPerSourceFile of this.nodes.values()) {
-      for (const node of nodesPerSourceFile) {
+    for (const basicBlocksPerSourceFile of this.basicBlocks.values()) {
+      for (const basicBlock of basicBlocksPerSourceFile) {
         this.analysis.onNodeEntry(
-          node,
+          basicBlock,
           (
             n: SourceCFGNode,
             _i: WasmInstruction,
@@ -258,8 +263,8 @@ export class CodeCoverageTool {
               n.wasmFunOwner,
             );
 
-            // branch coverage.
-            this.reportCoveredNode(sourceLocation.source, n);
+            // basic block coverage.
+            this.reportCoveredBasicBlock(sourceLocation.source, n);
 
             // covered source locations.
             this.reportCoveredSourceLocation(
@@ -370,41 +375,46 @@ export class CodeCoverageTool {
     };
   }
 
-  private getBranchCoverageResults(): CodeCoverageToolResult['branchCoverage'] {
-    const sourceFiles: CodeCoverageToolResult['branchCoverage']['sourceFiles'] =
+  private getBasicBlockCoverageResults(): CodeCoverageToolResult['basicBlockCoverage'] {
+    const sourceFiles: CodeCoverageToolResult['basicBlockCoverage']['sourceFiles'] =
       [];
 
-    let totalCoveredNodeCount = 0;
-    let totalNodeCount = 0;
+    let totalCoveredBasicBlockCount = 0;
+    let totalBasicBlockCount = 0;
 
-    for (const [sourceFile, nodesPerSourceFile] of this.nodes.entries()) {
-      const coveredNodes = this.coveredNodes.get(sourceFile)!;
+    for (const [
+      sourceFile,
+      basicBlocksPerSourceFile,
+    ] of this.basicBlocks.entries()) {
+      const coveredBasicBlocks = this.coveredBasicBlocks.get(sourceFile)!;
 
-      const coveredNodeCount = coveredNodes.size;
-      const nodeCount = nodesPerSourceFile.size;
+      const coveredBasicBlockCount = coveredBasicBlocks.size;
+      const basicBlockCount = basicBlocksPerSourceFile.size;
 
-      totalCoveredNodeCount += coveredNodeCount;
-      totalNodeCount += nodeCount;
+      totalCoveredBasicBlockCount += coveredBasicBlockCount;
+      totalBasicBlockCount += basicBlockCount;
 
       sourceFiles.push({
         name: sourceFile,
-        coveredNodeCount,
-        nodeCount,
+        coveredBasicBlockCount,
+        basicBlockCount,
         ratio:
-          nodeCount === 0
+          basicBlockCount === 0
             ? 0
-            : Number((coveredNodeCount / nodeCount).toFixed(2)),
+            : Number((coveredBasicBlockCount / basicBlockCount).toFixed(2)),
       });
     }
 
     return {
       sourceFiles,
-      totalCoveredNodeCount,
-      totalNodeCount,
+      totalCoveredBasicBlockCount: totalCoveredBasicBlockCount,
+      totalBasicBlockCount: totalBasicBlockCount,
       ratio:
-        totalNodeCount === 0
+        totalBasicBlockCount === 0
           ? 0
-          : Number((totalCoveredNodeCount / totalNodeCount).toFixed(2)),
+          : Number(
+              (totalCoveredBasicBlockCount / totalBasicBlockCount).toFixed(2),
+            ),
     };
   }
 
@@ -415,14 +425,14 @@ export class CodeCoverageTool {
   private getCoverageResults(): CodeCoverageToolResult {
     const lineCoverage = this.getLineCoverageResults();
     const functionCoverage = this.getFunctionCoverageResults();
-    const branchCoverage = this.getBranchCoverageResults();
+    const basicBlockCoverage = this.getBasicBlockCoverageResults();
     const coveredSourceLocations = this.getCoveredSourceLocationsResults();
     const heapBytesUsed = this.usedHeapBytesAfter - this.usedHeapBytesBefore;
 
     return {
       lineCoverage,
       functionCoverage,
-      branchCoverage,
+      basicBlockCoverage,
       coveredSourceLocations,
       heapBytesUsed,
     };
