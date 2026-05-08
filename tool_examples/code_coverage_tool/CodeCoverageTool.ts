@@ -4,9 +4,12 @@ import { LanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
 import { WasmInstruction } from '../../src/webassembly/wasm/wasm_instruction';
 import { WasmitoBackendVM } from '../../src/runtimes/wasmito_vm/wasmito_vm';
 import { WASMFunction } from '../../src/webassembly/wasm/wasm_function';
-import { SourceCFGNode } from '../../src/cfg/source_cfg_node_edge';
 import { ReadOnlyWasmValue } from '../../src/tool_api/interrupts';
 import { WasmAnalysis } from '../../src/tool_api/wasm_analysis';
+import {
+  SourceCFGEdgeToNode,
+  SourceCFGNode,
+} from '../../src/cfg/source_cfg_node_edge';
 import {
   CodeCoverageToolConfig,
   CodeCoverageToolSourceLocation,
@@ -32,6 +35,10 @@ export class CodeCoverageTool {
   // basic block coverage.
   private readonly coveredBasicBlocks: Map<string, Set<SourceCFGNode>>; // K = filename, V = set of covered basic blocks.
   private readonly basicBlocks: Map<string, Set<SourceCFGNode>>; // K = filename, V = set of basic blocks.
+
+  // branch coverage.
+  private readonly coveredBranches: Map<string, Set<string>>; // K = filename, V = set of covered branches.
+  private readonly branches: Map<string, Set<string>>; // K = filename, V = set of branches.
 
   // covered source locations.
   private readonly coveredSourceLocations: Map<
@@ -70,6 +77,10 @@ export class CodeCoverageTool {
     // basic block coverage.
     this.coveredBasicBlocks = new Map();
     this.basicBlocks = new Map();
+
+    // branch coverage.
+    this.coveredBranches = new Map();
+    this.branches = new Map();
 
     // line coverage, function coverage, basic block coverage.
     const nonTestFunctions =
@@ -117,6 +128,15 @@ export class CodeCoverageTool {
       if (!this.basicBlocks.has(sourceLocation.source)) {
         this.basicBlocks.set(sourceLocation.source, new Set());
       }
+
+      // branch coverage.
+      if (!this.coveredBranches.has(sourceLocation.source)) {
+        this.coveredBranches.set(sourceLocation.source, new Set());
+      }
+
+      if (!this.branches.has(sourceLocation.source)) {
+        this.branches.set(sourceLocation.source, new Set());
+      }
     }
 
     // basic block coverage.
@@ -124,11 +144,19 @@ export class CodeCoverageTool {
     sourceCFG.allNodes().forEach((sourceCFGNode) => {
       const functionId = sourceCFGNode.wasmFunOwner;
       if (!this.wasmTestFunctionIds.has(functionId)) {
-        this.basicBlocks
-          .get(sourceCFGNode.sourceLocation.source)!
-          .add(sourceCFGNode);
+        const source = sourceCFGNode.sourceLocation.source;
+        this.basicBlocks.get(source)!.add(sourceCFGNode);
+
+        sourceCFGNode.edges.forEach((edge) => {
+          const nodeEdgePointsTo = SourceCFGEdgeToNode(edge);
+          const key = `${sourceCFGNode.nodeId}->${nodeEdgePointsTo.nodeId}`;
+          this.branches.get(source)!.add(key);
+        });
       }
     });
+
+    // branch coverage.
+    //this.branches.get(sourceLocation.source)!.add();
 
     // covered source locations.
     this.coveredSourceLocations = new Map();
@@ -160,6 +188,14 @@ export class CodeCoverageTool {
     basicBlock: SourceCFGNode,
   ) {
     this.coveredBasicBlocks.get(sourceFile)!.add(basicBlock);
+  }
+
+  private reportCoveredBranch(
+    sourceFile: string,
+    from: SourceCFGNode,
+    to: SourceCFGNode,
+  ) {
+    this.coveredBranches.get(sourceFile)!.add(`${from.nodeId}->${to.nodeId}`);
   }
 
   private reportCoveredSourceLocation(
@@ -206,6 +242,9 @@ export class CodeCoverageTool {
               sourceLocation.linenr,
               sourceLocation.colnr,
             );
+
+            // branch coverage.
+            // TODO
           });
         }
       }
@@ -213,6 +252,7 @@ export class CodeCoverageTool {
   }
 
   private registerOnNodeEntryCallback(): void {
+    let previousNode: SourceCFGNode | undefined;
     for (const basicBlocksPerSourceFile of this.basicBlocks.values()) {
       for (const basicBlock of basicBlocksPerSourceFile) {
         this.analysis.onNodeEntry(
@@ -245,6 +285,24 @@ export class CodeCoverageTool {
               sourceLocation.linenr,
               sourceLocation.colnr,
             );
+
+            // branch coverage.
+            if (previousNode === undefined) {
+              previousNode = n;
+              return;
+            }
+
+            const edgeFoundUsedToEnterThisBasicBlock = previousNode.edges.find(
+              (edge) => {
+                const nodeEdgePointsTo = SourceCFGEdgeToNode(edge);
+                return nodeEdgePointsTo.nodeId === n.nodeId;
+              },
+            );
+
+            if (edgeFoundUsedToEnterThisBasicBlock !== undefined)
+              this.reportCoveredBranch(sourceLocation.source, previousNode, n);
+
+            previousNode = n;
           },
         );
       }
@@ -371,14 +429,52 @@ export class CodeCoverageTool {
 
     return {
       sourceFiles,
-      totalCoveredBasicBlockCount: totalCoveredBasicBlockCount,
-      totalBasicBlockCount: totalBasicBlockCount,
+      totalCoveredBasicBlockCount,
+      totalBasicBlockCount,
       ratio:
         totalBasicBlockCount === 0
           ? 0
           : Number(
               (totalCoveredBasicBlockCount / totalBasicBlockCount).toFixed(2),
             ),
+    };
+  }
+
+  private getBranchCoverageResults(): CodeCoverageToolResult['branchCoverage'] {
+    const sourceFiles: CodeCoverageToolResult['branchCoverage']['sourceFiles'] =
+      [];
+
+    let totalCoveredBranchCount = 0;
+    let totalBranchCount = 0;
+
+    for (const [sourceFile, branchesPerSourceFile] of this.branches.entries()) {
+      const coveredBranches = this.coveredBranches.get(sourceFile)!;
+
+      const coveredBranchCount = coveredBranches.size;
+      const branchCount = branchesPerSourceFile.size;
+
+      totalCoveredBranchCount += coveredBranchCount;
+      totalBranchCount += branchCount;
+
+      sourceFiles.push({
+        name: sourceFile,
+        coveredBranchCount,
+        branchCount,
+        ratio:
+          branchCount === 0
+            ? 0
+            : Number((coveredBranchCount / branchCount).toFixed(2)),
+      });
+    }
+
+    return {
+      sourceFiles,
+      totalCoveredBranchCount,
+      totalBranchCount,
+      ratio:
+        totalBranchCount === 0
+          ? 0
+          : Number((totalCoveredBranchCount / totalBranchCount).toFixed(2)),
     };
   }
 
@@ -390,6 +486,7 @@ export class CodeCoverageTool {
     const lineCoverage = this.getLineCoverageResults();
     const functionCoverage = this.getFunctionCoverageResults();
     const basicBlockCoverage = this.getBasicBlockCoverageResults();
+    const branchCoverage = this.getBranchCoverageResults();
     const coveredSourceLocations = this.getCoveredSourceLocationsResults();
     const heapBytesUsed = this.usedHeapBytesAfter - this.usedHeapBytesBefore;
 
@@ -397,6 +494,7 @@ export class CodeCoverageTool {
       lineCoverage,
       functionCoverage,
       basicBlockCoverage,
+      branchCoverage,
       coveredSourceLocations,
       heapBytesUsed,
     };
