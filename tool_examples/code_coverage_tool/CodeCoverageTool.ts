@@ -12,7 +12,6 @@ import {
   CodeCoverageToolSourceLocation,
   CodeCoverageToolResult,
 } from './CodeCoverageToolTypes';
-import assert from 'assert';
 
 export class CodeCoverageTool {
   private readonly languageAdaptor: LanguageAdaptor;
@@ -39,12 +38,6 @@ export class CodeCoverageTool {
     string,
     CodeCoverageToolSourceLocation
   >;
-
-  // test exit nodes.
-  private readonly testExitNodes: Set<SourceCFGNode>;
-  private testExitNodesRemaining: number;
-  private resolveAllTestExitNodesEnteredPromise!: () => void;
-  private readonly allTestExitNodesEnteredPromise: Promise<void>; // Gets resolved when all test exit nodes are entered.
 
   // memory usage.
   private usedHeapBytesBefore: number;
@@ -139,26 +132,6 @@ export class CodeCoverageTool {
 
     // covered source locations.
     this.coveredSourceLocations = new Map();
-
-    // test exit nodes.
-    this.testExitNodes = new Set();
-    this.testExitNodesRemaining = 0;
-    for (const wasmTestFunctionId of this.wasmTestFunctionIds) {
-      const testFunctionCFG =
-        sourceCFG.getFunctionSourceCFG(wasmTestFunctionId);
-      assert(
-        testFunctionCFG,
-        'No CFG for test function: ' + wasmTestFunctionId,
-      );
-
-      for (const testExitNode of testFunctionCFG.exitNodes) {
-        this.testExitNodes.add(testExitNode);
-      }
-    }
-    this.testExitNodesRemaining = this.testExitNodes.size;
-    this.allTestExitNodesEnteredPromise = new Promise((resolve) => {
-      this.resolveAllTestExitNodesEnteredPromise = resolve;
-    });
 
     // memory usage.
     this.usedHeapBytesBefore = 0;
@@ -275,15 +248,6 @@ export class CodeCoverageTool {
           },
         );
       }
-    }
-  }
-
-  private registerOnTestExitNodeEntryCallback(): void {
-    for (const testExitNode of this.testExitNodes) {
-      this.analysis.onNodeEntry(testExitNode, () => {
-        if (--this.testExitNodesRemaining === 0)
-          this.resolveAllTestExitNodesEnteredPromise();
-      });
     }
   }
 
@@ -438,16 +402,6 @@ export class CodeCoverageTool {
     };
   }
 
-  private async testExitNodeEnteredOrTimedOut(): Promise<void> {
-    let timeout;
-    const timeoutPromise = new Promise<void>((resolve) => {
-      timeout = setTimeout(resolve, this.config.timeoutMs);
-    });
-
-    await Promise.race([this.allTestExitNodesEnteredPromise, timeoutPromise]);
-    clearTimeout(timeout);
-  }
-
   private async inspectUsedHeapBytes(): Promise<number> {
     return (await this.vm.inspect(new StateRequest().includeHeapFree()))
       .heapFree!;
@@ -460,16 +414,21 @@ export class CodeCoverageTool {
     } else if (this.config.implementation === 'instruction') {
       this.registerAfterInstructionCallback();
     }
-    this.registerOnTestExitNodeEntryCallback();
     await this.analysis.deploy();
     this.usedHeapBytesAfter = await this.inspectUsedHeapBytes();
 
     for (const wasmTestFunctionId of this.wasmTestFunctionIds) {
       const callRequest = new RemoteCallRequest(wasmTestFunctionId, []);
-      this.vm.sendRequest(callRequest);
+
+      let timeout;
+      const timeoutPromise = new Promise<void>((resolve) => {
+        timeout = setTimeout(resolve, this.config.timeoutMs);
+      });
+
+      await Promise.race([this.vm.sendRequest(callRequest), timeoutPromise]);
+      clearTimeout(timeout);
     }
 
-    await this.testExitNodeEnteredOrTimedOut();
     await this.vm.close();
     return this.getCoverageResults();
   }
