@@ -68,7 +68,10 @@ export function registerCoverageCommand(program: Command) {
       'Execution target: "local" (default) or "mcu".',
       'local',
     )
-    .option('-t, --timeout <ms>', 'Maximum analysis time in milliseconds.')
+    .option(
+      '-t, --timeout <ms>',
+      'Maximum analysis time per test function in milliseconds.',
+    )
     .option(
       '-o, --output <output-path>',
       'Write the coverage report to a file instead of stdout.',
