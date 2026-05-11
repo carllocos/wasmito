@@ -23,6 +23,9 @@ socket.on('connect', () => {
   logger.info('Connected to server');
 });
 
+// Primitives inside the module being analysed
+const primitiveMap = new Map<number, string>();
+
 
 async function main(): Promise<void> {
   const analyseMaxTimeSecs = 5; // stop analysis after this many seconds
@@ -66,32 +69,15 @@ async function main(): Promise<void> {
   const analysis = new WasmAnalysis(wasm, vmConnection);
 
   // Get all imported functions (happens to be exclusively primitive functions) and create a map from their function index to their name 
-  const primitiveMap = new Map<number, string>();
   for (const importedFn of wasm.importFuncs) {
     primitiveMap.set(importedFn.id, importedFn.name);
   }
 
-  // logger.info(`Primitive functions in the module: ${[...primitiveMap.values()].join(', ')}`);
-  // logger.info(`Lenght of all instructions received via getCallInstructions: ${wasm.getCallInstructions().length}`);
-
-  for (const callInstr of wasm.getCallInstructions()) {
-    if (primitiveMap.has(callInstr.funIdx)) {
-      const primitiveName = primitiveMap.get(callInstr.funIdx);
-      //logger.info(`Call instruction with name '${callInstr.name}' calls primitive function '${callInstr.funcName}'`);
-      // The line above this one prints out func_0 instead of their actual names, why ?
-      logger.info(`Call instruction with name '${callInstr.name}' calls primitive function '${primitiveName}'`);
-
-      // Before a call instruction that calls a primitive function, send the name of the primitive function to brigadier
-      analysis.before(callInstr, alertBrigadierForPrimitiveCall(callInstr, primitiveName));
-    }
-  }
-
-  // Add a call before every instruction
+  // Add a callback before every instruction
   for (const f of wasm.functions) {
     for (const i of f.allInstructions) {
       // analysis.before(i, showInstruction);
       analysis.before(i, sendToBrigadier(f));
-      // logger.info(`Instruction ${i.name} of function ${f.name} at address ${i.startAddress} is processed`);
     }
   }
 
@@ -104,20 +90,18 @@ function showInstruction(i: WasmInstruction, args: ReadOnlyWasmValue[]): void {
   logger.info(`Instruction ${i.name} at address ${i.startAddress} is about to execute`);
 }
 
-function alertBrigadierForPrimitiveCall(i: CallInstruction, primitiveName: string | undefined): (i: WasmInstruction, args: ReadOnlyWasmValue[]) => void {
-  return (i: WasmInstruction, args: ReadOnlyWasmValue[]) => {
+function sendCallInstructionToBrigadier(f: WASMFunction, i: CallInstruction, args: ReadOnlyWasmValue[]): void {
+  const callee_id = i.funIdx;
+  if (primitiveMap.has(callee_id)) {
+    const primitiveName = primitiveMap.get(callee_id);
     socket.emit('wasmPrimitiveCall', {
       name: i.name,
       args: args.map(arg => arg.value),
+      function_name: f.name,
+      function_address: f.startAddress,
       primitiveFunction: primitiveName
     });
-  logger.info(`Call instruction '${i.name}' called by primitive function '${primitiveName}' is processed`);
-  };
-}
-
-
-function sendToBrigadier(f: WASMFunction): (i: WasmInstruction, args: ReadOnlyWasmValue[]) => void {
-  return (i: WasmInstruction, args: ReadOnlyWasmValue[]) => {
+  } else {
     socket.emit('wasmInstruction', {
       name: i.name,
       address: i.startAddress,
@@ -125,6 +109,28 @@ function sendToBrigadier(f: WASMFunction): (i: WasmInstruction, args: ReadOnlyWa
       function_name: f.name,
       function_address: f.startAddress
     });
+  }
+}
+
+function sendInstructionToBrigadier(f: WASMFunction, i: WasmInstruction, args: ReadOnlyWasmValue[]): void {
+  socket.emit('wasmInstruction', {
+    name: i.name,
+    address: i.startAddress,
+    args: args.map(arg => arg.value),
+    function_name: f.name,
+    function_address: f.startAddress
+  });
+};
+
+
+
+function sendToBrigadier(f: WASMFunction): (i: WasmInstruction, args: ReadOnlyWasmValue[]) => void {
+  return (i: WasmInstruction, args: ReadOnlyWasmValue[]) => {
+    if (i instanceof CallInstruction) {
+      sendCallInstructionToBrigadier(f, i, args);
+    } else {
+      sendInstructionToBrigadier(f, i, args);
+    }
   };
 }
 
