@@ -6,7 +6,7 @@ import { WasmModule } from '../../src/webassembly/wasm/wasm_module';
 import { WasmAnalysis } from '../../src/tool_api/wasm_analysis';
 import { WasmitoBackendVM } from '../../src/runtimes/wasmito_vm/wasmito_vm';
 import { connectToExistingMCUVM, spawnDevVM, spawnMCUVM } from '../spawn_vm';
-import { WasmInstruction } from '../../src/webassembly/wasm/wasm_instruction';
+import { CallInstruction, WasmInstruction } from '../../src/webassembly/wasm/wasm_instruction';
 import { WASMFunction } from '../../src/webassembly/wasm/wasm_function';
 import { ReadOnlyWasmValue } from '../../src/tool_api/interrupts';
 import { BoardBaudRate } from '../../src/util/serial_port';
@@ -33,20 +33,20 @@ async function main(): Promise<void> {
   const wasm = new WasmModule(wasmPath);
 
   // Running analysis on the computer 
-  // const vmConnection = await spawnDevVM(wasm);
+  const vmConnection = await spawnDevVM(wasm);
 
   // Running analysis on the MCU
-  const vmConnection = await spawnMCUVM(wasm, {
-    vmConfig: {
-      pauseOnStart: true, // pause the VM on deploy of the Wasm module
-      serialPort: '/dev/ttyUSB0',
-      baudrate: BoardBaudRate.BD_115200,
-      fqbn: {
-        boardName: 'M5Stick-C',
-        fqbn: 'm5stack:esp32:m5stick-c',
-      },
-    },
-  });
+  // const vmConnection = await spawnMCUVM(wasm, {
+  //   vmConfig: {
+  //     pauseOnStart: true, // pause the VM on deploy of the Wasm module
+  //     serialPort: '/dev/ttyUSB0',
+  //     baudrate: BoardBaudRate.BD_115200,
+  //     fqbn: {
+  //       boardName: 'M5Stick-C',
+  //       fqbn: 'm5stack:esp32:m5stick-c',
+  //     },
+  //   },
+  // });
 
   // const vmConnection = await connectToExistingMCUVM(wasm, {
   //   vmConfig: {
@@ -65,12 +65,33 @@ async function main(): Promise<void> {
 
   const analysis = new WasmAnalysis(wasm, vmConnection);
 
+  // Get all imported functions (happens to be exclusively primitive functions) and create a map from their function index to their name 
+  const primitiveMap = new Map<number, string>();
+  for (const importedFn of wasm.importFuncs) {
+    primitiveMap.set(importedFn.id, importedFn.name);
+  }
+
+  // logger.info(`Primitive functions in the module: ${[...primitiveMap.values()].join(', ')}`);
+  // logger.info(`Lenght of all instructions received via getCallInstructions: ${wasm.getCallInstructions().length}`);
+
+  for (const callInstr of wasm.getCallInstructions()) {
+    if (primitiveMap.has(callInstr.funIdx)) {
+      const primitiveName = primitiveMap.get(callInstr.funIdx);
+      //logger.info(`Call instruction with name '${callInstr.name}' calls primitive function '${callInstr.funcName}'`);
+      // The line above this one prints out func_0 instead of their actual names, why ?
+      logger.info(`Call instruction with name '${callInstr.name}' calls primitive function '${primitiveName}'`);
+
+      // Before a call instruction that calls a primitive function, send the name of the primitive function to brigadier
+      analysis.before(callInstr, alertBrigadierForPrimitiveCall(callInstr, primitiveName));
+    }
+  }
+
   // Add a call before every instruction
   for (const f of wasm.functions) {
     for (const i of f.allInstructions) {
       // analysis.before(i, showInstruction);
       analysis.before(i, sendToBrigadier(f));
-      logger.info(`Instruction ${i.name} of function ${f.name} at address ${i.startAddress} is processed`);
+      // logger.info(`Instruction ${i.name} of function ${f.name} at address ${i.startAddress} is processed`);
     }
   }
 
@@ -81,6 +102,30 @@ async function main(): Promise<void> {
 
 function showInstruction(i: WasmInstruction, args: ReadOnlyWasmValue[]): void {
   logger.info(`Instruction ${i.name} at address ${i.startAddress} is about to execute`);
+}
+
+function alertBrigadierForPrimitiveCall(i: CallInstruction, primitiveName: string | undefined): (i: WasmInstruction, args: ReadOnlyWasmValue[]) => void {
+  return (i: WasmInstruction, args: ReadOnlyWasmValue[]) => {
+    socket.emit('wasmPrimitiveCall', {
+      name: i.name,
+      args: args.map(arg => arg.value),
+      primitiveFunction: primitiveName
+    });
+  logger.info(`Call instruction '${i.name}' called by primitive function '${primitiveName}' is processed`);
+  };
+}
+
+
+function sendToBrigadier(f: WASMFunction): (i: WasmInstruction, args: ReadOnlyWasmValue[]) => void {
+  return (i: WasmInstruction, args: ReadOnlyWasmValue[]) => {
+    socket.emit('wasmInstruction', {
+      name: i.name,
+      address: i.startAddress,
+      args: args.map(arg => arg.value),
+      function_name: f.name,
+      function_address: f.startAddress
+    });
+  };
 }
 
 function structureForBrigadier(f: WASMFunction, i: WasmInstruction) {
@@ -95,18 +140,6 @@ function structureForBrigadier(f: WASMFunction, i: WasmInstruction) {
     function: f_name
   };
   return event;
-}
-
-function sendToBrigadier(f: WASMFunction): (i: WasmInstruction, args: ReadOnlyWasmValue[]) => void {
-  return (i: WasmInstruction, args: ReadOnlyWasmValue[]) => {
-    socket.emit('wasmInstruction', {
-      name: i.name,
-      address: i.startAddress,
-      args: args.map(arg => arg.value),
-      function_name: f.name,
-      function_address: f.startAddress
-    });
-  };
 }
 
 /**
