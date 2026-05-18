@@ -147,6 +147,7 @@ export class CodeCoverageTool {
         const source = sourceCFGNode.sourceLocation.source;
         this.basicBlocks.get(source)!.add(sourceCFGNode);
 
+        // branch coverage.
         sourceCFGNode.edges.forEach((edge) => {
           const nodeEdgePointsTo = SourceCFGEdgeToNode(edge);
           const key = `${sourceCFGNode.nodeId}->${nodeEdgePointsTo.nodeId}`;
@@ -154,9 +155,6 @@ export class CodeCoverageTool {
         });
       }
     });
-
-    // branch coverage.
-    //this.branches.get(sourceLocation.source)!.add();
 
     // covered source locations.
     this.coveredSourceLocations = new Map();
