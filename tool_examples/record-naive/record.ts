@@ -11,7 +11,6 @@ import { exit } from 'process';
 import {
   copyClock,
   LogicalClock,
-  logRecord,
   logRecordings,
   newLogicalClock,
   type Record,
@@ -20,8 +19,15 @@ import {
 import { spawnDevVM, spawnMCUVM } from '../spawn_vm';
 
 import { BoardBaudRate } from '../../src/util/serial_port';
+import { writeFile, WriteFileOptions } from 'fs';
 
 // import { WriteFileOptions, writeFileSync } from 'node:fs';
+
+const writeFlags: WriteFileOptions = {
+  encoding: 'utf-8',
+  flag: 'a',
+  mode: 0o666,
+};
 
 let instrumentedCount = 0;
 function recordInterrupt(interrupt: ReadOnlyInterrupt): void {
@@ -32,12 +38,11 @@ function recordInterrupt(interrupt: ReadOnlyInterrupt): void {
     clock: copyClock(logicalClock),
   };
   records.push(record);
-  logRecord(record);
+  // logRecord(record);
 }
 
 function recordInstr(i: WasmInstruction, args: ReadOnlyWasmValue[]): void {
   logicalClock.instrs += 1;
-
   const record: Record = {
     instrAddr: i.startAddress,
     instrName: i.name,
@@ -52,9 +57,12 @@ const logicalClock: LogicalClock = newLogicalClock();
 const records: Record[] = [];
 
 async function main(): Promise<void> {
+  const wasmPath = resolve('./app_examples/assemblyscript/fib/wasm/fib.wasm');
+  /*
   const wasmPath = resolve(
-    './app_examples/assemblyscript/toggle_led/wasm/toggle_led.wasm',
+    './libs/WARDuino/benchmarks/tasks/catalan/wast/impl.wasm',
   );
+*/
   const wasm = new WasmModule(wasmPath);
   //const instr = wasm.getInstruction(0xee);
   //assert(instr !== undefined);
@@ -86,9 +94,26 @@ async function main(): Promise<void> {
   analysis.beforeHandlingInterrupt(recordInterrupt);
 
   await analysis.deploy();
-  await analysis.run();
   const recordSecs = 10;
-  stopRecording(vmConnection, analysis, recordSecs);
+  const ms = recordSecs * 1000; // convert to milliseconds
+  await analysis.run();
+  const beginTime = performance.now();
+  setTimeout(async () => {
+    const endTime = performance.now();
+    writeFile(
+      resolve('./tool_examples/record-naive/bench-rec.csv'),
+      `${wasmPath},${endTime - beginTime}\n`,
+      writeFlags,
+      () => console.log('time written'),
+    );
+    await vmConnection.pause();
+    await analysis.remove();
+    await vmConnection.close();
+    logRecordings(records);
+    console.log(`recording time: ${(endTime - beginTime) / 1000}s`);
+
+    exit(0);
+  }, ms);
 
   // The following is optional
   // if you comment, no interrupt will be simulated

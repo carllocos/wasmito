@@ -19,6 +19,7 @@ import {
 import { spawnDevVM, spawnMCUVM } from '../spawn_vm';
 
 import { BoardBaudRate } from '../../src/util/serial_port';
+import { writeFile, WriteFileOptions } from 'fs';
 
 // import { WriteFileOptions, writeFileSync } from 'node:fs';
 
@@ -49,16 +50,30 @@ function incrementInstrClock(
   i: WasmInstruction,
   args: ReadOnlyWasmValue[],
 ): void {
+  if (args.length > 0) {
+    console.log('should be recorded...');
+    // recordInstr(i, args);
+  }
   logicalClock.instrs += 1;
 }
 
 const logicalClock: LogicalClock = newLogicalClock();
 const records: Record[] = [];
 
+const writeFlags: WriteFileOptions = {
+  encoding: 'utf-8',
+  flag: 'a',
+  mode: 0o666,
+};
+
 async function main(): Promise<void> {
+  const wasmPath = resolve('./app_examples/assemblyscript/fib/wasm/fib.wasm');
+  /*
   const wasmPath = resolve(
-    './app_examples/assemblyscript/toggle_led/wasm/toggle_led.wasm',
+    './libs/WARDuino/benchmarks/tasks/fac/wast/impl.wasm',
   );
+  */
+
   const wasm = new WasmModule(wasmPath);
   //const instr = wasm.getInstruction(0xee);
   //assert(instr !== undefined);
@@ -84,28 +99,30 @@ async function main(): Promise<void> {
   const exportedFunctions = wasm.allExportedFuncs();
   const exportedFunctionsIds = exportedFunctions.map((value) => value.id);
   // these functions are the ones that may be counted as they dont belong to the exported funcs.
-  const recordingFunctions = wasm.functions.filter(
-    (outerValue, index, array) => {
-      return (
-        // find the exported function in the functions array
-        exportedFunctionsIds.findIndex(
-          (inner, index, array) => inner == outerValue.id,
-          // if not found this function may be just counted.
-        ) == -1
-      );
-    },
-  );
+
+  let recordingFunctions = wasm.functions.filter((outerValue, index, array) => {
+    return (
+      // find the exported function in the functions array
+      exportedFunctionsIds.findIndex(
+        (inner, index, array) => inner == outerValue.id,
+        // if not found this function may be just counted.
+      ) == -1
+    );
+  });
+
+  // recordingFunctions = wasm.functions;
 
   for (const f of recordingFunctions) {
     console.log(`amount of instructions: #${f.allInstructions.length}#`);
     for (const i of f.allInstructions) {
       console.log(`    amount of args: #${i.args.length}#`);
       if (i.args.length > 0) {
-        console.log('        R');
+        console.log(`        R${i.startAddress}`);
         analysis.before(i, recordInstr);
+
         instrumentedCount += 1;
       } else {
-        console.log('        C');
+        console.log(`        C${i.startAddress}`);
         analysis.before(i, incrementInstrClock);
         countingCount += 1;
       }
@@ -119,46 +136,31 @@ async function main(): Promise<void> {
     }
   }
 
-  /*
-  for (const f of wasm.functions) {
-    console.log(`amount of instructions: #${f.allInstructions.length}#`);
-    for (const i of f.allInstructions) {
-      console.log(`    amount of args: #${i.args.length}#`);
-      if (i.args.length > 0) {
-        console.log('        R');
-        analysis.before(i, recordInstr);
-        instrumentedCount += 1;
-      } else {
-        analysis.before(i, incrementInstrClock);
-        console.log('        C');
-        countingCount += 1;
-      }
-    }
-  }
-
-  for (const f of wasm.allExportedFuncs()) {
-    console.log(`amount of instructions: #${f.allInstructions.length}#`);
-    for (const i of f.allInstructions) {
-      console.log(`    amount of args: #${i.args.length}#`);
-      if (i.args.length == 0) {
-        instrumentedCount += 1;
-        countingCount -= 1;
-      }
-      console.log('        R');
-      analysis.before(i, recordInstr);
-    }
-  }
-  */
-
   console.log(`counting ${countingCount} and recording ${instrumentedCount}`);
 
   //register advice on before handling interrupt
   analysis.beforeHandlingInterrupt(recordInterrupt);
-
   await analysis.deploy();
-  await analysis.run();
   const recordSecs = 10;
-  stopRecording(vmConnection, analysis, recordSecs);
+  await analysis.run();
+  const beginTime = performance.now();
+
+  const ms = recordSecs * 1000; // convert to milliseconds
+  setTimeout(async () => {
+    const endTime = performance.now();
+    logRecordings(records);
+    writeFile(
+      resolve('./tool_examples/record-optimized/bench-rec.csv'),
+      `${wasmPath},${endTime - beginTime}\n`,
+      writeFlags,
+      () => console.log('time written'),
+    );
+    await vmConnection.pause();
+    await analysis.remove();
+    await vmConnection.close();
+    console.log(`recording time: ${(endTime - beginTime) / 1000}s`);
+    exit(0);
+  }, ms);
 
   // The following is optional
   // if you comment, no interrupt will be simulated
