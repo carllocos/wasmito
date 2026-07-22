@@ -51,8 +51,6 @@ export function getInstructions<I extends WasmInstruction>(
   return instrs;
 }
 
-// const actionsCache: Map<number, [Hook[], InspectStateHook]> = new Map();
-
 export function instruction<I extends WasmInstruction>(
   moment: 'before',
   instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode | WASMFunction,
@@ -274,28 +272,24 @@ function createCallback<I extends WasmInstruction>(
   }
 }
 
-// const actionsCache: Map<string, [Hook[], InspectStateHook]> = new Map();
-// function makeActionsCacheKey(
-//   cbArgs: number,
-//   i: WasmInstruction,
-//   mutate: boolean,
-//   moment: InstrMoment,
-// ) {
-//   if (cbArgs <= 1) return mutate ? '1' : '0';
+const actionsCache: Map<string, [Hook[], InspectStateHook]> = new Map();
+function makeActionsCacheKey(
+  cbArgs: number,
+  i: WasmInstruction,
+  mutate: boolean,
+  moment: InstrMoment,
+) {
+  if (cbArgs <= 1) return mutate ? '1' : '0';
 
-//   let key = getWasmOpcodeNr(i.opcode) + (getWasmSubOpcodeNr(i.opcode) ?? 0);
-//   if (mutate) key = key * -1;
-
-//   if (isCallInstruction(i)) {
-//     if (moment === 'before') {
-//       return `${key} ${i.signature.nrArgs}`;
-//     } else if (moment === 'after') {
-//       return `${key} ${i.signature.nrResults}`;
-//     } else {
-//       return `${key} ${i.signature.nrArgs} ${i.signature.nrResults}`;
-//     }
-//   } else return `${key}`;
-// }
+  const mutateSign = mutate ? '-1' : '2';
+  if (moment === 'before') {
+    return `${mutateSign} ${i.signature.nrArgs}`;
+  } else if (moment === 'after') {
+    return `${mutateSign} ${i.signature.nrResults}`;
+  } else {
+    return `${mutateSign} ${i.signature.nrArgs} ${i.signature.nrResults}`;
+  }
+}
 
 function createActions(
   moment: InstrMoment,
@@ -303,10 +297,9 @@ function createActions(
   updateState: boolean,
   cbNrOfArgs: number,
 ): [Hook[], InspectStateHook] {
-  // TODO fix cache
-  // const key = makeActionsCacheKey(cbNrOfArgs, instr, updateState, moment);
+  const key = makeActionsCacheKey(cbNrOfArgs, instr, updateState, moment);
 
-  // if (actionsCache.has(key)) return actionsCache.get(key)!;
+  if (actionsCache.has(key)) return actionsCache.get(key)!;
 
   const inspectAction = new InspectStateHook(new StateRequest());
   inspectAction.includePC();
@@ -339,7 +332,7 @@ function createActions(
   hooks.push(inspectAction);
 
   const actions: [Hook[], InspectStateHook] = [hooks, inspectAction];
-  // actionsCache.set(key, actions);
+  actionsCache.set(key, actions);
   return actions;
 }
 
