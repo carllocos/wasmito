@@ -3,25 +3,20 @@ import { DeviceManager } from '../src/device/device_manager';
 import { getGlobalLogger } from '../src/logger/logger';
 import { createDevPlatform } from '../src/platforms/platformbuilder_factory';
 import { type SourceMap } from '../src/source_mappers/source_map';
-import {
-  type RequestMessage,
-  ResponseType,
-} from '../src/runtimes/request_interface';
-import {
-  RemoveHookOnWasmAddrRequest,
-  type HookOnWasmAddrResponse,
-} from '../src/runtimes/wasmito_vm/requests/hook_on_wasm_addr_request';
+import { RemoveHookOnWasmAddrRequest } from '../src/runtimes/wasmito_vm/requests/hook_on_wasm_addr_request';
 import { StateRequest } from '../src/runtimes/wasmito_vm/requests/inspect_request';
 import { type WasmitoDevVM } from '../src/runtimes/wasmito_vm/dev_vm';
 import { type WasmState } from '../src/webassembly/wasm';
 import { LanguageAdaptor } from '../src/language_adaptors/language_adaptor';
 import { resolve } from 'path';
+import { RequestMessage, ResponseType } from '../src/runtimes/request_msg';
+import { isSuccessfulReply } from '../src/runtimes/wasmito_vm/requests/around_function_request';
 
-export function allSucceeded(replies: HookOnWasmAddrResponse[]): boolean {
+export function allSucceeded(replies: RequestMessage[]): boolean {
   let idx = 0;
   while (idx < replies.length) {
     const reply = replies[idx];
-    if (reply.responseType !== ResponseType.SuccessResponse) {
+    if (!isSuccessfulReply(reply)) {
       return false;
     }
     idx++;
