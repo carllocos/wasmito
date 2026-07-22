@@ -10,11 +10,13 @@ import { Instruction } from './instructions';
 export class UpdateStackValueRequest extends APIRequestNoSubscription<boolean> {
   private stackIdx: number;
   private value: WASM.Value;
+  readonly instruction: Instruction;
 
   constructor(stackIdx: number, value: WASM.Value) {
     super();
     this.stackIdx = stackIdx;
     this.value = value;
+    this.instruction = Instruction.updateStackValue;
   }
 
   description(): string {
@@ -27,7 +29,7 @@ export class UpdateStackValueRequest extends APIRequestNoSubscription<boolean> {
       includeIndex: false,
       includeType: false,
     });
-    return `${Instruction.updateStackValue}${idx}${encoding}\n`;
+    return `${this.instruction}${this.serializeID()}${idx}${encoding}\n`;
   }
 
   parse(input: string): boolean {

@@ -9,13 +9,16 @@ import {
 } from '../../request_msg';
 import { Instruction } from './instructions';
 
-export class PauseRequest extends APIRequestNoSubscription<string> {
+export class PauseRequest extends APIRequestNoSubscription<boolean> {
+  readonly instruction = Instruction.Pause;
+
   description(): string {
     return 'PauseRequest';
   }
 
   getData(): string {
-    return `${Instruction.Pause}\n`;
+    return `${this.instruction}${this.serializeID()}\n`;
+  }
   }
 
   parse(input: string): string {

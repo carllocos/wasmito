@@ -9,13 +9,15 @@ import {
   ResponseType,
 } from '../../request_msg';
 
-export class ResolveEventRequest extends APIRequestNoSubscription<void> {
+export class ResolveEventRequest extends APIRequestNoSubscription<boolean> {
+  readonly instruction = Instruction.PopEvent;
+
   description(): string {
     return 'ResolveEventRequest';
   }
 
   getData(): string {
-    return `${Instruction.PopEvent}\n`;
+    return `${Instruction.PopEvent}${this.serializeID()}\n`;
   }
 
   parse(input: string): string {

@@ -16,11 +16,13 @@ import {
 } from '../../request_msg';
 
 export class UpdateCallbackMappingRequest extends APIRequestNoSubscription<boolean> {
+  readonly instruction: Instruction;
   private readonly mappings: WASM.CallbackMapping[];
 
   constructor(mappings: WASM.CallbackMapping[]) {
     super();
     this.mappings = mappings;
+    this.instruction = Instruction.UpdateCallbackmapping;
   }
 
   description(): string {
@@ -42,7 +44,7 @@ export class UpdateCallbackMappingRequest extends APIRequestNoSubscription<boole
     jsonStr += ']}';
     const mappingsHex = encodeJSONToHexString(jsonStr);
 
-    return `${Instruction.UpdateCallbackmapping}${mappingsHex}\n`;
+    return `${this.instruction}${mappingsHex}\n`;
   }
 
   private getHexStringEncoding(mappings: WASM.CallbackMapping[]): string {
@@ -66,7 +68,7 @@ export class UpdateCallbackMappingRequest extends APIRequestNoSubscription<boole
       const mappingAsHex = `${idSizeAsHex}${idAsHex}${numberOfCallbacksHex}${callbacksHex}`;
       mappingsHex += mappingAsHex;
     }
-    return `${Instruction.UpdateCallbackmapping}${mappingsHex}\n`;
+    return `${this.instruction}${this.serializeID()}${mappingsHex}\n`;
   }
 
   getData(): string {

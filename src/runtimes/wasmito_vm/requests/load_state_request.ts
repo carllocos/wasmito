@@ -9,8 +9,11 @@ import {
   RequestMessage,
   ResponseType,
 } from '../../request_msg';
+import { Instruction } from './instructions';
 
-export class LoadStateRequest extends APIRequestNoSubscription<string> {
+export class LoadStateRequest extends APIRequestNoSubscription<boolean> {
+  readonly instruction = Instruction.LoadSnapshot;
+
   private readonly encodedState: string;
   private readonly lastRequest: boolean;
 
@@ -25,7 +28,7 @@ export class LoadStateRequest extends APIRequestNoSubscription<string> {
   }
 
   getData(): string {
-    return this.encodedState;
+    return `${this.instruction}${this.serializeID()}${this.encodedState}`;
   }
 
   parse(input: string): string {

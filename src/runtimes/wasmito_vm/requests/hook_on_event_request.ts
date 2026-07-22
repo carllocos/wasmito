@@ -28,120 +28,15 @@ export enum HookOnEventMoment {
 export function getHookOnEventMomentFromString(
   str: string,
 ): HookOnEventMoment | undefined {
-  switch (str) {
-    case '01':
-      return HookOnEventMoment.onNewEvent;
-    case '02':
-      return HookOnEventMoment.beforeEventHandled;
-    case '03':
-      return HookOnEventMoment.afterEventHandled;
-    default:
-      return undefined;
-  }
-}
+  readonly instruction = Instruction.HookOnEvent;
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface HookOnEventJSONResponse extends RequestMessage {}
-
-export abstract class HookOnEventResponse {
-  abstract isSucessful(): boolean;
-}
-
-export class HookOnEventSuccessfulResponse extends HookOnEventResponse {
-  isSucessful(): boolean {
-    return true;
-  }
-}
-
-export class HookOnEventErrorResponse extends HookOnEventResponse {
-  public readonly errorCode: number;
-  public readonly errorMessage: string;
-
-  constructor(errorCode: number, errorMsg: string) {
-    super();
-    this.errorCode = errorCode;
-    this.errorMessage = errorMsg;
-  }
-
-  isSucessful(): boolean {
-    return false;
-  }
-}
-
-export class HookOnEventSubsriptionMessage {
-  public readonly subsriptionData: any;
-  constructor(data: string) {
-    if (isHexaString(data)) {
-      this.subsriptionData = this.parseHexaString(data);
-    } else {
-      this.subsriptionData = this.parseJSONString(data);
-    }
-  }
-
-  private parseHexaString(data: string): string {
-    if (Instruction.HookOnEvent !== data.slice(0, 2)) {
-      throw Error('Invalid subsription data');
-    }
-
-    if (ResponseType.SubscriptionResponse !== data.slice(2, 4)) {
-      throw Error('Invalid subsription data');
-    }
-    return data.slice(4);
-  }
-
-  private parseJSONString(data: string): any {
-    const parsed = JSON.parse(data);
-    if (
-      parsed.interrupt !== Instruction.HookOnEvent ||
-      parsed.kind !== ResponseType.SubscriptionResponse
-    ) {
-      throw new Error('Invalid subscription message');
-    }
-    let subContent: any = {};
-    if (typeof parsed.sub === 'string') {
-      subContent = JSON.parse(parsed.sub);
-    } else if (typeof parsed.sub === 'object') {
-      subContent = parsed.sub;
-    }
-
-    if (
-      subContent.moment !== HookOnEventMoment.afterEventHandled &&
-      subContent.moment !== HookOnEventMoment.beforeEventHandled &&
-      subContent.moment !== HookOnEventMoment.onNewEvent
-    ) {
-      throw new Error('Invalid subscription message');
-    }
-
-    if (subContent.val === undefined) {
-      throw new Error('Invalid subscription message');
-    }
-    return subContent.val;
-  }
-}
-
-// function isHookOnEventResponse(response: RequestMessage): boolean {
-//   return response.interrupt === Instruction.HookOnWasmAddr;
-// }
-
-// function createHookOnEventResponse(msg: RequestMessage): HookOnEventResponse {
-//   return msg;
-// }
-
-export function isSuccessfullHookOnEventResponse(
-  response: HookOnEventResponse,
-): boolean {
-  return response instanceof HookOnEventSuccessfulResponse;
-}
-
-export class HookOnEventRequest extends APIRequest<HookOnEventResponse> {
   public readonly hooks: Hook[];
-  private readonly interruptNr: Instruction;
   private hookMoment: HookOnEventMoment;
 
   constructor(moment: HookOnEventMoment) {
     super();
     this.hooks = [];
-    this.interruptNr = Instruction.HookOnEvent;
+    this.instruction = Instruction.HookOnEvent;
     this.hookMoment = moment;
   }
 
@@ -167,7 +62,7 @@ export class HookOnEventRequest extends APIRequest<HookOnEventResponse> {
     let encodedHook = '';
     encodedSchedule = this.hooks[0].schedule.serializeBinary();
     encodedHook = this.hooks[0].serializeBinary();
-    return `${this.interruptNr}${this.hookMoment}${encodedSchedule}${encodedHook}\n`;
+    return `${this.instruction}${this.serializeID()}${this.hookMoment}${encodedSchedule}${encodedHook}\n`;
   }
 
   override parse(input: string): HookOnEventResponse {

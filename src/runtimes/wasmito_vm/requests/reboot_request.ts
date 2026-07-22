@@ -3,8 +3,11 @@ import {
   APIRequestNoSubscription,
 } from '../../request_interface';
 import { RequestMessage, ResponseType } from '../../request_msg';
+import { Instruction } from './instructions';
 
-export class RebootRequest extends APIRequestNoSubscription<void> {
+export class RebootRequest extends APIRequestNoSubscription<boolean> {
+  readonly instruction = Instruction.Run; // TODO no reboot request yet
+
   description(): string {
     return 'RebootRequest';
   }

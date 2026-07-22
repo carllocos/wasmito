@@ -28,7 +28,9 @@ export class InspectStateHook
   }
 
   public serializeBinary(): string {
-    return `${this.kind}${this.stateToInspect.generateInterrupt()}`;
+    const includeInterruptNr = false;
+    const includeID = false;
+    return `${this.kind}${this.stateToInspect.generateInterrupt(includeInterruptNr, includeID)}`;
   }
 
   description(): string {

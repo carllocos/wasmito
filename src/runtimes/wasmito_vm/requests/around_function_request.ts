@@ -71,6 +71,8 @@ export function isAroundFunctionJSONResponse(
 }
 
 export class AroundFunctionRequest extends APIRequestNoSubscription<AroundHookResponse> {
+  readonly instruction = Instruction.AroundFunction;
+
   public readonly function_idx;
   public readonly hooks: Hook[];
   private _isAddRequest: boolean;
@@ -113,10 +115,10 @@ export class AroundFunctionRequest extends APIRequestNoSubscription<AroundHookRe
       const addRequest = '01';
       const encodedSchedule = this.hooks[0].schedule.serializeBinary();
       const encodedHook = this.hooks[0].serializeBinary();
-      return `${Instruction.AroundFunction}${encodedFidx}${addRequest}${encodedSchedule}${encodedHook}\n`;
+      return `${this.instruction}${this.serializeID()}${encodedFidx}${addRequest}${encodedSchedule}${encodedHook}\n`;
     } else {
       const removeReq = '00';
-      return `${Instruction.AroundFunction}${encodedFidx}${removeReq}\n`;
+      return `${this.instruction}${this.serializeID()}${encodedFidx}${removeReq}\n`;
     }
   }
 
