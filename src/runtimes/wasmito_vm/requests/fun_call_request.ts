@@ -237,6 +237,8 @@ function errorCodeMessage(errorCode: number): string | undefined {
 }
 
 export class RemoteCallRequest extends FunCallRequest<ProxyCallResponse> {
+  readonly instruction = Instruction.FuncCall;
+
   constructor(funcToCall: number, args: WASM.Value[]) {
     super(funcToCall, args, false);
   }
