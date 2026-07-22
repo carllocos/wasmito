@@ -28,6 +28,14 @@ export enum HookOnEventMoment {
 export function getHookOnEventMomentFromString(
   str: string,
 ): HookOnEventMoment | undefined {
+  const enumValues: string[] = Object.values(HookOnEventMoment);
+  if (enumValues.includes(str)) {
+    return str as HookOnEventMoment;
+  }
+  return undefined;
+}
+
+export class HookOnEventRequest extends APIRequest<RequestMessage> {
   readonly instruction = Instruction.HookOnEvent;
 
   public readonly hooks: Hook[];
