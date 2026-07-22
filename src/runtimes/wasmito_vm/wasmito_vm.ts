@@ -197,9 +197,10 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
   public async run(timeout?: number): Promise<boolean> {
     const request = new RunRequest();
     this.logger.debug('Sending RunRequest');
-    await this.sendRequest(request, timeout);
-    this.logger.info('Running');
-    return true;
+    const s = await this.sendRequest(request, timeout);
+    if (s) this.logger.debug('Running');
+    else this.logger.debug('Failed to run');
+    return s;
   }
 
   public async pause(timeout?: number): Promise<void> {
