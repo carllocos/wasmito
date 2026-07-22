@@ -8,12 +8,15 @@ import { WasmModule } from '../../webassembly/wasm/wasm_module';
 import { WasmCode, WasmOpcode } from '../../webassembly/wasm/wasm_opcode';
 import { ReadOnlyWasmValue, WritableWasmValue } from '../interrupts';
 import { GroupHooks, InstrMoment } from '../group_hooks';
-import { WasmState } from '../../webassembly/wasm';
+import { WASM, WasmState } from '../../webassembly/wasm';
 import { assertFatalHookError, Hook } from '../../hooks/hook';
 import { InspectStateHook } from '../../hooks/hook_inspect_state';
 import { StateRequest } from '../../runtimes/wasmito_vm/requests/inspect_request';
 import { PauseVMHook } from '../../hooks/hook_run_pause';
 import { getGlobalLogger } from '../../logger/logger';
+import { WASMFunction } from '../../webassembly/wasm/wasm_function';
+
+const logger = getGlobalLogger();
 
 export function getInstructions<I extends WasmInstruction>(
   wasm: WasmModule,
@@ -56,9 +59,17 @@ export function instruction<I extends WasmInstruction>(
   maxTimeoutMs: number,
   cb:
     | ((instr: I, args: ReadOnlyWasmValue[], vm: WasmitoBackendVM) => void)
+    | ((
+        instr: I,
+        args: ReadOnlyWasmValue[],
+        vm: WasmitoBackendVM,
+      ) => Promise<void>)
     | ((instr: I, args: ReadOnlyWasmValue[]) => void)
+    | ((instr: I, args: ReadOnlyWasmValue[]) => Promise<void>)
     | ((vm: WasmitoBackendVM) => void)
-    | (() => void),
+    | ((vm: WasmitoBackendVM) => Promise<void>)
+    | (() => void)
+    | (() => Promise<void>),
   mutate: false,
 ): GroupHooks | undefined;
 export function instruction<I extends WasmInstruction>(
@@ -73,7 +84,13 @@ export function instruction<I extends WasmInstruction>(
         args: WritableWasmValue[],
         vm: WasmitoBackendVM,
       ) => WritableWasmValue[])
-    | ((instr: I, args: WritableWasmValue[]) => WritableWasmValue[]),
+    | ((
+        instr: I,
+        args: WritableWasmValue[],
+        vm: WasmitoBackendVM,
+      ) => Promise<WritableWasmValue[]>)
+    | ((instr: I, args: WritableWasmValue[]) => WritableWasmValue[])
+    | ((instr: I, args: WritableWasmValue[]) => Promise<WritableWasmValue[]>),
   mutate: true,
 ): GroupHooks | undefined;
 export function instruction<I extends WasmInstruction>(
@@ -88,9 +105,17 @@ export function instruction<I extends WasmInstruction>(
         result: ReadOnlyWasmValue | undefined,
         vm: WasmitoBackendVM,
       ) => void)
+    | ((
+        instr: I,
+        result: ReadOnlyWasmValue | undefined,
+        vm: WasmitoBackendVM,
+      ) => Promise<void>)
     | ((instr: I, result: ReadOnlyWasmValue | undefined) => void)
+    | ((instr: I, result: ReadOnlyWasmValue | undefined) => Promise<void>)
     | ((vm: WasmitoBackendVM) => void)
-    | (() => void),
+    | ((vm: WasmitoBackendVM) => Promise<void>)
+    | (() => void)
+    | (() => Promise<void>),
   mutate: false,
 ): GroupHooks | undefined;
 export function instruction<I extends WasmInstruction>(
@@ -108,7 +133,16 @@ export function instruction<I extends WasmInstruction>(
     | ((
         instr: I,
         result: WritableWasmValue | undefined,
-      ) => WritableWasmValue | undefined),
+        vm: WasmitoBackendVM,
+      ) => Promise<WritableWasmValue | undefined>)
+    | ((
+        instr: I,
+        result: WritableWasmValue | undefined,
+      ) => WritableWasmValue | undefined)
+    | ((
+        instr: I,
+        result: WritableWasmValue | undefined,
+      ) => Promise<WritableWasmValue | undefined>),
   mutate: true,
 ): GroupHooks | undefined;
 export function instruction<I extends WasmInstruction>(
@@ -117,34 +151,61 @@ export function instruction<I extends WasmInstruction>(
   wasm: WasmModule,
   vm: WasmitoBackendVM,
   maxTimeoutMs: number,
-  // cb: (...args: any[]) => any,
-  // updateState?: boolean,
   cb:
     | ((
         instr: I,
         args: WritableWasmValue[],
         vm: WasmitoBackendVM,
       ) => WritableWasmValue[])
+    | ((
+        instr: I,
+        args: WritableWasmValue[],
+        vm: WasmitoBackendVM,
+      ) => Promise<WritableWasmValue[]>)
     | ((instr: I, args: WritableWasmValue[]) => WritableWasmValue[])
+    | ((instr: I, args: WritableWasmValue[]) => Promise<WritableWasmValue[]>)
     | ((instr: I, args: ReadOnlyWasmValue[], vm: WasmitoBackendVM) => void)
+    | ((
+        instr: I,
+        args: ReadOnlyWasmValue[],
+        vm: WasmitoBackendVM,
+      ) => Promise<void>)
     | ((instr: I, args: ReadOnlyWasmValue[]) => void)
+    | ((instr: I, args: ReadOnlyWasmValue[]) => Promise<void>)
     | ((
         instr: I,
         result: WritableWasmValue | undefined,
         vm: WasmitoBackendVM,
       ) => WritableWasmValue | undefined)
+    | ((
+        instr: I,
+        result: WritableWasmValue | undefined,
+        vm: WasmitoBackendVM,
+      ) => Promise<WritableWasmValue | undefined>)
     | ((
         instr: I,
         result: ReadOnlyWasmValue | undefined,
         vm: WasmitoBackendVM,
       ) => void)
+    | ((
+        instr: I,
+        result: ReadOnlyWasmValue | undefined,
+        vm: WasmitoBackendVM,
+      ) => Promise<void>)
     | ((instr: I, result: ReadOnlyWasmValue | undefined) => void)
+    | ((instr: I, result: ReadOnlyWasmValue | undefined) => Promise<void>)
     | ((
         instr: I,
         result: WritableWasmValue | undefined,
       ) => WritableWasmValue | undefined)
+    | ((
+        instr: I,
+        result: WritableWasmValue | undefined,
+      ) => Promise<WritableWasmValue | undefined>)
     | ((vm: WasmitoBackendVM) => void)
-    | (() => void),
+    | ((vm: WasmitoBackendVM) => Promise<void>)
+    | (() => void)
+    | (() => Promise<void>),
   mutate: boolean,
 ): GroupHooks | undefined {
   const instrs = getInstructions(wasm, instr, moment);
@@ -183,11 +244,11 @@ function createCallback<I extends WasmInstruction>(
   instr: I,
   updateState: boolean,
   cb: (...args: any[]) => any,
-): (s: WasmState) => void {
+): (s: WasmState) => Promise<void> {
   switch (cb.length) {
     case 0:
     case 1:
-      return createCallbackNoArgs(vm, cb);
+      return createCallbackNoArgs(vm, instr, moment, cb);
     case 2:
     case 3:
       if (moment === 'before') {
@@ -255,11 +316,16 @@ function createActions(
 
 export function createCallbackNoArgs(
   vm: WasmitoBackendVM,
+  instr: WasmInstruction,
+  moment: InstrMoment,
   cb: // do not care about args, nor return value
-  ((vm: WasmitoBackendVM) => void) | (() => void),
-): (s: WasmState) => void {
-  return (_s: WasmState) => {
-    cb(vm);
+  | ((vm: WasmitoBackendVM) => void)
+    | ((vm: WasmitoBackendVM) => Promise<void>)
+    | (() => void)
+    | (() => Promise<void>),
+): (s: WasmState) => Promise<void> {
+  return async (s: WasmState) => {
+    await cb(vm);
   };
 }
 
@@ -270,8 +336,8 @@ function createCallbackWithArgs(
   instr: WasmInstruction,
   mutable: boolean,
   cb: (...args: any[]) => any, // cb: // update args
-): (s: WasmState) => void {
-  return (s: WasmState) => {
+): (s: WasmState) => Promise<void> {
+  return async (s: WasmState) => {
     assertFatalHookError(s.pc !== undefined, 'pc is empty');
     const i = mod.getInstruction(s.pc);
     assertFatalHookError(
@@ -303,7 +369,7 @@ function createCallbackWithArgs(
       }
     }
 
-    const newArgs = cb(i, args, vm);
+    const newArgs = await cb(i, args, vm);
     if (mutable) {
       assertFatalHookError(
         newArgs !== undefined,
@@ -314,14 +380,13 @@ function createCallbackWithArgs(
         newArgs instanceof Array,
         'new Args are expected to be an array',
       );
-      getGlobalLogger().debug(
-        `new Values: [${newArgs.map((v) => v.value).join(', ')}]`,
+      logger.debug(
+        `new Values: [${newArgs.map((v) => `(${WASM.typeToString(v.type)}, ${v.value})`).join(', ')}]`,
       );
-      updateArgsStack(newArgs, vm).then((s) => {
-        assert(s, 'failed to update the stack with new values');
-        getGlobalLogger().debug('Resume execution on VM');
-        vm.run(maxTimeoutMs); // TODO await
-      });
+      const success = await updateArgsStack(newArgs, vm);
+      assert(success, 'failed to update the stack with new values');
+      logger.debug('Resume execution on VM');
+      await vm.run(maxTimeoutMs);
     } else {
       assertFatalHookError(
         newArgs === undefined,
@@ -348,8 +413,8 @@ function createCallbackWithResult(
   instr: WasmInstruction,
   mutate: boolean,
   cb: (...args: any[]) => any,
-): (s: WasmState) => void {
-  return (s: WasmState) => {
+): (s: WasmState) => Promise<void> {
+  return async (s: WasmState) => {
     // Careful!
     // since the pc in the retrieved Wasm state refers to the instruction that will be executed
     // after `instr`.
@@ -373,7 +438,7 @@ function createCallbackWithResult(
         : new ReadOnlyWasmValue(val);
     }
 
-    const updatedValue = cb(instr, result, vm);
+    const updatedValue = await cb(instr, result, vm);
     if (mutate) {
       assertFatalHookError(
         (updatedValue === undefined && result === undefined) ||
@@ -382,17 +447,16 @@ function createCallbackWithResult(
       );
       // TODO validate the new value
       if (updatedValue !== undefined) {
-        getGlobalLogger().debug(`New value computed ${result?.value}`);
-        updateArgsStack([updatedValue], vm).then((s) => {
-          assert(
-            s,
-            `failed to update the stack with new value ${updatedValue.value} (type ${updatedValue.type})`,
-          );
-          getGlobalLogger().debug('Resume execution on VM');
-          vm.run(maxTimeoutMs); // TODO await
-        });
+        logger.debug(`New value computed ${result?.value}`);
+        const success = await updateArgsStack([updatedValue], vm);
+        assert(
+          success,
+          `failed to update the stack with new value ${updatedValue.value} (type ${updatedValue.type})`,
+        );
+        logger.debug('Resume execution on VM');
+        await vm.run(maxTimeoutMs);
       } else {
-        vm.run(maxTimeoutMs); // TODO await
+        await vm.run(maxTimeoutMs);
       }
     } else {
       assertFatalHookError(
