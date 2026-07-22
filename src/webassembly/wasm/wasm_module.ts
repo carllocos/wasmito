@@ -577,7 +577,10 @@ function retrieveAllInstructions(
 ): WasmInstruction[] {
   const globalInstructions = retrieveGlobalInstructions(mod);
   const funcBodies = functions.flatMap((f) => {
-    return f.allInstructions;
+    return f.allInstructions.map((i) => {
+      i.enclosingFunction = f;
+      return i;
+    });
   });
   return globalInstructions.concat(funcBodies);
 }
