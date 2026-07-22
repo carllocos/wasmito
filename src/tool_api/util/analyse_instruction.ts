@@ -19,7 +19,7 @@ export function getInstructions<I extends WasmInstruction>(
   wasm: WasmModule,
   instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
 ): WasmInstruction[] {
-  const instrs: WasmInstruction[] = [];
+  let instrs: WasmInstruction[] = [];
   let i: WasmInstruction | undefined;
   if (typeof instr === 'number') {
     if (instr >= 0) {
@@ -27,7 +27,7 @@ export function getInstructions<I extends WasmInstruction>(
     } else {
       // group of instructions
       for (const op of WasmCode.toSingleOpcodes(instr)) {
-        instrs.push(...wasm.instructionsFromOpcode(op));
+        instrs = [...instrs, ...wasm.instructionsFromOpcode(op)]; // trick to avoid stack exhaustion
       }
     }
   } else if (instr instanceof WasmInstruction) {

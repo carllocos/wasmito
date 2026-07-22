@@ -108,9 +108,9 @@ export class WasmModule {
   }
 
   instructionsFromOpcode(opcode: WasmOpcode): WasmInstruction[] {
-    const instrs: WasmInstruction[] = [];
+    let instrs: WasmInstruction[] = [];
     for (const f of this.functions) {
-      f.instructionsFromOpcode(opcode).forEach((i) => instrs.push(i));
+      instrs = [...instrs, ...f.instructionsFromOpcode(opcode)]; // trick to avoid running out of stack
     }
     return instrs;
   }
