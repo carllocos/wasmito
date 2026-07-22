@@ -67,7 +67,12 @@ export class WasmAnalysis {
    *
    */
   before<I extends WasmInstruction>(
-    instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
+    instr:
+      | I
+      | WasmAddress
+      | WasmOpcode
+      | WasmCode.MultipleOpcode
+      | WASMFunction,
     cb:
       | ((instr: I, args: ReadOnlyWasmValue[], vm: WasmitoBackendVM) => void)
       | ((
@@ -97,7 +102,12 @@ export class WasmAnalysis {
   }
 
   beforeMut<I extends WasmInstruction>(
-    instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
+    instr:
+      | I
+      | WasmAddress
+      | WasmOpcode
+      | WasmCode.MultipleOpcode
+      | WASMFunction,
     cb:
       | ((
           instr: I,
@@ -127,7 +137,12 @@ export class WasmAnalysis {
   }
 
   after<I extends WasmInstruction>(
-    instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
+    instr:
+      | I
+      | WasmAddress
+      | WasmOpcode
+      | WasmCode.MultipleOpcode
+      | WASMFunction,
     cb:
       | ((
           instr: I,
@@ -161,7 +176,12 @@ export class WasmAnalysis {
   }
 
   afterMut<I extends WasmInstruction>(
-    instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
+    instr:
+      | I
+      | WasmAddress
+      | WasmOpcode
+      | WasmCode.MultipleOpcode
+      | WASMFunction,
     cb:
       | ((
           instr: I,

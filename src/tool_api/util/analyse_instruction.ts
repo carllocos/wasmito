@@ -53,7 +53,7 @@ export function getInstructions<I extends WasmInstruction>(
 
 export function instruction<I extends WasmInstruction>(
   moment: 'before',
-  instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
+  instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode | WASMFunction,
   wasm: WasmModule,
   vm: WasmitoBackendVM,
   maxTimeoutMs: number,
@@ -74,7 +74,7 @@ export function instruction<I extends WasmInstruction>(
 ): GroupHooks | undefined;
 export function instruction<I extends WasmInstruction>(
   moment: 'before',
-  instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
+  instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode | WASMFunction,
   wasm: WasmModule,
   vm: WasmitoBackendVM,
   maxTimeoutMs: number,
@@ -95,7 +95,7 @@ export function instruction<I extends WasmInstruction>(
 ): GroupHooks | undefined;
 export function instruction<I extends WasmInstruction>(
   moment: 'after',
-  instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
+  instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode | WASMFunction,
   wasm: WasmModule,
   vm: WasmitoBackendVM,
   maxTimeoutMs: number,
@@ -120,7 +120,7 @@ export function instruction<I extends WasmInstruction>(
 ): GroupHooks | undefined;
 export function instruction<I extends WasmInstruction>(
   moment: 'after',
-  instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
+  instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode | WASMFunction,
   wasm: WasmModule,
   vm: WasmitoBackendVM,
   maxTimeoutMs: number,
@@ -147,7 +147,7 @@ export function instruction<I extends WasmInstruction>(
 ): GroupHooks | undefined;
 export function instruction<I extends WasmInstruction>(
   moment: InstrMoment,
-  instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
+  instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode | WASMFunction,
   wasm: WasmModule,
   vm: WasmitoBackendVM,
   maxTimeoutMs: number,
