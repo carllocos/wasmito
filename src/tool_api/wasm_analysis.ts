@@ -35,31 +35,51 @@ export class WasmAnalysis {
   public readonly wasm: WasmModule;
   private vm: WasmitoBackendVM;
   private groups: GroupHooks[];
+  private interruptGroups: GroupHooks[];
   private _logger: Logger;
   private maxTimeoutMs: number;
+  private _sourceMap?: SourceMap;
   private _adaptor?: LanguageAdaptor;
+  private envFuncForPinInterrupt: number;
+  private analysisResolver: any;
+  private userOnFinishCB: any;
 
   constructor(
-    wasm: WasmModule | LanguageAdaptor,
+    wasm: WasmModule | SourceMap | LanguageAdaptor,
     vm: WasmitoBackendVM,
     config?: AnalysisConfig,
   ) {
     if (wasm instanceof WasmModule) {
       this.wasm = wasm;
+    } else if (wasm instanceof SourceMap) {
+      this.wasm = wasm.wasm;
+      this._sourceMap = wasm;
     } else {
       this._adaptor = wasm;
       this.wasm = wasm.sourceMap.wasm;
+      this._sourceMap = wasm.sourceMap;
     }
     this.vm = vm;
     this.groups = [];
+    this.interruptGroups = [];
     this._logger = createLogger(config?.name ?? 'WasmAnalyse');
     this.maxTimeoutMs = config?.maxTimeoutMs ?? 30000;
+    this.envFuncForPinInterrupt = this.findEnvFuncForPinInterrupt();
   }
+
   private addGroup(g: GroupHooks | undefined): GroupHooks | undefined {
     if (g !== undefined) {
       this.groups.push(g);
     }
     return g;
+  }
+
+  private findEnvFuncForPinInterrupt(): number {
+    for (const func of this.wasm.importFuncs) {
+      if (func.fullName.includes('subscribe_interrupt')) return func.id;
+    }
+    this._logger.debug(`No subscribe env function found in the given module`);
+    return -1;
   }
 
   /*
