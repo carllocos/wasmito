@@ -9,13 +9,16 @@ import {
 } from '../../request_msg';
 import { Instruction } from './instructions';
 
-export class RunRequest extends APIRequestNoSubscription<string> {
+export class RunRequest extends APIRequestNoSubscription<boolean> {
+  readonly instruction = Instruction.Run;
+
   description(): string {
     return 'RunRequest';
   }
 
   getData(): string {
-    return `${Instruction.Run}\n`;
+    return `${this.instruction}${this.serializeID()}\n`;
+  }
   }
 
   parse(data: string): string {

@@ -45,10 +45,11 @@ export abstract class FunCallRequest<R> extends APIRequestNoSubscription<R> {
   abstract parse(input: string): R;
 
   encodeRemoteCallRequest(): string {
-    // format: interrupt | LEB32 funcid | args | newline | null termination
+    // format: interrupt | LEB ID request| LEB32 funcid | args | newline | null termination
     // interrupt
     let encoding = '';
-    encoding += this.isProxyCall ? Instruction.ProxyCall : Instruction.FuncCall;
+    encoding += this.instruction;
+    encoding += this.serializeID();
 
     // funcid
     encoding += WASM.leb128(this.funcToCall);
@@ -102,6 +103,8 @@ export function isProxyCallSuccessfulResponse(
 }
 
 export class ProxyCallRequest extends FunCallRequest<ProxyCallResponse> {
+  readonly instruction = Instruction.ProxyCall;
+
   constructor(funcToCall: number, args: WASM.Value[]) {
     super(funcToCall, args, true);
   }

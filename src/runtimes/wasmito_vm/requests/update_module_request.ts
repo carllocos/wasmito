@@ -10,13 +10,16 @@ import {
   ResponseType,
 } from '../../request_msg';
 
-export class UpdateWasmModuleRequest extends APIRequestNoSubscription<string> {
+export class UpdateWasmModuleRequest extends APIRequestNoSubscription<boolean> {
   private readonly wasmBuffer: Buffer;
   private readonly wasm: Uint8Array;
+
+  readonly instruction: Instruction;
   constructor(wasm: Buffer) {
     super();
     this.wasmBuffer = wasm;
     this.wasm = new Uint8Array(wasm);
+    this.instruction = Instruction.UpdateWasmModule;
   }
 
   description(): string {
@@ -28,7 +31,7 @@ export class UpdateWasmModuleRequest extends APIRequestNoSubscription<string> {
     const sizeBuffer = Buffer.allocUnsafe(4);
     sizeBuffer.writeUint32BE(this.wasm.length);
     const wasmHex = this.wasmBuffer.toString('hex');
-    return `${Instruction.UpdateWasmModule}${sizeHex}${wasmHex}\n`;
+    return `${this.instruction}${this.serializeID()}${sizeHex}${wasmHex}\n`;
   }
 
   override parse(input: string): string {

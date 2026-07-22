@@ -88,20 +88,12 @@ export class HookOnErrorSubsriptionMessage {
   }
 }
 
-export function isSuccessfullHookOnErrorResponse(
-  response: HookOnErrorResponse,
-): boolean {
-  return response instanceof HookOnErrorSuccessfulResponse;
-}
-
-export class HookOnError extends APIRequest<HookOnErrorResponse> {
+  readonly instruction = Instruction.HookOnError;
   public readonly hooks: Hook[];
-  private readonly interruptNr: Instruction;
 
   constructor() {
     super();
     this.hooks = [];
-    this.interruptNr = Instruction.HookOnError;
   }
 
   onError(hook: Hook): HookOnError {
@@ -124,7 +116,7 @@ export class HookOnError extends APIRequest<HookOnErrorResponse> {
     let encodedHook = '';
     encodedSchedule = this.hooks[0].schedule.serializeBinary();
     encodedHook = this.hooks[0].serializeBinary();
-    return `${this.interruptNr}${encodedSchedule}${encodedHook}\n`;
+    return `${this.instruction}${this.serializeID()}${encodedSchedule}${encodedHook}\n`;
   }
 
   override parse(input: string): HookOnErrorResponse {

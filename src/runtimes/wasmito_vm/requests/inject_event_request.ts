@@ -15,6 +15,7 @@ import {
 } from '../../request_msg';
 
 export class PushEventRequest extends APIRequestNoSubscription<boolean> {
+  readonly instruction = Instruction.PushEvent;
   private readonly topic: string;
   private readonly payload: string;
   private _binaryEncode: boolean;
@@ -35,17 +36,10 @@ export class PushEventRequest extends APIRequestNoSubscription<boolean> {
   }
 
   getData(): string {
-    if (this._binaryEncode) {
-      return this.getDataBinaryEncoding();
-    } else {
-      return this.getDataAsJSON();
-    }
-  }
-
-  private getDataAsJSON(): string {
-    const obj = { topic: this.topic, payload: this.payload };
-    const hexEvent = encodeJSONToHexString(obj);
-    return `${Instruction.PushEvent}${hexEvent}\n`;
+    const encoding = this._binaryEncode
+      ? encodeEventAsBinary(this.topic, this.payload)
+      : encodeEventAsJSON(this.topic, this.payload);
+    return `${this.instruction}${this.serializeID()}${encoding}\n`;
   }
 
   private getDataBinaryEncoding(): string {
@@ -78,4 +72,27 @@ export class MockPinInterruptRequest extends PushEventRequest {
   constructor(pin: number) {
     super(`interrupt_${pin}`, '');
   }
+}
+
+export function encodeEventAsJSON(topic: string, payload: string): string {
+  const obj = { topic: topic, payload: payload };
+  return encodeJSONToHexString(obj);
+}
+
+export function encodeEventAsBinary(topic: string, payload: string): string {
+  return `${binaryEncodeTopic(topic)}${binaryEncodePayload(payload)}`;
+}
+
+function binaryEncodeTopic(topic: string): string {
+  // format: size topic (LEB) | topic hex
+  const size = encodeToHexLEB128(topic.length);
+  const t = encodeStringToHex(topic);
+  return `${size}${t}`;
+}
+
+function binaryEncodePayload(payload: string): string {
+  // format: size payload (LEB) | payload hex
+  const size = encodeToHexLEB128(payload.length);
+  const p = encodeStringToHex(payload);
+  return `${size}${p}`;
 }

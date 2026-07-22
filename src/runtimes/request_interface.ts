@@ -1,10 +1,8 @@
 import { type Channel } from '../communication/channel_interface';
+import { IDGenerator, RequestID } from '../communication/id_generator';
 import { RequestsManager } from '../communication/requests_manager';
-import { errorCodeToMessage } from './error_codes';
-import {
-  getInstructionFromString,
-  type Instruction,
-} from './wasmito_vm/requests/instructions';
+import { RequestMessage } from './request_msg';
+import { type Instruction } from './wasmito_vm/requests/instructions';
 
 export enum SubscriptionParseOutcome {
   Successful,
@@ -12,13 +10,22 @@ export enum SubscriptionParseOutcome {
 }
 
 export class APIRequestInvalidParse extends Error {}
+const idGenerator = new IDGenerator();
 
 export abstract class APIRequest<R> {
+  public readonly id: RequestID;
+  abstract readonly instruction: Instruction;
+  constructor() {
+    this.id = idGenerator.newID();
+  }
   abstract description(): string;
   abstract getData(): string;
   abstract parse(input: string): R;
   abstract handleSubscriptionData(data: string): SubscriptionParseOutcome;
   abstract isSubscriptionClosed(): boolean;
+  serializeID(): string {
+    return idGenerator.serialiseIDToLEBHex(this.id);
+  }
 }
 
 export abstract class APIRequestNoSubscription<R> extends APIRequest<R> {

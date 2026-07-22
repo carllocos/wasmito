@@ -34,12 +34,14 @@ export interface StackInpsectResponse {
 }
 
 export class InspectStack extends APIRequestNoSubscription<WasmStack> {
+  readonly instruction = Instruction.Inspect;
+
   description(): string {
     return `InspectStack`;
   }
 
   getData(): string {
-    return `${Instruction.Inspect}${InspectableState.stackState}\n`;
+    return `${this.instruction}${this.serializeID()}${InspectableState.stackState}\n`;
   }
 
   parse(input: string): WasmStack {
@@ -86,7 +88,7 @@ export class StateRequest
   extends APIRequestNoSubscription<WasmState>
   implements WasmStateI<StateRequest>
 {
-  private state: string[] = [];
+  readonly instruction = Instruction.Inspect;
 
   public includeAll(): StateRequest {
     this.state = [];
@@ -177,7 +179,14 @@ export class StateRequest
         'StateInspectRequest should request at least one state kind. It is currently empty',
       );
     }
-    return `${Instruction.Inspect}${numberBytes}${stateToReq}`;
+    let d = '';
+    if (includeInterruptNr) {
+      d += this.instruction;
+    }
+    if (includeID) {
+      d += this.serializeID();
+    }
+    return `${d}${numberBytes}${stateToReq}`;
   }
 
   description(): string {
@@ -185,7 +194,9 @@ export class StateRequest
   }
 
   getData(): string {
-    return `${this.generateInterrupt()}\n`;
+    const includeID = true;
+    const includeInterruptNr = true;
+    return `${this.generateInterrupt(includeInterruptNr, includeID)}\n`;
   }
 
   private pushState(s: string): void {

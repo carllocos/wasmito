@@ -26,38 +26,11 @@ export enum HookOnWasmAddrMoment {
 export function getHookMomentFromString(
   str: string,
 ): HookOnWasmAddrMoment | undefined {
-  switch (str) {
-    case '01':
-      return HookOnWasmAddrMoment.HookBefore;
-    case '02':
-      return HookOnWasmAddrMoment.HookAfter;
-    default:
-      return undefined;
-  }
-}
-
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface HookOnWasmAddrJSONResponse extends RequestMessage {}
-
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface HookOnWasmAddrResponse extends HookOnWasmAddrJSONResponse {}
-
-function isHookOnWasmAddrResponse(response: RequestMessage): boolean {
-  return response.interrupt === Instruction.HookOnWasmAddr;
-}
-
-export function createHookOnWasmAddrResponse(
-  msg: RequestMessage,
-): HookOnWasmAddrResponse {
-  return msg;
-}
-
-export class HookOnWasmAddrRequest extends APIRequest<HookOnWasmAddrResponse> {
+  readonly instruction = Instruction.HookOnWasmAddr;
   private readonly logger: Logger;
   public readonly wasmAddr;
   public readonly hooks: Hook[];
   private moment: HookOnWasmAddrMoment;
-  private readonly interruptNr: Instruction;
   protected isaddRequest: boolean; // true for add, false for remove;
   private subscriptionActive: boolean;
 
@@ -66,7 +39,6 @@ export class HookOnWasmAddrRequest extends APIRequest<HookOnWasmAddrResponse> {
     this.wasmAddr = wasmAddr;
     this.hooks = [];
     this.moment = moment ?? HookOnWasmAddrMoment.HookBefore;
-    this.interruptNr = Instruction.HookOnWasmAddr;
     this.isaddRequest = true;
     this.logger = createLogger('HookOnWasmAddrRequest');
     this.subscriptionActive = true;
@@ -110,7 +82,7 @@ export class HookOnWasmAddrRequest extends APIRequest<HookOnWasmAddrResponse> {
       encodedHook = this.hooks[0].serializeBinary();
       encodedAddOrRemoveOp = '01';
     }
-    return `${this.interruptNr}${encodedAddr}${this.moment}${encodedAddOrRemoveOp}${encodedSchedule}${encodedHook}\n`;
+    return `${this.instruction}${this.serializeID()}${encodedAddr}${this.moment}${encodedAddOrRemoveOp}${encodedSchedule}${encodedHook}\n`;
   }
 
   override parse(input: string): HookOnWasmAddrResponse {
