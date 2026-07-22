@@ -325,6 +325,9 @@ export function createCallbackNoArgs(
     | (() => Promise<void>),
 ): (s: WasmState) => Promise<void> {
   return async (s: WasmState) => {
+    if (moment === 'before' && s.pc !== instr.startAddress) {
+      return;
+    }
     await cb(vm);
   };
 }
