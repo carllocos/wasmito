@@ -103,9 +103,10 @@ export class StateRequest
   implements WasmStateI<StateRequest>
 {
   readonly instruction = Instruction.Inspect;
+  private state: Set<string> = new Set();
 
   public includeAll(): StateRequest {
-    this.state = [];
+    this.state = new Set();
     const allStates = Object.values(InspectableState) as string[];
     allStates
       .filter((s) => !isNaN(parseInt(s, 16)))
@@ -116,7 +117,11 @@ export class StateRequest
   }
 
   public isRequestEmpty(): boolean {
-    return this.state.length === 0;
+    return this.state.size === 0;
+  }
+
+  public doesInclude(s: InspectableState): boolean {
+    return this.state.has(s);
   }
 
   public includePC(): StateRequest {
@@ -188,6 +193,9 @@ export class StateRequest
     includeInterruptNr: boolean,
     includeID: boolean,
   ): string {
+    const states = Array.from(this.state).sort();
+    const numberBytes = serializeUInt16BE(states.length);
+    const stateToReq = states.join('');
     if (stateToReq === '') {
       throw new Error(
         'StateInspectRequest should request at least one state kind. It is currently empty',
@@ -214,9 +222,8 @@ export class StateRequest
   }
 
   private pushState(s: string): void {
-    const present = this.state.find((s2) => s === s2);
-    if (present === undefined) {
-      this.state.push(s);
+    if (!this.state.has(s)) {
+      this.state.add(s);
     }
   }
 

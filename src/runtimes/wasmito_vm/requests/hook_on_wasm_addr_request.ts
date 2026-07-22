@@ -33,6 +33,7 @@ export function getHookMomentFromString(
   return undefined;
 }
 
+const logger = createLogger('HookOnWasmAddrRequest');
 
 export class HookOnWasmAddrRequest extends APIRequest<RequestMessage> {
   readonly instruction = Instruction.HookOnWasmAddr;
@@ -49,7 +50,7 @@ export class HookOnWasmAddrRequest extends APIRequest<RequestMessage> {
     this.hooks = [];
     this.moment = moment ?? HookOnWasmAddrMoment.HookBefore;
     this.isaddRequest = true;
-    this.logger = createLogger('HookOnWasmAddrRequest');
+    this.logger = logger;
     this.subscriptionActive = true;
   }
 
