@@ -330,7 +330,35 @@ export class RemoteCallRequest extends FunCallRequest<ProxyCallResponse> {
       if (hasResultValue === '00') {
         return response;
       } else if (hasResultValue === '01') {
-        throw Error(`TODO read resultValue MSG from hexaInput`);
+        const encodedTypeAndValue = hexaInput.slice(4, hexaInput.length);
+        // 2 chars for the type
+        const typeInHex = encodedTypeAndValue.slice(0, 2).toLowerCase();
+        const valueType = WASM.hexToType.get(typeInHex);
+        assert(
+          valueType !== undefined,
+          `the encoded Wasm Type '${typeInHex}' returned from the call is not a Wasm type`,
+        );
+
+        const encodedValue = encodedTypeAndValue.slice(
+          2,
+          encodedTypeAndValue.length,
+        );
+        const buffer = hexStringToUint8Array(encodedValue);
+        assert(
+          buffer !== undefined,
+          `the encoded WasmValue '${encodedValue}' returned from the call is not a valid hex string`,
+        );
+        const decodedValue = decodeLEB128(buffer);
+        assert(
+          decodedValue !== undefined,
+          `the encoded WasmValue '${encodedValue}' returned from the call could not be decoded`,
+        );
+
+        response.resultValue = {
+          type: valueType,
+          value: decodedValue.value,
+        };
+        return response;
       } else {
         return undefined;
       }
