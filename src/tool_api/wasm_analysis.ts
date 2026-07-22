@@ -528,8 +528,52 @@ export class WasmAnalysis {
     g.deployed = true;
   }
 
-  async run(timeoutMs?: number): Promise<void> {
-    await this.vm.run(timeoutMs);
+  async run<T>(
+    onComplete:
+      | (() => Promise<T>)
+      | (() => T)
+      | ((vm: WasmitoBackendVM) => Promise<T>)
+      | ((vm: WasmitoBackendVM) => T),
+  ): Promise<T>;
+  async run<T>(
+    onComplete:
+      | (() => Promise<T>)
+      | (() => T)
+      | ((vm: WasmitoBackendVM) => Promise<T>)
+      | ((vm: WasmitoBackendVM) => T),
+    timeoutMs: number,
+  ): Promise<T>;
+  async run(timeoutMs: number): Promise<void>;
+  async run(): Promise<void>;
+  async run(...args: any[]): Promise<void> {
+    let timeoutMs: number | undefined;
+    // eslint-disable-next-line no-async-promise-executor
+    return new Promise(async (resolve) => {
+      switch (args.length) {
+        case 0:
+          break;
+        case 1:
+          if (typeof args[0] === 'number') {
+            timeoutMs = args[0];
+          } else if (typeof args[0] === 'function') {
+            this.userOnFinishCB = args[0];
+          } else {
+            throw new Error(`invalid arguments`);
+          }
+          break;
+        default:
+          if (typeof args[0] !== 'function' || typeof args[1] !== 'number') {
+            throw new Error(`invalid arguments`);
+          }
+          this.userOnFinishCB = args[0];
+          timeoutMs = args[1];
+          break;
+      }
+      this.analysisResolver = resolve;
+
+      await this.vm.run(timeoutMs);
+    });
+  }
   }
 }
 
