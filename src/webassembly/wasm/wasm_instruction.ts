@@ -1,5 +1,7 @@
+import assert from 'assert';
 import { WASM } from '../wasm';
 import { PlaceholderType, WasmType } from './opcode_type';
+import { WASMFunction } from './wasm_function';
 import {
   WasmOpcodeBlock,
   WasmOpcodeBr,
@@ -35,6 +37,8 @@ export class WasmInstruction {
   public endAddress: number;
   private _subInstructions: WasmInstruction[];
   private _allSubInstructions: WasmInstruction[];
+  private _enclosingFunc: WASMFunction | undefined;
+  private _indexInFunction: number | undefined;
 
   constructor(
     opcode: WasmOpcode,
@@ -55,6 +59,31 @@ export class WasmInstruction {
     this.immediate = immediate;
     this._subInstructions = [];
     this._allSubInstructions = [];
+  }
+
+  set enclosingFunction(f: WASMFunction) {
+    if (this._enclosingFunc !== undefined) {
+      throw new Error(`You cannot reassign the enclosing func`);
+    }
+    this._enclosingFunc = f;
+  }
+
+  getEnclosingFunction(): WASMFunction {
+    if (this._enclosingFunc === undefined)
+      throw new Error(`Instr has no enclosing function assigned`);
+    return this._enclosingFunc;
+  }
+
+  getIndexInFunction(): number {
+    if (this._indexInFunction === undefined) {
+      this._indexInFunction =
+        this.getEnclosingFunction().getInstructionIndex(this);
+    }
+    assert(
+      this._indexInFunction >= 0,
+      `Instr is not part of the enclosing function`,
+    );
+    return this._indexInFunction;
   }
 
   get subInstructions(): WasmInstruction[] {
@@ -83,6 +112,14 @@ export class WasmInstruction {
     if (this._signature instanceof PlaceholderType) {
       this._signature = new WasmType(type.nrArgs, type.nrResults, type.id);
     }
+  }
+
+  equals(other: WasmInstruction): boolean {
+    return (
+      this === other ||
+      (this.startAddress === other.startAddress &&
+        equalOpcodes(this.opcode, other.opcode))
+    );
   }
 
   hasOpcode(opcode: WasmOpcode): boolean {
@@ -573,6 +610,12 @@ export class GlobalGetInstruction extends WasmInstruction {
   }
 }
 
+export function isGlobalGetInstruction(
+  i: WasmInstruction,
+): i is GlobalGetInstruction {
+  return i instanceof GlobalGetInstruction;
+}
+
 export class GlobalSetInstruction extends WasmInstruction {
   private _idx: number;
   constructor(idx: number) {
@@ -583,6 +626,12 @@ export class GlobalSetInstruction extends WasmInstruction {
   get index(): number {
     return this._idx;
   }
+}
+
+export function isGlobalSetInstruction(
+  i: WasmInstruction,
+): i is GlobalSetInstruction {
+  return i instanceof GlobalSetInstruction;
 }
 
 export class LoadInstruction extends WasmInstruction {
@@ -613,6 +662,10 @@ export class StoreInstruction extends WasmInstruction {
   targetValueSize(): number {
     return memoryTargetValueSize(this);
   }
+}
+
+export function isStoreInstruction(i: any): i is StoreInstruction {
+  return i instanceof StoreInstruction;
 }
 
 function memoryTargetValueSize(i: LoadInstruction | StoreInstruction): number {
