@@ -1,3 +1,4 @@
+import assert from 'assert';
 import { createLogger } from '../../../logger/logger';
 import { WASM } from '../../../webassembly/wasm';
 import { Instruction, getInstructionFromString } from './instructions';
@@ -5,6 +6,8 @@ import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
 } from '../../request_interface';
+import { decodeLEB128, hexStringToUint8Array } from '../../../util/decoder';
+import { RequestMessage, ResponseType } from '../../request_msg';
 
 const logger = createLogger('FunCallRequest');
 
@@ -35,7 +38,8 @@ export abstract class FunCallRequest<R> extends APIRequestNoSubscription<R> {
   }
 
   getData(): string {
-    return this.encodeRemoteCallRequest();
+    throw new Error(`TODO fix ID of calls at VM side`);
+    // return this.encodeRemoteCallRequest();
   }
 
   override isSubscriptionClosed(): boolean {
@@ -115,6 +119,10 @@ export class ProxyCallRequest extends FunCallRequest<ProxyCallResponse> {
       throw new APIRequestInvalidParse(`No response for ${this.description()}`);
     }
     return response;
+  }
+
+  processAck(_ack: RequestMessage): ProxyCallResponse {
+    throw new Error('Method not implemented.');
   }
 
   decodeHexaStringResponse(hexaInput: string): ProxyCallResponse | undefined {
@@ -249,6 +257,10 @@ export class RemoteCallRequest extends FunCallRequest<ProxyCallResponse> {
       throw new APIRequestInvalidParse(`No response for ${this.description()}`);
     }
     return response;
+  }
+
+  processAck(_ack: RequestMessage): ProxyCallResponse {
+    throw new Error('Method not implemented.');
   }
 
   private decodeHexaStringResponse(

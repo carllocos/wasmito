@@ -27,6 +27,10 @@ export class AddBreakpointRequest extends APIRequestNoSubscription<number> {
     return `${this.instructionNr}${this.serializeID()}${encodedAddr}\n`;
   }
 
+  processAck(_ack: RequestMessage): number {
+    throw new Error('Method not implemented.');
+  }
+
   parse(data: string): number {
     if (data === `BP ${this.wasmAddr}!`) {
       return this.wasmAddr;
@@ -54,6 +58,10 @@ export class RemoveBreakpointRequest extends APIRequestNoSubscription<number> {
   getData(): string {
     const encodedAddr = serializeUInt(this.wasmAddr, 4, true);
     return `${this.instructionNr}${this.serializeID()}${encodedAddr}\n`;
+  }
+
+  processAck(_ack: RequestMessage): number {
+    throw new Error('Method not implemented.');
   }
 
   parse(data: string): number {

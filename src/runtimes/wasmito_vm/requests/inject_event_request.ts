@@ -7,6 +7,7 @@ import { Instruction } from './instructions';
 import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
+  SubscriptionParseOutcome,
 } from '../../request_interface';
 import {
   isRequestMessage,
@@ -41,23 +42,18 @@ export class PushEventRequest extends APIRequestNoSubscription<boolean> {
       : encodeEventAsJSON(this.topic, this.payload);
     return `${this.instruction}${this.serializeID()}${encoding}\n`;
   }
+  override processAck(ack: RequestMessage): boolean {
+    if (isRequestMessage(ack, this.instruction)) {
+      return ack.responseType === ResponseType.SuccessResponse;
+    }
 
-  private getDataBinaryEncoding(): string {
-    return `${Instruction.PushEvent}${this.binaryEncodeTopic()}${this.binaryEncodePayload()}\n`;
+    throw new APIRequestInvalidParse('no response for InjectEventRequest');
   }
 
-  binaryEncodeTopic(): string {
-    // format: size topic (LEB) | topic hex
-    const size = encodeToHexLEB128(this.topic.length);
-    const t = encodeStringToHex(this.topic);
-    return `${size}${t}`;
-  }
-
-  binaryEncodePayload(): string {
-    // format: size payload (LEB) | payload hex
-    const size = encodeToHexLEB128(this.payload.length);
-    const p = encodeStringToHex(this.payload);
-    return `${size}${p}`;
+  override async processSubscriptionData(
+    _sub: RequestMessage,
+  ): Promise<SubscriptionParseOutcome> {
+    throw new Error(`lalal`);
   }
 
   parse(input: string): boolean {

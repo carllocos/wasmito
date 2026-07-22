@@ -1,10 +1,5 @@
-import {
-  FatalHookError,
-  parseHookContent,
-  type Hook,
-} from '../../../hooks/hook';
+import { runHooksAndListeners, type Hook } from '../../../hooks/hook';
 import { createLogger } from '../../../logger/logger';
-import { isHexaString } from '../../../util/decoder';
 import { Instruction } from './instructions';
 import {
   APIRequest,
@@ -73,96 +68,30 @@ export class HookOnEventRequest extends APIRequest<RequestMessage> {
     return `${this.instruction}${this.serializeID()}${this.hookMoment}${encodedSchedule}${encodedHook}\n`;
   }
 
-  override parse(input: string): HookOnEventResponse {
-    // TODO parse hexa string and convert to json object
-    const response: HookOnEventResponse | undefined =
-      this.decodeHexaStringResponse(input);
-    if (response === undefined) {
-      throw new APIRequestInvalidParse('No reply for HookOnEvent');
-    }
-    return response;
+  override parse(_input: string): RequestMessage {
+    throw new Error(`TODO remove`);
   }
 
   override isSubscriptionClosed(): boolean {
     return false;
   }
 
-  override handleSubscriptionData(data: string): SubscriptionParseOutcome {
-    let postOnData = SubscriptionParseOutcome.Failed;
-    try {
-      const msg = new HookOnEventSubsriptionMessage(data);
-      const s = parseHookContent(this.hooks, msg.subsriptionData, logger);
-      if (s) postOnData = SubscriptionParseOutcome.Successful;
-    } catch (e) {
-      if (e instanceof FatalHookError) throw e;
+  override processAck(ack: RequestMessage): RequestMessage {
+    if (isRequestMessage(ack, this.instruction)) return ack;
+    throw new APIRequestInvalidParse('No reply for HookOnEvent');
+  }
+
+  override async processSubscriptionData(
+    msg: RequestMessage,
+  ): Promise<SubscriptionParseOutcome> {
+    if (!isSubscriptionMessage(msg, this.instruction)) {
+      return SubscriptionParseOutcome.Failed;
     }
-    return postOnData;
+    return await runHooksAndListeners(this.hooks, msg.sub, logger);
   }
 
   public addHook(hook: Hook): HookOnEventRequest {
     this.hooks.push(hook);
     return this;
-  }
-
-  private decodeHexaStringResponse(
-    hexaInput: string,
-  ): HookOnEventResponse | undefined {
-    // format: header | response type | possible body 1
-    // header: HookOnEvent Instruction Nr (2 chars hexa) |
-    // response_type : 2 chars hexa
-    // body1 only if response type is error: error code (2 chars hexa)
-
-    const hexRegex = /^[0-9a-fA-F]+$/;
-    if (!hexRegex.test(hexaInput)) {
-      return undefined;
-    }
-
-    if (hexaInput.length < 4) {
-      return undefined;
-    }
-
-    if (Instruction.HookOnEvent !== hexaInput.slice(0, 2)) {
-      return undefined;
-    }
-    const typeResponse = hexaInput.slice(2, 4);
-    if (typeResponse === ResponseType.SuccessResponse) {
-      if (hexaInput.length > 4) {
-        logger.error(
-          `Successful response contains more than just instruction type and response type. Extra content ${hexaInput.slice(
-            4,
-          )} . Full message ${hexaInput}`,
-        );
-      }
-      return new HookOnEventSuccessfulResponse();
-    } else if (typeResponse === ResponseType.ErrorResponse) {
-      const errorCodeHexa = hexaInput.slice(4, 6);
-      const errorCode = parseInt(errorCodeHexa, 16);
-      if (isNaN(errorCode)) {
-        logger.error(
-          `Error response received a non hexa errorCode. Given '${errorCodeHexa}'. Full message '${hexaInput}'`,
-        );
-        return undefined;
-      }
-
-      const excpMsg = getExceptionMsgFromErrorCode(errorCode);
-      if (excpMsg === undefined) {
-        logger.error(`No error message registered for errorCode ${errorCode}`);
-      }
-
-      if (hexaInput.length > 6) {
-        logger.error(
-          `Error response contains more than just instruction type, response type, and errorCode. Extra content ${hexaInput.slice(
-            6,
-          )} . Full message ${hexaInput}`,
-        );
-      }
-
-      return new HookOnEventErrorResponse(errorCode, excpMsg ?? '');
-    } else {
-      logger.error(
-        `Error response contains no valid response type ${typeResponse} . Full message ${hexaInput}`,
-      );
-      return undefined;
-    }
   }
 }

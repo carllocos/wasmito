@@ -32,12 +32,16 @@ export abstract class APIRequest<R> {
 }
 
 export abstract class APIRequestNoSubscription<R> extends APIRequest<R> {
-  override handleSubscriptionData(_data: string): SubscriptionParseOutcome {
-    return SubscriptionParseOutcome.Failed;
-  }
   override isSubscriptionClosed(): boolean {
     return true;
   }
+
+  override async processSubscriptionData(
+    _sub: RequestMessage,
+  ): Promise<SubscriptionParseOutcome> {
+    throw new Error(
+      `No subscription supported in request '${this.description()}'`,
+    );
   }
 }
 

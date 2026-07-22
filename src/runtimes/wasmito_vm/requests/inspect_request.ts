@@ -53,6 +53,20 @@ export class InspectStack extends APIRequestNoSubscription<WasmStack> {
       throw new APIRequestInvalidParse('No response for inspect stack');
     }
   }
+
+  processAck(ack: RequestMessage): WasmStack {
+    if (isSuccessfulMessage(ack, this.instruction)) {
+      try {
+        const resp: StackInpsectResponse = JSON.parse(ack.sub);
+        return new WasmStack(resp.stack);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (e) {
+        throw new APIRequestInvalidParse('No response for inspect stack');
+      }
+    }
+
+    throw new APIRequestInvalidParse('No response for inspect');
+  }
 }
 
 // TODO split into a class that defines what you want as sate and another one that takes the first class to create a request to ask for that state
@@ -170,10 +184,10 @@ export class StateRequest
     return this;
   }
 
-  public generateInterrupt(): string {
-    this.state.sort();
-    const numberBytes = serializeUInt16BE(this.state.length);
-    const stateToReq = this.state.join('');
+  public generateInterrupt(
+    includeInterruptNr: boolean,
+    includeID: boolean,
+  ): string {
     if (stateToReq === '') {
       throw new Error(
         'StateInspectRequest should request at least one state kind. It is currently empty',
@@ -218,9 +232,23 @@ export class StateRequest
     return new WasmState(response, line);
   }
 
+  processAck(ack: RequestMessage): WasmState {
+    if (isRequestMessage(ack, this.instruction)) {
+      if (ack.responseType === ResponseType.SuccessResponse) {
+        this.assertAllRequestedStateArePresent(ack.sub);
+        return new WasmState(ack.sub, '');
+      }
+    }
+
+    throw new APIRequestInvalidParse(`StateRequest got invalid state`);
+  }
+
   private assertAllRequestedStateArePresent(response: any): void {
-    for (let i = 0; i < this.state.length; i++) {
-      const s = this.state[i];
+    if (typeof response !== 'object') {
+      throw new Error('invalid state');
+    }
+
+    for (const s of this.state.values()) {
       if (s === InspectableState.pcState && response.pc === undefined) {
         throw new Error('invalid state');
       } else if (

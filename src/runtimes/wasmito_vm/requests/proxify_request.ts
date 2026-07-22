@@ -20,10 +20,18 @@ export class ProxifyRequest extends APIRequestNoSubscription<boolean> {
     return 'ProxifyRequest';
   }
 
-  parse(input: string): string {
+  parse(input: string): boolean {
     if (input === 'Interrupt: 65') {
-      return input;
+      return true;
     }
+    throw new APIRequestInvalidParse('No ack for Proxify');
+  }
+
+  processAck(ack: RequestMessage): boolean {
+    if (isRequestMessage(ack, this.instruction)) {
+      return ack.responseType === ResponseType.SuccessResponse;
+    }
+
     throw new APIRequestInvalidParse('No ack for Proxify');
   }
 }

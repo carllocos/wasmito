@@ -32,10 +32,12 @@ export class UpdateStackValueRequest extends APIRequestNoSubscription<boolean> {
     return `${this.instruction}${this.serializeID()}${idx}${encoding}\n`;
   }
 
-  parse(input: string): boolean {
-    if (input === `StackValue ${this.stackIdx} changed`) {
-      return true;
-    }
+  parse(_input: string): boolean {
     throw new APIRequestInvalidParse('No ack for Pause');
+  }
+
+  processAck(ack: RequestMessage): boolean {
+    if (ack.interrupt !== this.instruction) return false;
+    return true;
   }
 }
