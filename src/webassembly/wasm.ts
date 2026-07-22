@@ -1,3 +1,4 @@
+import assert from 'assert';
 import { LogicalClock } from '../hooks/logicalclock';
 import { createLogger } from '../logger/logger';
 import { decodeLEB128, hexStringToUint8Array } from '../util/decoder';
@@ -109,7 +110,7 @@ export namespace WASM {
     switch (value.type) {
       case Type.i32:
       case Type.i64:
-        encodedValue += encodeToHexLEB128(value.value);
+        encodedValue += encodeToHexLEB128(value.value, true);
         break;
       case Type.f32:
         encodedValue += floatToHexString(value.value);
