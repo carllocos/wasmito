@@ -243,7 +243,16 @@ export namespace WASM {
     };
   }
 
-  export function interruptTopicToPinNumber(topic: string): number | undefined {
+  export function interruptTopicToPinNumber(topic: string): number {
+    // e.g, topic="interrupt_33"
+    const pin = interruptTopicToPinNumberIfPossible(topic);
+    assert(pin !== undefined);
+    return pin;
+  }
+
+  export function interruptTopicToPinNumberIfPossible(
+    topic: string,
+  ): number | undefined {
     // e.g, topic="interrupt_33"
     const vals = topic.split('_');
     if (vals.length !== 2) {

@@ -283,21 +283,35 @@ export class WasmModule {
 
     return calls.filter((c) => c.funIdx === funID);
   }
+  public getStartFunction(): WASMFunction | undefined {
+    const funcs = this.getFunctions(['_start']);
+    if (funcs.length === 0) return undefined;
+    assert(
+      funcs.length === 1,
+      `only one _start function expected: Found ${funcs.length}`,
+    );
+    return funcs[0];
+  }
 
-  public getMainFunctions(): WASMFunction[] {
-    const mainNames = new Set<string>(['main', '_main', '_start']);
+  private getFunctions(namesFuncs: string[]): WASMFunction[] {
+    const names: Set<string> = new Set(namesFuncs);
     const funcs: WASMFunction[] = [];
     const added = new Set<number>();
     for (const f of this.functions) {
       if (
         !added.has(f.id) &&
-        (mainNames.has(f.name) || (f.exported && mainNames.has(f.exportName)))
+        (names.has(f.name) || (f.exported && names.has(f.exportName)))
       ) {
         funcs.push(f);
         added.add(f.id);
       }
     }
     return funcs;
+  }
+
+  public getMainFunctions(): WASMFunction[] {
+    const mainNames = ['main', '_main', '_start'];
+    return this.getFunctions(mainNames);
   }
 
   public allExportedFuncs(): WASMFunction[] {
