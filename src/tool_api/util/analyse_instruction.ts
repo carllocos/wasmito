@@ -51,6 +51,8 @@ export function getInstructions<I extends WasmInstruction>(
   return instrs;
 }
 
+// const actionsCache: Map<number, [Hook[], InspectStateHook]> = new Map();
+
 export function instruction<I extends WasmInstruction>(
   moment: 'before',
   instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode | WASMFunction,
@@ -272,17 +274,41 @@ function createCallback<I extends WasmInstruction>(
   }
 }
 
+// const actionsCache: Map<string, [Hook[], InspectStateHook]> = new Map();
+// function makeActionsCacheKey(
+//   cbArgs: number,
+//   i: WasmInstruction,
+//   mutate: boolean,
+//   moment: InstrMoment,
+// ) {
+//   if (cbArgs <= 1) return mutate ? '1' : '0';
+
+//   let key = getWasmOpcodeNr(i.opcode) + (getWasmSubOpcodeNr(i.opcode) ?? 0);
+//   if (mutate) key = key * -1;
+
+//   if (isCallInstruction(i)) {
+//     if (moment === 'before') {
+//       return `${key} ${i.signature.nrArgs}`;
+//     } else if (moment === 'after') {
+//       return `${key} ${i.signature.nrResults}`;
+//     } else {
+//       return `${key} ${i.signature.nrArgs} ${i.signature.nrResults}`;
+//     }
+//   } else return `${key}`;
+// }
+
 function createActions(
   moment: InstrMoment,
   instr: WasmInstruction,
   updateState: boolean,
   cbNrOfArgs: number,
 ): [Hook[], InspectStateHook] {
-  const hooks: Hook[] = [];
-  const inspectAction = new InspectStateHook(
-    new StateRequest(),
-    instr.startAddress,
-  );
+  // TODO fix cache
+  // const key = makeActionsCacheKey(cbNrOfArgs, instr, updateState, moment);
+
+  // if (actionsCache.has(key)) return actionsCache.get(key)!;
+
+  const inspectAction = new InspectStateHook(new StateRequest());
   inspectAction.includePC();
   switch (cbNrOfArgs) {
     case 0:
@@ -307,11 +333,14 @@ function createActions(
         `Callback has not the right type signature. Given nr of arguments ${cbNrOfArgs}`,
       );
   }
-  if (updateState) {
-    hooks.push(new PauseVMHook());
-  }
+
+  const hooks: Hook[] = [];
+  if (updateState) hooks.push(new PauseVMHook());
   hooks.push(inspectAction);
-  return [hooks, inspectAction];
+
+  const actions: [Hook[], InspectStateHook] = [hooks, inspectAction];
+  // actionsCache.set(key, actions);
+  return actions;
 }
 
 export function createCallbackNoArgs(
