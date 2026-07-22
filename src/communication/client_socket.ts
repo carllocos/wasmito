@@ -85,9 +85,7 @@ export class ClientSideSocket extends AbstractChannel {
           this.logger.debug('connected');
         });
 
-        this.connection.on('data', (data: Buffer) => {
-          this.onDataHandler(data);
-        });
+        this.connection.on('data', this.onDataHandler.bind(this));
 
         this.connection.on('error', (err) => {
           this.logger.error(err.toString());
