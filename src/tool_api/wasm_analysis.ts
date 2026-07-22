@@ -70,9 +70,17 @@ export class WasmAnalysis {
     instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
     cb:
       | ((instr: I, args: ReadOnlyWasmValue[], vm: WasmitoBackendVM) => void)
+      | ((
+          instr: I,
+          args: ReadOnlyWasmValue[],
+          vm: WasmitoBackendVM,
+        ) => Promise<void>)
       | ((instr: I, args: ReadOnlyWasmValue[]) => void)
+      | ((instr: I, args: ReadOnlyWasmValue[]) => Promise<void>)
       | ((vm: WasmitoBackendVM) => void)
-      | (() => void),
+      | ((vm: WasmitoBackendVM) => Promise<void>)
+      | (() => void)
+      | (() => Promise<void>),
   ): GroupHooks | undefined {
     const mutate = false;
     return this.addGroup(
@@ -96,7 +104,13 @@ export class WasmAnalysis {
           args: WritableWasmValue[],
           vm: WasmitoBackendVM,
         ) => WritableWasmValue[])
-      | ((instr: I, args: WritableWasmValue[]) => WritableWasmValue[]),
+      | ((
+          instr: I,
+          args: WritableWasmValue[],
+          vm: WasmitoBackendVM,
+        ) => Promise<WritableWasmValue[]>)
+      | ((instr: I, args: WritableWasmValue[]) => WritableWasmValue[])
+      | ((instr: I, args: WritableWasmValue[]) => Promise<WritableWasmValue[]>),
   ): GroupHooks | undefined {
     const mutate = true;
     return this.addGroup(
@@ -120,9 +134,17 @@ export class WasmAnalysis {
           result: ReadOnlyWasmValue | undefined,
           vm: WasmitoBackendVM,
         ) => void)
+      | ((
+          instr: I,
+          result: ReadOnlyWasmValue | undefined,
+          vm: WasmitoBackendVM,
+        ) => Promise<void>)
       | ((instr: I, result: ReadOnlyWasmValue | undefined) => void)
+      | ((instr: I, result: ReadOnlyWasmValue | undefined) => Promise<void>)
       | ((vm: WasmitoBackendVM) => void)
-      | (() => void),
+      | ((vm: WasmitoBackendVM) => Promise<void>)
+      | (() => void)
+      | (() => Promise<void>),
   ): GroupHooks | undefined {
     const mutate = false;
     return this.addGroup(
@@ -149,7 +171,16 @@ export class WasmAnalysis {
       | ((
           instr: I,
           result: WritableWasmValue | undefined,
-        ) => WritableWasmValue | undefined),
+          vm: WasmitoBackendVM,
+        ) => Promise<WritableWasmValue | undefined>)
+      | ((
+          instr: I,
+          result: WritableWasmValue | undefined,
+        ) => WritableWasmValue | undefined)
+      | ((
+          instr: I,
+          result: WritableWasmValue | undefined,
+        ) => Promise<WritableWasmValue | undefined>),
   ): GroupHooks | undefined {
     const mutate = true;
     return this.addGroup(
@@ -301,10 +332,11 @@ export class WasmAnalysis {
     // const reachableInstrs = node.incomingEdges.map(SourceCFGEdgeToInstruction);
     const reachableInstrs = [sourceNodeFirstInstruction(node)];
     assert(reachableInstrs.length > 0);
-    const g = new GroupHooks('before');
+    const moment = 'before';
+    const g = new GroupHooks(moment);
     for (const i of reachableInstrs) {
       const [actions, actionToSubscribe] = createActionsNode(i, cb.length);
-      const newCB = createCallbackNode(node, this.vm, this.wasm, i, cb);
+      const newCB = createCallbackNode(node, this.vm, this.wasm, i, moment, cb);
       actionToSubscribe.subscribe(newCB);
       g.addInstructionActions(i, actions);
     }
@@ -452,28 +484,18 @@ function createActionsNode(
   return [hooks, inspectAction];
 }
 
-//   cb: (
-//     n: SourceCFGNode,
-//     instr: WasmInstruction,
-//     args: ReadOnlyWasmValue[],
-//     vm: WasmitoBackendVM,
-//   ) => void,
-//   cb: (
-//     n: SourceCFGNode,
-//     instr: WasmInstruction,
-//     args: ReadOnlyWasmValue[],
-//   ) => void,
 function createCallbackNode(
   node: SourceCFGNode,
   vm: WasmitoBackendVM,
   mod: WasmModule,
   instr: WasmInstruction,
+  moment: InstrMoment,
   cb: (...args: any[]) => any,
 ): (s: WasmState) => void {
   switch (cb.length) {
     case 0:
     case 1:
-      return createCallbackNoArgs(vm, cb);
+      return createCallbackNoArgs(vm, instr, moment, cb);
     case 2:
       return callbackArgs(node, mod, instr, false, vm, cb);
     case 3:
