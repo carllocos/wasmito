@@ -422,14 +422,14 @@ function createCallbackWithResult(
     assertFatalHookError(s.pc !== undefined, 'pc is empty');
     let result: WritableWasmValue | ReadOnlyWasmValue | undefined;
 
-    if (instr.signature.nrResults) {
+    if (instr.signature.nrResults > 0) {
       assertFatalHookError(
         s.stack !== undefined,
-        'VM failed to provide the stack needed to construct args',
+        `VM failed to provide the stack needed to construct args for instr '${instr.name}'`,
       );
       assertFatalHookError(
         s.stack.length >= instr.signature.nrResults,
-        'Stack has not the expected number of values to read result',
+        `Stack has not the expected number of values to read result for instr '${instr.name}'`,
       );
 
       const val = s.stack[s.stack.length - 1];
