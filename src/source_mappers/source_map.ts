@@ -114,18 +114,24 @@ export class SourceMap {
   public readonly wasm: WasmModule;
 
   constructor(
-    wasmPath: string | SourceMap, // TODO get rid of duble type here
+    wasmPath: string | SourceMap | WasmModule, // TODO get rid of multiple type here
     sources: string[],
     mappings: SourceCodeLocation[],
   ) {
-    this._wasmPath =
-      wasmPath instanceof SourceMap ? wasmPath.wasm.wasmPath : wasmPath;
+    this._wasmPath = '';
+    if (typeof wasmPath === 'string') {
+      this._wasmPath = wasmPath;
+      this.wasm = new WasmModule(this._wasmPath);
+    } else if (wasmPath instanceof SourceMap) {
+      this._wasmPath = wasmPath.wasm.wasmPath;
+      this.wasm = wasmPath.wasm;
+    } else {
+      this._wasmPath = wasmPath.wasmPath;
+      this.wasm = wasmPath;
+    }
+
     this._sources = sources;
     this._mappings = mappings;
-    this.wasm =
-      wasmPath instanceof SourceMap
-        ? wasmPath.wasm
-        : new WasmModule(this._wasmPath);
   }
 
   get sources(): string[] {
