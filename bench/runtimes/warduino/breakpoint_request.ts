@@ -3,6 +3,7 @@ import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
 } from '../../../src/runtimes/request_interface';
+import { RequestMessage } from '../../../src/runtimes/request_msg';
 
 export class AddBreakpointRequest extends APIRequestNoSubscription<number> {
   private readonly instructionNr: string;

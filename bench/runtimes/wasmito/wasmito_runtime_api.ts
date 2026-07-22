@@ -5,12 +5,7 @@ import {
   HookOnWasmAddrRequest,
   RemoveHookOnWasmAddrRequest,
 } from '../../../src/runtimes/wasmito_vm/requests/hook_on_wasm_addr_request';
-import {
-  type APIRequest,
-  createRequestMessage,
-  isSubscriptionMessage,
-  isSuccessfulMessage,
-} from '../../../src/runtimes/request_interface';
+import { type APIRequest } from '../../../src/runtimes/request_interface';
 import { PauseVMHook } from '../../../src/hooks/hook_run_pause';
 import { RunRequest } from '../../../src/runtimes/wasmito_vm/requests/run_request';
 import { StateRequest, StepRequest } from '../../../src/runtimes';
@@ -18,6 +13,11 @@ import { type WasmState } from '../../../src/webassembly/wasm';
 import { type Channel } from '../../../src/communication/channel_interface';
 import { InspectStateHook } from '../../../src/hooks/hook_inspect_state';
 import { RequestsManager } from '../../../src/communication/requests_manager';
+import {
+  createRequestMessage,
+  isSubscriptionMessage,
+  isSuccessfulMessage,
+} from '../../../src/runtimes/request_msg';
 
 export class WasmitoRuntimeDBGAPI implements RuntimeDebugAPI {
   runtimeName: string;

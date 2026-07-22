@@ -8,6 +8,11 @@ import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
 } from '../../request_interface';
+import {
+  isRequestMessage,
+  RequestMessage,
+  ResponseType,
+} from '../../request_msg';
 
 export class PushEventRequest extends APIRequestNoSubscription<boolean> {
   private readonly topic: string;

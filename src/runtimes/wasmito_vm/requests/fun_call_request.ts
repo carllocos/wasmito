@@ -4,7 +4,6 @@ import { Instruction, getInstructionFromString } from './instructions';
 import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
-  ResponseType,
 } from '../../request_interface';
 
 const logger = createLogger('FunCallRequest');

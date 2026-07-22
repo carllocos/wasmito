@@ -3,9 +3,12 @@ import { encodeToHexLEB128 } from '../../../util/encoder';
 import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
-  ResponseType,
-  getResponseTypeFromString,
 } from '../../request_interface';
+import {
+  getResponseTypeFromString,
+  RequestMessage,
+  ResponseType,
+} from '../../request_msg';
 import { Instruction, getInstructionFromString } from './instructions';
 import { type Hook } from '../../../hooks/hook';
 
