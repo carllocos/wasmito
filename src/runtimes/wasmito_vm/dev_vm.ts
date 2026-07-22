@@ -18,6 +18,8 @@ export class WasmitoDevVMError extends Error {
   }
 }
 
+export const DEV_VM_DEFAULT_PORT = 8192;
+
 export class WasmitoDevVM extends WasmitoBackendVM {
   protected logger: Logger;
   protected process?: ChildProcess;
