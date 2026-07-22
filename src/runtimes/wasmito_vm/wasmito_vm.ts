@@ -29,7 +29,6 @@ import {
 import {
   HookOnEventMoment,
   HookOnEventRequest,
-  isSuccessfullHookOnEventResponse,
 } from './requests/hook_on_event_request';
 import {
   type BreakpointPolicy,
@@ -37,10 +36,7 @@ import {
 } from '../../debugger/breakpoint_policies';
 import { type Breakpoint } from '../../debugger/breakpoint';
 import { type Hook } from '../../hooks/hook';
-import {
-  HookOnError,
-  isSuccessfullHookOnErrorResponse,
-} from './requests/hook_on_error';
+import { HookOnError } from './requests/hook_on_error';
 import { EventInspectHook } from '../../hooks/hook_event';
 import { type DeviceIdentity } from '../../device';
 import { type WASMFunction } from '../../webassembly/wasm/wasm_function';
@@ -455,7 +451,7 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
       HookOnEventMoment.onNewEvent,
     ).addHook(hook);
     const response = await this.sendRequest(request, timeout);
-    return isSuccessfullHookOnEventResponse(response);
+    return isSuccessfulMessage(response);
   }
 
   async addHookOnEventHandling(hook: Hook, timeout?: number): Promise<boolean> {
@@ -463,13 +459,13 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
       HookOnEventMoment.beforeEventHandled,
     ).addHook(hook);
     const response = await this.sendRequest(request, timeout);
-    return isSuccessfullHookOnEventResponse(response);
+    return isSuccessfulMessage(response);
   }
 
   async addHookOnError(hook: Hook, timeout?: number): Promise<boolean> {
     const request = new HookOnError().onError(hook);
     const response = await this.sendRequest(request, timeout);
-    return isSuccessfullHookOnErrorResponse(response);
+    return isSuccessfulMessage(response);
   }
 
   async simulateInterrupt(pinNr: number, timeoutMs?: number): Promise<void> {
