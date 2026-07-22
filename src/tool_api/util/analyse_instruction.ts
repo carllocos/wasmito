@@ -345,6 +345,8 @@ function createCallbackWithArgs(
       `No instruction found for address ${s.pc}`,
     );
 
+    if (i.startAddress !== instr.startAddress) return; // TODO replace with assert?
+
     assertFatalHookError(
       i.signature.nrArgs === instr.signature.nrArgs,
       `mismatch between expect args of instr ${i.name} and ${instr.name}`,
