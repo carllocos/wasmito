@@ -209,7 +209,7 @@ async function ArduinoClean(outputDir: string): Promise<number> {
       if (code !== null) {
         const msg = `Arduino clean exited with code ${code}`;
         if (code === 0) {
-          console.info(msg);
+          console.debug(msg);
         } else {
           console.error(msg);
         }
