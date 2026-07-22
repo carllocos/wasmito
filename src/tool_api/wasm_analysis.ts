@@ -18,6 +18,7 @@ import {
 import { StateRequest } from '../runtimes/wasmito_vm/requests/inspect_request';
 import { WasmModule } from '../webassembly/wasm/wasm_module';
 import {
+  CallInstruction,
   WasmAddress,
   WasmInstruction,
 } from '../webassembly/wasm/wasm_instruction';
@@ -25,6 +26,10 @@ import { WasmCode, WasmOpcode } from '../webassembly/wasm/wasm_opcode';
 import { WasmState } from '../webassembly/wasm';
 import { assertFatalHookError, Hook } from '../hooks/hook';
 import { InspectStateHook } from '../hooks/hook_inspect_state';
+import { SourceMap } from '../source_mappers/source_map';
+import { HookOnWasmAddrRequest } from '../runtimes/wasmito_vm/requests/hook_on_wasm_addr_request';
+import { WASMFunction } from '../webassembly/wasm/wasm_function';
+import { isErrorMessage } from '../runtimes/request_msg';
 
 export interface AnalysisConfig {
   name: string;
