@@ -245,7 +245,7 @@ class HexaStateMessages {
       const size = Math.floor(payload.length / 2);
       const sizeHexa = HexaEncoderSerializeUInt32BE(size);
       const done = msgIdx + 1 === amountMessages ? '01' : '00';
-      const msg = `${Instruction.LoadSnapshot}${sizeHexa}${payload}${done}${lastChar}`;
+      const msg = `${sizeHexa}${payload}${done}${lastChar}`;
       if (msg.length % 2 !== 0) {
         throw new Error('WoodState: Hexa message not even');
       }
