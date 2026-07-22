@@ -4,6 +4,7 @@ import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
 } from '../../request_interface';
+import { RequestMessage } from '../../request_msg';
 import { Instruction } from './instructions';
 
 export class UpdateStackValueRequest extends APIRequestNoSubscription<boolean> {

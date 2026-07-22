@@ -2,6 +2,7 @@ import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
 } from '../../request_interface';
+import { RequestMessage, ResponseType } from '../../request_msg';
 
 export class RebootRequest extends APIRequestNoSubscription<void> {
   description(): string {

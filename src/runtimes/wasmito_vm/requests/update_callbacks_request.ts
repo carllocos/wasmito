@@ -9,6 +9,11 @@ import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
 } from '../../request_interface';
+import {
+  isRequestMessage,
+  RequestMessage,
+  ResponseType,
+} from '../../request_msg';
 
 export class UpdateCallbackMappingRequest extends APIRequestNoSubscription<boolean> {
   private readonly mappings: WASM.CallbackMapping[];

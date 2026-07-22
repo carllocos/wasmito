@@ -2,12 +2,12 @@ import { type Channel } from '../../communication/channel_interface';
 import { type RuntimeToolAPI } from '../runtime_api';
 import { RunRequest } from './requests/run_request';
 import { StepRequest } from './requests/step_request';
+import { type APIRequest } from '../request_interface';
 import {
-  isSuccessfulMessage,
-  type APIRequest,
-  ResponseType,
   isErrorMessage,
-} from '../request_interface';
+  isSuccessfulMessage,
+  ResponseType,
+} from '../request_msg';
 import { type Platform } from '../../platforms/platform';
 import { PauseRequest } from './requests/pause_request';
 import { ProxifyRequest } from './requests/proxify_request';

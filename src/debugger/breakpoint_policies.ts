@@ -4,7 +4,7 @@ import { createLogger, Logger } from '../logger/logger';
 import { InspectStateHook } from '../hooks/hook_inspect_state';
 import { type WasmState } from '../webassembly';
 import { type WasmitoBackendVM } from '../runtimes/wasmito_vm/wasmito_vm';
-import { isSuccessfulMessage } from '../runtimes/request_interface';
+import { isSuccessfulMessage } from '../runtimes/request_msg';
 import { StateRequest } from '../runtimes/wasmito_vm/requests/inspect_request';
 import { PauseVMHook } from '../hooks/hook_run_pause';
 import { type SourceCodeLocation } from '../source_mappers';

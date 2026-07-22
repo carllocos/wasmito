@@ -3,6 +3,11 @@ import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
 } from '../../request_interface';
+import {
+  isRequestMessage,
+  RequestMessage,
+  ResponseType,
+} from '../../request_msg';
 
 export class ResolveEventRequest extends APIRequestNoSubscription<void> {
   description(): string {

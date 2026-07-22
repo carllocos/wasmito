@@ -5,11 +5,14 @@ import { Instruction } from './instructions';
 import {
   APIRequest,
   APIRequestInvalidParse,
-  ResponseType,
   SubscriptionParseOutcome,
-  type RequestMessage,
 } from '../../request_interface';
-import { getExceptionMsgFromErrorCode } from './request_error_code';
+import {
+  isRequestMessage,
+  isSubscriptionMessage,
+  RequestMessage,
+  ResponseType,
+} from '../../request_msg';
 
 const logger = createLogger('HookOnError');
 

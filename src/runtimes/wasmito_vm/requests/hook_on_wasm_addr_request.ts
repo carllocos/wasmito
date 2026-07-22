@@ -3,10 +3,7 @@ import { encodeToHexLEB128 } from '../../../util/encoder';
 import {
   APIRequest,
   APIRequestInvalidParse,
-  createRequestMessage,
-  isSubscriptionMessage,
   SubscriptionParseOutcome,
-  type RequestMessage,
 } from '../../request_interface';
 import {
   FatalHookError,
@@ -14,6 +11,11 @@ import {
   type Hook,
 } from '../../../hooks/hook';
 import { Instruction } from './instructions';
+import {
+  isRequestMessage,
+  isSubscriptionMessage,
+  RequestMessage,
+} from '../../request_msg';
 
 export enum HookOnWasmAddrMoment {
   HookBefore = '01',
