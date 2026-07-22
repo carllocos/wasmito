@@ -540,6 +540,8 @@ function createWasmFunctions(
     let exportName = '';
     if (funExported?.innerName !== undefined) {
       exportName = funExported.name;
+    } else if (funExported?.name !== undefined) {
+      exportName = funExported.name;
     }
     const f = new WASMFunction(
       fun.name.value,
