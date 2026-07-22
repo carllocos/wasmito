@@ -343,6 +343,47 @@ export class WasmAnalysis {
     return gh;
   }
 
+  onPinInterruptHandlerUpdateMut(
+    cb:
+      | ((handlers: PinInterruptHandler[], vm: WasmitoBackendVM) => void)
+      | ((
+          handlers: PinInterruptHandler[],
+          vm: WasmitoBackendVM,
+        ) => Promise<void>),
+  ): boolean {
+    const calls = this.wasm.getCallInstructions(this.envFuncForPinInterrupt);
+    for (const call of calls)
+      this.afterMut(call, this.askInterruptHandlers(cb));
+    return calls.length > 0;
+  }
+
+  private askInterruptHandlers(
+    cb:
+      | ((handlers: PinInterruptHandler[], vm: WasmitoBackendVM) => void)
+      | ((
+          handlers: PinInterruptHandler[],
+          vm: WasmitoBackendVM,
+        ) => Promise<void>),
+  ) {
+    return async (
+      _c: CallInstruction,
+      _r: WritableWasmValue | undefined,
+      vm: WasmitoBackendVM,
+    ): Promise<WritableWasmValue | undefined> => {
+      const state = new StateRequest();
+      state.includeCallbackMappings();
+      state.includeTable();
+      const s = await vm.inspect(state);
+      const tbl = s.table;
+      assert(tbl !== undefined);
+      const handlers = s.callbackMappings.map((cbm) => {
+        return callbackMappingToPinInterruptHandler(this.wasm, tbl, cbm);
+      });
+      await cb(handlers, vm);
+      return _r;
+    };
+  }
+
   onNodeEntry(
     node: SourceCFGNode,
     cb: (
