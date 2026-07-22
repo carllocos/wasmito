@@ -111,12 +111,13 @@ export class WasmitoDevVM extends WasmitoBackendVM {
     });
 
     let connected = false;
-    childProcess.on('exit', (exitCode: number | null) => {
+    childProcess.on('exit', (exitCode: number | null, signal) => {
       if (!connected) {
         this.logger.error(
           `VM Process exited before connection established with exitCode ${exitCode}`,
         );
       } else if (exitCode !== null && exitCode !== undefined) {
+        this.logger.error(`exit signal ${signal}`);
         if (exitCode > 0) {
           this.logger.error(`VM Process exited with exitCode ${exitCode}`);
         } else {
@@ -177,7 +178,7 @@ export class WasmitoDevVM extends WasmitoBackendVM {
           'Cannot spawn a DevelopmentVM as no free port was found',
         );
       }
-      this.logger.info(
+      this.logger.debug(
         `No toolPort provided so will start using port ${openPort}`,
       );
       this.platform.config.vmConfig.toolPort = openPort;
