@@ -13,12 +13,12 @@ import {
   type AroundHookResponse,
 } from '../../src/runtimes/wasmito_vm/requests/around_function_request';
 import { type WasmitoBackendVM } from '../../src/runtimes/wasmito_vm/wasmito_vm';
-import { ResponseType } from '../../src/runtimes/request_interface';
 import {
   type TestScenarioResult,
   type TestProgram,
 } from '../shared_interfaces';
 import { LanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
+import { ResponseType } from '../../src/runtimes/request_msg';
 
 const wasmPath = './tool_examples/wat_examples/dimmer-double-button.wasm';
 const program: TestProgram = LanguageAdaptor.emptyAdaptor(wasmPath);
