@@ -82,4 +82,12 @@ export class UpdateCallbackMappingRequest extends APIRequestNoSubscription<boole
 
     throw new APIRequestInvalidParse('No ack for update callback mappings');
   }
+
+  processAck(ack: RequestMessage): boolean {
+    if (isRequestMessage(ack, this.instruction)) {
+      return ack.responseType === ResponseType.SuccessResponse;
+    }
+
+    throw new APIRequestInvalidParse('No ack for update callback mappings');
+  }
 }

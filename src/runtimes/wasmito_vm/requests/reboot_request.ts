@@ -16,10 +16,18 @@ export class RebootRequest extends APIRequestNoSubscription<boolean> {
     throw new Error('TODO');
   }
 
-  parse(input: string): void {
+  parse(input: string): boolean {
     if (input === 'Reboot!') {
-      return;
+      return true;
     }
+    throw new APIRequestInvalidParse('No ack for Reboot');
+  }
+
+  processAck(ack: RequestMessage): boolean {
+    if (ack.interrupt === this.instruction) {
+      return ack.responseType === ResponseType.SuccessResponse;
+    }
+
     throw new APIRequestInvalidParse('No ack for Reboot');
   }
 }

@@ -19,11 +19,17 @@ export class PauseRequest extends APIRequestNoSubscription<boolean> {
   getData(): string {
     return `${this.instruction}${this.serializeID()}\n`;
   }
+
+  processAck(ack: RequestMessage): boolean {
+    if (isRequestMessage(ack, this.instruction)) {
+      return ack.responseType == ResponseType.SuccessResponse;
+    }
+    throw new APIRequestInvalidParse('No ack for Pause');
   }
 
-  parse(input: string): string {
+  parse(input: string): boolean {
     if (input === 'PAUSE!') {
-      return input;
+      return true;
     }
     throw new APIRequestInvalidParse('No ack for Pause');
   }

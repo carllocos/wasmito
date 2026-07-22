@@ -19,11 +19,17 @@ export class RunRequest extends APIRequestNoSubscription<boolean> {
   getData(): string {
     return `${this.instruction}${this.serializeID()}\n`;
   }
+
+  override processAck(ack: RequestMessage): boolean {
+    if (isRequestMessage(ack, this.instruction))
+      return ack.responseType === ResponseType.SuccessResponse;
+
+    throw new APIRequestInvalidParse('No ack for Run');
   }
 
-  parse(data: string): string {
+  parse(data: string): boolean {
     if (data === 'GO!') {
-      return data;
+      return true;
     }
     throw new APIRequestInvalidParse('No ack for Run');
   }

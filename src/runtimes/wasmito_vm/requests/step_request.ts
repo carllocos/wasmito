@@ -20,10 +20,18 @@ export class StepRequest extends APIRequestNoSubscription<boolean> {
     return `${this.instruction}${this.serializeID()}\n`;
   }
 
-  parse(input: string): string {
+  parse(input: string): boolean {
     if (input === 'STEP!') {
-      return input;
+      return true;
     }
+    throw new APIRequestInvalidParse('No ack for Step');
+  }
+
+  processAck(ack: RequestMessage): boolean {
+    if (isRequestMessage(ack, this.instruction)) {
+      return ack.responseType === ResponseType.SuccessResponse;
+    }
+
     throw new APIRequestInvalidParse('No ack for Step');
   }
 }

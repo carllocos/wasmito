@@ -31,12 +31,22 @@ export class LoadStateRequest extends APIRequestNoSubscription<boolean> {
     return `${this.instruction}${this.serializeID()}${this.encodedState}`;
   }
 
-  parse(input: string): string {
+  parse(input: string): boolean {
     const expectedAck = this.lastRequest ? 'done!' : 'ack!';
     if (input === expectedAck) {
-      return input;
+      return true;
     }
     throw new APIRequestInvalidParse('No ack for StateUpdate request');
+  }
+
+  processAck(ack: RequestMessage): boolean {
+    if (isRequestMessage(ack, this.instruction)) {
+      if (ack.responseType !== ResponseType.SuccessResponse) return false;
+
+      const expectedAck = this.lastRequest ? 'done!' : 'ack!';
+      return ack.sub === expectedAck;
+    }
+    throw new Error('No ack for StateUpdate request');
   }
 }
 

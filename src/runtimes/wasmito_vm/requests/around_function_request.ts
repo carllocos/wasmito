@@ -122,6 +122,10 @@ export class AroundFunctionRequest extends APIRequestNoSubscription<AroundHookRe
     }
   }
 
+  processAck(_ack: RequestMessage): AroundHookResponse {
+    throw new Error('Method not implemented.');
+  }
+
   parse(input: string): AroundHookResponse {
     const err = new APIRequestInvalidParse(
       'No reply for AroundFunctionRequest',

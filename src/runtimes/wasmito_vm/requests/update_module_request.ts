@@ -34,9 +34,13 @@ export class UpdateWasmModuleRequest extends APIRequestNoSubscription<boolean> {
     return `${this.instruction}${this.serializeID()}${sizeHex}${wasmHex}\n`;
   }
 
-  override parse(input: string): string {
-    if (input === 'CHANGE Module!') {
-      return input;
+  override parse(_input: string): boolean {
+    throw new APIRequestInvalidParse('No ack for update wasm module');
+  }
+
+  processAck(ack: RequestMessage): boolean {
+    if (isRequestMessage(ack, this.instruction)) {
+      return ack.responseType === ResponseType.SuccessResponse;
     }
     throw new APIRequestInvalidParse('No ack for update wasm module');
   }
