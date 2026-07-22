@@ -69,7 +69,9 @@ export class WasmAnalysis {
 
   private addGroup(g: GroupHooks | undefined): GroupHooks | undefined {
     if (g !== undefined) {
-      this.groups.push(g);
+      assert(g.actions.length > 0, 'No action registered for group');
+      if (g.instructions.length >= 1) this.groups.push(g);
+      else this.interruptGroups.push(g);
     }
     return g;
   }
@@ -419,24 +421,15 @@ export class WasmAnalysis {
     throw new Error('TODO');
   }
 
-  private assertValidGroups(): GroupHooks[] {
+  private assertValidGroups(): [GroupHooks[], GroupHooks[]] {
     const gps = this.groups.filter((g) => !g.deployed);
-    assert(gps.length > 0, `No hooks registed to deploy`);
-    for (const g of gps) {
-      assert(g.actions.length > 0, 'No action registered for group');
-    }
-    return gps;
+    assert(
+      gps.length > 0 || this.interruptGroups.length > 0,
+      `No hooks registed to deploy`,
+    );
+    return [gps, this.interruptGroups];
   }
 
-  async deploy(timeoutMs?: number): Promise<void> {
-    const gps = this.assertValidGroups();
-    for (const g of gps) {
-      if (g.instructions.length > 0) {
-        await this.deployOnInstructions(g, timeoutMs);
-      } else {
-        await this.deployOnInterrupts(g, timeoutMs);
-      }
-    }
   }
 
   async remove(): Promise<void> {}
