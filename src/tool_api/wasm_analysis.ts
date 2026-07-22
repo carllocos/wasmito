@@ -1,12 +1,14 @@
 import assert from 'assert';
 import { WasmitoBackendVM } from '../runtimes/wasmito_vm/wasmito_vm';
 import {
+  callbackMappingToPinInterruptHandler,
+  PinInterruptHandler,
   ReadOnlyInterrupt,
   ReadOnlyWasmValue,
   WritableInterrupt,
   WritableWasmValue,
 } from './interrupts';
-import { GroupHooks } from './group_hooks';
+import { GroupHooks, InstrMoment } from './group_hooks';
 import { createLogger, Logger } from '../logger/logger';
 import { createCallbackNoArgs, instruction } from './util/analyse_instruction';
 import { interrupt } from './util/analyse_interrupts';
@@ -476,6 +478,45 @@ export class WasmAnalysis {
     return [gps, this.interruptGroups];
   }
 
+  async deploy(): Promise<void>;
+  async deploy(timeoutMs: number): Promise<void>;
+  async deploy(deployInBulk: boolean): Promise<void>;
+  async deploy(deployInBulk: boolean, timeoutMs: number): Promise<void>;
+  async deploy(...args: any[]): Promise<void> {
+    this.onFinish(); // TODO find a way to put as last
+
+    let deployInBulk: boolean = true;
+    let timeoutMs: number | undefined = undefined;
+    switch (args.length) {
+      case 2:
+        deployInBulk = args[0];
+        timeoutMs = args[1];
+        break;
+      case 1:
+        if (typeof args[0] === 'boolean') {
+          deployInBulk = args[0];
+        } else if (typeof args[0] === 'number') {
+          timeoutMs = args[0];
+        }
+        break;
+    }
+    const [gps, interruptGroups] = this.assertValidGroups();
+    await this.deployOnInstructions(gps, deployInBulk, timeoutMs);
+    await this.deployInterruptGroups(interruptGroups, timeoutMs);
+  }
+
+  private async deployInterruptGroups(
+    gps: GroupHooks[],
+    timeoutMs?: number,
+  ): Promise<void> {
+    // TODO bulk
+    for (let idx = 0; idx < gps.length; idx++) {
+      this._logger.debug(
+        `Deploying Interrupt Group #${idx + 1} out of #${gps.length}`,
+      );
+      await this.deployOnInterrupts(gps[idx], timeoutMs);
+    }
+    return;
   }
 
   async remove(): Promise<void> {}
@@ -506,26 +547,47 @@ export class WasmAnalysis {
     }
   }
 
-  private async deployOnInstructions(
-    g: GroupHooks,
-    timeoutMs?: number,
-  ): Promise<void> {
-    for (const i of g.instructions) {
-      for (const a of g.getInstructionActions(i)) {
-        const added = await this.vm.addHookOnAddr(
-          i.startAddress,
-          a,
-          g.internalInstructionMode,
-          timeoutMs,
-        );
-        if (!added) {
-          throw new Error(
-            `failed to register action '${a.description}' on instr '${i.name}' at address '${i.startAddress}'}`,
+  private createOnAddRequests(gps: GroupHooks[]): HookOnWasmAddrRequest[] {
+    const reqs: HookOnWasmAddrRequest[] = [];
+    for (const g of gps) {
+      for (const i of g.instructions) {
+        for (const h of g.getInstructionActions(i)) {
+          reqs.push(
+            new HookOnWasmAddrRequest(
+              i.startAddress,
+              g.internalInstructionMode,
+            ).addHook(h),
           );
         }
       }
     }
-    g.deployed = true;
+    return reqs;
+  }
+
+  private async deployOnInstructions(
+    g: GroupHooks | GroupHooks[],
+    inBulk: boolean,
+    timeoutPerRequestMs?: number,
+  ): Promise<void> {
+    const gps = g instanceof Array ? g : [g];
+    const reqs = this.createOnAddRequests(gps);
+    const responses = await this.vm.sendRequests(
+      reqs,
+      inBulk,
+      timeoutPerRequestMs,
+    );
+    for (let idx = 0; idx < responses.length; idx++) {
+      const response = responses[idx];
+      if (isErrorMessage(response)) {
+        const request = reqs[idx];
+        const msg = `Failed to register hook '${request.description()}' at address ${request.wasmAddr}. Reason: ${response.error_msg} (error code ${response.error_code}))`;
+        this._logger.error(msg);
+        throw new Error(msg);
+      }
+    }
+
+    gps.forEach((g) => (g.deployed = true));
+    return;
   }
 
   async run<T>(
@@ -574,6 +636,15 @@ export class WasmAnalysis {
       await this.vm.run(timeoutMs);
     });
   }
+
+  private onFinish(): void {
+    const mainFunc = this.wasm.getMainFunction();
+    this.after(mainFunc, async (vm: WasmitoBackendVM) => {
+      let v = undefined;
+      if (this.userOnFinishCB !== undefined) v = await this.userOnFinishCB(vm);
+      await vm.close();
+      this.analysisResolver(v);
+    });
   }
 }
 
