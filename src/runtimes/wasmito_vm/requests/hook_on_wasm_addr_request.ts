@@ -26,6 +26,15 @@ export enum HookOnWasmAddrMoment {
 export function getHookMomentFromString(
   str: string,
 ): HookOnWasmAddrMoment | undefined {
+  const moments: string[] = Object.values(HookOnWasmAddrMoment);
+  if (moments.includes(str)) {
+    return str as HookOnWasmAddrMoment;
+  }
+  return undefined;
+}
+
+
+export class HookOnWasmAddrRequest extends APIRequest<RequestMessage> {
   readonly instruction = Instruction.HookOnWasmAddr;
   private readonly logger: Logger;
   public readonly wasmAddr;
