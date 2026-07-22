@@ -238,11 +238,26 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
 
   public async sendRequest<T>(
     request: APIRequest<T>,
-    timeout?: number,
+    timeout: number | undefined = undefined,
+    bulkRequests: boolean = true,
   ): Promise<T> {
     return await this.requestManager.sendRequest(
       this.channel,
       request,
+      timeout,
+      bulkRequests,
+    );
+  }
+
+  public async sendRequests<T>(
+    requests: Array<APIRequest<T>>,
+    bulkRequests: boolean,
+    timeout?: number,
+  ): Promise<Array<T>> {
+    return await this.requestManager.sendRequests(
+      this.channel,
+      requests,
+      bulkRequests,
       timeout,
     );
   }
@@ -264,7 +279,7 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
 
   async resolveEvent(timeout?: number): Promise<void> {
     const request = new ResolveEventRequest();
-    await this.sendRequest(request, timeout);
+    await this.sendRequest<void>(request, timeout);
   }
 
   public async proxify(timeout?: number): Promise<void> {
