@@ -245,6 +245,10 @@ export class WasmAnalysis {
     );
   }
 
+  async close() {
+    await this.vm.close();
+  }
+
   onNewInterrupt(
     cb:
       | ((ev: ReadOnlyInterrupt, vm: WasmitoBackendVM) => void)
