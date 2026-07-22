@@ -17,7 +17,8 @@ import { getGlobalLogger } from '../../logger/logger';
 
 export function getInstructions<I extends WasmInstruction>(
   wasm: WasmModule,
-  instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
+  instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode | WASMFunction,
+  moment: InstrMoment,
 ): WasmInstruction[] {
   let instrs: WasmInstruction[] = [];
   let i: WasmInstruction | undefined;
@@ -32,6 +33,12 @@ export function getInstructions<I extends WasmInstruction>(
     }
   } else if (instr instanceof WasmInstruction) {
     i = wasm.getInstruction(instr.startAddress);
+  } else if (instr instanceof WASMFunction) {
+    if (moment === 'before') {
+      throw new Error(`unsupported`);
+    }
+    const endInstr = instr.body[instr.body.length - 1];
+    instrs.push(endInstr);
   } else {
     wasm.instructionsFromOpcode(instr).forEach((i) => instrs.push(i));
   }
@@ -140,7 +147,7 @@ export function instruction<I extends WasmInstruction>(
     | (() => void),
   mutate: boolean,
 ): GroupHooks | undefined {
-  const instrs = getInstructions(wasm, instr);
+  const instrs = getInstructions(wasm, instr, moment);
   if (instrs.length === 0) {
     return undefined;
   }
