@@ -38,10 +38,10 @@ export class SerialConnection implements Channel {
     );
   }
 
-  public write(
+  public async write(
     data: any,
     cb?: ((err?: Error | null | undefined) => void) | undefined,
-  ): boolean {
+  ): Promise<boolean> {
     if (this.port === undefined) return false;
     const s = this.port.write(data, cb);
     if (s) this.writeListeners.onSubscriptionData(data);

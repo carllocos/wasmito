@@ -23,12 +23,32 @@ export class ClientSideSocket extends AbstractChannel {
   public write(
     data: string | Uint8Array,
     cb?: ((err?: Error | null | undefined) => void) | undefined,
-  ): boolean {
-    if (this.connection === undefined) return false;
+  ): Promise<boolean> {
+    const con = this.connection;
+    return new Promise((resolve) => {
+      if (con === undefined) return resolve(false);
+      const flushed = con.write(data, (err?: Error | null | undefined) => {
+        if (err !== undefined && err !== null) {
+          this.logger.error(
+            `Error occurred when writing to socket: ${err.message}`,
+          );
+          resolve(false);
+        } else {
+          this.fanout(data);
+        }
+        if (cb !== undefined) {
+          cb(err);
+        }
+      });
 
-    const s = this.connection.write(data, cb);
-    if (s) this.fanout(data);
-    return s;
+      if (flushed) {
+        resolve(true);
+      } else {
+        con.on('drain', () => {
+          resolve(true);
+        });
+      }
+    });
   }
 
   public async close(_timeout?: number): Promise<boolean> {
@@ -41,13 +61,7 @@ export class ClientSideSocket extends AbstractChannel {
   }
 
   public async send(data: string): Promise<boolean> {
-    return this.write(data, (err?: Error | null | undefined) => {
-      if (err !== undefined && err !== null) {
-        this.logger.error(
-          `Error occurred when writing to socket: ${err.message}`,
-        );
-      }
-    });
+    return await this.write(data);
   }
 
   public async open(timeout?: number): Promise<boolean> {
