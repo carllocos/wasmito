@@ -70,6 +70,7 @@ export abstract class Hook {
 
 export abstract class HookWithoutSubscription extends Hook {}
 
+const hookLogger = createLogger('SubscriptionHook');
 export abstract class HookWithSubscription<SubscriptionType>
   extends Hook
   implements SubscriptionHook<SubscriptionType>
@@ -79,7 +80,7 @@ export abstract class HookWithSubscription<SubscriptionType>
 
   constructor(kind: HookKind, logger?: Logger) {
     super(kind);
-    this.logger = logger ?? createLogger('SubscriptionHook');
+    this.logger = logger ?? hookLogger;
     this.subscriptions = new Subscription(
       this.parseSubscriptionData.bind(this),
       this.logger,
