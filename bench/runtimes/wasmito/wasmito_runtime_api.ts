@@ -116,27 +116,12 @@ export class WasmitoRuntimeDBGAPI implements RuntimeDebugAPI {
 
   private async sendRequest<T>(
     request: APIRequest<T>,
-    timeout?: number,
+    timeout: number | undefined = undefined,
+    bulkRequests: boolean = true,
   ): Promise<T> {
     const command = new RequestsManager();
-    return command.sendRequest(this.channel, request, timeout);
+    return command.sendRequest(this.channel, request, timeout, bulkRequests);
   }
-
-  // private subscribeData(s: WasmState): void {
-  //   if (s.pc === undefined) {
-  //     throw new Error(`On breakpoint reached did not return bp addr`);
-  //   }
-  //   for (const bpListener of this.breakpointListeners) {
-  //     if (!this.removedListeners.has(bpListener)) {
-  //       bpListener(s.pc);
-  //     }
-  //   }
-
-  //   this.breakpointListeners = this.breakpointListeners.filter((h) => {
-  //     return !this.removedListeners.has(h);
-  //   });
-  //   this.removedListeners.clear();
-  // }
 
   async addBreakpoint(addr: number, timeout?: number): Promise<boolean> {
     if (!this.listenerActivated) {
@@ -182,14 +167,13 @@ export class WasmitoRuntimeDBGAPI implements RuntimeDebugAPI {
 
   async run(timeout?: number): Promise<boolean> {
     const req = new RunRequest();
-    const response = await this.sendRequest(req, timeout);
-    return response === 'GO!';
+    return await this.sendRequest(req, timeout);
   }
 
   async step(timeout?: number): Promise<boolean> {
     const req = new StepRequest();
     const response = await this.sendRequest(req, timeout);
-    if (response !== 'STEP!') {
+    if (!response) {
       throw new Error(`Wasmito runtime failed to step`);
     }
     return true;
