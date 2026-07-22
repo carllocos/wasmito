@@ -20,8 +20,11 @@ export abstract class APIRequest<R> {
   }
   abstract description(): string;
   abstract getData(): string;
-  abstract parse(input: string): R;
-  abstract handleSubscriptionData(data: string): SubscriptionParseOutcome;
+  abstract parse(input: string): R; // TODO remove
+  abstract processAck(ack: RequestMessage): R;
+  abstract processSubscriptionData(
+    sub: RequestMessage,
+  ): Promise<SubscriptionParseOutcome>;
   abstract isSubscriptionClosed(): boolean;
   serializeID(): string {
     return idGenerator.serialiseIDToLEBHex(this.id);
