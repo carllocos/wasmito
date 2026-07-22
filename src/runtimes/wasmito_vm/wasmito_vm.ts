@@ -414,9 +414,10 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
     const response = await this.sendRequest(req, timeout);
     const s = isSuccessfulMessage(response);
     if (s) {
-      const requests = this.hooksStore.get(addr) ?? [];
-      requests.push(req);
-      this.hooksStore.set(addr, requests);
+      // TODO fix hook stores in DBG
+      // const requests = this.hooksStore.get(addr) ?? [];
+      // requests.push(req);
+      // this.hooksStore.set(addr, requests);
     } else if (isErrorMessage(response)) {
       const msg = `HookOnAddress failed to register hook: '${hook.description()}' at address ${addr} failed. Reason: ${response.error_msg} (error code ${response.error_code}))`;
       this.logger.error(msg);
