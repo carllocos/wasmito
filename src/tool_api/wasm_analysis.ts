@@ -653,10 +653,7 @@ function createActionsNode(
   cbNrOfArgs: number,
 ): [Hook[], InspectStateHook] {
   const hooks: Hook[] = [];
-  const inspectAction = new InspectStateHook(
-    new StateRequest(),
-    instr.startAddress,
-  );
+  const inspectAction = new InspectStateHook(new StateRequest());
   inspectAction.includePC();
   switch (cbNrOfArgs) {
     case 0:
