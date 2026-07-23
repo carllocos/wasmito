@@ -128,12 +128,6 @@ export class HookOnWasmAddrRequest extends APIRequest<RequestMessage> {
   }
 }
 
-<<<<<<< HEAD
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface RemoveHookOnWasmAddrResponse extends HookOnWasmAddrJSONResponse {}
-
-=======
->>>>>>> main
 export class RemoveHookOnWasmAddrRequest extends HookOnWasmAddrRequest {
   constructor(wasmAddr: number) {
     super(wasmAddr);

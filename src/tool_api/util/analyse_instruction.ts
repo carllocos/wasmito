@@ -341,12 +341,6 @@ export function createCallbackNoArgs(
   instr: WasmInstruction,
   moment: InstrMoment,
   cb: // do not care about args, nor return value
-<<<<<<< HEAD
-    ((vm: WasmitoBackendVM) => void) | (() => void),
-): (s: WasmState) => void {
-  return (_s: WasmState) => {
-    cb(vm);
-=======
   | ((vm: WasmitoBackendVM) => void)
     | ((vm: WasmitoBackendVM) => Promise<void>)
     | (() => void)
@@ -357,7 +351,6 @@ export function createCallbackNoArgs(
       return;
     }
     await cb(vm);
->>>>>>> main
   };
 }
 
