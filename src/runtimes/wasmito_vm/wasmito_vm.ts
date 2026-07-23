@@ -2,12 +2,12 @@ import { type Channel } from '../../communication/channel_interface';
 import { type RuntimeToolAPI } from '../runtime_api';
 import { RunRequest } from './requests/run_request';
 import { StepRequest } from './requests/step_request';
+import { type APIRequest } from '../request_interface';
 import {
-  isSuccessfulMessage,
-  type APIRequest,
-  ResponseType,
   isErrorMessage,
-} from '../request_interface';
+  isSuccessfulMessage,
+  ResponseType,
+} from '../request_msg';
 import { type Platform } from '../../platforms/platform';
 import { PauseRequest } from './requests/pause_request';
 import { ProxifyRequest } from './requests/proxify_request';
@@ -29,7 +29,6 @@ import {
 import {
   HookOnEventMoment,
   HookOnEventRequest,
-  isSuccessfullHookOnEventResponse,
 } from './requests/hook_on_event_request';
 import {
   type BreakpointPolicy,
@@ -37,10 +36,7 @@ import {
 } from '../../debugger/breakpoint_policies';
 import { type Breakpoint } from '../../debugger/breakpoint';
 import { type Hook } from '../../hooks/hook';
-import {
-  HookOnError,
-  isSuccessfullHookOnErrorResponse,
-} from './requests/hook_on_error';
+import { HookOnError } from './requests/hook_on_error';
 import { EventInspectHook } from '../../hooks/hook_event';
 import { type DeviceIdentity } from '../../device';
 import { type WASMFunction } from '../../webassembly/wasm/wasm_function';
@@ -201,9 +197,10 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
   public async run(timeout?: number): Promise<boolean> {
     const request = new RunRequest();
     this.logger.debug('Sending RunRequest');
-    await this.sendRequest(request, timeout);
-    this.logger.info('Running');
-    return true;
+    const s = await this.sendRequest(request, timeout);
+    if (s) this.logger.debug('Running');
+    else this.logger.debug('Failed to run');
+    return s;
   }
 
   public async pause(timeout?: number): Promise<void> {
@@ -241,11 +238,26 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
 
   public async sendRequest<T>(
     request: APIRequest<T>,
-    timeout?: number,
+    timeout: number | undefined = undefined,
+    bulkRequests: boolean = true,
   ): Promise<T> {
     return await this.requestManager.sendRequest(
       this.channel,
       request,
+      timeout,
+      bulkRequests,
+    );
+  }
+
+  public async sendRequests<T>(
+    requests: Array<APIRequest<T>>,
+    bulkRequests: boolean,
+    timeout?: number,
+  ): Promise<Array<T>> {
+    return await this.requestManager.sendRequests(
+      this.channel,
+      requests,
+      bulkRequests,
       timeout,
     );
   }
@@ -267,7 +279,7 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
 
   async resolveEvent(timeout?: number): Promise<void> {
     const request = new ResolveEventRequest();
-    await this.sendRequest(request, timeout);
+    await this.sendRequest<void>(request, timeout);
   }
 
   public async proxify(timeout?: number): Promise<void> {
@@ -402,9 +414,10 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
     const response = await this.sendRequest(req, timeout);
     const s = isSuccessfulMessage(response);
     if (s) {
-      const requests = this.hooksStore.get(addr) ?? [];
-      requests.push(req);
-      this.hooksStore.set(addr, requests);
+      // TODO fix hook stores in DBG
+      // const requests = this.hooksStore.get(addr) ?? [];
+      // requests.push(req);
+      // this.hooksStore.set(addr, requests);
     } else if (isErrorMessage(response)) {
       const msg = `HookOnAddress failed to register hook: '${hook.description()}' at address ${addr} failed. Reason: ${response.error_msg} (error code ${response.error_code}))`;
       this.logger.error(msg);
@@ -455,7 +468,7 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
       HookOnEventMoment.onNewEvent,
     ).addHook(hook);
     const response = await this.sendRequest(request, timeout);
-    return isSuccessfullHookOnEventResponse(response);
+    return isSuccessfulMessage(response);
   }
 
   async addHookOnEventHandling(hook: Hook, timeout?: number): Promise<boolean> {
@@ -463,13 +476,13 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
       HookOnEventMoment.beforeEventHandled,
     ).addHook(hook);
     const response = await this.sendRequest(request, timeout);
-    return isSuccessfullHookOnEventResponse(response);
+    return isSuccessfulMessage(response);
   }
 
   async addHookOnError(hook: Hook, timeout?: number): Promise<boolean> {
     const request = new HookOnError().onError(hook);
     const response = await this.sendRequest(request, timeout);
-    return isSuccessfullHookOnErrorResponse(response);
+    return isSuccessfulMessage(response);
   }
 
   async simulateInterrupt(pinNr: number, timeoutMs?: number): Promise<void> {

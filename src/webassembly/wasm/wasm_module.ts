@@ -13,6 +13,7 @@ import {
 import {
   CallInstruction,
   isCallInstruction,
+  isConst,
   type WasmInstruction,
 } from './wasm_instruction';
 import { getOpcodeName, getWasmOpcodeNr, WasmOpcode } from './wasm_opcode';
@@ -27,6 +28,7 @@ export interface WasmGlobal {
   startAddress: number;
   endAddress: number;
   value: number; // might not be needed
+  initInstrs: WasmInstruction[];
 }
 
 export class WasmModule {
@@ -106,9 +108,9 @@ export class WasmModule {
   }
 
   instructionsFromOpcode(opcode: WasmOpcode): WasmInstruction[] {
-    const instrs: WasmInstruction[] = [];
+    let instrs: WasmInstruction[] = [];
     for (const f of this.functions) {
-      f.instructionsFromOpcode(opcode).forEach((i) => instrs.push(i));
+      instrs = [...instrs, ...f.instructionsFromOpcode(opcode)]; // trick to avoid running out of stack
     }
     return instrs;
   }
@@ -281,21 +283,35 @@ export class WasmModule {
 
     return calls.filter((c) => c.funIdx === funID);
   }
+  public getStartFunction(): WASMFunction | undefined {
+    const funcs = this.getFunctions(['_start']);
+    if (funcs.length === 0) return undefined;
+    assert(
+      funcs.length === 1,
+      `only one _start function expected: Found ${funcs.length}`,
+    );
+    return funcs[0];
+  }
 
-  public getMainFunctions(): WASMFunction[] {
-    const mainNames = new Set<string>(['main', '_main', '_start']);
+  private getFunctions(namesFuncs: string[]): WASMFunction[] {
+    const names: Set<string> = new Set(namesFuncs);
     const funcs: WASMFunction[] = [];
     const added = new Set<number>();
     for (const f of this.functions) {
       if (
         !added.has(f.id) &&
-        (mainNames.has(f.name) || (f.exported && mainNames.has(f.exportName)))
+        (names.has(f.name) || (f.exported && names.has(f.exportName)))
       ) {
         funcs.push(f);
         added.add(f.id);
       }
     }
     return funcs;
+  }
+
+  public getMainFunctions(): WASMFunction[] {
+    const mainNames = ['main', '_main', '_start'];
+    return this.getFunctions(mainNames);
   }
 
   public allExportedFuncs(): WASMFunction[] {
@@ -420,14 +436,29 @@ function createWasmGlobals(mod: ParsedModule): WasmGlobal[] {
     if (t === undefined) {
       throw new Error(`Could not convert ${g.globalType.valtype} to WASM type`);
     }
+
+    let initValue = 0;
+    let found = false;
+    for (const i of g.init) {
+      if (isConst(i)) {
+        if (found) {
+          throw new Error(
+            `the initial value for global ${globalID} was already set to ${initValue}. There are in total ${g.init.length} instructions`,
+          );
+        }
+        found = true;
+        initValue = i.value;
+      }
+    }
     return {
       index: globalID,
       name: g.name ?? `global${globalID}`,
       type: t,
       mutable: g.globalType.mutability !== 'const',
-      value: 0,
+      value: initValue,
       startAddress: g.loc.start.column,
       endAddress: g.loc.end.column,
+      initInstrs: g.init,
     };
   });
 }
@@ -509,6 +540,8 @@ function createWasmFunctions(
     let exportName = '';
     if (funExported?.innerName !== undefined) {
       exportName = funExported.name;
+    } else if (funExported?.name !== undefined) {
+      exportName = funExported.name;
     }
     const f = new WASMFunction(
       fun.name.value,
@@ -544,7 +577,10 @@ function retrieveAllInstructions(
 ): WasmInstruction[] {
   const globalInstructions = retrieveGlobalInstructions(mod);
   const funcBodies = functions.flatMap((f) => {
-    return f.allInstructions;
+    return f.allInstructions.map((i) => {
+      i.enclosingFunction = f;
+      return i;
+    });
   });
   return globalInstructions.concat(funcBodies);
 }

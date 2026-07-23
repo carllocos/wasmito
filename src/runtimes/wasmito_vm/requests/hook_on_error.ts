@@ -1,45 +1,20 @@
-import { parseHookContent, type Hook } from '../../../hooks/hook';
+import { runHooksAndListeners, type Hook } from '../../../hooks/hook';
 import { createLogger } from '../../../logger/logger';
 import { isHexaString } from '../../../util/decoder';
 import { Instruction } from './instructions';
 import {
   APIRequest,
   APIRequestInvalidParse,
-  ResponseType,
   SubscriptionParseOutcome,
-  type RequestMessage,
 } from '../../request_interface';
-import { getExceptionMsgFromErrorCode } from './request_error_code';
+import {
+  isRequestMessage,
+  isSubscriptionMessage,
+  RequestMessage,
+  ResponseType,
+} from '../../request_msg';
 
 const logger = createLogger('HookOnError');
-
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface HookOnErrorJSONResponse extends RequestMessage {}
-
-export abstract class HookOnErrorResponse {
-  abstract isSucessful(): boolean;
-}
-
-export class HookOnErrorSuccessfulResponse extends HookOnErrorResponse {
-  isSucessful(): boolean {
-    return true;
-  }
-}
-
-export class HookOnErrorFailedResponse extends HookOnErrorResponse {
-  public readonly errorCode: number;
-  public readonly errorMessage: string;
-
-  constructor(errorCode: number, errorMsg: string) {
-    super();
-    this.errorCode = errorCode;
-    this.errorMessage = errorMsg;
-  }
-
-  isSucessful(): boolean {
-    return false;
-  }
-}
 
 export class HookOnErrorSubsriptionMessage {
   public readonly subsriptionData: any;
@@ -85,20 +60,13 @@ export class HookOnErrorSubsriptionMessage {
   }
 }
 
-export function isSuccessfullHookOnErrorResponse(
-  response: HookOnErrorResponse,
-): boolean {
-  return response instanceof HookOnErrorSuccessfulResponse;
-}
-
-export class HookOnError extends APIRequest<HookOnErrorResponse> {
+export class HookOnError extends APIRequest<RequestMessage> {
+  readonly instruction = Instruction.HookOnError;
   public readonly hooks: Hook[];
-  private readonly interruptNr: Instruction;
 
   constructor() {
     super();
     this.hooks = [];
-    this.interruptNr = Instruction.HookOnError;
   }
 
   onError(hook: Hook): HookOnError {
@@ -121,36 +89,32 @@ export class HookOnError extends APIRequest<HookOnErrorResponse> {
     let encodedHook = '';
     encodedSchedule = this.hooks[0].schedule.serializeBinary();
     encodedHook = this.hooks[0].serializeBinary();
-    return `${this.interruptNr}${encodedSchedule}${encodedHook}\n`;
+    return `${this.instruction}${this.serializeID()}${encodedSchedule}${encodedHook}\n`;
   }
 
-  override parse(input: string): HookOnErrorResponse {
-    const response: HookOnErrorResponse | undefined =
-      this.decodeHexaStringResponse(input);
-    if (response === undefined) {
+  override parse(_input: string): RequestMessage {
+    throw new APIRequestInvalidParse('No reply for HookOnError');
+  }
+
+  processAck(ack: RequestMessage): RequestMessage {
+    if (isRequestMessage(ack, this.instruction) === undefined) {
       throw new APIRequestInvalidParse('No reply for HookOnError');
     }
-    return response;
+    return ack;
+  }
+
+  async processSubscriptionData(
+    sub: RequestMessage,
+  ): Promise<SubscriptionParseOutcome> {
+    if (isSubscriptionMessage(sub, this.instruction)) {
+      return await runHooksAndListeners(this.hooks, sub.sub, logger);
+    }
+
+    return SubscriptionParseOutcome.Failed;
   }
 
   override isSubscriptionClosed(): boolean {
     return false;
-  }
-
-  override handleSubscriptionData(data: string): SubscriptionParseOutcome {
-    try {
-      const msg = new HookOnErrorSubsriptionMessage(data);
-      const successFulParse = parseHookContent(
-        this.hooks,
-        msg.subsriptionData,
-        logger,
-      );
-      return successFulParse
-        ? SubscriptionParseOutcome.Successful
-        : SubscriptionParseOutcome.Failed;
-    } catch (_e) {
-      return SubscriptionParseOutcome.Failed;
-    }
   }
 
   private addHook(hook: Hook): HookOnError {
@@ -160,67 +124,5 @@ export class HookOnError extends APIRequest<HookOnErrorResponse> {
       logger.error('Todo support multiple hooks. For now just one hook');
     }
     return this;
-  }
-
-  private decodeHexaStringResponse(
-    hexaInput: string,
-  ): HookOnErrorResponse | undefined {
-    // format: header | response type | possible body 1
-    // header: HookOnError Instruction Nr (2 chars hexa) |
-    // response_type : 2 chars hexa
-    // body1 only if response type is error: error code (2 chars hexa)
-
-    const hexRegex = /^[0-9a-fA-F]+$/;
-    if (!hexRegex.test(hexaInput)) {
-      return undefined;
-    }
-
-    if (hexaInput.length < 4) {
-      return undefined;
-    }
-
-    if (Instruction.HookOnError !== hexaInput.slice(0, 2)) {
-      return undefined;
-    }
-    const typeResponse = hexaInput.slice(2, 4);
-    if (typeResponse === ResponseType.SuccessResponse) {
-      if (hexaInput.length > 4) {
-        logger.error(
-          `Successful response contains more than just instruction type and response type. Extra content ${hexaInput.slice(
-            4,
-          )} . Full message ${hexaInput}`,
-        );
-      }
-      return new HookOnErrorSuccessfulResponse();
-    } else if (typeResponse === ResponseType.ErrorResponse) {
-      const errorCodeHexa = hexaInput.slice(4, 6);
-      const errorCode = parseInt(errorCodeHexa, 16);
-      if (isNaN(errorCode)) {
-        logger.error(
-          `Error response received a non hexa errorCode. Given '${errorCodeHexa}'. Full message '${hexaInput}'`,
-        );
-        return undefined;
-      }
-
-      const excpMsg = getExceptionMsgFromErrorCode(errorCode);
-      if (excpMsg === undefined) {
-        logger.error(`No error message registered for errorCode ${errorCode}`);
-      }
-
-      if (hexaInput.length > 6) {
-        logger.error(
-          `Error response contains more than just instruction type, response type, and errorCode. Extra content ${hexaInput.slice(
-            6,
-          )} . Full message ${hexaInput}`,
-        );
-      }
-
-      return new HookOnErrorFailedResponse(errorCode, excpMsg ?? '');
-    } else {
-      logger.error(
-        `Error response contains no valid response type ${typeResponse} . Full message ${hexaInput}`,
-      );
-      return undefined;
-    }
   }
 }

@@ -8,7 +8,6 @@ import { EmptyValueSubstitution } from '../src/hooks/hook_value_substitution';
 import { type WasmValuesBuilder } from '../src/webassembly';
 import { type WASM, type WasmState } from '../src/webassembly/wasm';
 import { type ProxyCallResponse } from '../src/runtimes';
-import { ResponseType } from '../src/runtimes/request_interface';
 import { AroundFunctionRequest } from '../src/runtimes/wasmito_vm/requests/around_function_request';
 import { PushEventRequest } from '../src/runtimes/wasmito_vm/requests/inject_event_request';
 import { StateRequest } from '../src/runtimes/wasmito_vm/requests/inspect_request';
@@ -26,6 +25,7 @@ import {
   sourceCodeLocationToString,
   type SourceCodeLocation,
 } from '../src/source_mappers/source_map';
+import { ResponseType } from '../src/runtimes/request_msg';
 
 export interface ActionArgs {
   timeoutMs?: number;

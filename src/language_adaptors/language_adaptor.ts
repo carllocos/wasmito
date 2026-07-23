@@ -14,6 +14,8 @@ import { writeFileSync } from 'fs';
 import { SourceMapFromJSON } from '../source_mappers/source_map_builder';
 import { SourceMapConfig } from '../source_mappers/source_map_config';
 import { SourceCFGNode } from '../cfg/source_cfg_node_edge';
+import assert from 'assert';
+import { WasmModule } from '../webassembly';
 
 const logger = createLogger('LanguageAdaptor');
 
@@ -53,13 +55,15 @@ export interface CountMappingJson {
 export class LanguageAdaptor {
   public readonly sourceMap: SourceMap;
   private readonly _asts: AgnosticASTMap;
-  private readonly _wasmCFGs: WasmCFGs;
+  private readonly _wasmCFGs?: WasmCFGs;
   private _srcCfg?: SourceCFGs;
 
-  constructor(sourceMap: SourceMap) {
+  constructor(sourceMap: SourceMap, constructCFGs: boolean = true) {
     this.sourceMap = sourceMap;
     this._asts = new Map();
-    this._wasmCFGs = new WasmCFGs(sourceMap.wasm);
+    if (constructCFGs) {
+      this._wasmCFGs = new WasmCFGs(sourceMap.wasm);
+    }
   }
 
   get asts(): AgnosticASTMap {
@@ -183,6 +187,10 @@ export class LanguageAdaptor {
   }
 
   private buildSourceCFGs(includeUnavailableSourceFiles: boolean): void {
+    assert(
+      this._wasmCFGs !== undefined,
+      'LanguageAdaptor was constructed without WCFGs',
+    );
     this._srcCfg = new SourceCFGs(
       this._asts,
       this.sourceMap,
@@ -191,8 +199,8 @@ export class LanguageAdaptor {
     );
   }
 
-  static emptyAdaptor(wasmPath: string): LanguageAdaptor {
-    return new LanguageAdaptor(new SourceMap(wasmPath, [], []));
+  static emptyAdaptor(wasmPath: string | WasmModule): LanguageAdaptor {
+    return new LanguageAdaptor(new SourceMap(wasmPath, [], []), false);
   }
 
   static fromMappingsPath(

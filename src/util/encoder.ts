@@ -15,8 +15,37 @@ export function encodeLEB128(value: number): number[] {
   return result;
 }
 
-export function encodeToHexLEB128(value: number): string {
-  const bytes = encodeLEB128(value);
+export function encodeSLEB128(value: number): Uint8Array {
+  if (!Number.isInteger(value)) {
+    throw new Error('Value must be an integer');
+  }
+
+  const bytes: number[] = [];
+  let more = true;
+
+  while (more) {
+    let byte = value & 0x7f;
+    const signBit = byte & 0x40;
+
+    value >>= 7;
+
+    if ((value === 0 && signBit === 0) || (value === -1 && signBit !== 0)) {
+      more = false;
+    } else {
+      byte |= 0x80;
+    }
+
+    bytes.push(byte);
+  }
+
+  return Uint8Array.from(bytes);
+}
+
+export function encodeToHexLEB128(
+  value: number,
+  signed: boolean = false,
+): string {
+  const bytes = signed ? Array.from(encodeSLEB128(value)) : encodeLEB128(value);
   const hexString = bytes
     .map((byte) => byte.toString(16).padStart(2, '0'))
     .join('');

@@ -2,21 +2,45 @@ import { Logger } from '../logger/logger';
 
 export interface ISubscription<SubscriptionType> {
   readonly subscribe: (
-    calllback: (value: SubscriptionType) => void,
+    callback:
+      | ((value: SubscriptionType) => void)
+      | ((value: SubscriptionType) => Promise<void>),
     oneTimeSubscription: boolean,
   ) => void;
-  readonly unSubscribe: (calllback: (value: SubscriptionType) => void) => void;
+  readonly unSubscribe: (
+    callback:
+      | ((value: SubscriptionType) => void)
+      | ((value: SubscriptionType) => Promise<void>),
+  ) => void;
   readonly onSubscriptionData: (data: SubscriptionType) => void;
   readonly parseSubscriptionData: (input: any) => SubscriptionType;
   readonly clearSubscriptions: () => void;
 }
 
+<<<<<<< HEAD
 export abstract class ASubscription<
   SubscriptionType,
 > implements ISubscription<SubscriptionType> {
   private listeners: Array<(data: SubscriptionType) => void>;
   private oneTimeListeners: Array<(data: SubscriptionType) => void>;
   private readonly removedListeners: Set<(data: SubscriptionType) => void>;
+=======
+export abstract class ASubscription<SubscriptionType>
+  implements ISubscription<SubscriptionType>
+{
+  private listeners: Array<
+    | ((data: SubscriptionType) => void)
+    | ((data: SubscriptionType) => Promise<void>)
+  >;
+  private oneTimeListeners: Array<
+    | ((data: SubscriptionType) => void)
+    | ((data: SubscriptionType) => Promise<void>)
+  >;
+  private readonly removedListeners: Set<
+    | ((data: SubscriptionType) => void)
+    | ((data: SubscriptionType) => Promise<void>)
+  >;
+>>>>>>> main
   protected logger: Logger;
 
   constructor(logger: Logger) {
@@ -27,25 +51,20 @@ export abstract class ASubscription<
   }
 
   public subscribe(
-    callback: (data: SubscriptionType) => void,
+    callback:
+      | ((data: SubscriptionType) => void)
+      | ((data: SubscriptionType) => Promise<void>),
     oneTimeSubscription: boolean,
   ): void {
-    let lstnrs: Array<(data: SubscriptionType) => void> = [];
-    if (oneTimeSubscription) {
-      lstnrs = this.oneTimeListeners;
-    } else {
-      lstnrs = this.listeners;
-    }
-    const found = lstnrs.find((cb) => cb === callback);
-    if (found !== undefined) {
-      this.logger.warn(`Attempting to add 2 same subscription callbacks`);
-      return;
-    }
-
-    lstnrs.push(callback);
+    if (oneTimeSubscription) this.oneTimeListeners.push(callback);
+    else this.listeners.push(callback);
   }
 
-  public unSubscribe(callback: (data: SubscriptionType) => void): void {
+  public unSubscribe(
+    callback:
+      | ((data: SubscriptionType) => void)
+      | ((data: SubscriptionType) => Promise<void>),
+  ): void {
     this.removedListeners.add(callback);
   }
 
@@ -53,17 +72,17 @@ export abstract class ASubscription<
     if (this.listeners.length === 0 && this.oneTimeListeners.length === 0) {
       return;
     }
-    this.listeners.forEach((listener) => {
+    this.listeners.forEach(async (listener) => {
       if (!this.removedListeners.has(listener)) {
-        listener(value);
+        await listener(value);
       }
     });
     this.listeners = this.listeners.filter((cb) => {
       return !this.removedListeners.has(cb);
     });
     this.removedListeners.clear();
-    this.oneTimeListeners.forEach((listener) => {
-      listener(value);
+    this.oneTimeListeners.forEach(async (listener) => {
+      await listener(value);
     });
     this.oneTimeListeners = [];
   }

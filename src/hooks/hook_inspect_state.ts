@@ -10,17 +10,10 @@ export class InspectStateHook
   implements WasmStateI<InspectStateHook>
 {
   private readonly _stateToInspect: StateRequest;
-  public readonly wasmAddress?: number;
-  constructor(
-    stateRequest: StateRequest = new StateRequest(),
-    wasmAddress?: number,
-  ) {
+  constructor(stateRequest: StateRequest = new StateRequest()) {
     super(HookKind.StateToInspect);
     this._stateToInspect = stateRequest;
-    this.wasmAddress = wasmAddress;
-    if (this.wasmAddress !== undefined) {
-      this._stateToInspect.includePC(); // include pc is mandatory
-    }
+    this._stateToInspect.includePC(); // include pc is mandatory
   }
 
   get stateToInspect(): StateRequest {
@@ -28,13 +21,13 @@ export class InspectStateHook
   }
 
   public serializeBinary(): string {
-    return `${this.kind}${this.stateToInspect.generateInterrupt()}`;
+    const includeInterruptNr = false;
+    const includeID = false;
+    return `${this.kind}${this.stateToInspect.generateInterrupt(includeInterruptNr, includeID)}`;
   }
 
   description(): string {
-    const postfix =
-      this.wasmAddress !== undefined ? `on addr ${this.wasmAddress}` : '';
-    return `State Inspecting ${postfix}`;
+    return `State Inspecting`;
   }
 
   parseSubscriptionData(input: any): WasmState {

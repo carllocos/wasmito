@@ -9,6 +9,7 @@ import {
 import { type LogicalClock } from './logicalclock';
 import { createLogger, Logger } from '../logger/logger';
 import { ISubscription, Subscription } from './isubscribe';
+import { SubscriptionParseOutcome } from '../runtimes/request_interface';
 
 export enum HookKind {
   RemoteCall = '01',
@@ -69,6 +70,7 @@ export abstract class Hook {
 
 export abstract class HookWithoutSubscription extends Hook {}
 
+const hookLogger = createLogger('SubscriptionHook');
 export abstract class HookWithSubscription<SubscriptionType>
   extends Hook
   implements SubscriptionHook<SubscriptionType>
@@ -78,7 +80,7 @@ export abstract class HookWithSubscription<SubscriptionType>
 
   constructor(kind: HookKind, logger?: Logger) {
     super(kind);
-    this.logger = logger ?? createLogger('SubscriptionHook');
+    this.logger = logger ?? hookLogger;
     this.subscriptions = new Subscription(
       this.parseSubscriptionData.bind(this),
       this.logger,
@@ -86,13 +88,19 @@ export abstract class HookWithSubscription<SubscriptionType>
   }
 
   public subscribe(
-    callback: (data: SubscriptionType) => void,
+    callback:
+      | ((data: SubscriptionType) => void)
+      | ((data: SubscriptionType) => Promise<void>),
     oneTimeSubscription: boolean = false,
   ): void {
     this.subscriptions.subscribe(callback, oneTimeSubscription);
   }
 
-  public unSubscribe(callback: (data: SubscriptionType) => void): void {
+  public unSubscribe(
+    callback:
+      | ((data: SubscriptionType) => void)
+      | ((data: SubscriptionType) => Promise<void>),
+  ): void {
     this.subscriptions.unSubscribe(callback);
   }
 
@@ -130,11 +138,11 @@ export function assertFatalHookError(
   }
 }
 
-export function parseHookContent(
+export async function parseHookContentAndRunListeners(
   hooks: Hook[],
   content: any,
   _logger?: Logger,
-): boolean {
+): Promise<boolean> {
   let oneSuccessfulParse = false;
   for (let i = 0; i < hooks.length; i++) {
     const hook = hooks[i];
@@ -151,10 +159,30 @@ export function parseHookContent(
 
       if (successfulParse) {
         // Perhaps catch the error?
-        hook.onSubscriptionData(parsed);
+        await hook.onSubscriptionData(parsed);
         return successfulParse;
       }
     }
   }
   return oneSuccessfulParse;
+}
+
+export async function runHooksAndListeners(
+  hooks: Hook[],
+  content: any,
+  logger?: Logger,
+): Promise<SubscriptionParseOutcome> {
+  try {
+    const successFulParse = await parseHookContentAndRunListeners(
+      hooks,
+      content,
+      logger,
+    );
+    return successFulParse
+      ? SubscriptionParseOutcome.Successful
+      : SubscriptionParseOutcome.Failed;
+  } catch (e) {
+    if (e instanceof FatalHookError) throw e;
+    return SubscriptionParseOutcome.Failed;
+  }
 }

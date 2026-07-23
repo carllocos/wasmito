@@ -27,10 +27,10 @@ export class MockChannel implements Channel {
     this.dataHandler(data);
   }
 
-  write(
+  async write(
     data: any,
     cb?: ((err?: Error | null | undefined) => void) | undefined,
-  ): boolean {
+  ): Promise<boolean> {
     if (this.mockWriteHandler === undefined) {
       throw Error('No mock for write registered');
     }

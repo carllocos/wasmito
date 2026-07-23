@@ -1,12 +1,14 @@
 import assert from 'assert';
 import { WasmitoBackendVM } from '../runtimes/wasmito_vm/wasmito_vm';
 import {
+  callbackMappingToPinInterruptHandler,
+  PinInterruptHandler,
   ReadOnlyInterrupt,
   ReadOnlyWasmValue,
   WritableInterrupt,
   WritableWasmValue,
 } from './interrupts';
-import { GroupHooks } from './group_hooks';
+import { GroupHooks, InstrMoment } from './group_hooks';
 import { createLogger, Logger } from '../logger/logger';
 import { createCallbackNoArgs, instruction } from './util/analyse_instruction';
 import { interrupt } from './util/analyse_interrupts';
@@ -18,6 +20,7 @@ import {
 import { StateRequest } from '../runtimes/wasmito_vm/requests/inspect_request';
 import { WasmModule } from '../webassembly/wasm/wasm_module';
 import {
+  CallInstruction,
   WasmAddress,
   WasmInstruction,
 } from '../webassembly/wasm/wasm_instruction';
@@ -25,6 +28,10 @@ import { WasmCode, WasmOpcode } from '../webassembly/wasm/wasm_opcode';
 import { WasmState } from '../webassembly/wasm';
 import { assertFatalHookError, Hook } from '../hooks/hook';
 import { InspectStateHook } from '../hooks/hook_inspect_state';
+import { SourceMap } from '../source_mappers/source_map';
+import { HookOnWasmAddrRequest } from '../runtimes/wasmito_vm/requests/hook_on_wasm_addr_request';
+import { WASMFunction } from '../webassembly/wasm/wasm_function';
+import { isErrorMessage } from '../runtimes/request_msg';
 
 export interface AnalysisConfig {
   name: string;
@@ -35,31 +42,53 @@ export class WasmAnalysis {
   public readonly wasm: WasmModule;
   private vm: WasmitoBackendVM;
   private groups: GroupHooks[];
+  private interruptGroups: GroupHooks[];
   private _logger: Logger;
   private maxTimeoutMs: number;
+  private _sourceMap?: SourceMap;
   private _adaptor?: LanguageAdaptor;
+  private envFuncForPinInterrupt: number;
+  private analysisResolver: any;
+  private userOnFinishCB: any;
 
   constructor(
-    wasm: WasmModule | LanguageAdaptor,
+    wasm: WasmModule | SourceMap | LanguageAdaptor,
     vm: WasmitoBackendVM,
     config?: AnalysisConfig,
   ) {
     if (wasm instanceof WasmModule) {
       this.wasm = wasm;
+    } else if (wasm instanceof SourceMap) {
+      this.wasm = wasm.wasm;
+      this._sourceMap = wasm;
     } else {
       this._adaptor = wasm;
       this.wasm = wasm.sourceMap.wasm;
+      this._sourceMap = wasm.sourceMap;
     }
     this.vm = vm;
     this.groups = [];
+    this.interruptGroups = [];
     this._logger = createLogger(config?.name ?? 'WasmAnalyse');
     this.maxTimeoutMs = config?.maxTimeoutMs ?? 30000;
+    this.envFuncForPinInterrupt = this.findEnvFuncForPinInterrupt();
   }
+
   private addGroup(g: GroupHooks | undefined): GroupHooks | undefined {
     if (g !== undefined) {
-      this.groups.push(g);
+      assert(g.actions.length > 0, 'No action registered for group');
+      if (g.instructions.length >= 1) this.groups.push(g);
+      else this.interruptGroups.push(g);
     }
     return g;
+  }
+
+  private findEnvFuncForPinInterrupt(): number {
+    for (const func of this.wasm.importFuncs) {
+      if (func.fullName.includes('subscribe_interrupt')) return func.id;
+    }
+    this._logger.debug(`No subscribe env function found in the given module`);
+    return -1;
   }
 
   /*
@@ -67,12 +96,25 @@ export class WasmAnalysis {
    *
    */
   before<I extends WasmInstruction>(
-    instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
+    instr:
+      | I
+      | WasmAddress
+      | WasmOpcode
+      | WasmCode.MultipleOpcode
+      | WASMFunction,
     cb:
       | ((instr: I, args: ReadOnlyWasmValue[], vm: WasmitoBackendVM) => void)
+      | ((
+          instr: I,
+          args: ReadOnlyWasmValue[],
+          vm: WasmitoBackendVM,
+        ) => Promise<void>)
       | ((instr: I, args: ReadOnlyWasmValue[]) => void)
+      | ((instr: I, args: ReadOnlyWasmValue[]) => Promise<void>)
       | ((vm: WasmitoBackendVM) => void)
-      | (() => void),
+      | ((vm: WasmitoBackendVM) => Promise<void>)
+      | (() => void)
+      | (() => Promise<void>),
   ): GroupHooks | undefined {
     const mutate = false;
     return this.addGroup(
@@ -89,14 +131,25 @@ export class WasmAnalysis {
   }
 
   beforeMut<I extends WasmInstruction>(
-    instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
+    instr:
+      | I
+      | WasmAddress
+      | WasmOpcode
+      | WasmCode.MultipleOpcode
+      | WASMFunction,
     cb:
       | ((
           instr: I,
           args: WritableWasmValue[],
           vm: WasmitoBackendVM,
         ) => WritableWasmValue[])
-      | ((instr: I, args: WritableWasmValue[]) => WritableWasmValue[]),
+      | ((
+          instr: I,
+          args: WritableWasmValue[],
+          vm: WasmitoBackendVM,
+        ) => Promise<WritableWasmValue[]>)
+      | ((instr: I, args: WritableWasmValue[]) => WritableWasmValue[])
+      | ((instr: I, args: WritableWasmValue[]) => Promise<WritableWasmValue[]>),
   ): GroupHooks | undefined {
     const mutate = true;
     return this.addGroup(
@@ -113,16 +166,29 @@ export class WasmAnalysis {
   }
 
   after<I extends WasmInstruction>(
-    instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
+    instr:
+      | I
+      | WasmAddress
+      | WasmOpcode
+      | WasmCode.MultipleOpcode
+      | WASMFunction,
     cb:
       | ((
           instr: I,
           result: ReadOnlyWasmValue | undefined,
           vm: WasmitoBackendVM,
         ) => void)
+      | ((
+          instr: I,
+          result: ReadOnlyWasmValue | undefined,
+          vm: WasmitoBackendVM,
+        ) => Promise<void>)
       | ((instr: I, result: ReadOnlyWasmValue | undefined) => void)
+      | ((instr: I, result: ReadOnlyWasmValue | undefined) => Promise<void>)
       | ((vm: WasmitoBackendVM) => void)
-      | (() => void),
+      | ((vm: WasmitoBackendVM) => Promise<void>)
+      | (() => void)
+      | (() => Promise<void>),
   ): GroupHooks | undefined {
     const mutate = false;
     return this.addGroup(
@@ -139,7 +205,12 @@ export class WasmAnalysis {
   }
 
   afterMut<I extends WasmInstruction>(
-    instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
+    instr:
+      | I
+      | WasmAddress
+      | WasmOpcode
+      | WasmCode.MultipleOpcode
+      | WASMFunction,
     cb:
       | ((
           instr: I,
@@ -149,7 +220,16 @@ export class WasmAnalysis {
       | ((
           instr: I,
           result: WritableWasmValue | undefined,
-        ) => WritableWasmValue | undefined),
+          vm: WasmitoBackendVM,
+        ) => Promise<WritableWasmValue | undefined>)
+      | ((
+          instr: I,
+          result: WritableWasmValue | undefined,
+        ) => WritableWasmValue | undefined)
+      | ((
+          instr: I,
+          result: WritableWasmValue | undefined,
+        ) => Promise<WritableWasmValue | undefined>),
   ): GroupHooks | undefined {
     const mutate = true;
     return this.addGroup(
@@ -163,6 +243,10 @@ export class WasmAnalysis {
         mutate,
       ),
     );
+  }
+
+  async close() {
+    await this.vm.close();
   }
 
   onNewInterrupt(
@@ -270,6 +354,47 @@ export class WasmAnalysis {
     return gh;
   }
 
+  onPinInterruptHandlerUpdateMut(
+    cb:
+      | ((handlers: PinInterruptHandler[], vm: WasmitoBackendVM) => void)
+      | ((
+          handlers: PinInterruptHandler[],
+          vm: WasmitoBackendVM,
+        ) => Promise<void>),
+  ): boolean {
+    const calls = this.wasm.getCallInstructions(this.envFuncForPinInterrupt);
+    for (const call of calls)
+      this.afterMut(call, this.askInterruptHandlers(cb));
+    return calls.length > 0;
+  }
+
+  private askInterruptHandlers(
+    cb:
+      | ((handlers: PinInterruptHandler[], vm: WasmitoBackendVM) => void)
+      | ((
+          handlers: PinInterruptHandler[],
+          vm: WasmitoBackendVM,
+        ) => Promise<void>),
+  ) {
+    return async (
+      _c: CallInstruction,
+      _r: WritableWasmValue | undefined,
+      vm: WasmitoBackendVM,
+    ): Promise<WritableWasmValue | undefined> => {
+      const state = new StateRequest();
+      state.includeCallbackMappings();
+      state.includeTable();
+      const s = await vm.inspect(state);
+      const tbl = s.table;
+      assert(tbl !== undefined);
+      const handlers = s.callbackMappings.map((cbm) => {
+        return callbackMappingToPinInterruptHandler(this.wasm, tbl, cbm);
+      });
+      await cb(handlers, vm);
+      return _r;
+    };
+  }
+
   onNodeEntry(
     node: SourceCFGNode,
     cb: (
@@ -301,10 +426,11 @@ export class WasmAnalysis {
     // const reachableInstrs = node.incomingEdges.map(SourceCFGEdgeToInstruction);
     const reachableInstrs = [sourceNodeFirstInstruction(node)];
     assert(reachableInstrs.length > 0);
-    const g = new GroupHooks('before');
+    const moment = 'before';
+    const g = new GroupHooks(moment);
     for (const i of reachableInstrs) {
       const [actions, actionToSubscribe] = createActionsNode(i, cb.length);
-      const newCB = createCallbackNode(node, this.vm, this.wasm, i, cb);
+      const newCB = createCallbackNode(node, this.vm, this.wasm, i, moment, cb);
       actionToSubscribe.subscribe(newCB);
       g.addInstructionActions(i, actions);
     }
@@ -347,24 +473,54 @@ export class WasmAnalysis {
     throw new Error('TODO');
   }
 
-  private assertValidGroups(): GroupHooks[] {
+  private assertValidGroups(): [GroupHooks[], GroupHooks[]] {
     const gps = this.groups.filter((g) => !g.deployed);
-    assert(gps.length > 0, `No hooks registed to deploy`);
-    for (const g of gps) {
-      assert(g.actions.length > 0, 'No action registered for group');
-    }
-    return gps;
+    assert(
+      gps.length > 0 || this.interruptGroups.length > 0,
+      `No hooks registed to deploy`,
+    );
+    return [gps, this.interruptGroups];
   }
 
-  async deploy(timeoutMs?: number): Promise<void> {
-    const gps = this.assertValidGroups();
-    for (const g of gps) {
-      if (g.instructions.length > 0) {
-        await this.deployOnInstructions(g, timeoutMs);
-      } else {
-        await this.deployOnInterrupts(g, timeoutMs);
-      }
+  async deploy(): Promise<void>;
+  async deploy(timeoutMs: number): Promise<void>;
+  async deploy(deployInBulk: boolean): Promise<void>;
+  async deploy(deployInBulk: boolean, timeoutMs: number): Promise<void>;
+  async deploy(...args: any[]): Promise<void> {
+    this.onFinish(); // TODO find a way to put as last
+
+    let deployInBulk: boolean = true;
+    let timeoutMs: number | undefined = undefined;
+    switch (args.length) {
+      case 2:
+        deployInBulk = args[0];
+        timeoutMs = args[1];
+        break;
+      case 1:
+        if (typeof args[0] === 'boolean') {
+          deployInBulk = args[0];
+        } else if (typeof args[0] === 'number') {
+          timeoutMs = args[0];
+        }
+        break;
     }
+    const [gps, interruptGroups] = this.assertValidGroups();
+    await this.deployOnInstructions(gps, deployInBulk, timeoutMs);
+    await this.deployInterruptGroups(interruptGroups, timeoutMs);
+  }
+
+  private async deployInterruptGroups(
+    gps: GroupHooks[],
+    timeoutMs?: number,
+  ): Promise<void> {
+    // TODO bulk
+    for (let idx = 0; idx < gps.length; idx++) {
+      this._logger.debug(
+        `Deploying Interrupt Group #${idx + 1} out of #${gps.length}`,
+      );
+      await this.deployOnInterrupts(gps[idx], timeoutMs);
+    }
+    return;
   }
 
   async remove(): Promise<void> {}
@@ -395,30 +551,104 @@ export class WasmAnalysis {
     }
   }
 
-  private async deployOnInstructions(
-    g: GroupHooks,
-    timeoutMs?: number,
-  ): Promise<void> {
-    for (const i of g.instructions) {
-      for (const a of g.getInstructionActions(i)) {
-        const added = await this.vm.addHookOnAddr(
-          i.startAddress,
-          a,
-          g.internalInstructionMode,
-          timeoutMs,
-        );
-        if (!added) {
-          throw new Error(
-            `failed to register action '${a.description}' on instr '${i.name}' at address '${i.startAddress}'}`,
+  private createOnAddRequests(gps: GroupHooks[]): HookOnWasmAddrRequest[] {
+    const reqs: HookOnWasmAddrRequest[] = [];
+    for (const g of gps) {
+      for (const i of g.instructions) {
+        for (const h of g.getInstructionActions(i)) {
+          reqs.push(
+            new HookOnWasmAddrRequest(
+              i.startAddress,
+              g.internalInstructionMode,
+            ).addHook(h),
           );
         }
       }
     }
-    g.deployed = true;
+    return reqs;
   }
 
-  async run(timeoutMs?: number): Promise<void> {
-    await this.vm.run(timeoutMs);
+  private async deployOnInstructions(
+    g: GroupHooks | GroupHooks[],
+    inBulk: boolean,
+    timeoutPerRequestMs?: number,
+  ): Promise<void> {
+    const gps = g instanceof Array ? g : [g];
+    const reqs = this.createOnAddRequests(gps);
+    const responses = await this.vm.sendRequests(
+      reqs,
+      inBulk,
+      timeoutPerRequestMs,
+    );
+    for (let idx = 0; idx < responses.length; idx++) {
+      const response = responses[idx];
+      if (isErrorMessage(response)) {
+        const request = reqs[idx];
+        const msg = `Failed to register hook '${request.description()}' at address ${request.wasmAddr}. Reason: ${response.error_msg} (error code ${response.error_code}))`;
+        this._logger.error(msg);
+        throw new Error(msg);
+      }
+    }
+
+    gps.forEach((g) => (g.deployed = true));
+    return;
+  }
+
+  async run<T>(
+    onComplete:
+      | (() => Promise<T>)
+      | (() => T)
+      | ((vm: WasmitoBackendVM) => Promise<T>)
+      | ((vm: WasmitoBackendVM) => T),
+  ): Promise<T>;
+  async run<T>(
+    onComplete:
+      | (() => Promise<T>)
+      | (() => T)
+      | ((vm: WasmitoBackendVM) => Promise<T>)
+      | ((vm: WasmitoBackendVM) => T),
+    timeoutMs: number,
+  ): Promise<T>;
+  async run(timeoutMs: number): Promise<void>;
+  async run(): Promise<void>;
+  async run(...args: any[]): Promise<void> {
+    let timeoutMs: number | undefined;
+    // eslint-disable-next-line no-async-promise-executor
+    return new Promise(async (resolve) => {
+      switch (args.length) {
+        case 0:
+          break;
+        case 1:
+          if (typeof args[0] === 'number') {
+            timeoutMs = args[0];
+          } else if (typeof args[0] === 'function') {
+            this.userOnFinishCB = args[0];
+          } else {
+            throw new Error(`invalid arguments`);
+          }
+          break;
+        default:
+          if (typeof args[0] !== 'function' || typeof args[1] !== 'number') {
+            throw new Error(`invalid arguments`);
+          }
+          this.userOnFinishCB = args[0];
+          timeoutMs = args[1];
+          break;
+      }
+      this.analysisResolver = resolve;
+
+      await this.vm.run(timeoutMs);
+    });
+  }
+
+  private onFinish(): void {
+    const mainFunc = this.wasm.getMainFunction();
+    this.after(mainFunc, async (vm: WasmitoBackendVM) => {
+      let v = undefined;
+      if (this.userOnFinishCB !== undefined) v = await this.userOnFinishCB(vm);
+      await vm.close();
+      this.analysisResolver(v);
+    });
   }
 }
 
@@ -427,10 +657,7 @@ function createActionsNode(
   cbNrOfArgs: number,
 ): [Hook[], InspectStateHook] {
   const hooks: Hook[] = [];
-  const inspectAction = new InspectStateHook(
-    new StateRequest(),
-    instr.startAddress,
-  );
+  const inspectAction = new InspectStateHook(new StateRequest());
   inspectAction.includePC();
   switch (cbNrOfArgs) {
     case 0:
@@ -452,28 +679,18 @@ function createActionsNode(
   return [hooks, inspectAction];
 }
 
-//   cb: (
-//     n: SourceCFGNode,
-//     instr: WasmInstruction,
-//     args: ReadOnlyWasmValue[],
-//     vm: WasmitoBackendVM,
-//   ) => void,
-//   cb: (
-//     n: SourceCFGNode,
-//     instr: WasmInstruction,
-//     args: ReadOnlyWasmValue[],
-//   ) => void,
 function createCallbackNode(
   node: SourceCFGNode,
   vm: WasmitoBackendVM,
   mod: WasmModule,
   instr: WasmInstruction,
+  moment: InstrMoment,
   cb: (...args: any[]) => any,
 ): (s: WasmState) => void {
   switch (cb.length) {
     case 0:
     case 1:
-      return createCallbackNoArgs(vm, cb);
+      return createCallbackNoArgs(vm, instr, moment, cb);
     case 2:
       return callbackArgs(node, mod, instr, false, vm, cb);
     case 3:

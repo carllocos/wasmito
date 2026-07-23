@@ -218,7 +218,7 @@ export async function ArduinoClean(arduinoSketchDir: string): Promise<number> {
       if (code !== null) {
         const msg = `Arduino clean exited with code ${code}`;
         if (code === 0) {
-          arduinoLogger.info(msg);
+          arduinoLogger.debug(msg);
         } else {
           arduinoLogger.error(msg);
         }

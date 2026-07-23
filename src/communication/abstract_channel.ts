@@ -28,7 +28,7 @@ export abstract class AbstractChannel implements Channel {
   public abstract write(
     data: any,
     cb?: ((err?: Error | null | undefined) => void) | undefined,
-  ): boolean;
+  ): Promise<boolean>;
 
   addOnWriteListener(callback: (data: string | Uint8Array) => void): void {
     this.writeListeners.subscribe(callback, false);
@@ -85,7 +85,6 @@ export abstract class AbstractChannel implements Channel {
       if (line.length > 0 && line.charAt(line.length - 1) === '\r') {
         line = line.slice(0, line.length - 1);
       }
-      this.logger.debug(line);
       lines.push(line);
       idx = this.dataBuffered.indexOf('\n');
     }

@@ -3,9 +3,12 @@ import { encodeToHexLEB128 } from '../../../util/encoder';
 import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
-  ResponseType,
-  getResponseTypeFromString,
 } from '../../request_interface';
+import {
+  getResponseTypeFromString,
+  RequestMessage,
+  ResponseType,
+} from '../../request_msg';
 import { Instruction, getInstructionFromString } from './instructions';
 import { type Hook } from '../../../hooks/hook';
 
@@ -68,6 +71,8 @@ export function isAroundFunctionJSONResponse(
 }
 
 export class AroundFunctionRequest extends APIRequestNoSubscription<AroundHookResponse> {
+  readonly instruction = Instruction.AroundFunction;
+
   public readonly function_idx;
   public readonly hooks: Hook[];
   private _isAddRequest: boolean;
@@ -110,11 +115,15 @@ export class AroundFunctionRequest extends APIRequestNoSubscription<AroundHookRe
       const addRequest = '01';
       const encodedSchedule = this.hooks[0].schedule.serializeBinary();
       const encodedHook = this.hooks[0].serializeBinary();
-      return `${Instruction.AroundFunction}${encodedFidx}${addRequest}${encodedSchedule}${encodedHook}\n`;
+      return `${this.instruction}${this.serializeID()}${encodedFidx}${addRequest}${encodedSchedule}${encodedHook}\n`;
     } else {
       const removeReq = '00';
-      return `${Instruction.AroundFunction}${encodedFidx}${removeReq}\n`;
+      return `${this.instruction}${this.serializeID()}${encodedFidx}${removeReq}\n`;
     }
+  }
+
+  processAck(_ack: RequestMessage): AroundHookResponse {
+    throw new Error('Method not implemented.');
   }
 
   parse(input: string): AroundHookResponse {
