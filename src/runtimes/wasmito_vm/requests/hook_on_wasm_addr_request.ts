@@ -16,6 +16,7 @@ import {
   isSubscriptionMessage,
   RequestMessage,
 } from '../../request_msg';
+import assert from 'assert';
 
 export enum HookOnWasmAddrMoment {
   HookBefore = '01',
@@ -39,7 +40,7 @@ export class HookOnWasmAddrRequest extends APIRequest<RequestMessage> {
   readonly instruction = Instruction.HookOnWasmAddr;
   private readonly logger: Logger;
   public readonly wasmAddr;
-  public readonly hooks: Hook[];
+  private hook: Hook | undefined;
   private moment: HookOnWasmAddrMoment;
   protected isaddRequest: boolean; // true for add, false for remove;
   private subscriptionActive: boolean;
@@ -47,7 +48,6 @@ export class HookOnWasmAddrRequest extends APIRequest<RequestMessage> {
   constructor(wasmAddr: number, moment?: HookOnWasmAddrMoment) {
     super();
     this.wasmAddr = wasmAddr;
-    this.hooks = [];
     this.moment = moment ?? HookOnWasmAddrMoment.HookBefore;
     this.isaddRequest = true;
     this.logger = logger;
@@ -65,16 +65,17 @@ export class HookOnWasmAddrRequest extends APIRequest<RequestMessage> {
   }
 
   addHook(hook: Hook): HookOnWasmAddrRequest {
-    if (this.hooks.length === 0) {
-      this.hooks.push(hook);
+    if (this.hook === undefined) {
+      this.hook = hook;
     } else {
-      this.logger.debug('Todo support multiple hooks. For now just one hook');
+      const errMsg = `Cannot asisgn multiple hooks`;
+      this.logger.error(errMsg);
+      throw new Error(errMsg);
     }
     return this;
   }
-
   description(): string {
-    const hooksDescription = this.hooks.map((h) => h.description()).join(', ');
+    const hooksDescription = this.hook?.description() ?? '';
     if (this.isaddRequest) {
       return `HookOnWasmAddrRequest for ${this.wasmAddr} hooks: [${hooksDescription}]`;
     } else {
@@ -83,13 +84,14 @@ export class HookOnWasmAddrRequest extends APIRequest<RequestMessage> {
   }
 
   override getData(): string {
+    assert(this.hook !== undefined, 'hook was not assigned');
     const encodedAddr = encodeToHexLEB128(this.wasmAddr);
     let encodedSchedule = '';
     let encodedHook = '';
     let encodedAddOrRemoveOp = '00';
     if (this.isaddRequest) {
-      encodedSchedule = this.hooks[0].schedule.serializeBinary();
-      encodedHook = this.hooks[0].serializeBinary();
+      encodedSchedule = this.hook.schedule.serializeBinary();
+      encodedHook = this.hook.serializeBinary();
       encodedAddOrRemoveOp = '01';
     }
     return `${this.instruction}${this.serializeID()}${encodedAddr}${this.moment}${encodedAddOrRemoveOp}${encodedSchedule}${encodedHook}\n`;
@@ -116,7 +118,8 @@ export class HookOnWasmAddrRequest extends APIRequest<RequestMessage> {
       return SubscriptionParseOutcome.Failed;
     }
 
-    return await runHooksAndListeners(this.hooks, content.val, this.logger);
+    assert(this.hook !== undefined, 'hook was not assigned');
+    return await runHooksAndListeners([this.hook], content.val, this.logger);
   }
 
   override isSubscriptionClosed(): boolean {
