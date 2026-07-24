@@ -253,8 +253,8 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
     requests: Array<APIRequest<T>>,
     bulkRequests: boolean,
     timeout?: number,
-  ): Promise<Array<T>> {
-    return await this.requestManager.sendRequests(
+  ): Promise<void> {
+    await this.requestManager.sendRequests(
       this.channel,
       requests,
       bulkRequests,
