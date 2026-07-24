@@ -51,5 +51,6 @@ export async function sendRequest<T>(
   timeout?: number,
 ): Promise<T> {
   const m = new RequestsManager();
-  return m.sendRequest(channel, request, timeout);
+  const bulk = false;
+  return m.sendRequest(channel, request, bulk, timeout);
 }
