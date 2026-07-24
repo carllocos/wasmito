@@ -159,8 +159,8 @@ export class RequestsManager {
   async sendRequest<T>(
     connection: Channel,
     request: APIRequest<T>,
+    bulkRequests: boolean,
     timeoutMs: number | undefined = undefined, // TODO handle timeouts
-    bulkRequests: boolean = true,
   ): Promise<T> {
     const response = await this.sendRequests(
       connection,
