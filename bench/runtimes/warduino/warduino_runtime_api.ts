@@ -19,6 +19,7 @@ export class WARDuinoRuntimeAPI implements RuntimeDebugAPI {
 
   private bpListeners: Array<(bpAddr: number) => void>;
   private readonly removedListeners: Set<(bpAddr: number) => void>;
+  public bulkRequests: boolean;
 
   constructor(channel: Channel) {
     this.channel = channel;
@@ -27,6 +28,7 @@ export class WARDuinoRuntimeAPI implements RuntimeDebugAPI {
     this.removedListeners = new Set();
     this.bpListeners = [];
     this.breakpoints = new Set();
+    this.bulkRequests = true;
   }
 
   private listenForOnBPReach(data: string): void {
@@ -126,6 +128,11 @@ export class WARDuinoRuntimeAPI implements RuntimeDebugAPI {
     timeout?: number,
   ): Promise<T> {
     const command = new RequestsManager();
-    return command.sendRequest(this.channel, request, timeout);
+    return command.sendRequest(
+      this.channel,
+      request,
+      this.bulkRequests,
+      timeout,
+    );
   }
 }

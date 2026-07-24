@@ -29,6 +29,7 @@ export class WARDuinoRuntimeAPI implements RuntimeToolAPI {
 
   private bpListeners: Array<(bpAddr: number) => void>;
   private readonly removedListeners: Set<(bpAddr: number) => void>;
+  public bulkRequests: boolean;
 
   constructor(channel: Channel) {
     this.channel = channel;
@@ -37,6 +38,7 @@ export class WARDuinoRuntimeAPI implements RuntimeToolAPI {
     this.removedListeners = new Set();
     this.bpListeners = [];
     this.breakpoints = new Set();
+    this.bulkRequests = true;
   }
 
   private listenForOnBPReach(data: string): void {
@@ -147,7 +149,12 @@ export class WARDuinoRuntimeAPI implements RuntimeToolAPI {
     timeout?: number,
   ): Promise<T> {
     const command = new RequestsManager();
-    return command.sendRequest(this.channel, request, timeout);
+    return command.sendRequest(
+      this.channel,
+      request,
+      this.bulkRequests,
+      timeout,
+    );
   }
 
   pause(timeout?: number): Promise<void> {

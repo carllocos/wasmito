@@ -67,6 +67,8 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
 
   private requestManager: RequestsManager;
 
+  public bulkRequests: boolean;
+
   constructor(platform: Platform, communicationChannel: Channel) {
     this._platform = platform;
     this._channel = communicationChannel;
@@ -76,6 +78,7 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
     this._breakpointPolicy = new BreakpointDefaultPolicy(this);
     this._funcsProxied = new Map();
     this.requestManager = new RequestsManager();
+    this.bulkRequests = true;
   }
 
   get platform(): Platform {
@@ -239,13 +242,12 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
   public async sendRequest<T>(
     request: APIRequest<T>,
     timeout: number | undefined = undefined,
-    bulkRequests: boolean = true,
   ): Promise<T> {
     return await this.requestManager.sendRequest(
       this.channel,
       request,
+      this.bulkRequests,
       timeout,
-      bulkRequests,
     );
   }
 

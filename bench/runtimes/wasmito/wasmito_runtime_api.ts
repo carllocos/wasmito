@@ -27,6 +27,7 @@ export class WasmitoRuntimeDBGAPI implements RuntimeDebugAPI {
   private readonly hooksOfBreakpoints: Map<number, HookOnWasmAddrRequest[]>;
   private breakpointListeners: Array<(bpAddr: number) => void>;
   private readonly removedListeners: Set<(bpAddr: number) => void>;
+  public bulkRequests: boolean;
 
   constructor(channel: Channel) {
     this.channel = channel;
@@ -37,6 +38,7 @@ export class WasmitoRuntimeDBGAPI implements RuntimeDebugAPI {
 
     this.listenerActivated = false;
     this.hooksOfBreakpoints = new Map();
+    this.bulkRequests = true;
   }
 
   onBreakpoint(handler: (bpAdrr: number) => void): void {
@@ -117,10 +119,14 @@ export class WasmitoRuntimeDBGAPI implements RuntimeDebugAPI {
   private async sendRequest<T>(
     request: APIRequest<T>,
     timeout: number | undefined = undefined,
-    bulkRequests: boolean = true,
   ): Promise<T> {
     const command = new RequestsManager();
-    return command.sendRequest(this.channel, request, timeout, bulkRequests);
+    return command.sendRequest(
+      this.channel,
+      request,
+      this.bulkRequests,
+      timeout,
+    );
   }
 
   async addBreakpoint(addr: number, timeout?: number): Promise<boolean> {
