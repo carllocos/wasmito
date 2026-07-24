@@ -101,7 +101,12 @@ export class WasmModule {
       if (addr < f.startAddress || f.endAddress <= addr) {
         continue;
       }
-      return f.allInstructions.find((i) => i.startAddress === addr);
+      for (const i of f.allInstructions) {
+        // for instead of find to reduce memory
+        if (i.startAddress === addr) {
+          return i;
+        }
+      }
     }
 
     return undefined;
