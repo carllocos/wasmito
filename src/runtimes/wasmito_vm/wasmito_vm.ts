@@ -279,7 +279,7 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
 
   async resolveEvent(timeout?: number): Promise<void> {
     const request = new ResolveEventRequest();
-    await this.sendRequest<void>(request, timeout);
+    await this.sendRequest(request, timeout);
   }
 
   public async proxify(timeout?: number): Promise<void> {
