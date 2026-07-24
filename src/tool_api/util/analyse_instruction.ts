@@ -7,7 +7,7 @@ import {
 import { WasmModule } from '../../webassembly/wasm/wasm_module';
 import { WasmCode, WasmOpcode } from '../../webassembly/wasm/wasm_opcode';
 import { ReadOnlyWasmValue, WritableWasmValue } from '../interrupts';
-import { GroupHooks, InstrMoment } from '../group_hooks';
+import { InstrMoment } from '../group_hooks';
 import { WASM, WasmState } from '../../webassembly/wasm';
 import { assertFatalHookError, Hook } from '../../hooks/hook';
 import { InspectStateHook } from '../../hooks/hook_inspect_state';
@@ -15,6 +15,7 @@ import { StateRequest } from '../../runtimes/wasmito_vm/requests/inspect_request
 import { PauseVMHook } from '../../hooks/hook_run_pause';
 import { getGlobalLogger } from '../../logger/logger';
 import { WASMFunction } from '../../webassembly/wasm/wasm_function';
+import { HookOnWasmAddrRequest } from '../../runtimes/wasmito_vm/requests/hook_on_wasm_addr_request';
 
 const logger = getGlobalLogger();
 
@@ -52,6 +53,7 @@ export function getInstructions<I extends WasmInstruction>(
 }
 
 export function instruction<I extends WasmInstruction>(
+  reqs: HookOnWasmAddrRequest[],
   moment: 'before',
   instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode | WASMFunction,
   wasm: WasmModule,
@@ -71,8 +73,9 @@ export function instruction<I extends WasmInstruction>(
     | (() => void)
     | (() => Promise<void>),
   mutate: false,
-): GroupHooks | undefined;
+): number;
 export function instruction<I extends WasmInstruction>(
+  reqs: HookOnWasmAddrRequest[],
   moment: 'before',
   instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode | WASMFunction,
   wasm: WasmModule,
@@ -92,8 +95,9 @@ export function instruction<I extends WasmInstruction>(
     | ((instr: I, args: WritableWasmValue[]) => WritableWasmValue[])
     | ((instr: I, args: WritableWasmValue[]) => Promise<WritableWasmValue[]>),
   mutate: true,
-): GroupHooks | undefined;
+): number;
 export function instruction<I extends WasmInstruction>(
+  reqs: HookOnWasmAddrRequest[],
   moment: 'after',
   instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode | WASMFunction,
   wasm: WasmModule,
@@ -117,8 +121,9 @@ export function instruction<I extends WasmInstruction>(
     | (() => void)
     | (() => Promise<void>),
   mutate: false,
-): GroupHooks | undefined;
+): number;
 export function instruction<I extends WasmInstruction>(
+  reqs: HookOnWasmAddrRequest[],
   moment: 'after',
   instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode | WASMFunction,
   wasm: WasmModule,
@@ -144,8 +149,9 @@ export function instruction<I extends WasmInstruction>(
         result: WritableWasmValue | undefined,
       ) => Promise<WritableWasmValue | undefined>),
   mutate: true,
-): GroupHooks | undefined;
+): number;
 export function instruction<I extends WasmInstruction>(
+  reqs: HookOnWasmAddrRequest[],
   moment: InstrMoment,
   instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode | WASMFunction,
   wasm: WasmModule,
@@ -207,15 +213,15 @@ export function instruction<I extends WasmInstruction>(
     | (() => void)
     | (() => Promise<void>),
   mutate: boolean,
-): GroupHooks | undefined {
+): number {
   const instrs = getInstructions(wasm, instr, moment);
   if (instrs.length === 0) {
-    return undefined;
+    return 0;
   }
 
-  const g = new GroupHooks(moment);
+  const reqsSize = reqs.length;
   for (const i of instrs) {
-    const [actions, actionToSubscribe] = createActions(
+    const [hooks, actionToSubscribe] = createActions(
       moment,
       i,
       mutate,
@@ -231,9 +237,12 @@ export function instruction<I extends WasmInstruction>(
       cb,
     );
     actionToSubscribe.subscribe(newCB);
-    g.addInstructionActions(i, actions);
+    for (const h of hooks) {
+      // for loop to reduce memory use
+      reqs.push(new HookOnWasmAddrRequest(i.startAddress).addHook(h));
+    }
   }
-  return g;
+  return reqs.length - reqsSize;
 }
 
 function createCallback<I extends WasmInstruction>(
@@ -272,23 +281,31 @@ function createCallback<I extends WasmInstruction>(
   }
 }
 
-const actionsCache: Map<string, [Hook[], InspectStateHook]> = new Map();
+const actionsCache: Map<number, [Hook[], InspectStateHook]> = new Map();
 function makeActionsCacheKey(
   cbArgs: number,
   i: WasmInstruction,
   mutate: boolean,
   moment: InstrMoment,
-) {
-  if (cbArgs <= 1) return mutate ? '1' : '0';
+): number {
+  if (cbArgs <= 1) return mutate ? 1 : 0;
 
-  const mutateSign = mutate ? '-1' : '2';
+  const mutateSign = mutate ? -1 : 1;
+  let stack = 3;
   if (moment === 'before') {
-    return `${mutateSign} ${i.signature.nrArgs}`;
+    if (i.signature.nrArgs > 0) {
+      stack = 4;
+    }
   } else if (moment === 'after') {
-    return `${mutateSign} ${i.signature.nrResults}`;
+    if (i.signature.nrResults > 0) {
+      stack = 4;
+    }
   } else {
-    return `${mutateSign} ${i.signature.nrArgs} ${i.signature.nrResults}`;
+    if (i.signature.nrArgs > 0 || i.signature.nrResults > 0) {
+      stack = 4;
+    }
   }
+  return mutateSign * stack;
 }
 
 function createActions(
