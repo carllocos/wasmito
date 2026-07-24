@@ -407,6 +407,10 @@ function createCallbackWithArgs(
         newArgs instanceof Array,
         'new Args are expected to be an array',
       );
+      assertFatalHookError(
+        newArgs.filter((a) => isNaN(a.value)).length === 0,
+        `advice returned argument(s) that were the value is equal to NaN`,
+      );
       logger.debug(
         `new Values: [${newArgs.map((v) => `(${WASM.typeToString(v.type)}, ${v.value})`).join(', ')}]`,
       );
