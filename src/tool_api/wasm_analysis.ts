@@ -29,9 +29,9 @@ import { WasmState } from '../webassembly/wasm';
 import { assertFatalHookError, Hook } from '../hooks/hook';
 import { InspectStateHook } from '../hooks/hook_inspect_state';
 import { SourceMap } from '../source_mappers/source_map';
-import { HookOnWasmAddrRequest } from '../runtimes/wasmito_vm/requests/hook_on_wasm_addr_request';
 import { WASMFunction } from '../webassembly/wasm/wasm_function';
 import { isErrorMessage } from '../runtimes/request_msg';
+import { APIRequest, HookOnWasmAddrRequest } from '../runtimes';
 
 export interface AnalysisConfig {
   name: string;
@@ -41,7 +41,6 @@ export interface AnalysisConfig {
 export class WasmAnalysis {
   public readonly wasm: WasmModule;
   private vm: WasmitoBackendVM;
-  private groups: GroupHooks[];
   private interruptGroups: GroupHooks[];
   private _logger: Logger;
   private maxTimeoutMs: number;
@@ -50,6 +49,7 @@ export class WasmAnalysis {
   private envFuncForPinInterrupt: number;
   private analysisResolver: any;
   private userOnFinishCB: any;
+  private _requests: HookOnWasmAddrRequest[];
 
   constructor(
     wasm: WasmModule | SourceMap | LanguageAdaptor,
@@ -67,8 +67,8 @@ export class WasmAnalysis {
       this._sourceMap = wasm.sourceMap;
     }
     this.vm = vm;
-    this.groups = [];
     this.interruptGroups = [];
+    this._requests = [];
     this._logger = createLogger(config?.name ?? 'WasmAnalyse');
     this.maxTimeoutMs = config?.maxTimeoutMs ?? 30000;
     this.envFuncForPinInterrupt = this.findEnvFuncForPinInterrupt();
@@ -80,7 +80,9 @@ export class WasmAnalysis {
       if (g.instructions.length >= 1) this.groups.push(g);
       else this.interruptGroups.push(g);
     }
-    return g;
+
+  private addGroup(reqs: number): void {
+    assert(reqs > 0, 'No action registered for group');
   }
 
   private findEnvFuncForPinInterrupt(): number {
@@ -115,10 +117,11 @@ export class WasmAnalysis {
       | ((vm: WasmitoBackendVM) => Promise<void>)
       | (() => void)
       | (() => Promise<void>),
-  ): GroupHooks | undefined {
+  ): this {
     const mutate = false;
-    return this.addGroup(
+    this.addGroup(
       instruction<I>(
+        this._requests,
         'before',
         instr,
         this.wasm,
@@ -128,6 +131,7 @@ export class WasmAnalysis {
         mutate,
       ),
     );
+    return this;
   }
 
   beforeMut<I extends WasmInstruction>(
@@ -150,10 +154,11 @@ export class WasmAnalysis {
         ) => Promise<WritableWasmValue[]>)
       | ((instr: I, args: WritableWasmValue[]) => WritableWasmValue[])
       | ((instr: I, args: WritableWasmValue[]) => Promise<WritableWasmValue[]>),
-  ): GroupHooks | undefined {
+  ): this {
     const mutate = true;
-    return this.addGroup(
+    this.addGroup(
       instruction<I>(
+        this._requests,
         'before',
         instr,
         this.wasm,
@@ -163,6 +168,7 @@ export class WasmAnalysis {
         mutate,
       ),
     );
+    return this;
   }
 
   after<I extends WasmInstruction>(
@@ -189,10 +195,11 @@ export class WasmAnalysis {
       | ((vm: WasmitoBackendVM) => Promise<void>)
       | (() => void)
       | (() => Promise<void>),
-  ): GroupHooks | undefined {
+  ): this {
     const mutate = false;
-    return this.addGroup(
+    this.addGroup(
       instruction<I>(
+        this._requests,
         'after',
         instr,
         this.wasm,
@@ -202,6 +209,7 @@ export class WasmAnalysis {
         mutate,
       ),
     );
+    return this;
   }
 
   afterMut<I extends WasmInstruction>(
@@ -230,10 +238,11 @@ export class WasmAnalysis {
           instr: I,
           result: WritableWasmValue | undefined,
         ) => Promise<WritableWasmValue | undefined>),
-  ): GroupHooks | undefined {
+  ): this {
     const mutate = true;
-    return this.addGroup(
+    this.addGroup(
       instruction<I>(
+        this._requests,
         'after',
         instr,
         this.wasm,
@@ -243,6 +252,7 @@ export class WasmAnalysis {
         mutate,
       ),
     );
+    return this;
   }
 
   async close() {
@@ -473,15 +483,6 @@ export class WasmAnalysis {
     throw new Error('TODO');
   }
 
-  private assertValidGroups(): [GroupHooks[], GroupHooks[]] {
-    const gps = this.groups.filter((g) => !g.deployed);
-    assert(
-      gps.length > 0 || this.interruptGroups.length > 0,
-      `No hooks registed to deploy`,
-    );
-    return [gps, this.interruptGroups];
-  }
-
   async deploy(): Promise<void>;
   async deploy(timeoutMs: number): Promise<void>;
   async deploy(deployInBulk: boolean): Promise<void>;
@@ -504,9 +505,7 @@ export class WasmAnalysis {
         }
         break;
     }
-    const [gps, interruptGroups] = this.assertValidGroups();
-    await this.deployOnInstructions(gps, deployInBulk, timeoutMs);
-    await this.deployInterruptGroups(interruptGroups, timeoutMs);
+    await this.deployOnInstructions(this._requests, deployInBulk, timeoutMs);
   }
 
   private async deployInterruptGroups(
@@ -551,46 +550,20 @@ export class WasmAnalysis {
     }
   }
 
-  private createOnAddRequests(gps: GroupHooks[]): HookOnWasmAddrRequest[] {
-    const reqs: HookOnWasmAddrRequest[] = [];
-    for (const g of gps) {
-      for (const i of g.instructions) {
-        for (const h of g.getInstructionActions(i)) {
-          reqs.push(
-            new HookOnWasmAddrRequest(
-              i.startAddress,
-              g.internalInstructionMode,
-            ).addHook(h),
-          );
-        }
-      }
-    }
-    return reqs;
-  }
-
   private async deployOnInstructions(
-    g: GroupHooks | GroupHooks[],
+    reqs: APIRequest<any>[],
     inBulk: boolean,
     timeoutPerRequestMs?: number,
   ): Promise<void> {
-    const gps = g instanceof Array ? g : [g];
-    const reqs = this.createOnAddRequests(gps);
-    const responses = await this.vm.sendRequests(
-      reqs,
-      inBulk,
-      timeoutPerRequestMs,
-    );
-    for (let idx = 0; idx < responses.length; idx++) {
-      const response = responses[idx];
+    await this.vm.sendRequests(reqs, inBulk, timeoutPerRequestMs);
+    for (const req of reqs) {
+      const response = req.responseMessage;
       if (isErrorMessage(response)) {
-        const request = reqs[idx];
-        const msg = `Failed to register hook '${request.description()}' at address ${request.wasmAddr}. Reason: ${response.error_msg} (error code ${response.error_code}))`;
+        const msg = `Failed to register hook '${req.description()}'. Reason: ${response.error_msg} (error code ${response.error_code}))`;
         this._logger.error(msg);
         throw new Error(msg);
       }
     }
-
-    gps.forEach((g) => (g.deployed = true));
     return;
   }
 
