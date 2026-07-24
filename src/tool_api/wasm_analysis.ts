@@ -74,12 +74,12 @@ export class WasmAnalysis {
     this.envFuncForPinInterrupt = this.findEnvFuncForPinInterrupt();
   }
 
-  private addGroup(g: GroupHooks | undefined): GroupHooks | undefined {
-    if (g !== undefined) {
-      assert(g.actions.length > 0, 'No action registered for group');
-      if (g.instructions.length >= 1) this.groups.push(g);
-      else this.interruptGroups.push(g);
-    }
+  private addGroupInterrupt(
+    group: GroupHooks | undefined,
+    typeHook: string,
+  ): void {
+    assert(group !== undefined, `failed to hook upon '${typeHook}'`);
+  }
 
   private addGroup(reqs: number): void {
     assert(reqs > 0, 'No action registered for group');
@@ -264,20 +264,14 @@ export class WasmAnalysis {
       | ((ev: ReadOnlyInterrupt, vm: WasmitoBackendVM) => void)
       | ((ev: ReadOnlyInterrupt) => void)
       | (() => void),
-  ): GroupHooks {
+  ): this {
     const mutate = false;
-    const gh = this.addGroup(
-      interrupt(
-        this.vm,
-        this.maxTimeoutMs,
-        'onNewInterrupt',
-        mutate,
-        mutate,
-        cb,
-      ),
+    const groupType = 'onNewInterrupt';
+    this.addGroupInterrupt(
+      interrupt(this.vm, this.maxTimeoutMs, groupType, mutate, mutate, cb),
+      groupType,
     );
-    assert(gh !== undefined, 'failed to hook upon `onNewInterrupt`');
-    return gh;
+    return this;
   }
 
   onNewInterruptMut(
@@ -285,20 +279,14 @@ export class WasmAnalysis {
       | ((ev: WritableInterrupt, vm: WasmitoBackendVM) => WritableInterrupt)
       | ((ev: WritableInterrupt) => WritableInterrupt)
       | (() => void),
-  ): GroupHooks {
+  ): this {
     const mutate = true;
-    const gh = this.addGroup(
-      interrupt(
-        this.vm,
-        this.maxTimeoutMs,
-        'onNewInterrupt',
-        mutate,
-        mutate,
-        cb,
-      ),
+    const groupType = 'onNewInterrupt';
+    this.addGroupInterrupt(
+      interrupt(this.vm, this.maxTimeoutMs, groupType, mutate, mutate, cb),
+      groupType,
     );
-    assert(gh !== undefined, 'failed to hook upon `onNewInterruptMut`');
-    return gh;
+    return this;
   }
 
   beforeHandlingInterrupt(
@@ -306,20 +294,14 @@ export class WasmAnalysis {
       | ((ev: ReadOnlyInterrupt, vm: WasmitoBackendVM) => void)
       | ((ev: ReadOnlyInterrupt) => void)
       | (() => void),
-  ): GroupHooks {
+  ): this {
     const mutate = false;
-    const gh = this.addGroup(
-      interrupt(
-        this.vm,
-        this.maxTimeoutMs,
-        'beforeInterruptHandled',
-        mutate,
-        mutate,
-        cb,
-      ),
+    const groupType = 'beforeInterruptHandled';
+    this.addGroupInterrupt(
+      interrupt(this.vm, this.maxTimeoutMs, groupType, mutate, mutate, cb),
+      groupType,
     );
-    assert(gh !== undefined, 'failed to hook upon `beforeInterruptHandled`');
-    return gh;
+    return this;
   }
 
   beforeHandlingInterruptMut(
@@ -327,20 +309,14 @@ export class WasmAnalysis {
       | ((ev: WritableInterrupt, vm: WasmitoBackendVM) => WritableInterrupt)
       | ((ev: WritableInterrupt) => WritableInterrupt)
       | (() => void),
-  ): GroupHooks {
+  ): this {
     const mutate = true;
-    const gh = this.addGroup(
-      interrupt(
-        this.vm,
-        this.maxTimeoutMs,
-        'beforeInterruptHandled',
-        mutate,
-        mutate,
-        cb,
-      ),
+    const groupType = 'beforeInterruptHandled';
+    this.addGroupInterrupt(
+      interrupt(this.vm, this.maxTimeoutMs, groupType, mutate, mutate, cb),
+      groupType,
     );
-    assert(gh !== undefined, 'failed to hook upon `beforeInterruptHandledMut`');
-    return gh;
+    return this;
   }
 
   afterHandlingInterrupt(
@@ -348,20 +324,14 @@ export class WasmAnalysis {
       | ((ev: ReadOnlyInterrupt) => void)
       | ((ev: ReadOnlyInterrupt, vm: WasmitoBackendVM) => void)
       | (() => void),
-  ): GroupHooks {
+  ): this {
     const mutate = false;
-    const gh = this.addGroup(
-      interrupt(
-        this.vm,
-        this.maxTimeoutMs,
-        'afterHandlingInterrupt',
-        mutate,
-        mutate,
-        cb,
-      ),
+    const groupType = 'afterHandlingInterrupt';
+    this.addGroupInterrupt(
+      interrupt(this.vm, this.maxTimeoutMs, groupType, mutate, mutate, cb),
+      groupType,
     );
-    assert(gh !== undefined, 'failed to hook upon `afterHandlingInterrupt`');
-    return gh;
+    return this;
   }
 
   onPinInterruptHandlerUpdateMut(
@@ -444,9 +414,10 @@ export class WasmAnalysis {
       actionToSubscribe.subscribe(newCB);
       g.addInstructionActions(i, actions);
     }
-    const gh = this.addGroup(g);
-    assert(gh !== undefined, 'failed to hook upon `onNodeEntry`');
-    return gh;
+    throw new Error('TODO');
+    // const gh = this.addGroup(g);
+    // assert(gh !== undefined, 'failed to hook upon `onNodeEntry`');
+    // return gh;
   }
 
   onError(_cb: (...args: any[]) => any): GroupHooks {
@@ -506,6 +477,7 @@ export class WasmAnalysis {
         break;
     }
     await this.deployOnInstructions(this._requests, deployInBulk, timeoutMs);
+    // await this.deployInterruptGroups(interruptGroups, timeoutMs);
   }
 
   private async deployInterruptGroups(
