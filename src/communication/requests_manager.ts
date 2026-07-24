@@ -122,6 +122,11 @@ class SendRequest<T> {
       return SubscriptionParseOutcome.Failed;
     return await this.request.processSubscriptionData(data);
   }
+
+  setResolvers(resolve: any, reject: any) {
+    this.resolver = resolve;
+    this.rejector = reject;
+  }
 }
 
 export class RequestsManager {
@@ -237,10 +242,11 @@ export class RequestsManager {
         );
       }
 
+      const req = new SendRequest(request, this.requests);
       const p = new Promise<T>((resolve, reject) => {
-        const req = new SendRequest(request, this.requests, resolve, reject);
-        this.requests.set(request.id, req);
+        req.setResolvers(resolve, reject);
       });
+      this.requests.set(request.id, req);
       const successful = await connection.send(data);
       if (!successful) {
         throw new CommandError(
