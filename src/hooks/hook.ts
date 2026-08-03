@@ -24,8 +24,10 @@ export enum HookKind {
   EventAdd = '12',
 }
 
-export type SubscriptionHook<SubscriptionType> =
-  ISubscription<SubscriptionType>;
+export type SubscriptionHook<UnPasedSubData, ParsedType> = ISubscription<
+  UnPasedSubData,
+  ParsedType
+>;
 
 export abstract class Hook {
   public readonly kind: HookKind;
