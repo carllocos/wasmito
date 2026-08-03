@@ -1,7 +1,7 @@
 import { type WasmState } from '../webassembly';
 import { StateRequest } from '../runtimes/wasmito_vm/requests/inspect_request';
 import { PauseVMHook } from '../hooks/hook_run_pause';
-import { type Hook } from '../hooks/hook';
+import { SubscriptionContent, type Hook } from '../hooks/hook';
 import { InspectStateHook } from '../hooks/hook_inspect_state';
 import { createLogger, Logger } from '../logger/logger';
 import {
@@ -9,29 +9,42 @@ import {
   strictEqualSourceCodeLocations,
   type SourceCodeLocation,
 } from '../source_mappers/source_map';
-import { HookOnWasmAddrRequest } from '../runtimes/wasmito_vm/requests/hook_on_wasm_addr_request';
+import {
+  HookOnAddrSubContent,
+  HookOnWasmAddrRequest,
+} from '../runtimes/wasmito_vm/requests/hook_on_wasm_addr_request';
 import { ISubscription } from '../hooks/isubscribe';
 
 // TODO reimplement as extension to HookWithSub? Although this is bound to an address and should be extensible to support binding to events
-export class Breakpoint implements ISubscription<WasmState> {
+export class Breakpoint
+  implements
+    ISubscription<
+      SubscriptionContent<HookOnAddrSubContent, any>,
+      SubscriptionContent<HookOnAddrSubContent, WasmState>
+    >
+{
   protected logger: Logger;
 
   public readonly sourceCodeLocation: SourceCodeLocation;
   private _hooks: Hook[];
-  private readonly removedListeners: Set<(data: WasmState) => void>;
+  private readonly removedListeners: Set<
+    (data: SubscriptionContent<HookOnAddrSubContent, WasmState>) => void
+  >;
 
-  protected readonly fanOutToListeners: (state: WasmState) => void;
+  protected readonly fanOutToListeners: (
+    state: SubscriptionContent<HookOnAddrSubContent, WasmState>,
+  ) => Promise<void>;
 
-  private listeners: Array<(state: WasmState) => void>;
+  private listeners: Array<
+    (sub: SubscriptionContent<HookOnAddrSubContent, WasmState>) => void
+  >;
   constructor(
     sourceCodeLocation: SourceCodeLocation,
     stateOnBreakpoint?: StateRequest,
   ) {
     this.logger = createLogger('Breakpoint');
     this.sourceCodeLocation = sourceCodeLocation;
-    this.fanOutToListeners = (state: WasmState) => {
-      this.onSubscriptionData(state);
-    };
+    this.fanOutToListeners = this.onSubscriptionData.bind(this);
     this.removedListeners = new Set();
     this.listeners = [];
     this._hooks = this.createHooks(stateOnBreakpoint);
@@ -43,7 +56,8 @@ export class Breakpoint implements ISubscription<WasmState> {
 
   private createHooks(sttateOnBreakpoint?: StateRequest): Hook[] {
     const stateOnBreakpoint = sttateOnBreakpoint ?? this.createStateRequest();
-    const inspectStateHook = new InspectStateHook(stateOnBreakpoint);
+    const inspectStateHook: InspectStateHook<HookOnAddrSubContent> =
+      new InspectStateHook(stateOnBreakpoint);
 
     // careful:
     // do not use subscribe(this.onSubscriptionData.bind(this))
@@ -61,11 +75,17 @@ export class Breakpoint implements ISubscription<WasmState> {
       .includeEvents();
   }
 
-  parseSubscriptionData(_input: any): WasmState {
+  parseSubscriptionData(
+    _input: SubscriptionContent<HookOnAddrSubContent, any>,
+  ): SubscriptionContent<HookOnAddrSubContent, WasmState> {
     throw new Error('Method should not be called');
   }
 
-  public subscribe(callback: (data: WasmState) => void): void {
+  public subscribe(
+    callback: (
+      data: SubscriptionContent<HookOnAddrSubContent, WasmState>,
+    ) => void,
+  ): void {
     const found = this.listeners.find((cb) => cb === callback);
     if (found !== undefined) {
       this.logger.warn(`Attempting to add 2 same subscription callbacks`);
@@ -75,17 +95,23 @@ export class Breakpoint implements ISubscription<WasmState> {
     this.listeners.push(callback);
   }
 
-  public unSubscribe(callback: (data: WasmState) => void): void {
+  public unSubscribe(
+    callback: (
+      data: SubscriptionContent<HookOnAddrSubContent, WasmState>,
+    ) => void,
+  ): void {
     this.removedListeners.add(callback);
   }
 
-  onSubscriptionData(value: WasmState): void {
+  async onSubscriptionData(
+    value: SubscriptionContent<HookOnAddrSubContent, WasmState>,
+  ): Promise<void> {
     if (this.listeners.length === 0) {
       this.logger.warn('There is no listener for subscription content');
     }
-    this.listeners.forEach((listener) => {
+    this.listeners.forEach(async (listener) => {
       if (!this.removedListeners.has(listener)) {
-        listener(value);
+        await listener(value);
       }
     });
     this.listeners = this.listeners.filter((cb) => {
