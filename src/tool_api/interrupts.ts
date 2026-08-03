@@ -3,42 +3,60 @@ import { WASM } from '../webassembly/wasm';
 import { WASMFunction, WasmModule } from '../webassembly';
 
 export class WritableInterrupt {
-  private _ev: WASM.Event;
+  private _topic: string;
+  private _payload: string;
 
-  constructor(ev: WASM.Event) {
-    this._ev = ev;
+  constructor(topic: string, payload: string);
+  constructor(ev: WASM.Event);
+  constructor(...args: any[]) {
+    if (args.length === 2) {
+      this._topic = args[0];
+      this._payload = args[1];
+    } else {
+      this._topic = args[0].topic;
+      this._payload = args[0].payload;
+    }
   }
 
   get topic(): string {
-    return this._ev.topic;
+    return this._topic;
   }
 
   set topic(t: string) {
-    this._ev.topic = t;
+    this._topic = t;
   }
 
   get payload(): string {
-    return this._ev.payload;
+    return this._payload;
   }
 
   set payload(p: string) {
-    this._ev.payload = p;
+    this._payload = p;
   }
 }
 
 export class ReadOnlyInterrupt {
-  private _ev: WASM.Event;
+  private _topic: string;
+  private _payload: string;
 
-  constructor(ev: WASM.Event) {
-    this._ev = ev;
+  constructor(topic: string, payload: string);
+  constructor(ev: WASM.Event);
+  constructor(...args: any[]) {
+    if (args.length === 2) {
+      this._topic = args[0];
+      this._payload = args[1];
+    } else {
+      this._topic = args[0].topic;
+      this._payload = args[0].payload;
+    }
   }
 
   get topic(): string {
-    return this._ev.topic;
+    return this._topic;
   }
 
   get payload(): string {
-    return this._ev.payload;
+    return this._payload;
   }
 }
 
