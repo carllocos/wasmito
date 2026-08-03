@@ -5,6 +5,7 @@ import {
   HookKind,
   HookWithSubscription,
   HookWithoutSubscription,
+  SubscriptionContent,
 } from './hook';
 import { encodeEventAsBinary } from '../runtimes/wasmito_vm/requests/inject_event_request';
 
@@ -23,7 +24,10 @@ export class EventRemoveHook extends HookWithoutSubscription {
   }
 }
 
-export class EventInspectHook extends HookWithSubscription<WASM.Event> {
+export class EventInspectHook<HookMetaData> extends HookWithSubscription<
+  HookMetaData,
+  WASM.Event
+> {
   constructor() {
     super(HookKind.EventInspect);
     // this.parseSubscriptionData = this.deserializeSubscriptionMessage.bind(this);
@@ -38,7 +42,10 @@ export class EventInspectHook extends HookWithSubscription<WASM.Event> {
     return 'EventInspect';
   }
 
-  parseSubscriptionData(data: any): WASM.Event {
+  parseSubscriptionData(
+    msg: SubscriptionContent<HookMetaData, any>,
+  ): SubscriptionContent<HookMetaData, WASM.Event> {
+    const data = msg.sub;
     if (typeof data !== 'string') {
       throw new APIRequestInvalidParse(
         'no subscription reply for EventInspectHook',
@@ -57,7 +64,11 @@ export class EventInspectHook extends HookWithSubscription<WASM.Event> {
         'no subscription reply for EventInspectHook',
       );
     }
-    return ev;
+    return {
+      msg: msg.msg,
+      metadata: msg.metadata,
+      sub: ev,
+    };
   }
 }
 
