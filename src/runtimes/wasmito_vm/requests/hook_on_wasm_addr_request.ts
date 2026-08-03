@@ -13,8 +13,8 @@ import {
 import { Instruction } from './instructions';
 import {
   isRequestMessage,
-  isSubscriptionMessage,
   RequestMessage,
+  SubscribeResponse,
 } from '../../request_msg';
 import assert from 'assert';
 
@@ -117,16 +117,21 @@ export class HookOnWasmAddrRequest extends APIRequest<RequestMessage> {
   }
 
   async processSubscriptionData(
-    msg: RequestMessage,
+    msg: SubscribeResponse,
   ): Promise<SubscriptionParseOutcome> {
-    if (!isSubscriptionMessage(msg)) return SubscriptionParseOutcome.Failed;
-
     const content = parseSubContentMessage(this.moment, this.wasmAddr, msg.sub);
     if (content === undefined) {
       return SubscriptionParseOutcome.Failed;
     }
 
     assert(this._hook !== undefined, 'hook was not assigned');
+
+    const m = {
+      msg,
+      metadata: content,
+      sub: content.val,
+    };
+    return await runHooksAndListeners(m, [this._hook], this.logger);
   }
 
   override isSubscriptionClosed(): boolean {
@@ -149,10 +154,25 @@ export class RemoveHookOnWasmAddrRequest extends HookOnWasmAddrRequest {
   }
 }
 
-interface HookOnAddrSubContent {
+export interface HookOnAddrSubContent {
   moment: HookOnWasmAddrMoment;
   addr: number;
   val: any;
+}
+
+export function isHookOnAddrSubContent(
+  input: any,
+): input is HookOnAddrSubContent {
+  return (
+    typeof input === 'object' &&
+    input !== null &&
+    input.moment !== undefined &&
+    typeof input.moment === 'string' &&
+    getHookMomentFromString(input.moment) !== undefined &&
+    input.addr !== undefined &&
+    typeof input.addr === 'number' &&
+    input.val !== undefined
+  );
 }
 
 function parseSubContentMessage(
