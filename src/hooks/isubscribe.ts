@@ -12,7 +12,7 @@ export interface ISubscription<UnParsedSubData, SubscriptionType> {
       | ((value: SubscriptionType) => void)
       | ((value: SubscriptionType) => Promise<void>),
   ) => void;
-  readonly onSubscriptionData: (data: SubscriptionType) => void;
+  readonly onSubscriptionData: (data: SubscriptionType) => Promise<void>;
   readonly parseSubscriptionData: (input: UnParsedSubData) => SubscriptionType;
   readonly clearSubscriptions: () => void;
 }
@@ -59,7 +59,7 @@ export abstract class ASubscription<UnParsedSubData, SubscriptionType>
     this.removedListeners.add(callback);
   }
 
-  onSubscriptionData(value: SubscriptionType): void {
+  async onSubscriptionData(value: SubscriptionType): Promise<void> {
     if (this.listeners.length === 0 && this.oneTimeListeners.length === 0) {
       return;
     }
