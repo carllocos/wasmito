@@ -44,8 +44,11 @@ export class ReadOnlyInterrupt {
 
 export class ReadOnlyWasmValue {
   protected v: WASM.Value;
-  constructor(v: WASM.Value) {
+  private _stackIdx: number;
+
+  constructor(v: WASM.Value, stackIdx = -1) {
     this.v = v;
+    this._stackIdx = stackIdx;
   }
 
   get type(): WASM.Type {
@@ -54,6 +57,13 @@ export class ReadOnlyWasmValue {
 
   get value(): number {
     return this.v.value;
+  }
+
+  get stackIdx(): number {
+    if (this._stackIdx < 0) {
+      throw new Error(`No Stack Index set for ReadableWasmValue`);
+    }
+    return this._stackIdx;
   }
 }
 
