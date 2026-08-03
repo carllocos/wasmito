@@ -27,6 +27,7 @@ import {
   type ProxyCallResponse,
 } from './requests/fun_call_request';
 import {
+  HookOnEventContent,
   HookOnEventMoment,
   HookOnEventRequest,
 } from './requests/hook_on_event_request';
@@ -58,7 +59,7 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
   private _languageAdaptor?: LanguageAdaptor;
   protected abstract readonly ErrorClass: new (errorMsg: string) => Error;
 
-  protected readonly onNewEventHook: EventInspectHook;
+  protected readonly onNewEventHook: EventInspectHook<HookOnEventContent>;
   private onNewEventHookAdded: boolean;
   private _breakpointPolicy: BreakpointPolicy;
   private readonly _funcsProxied: Map<WASMFunction, AroundFunctionRequest>;
@@ -189,7 +190,7 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
     }
 
     if (this.onNewEventHookAdded) {
-      this.onNewEventHook.subscribe(cb);
+      this.onNewEventHook.subscribe((msg) => cb(msg.sub));
     }
     return this.onNewEventHookAdded;
   }
