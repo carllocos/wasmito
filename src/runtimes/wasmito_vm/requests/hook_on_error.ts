@@ -1,4 +1,8 @@
-import { runHooksAndListeners, type Hook } from '../../../hooks/hook';
+import {
+  runHooksAndListeners,
+  SubscriptionContent,
+  type Hook,
+} from '../../../hooks/hook';
 import { createLogger } from '../../../logger/logger';
 import { isHexaString } from '../../../util/decoder';
 import { Instruction } from './instructions';
@@ -9,12 +13,16 @@ import {
 } from '../../request_interface';
 import {
   isRequestMessage,
-  isSubscriptionMessage,
   RequestMessage,
   ResponseType,
+  SubscribeResponse,
 } from '../../request_msg';
 
 const logger = createLogger('HookOnError');
+
+export interface HookOnErrorSubContent {
+  instruction: Instruction.HookOnError;
+}
 
 export class HookOnErrorSubsriptionMessage {
   public readonly subsriptionData: any;
@@ -104,13 +112,14 @@ export class HookOnError extends APIRequest<RequestMessage> {
   }
 
   async processSubscriptionData(
-    sub: RequestMessage,
+    sub: SubscribeResponse,
   ): Promise<SubscriptionParseOutcome> {
-    if (isSubscriptionMessage(sub, this.instruction)) {
-      return await runHooksAndListeners(this.hooks, sub.sub, logger);
-    }
-
-    return SubscriptionParseOutcome.Failed;
+    const msg: SubscriptionContent<HookOnErrorSubContent, any> = {
+      msg: sub,
+      metadata: { instruction: Instruction.HookOnError },
+      sub: sub.sub,
+    };
+    return await runHooksAndListeners(msg, this.hooks, logger);
   }
 
   override isSubscriptionClosed(): boolean {
