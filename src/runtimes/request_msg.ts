@@ -108,7 +108,7 @@ export function isErrorMessage(
 export function isSubscriptionMessage(
   msg: any,
   instruction?: Instruction,
-): msg is RequestMessage {
+): msg is SubscribeResponse {
   return (
     isRequestMessage(msg, instruction) &&
     msg.responseType === ResponseType.SubscriptionResponse &&
