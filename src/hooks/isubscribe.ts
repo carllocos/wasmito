@@ -1,6 +1,6 @@
 import { Logger } from '../logger/logger';
 
-export interface ISubscription<SubscriptionType> {
+export interface ISubscription<UnParsedSubData, SubscriptionType> {
   readonly subscribe: (
     callback:
       | ((value: SubscriptionType) => void)
@@ -13,12 +13,12 @@ export interface ISubscription<SubscriptionType> {
       | ((value: SubscriptionType) => Promise<void>),
   ) => void;
   readonly onSubscriptionData: (data: SubscriptionType) => void;
-  readonly parseSubscriptionData: (input: any) => SubscriptionType;
+  readonly parseSubscriptionData: (input: UnParsedSubData) => SubscriptionType;
   readonly clearSubscriptions: () => void;
 }
 
-export abstract class ASubscription<SubscriptionType>
-  implements ISubscription<SubscriptionType>
+export abstract class ASubscription<UnParsedSubData, SubscriptionType>
+  implements ISubscription<UnParsedSubData, SubscriptionType>
 {
   private listeners: Array<
     | ((data: SubscriptionType) => void)
@@ -83,13 +83,14 @@ export abstract class ASubscription<SubscriptionType>
     this.oneTimeListeners.length = 0;
     this.listeners.length = 0;
   }
-  abstract parseSubscriptionData(input: any): SubscriptionType;
+  abstract parseSubscriptionData(data: UnParsedSubData): SubscriptionType;
 }
 
-export class Subscription<
-  SubscriptionType,
-> extends ASubscription<SubscriptionType> {
-  private parse: (input: any) => SubscriptionType;
+export class Subscription<UnParsedData, SubscriptionType> extends ASubscription<
+  UnParsedData,
+  SubscriptionType
+> {
+  private parse: (input: UnParsedData) => SubscriptionType;
 
   constructor(
     parseSubscriptionData: (input: any) => SubscriptionType,
@@ -99,7 +100,7 @@ export class Subscription<
     this.parse = parseSubscriptionData;
   }
 
-  override parseSubscriptionData(input: any): SubscriptionType {
-    return this.parse(input);
+  override parseSubscriptionData(data: UnParsedData): SubscriptionType {
+    return this.parse(data);
   }
 }
