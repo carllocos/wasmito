@@ -80,7 +80,6 @@ export class RequestsManager {
     end: number,
     _timeoutMs?: number,
   ): Promise<void> {
-    this._waitingForAcksBulk.clear(); // TODO do we need?
     let data = '';
     for (let idx = start; idx < end && idx < requests.length; idx++) {
       const request = requests[idx];
