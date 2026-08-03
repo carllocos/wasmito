@@ -34,67 +34,67 @@ export class InspectStateHook
     return this.stateToInspect.parse(input);
   }
 
-  includePC(): InspectStateHook {
+  includePC(): this {
     this._stateToInspect.includePC();
     return this;
   }
 
-  includeStack(): InspectStateHook {
+  includeStack(): this {
     this._stateToInspect.includeStack();
     return this;
   }
 
-  includeCallstack(): InspectStateHook {
+  includeCallstack(): this {
     this._stateToInspect.includeCallstack();
     return this;
   }
 
-  includeGlobals(): InspectStateHook {
+  includeGlobals(): this {
     this._stateToInspect.includeGlobals();
     return this;
   }
 
-  includeMemory(): InspectStateHook {
+  includeMemory(): this {
     this._stateToInspect.includeMemory();
     return this;
   }
 
-  includeTable(): InspectStateHook {
+  includeTable(): this {
     this._stateToInspect.includeTable();
     return this;
   }
 
-  includeBranchingTable(): InspectStateHook {
+  includeBranchingTable(): this {
     this._stateToInspect.includeBranchingTable();
     return this;
   }
 
-  includeBreakpoints(): InspectStateHook {
+  includeBreakpoints(): this {
     this._stateToInspect.includeBreakpoints();
     return this;
   }
 
-  includeCallbackMappings(): InspectStateHook {
+  includeCallbackMappings(): this {
     this._stateToInspect.includeCallbackMappings();
     return this;
   }
 
-  includeEvents(): InspectStateHook {
+  includeEvents(): this {
     this._stateToInspect.includeEvents();
     return this;
   }
 
-  includeException(): InspectStateHook {
+  includeException(): this {
     this._stateToInspect.includeException();
     return this;
   }
 
-  includeLogicalClock(): InspectStateHook {
+  includeLogicalClock(): this {
     this._stateToInspect.includeLogicalClock();
     return this;
   }
 
-  includeHeapFree(): InspectStateHook {
+  includeHeapFree(): this {
     this._stateToInspect.includeHeapFree();
     return this;
   }
