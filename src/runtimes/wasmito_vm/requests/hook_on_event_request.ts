@@ -1,4 +1,8 @@
-import { runHooksAndListeners, type Hook } from '../../../hooks/hook';
+import {
+  runHooksAndListeners,
+  SubscriptionContent,
+  type Hook,
+} from '../../../hooks/hook';
 import { createLogger } from '../../../logger/logger';
 import { Instruction } from './instructions';
 import {
@@ -8,8 +12,8 @@ import {
 } from '../../request_interface';
 import {
   isRequestMessage,
-  isSubscriptionMessage,
   RequestMessage,
+  SubscribeResponse,
 } from '../../request_msg';
 
 const logger = createLogger('HookOnEventRequest');
@@ -28,6 +32,10 @@ export function getHookOnEventMomentFromString(
     return str as HookOnEventMoment;
   }
   return undefined;
+}
+
+export interface HookOnEventContent {
+  moment: HookOnEventMoment;
 }
 
 export class HookOnEventRequest extends APIRequest<RequestMessage> {
@@ -82,12 +90,16 @@ export class HookOnEventRequest extends APIRequest<RequestMessage> {
   }
 
   override async processSubscriptionData(
-    msg: RequestMessage,
+    msg: SubscribeResponse,
   ): Promise<SubscriptionParseOutcome> {
-    if (!isSubscriptionMessage(msg, this.instruction)) {
-      return SubscriptionParseOutcome.Failed;
-    }
-    return await runHooksAndListeners(this.hooks, msg.sub, logger);
+    const m: SubscriptionContent<HookOnEventContent, any> = {
+      msg,
+      metadata: {
+        moment: this.hookMoment,
+      },
+      sub: msg.sub,
+    };
+    return await runHooksAndListeners(m, this.hooks, logger);
   }
 
   public addHook(hook: Hook): this {
