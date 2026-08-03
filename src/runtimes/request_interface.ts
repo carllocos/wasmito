@@ -5,7 +5,11 @@ import {
   RequestsManager,
 } from '../communication/requests_manager';
 import { createLogger } from '../logger/logger';
-import { RequestMessage } from './request_msg';
+import {
+  isSubscriptionMessage,
+  RequestMessage,
+  SubscribeResponse,
+} from './request_msg';
 import { type Instruction } from './wasmito_vm/requests/instructions';
 
 const logger = createLogger('RequestManager');
@@ -104,9 +108,12 @@ export abstract class APIRequest<R> {
     if (this._rejected) return SubscriptionParseOutcome.Failed;
 
     if (this._resolved) {
-      // case we may feed data to a subscription
-      // if(this.isSubscriptionClosed()){}
-      return await this.processSubscriptionData(msg);
+      if (isSubscriptionMessage(msg)) {
+        // case we may feed data to a subscription
+        // if(this.isSubscriptionClosed()){}
+        return await this.processSubscriptionData(msg);
+      }
+      return SubscriptionParseOutcome.Failed;
     } else {
       return this.processRequestAck(msg);
     }
@@ -148,7 +155,7 @@ export abstract class APIRequestNoSubscription<R> extends APIRequest<R> {
   }
 
   override async processSubscriptionData(
-    _sub: RequestMessage,
+    _sub: SubscribeResponse,
   ): Promise<SubscriptionParseOutcome> {
     throw new Error(
       `No subscription supported in request '${this.description()}'`,
