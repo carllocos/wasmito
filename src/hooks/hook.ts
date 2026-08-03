@@ -10,6 +10,7 @@ import { type LogicalClock } from './logicalclock';
 import { createLogger, Logger } from '../logger/logger';
 import { ISubscription, Subscription } from './isubscribe';
 import { SubscriptionParseOutcome } from '../runtimes/request_interface';
+import { SubscribeResponse } from '../runtimes/request_msg';
 
 export enum HookKind {
   RemoteCall = '01',
@@ -161,9 +162,9 @@ export function assertFatalHookError(
   }
 }
 
-export async function parseHookContentAndRunListeners(
+export async function parseHookContentAndRunListeners<M>(
+  msg: SubscriptionContent<M, any>,
   hooks: Hook[],
-  content: any,
   _logger?: Logger,
 ): Promise<boolean> {
   let oneSuccessfulParse = false;
@@ -174,7 +175,7 @@ export async function parseHookContentAndRunListeners(
       let successfulParse = false;
       oneSuccessfulParse = successfulParse || oneSuccessfulParse;
       try {
-        parsed = hook.parseSubscriptionData(content);
+        parsed = hook.parseSubscriptionData(msg);
         successfulParse = true;
       } catch (_e) {
         // empty
@@ -190,15 +191,15 @@ export async function parseHookContentAndRunListeners(
   return oneSuccessfulParse;
 }
 
-export async function runHooksAndListeners(
+export async function runHooksAndListeners<M>(
+  msg: SubscriptionContent<M, any>,
   hooks: Hook[],
-  content: any,
   logger?: Logger,
 ): Promise<SubscriptionParseOutcome> {
   try {
     const successFulParse = await parseHookContentAndRunListeners(
+      msg,
       hooks,
-      content,
       logger,
     );
     return successFulParse
