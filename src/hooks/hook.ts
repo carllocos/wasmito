@@ -70,14 +70,27 @@ export abstract class Hook {
   abstract serializeBinary(): string;
 }
 
+export interface SubscriptionContent<M, S> {
+  msg: SubscribeResponse;
+  metadata: M;
+  sub: S;
+}
+
 export abstract class HookWithoutSubscription extends Hook {}
 
 const hookLogger = createLogger('SubscriptionHook');
-export abstract class HookWithSubscription<SubscriptionType>
+export abstract class HookWithSubscription<HookMetaData, SubscriptionType>
   extends Hook
-  implements SubscriptionHook<SubscriptionType>
+  implements
+    SubscriptionHook<
+      SubscriptionContent<HookMetaData, any>,
+      SubscriptionContent<HookMetaData, SubscriptionType>
+    >
 {
-  private subscriptions: Subscription<SubscriptionType>;
+  private subscriptions: Subscription<
+    SubscribeResponse,
+    SubscriptionContent<HookMetaData, SubscriptionType>
+  >;
   protected logger: Logger;
 
   constructor(kind: HookKind, logger?: Logger) {
@@ -91,8 +104,10 @@ export abstract class HookWithSubscription<SubscriptionType>
 
   public subscribe(
     callback:
-      | ((data: SubscriptionType) => void)
-      | ((data: SubscriptionType) => Promise<void>),
+      | ((data: SubscriptionContent<HookMetaData, SubscriptionType>) => void)
+      | ((
+          data: SubscriptionContent<HookMetaData, SubscriptionType>,
+        ) => Promise<void>),
     oneTimeSubscription: boolean = false,
   ): void {
     this.subscriptions.subscribe(callback, oneTimeSubscription);
@@ -100,26 +115,32 @@ export abstract class HookWithSubscription<SubscriptionType>
 
   public unSubscribe(
     callback:
-      | ((data: SubscriptionType) => void)
-      | ((data: SubscriptionType) => Promise<void>),
+      | ((data: SubscriptionContent<HookMetaData, SubscriptionType>) => void)
+      | ((
+          data: SubscriptionContent<HookMetaData, SubscriptionType>,
+        ) => Promise<void>),
   ): void {
     this.subscriptions.unSubscribe(callback);
   }
 
-  onSubscriptionData(value: SubscriptionType): void {
-    this.subscriptions.onSubscriptionData(value);
+  async onSubscriptionData(
+    value: SubscriptionContent<HookMetaData, SubscriptionType>,
+  ): Promise<void> {
+    await this.subscriptions.onSubscriptionData(value);
   }
 
   clearSubscriptions(): void {
     this.subscriptions.clearSubscriptions();
   }
 
-  abstract parseSubscriptionData(input: any): SubscriptionType;
+  abstract parseSubscriptionData(
+    data: SubscriptionContent<HookMetaData, any>,
+  ): SubscriptionContent<HookMetaData, SubscriptionType>;
 }
 
-export function isHookWithSubscription<SubscriptionType>(
+export function isHookWithSubscription<HookMetada, SubscriptionType>(
   h: Hook,
-): h is HookWithSubscription<SubscriptionType> {
+): h is HookWithSubscription<HookMetada, SubscriptionType> {
   return h instanceof HookWithSubscription;
 }
 
