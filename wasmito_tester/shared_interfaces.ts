@@ -51,7 +51,7 @@ export function isDelayedAction<ResultType>(
 
 export interface SubscribeAction<
   ResultType,
-  _Hook extends HookWithSubscription<ResultType>,
+  _Hook extends HookWithSubscription<any, ResultType>,
 > {
   description: string;
   timeout?: number;
@@ -62,7 +62,7 @@ export interface SubscribeAction<
 
 export function isActionThatSubscribesTo<
   ResultType,
-  HookType extends HookWithSubscription<ResultType>,
+  HookType extends HookWithSubscription<any, ResultType>,
 >(obj: any): obj is SubscribeAction<ResultType, HookType> {
   return (
     typeof obj === 'object' &&
@@ -77,14 +77,14 @@ export function isActionThatSubscribesTo<
 export type SubActReturn<
   ActionResultType,
   SubscriptionType,
-  HookType extends HookWithSubscription<SubscriptionType>,
+  HookType extends HookWithSubscription<any, SubscriptionType>,
 > = [ActionResultType, HookType];
 
 // Is an action that can generate periodically content and other actions can subscribe to
 export interface SubscriptionEmitterAction<
   ActionResultType,
   SubscriptionType,
-  HookType extends HookWithSubscription<SubscriptionType>,
+  HookType extends HookWithSubscription<any, SubscriptionType>,
 > {
   subscriptionID: string;
   description: string;
@@ -109,7 +109,7 @@ export interface SubscriptionEmitterAction<
 export function isSubscriptionEmitterAction<
   ActionResultType,
   SubscriptionType,
-  HookType extends HookWithSubscription<SubscriptionType>,
+  HookType extends HookWithSubscription<any, SubscriptionType>,
 >(
   obj: any,
 ): obj is SubscriptionEmitterAction<
@@ -129,7 +129,7 @@ export function isSubscriptionEmitterAction<
   );
 }
 
-export type Act<V, Y, Z extends HookWithSubscription<Y>> =
+export type Act<V, Y, Z extends HookWithSubscription<any, Y>> =
   | Action<V>
   | SubscriptionEmitterAction<V, Y, Z>
   | SubscribeAction<Y, Z>;

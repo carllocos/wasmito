@@ -5,6 +5,7 @@ import { PlaceholderType } from '../../src/webassembly/wasm/opcode_type';
 import { getGlobalLogger } from '../../src/logger/logger';
 import path from 'path';
 import { SourceCFGNode } from '../../src/cfg/source_cfg_node_edge';
+import { SubscriptionContent } from '../../src/hooks/hook';
 
 class WriteCSV {
   private readonly maxBuffer: number;
@@ -146,9 +147,12 @@ export class StoreTrace {
     this.writer.close();
   }
 
-  write(n: SourceCFGNode): (state: WasmState) => void {
+  write(
+    n: SourceCFGNode,
+  ): (sub: SubscriptionContent<any, WasmState>) => Promise<void> {
     this.addBefore(n.sourceLocation.address, n.instructions[0]);
-    const w = (state: WasmState) => {
+    const w = async (msg: SubscriptionContent<any, WasmState>) => {
+      const state = msg.sub;
       this.writeBefore(n, state);
     };
     w.bind(this);

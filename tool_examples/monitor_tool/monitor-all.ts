@@ -9,11 +9,16 @@ import { sourceCodeLocationToString } from '../../src/source_mappers/source_map'
 import { WasmitoBackendVM } from '../../src/runtimes/wasmito_vm/wasmito_vm';
 import { CFGTOOLOperations } from '../../src/tool_api/cfg_tool_api';
 import { SourceCFGs } from '../../src/cfg/source_cfg';
-import { LexicalScopeRequest } from '../../src/source_mappers/state_mappings';
+import {
+  LexicalScope,
+  LexicalScopeRequest,
+} from '../../src/source_mappers/state_mappings';
 import { MCUWasmitoVM } from '../../src/runtimes/wasmito_vm/mcu_vm';
 import { BoardBaudRate } from '../../src/util/serial_port';
 import { exit } from 'process';
 import { LanguageAdaptor } from '../../src/language_adaptors/language_adaptor';
+import { SubscriptionContent } from '../../src/hooks/hook';
+import { HookOnAddrSubContent } from '../../src/runtimes/wasmito_vm/requests/hook_on_wasm_addr_request';
 
 export async function warduinoOnMCU(
   languageAdaptor: LanguageAdaptor,
@@ -50,10 +55,13 @@ export async function monitorAllNodes(
   for (const node of scfgs.allNodes()) {
     const state = new LexicalScopeRequest(scfgs.sourceMap);
     state.includeSourceLocation();
-    state.subscribe((lexicalScope) => {
-      const loc = lexicalScope.sourceLocation;
-      console.log(`Reached (${loc.source}, ${loc.linenr}, ${loc.colnr})`);
-    });
+    state.subscribe(
+      (msg: SubscriptionContent<HookOnAddrSubContent, LexicalScope>) => {
+        const lexicalScope = msg.sub;
+        const loc = lexicalScope.sourceLocation;
+        console.log(`Reached (${loc.source}, ${loc.linenr}, ${loc.colnr})`);
+      },
+    );
 
     const secsToWaitUntilResponse = 10000;
     const s = await CFGTOOLOperations.onNodeEntry(

@@ -19,7 +19,7 @@ import {
   type DeviceID,
 } from './shared_interfaces';
 import { type WasmitoBackendVM } from '../src/runtimes';
-import { HookWithSubscription } from '../src/hooks/hook';
+import { HookWithSubscription, SubscriptionContent } from '../src/hooks/hook';
 
 type DelayResolver = (value: boolean | PromiseLike<boolean>) => void;
 
@@ -218,7 +218,7 @@ export class SystemTester {
     this.logger.info(`run test scenario ${scenario.testName}`);
     this.assertVMOfDeviceIDExists(targetDeviceID);
     const vm = this.systemDeployer.deviceVM(targetDeviceID);
-    const actionHooksMap = new Map<string, HookWithSubscription<any>>();
+    const actionHooksMap = new Map<string, HookWithSubscription<any, any>>();
 
     console.debug(`'${scenario.testName}'`);
     const doExpects = await this.runActions(
@@ -251,7 +251,7 @@ export class SystemTester {
     scenarioName: string,
     actions: Array<Act<any, any, any>>,
     actionRunResults: ActionRunResult[],
-    hookMap: Map<string, HookWithSubscription<any>>,
+    hookMap: Map<string, HookWithSubscription<any, any>>,
     logPrefix: string = 'Action',
   ): Promise<boolean> {
     for (let i = 0; i < actions.length; i++) {
@@ -345,11 +345,11 @@ export class SystemTester {
   private async runActionToEmitSubscriptionValues<
     R,
     H,
-    S extends HookWithSubscription<H>,
+    S extends HookWithSubscription<any, H>,
   >(
     vm: WasmitoBackendVM,
     action: SubscriptionEmitterAction<R, H, S>,
-    hookMap: Map<string, HookWithSubscription<any>>,
+    hookMap: Map<string, HookWithSubscription<any, any>>,
     logPrefix: string,
     actionIndex: number,
   ): Promise<[R, boolean]> {
@@ -381,7 +381,7 @@ export class SystemTester {
     scenarioName: string,
     expects: Array<Act<any, any, any>>,
     expectsResults: ActionRunResult[],
-    hookMap: Map<string, HookWithSubscription<any>>,
+    hookMap: Map<string, HookWithSubscription<any, any>>,
   ): Promise<boolean> {
     const logPrefix = 'Expect';
     return await this.runActions(
@@ -413,10 +413,10 @@ export class SystemTester {
   private async runActionThatSubscribesTo<
     T,
     H,
-    S extends HookWithSubscription<H>,
+    S extends HookWithSubscription<any, H>,
   >(
     action: SubscribeAction<H, S>,
-    hookMap: Map<string, HookWithSubscription<any>>,
+    hookMap: Map<string, HookWithSubscription<any, any>>,
     logPrefix: string,
     actionIdx: number,
   ): Promise<[T, boolean]> {
@@ -541,7 +541,7 @@ export class SystemTester {
 
   private async subscribeToHook<T>(
     action: SubscribeAction<any, any>,
-    hook: HookWithSubscription<any>,
+    hook: HookWithSubscription<any, any>,
     logPrefix: string,
     actionIdx: number,
   ): Promise<[T, boolean]> {
@@ -549,14 +549,14 @@ export class SystemTester {
       `${logPrefix} #${actionIdx}: subscribe to '${action.subscribeToID}'`,
     );
     const p = new Promise<[T, boolean]>((resolve, reject) => {
-      const cb = (r: T): void => {
+      const cb = (sub: SubscriptionContent<any, T>): void => {
         action
-          .checkSubscription(r)
+          .checkSubscription(sub.sub)
           .then((v: boolean) => {
             if (cb !== undefined) {
               hook.unSubscribe(cb);
             }
-            resolve([r, v]);
+            resolve([sub.sub, v]);
           })
           .catch((err) => {
             if (cb !== undefined) {
