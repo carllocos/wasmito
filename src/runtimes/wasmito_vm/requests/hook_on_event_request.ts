@@ -90,7 +90,7 @@ export class HookOnEventRequest extends APIRequest<RequestMessage> {
     return await runHooksAndListeners(this.hooks, msg.sub, logger);
   }
 
-  public addHook(hook: Hook): HookOnEventRequest {
+  public addHook(hook: Hook): this {
     this.hooks.push(hook);
     return this;
   }
