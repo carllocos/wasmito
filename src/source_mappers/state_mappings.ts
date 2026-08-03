@@ -1,13 +1,19 @@
 import assert from 'assert';
-import { HookKind, HookWithSubscription, InspectStateHook } from '../hooks';
+import {
+  HookKind,
+  HookWithSubscription,
+  InspectStateHook,
+  SubscriptionContent,
+} from '../hooks';
 import { createLogger } from '../logger/logger';
-import { StateRequest } from '../runtimes';
 import { WasmState } from '../webassembly';
 import {
   SourceCodeLocation,
   sourceCodeLocationToString,
   SourceMap,
 } from './source_map';
+import { HookOnAddrSubContent } from '../runtimes/wasmito_vm/requests/hook_on_wasm_addr_request';
+import { StateRequest } from '../runtimes/wasmito_vm/requests/inspect_request';
 
 const logger = createLogger('LexicalScopeRequest');
 
@@ -46,11 +52,14 @@ export class LexicalScope {
 
 type StateParser = (b: LexicalScopeBuilder, m: boolean, w: WasmState) => void;
 
-export class LexicalScopeRequest extends HookWithSubscription<LexicalScope> {
+export class LexicalScopeRequest extends HookWithSubscription<
+  HookOnAddrSubContent,
+  LexicalScope
+> {
   private sourceMap: SourceMap;
   private loc?: SourceCodeLocation;
   private req: StateRequest;
-  private hook: InspectStateHook;
+  private hook: InspectStateHook<HookOnAddrSubContent>;
   private parsers: Array<[boolean, StateParser]>;
 
   constructor(sourceMap: SourceMap, location?: SourceCodeLocation) {
@@ -91,12 +100,14 @@ export class LexicalScopeRequest extends HookWithSubscription<LexicalScope> {
     return this;
   }
 
-  parseSubscriptionData(input: WasmState): LexicalScope {
+  parseSubscriptionData(
+    input: SubscriptionContent<HookOnAddrSubContent, any>,
+  ): SubscriptionContent<HookOnAddrSubContent, LexicalScope> {
     const b = new LexicalScopeBuilder();
     for (const [missingStateAllowed, parser] of this.parsers) {
-      parser(b, missingStateAllowed, input);
+      parser(b, missingStateAllowed, input.sub);
     }
-    return b.seal();
+    return { msg: input.msg, metadata: input.metadata, sub: b.seal() };
   }
 
   private parseLocation(
