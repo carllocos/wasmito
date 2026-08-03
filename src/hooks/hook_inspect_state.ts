@@ -21,6 +21,10 @@ export class InspectStateHook<HookMetadata>
     return this._stateToInspect;
   }
 
+  public doesInclude(s: InspectableState): boolean {
+    return this._stateToInspect.doesInclude(s);
+  }
+
   public serializeBinary(): string {
     const includeInterruptNr = false;
     const includeID = false;
