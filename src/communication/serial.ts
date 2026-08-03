@@ -22,7 +22,7 @@ export class SerialConnection implements Channel {
   private dataBuffered: string = '';
   private readonly logger: Logger;
   private readonly removedListeners: Set<(data: string) => void>;
-  private writeListeners: Subscription<string | Uint8Array>;
+  private writeListeners: Subscription<string, string | Uint8Array>;
 
   readonly channelName: string;
 
