@@ -7,7 +7,7 @@ export class MockChannel implements Channel {
   readonly channelName: string = 'MockChannel';
   private dataHandler?: (data: string) => void;
   private mockWriteHandler?: (data: any) => boolean;
-  private writeListeners: Subscription<string | Uint8Array>;
+  private writeListeners: Subscription<string, string | Uint8Array>;
 
   constructor() {
     this.writeListeners = new Subscription(
