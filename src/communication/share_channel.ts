@@ -20,7 +20,7 @@ export class ShareChannel implements Channel {
   private _serverPort: number;
   private readonly logger: Logger;
   private clients: net.Socket[];
-  private writeListeners: Subscription<string | Uint8Array>;
+  private writeListeners: Subscription<string, string | Uint8Array>;
 
   readonly channelName: string;
 
