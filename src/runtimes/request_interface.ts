@@ -47,12 +47,10 @@ export abstract class APIRequest<R> {
   abstract getData(): string;
   abstract parse(input: string): R; // TODO remove
   abstract processAck(ack: RequestMessage): R;
-  async processSubscriptionData(
-    sub: RequestMessage,
-  ): Promise<SubscriptionParseOutcome> {
-    if (this.isSubscriptionClosed()) return SubscriptionParseOutcome.Failed;
-    return await this.processSubscriptionData(sub);
-  }
+  abstract processSubscriptionData(
+    sub: SubscribeResponse,
+  ): Promise<SubscriptionParseOutcome>;
+
   abstract isSubscriptionClosed(): boolean;
 
   serializeID(): string {
