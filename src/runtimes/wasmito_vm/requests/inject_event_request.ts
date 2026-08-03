@@ -50,12 +50,6 @@ export class PushEventRequest extends APIRequestNoSubscription<boolean> {
     throw new APIRequestInvalidParse('no response for InjectEventRequest');
   }
 
-  override async processSubscriptionData(
-    _sub: RequestMessage,
-  ): Promise<SubscriptionParseOutcome> {
-    throw new Error(`lalal`);
-  }
-
   parse(input: string): boolean {
     if (input === 'new pushed event') {
       return true;
