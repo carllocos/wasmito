@@ -63,18 +63,18 @@ export abstract class ASubscription<UnParsedSubData, SubscriptionType>
     if (this.listeners.length === 0 && this.oneTimeListeners.length === 0) {
       return;
     }
-    this.listeners.forEach(async (listener) => {
+    for (const listener of this.listeners) {
       if (!this.removedListeners.has(listener)) {
         await listener(value);
       }
-    });
+    }
     this.listeners = this.listeners.filter((cb) => {
       return !this.removedListeners.has(cb);
     });
     this.removedListeners.clear();
-    this.oneTimeListeners.forEach(async (listener) => {
+    for (const listener of this.oneTimeListeners) {
       await listener(value);
-    });
+    }
     this.oneTimeListeners = [];
   }
 
