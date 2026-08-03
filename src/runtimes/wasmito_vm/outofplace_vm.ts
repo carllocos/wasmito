@@ -18,6 +18,8 @@ import { createLogger, Logger } from '../../logger/logger';
 import { type DevVMPlatform } from '../../platforms/dev_vm_platform';
 import { createDevPlatform } from '../../platforms/platformbuilder_factory';
 import { LanguageAdaptor } from '../../language_adaptors';
+import { HookOnAddrSubContent } from './requests/hook_on_wasm_addr_request';
+import { SubscriptionContent } from '../../hooks/hook';
 
 export class OutOfPlaceVMError extends Error {
   constructor(message: string) {
@@ -474,7 +476,7 @@ export class OutOfThingsMonitor {
   public readonly targetVM: WasmitoBackendVM;
   private readonly _snapshots: WasmState[];
   private readonly _bpPolicy: BreakpointPolicy;
-  private readonly _snapshotHook: InspectStateHook;
+  private readonly _snapshotHook: InspectStateHook<HookOnAddrSubContent>;
   private onSpawnCb: ((vm: WasmitoDevVM, p: ChildProcess) => void) | undefined;
   private snapshotListeners: Array<(snapshot: WasmState) => void>;
   private readonly removedSnapshotListeners: Set<(snapshot: WasmState) => void>;
@@ -507,12 +509,15 @@ export class OutOfThingsMonitor {
   async setup(): Promise<void> {
     this.targetVM.changeBreakpointPolicy(this._bpPolicy);
     this.targetVM.breakpoints.forEach((bp) => {
-      bp.subscribe((state: WasmState) => {
-        if (state.isSnapshot()) {
-          this._snapshots.push(state);
-          this.onNewSnapshotListeners(state);
-        }
-      });
+      bp.subscribe(
+        (sub: SubscriptionContent<HookOnAddrSubContent, WasmState>) => {
+          const state = sub.sub;
+          if (state.isSnapshot()) {
+            this._snapshots.push(state);
+            this.onNewSnapshotListeners(state);
+          }
+        },
+      );
     });
 
     if (!(await this.targetVM.addHookOnError(this._snapshotHook))) {
@@ -573,14 +578,19 @@ export class OutOfThingsMonitor {
   }
 
   private storeSnapshot(bp: Breakpoint): void {
-    bp.subscribe((snapshot: WasmState) => {
-      if (snapshot.isSnapshot()) {
-        this._snapshots.push(snapshot);
-        this.onNewSnapshotListeners(snapshot);
-      } else {
-        this.logger.error(`Received state that was supposed to be a snapshot`);
-      }
-    });
+    bp.subscribe(
+      (sub: SubscriptionContent<HookOnAddrSubContent, WasmState>) => {
+        const snapshot = sub.sub;
+        if (snapshot.isSnapshot()) {
+          this._snapshots.push(snapshot);
+          this.onNewSnapshotListeners(snapshot);
+        } else {
+          this.logger.error(
+            `Received state that was supposed to be a snapshot`,
+          );
+        }
+      },
+    );
   }
 
   private onNewSnapshotListeners(snapshot: WasmState): void {
