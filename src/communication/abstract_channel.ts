@@ -68,11 +68,11 @@ export abstract class AbstractChannel implements Channel {
   private handleLines(lines: string[]): void {
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
-      this.listeners.forEach((listener) => {
+      for (const listener of this.listeners) {
         if (!this.removedListeners.has(listener)) {
           listener(line);
         }
-      });
+      }
     }
   }
 
