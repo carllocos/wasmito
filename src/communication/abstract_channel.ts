@@ -11,7 +11,7 @@ export abstract class AbstractChannel implements Channel {
   private readonly removedListeners: Set<(data: string) => void>;
   protected logger: Logger;
 
-  private writeListeners: Subscription<string | Uint8Array>;
+  private writeListeners: Subscription<string, string | Uint8Array>;
 
   constructor(channelName: string) {
     this.channelName = channelName;
