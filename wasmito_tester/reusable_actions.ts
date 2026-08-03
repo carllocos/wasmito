@@ -1,5 +1,6 @@
 import { InspectStateHook } from '../src/hooks/hook_inspect_state';
 import {
+  SubscriptionContent,
   type HookWithoutSubscription,
   type HookWithSubscription,
 } from '../src/hooks/hook';
@@ -7,7 +8,6 @@ import { EventInspectHook } from '../src/hooks/hook_event';
 import { EmptyValueSubstitution } from '../src/hooks/hook_value_substitution';
 import { type WasmValuesBuilder } from '../src/webassembly';
 import { type WASM, type WasmState } from '../src/webassembly/wasm';
-import { type ProxyCallResponse } from '../src/runtimes';
 import { AroundFunctionRequest } from '../src/runtimes/wasmito_vm/requests/around_function_request';
 import { PushEventRequest } from '../src/runtimes/wasmito_vm/requests/inject_event_request';
 import { StateRequest } from '../src/runtimes/wasmito_vm/requests/inspect_request';
@@ -26,6 +26,10 @@ import {
   type SourceCodeLocation,
 } from '../src/source_mappers/source_map';
 import { ResponseType } from '../src/runtimes/request_msg';
+import { HookOnAddrSubContent } from '../src/runtimes/wasmito_vm/requests/hook_on_wasm_addr_request';
+import { HookOnEventContent } from '../src/runtimes/wasmito_vm/requests/hook_on_event_request';
+import { ProxyCallResponse } from '../src/runtimes/wasmito_vm/requests/fun_call_request';
+import { HookOnErrorSubContent } from '../src/runtimes/wasmito_vm/requests/hook_on_error';
 
 export interface ActionArgs {
   timeoutMs?: number;
@@ -36,16 +40,29 @@ export function addBreakpointSubscription(
   subscriptionID: string,
   breakpoint: Breakpoint,
   timeout?: number,
-): SubscriptionEmitterAction<boolean, WasmState, InspectStateHook> {
-  const act: SubscriptionEmitterAction<boolean, WasmState, InspectStateHook> = {
+): SubscriptionEmitterAction<
+  boolean,
+  WasmState,
+  InspectStateHook<HookOnAddrSubContent>
+> {
+  const act: SubscriptionEmitterAction<
+    boolean,
+    WasmState,
+    InspectStateHook<HookOnAddrSubContent>
+  > = {
     subscriptionID,
     timeout,
     description: `add breakpoint ${breakpoint.toString()}`,
     setupSubscription: async (
       device: WasmitoBackendVM,
-    ): Promise<SubActReturn<boolean, WasmState, InspectStateHook>> => {
-      const hook = new InspectStateHook(new StateRequest().includePC());
-      breakpoint.subscribe(hook.onSubscriptionData.bind(hook));
+    ): Promise<
+      SubActReturn<boolean, WasmState, InspectStateHook<HookOnAddrSubContent>>
+    > => {
+      const hook = new InspectStateHook<HookOnAddrSubContent>(
+        new StateRequest().includePC(),
+      );
+      const cb = hook.onSubscriptionData.bind(hook);
+      breakpoint.subscribe((sub) => cb(sub));
       const added = await device.addBreakpoint(breakpoint);
       return [added, hook];
     },
@@ -66,9 +83,13 @@ export function addBPAndRunUntil(
     doAction: async (device: WasmitoBackendVM): Promise<boolean> => {
       return new Promise<boolean>((resolve, reject) => {
         const bp = new Breakpoint(loc);
-        bp.subscribe((_state: WasmState): void => {
-          resolve(true);
-        });
+        bp.subscribe(
+          (
+            _state: SubscriptionContent<HookOnAddrSubContent, WasmState>,
+          ): void => {
+            resolve(true);
+          },
+        );
 
         device
           .addBreakpoint(bp)
@@ -120,14 +141,25 @@ export function removeBPAt(
 export function onNewEventAction(
   subscriptionId: string,
   timeout: number,
-): SubscriptionEmitterAction<boolean, WASM.Event, EventInspectHook> {
-  const ac: SubscriptionEmitterAction<boolean, WASM.Event, EventInspectHook> = {
+): SubscriptionEmitterAction<
+  boolean,
+  WASM.Event,
+  EventInspectHook<HookOnEventContent>
+> {
+  const ac: SubscriptionEmitterAction<
+    boolean,
+    WASM.Event,
+    EventInspectHook<HookOnEventContent>
+  > = {
     subscriptionID: subscriptionId,
     description: 'Hook into new events',
     setupSubscription: async (
       device: WasmitoBackendVM,
-    ): Promise<SubActReturn<boolean, WASM.Event, EventInspectHook>> => {
-      const hook: HookWithSubscription<WASM.Event> = new EventInspectHook();
+    ): Promise<
+      SubActReturn<boolean, WASM.Event, EventInspectHook<HookOnEventContent>>
+    > => {
+      const hook: HookWithSubscription<HookOnEventContent, WASM.Event> =
+        new EventInspectHook();
       const added = await device.addHookOnNewEvent(hook);
       return [added, hook];
     },
@@ -144,14 +176,25 @@ export function onNewEventAction(
 export function onHandledEventSubscription(
   subscriptionId: string,
   timeout: number,
-): SubscriptionEmitterAction<boolean, WASM.Event, EventInspectHook> {
-  const ac: SubscriptionEmitterAction<boolean, WASM.Event, EventInspectHook> = {
+): SubscriptionEmitterAction<
+  boolean,
+  WASM.Event,
+  EventInspectHook<HookOnEventContent>
+> {
+  const ac: SubscriptionEmitterAction<
+    boolean,
+    WASM.Event,
+    EventInspectHook<HookOnEventContent>
+  > = {
     subscriptionID: subscriptionId,
     description: 'Hook into handled events',
     setupSubscription: async (
       device: WasmitoBackendVM,
-    ): Promise<SubActReturn<boolean, WASM.Event, EventInspectHook>> => {
-      const hook: HookWithSubscription<WASM.Event> = new EventInspectHook();
+    ): Promise<
+      SubActReturn<boolean, WASM.Event, EventInspectHook<HookOnEventContent>>
+    > => {
+      const hook: HookWithSubscription<HookOnEventContent, WASM.Event> =
+        new EventInspectHook();
       const added = await device.addHookOnEventHandling(hook);
       return [added, hook];
     },
@@ -434,16 +477,26 @@ export function unregisterFuncForProxyCallAction(
 export function createOnErrorActionEmitter(
   subscriptionID: string,
   timeout: number,
-): SubscriptionEmitterAction<boolean, WasmState, InspectStateHook> {
-  const ac: SubscriptionEmitterAction<boolean, WasmState, InspectStateHook> = {
+): SubscriptionEmitterAction<
+  boolean,
+  WasmState,
+  InspectStateHook<HookOnErrorSubContent>
+> {
+  const ac: SubscriptionEmitterAction<
+    boolean,
+    WasmState,
+    InspectStateHook<HookOnErrorSubContent>
+  > = {
     subscriptionID,
     description: `Create on error emitter with id ${subscriptionID}`,
     setupSubscription: async (
       device: WasmitoBackendVM,
-    ): Promise<SubActReturn<boolean, WasmState, InspectStateHook>> => {
+    ): Promise<
+      SubActReturn<boolean, WasmState, InspectStateHook<HookOnErrorSubContent>>
+    > => {
       const req = new StateRequest();
       req.includeAll();
-      const hook = new InspectStateHook(req);
+      const hook = new InspectStateHook<HookOnErrorSubContent>(req);
       const added = await device.addHookOnError(hook);
       return [added, hook];
     },
@@ -487,7 +540,7 @@ export function TriggerInterrupt(
 export function SubscribeOnBPReached(
   id: string,
   args?: ActionArgs,
-): SubscribeAction<WasmState, InspectStateHook> {
+): SubscribeAction<WasmState, InspectStateHook<HookOnAddrSubContent>> {
   const timeout = args?.timeoutMs;
   const delay = args?.executeAfterMs;
   const description = `wait ${timeout === undefined ? '' : `max ${timeout}`} for '${id}'`;
