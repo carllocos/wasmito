@@ -1,13 +1,14 @@
 import { type WasmState } from '../webassembly/wasm';
 import {
+  InspectableState,
   StateRequest,
   WasmStateI,
 } from '../runtimes/wasmito_vm/requests/inspect_request';
-import { HookKind, HookWithSubscription } from './hook';
+import { HookKind, HookWithSubscription, SubscriptionContent } from './hook';
 
-export class InspectStateHook
-  extends HookWithSubscription<WasmState>
-  implements WasmStateI<InspectStateHook>
+export class InspectStateHook<HookMetadata>
+  extends HookWithSubscription<HookMetadata, WasmState>
+  implements WasmStateI<InspectStateHook<HookMetadata>>
 {
   private readonly _stateToInspect: StateRequest;
   constructor(stateRequest: StateRequest = new StateRequest()) {
@@ -30,8 +31,15 @@ export class InspectStateHook
     return `State Inspecting`;
   }
 
-  parseSubscriptionData(input: any): WasmState {
-    return this.stateToInspect.parse(input);
+  parseSubscriptionData(
+    msg: SubscriptionContent<HookMetadata, any>,
+  ): SubscriptionContent<HookMetadata, WasmState> {
+    const parsed = this.stateToInspect.parse(msg.sub);
+    return {
+      msg: msg.msg,
+      metadata: msg.metadata,
+      sub: parsed,
+    };
   }
 
   includePC(): this {
