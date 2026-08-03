@@ -40,7 +40,9 @@ export class RequestsManager {
       this.connection?.removeOnData(this.onRequestData.bind(this));
     }
     if (req.isResolved()) {
-      this._waitingForAcksBulk.delete(req.id);
+      if (this._waitingForAcksBulk.has(req.id)) {
+        this._waitingForAcksBulk.delete(req.id);
+      }
       if (this._waitingForAcksBulk.size === 0) {
         this._resolveBulk();
       }
