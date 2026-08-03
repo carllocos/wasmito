@@ -40,7 +40,7 @@ export class HookOnWasmAddrRequest extends APIRequest<RequestMessage> {
   readonly instruction = Instruction.HookOnWasmAddr;
   private readonly logger: Logger;
   public readonly wasmAddr;
-  private hook: Hook | undefined;
+  private _hook: Hook | undefined;
   private moment: HookOnWasmAddrMoment;
   protected isaddRequest: boolean; // true for add, false for remove;
   private subscriptionActive: boolean;
@@ -54,6 +54,14 @@ export class HookOnWasmAddrRequest extends APIRequest<RequestMessage> {
     this.subscriptionActive = true;
   }
 
+  get hook(): Hook | undefined {
+    return this._hook;
+  }
+
+  set hook(h: Hook) {
+    this._hook = h;
+  }
+
   before(): HookOnWasmAddrRequest {
     this.moment = HookOnWasmAddrMoment.HookBefore;
     return this;
@@ -65,8 +73,8 @@ export class HookOnWasmAddrRequest extends APIRequest<RequestMessage> {
   }
 
   addHook(hook: Hook): HookOnWasmAddrRequest {
-    if (this.hook === undefined) {
-      this.hook = hook;
+    if (this._hook === undefined) {
+      this._hook = hook;
     } else {
       const errMsg = `Cannot asisgn multiple hooks`;
       this.logger.error(errMsg);
@@ -75,7 +83,7 @@ export class HookOnWasmAddrRequest extends APIRequest<RequestMessage> {
     return this;
   }
   description(): string {
-    const hooksDescription = this.hook?.description() ?? '';
+    const hooksDescription = this._hook?.description() ?? '';
     if (this.isaddRequest) {
       return `HookOnWasmAddrRequest for ${this.wasmAddr} hooks: [${hooksDescription}]`;
     } else {
@@ -84,14 +92,14 @@ export class HookOnWasmAddrRequest extends APIRequest<RequestMessage> {
   }
 
   override getData(): string {
-    assert(this.hook !== undefined, 'hook was not assigned');
+    assert(this._hook !== undefined, 'hook was not assigned');
     const encodedAddr = encodeToHexLEB128(this.wasmAddr);
     let encodedSchedule = '';
     let encodedHook = '';
     let encodedAddOrRemoveOp = '00';
     if (this.isaddRequest) {
-      encodedSchedule = this.hook.schedule.serializeBinary();
-      encodedHook = this.hook.serializeBinary();
+      encodedSchedule = this._hook.schedule.serializeBinary();
+      encodedHook = this._hook.serializeBinary();
       encodedAddOrRemoveOp = '01';
     }
     return `${this.instruction}${this.serializeID()}${encodedAddr}${this.moment}${encodedAddOrRemoveOp}${encodedSchedule}${encodedHook}\n`;
@@ -118,8 +126,7 @@ export class HookOnWasmAddrRequest extends APIRequest<RequestMessage> {
       return SubscriptionParseOutcome.Failed;
     }
 
-    assert(this.hook !== undefined, 'hook was not assigned');
-    return await runHooksAndListeners([this.hook], content.val, this.logger);
+    assert(this._hook !== undefined, 'hook was not assigned');
   }
 
   override isSubscriptionClosed(): boolean {
