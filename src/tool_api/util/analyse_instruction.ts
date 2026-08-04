@@ -230,167 +230,180 @@ function instrMomentToHookMoment(m: InstrMoment): HookOnWasmAddrMoment {
   }
 }
 
-const actionsCache: Map<number, [Hook[], InspectStateHook]> = new Map();
-function makeActionsCacheKey(
-  cbArgs: number,
+type StackArgs = WASMValueIndexed[] | WASMValueIndexed | undefined;
+
+function copyArgsFromStack(
   i: WasmInstruction,
-  mutate: boolean,
-  moment: InstrMoment,
-): number {
-  if (cbArgs <= 1) return mutate ? 1 : 0;
+  stack: WASMValueIndexed[] | undefined,
+  moment: HookOnWasmAddrMoment,
+): StackArgs {
+  if (stack === undefined) return [];
 
-  const mutateSign = mutate ? -1 : 1;
-  let stack = 3;
-  if (moment === 'before') {
-    if (i.signature.nrArgs > 0) {
-      stack = 4;
-    }
-  } else if (moment === 'after') {
-    if (i.signature.nrResults > 0) {
-      stack = 4;
-    }
-  } else {
-    if (i.signature.nrArgs > 0 || i.signature.nrResults > 0) {
-      stack = 4;
-    }
-  }
-  return mutateSign * stack;
-}
-
-function createActions(
-  moment: InstrMoment,
-  instr: WasmInstruction,
-  updateState: boolean,
-  cbNrOfArgs: number,
-): [Hook[], InspectStateHook] {
-  const key = makeActionsCacheKey(cbNrOfArgs, instr, updateState, moment);
-
-  if (actionsCache.has(key)) return actionsCache.get(key)!;
-
-  const inspectAction = new InspectStateHook(new StateRequest());
-  inspectAction.includePC();
-  switch (cbNrOfArgs) {
-    case 0:
-    case 1:
-      break;
-    case 2:
-    case 3:
-      if (moment === 'before') {
-        if (instr.signature.nrArgs > 0) {
-          inspectAction.includeStack();
-        }
-      } else if (moment === 'after') {
-        if (instr.signature.nrResults > 0) {
-          inspectAction.includeStack();
-        }
-      } else {
-        throw new Error(`TODO callback for ${moment}`);
-      }
-      break;
-    default:
-      throw new Error(
-        `Callback has not the right type signature. Given nr of arguments ${cbNrOfArgs}`,
+  const signature = i.signature;
+  switch (moment) {
+    case HookOnWasmAddrMoment.HookBefore: {
+      assertFatalHookError(
+        signature.nrArgs > 0 && stack.length >= signature.nrArgs,
+        `VM failed to provide the stack needed to construct args. Expected stack size ${signature.nrArgs}. Given stack size ${stack.length}`,
       );
-  }
-
-  const hooks: Hook[] = [];
-  if (updateState) hooks.push(new PauseVMHook());
-  hooks.push(inspectAction);
-
-  const actions: [Hook[], InspectStateHook] = [hooks, inspectAction];
-  actionsCache.set(key, actions);
-  return actions;
-}
-
-export function createCallbackNoArgs(
-  vm: WasmitoBackendVM,
-  instr: WasmInstruction,
-  moment: InstrMoment,
-  cb: // do not care about args, nor return value
-  | ((vm: WasmitoBackendVM) => void)
-    | ((vm: WasmitoBackendVM) => Promise<void>)
-    | (() => void)
-    | (() => Promise<void>),
-): (s: WasmState) => Promise<void> {
-  return async (s: WasmState) => {
-    if (moment === 'before' && s.pc !== instr.startAddress) {
-      return;
+      return stack.slice(-i.signature.nrArgs).map((v: WASMValueIndexed) => {
+        return {
+          type: v.type,
+          value: v.value,
+          idx: v.idx,
+        };
+      });
     }
-    await cb(vm);
-  };
+
+    case HookOnWasmAddrMoment.HookAfter: {
+      assertFatalHookError(
+        signature.nrResults > 0 && stack.length >= signature.nrResults,
+        `Stack has not the expected number of values to read result for instr '${i.name}'`,
+      );
+      const v = stack[stack.length - 1];
+      return {
+        type: v.type,
+        value: v.value,
+        idx: v.idx,
+      };
+    }
+    default:
+      throw new Error(`TODO`);
+  }
 }
 
-function createCallbackWithArgs(
+export function runAdvicesInstruction(
+  advicesContainer: AdvicesRegistery,
   vm: WasmitoBackendVM,
   maxTimeoutMs: number,
   mod: WasmModule,
-  instr: WasmInstruction,
-  mutable: boolean,
-  cb: (...args: any[]) => any, // cb: // update args
-): (s: WasmState) => Promise<void> {
-  return async (s: WasmState) => {
-    assertFatalHookError(s.pc !== undefined, 'pc is empty');
-    const i = mod.getInstruction(s.pc);
+): (
+  sub: SubscriptionContent<HookOnAddrSubContent, WasmState>,
+) => Promise<void> {
+  return async (sub: SubscriptionContent<HookOnAddrSubContent, WasmState>) => {
+    const metadata = sub.metadata;
+    assert(isHookOnAddrSubContent(metadata), `no valid subscribe msg`);
+    const i = mod.getInstruction(metadata.addr);
     assertFatalHookError(
       i !== undefined,
-      `No instruction found for address ${s.pc}`,
+      `No instruction found for address ${metadata.addr}`,
     );
 
-    if (i.startAddress !== instr.startAddress) return; // TODO replace with assert?
-
-    assertFatalHookError(
-      i.signature.nrArgs === instr.signature.nrArgs,
-      `mismatch between expect args of instr ${i.name} and ${instr.name}`,
-    );
-
-    let args: WritableWasmValue[] | ReadOnlyWasmValue[] = [];
-    if (i.signature.nrArgs > 0) {
-      assertFatalHookError(
-        s.stack !== undefined,
-        'VM failed to provide the stack needed to construct args',
-      );
-      assertFatalHookError(
-        s.stack.length >= i.signature.nrArgs,
-        `Stack is expected to have #${i.signature.nrArgs} values but has ${s.stack.length} to reconstruct args for '${i.name}' inst at addr ${i.startAddress}`,
-      );
-
-      const vals = s.stack.slice(-i.signature.nrArgs);
-      if (mutable) {
-        args = vals.map((v) => new WritableWasmValue(v, v.idx));
+    const moment = metadata.moment;
+    const advices = advicesContainer.getAdvices(moment, metadata.addr);
+    const wasmState = sub.sub;
+    const stackArgs = copyArgsFromStack(i, wasmState.stack, moment);
+    let mutated = false;
+    let argsCB: AdviceArgsCB;
+    for (let adviceIdx = 0; adviceIdx < advices.length; adviceIdx++) {
+      const [advice, mutate] = advices[adviceIdx];
+      mutated = mutate || mutated;
+      argsCB = prepareArgsCB(stackArgs, argsCB, mutate);
+      let newArgs;
+      if (isNoArgAdvice(advice)) {
+        await advice();
+      } else if (isVMArgAdvice(advice)) {
+        await advice(vm);
       } else {
-        args = vals.map((v) => new ReadOnlyWasmValue(v));
+        newArgs = await advice(i, argsCB as any, vm);
       }
+      // assertArgsValidity(stackArgs, newArgs, mutate);
+      if (mutate) argsCB = newArgs as any;
     }
-
-    const newArgs = await cb(i, args, vm);
-    if (mutable) {
-      assertFatalHookError(
-        newArgs !== undefined,
-        'No new values provided by the user registered callback',
-      );
-      // TODO check if returnValues has right type
-      assertFatalHookError(
-        newArgs instanceof Array,
-        'new Args are expected to be an array',
-      );
-      logger.debug(
-        `new Values: [${newArgs.map((v) => `(${WASM.typeToString(v.type)}, ${v.value})`).join(', ')}]`,
-      );
-      const success = await updateArgsStack(newArgs, vm);
-      assert(success, 'failed to update the stack with new values');
+    if (mutated) {
+      if (argsCB !== undefined) {
+        let as: ReadOnlyWasmValue[] | WritableWasmValue[];
+        if (argsCB instanceof Array) {
+          as = argsCB;
+        } else if (argsCB instanceof ReadOnlyWasmValue) {
+          as = [argsCB];
+        } else {
+          as = [argsCB];
+        }
+        const success = await updateArgsStack(as, vm);
+        assert(success, 'failed to update the stack with new values');
+      }
       logger.debug('Resume execution on VM');
       await vm.run(maxTimeoutMs);
-    } else {
-      assertFatalHookError(
-        newArgs === undefined,
-        `Registered callback should not return any value as no update is expected`,
-      );
     }
   };
 }
 
+type AdviceArgsCB =
+  | ReadOnlyWasmValue[]
+  | ReadOnlyWasmValue
+  | WritableWasmValue[]
+  | WritableWasmValue
+  | undefined;
+
+function prepareArgsCB(
+  stackArgs: StackArgs,
+  adviceArgs: AdviceArgsCB,
+  mutate: boolean,
+): AdviceArgsCB {
+  if (stackArgs === undefined) {
+    return undefined;
+  }
+
+  if (adviceArgs === undefined) {
+    const args = stackToAdviceArgs(
+      stackArgs instanceof Array ? stackArgs : [stackArgs],
+      mutate,
+    );
+    return stackArgs instanceof Array ? args : args[0];
+  }
+
+  return adviceArgToAdviceArg(adviceArgs, mutate);
+}
+
+function stackToAdviceArgs(
+  args: WASMValueIndexed[],
+  write: boolean,
+): ReadOnlyWasmValue[] | WritableWasmValue[] {
+  if (write)
+    return args.map((a) => new WritableWasmValue(a.type, a.value, a.idx));
+  else return args.map((a) => new ReadOnlyWasmValue(a.type, a.value, a.idx));
+}
+
+function adviceArgToAdviceArg(
+  args: AdviceArgsCB,
+  toWrite: boolean,
+): AdviceArgsCB {
+  if (args === undefined) {
+    return undefined;
+  }
+
+  if (args instanceof WritableWasmValue) {
+    if (toWrite) return args;
+    else return new ReadOnlyWasmValue(args.type, args.value, args.stackIdx);
+  }
+
+  if (args instanceof ReadOnlyWasmValue) {
+    if (toWrite)
+      return new WritableWasmValue(args.type, args.value, args.stackIdx);
+    else return args;
+  }
+
+  if (args.length === 0) return [];
+
+  if (args[0] instanceof WritableWasmValue) {
+    if (toWrite) return args;
+    const newArgs: ReadOnlyWasmValue[] = [];
+    for (const arg of args)
+      newArgs.push(new ReadOnlyWasmValue(arg.type, arg.value, arg.stackIdx));
+    return newArgs;
+  } else {
+    if (!toWrite) return args;
+    const newArgs: WritableWasmValue[] = [];
+
+    for (const arg of args)
+      newArgs.push(new WritableWasmValue(arg.type, arg.value, arg.stackIdx));
+    return newArgs;
+  }
+}
+
 async function updateArgsStack(
-  args: WritableWasmValue[],
+  args: WritableWasmValue[] | ReadOnlyWasmValue[],
   vm: WasmitoBackendVM,
 ): Promise<boolean> {
   for (const arg of args) {
@@ -398,64 +411,4 @@ async function updateArgsStack(
     if (!s) return false;
   }
   return true;
-}
-
-function createCallbackWithResult(
-  vm: WasmitoBackendVM,
-  maxTimeoutMs: number,
-  instr: WasmInstruction,
-  mutate: boolean,
-  cb: (...args: any[]) => any,
-): (s: WasmState) => Promise<void> {
-  return async (s: WasmState) => {
-    // Careful!
-    // since the pc in the retrieved Wasm state refers to the instruction that will be executed
-    // after `instr`.
-    // We pass to the user callback `instr` as argument
-    assertFatalHookError(s.pc !== undefined, 'pc is empty');
-    let result: WritableWasmValue | ReadOnlyWasmValue | undefined;
-
-    if (instr.signature.nrResults > 0) {
-      assertFatalHookError(
-        s.stack !== undefined,
-        `VM failed to provide the stack needed to construct args for instr '${instr.name}'`,
-      );
-      assertFatalHookError(
-        s.stack.length >= instr.signature.nrResults,
-        `Stack has not the expected number of values to read result for instr '${instr.name}'`,
-      );
-
-      const val = s.stack[s.stack.length - 1];
-      result = mutate
-        ? new WritableWasmValue(val, val.idx)
-        : new ReadOnlyWasmValue(val);
-    }
-
-    const updatedValue = await cb(instr, result, vm);
-    if (mutate) {
-      assertFatalHookError(
-        (updatedValue === undefined && result === undefined) ||
-          updatedValue instanceof WritableWasmValue,
-        'The returned user result is not a WritableWasmValue',
-      );
-      // TODO validate the new value
-      if (updatedValue !== undefined) {
-        logger.debug(`New value computed ${result?.value}`);
-        const success = await updateArgsStack([updatedValue], vm);
-        assert(
-          success,
-          `failed to update the stack with new value ${updatedValue.value} (type ${updatedValue.type})`,
-        );
-        logger.debug('Resume execution on VM');
-        await vm.run(maxTimeoutMs);
-      } else {
-        await vm.run(maxTimeoutMs);
-      }
-    } else {
-      assertFatalHookError(
-        updatedValue === undefined,
-        `Registered callback should not return any value as no update is expected`,
-      );
-    }
-  };
 }
