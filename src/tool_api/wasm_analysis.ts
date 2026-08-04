@@ -10,8 +10,8 @@ import {
 } from './interrupts';
 import { GroupHooks, InstrMoment } from './group_hooks';
 import { createLogger, Logger } from '../logger/logger';
-import { createCallbackNoArgs, instruction } from './util/analyse_instruction';
-import { interrupt } from './util/analyse_interrupts';
+import { instruction, runAdvicesInstruction } from './util/analyse_instruction';
+import { interrupt, runAdvicesInterrupt } from './util/analyse_interrupts';
 import { LanguageAdaptor } from '../language_adaptors';
 import {
   SourceCFGNode,
@@ -26,12 +26,14 @@ import {
 } from '../webassembly/wasm/wasm_instruction';
 import { WasmCode, WasmOpcode } from '../webassembly/wasm/wasm_opcode';
 import { WasmState } from '../webassembly/wasm';
-import { assertFatalHookError, Hook } from '../hooks/hook';
+import { Hook, SubscriptionContent } from '../hooks/hook';
 import { InspectStateHook } from '../hooks/hook_inspect_state';
 import { SourceMap } from '../source_mappers/source_map';
 import { WASMFunction } from '../webassembly/wasm/wasm_function';
 import { isErrorMessage } from '../runtimes/request_msg';
-import { APIRequest, HookOnWasmAddrRequest } from '../runtimes';
+import { APIRequest, HookOnAddrSubContent } from '../runtimes';
+import { HookOnErrorSubContent } from '../runtimes/wasmito_vm/requests/hook_on_error';
+import { AdvicesRegistery } from './util/advices_registery';
 
 export interface AnalysisConfig {
   name: string;
@@ -41,7 +43,6 @@ export interface AnalysisConfig {
 export class WasmAnalysis {
   public readonly wasm: WasmModule;
   private vm: WasmitoBackendVM;
-  private interruptGroups: GroupHooks[];
   private _logger: Logger;
   private maxTimeoutMs: number;
   private _sourceMap?: SourceMap;
@@ -49,7 +50,11 @@ export class WasmAnalysis {
   private envFuncForPinInterrupt: number;
   private analysisResolver: any;
   private userOnFinishCB: any;
-  private _requests: HookOnWasmAddrRequest[];
+  private _advices: AdvicesRegistery;
+
+  private _hookOnErrorAction:
+    | InspectStateHook<HookOnErrorSubContent>
+    | undefined;
 
   constructor(
     wasm: WasmModule | SourceMap | LanguageAdaptor,
@@ -67,22 +72,38 @@ export class WasmAnalysis {
       this._sourceMap = wasm.sourceMap;
     }
     this.vm = vm;
-    this.interruptGroups = [];
-    this._requests = [];
     this._logger = createLogger(config?.name ?? 'WasmAnalyse');
     this.maxTimeoutMs = config?.maxTimeoutMs ?? 30000;
     this.envFuncForPinInterrupt = this.findEnvFuncForPinInterrupt();
+    this._advices = new AdvicesRegistery();
+    this._advices.registerAdviceInstructionCallback(
+      runAdvicesInstruction(
+        this._advices,
+        this.vm,
+        this.maxTimeoutMs,
+        this.wasm,
+      ),
+    );
+    this._advices.registerAdviceInterruptCallback(
+      runAdvicesInterrupt(this._advices, this.vm, this.maxTimeoutMs),
+    );
   }
 
-  private addGroupInterrupt(
-    group: GroupHooks | undefined,
+  private assertInterruptAdvicesRegister(
+    registeredAdvices: number,
     typeHook: string,
   ): void {
-    assert(group !== undefined, `failed to hook upon '${typeHook}'`);
+    assert(
+      registeredAdvices > 0,
+      `failed to register advice upon '${typeHook}'`,
+    );
   }
 
-  private addGroup(reqs: number): void {
-    assert(reqs > 0, 'No action registered for group');
+  private assertInstructionAdviceRegister(
+    registeredAdvices: number,
+    moment: string,
+  ): void {
+    assert(registeredAdvices > 0, `Failed to register ${moment} advice`);
   }
 
   private findEnvFuncForPinInterrupt(): number {
@@ -119,17 +140,18 @@ export class WasmAnalysis {
       | (() => Promise<void>),
   ): this {
     const mutate = false;
-    this.addGroup(
+    const moment = 'before';
+    this.assertInstructionAdviceRegister(
       instruction<I>(
-        this._requests,
-        'before',
+        this._advices,
+        moment,
         instr,
         this.wasm,
-        this.vm,
         this.maxTimeoutMs,
         cb,
         mutate,
       ),
+      moment,
     );
     return this;
   }
@@ -156,17 +178,18 @@ export class WasmAnalysis {
       | ((instr: I, args: WritableWasmValue[]) => Promise<WritableWasmValue[]>),
   ): this {
     const mutate = true;
-    this.addGroup(
+    const moment = 'before';
+    this.assertInstructionAdviceRegister(
       instruction<I>(
-        this._requests,
-        'before',
+        this._advices,
+        moment,
         instr,
         this.wasm,
-        this.vm,
         this.maxTimeoutMs,
         cb,
         mutate,
       ),
+      moment,
     );
     return this;
   }
@@ -197,17 +220,18 @@ export class WasmAnalysis {
       | (() => Promise<void>),
   ): this {
     const mutate = false;
-    this.addGroup(
+    const moment = 'after';
+    this.assertInstructionAdviceRegister(
       instruction<I>(
-        this._requests,
-        'after',
+        this._advices,
+        moment,
         instr,
         this.wasm,
-        this.vm,
         this.maxTimeoutMs,
         cb,
         mutate,
       ),
+      moment,
     );
     return this;
   }
@@ -240,17 +264,18 @@ export class WasmAnalysis {
         ) => Promise<WritableWasmValue | undefined>),
   ): this {
     const mutate = true;
-    this.addGroup(
+    const moment = 'after';
+    this.assertInstructionAdviceRegister(
       instruction<I>(
-        this._requests,
-        'after',
+        this._advices,
+        moment,
         instr,
         this.wasm,
-        this.vm,
         this.maxTimeoutMs,
         cb,
         mutate,
       ),
+      moment,
     );
     return this;
   }
@@ -262,13 +287,16 @@ export class WasmAnalysis {
   onNewInterrupt(
     cb:
       | ((ev: ReadOnlyInterrupt, vm: WasmitoBackendVM) => void)
+      | ((ev: ReadOnlyInterrupt, vm: WasmitoBackendVM) => Promise<void>)
       | ((ev: ReadOnlyInterrupt) => void)
-      | (() => void),
+      | ((ev: ReadOnlyInterrupt) => Promise<void>)
+      | (() => void)
+      | (() => Promise<void>),
   ): this {
     const mutate = false;
     const groupType = 'onNewInterrupt';
-    this.addGroupInterrupt(
-      interrupt(this.vm, this.maxTimeoutMs, groupType, mutate, mutate, cb),
+    this.assertInterruptAdvicesRegister(
+      interrupt(this._advices, groupType, mutate, cb, this.maxTimeoutMs),
       groupType,
     );
     return this;
@@ -282,8 +310,8 @@ export class WasmAnalysis {
   ): this {
     const mutate = true;
     const groupType = 'onNewInterrupt';
-    this.addGroupInterrupt(
-      interrupt(this.vm, this.maxTimeoutMs, groupType, mutate, mutate, cb),
+    this.assertInterruptAdvicesRegister(
+      interrupt(this._advices, groupType, mutate, cb, this.maxTimeoutMs),
       groupType,
     );
     return this;
@@ -297,8 +325,8 @@ export class WasmAnalysis {
   ): this {
     const mutate = false;
     const groupType = 'beforeInterruptHandled';
-    this.addGroupInterrupt(
-      interrupt(this.vm, this.maxTimeoutMs, groupType, mutate, mutate, cb),
+    this.assertInterruptAdvicesRegister(
+      interrupt(this._advices, groupType, mutate, cb, this.maxTimeoutMs),
       groupType,
     );
     return this;
@@ -312,8 +340,8 @@ export class WasmAnalysis {
   ): this {
     const mutate = true;
     const groupType = 'beforeInterruptHandled';
-    this.addGroupInterrupt(
-      interrupt(this.vm, this.maxTimeoutMs, groupType, mutate, mutate, cb),
+    this.assertInterruptAdvicesRegister(
+      interrupt(this._advices, groupType, mutate, cb, this.maxTimeoutMs),
       groupType,
     );
     return this;
@@ -327,8 +355,8 @@ export class WasmAnalysis {
   ): this {
     const mutate = false;
     const groupType = 'afterHandlingInterrupt';
-    this.addGroupInterrupt(
-      interrupt(this.vm, this.maxTimeoutMs, groupType, mutate, mutate, cb),
+    this.assertInterruptAdvicesRegister(
+      interrupt(this._advices, groupType, mutate, cb, this.maxTimeoutMs),
       groupType,
     );
     return this;
@@ -420,24 +448,30 @@ export class WasmAnalysis {
     // return gh;
   }
 
-  onError(_cb: (...args: any[]) => any): GroupHooks {
-    throw new Error(`TODO`);
+  onError(
+    cb:
+      | ((i: WasmInstruction | undefined, errorMsg: string) => void)
+      | ((i: WasmInstruction | undefined, errorMsg: string) => Promise<void>),
+  ): this {
+    const inspectAction = new InspectStateHook<HookOnErrorSubContent>();
+    inspectAction.includePC().includeException();
+    inspectAction.subscribe(
+      (sub: SubscriptionContent<HookOnErrorSubContent, WasmState>) => {
+        const wasmState = sub.sub;
+        let instr: WasmInstruction | undefined;
+        if (wasmState.pc !== undefined) {
+          instr = this.wasm.getInstruction(wasmState.pc);
+        }
+        assert(
+          wasmState.exception !== undefined && wasmState.exception !== '',
+          'No exception send by VM',
+        );
+        cb(instr, wasmState.exception);
+      },
+    );
 
-    // async function closeOnError(
-    //   wasm: WasmModule,
-    //   vmConnection: WasmitoBackendVM,
-    // ): Promise<void> {
-    //   const inspectAction = new InspectStateHook().includePC().includeException();
-    //   inspectAction.subscribe((wasmState) => {
-    //     assert(wasmState.pc !== undefined);
-    //     const instr = wasm.getInstruction(wasmState.pc);
-    //     assert(instr !== undefined);
-    //     console.log(
-    //       `Exception occurred at 0x${instr.startAddress} ${instr.name}: ${wasmState.exception}\n`,
-    //     );
-    //   });
-    //   await hookOnError([inspectAction], vmConnection);
-    // }
+    this._hookOnErrorAction = inspectAction;
+    return this;
   }
 
   aroundFunction(_cb: (...args: any[]) => any): GroupHooks {
@@ -476,53 +510,42 @@ export class WasmAnalysis {
         }
         break;
     }
-    await this.deployOnInstructions(this._requests, deployInBulk, timeoutMs);
-    // await this.deployInterruptGroups(interruptGroups, timeoutMs);
+    await this.deployRequests(
+      this._advices.instructionsRequest,
+      deployInBulk,
+      timeoutMs,
+    );
+    await this.deployRequests(
+      this._advices.interruptRequests,
+      deployInBulk,
+      timeoutMs,
+    );
+
+    if (this._hookOnErrorAction === undefined) {
+      this.onError(this.logError.bind(this));
+    }
+
+    await this.deployOnError();
   }
 
-  private async deployInterruptGroups(
-    gps: GroupHooks[],
-    timeoutMs?: number,
-  ): Promise<void> {
-    // TODO bulk
-    for (let idx = 0; idx < gps.length; idx++) {
-      this._logger.debug(
-        `Deploying Interrupt Group #${idx + 1} out of #${gps.length}`,
-      );
-      await this.deployOnInterrupts(gps[idx], timeoutMs);
-    }
-    return;
+  private async deployOnError() {
+    assert(
+      this._hookOnErrorAction !== undefined,
+      'No hook registered for on error',
+    );
+    const s = await this.vm.addHookOnError(this._hookOnErrorAction);
+    if (!s) throw new Error(`Failed to register hook On error`);
+  }
+
+  private logError(i: WasmInstruction | undefined, exception: string): void {
+    console.error(
+      `error occurred in VM at instr=${i?.name} addr=${i?.startAddress}:${exception}`,
+    );
   }
 
   async remove(): Promise<void> {}
 
-  private async deployOnInterrupts(
-    g: GroupHooks,
-    timeoutMs?: number,
-  ): Promise<void> {
-    let cb;
-    switch (g.mode) {
-      case 'onNewInterrupt':
-        cb = this.vm.addHookOnNewEvent.bind(this.vm);
-        break;
-      case 'beforeInterruptHandled':
-        cb = this.vm.addHookOnEventHandling.bind(this.vm);
-        break;
-      // case 'afterHandlingInterrupt':
-      default:
-        throw new Error(`unsupported moment ${g.mode}`);
-    }
-    for (const a of g.actions) {
-      const success = await cb(a, timeoutMs);
-      if (!success) {
-        throw new Error(
-          `failed to add action '${a.description()}' onNewInterrupt`,
-        );
-      }
-    }
-  }
-
-  private async deployOnInstructions(
+  private async deployRequests(
     reqs: APIRequest<any>[],
     inBulk: boolean,
     timeoutPerRequestMs?: number,
@@ -539,13 +562,7 @@ export class WasmAnalysis {
     return;
   }
 
-  async run<T>(
-    onComplete:
-      | (() => Promise<T>)
-      | (() => T)
-      | ((vm: WasmitoBackendVM) => Promise<T>)
-      | ((vm: WasmitoBackendVM) => T),
-  ): Promise<T>;
+  async run<T>(onComplete: (() => Promise<T>) | (() => T)): Promise<T>;
   async run<T>(
     onComplete:
       | (() => Promise<T>)
