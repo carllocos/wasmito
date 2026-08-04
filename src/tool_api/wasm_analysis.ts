@@ -642,67 +642,106 @@ function createActionsNode(
 }
 
 function createCallbackNode(
-  node: SourceCFGNode,
-  vm: WasmitoBackendVM,
-  mod: WasmModule,
-  instr: WasmInstruction,
-  moment: InstrMoment,
-  cb: (...args: any[]) => any,
-): (s: WasmState) => void {
-  switch (cb.length) {
-    case 0:
-    case 1:
-      return createCallbackNoArgs(vm, instr, moment, cb);
-    case 2:
-      return callbackArgs(node, mod, instr, false, vm, cb);
-    case 3:
-    case 4:
-      return callbackArgs(node, mod, instr, true, vm, cb);
-    default:
-      throw new Error(`Callback has incorrect number of arguments`);
-  }
+  _node: SourceCFGNode,
+  _vm: WasmitoBackendVM,
+  _mod: WasmModule,
+  _instr: WasmInstruction,
+  _moment: InstrMoment,
+  _cb: (...args: any[]) => any,
+): (s: SubscriptionContent<HookOnAddrSubContent, WasmState>) => void {
+  throw new Error();
+  // switch (cb.length) {
+  //   case 0:
+  //   case 1:
+  //     return createCallbackNoArgs(vm, instr, moment, cb);
+  //   case 2:
+  //     return callbackArgs(node, mod, instr, false, vm, cb);
+  //   case 3:
+  //   case 4:
+  //     return callbackArgs(node, mod, instr, true, vm, cb);
+  //   default:
+  //     throw new Error(`Callback has incorrect number of arguments`);
+  // }
 }
 
-function callbackArgs(
-  node: SourceCFGNode,
-  mod: WasmModule,
-  instr: WasmInstruction,
-  includeInstrArgs: boolean,
-  vm: WasmitoBackendVM,
-  cb: (...args: any[]) => any,
-): (s: WasmState) => void {
-  return (s: WasmState) => {
-    assertFatalHookError(s.pc !== undefined, 'pc is empty');
-    const i = mod.getInstruction(s.pc);
-    assertFatalHookError(
-      i !== undefined,
-      `No instruction found for address ${s.pc}`,
-    );
+// function callbackArgs(
+//   node: SourceCFGNode,
+//   mod: WasmModule,
+//   instr: WasmInstruction,
+//   includeInstrArgs: boolean,
+//   vm: WasmitoBackendVM,
+//   cb: (...args: any[]) => any,
+// ): (s: WasmState) => void {
+//   return (s: WasmState) => {
+//     assertFatalHookError(s.pc !== undefined, 'pc is empty');
+//     const i = mod.getInstruction(s.pc);
+//     assertFatalHookError(
+//       i !== undefined,
+//       `No instruction found for address ${s.pc}`,
+//     );
 
-    assertFatalHookError(
-      i.signature.nrArgs === instr.signature.nrArgs,
-      `mismatch between expect args of instr ${i.name} and ${instr.name}`,
-    );
+//     assertFatalHookError(
+//       i.signature.nrArgs === instr.signature.nrArgs,
+//       `mismatch between expect args of instr ${i.name} and ${instr.name}`,
+//     );
 
-    let args: WritableWasmValue[] | ReadOnlyWasmValue[] = [];
-    if (includeInstrArgs && i.signature.nrArgs > 0) {
-      assertFatalHookError(
-        s.stack !== undefined,
-        'VM failed to provide the stack needed to construct args',
-      );
-      assertFatalHookError(
-        s.stack.length >= i.signature.nrArgs,
-        `Stack is expected to have #${i.signature.nrArgs} values but has ${s.stack.length} to reconstruct args for '${i.name}' inst at addr ${i.startAddress}`,
-      );
+//     let args: WritableWasmValue[] | ReadOnlyWasmValue[] = [];
+//     if (includeInstrArgs && i.signature.nrArgs > 0) {
+//       assertFatalHookError(
+//         s.stack !== undefined,
+//         'VM failed to provide the stack needed to construct args',
+//       );
+//       assertFatalHookError(
+//         s.stack.length >= i.signature.nrArgs,
+//         `Stack is expected to have #${i.signature.nrArgs} values but has ${s.stack.length} to reconstruct args for '${i.name}' inst at addr ${i.startAddress}`,
+//       );
 
-      const vals = s.stack.slice(-i.signature.nrArgs);
-      args = vals.map((v) => new ReadOnlyWasmValue(v));
-    }
+//       const vals = s.stack.slice(-i.signature.nrArgs);
+//       args = vals.map((v) => new ReadOnlyWasmValue(v));
+//     }
 
-    const newArgs = cb(node, i, args, vm);
-    assertFatalHookError(
-      newArgs === undefined,
-      `Registered callback should not return any value as no update is expected`,
-    );
-  };
-}
+//     const newArgs = cb(node, i, args, vm);
+//     assertFatalHookError(
+//       newArgs === undefined,
+//       `Registered callback should not return any value as no update is expected`,
+//     );
+//   };
+// }
+// private async deployOnInterrupt(
+//   reqs: HookOnEventRequest[],
+//   deployInBulk: boolean,
+//   timeoutMs?: number,
+// ): Promise<void> {
+// for (let idx = 0; idx < gps.length; idx++) {
+//   this._logger.debug(
+//     `Deploying Interrupt Group #${idx + 1} out of #${gps.length}`,
+//   );
+//   await this.deployOnInterrupts(gps[idx], timeoutMs);
+// }
+// return;
+// }
+// private async deployOnInterrupts(
+//   g: GroupHooks,
+//   timeoutMs?: number,
+// ): Promise<void> {
+//   let cb;
+//   switch (g.mode) {
+//     case 'onNewInterrupt':
+//       cb = this.vm.addHookOnNewEvent.bind(this.vm);
+//       break;
+//     case 'beforeInterruptHandled':
+//       cb = this.vm.addHookOnEventHandling.bind(this.vm);
+//       break;
+//     // case 'afterHandlingInterrupt':
+//     default:
+//       throw new Error(`unsupported moment ${g.mode}`);
+//   }
+//   for (const a of g.actions) {
+//     const success = await cb(a, timeoutMs);
+//     if (!success) {
+//       throw new Error(
+//         `failed to add action '${a.description()}' onNewInterrupt`,
+//       );
+//     }
+//   }
+// }
