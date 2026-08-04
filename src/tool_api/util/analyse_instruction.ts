@@ -215,69 +215,18 @@ export function instruction<I extends WasmInstruction>(
   mutate: boolean,
 ): number {
   const instrs = getInstructions(wasm, instr, moment);
-  if (instrs.length === 0) {
-    return 0;
-  }
-
-  const reqsSize = reqs.length;
-  for (const i of instrs) {
-    const [hooks, actionToSubscribe] = createActions(
-      moment,
-      i,
-      mutate,
-      cb.length,
-    );
-    const newCB = createCallback(
-      vm,
-      maxTimeoutMs,
-      moment,
-      wasm,
-      i as I,
-      mutate,
-      cb,
-    );
-    actionToSubscribe.subscribe(newCB);
-    for (const h of hooks) {
-      // for loop to reduce memory use
-      reqs.push(new HookOnWasmAddrRequest(i.startAddress).addHook(h));
-    }
-  }
-  return reqs.length - reqsSize;
+  const hm = instrMomentToHookMoment(moment);
+  return advices.addInstructionsAdvice(hm, instrs, mutate, cb);
 }
 
-function createCallback<I extends WasmInstruction>(
-  vm: WasmitoBackendVM,
-  maxTimeout: number,
-  moment: InstrMoment,
-  mod: WasmModule,
-  instr: I,
-  updateState: boolean,
-  cb: (...args: any[]) => any,
-): (s: WasmState) => Promise<void> {
-  switch (cb.length) {
-    case 0:
-    case 1:
-      return createCallbackNoArgs(vm, instr, moment, cb);
-    case 2:
-    case 3:
-      if (moment === 'before') {
-        return createCallbackWithArgs(
-          vm,
-          maxTimeout,
-          mod,
-          instr,
-          updateState,
-          cb,
-        );
-      } else if (moment === 'after') {
-        return createCallbackWithResult(vm, maxTimeout, instr, updateState, cb);
-      } else {
-        throw new Error(`TODO callback for ${moment}`);
-      }
+function instrMomentToHookMoment(m: InstrMoment): HookOnWasmAddrMoment {
+  switch (m) {
+    case 'before':
+      return HookOnWasmAddrMoment.HookBefore;
+    case 'after':
+      return HookOnWasmAddrMoment.HookAfter;
     default:
-      throw new Error(
-        `Callback has not the right type signature. Given nr of arguments ${cb.length}`,
-      );
+      throw new Error(`TODO`);
   }
 }
 
