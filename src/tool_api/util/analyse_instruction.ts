@@ -8,17 +8,22 @@ import { WasmModule } from '../../webassembly/wasm/wasm_module';
 import { WasmCode, WasmOpcode } from '../../webassembly/wasm/wasm_opcode';
 import { ReadOnlyWasmValue, WritableWasmValue } from '../interrupts';
 import { InstrMoment } from '../group_hooks';
-import { WASM, WasmState } from '../../webassembly/wasm';
-import { assertFatalHookError, Hook } from '../../hooks/hook';
-import { InspectStateHook } from '../../hooks/hook_inspect_state';
-import { StateRequest } from '../../runtimes/wasmito_vm/requests/inspect_request';
-import { PauseVMHook } from '../../hooks/hook_run_pause';
+import { WasmState, WASMValueIndexed } from '../../webassembly/wasm';
+import { assertFatalHookError, SubscriptionContent } from '../../hooks/hook';
 import { getGlobalLogger } from '../../logger/logger';
 import { WASMFunction } from '../../webassembly/wasm/wasm_function';
-import { HookOnWasmAddrRequest } from '../../runtimes/wasmito_vm/requests/hook_on_wasm_addr_request';
+import {
+  HookOnAddrSubContent,
+  HookOnWasmAddrMoment,
+  isHookOnAddrSubContent,
+} from '../../runtimes/wasmito_vm/requests/hook_on_wasm_addr_request';
+import {
+  AdvicesRegistery,
+  isNoArgAdvice,
+  isVMArgAdvice,
+} from './advices_registery';
 
 const logger = getGlobalLogger();
-
 export function getInstructions<I extends WasmInstruction>(
   wasm: WasmModule,
   instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode | WASMFunction,
@@ -53,11 +58,10 @@ export function getInstructions<I extends WasmInstruction>(
 }
 
 export function instruction<I extends WasmInstruction>(
-  reqs: HookOnWasmAddrRequest[],
+  advices: AdvicesRegistery,
   moment: 'before',
   instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode | WASMFunction,
   wasm: WasmModule,
-  vm: WasmitoBackendVM,
   maxTimeoutMs: number,
   cb:
     | ((instr: I, args: ReadOnlyWasmValue[], vm: WasmitoBackendVM) => void)
@@ -75,11 +79,10 @@ export function instruction<I extends WasmInstruction>(
   mutate: false,
 ): number;
 export function instruction<I extends WasmInstruction>(
-  reqs: HookOnWasmAddrRequest[],
+  advices: AdvicesRegistery,
   moment: 'before',
   instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode | WASMFunction,
   wasm: WasmModule,
-  vm: WasmitoBackendVM,
   maxTimeoutMs: number,
   cb:
     | ((
@@ -97,11 +100,10 @@ export function instruction<I extends WasmInstruction>(
   mutate: true,
 ): number;
 export function instruction<I extends WasmInstruction>(
-  reqs: HookOnWasmAddrRequest[],
+  advices: AdvicesRegistery,
   moment: 'after',
   instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode | WASMFunction,
   wasm: WasmModule,
-  vm: WasmitoBackendVM,
   maxTimeoutMs: number,
   cb:
     | ((
@@ -123,11 +125,10 @@ export function instruction<I extends WasmInstruction>(
   mutate: false,
 ): number;
 export function instruction<I extends WasmInstruction>(
-  reqs: HookOnWasmAddrRequest[],
+  advices: AdvicesRegistery,
   moment: 'after',
   instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode | WASMFunction,
   wasm: WasmModule,
-  vm: WasmitoBackendVM,
   maxTimeoutMs: number,
   cb:
     | ((
@@ -151,11 +152,10 @@ export function instruction<I extends WasmInstruction>(
   mutate: true,
 ): number;
 export function instruction<I extends WasmInstruction>(
-  reqs: HookOnWasmAddrRequest[],
+  advices: AdvicesRegistery,
   moment: InstrMoment,
   instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode | WASMFunction,
   wasm: WasmModule,
-  vm: WasmitoBackendVM,
   maxTimeoutMs: number,
   cb:
     | ((
