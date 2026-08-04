@@ -617,9 +617,11 @@ export class WasmAnalysis {
 function createActionsNode(
   instr: WasmInstruction,
   cbNrOfArgs: number,
-): [Hook[], InspectStateHook] {
+): [Hook[], InspectStateHook<HookOnAddrSubContent>] {
   const hooks: Hook[] = [];
-  const inspectAction = new InspectStateHook(new StateRequest());
+  const inspectAction = new InspectStateHook<HookOnAddrSubContent>(
+    new StateRequest(),
+  );
   inspectAction.includePC();
   switch (cbNrOfArgs) {
     case 0:
