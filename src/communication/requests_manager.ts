@@ -43,7 +43,9 @@ export class RequestsManager {
         this._waitingForAcksBulk.delete(req.id);
       }
       if (this._waitingForAcksBulk.size === 0) {
-        this._resolveBulk();
+        if (this._resolveBulk !== undefined) {
+          this._resolveBulk();
+        }
       }
     }
     return;
