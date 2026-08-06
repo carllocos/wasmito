@@ -1,10 +1,7 @@
 import { expect } from 'chai';
 import path from 'path';
 import { WasmModule } from '../../src/webassembly/wasm/wasm_module';
-import {
-  connectToExistingDevVM,
-  spawnDevVM,
-} from '../../tool_examples/spawn_vm';
+import { spawnDevVM } from '../../tool_examples/spawn_vm';
 import { WasmAnalysis } from '../../src/tool_api/wasm_analysis';
 import { WasmitoBackendVM } from '../../src/runtimes/wasmito_vm/wasmito_vm';
 import { ReadOnlyWasmValue } from '../../src/tool_api/interrupts';
