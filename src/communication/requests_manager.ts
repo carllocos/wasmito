@@ -15,8 +15,7 @@ export class RequestsManager {
   private connection?: Channel;
   private requests: Map<RequestID, APIRequest<any>>;
 
-  private _resolveBulk: any;
-  private _rejectBulk: any;
+  private _resolveBulk: ((value: void | PromiseLike<void>) => void) | undefined;
   private _waitingForAcksBulk: Set<number> = new Set();
 
   constructor() {
@@ -95,9 +94,8 @@ export class RequestsManager {
       this.requests.set(request.id, request);
     }
 
-    const p = new Promise((resolve, reject) => {
+    const p = new Promise((resolve) => {
       this._resolveBulk = resolve;
-      this._rejectBulk = reject;
     });
 
     const successful = await connection.send(data);
