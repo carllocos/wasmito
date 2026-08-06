@@ -305,8 +305,14 @@ export class WasmAnalysis {
   onNewInterruptMut(
     cb:
       | ((ev: WritableInterrupt, vm: WasmitoBackendVM) => WritableInterrupt)
+      | ((
+          ev: WritableInterrupt,
+          vm: WasmitoBackendVM,
+        ) => Promise<WritableInterrupt>)
       | ((ev: WritableInterrupt) => WritableInterrupt)
-      | (() => void),
+      | ((ev: WritableInterrupt) => Promise<WritableInterrupt>)
+      | (() => void)
+      | (() => Promise<void>),
   ): this {
     const mutate = true;
     const groupType = 'onNewInterrupt';
@@ -320,8 +326,11 @@ export class WasmAnalysis {
   beforeHandlingInterrupt(
     cb:
       | ((ev: ReadOnlyInterrupt, vm: WasmitoBackendVM) => void)
+      | ((ev: ReadOnlyInterrupt, vm: WasmitoBackendVM) => Promise<void>)
       | ((ev: ReadOnlyInterrupt) => void)
-      | (() => void),
+      | ((ev: ReadOnlyInterrupt) => Promise<void>)
+      | (() => void)
+      | (() => Promise<void>),
   ): this {
     const mutate = false;
     const groupType = 'beforeInterruptHandled';
@@ -335,7 +344,13 @@ export class WasmAnalysis {
   beforeHandlingInterruptMut(
     cb:
       | ((ev: WritableInterrupt, vm: WasmitoBackendVM) => WritableInterrupt)
+      | ((
+          ev: WritableInterrupt,
+          vm: WasmitoBackendVM,
+        ) => Promise<WritableInterrupt>)
       | ((ev: WritableInterrupt) => WritableInterrupt)
+      | ((ev: WritableInterrupt) => Promise<WritableInterrupt>)
+      | (() => Promise<void>)
       | (() => void),
   ): this {
     const mutate = true;
@@ -350,8 +365,11 @@ export class WasmAnalysis {
   afterHandlingInterrupt(
     cb:
       | ((ev: ReadOnlyInterrupt) => void)
+      | ((ev: ReadOnlyInterrupt) => Promise<void>)
       | ((ev: ReadOnlyInterrupt, vm: WasmitoBackendVM) => void)
-      | (() => void),
+      | ((ev: ReadOnlyInterrupt, vm: WasmitoBackendVM) => Promise<void>)
+      | (() => void)
+      | (() => Promise<void>),
   ): this {
     const mutate = false;
     const groupType = 'afterHandlingInterrupt';
