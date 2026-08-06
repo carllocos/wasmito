@@ -196,17 +196,12 @@ export async function runHooksAndListeners<M>(
   hooks: Hook[],
   logger?: Logger,
 ): Promise<SubscriptionParseOutcome> {
-  try {
-    const successFulParse = await parseHookContentAndRunListeners(
-      msg,
-      hooks,
-      logger,
-    );
-    return successFulParse
-      ? SubscriptionParseOutcome.Successful
-      : SubscriptionParseOutcome.Failed;
-  } catch (e) {
-    if (e instanceof FatalHookError) throw e;
-    return SubscriptionParseOutcome.Failed;
-  }
+  const successFulParse = await parseHookContentAndRunListeners(
+    msg,
+    hooks,
+    logger,
+  );
+  return successFulParse
+    ? SubscriptionParseOutcome.Successful
+    : SubscriptionParseOutcome.Failed;
 }
