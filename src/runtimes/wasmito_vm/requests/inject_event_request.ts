@@ -7,7 +7,6 @@ import { Instruction } from './instructions';
 import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
-  SubscriptionParseOutcome,
 } from '../../request_interface';
 import {
   isRequestMessage,
