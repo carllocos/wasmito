@@ -17,7 +17,12 @@ import { WASM, WasmState } from '../../webassembly/wasm';
 import { WasmInstruction } from '../../webassembly/wasm/wasm_instruction';
 import { InspectableState } from '../../runtimes/wasmito_vm/requests/inspect_request';
 import { WasmitoBackendVM } from '../../runtimes/wasmito_vm/wasmito_vm';
-import { ReadOnlyWasmValue, WritableWasmValue } from '../interrupts';
+import {
+  ReadOnlyInterrupt,
+  ReadOnlyWasmValue,
+  WritableInterrupt,
+  WritableWasmValue,
+} from '../interrupts';
 
 export type AdviceBefore<I extends WasmInstruction> =
   | ((
@@ -84,7 +89,7 @@ export type Advice<I extends WasmInstruction> =
   | AdviceVMArg;
 
 export function isNoArgAdvice<I extends WasmInstruction>(
-  advice: Advice<I>,
+  advice: Advice<I> | AdviceInterrupt,
 ): advice is AdviceNoArgs {
   return advice.length === 0;
 }
@@ -97,6 +102,56 @@ export function isVMArgAdvice<I extends WasmInstruction>(
 
 type AdviceArray = Array<[Advice<WasmInstruction>, boolean]>;
 type AdviceMap = Map<number, AdviceArray>;
+
+export type AdviceOnNewInterrupt =
+  | ((ev: ReadOnlyInterrupt, vm: WasmitoBackendVM) => void)
+  | ((ev: ReadOnlyInterrupt, vm: WasmitoBackendVM) => Promise<void>)
+  | ((ev: ReadOnlyInterrupt) => void)
+  | ((ev: ReadOnlyInterrupt) => Promise<void>)
+  | AdviceNoArgs;
+
+export type AdviceOnNewInterruptMut =
+  | ((ev: WritableInterrupt, vm: WasmitoBackendVM) => WritableInterrupt)
+  | ((
+      ev: WritableInterrupt,
+      vm: WasmitoBackendVM,
+    ) => Promise<WritableInterrupt>)
+  | ((ev: WritableInterrupt) => WritableInterrupt)
+  | ((ev: WritableInterrupt) => Promise<WritableInterrupt>)
+  | AdviceNoArgs;
+
+export type AdviceBeforeHandlingInterrupt =
+  | ((ev: ReadOnlyInterrupt, vm: WasmitoBackendVM) => void)
+  | ((ev: ReadOnlyInterrupt, vm: WasmitoBackendVM) => Promise<void>)
+  | ((ev: ReadOnlyInterrupt) => void)
+  | ((ev: ReadOnlyInterrupt) => Promise<void>)
+  | AdviceNoArgs;
+
+export type AdviceBeforeHandlingInterruptMut =
+  | ((ev: WritableInterrupt, vm: WasmitoBackendVM) => WritableInterrupt)
+  | ((
+      ev: WritableInterrupt,
+      vm: WasmitoBackendVM,
+    ) => Promise<WritableInterrupt>)
+  | ((ev: WritableInterrupt) => WritableInterrupt)
+  | ((ev: WritableInterrupt) => Promise<WritableInterrupt>)
+  | AdviceNoArgs;
+
+export type AdviceAfterHandlingInterrupt =
+  | ((ev: ReadOnlyInterrupt) => void)
+  | ((ev: ReadOnlyInterrupt) => Promise<void>)
+  | ((ev: ReadOnlyInterrupt, vm: WasmitoBackendVM) => void)
+  | ((ev: ReadOnlyInterrupt, vm: WasmitoBackendVM) => Promise<void>)
+  | AdviceNoArgs;
+
+export type AdviceInterrupt =
+  | AdviceOnNewInterrupt
+  | AdviceOnNewInterruptMut
+  | AdviceBeforeHandlingInterrupt
+  | AdviceBeforeHandlingInterruptMut
+  | AdviceAfterHandlingInterrupt;
+
+type AdviceInterruptArray = Array<[AdviceInterrupt, boolean]>;
 
 export class AdvicesRegistery {
   // for Instructions
@@ -115,9 +170,9 @@ export class AdvicesRegistery {
 
   // for interrupts
   private readonly _reqsEvents: HookOnEventRequest[];
-  private readonly advicesOnNewInterrupt: AdviceArray;
-  private readonly advicesBeforeInterrupt: AdviceArray;
-  private readonly advicesAfterInterrupt: AdviceArray;
+  private readonly advicesOnNewInterrupt: AdviceInterruptArray;
+  private readonly advicesBeforeInterrupt: AdviceInterruptArray;
+  private readonly advicesAfterInterrupt: AdviceInterruptArray;
   private readonly alreadyPaused: Set<HookOnEventMoment>;
   private readonly eventInspect: EventInspectHook<HookOnEventContent>;
   private readonly pauseVMHook: PauseVMHook;
@@ -227,7 +282,7 @@ export class AdvicesRegistery {
     this.eventInspect.subscribe(cb);
   }
 
-  getInterruptAdvices(moment: HookOnEventMoment): AdviceArray {
+  getInterruptAdvices(moment: HookOnEventMoment): AdviceInterruptArray {
     switch (moment) {
       case HookOnEventMoment.onNewEvent:
         return this.advicesOnNewInterrupt;
@@ -247,7 +302,7 @@ export class AdvicesRegistery {
   addInterruptAdvice(
     m: HookOnEventMoment,
     mutate: boolean,
-    cb: (...args: any[]) => any,
+    cb: AdviceInterrupt,
   ): number {
     const ads = this.getInterruptAdvices(m);
     const sizeBefore = ads.length;
