@@ -52,7 +52,7 @@ function assertUpdateEvent(
   if (expectedUpdate) {
     assertFatalHookError(
       ev instanceof WritableInterrupt,
-      `Expected Wasm.Event to be of type WritableInterurpt`,
+      `Expected Wasm.Event to be of type WritableInterrupt`,
     );
     return;
   }
