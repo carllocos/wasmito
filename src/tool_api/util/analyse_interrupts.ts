@@ -24,6 +24,7 @@ export function runAdvicesInterrupt(
   maxTimeoutMs: number,
 ): (data: SubscriptionContent<HookOnEventContent, WASM.Event>) => void {
   return async (sub: SubscriptionContent<HookOnEventContent, WASM.Event>) => {
+    await advicesContainer.waitForPendingInterruptAdvices();
     const moment = sub.metadata.moment;
     const advices = advicesContainer.getInterruptAdvices(moment);
     let ev: ReadOnlyInterrupt | WritableInterrupt = new ReadOnlyInterrupt(
@@ -42,6 +43,7 @@ export function runAdvicesInterrupt(
       getGlobalLogger().warn(`TODO update event`);
       await vm.run(maxTimeoutMs);
     }
+    advicesContainer.interruptAdvicesCompleted();
   };
 }
 
