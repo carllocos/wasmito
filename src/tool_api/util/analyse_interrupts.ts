@@ -34,9 +34,11 @@ export function runAdvicesInterrupt(
     for (const [advice, mutate] of advices) {
       mutated = mutated || mutate;
       ev = convertEvent(mutate, ev);
-      const ad = advice as any; // TODO fix
-      const newEvent = await ad(ev, vm);
-      assertUpdateEvent(newEvent, mutate);
+      const newEvent = await advice(ev as any, vm);
+      if (mutate) {
+        assertUpdateEvent(newEvent, mutate);
+        ev = newEvent as any;
+      }
     }
 
     if (mutated) {
