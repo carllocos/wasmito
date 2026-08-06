@@ -40,7 +40,7 @@ export interface RuntimeToolAPI {
 
   loadWasmState: (state: WasmState, timeout?: number) => Promise<void>;
 
-  resolveEvent: (timeout?: number) => Promise<void>;
+  resolveEvent: (timeout?: number) => Promise<boolean>;
 
   unregisterFuncForProxyCall: (
     funcToProxy: WASMFunction,

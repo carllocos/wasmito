@@ -177,7 +177,7 @@ export class WARDuinoRuntimeAPI implements RuntimeToolAPI {
   loadWasmState(state: WasmState, timeout?: number): Promise<void> {
     throw new Error('To implement');
   }
-  resolveEvent(timeout?: number): Promise<void> {
+  resolveEvent(timeout?: number): Promise<boolean> {
     throw new Error('To implement');
   }
   unregisterFuncForProxyCall(
