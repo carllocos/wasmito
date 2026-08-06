@@ -302,12 +302,17 @@ export class AdvicesRegistery {
         this._reqs.push(pauseReq);
         this.instrPause.add(i.startAddress);
       }
-      advicesRegistered += this.storeAdvice(hm, i.startAddress, cb, mutate);
+      advicesRegistered += this.storeInstructionAdvice(
+        hm,
+        i.startAddress,
+        cb,
+        mutate,
+      );
     }
     return advicesRegistered;
   }
 
-  storeAdvice(
+  storeInstructionAdvice(
     moment: HookOnWasmAddrMoment,
     addr: number,
     cb: Advice<WasmInstruction>,
