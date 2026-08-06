@@ -46,7 +46,7 @@ export function runAdvicesInterrupt(
 }
 
 function assertUpdateEvent(
-  ev: WritableInterrupt | ReadOnlyInterrupt | undefined,
+  ev: WritableInterrupt | ReadOnlyInterrupt | undefined | void,
   expectedUpdate: boolean,
 ) {
   if (expectedUpdate) {
