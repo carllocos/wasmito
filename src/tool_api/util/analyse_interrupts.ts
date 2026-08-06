@@ -57,8 +57,8 @@ function assertUpdateEvent(
     return;
   }
   assertFatalHookError(
-    ev instanceof ReadOnlyInterrupt,
-    'Non mutable advice should return a readonly Event',
+    ev === undefined,
+    'A non mutable advice should return nothing',
   );
 }
 
