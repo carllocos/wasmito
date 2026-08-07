@@ -6,13 +6,14 @@ import assert from 'assert';
 import { SourceCodeLocation } from '../../src/source_mappers/source_map';
 import { readFileSync, writeFile, WriteFileOptions } from 'fs';
 import { parse } from 'csv-parse/sync';
-import { spawnMCUVM } from '../spawn_vm';
+import { connectToExistingMCUVM, spawnMCUVM } from '../spawn_vm';
 import { WasmModule } from '../../src/webassembly/wasm/wasm_module';
 import { WasmAnalysis } from '../../src/tool_api/wasm_analysis';
 import { BoardBaudRate } from '../../src/util/serial_port';
 import { WritableWasmValue } from '../../src/tool_api/interrupts';
 import { exit } from 'process';
-import { getFileName } from '../../src';
+import { waitMilliSeconds } from '../../src/util/promise_util';
+import { spawn } from 'child_process';
 
 const writeFlags: WriteFileOptions = {
   encoding: 'utf-8',
@@ -41,37 +42,38 @@ class ReplayInstr {
     console.log(this.records[this.instructionCount + this.interruptCount]);
   }
 
-  public checkInstr(instr: WasmInstruction, args: WritableWasmValue[]) {
+  public async checkInstr(instr: WasmInstruction, args: WritableWasmValue[]) {
     console.log(this.records[this.interruptCount + this.instructionCount + 1]);
     const totalClock = this.interruptCount + this.instructionCount;
     if (totalClock + 1 >= this.records.length) {
       // clock is greater then the amount of recorded events...
       console.log('closing the vm');
-      setImmediate(async () => {
-        const endTime = performance.now();
-        writeFile(
-          resolve('./tool_examples/record-naive/bench-rep.csv'),
-          `${this.filename},${endTime - this.beginTime}\n`,
-          writeFlags,
-          () => console.log('time written'),
-        );
-        await this.vmConnection.pause();
-        await this.analysis.remove();
-        await this.vmConnection.close();
-        console.log(
-          `replayTime in seconds: ${(endTime - this.beginTime) / 1000}`,
-        );
+      const endTime = performance.now();
+      writeFile(
+        resolve('./tool_examples/record-naive/bench-rep.csv'),
+        `${this.filename},${endTime - this.beginTime}\n`,
+        writeFlags,
+        () => console.log('time written'),
+      );
+      await this.vmConnection.pause();
+      await this.analysis.remove();
+      await this.vmConnection.close();
+      console.log(
+        `replayTime in seconds: ${(endTime - this.beginTime) / 1000}`,
+      );
 
-        exit(0);
-      });
+      exit(0);
+
       return args;
     }
 
     // if the instruction number matches, its an instruction, otherwise is must be an interrupt, as we now record everything naively
     const recordedInstr = this.records[totalClock + 1]; // record list
+
     if (this.instructionCount + 1 == parseInt(recordedInstr[0])) {
-      this.instructionCount += 1;
       console.log(`${recordedInstr[4]}, ${instr.startAddress}`);
+      assert(parseInt(recordedInstr[4]) === instr.startAddress);
+      this.instructionCount += 1;
       const newArgs = recordedInstr[5].split(';');
       // assign all the recorded variables to the stack variables
       for (let i = 0; i < args.length; i++) {
@@ -85,10 +87,7 @@ class ReplayInstr {
           'interrupt_'.length,
         ),
       );
-      setImmediate(async () => {
-        console.log(`do interrupt on pin ${pin}`);
-        await this.vmConnection.simulateInterrupt(pin);
-      });
+      await this.vmConnection.simulateInterrupt(pin);
     }
 
     return args;
@@ -100,8 +99,8 @@ class ReplayInstr {
 
 async function main(): Promise<void> {
   const examplesDir = resolve('./app_examples/assemblyscript/');
-  const mappingsPath = path.join(examplesDir, 'fib/mappings.json');
-  const wasmPath = path.join(examplesDir, 'fib/wasm/fib.wasm');
+  const mappingsPath = path.join(examplesDir, 'toggle_led/mappings.json');
+  const wasmPath = path.join(examplesDir, 'toggle_led/wasm/toggle_led.wasm');
   /*
   const examplesDir = resolve('./libs/WARDuino/benchmarks/tasks/catalan/wast/');
   const mappingsPath = path.join(examplesDir, 'mappings.json');
@@ -121,7 +120,7 @@ async function main(): Promise<void> {
   // uncomment next to run analysis on local VM
   // const vmConnection = await spawnDevVM(wasm);
   // uncomment next to run analysis on MCU VM
-  const vmConnection = await spawnMCUVM(wasm, {
+  const vmConnection = await connectToExistingMCUVM(wasm, {
     vmConfig: {
       pauseOnStart: true, // pause the VM on deploy of the Wasm module
       serialPort: '/dev/ttyUSB0',
@@ -132,15 +131,17 @@ async function main(): Promise<void> {
       },
     },
   });
+  vmConnection.bulkRequests = false;
+  await waitMilliSeconds(1000);
   const analysis = new WasmAnalysis(wasm, vmConnection);
+
   const replayInstr = new ReplayInstr(
     resolve('./tool_examples/record-naive/recording.csv'),
     vmConnection,
     analysis,
   );
-  function checkInstr(instr: WasmInstruction, args: WritableWasmValue[]) {
-    args = replayInstr.checkInstr(instr, args);
-    return args;
+  async function checkInstr(instr: WasmInstruction, args: WritableWasmValue[]) {
+    return replayInstr.checkInstr(instr, args);
   }
   for (const func of wasm.functions) {
     for (const instr of func.allInstructions) {
@@ -150,8 +151,8 @@ async function main(): Promise<void> {
   }
 
   // analysis.beforeHandlingInterrupt()
-  await analysis.deploy();
-  console.log('deployed');
+  const deployInBulk = false;
+  await analysis.deploy(deployInBulk);
   await analysis.run();
   replayInstr.startTime();
 }

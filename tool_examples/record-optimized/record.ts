@@ -11,17 +11,20 @@ import { exit } from 'process';
 import {
   copyClock,
   LogicalClock,
+  logRecord,
   logRecordings,
   newLogicalClock,
   type Record,
 } from './logical_clock';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { spawnDevVM, spawnMCUVM } from '../spawn_vm';
+import { connectToExistingMCUVM, spawnMCUVM } from '../spawn_vm';
 
 import { BoardBaudRate } from '../../src/util/serial_port';
 import { writeFile, WriteFileOptions } from 'fs';
+import { waitMilliSeconds } from '../../src/util/promise_util';
 
 // import { WriteFileOptions, writeFileSync } from 'node:fs';
+let last_rec_startaddr: number = -1;
 
 function recordInterrupt(interrupt: ReadOnlyInterrupt): void {
   logicalClock.interrupts += 1;
@@ -30,31 +33,35 @@ function recordInterrupt(interrupt: ReadOnlyInterrupt): void {
     payload: interrupt.payload,
     clock: copyClock(logicalClock),
   };
-  records.push(record);
-  // logRecord(record);
+  logRecord(record);
 }
 
 function recordInstr(i: WasmInstruction, args: ReadOnlyWasmValue[]): void {
-  logicalClock.instrs += 1;
-
-  const record: Record = {
-    instrAddr: i.startAddress,
-    instrName: i.name,
-    instrArgs: args,
-    clock: copyClock(logicalClock),
-  };
-  records.push(record);
-  // logRecord(record);
+  if (last_rec_startaddr === i.startAddress) {
+    console.log('fake');
+  } else {
+    logicalClock.instrs += 1;
+    const record: Record = {
+      instrAddr: i.startAddress,
+      instrName: i.name,
+      instrArgs: args,
+      clock: copyClock(logicalClock),
+    };
+    // records.push(record);
+    logRecord(record);
+    last_rec_startaddr = i.startAddress;
+  }
 }
 function incrementInstrClock(
   i: WasmInstruction,
   args: ReadOnlyWasmValue[],
 ): void {
-  if (args.length > 0) {
-    console.log('should be recorded...');
-    // recordInstr(i, args);
+  if (last_rec_startaddr === i.startAddress) {
+    console.log('fake');
+  } else {
+    logicalClock.instrs += 1;
+    last_rec_startaddr = i.startAddress;
   }
-  logicalClock.instrs += 1;
 }
 
 const logicalClock: LogicalClock = newLogicalClock();
@@ -67,7 +74,9 @@ const writeFlags: WriteFileOptions = {
 };
 
 async function main(): Promise<void> {
-  const wasmPath = resolve('./app_examples/assemblyscript/fib/wasm/fib.wasm');
+  const wasmPath = resolve(
+    './app_examples/assemblyscript/toggle_led/wasm/toggle_led.wasm',
+  );
   /*
   const wasmPath = resolve(
     './libs/WARDuino/benchmarks/tasks/fac/wast/impl.wasm',
@@ -80,7 +89,7 @@ async function main(): Promise<void> {
   // uncomment next to run analysis on local VM
   // const vmConnection = await spawnDevVM(wasm);
   // uncomment next to run analysis on MCU VM
-  const vmConnection = await spawnMCUVM(wasm, {
+  const vmConnection = await connectToExistingMCUVM(wasm, {
     vmConfig: {
       pauseOnStart: true, // pause the VM on deploy of the Wasm module
       serialPort: '/dev/ttyUSB0',
@@ -91,24 +100,27 @@ async function main(): Promise<void> {
       },
     },
   });
-
+  vmConnection.bulkRequests = false;
+  await waitMilliSeconds(1000);
   const analysis = new WasmAnalysis(wasm, vmConnection);
 
   let instrumentedCount = 0;
   let countingCount = 0;
-  const exportedFunctions = wasm.allExportedFuncs();
-  const exportedFunctionsIds = exportedFunctions.map((value) => value.id);
+  const importedFunctions = wasm.importFuncs;
+  const importedFunctionIds = importedFunctions.map((value) => value.id);
   // these functions are the ones that may be counted as they dont belong to the exported funcs.
 
-  let recordingFunctions = wasm.functions.filter((outerValue, index, array) => {
-    return (
-      // find the exported function in the functions array
-      exportedFunctionsIds.findIndex(
-        (inner, index, array) => inner == outerValue.id,
-        // if not found this function may be just counted.
-      ) == -1
-    );
-  });
+  const recordingFunctions = wasm.functions.filter(
+    (outerValue, index, array) => {
+      return (
+        // find the exported function in the functions array
+        importedFunctionIds.findIndex(
+          (inner, index, array) => inner == outerValue.id,
+          // if not found this function may be just counted.
+        ) == -1
+      );
+    },
+  );
 
   // recordingFunctions = wasm.functions;
 
@@ -128,7 +140,7 @@ async function main(): Promise<void> {
       }
     }
   }
-  for (const f of exportedFunctions) {
+  for (const f of wasm.importFuncs) {
     for (const i of f.allInstructions) {
       console.log('        R');
       analysis.before(i, recordInstr);
@@ -140,7 +152,8 @@ async function main(): Promise<void> {
 
   //register advice on before handling interrupt
   analysis.beforeHandlingInterrupt(recordInterrupt);
-  await analysis.deploy();
+  const deployBulk = false;
+  await analysis.deploy(deployBulk);
   const recordSecs = 10;
   await analysis.run();
   const beginTime = performance.now();

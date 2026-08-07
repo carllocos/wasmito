@@ -11,15 +11,19 @@ import { exit } from 'process';
 import {
   copyClock,
   LogicalClock,
+  logRecord,
   logRecordings,
   newLogicalClock,
   type Record,
 } from './logical_clock';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { spawnDevVM, spawnMCUVM } from '../spawn_vm';
+import { connectToExistingMCUVM, spawnDevVM, spawnMCUVM } from '../spawn_vm';
 
 import { BoardBaudRate } from '../../src/util/serial_port';
 import { writeFile, WriteFileOptions } from 'fs';
+import { waitMilliSeconds } from '../../src/util/promise_util';
+import { MCUWasmitoVM } from '../../src';
+import { connect } from 'http2';
 
 // import { WriteFileOptions, writeFileSync } from 'node:fs';
 
@@ -28,48 +32,61 @@ const writeFlags: WriteFileOptions = {
   flag: 'a',
   mode: 0o666,
 };
-
+let last_rec_startaddr: number = -1;
 let instrumentedCount = 0;
 function recordInterrupt(interrupt: ReadOnlyInterrupt): void {
+  console.log('interrupt');
   logicalClock.interrupts += 1;
   const record: Record = {
     topic: interrupt.topic,
     payload: interrupt.payload,
     clock: copyClock(logicalClock),
   };
-  records.push(record);
-  // logRecord(record);
+  // records.push(record);
+  logRecord(record);
 }
 
 function recordInstr(i: WasmInstruction, args: ReadOnlyWasmValue[]): void {
-  logicalClock.instrs += 1;
-  const record: Record = {
-    instrAddr: i.startAddress,
-    instrName: i.name,
-    instrArgs: args,
-    clock: copyClock(logicalClock),
-  };
-  records.push(record);
-  // logRecord(record);
+  console.log('instruction');
+
+  if (last_rec_startaddr === i.startAddress) {
+    console.log('fake');
+  } else {
+    logicalClock.instrs += 1;
+    const record: Record = {
+      instrAddr: i.startAddress,
+      instrName: i.name,
+      instrArgs: args,
+      clock: copyClock(logicalClock),
+    };
+    // records.push(record);
+    logRecord(record);
+    last_rec_startaddr = i.startAddress;
+  }
 }
 
 const logicalClock: LogicalClock = newLogicalClock();
 const records: Record[] = [];
 
 async function main(): Promise<void> {
+  /*
   const wasmPath = resolve('./app_examples/assemblyscript/fib/wasm/fib.wasm');
   /*
   const wasmPath = resolve(
     './libs/WARDuino/benchmarks/tasks/catalan/wast/impl.wasm',
   );
-*/
+  */
+  const wasmPath = resolve(
+    './app_examples/assemblyscript/toggle_led/wasm/toggle_led.wasm',
+  );
+
   const wasm = new WasmModule(wasmPath);
   //const instr = wasm.getInstruction(0xee);
   //assert(instr !== undefined);
   // uncomment next to run analysis on local VM
   // const vmConnection = await spawnDevVM(wasm);
   // uncomment next to run analysis on MCU VM
-  const vmConnection = await spawnMCUVM(wasm, {
+  const vmConnection = await connectToExistingMCUVM(wasm, {
     vmConfig: {
       pauseOnStart: true, // pause the VM on deploy of the Wasm module
       serialPort: '/dev/ttyUSB0',
@@ -80,6 +97,9 @@ async function main(): Promise<void> {
       },
     },
   });
+  vmConnection.bulkRequests = false;
+  await waitMilliSeconds(1000); // timing issue with communication
+
   const analysis = new WasmAnalysis(wasm, vmConnection);
   for (const f of wasm.functions) {
     for (const i of f.allInstructions) {
@@ -90,13 +110,15 @@ async function main(): Promise<void> {
   }
   console.log(`instrumented instructions: #${instrumentedCount}`);
 
-  //register advice on before handling interrupt
+  // register advice on before handling interrupt
   analysis.beforeHandlingInterrupt(recordInterrupt);
+  const deployInBulk = false;
 
-  await analysis.deploy();
+  await analysis.deploy(deployInBulk);
   const recordSecs = 10;
   const ms = recordSecs * 1000; // convert to milliseconds
   await analysis.run();
+
   const beginTime = performance.now();
   setTimeout(async () => {
     const endTime = performance.now();
@@ -108,10 +130,9 @@ async function main(): Promise<void> {
     );
     await vmConnection.pause();
     await analysis.remove();
-    await vmConnection.close();
+    vmConnection.close();
     logRecordings(records);
     console.log(`recording time: ${(endTime - beginTime) / 1000}s`);
-
     exit(0);
   }, ms);
 

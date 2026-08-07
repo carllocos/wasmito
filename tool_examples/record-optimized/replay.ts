@@ -6,12 +6,18 @@ import assert from 'assert';
 import { SourceCodeLocation } from '../../src/source_mappers/source_map';
 import { readFileSync, writeFile, WriteFileOptions } from 'fs';
 import { parse } from 'csv-parse/sync';
-import { spawnMCUVM, spawnDevVM, connectToExistingDevVM } from '../spawn_vm';
+import {
+  spawnMCUVM,
+  spawnDevVM,
+  connectToExistingDevVM,
+  connectToExistingMCUVM,
+} from '../spawn_vm';
 import { WasmModule } from '../../src/webassembly/wasm/wasm_module';
 import { WasmAnalysis } from '../../src/tool_api/wasm_analysis';
 import { BoardBaudRate } from '../../src/util/serial_port';
 import { WritableWasmValue } from '../../src/tool_api/interrupts';
 import { exit } from 'process';
+import { waitMilliSeconds } from '../../src/util/promise_util';
 
 const writeFlags: WriteFileOptions = {
   encoding: 'utf-8',
@@ -43,7 +49,7 @@ class ReplayInstr {
     this.analysis = analysis;
     console.log(this.records[this.recordIndex]);
   }
-  public checkInstr(instr: WasmInstruction, args: WritableWasmValue[]) {
+  public async checkInstr(instr: WasmInstruction, args: WritableWasmValue[]) {
     if (this.recordIndex >= this.records.length) {
       console.log('closing the vm');
       setImmediate(async () => {
@@ -77,18 +83,11 @@ class ReplayInstr {
       // if its an interrupt and the clock is correct.
       this.interruptCount += 1;
       const pin = parseInt(currentRecord[2].slice('interrupt_'.length));
-      setImmediate(async () => {
-        console.log(`do interrupt on pin ${pin}`);
-        await this.vmConnection.simulateInterrupt(pin);
-      });
+      await this.vmConnection.simulateInterrupt(pin);
       this.recordIndex += 1;
     } else if (this.instructionCount + 1 == parseInt(currentRecord[0])) {
       this.instructionCount += 1;
-      console.log(
-        `(before assert) This Record: ${currentRecord}, m5s startadress : ${instr.startAddress}\n`,
-      );
       assert(parseInt(currentRecord[4]) == instr.startAddress);
-      console.log('assert did not fail');
 
       const newArgs = this.records[this.recordIndex][5].split(';');
       // assign all the recorded variables to the stack variables
@@ -118,8 +117,8 @@ class ReplayInstr {
 
 async function main(): Promise<void> {
   const examplesDir = resolve('./app_examples/assemblyscript/');
-  const mappingsPath = path.join(examplesDir, 'fib/mappings.json');
-  const wasmPath = path.join(examplesDir, 'fib/wasm/fib.wasm');
+  const mappingsPath = path.join(examplesDir, 'toggle_led/mappings.json');
+  const wasmPath = path.join(examplesDir, 'toggle_led/wasm/toggle_led.wasm');
   /*
   const examplesDir = resolve('./libs/WARDuino/benchmarks/tasks/fac/wast/');
   const mappingsPath = path.join(examplesDir, 'mappings.json');
@@ -142,7 +141,7 @@ async function main(): Promise<void> {
   // const vmConnection = await spawnDevVM(wasm);
   // uncomment next to run analysis on MCU VM
 
-  const vmConnection = await spawnMCUVM(wasm, {
+  const vmConnection = await connectToExistingMCUVM(wasm, {
     vmConfig: {
       pauseOnStart: true, // pause the VM on deploy of the Wasm module
       serialPort: '/dev/ttyUSB0',
@@ -153,6 +152,8 @@ async function main(): Promise<void> {
       },
     },
   });
+  vmConnection.bulkRequests = false;
+  await waitMilliSeconds(1000);
 
   /*
   const vmConnection = await connectToExistingMCUVM(wasm, {
@@ -173,9 +174,8 @@ async function main(): Promise<void> {
     vmConnection,
     analysis,
   );
-  function checkInstr(instr: WasmInstruction, args: WritableWasmValue[]) {
-    args = replayInstr.checkInstr(instr, args);
-    return args;
+  async function checkInstr(instr: WasmInstruction, args: WritableWasmValue[]) {
+    return await replayInstr.checkInstr(instr, args);
   }
 
   let instrumentedCount = 0;
@@ -188,7 +188,8 @@ async function main(): Promise<void> {
   console.log(`#instrumented instructions ${instrumentedCount}`);
 
   // analysis.beforeHandlingInterrupt()
-  await analysis.deploy();
+  const deployBulk = false;
+  await analysis.deploy(deployBulk);
   console.log('deployed');
   await analysis.run();
   replayInstr.startTime();

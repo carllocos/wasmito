@@ -614,31 +614,35 @@ export class WasmAnalysis {
   async run(...args: any[]): Promise<void> {
     let timeoutMs: number | undefined;
     // eslint-disable-next-line no-async-promise-executor
+    /*
     return new Promise(async (resolve) => {
-      switch (args.length) {
-        case 0:
-          break;
-        case 1:
-          if (typeof args[0] === 'number') {
-            timeoutMs = args[0];
-          } else if (typeof args[0] === 'function') {
-            this.userOnFinishCB = args[0];
-          } else {
-            throw new Error(`invalid arguments`);
-          }
-          break;
-        default:
-          if (typeof args[0] !== 'function' || typeof args[1] !== 'number') {
-            throw new Error(`invalid arguments`);
-          }
-          this.userOnFinishCB = args[0];
-          timeoutMs = args[1];
-          break;
-      }
-      this.analysisResolver = resolve;
 
-      await this.vm.run(timeoutMs);
+      this.analysisResolver = resolve;
     });
+    
+    switch (args.length) {
+      case 0:
+        break;
+      case 1:
+        if (typeof args[0] === 'number') {
+          timeoutMs = args[0];
+        } else if (typeof args[0] === 'function') {
+          this.userOnFinishCB = args[0];
+        } else {
+          throw new Error(`invalid arguments`);
+        }
+        break;
+      default:
+        if (typeof args[0] !== 'function' || typeof args[1] !== 'number') {
+          throw new Error(`invalid arguments`);
+        }
+        this.userOnFinishCB = args[0];
+        timeoutMs = args[1];
+        break;
+    }
+    */
+
+    await this.vm.run(timeoutMs);
   }
 
   private onFinish(): void {
