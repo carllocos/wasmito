@@ -28,28 +28,28 @@ const primitiveMap = new Map<number, string>();
 
 
 async function main(): Promise<void> {
-  const analyseMaxTimeSecs = 5; // stop analysis after this many seconds
+  const analyseMaxTimeSecs = 10; // stop analysis after this many seconds
 
   const wasmPath = resolve(
-    './app_examples/assemblyscript/blink/wasm/blink.wasm',
+    './app_examples/assemblyscript/toggle_led/wasm/toggle_led.wasm',
   );
   const wasm = new WasmModule(wasmPath);
 
   // Running analysis on the computer 
-  const vmConnection = await spawnDevVM(wasm);
+  // const vmConnection = await spawnDevVM(wasm);
 
   // Running analysis on the MCU
-  // const vmConnection = await spawnMCUVM(wasm, {
-  //   vmConfig: {
-  //     pauseOnStart: true, // pause the VM on deploy of the Wasm module
-  //     serialPort: '/dev/ttyUSB0',
-  //     baudrate: BoardBaudRate.BD_115200,
-  //     fqbn: {
-  //       boardName: 'M5Stick-C',
-  //       fqbn: 'm5stack:esp32:m5stick-c',
-  //     },
-  //   },
-  // });
+  const vmConnection = await spawnMCUVM(wasm, {
+    vmConfig: {
+      pauseOnStart: true, // pause the VM on deploy of the Wasm module
+      serialPort: '/dev/ttyUSB0',
+      baudrate: BoardBaudRate.BD_115200,
+      fqbn: {
+        boardName: 'M5Stick-C',
+        fqbn: 'm5stack:esp32:m5stick-c',
+      },
+    },
+  });
 
   // const vmConnection = await connectToExistingMCUVM(wasm, {
   //   vmConfig: {
@@ -94,8 +94,8 @@ function sendCallInstructionToBrigadier(f: WASMFunction, i: CallInstruction, arg
   const callee_id = i.funIdx;
   if (primitiveMap.has(callee_id)) {
     const primitiveName = primitiveMap.get(callee_id);
-    socket.emit('wasmPrimitiveCall', {
-      name: i.name,
+    socket.emit('wasmInstruction', {
+      name: "primitive_call",
       args: args.map(arg => arg.value),
       function_name: f.name,
       function_address: f.startAddress,
