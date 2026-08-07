@@ -1,12 +1,15 @@
 import { io } from 'socket.io-client';
-
-
 import { resolve } from 'path';
 import { WasmModule } from '../../src/webassembly/wasm/wasm_module';
 import { WasmAnalysis } from '../../src/tool_api/wasm_analysis';
 import { WasmitoBackendVM } from '../../src/runtimes/wasmito_vm/wasmito_vm';
-import { connectToExistingMCUVM, spawnDevVM, spawnMCUVM } from '../spawn_vm';
-import { CallInstruction, WasmInstruction } from '../../src/webassembly/wasm/wasm_instruction';
+import { 
+  connectToExistingMCUVM, 
+  spawnDevVM, 
+  spawnMCUVM } from '../spawn_vm';
+import { 
+  CallInstruction, 
+  WasmInstruction } from '../../src/webassembly/wasm/wasm_instruction';
 import { WASMFunction } from '../../src/webassembly/wasm/wasm_function';
 import { ReadOnlyWasmValue } from '../../src/tool_api/interrupts';
 import { BoardBaudRate } from '../../src/util/serial_port';
