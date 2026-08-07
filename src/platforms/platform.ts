@@ -31,13 +31,13 @@ export abstract class Platform {
     }
     this.outputDirectory = outputDir;
     if (outputDir === '') {
-      this.logger.info(
+      this.logger.debug(
         'No build output directory set. Falling back to tmp dir',
       );
       this.outputDirectory = createTempDirectory(this.tmpDirPrefix);
     }
     this.outputDirectory = getAbsolutePath(this.outputDirectory);
-    this.logger.info(`Using output directory: ${this.outputDirectory}`);
+    this.logger.debug(`Using output directory: ${this.outputDirectory}`);
   }
 
   get compilationOutputPath(): string {

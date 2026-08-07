@@ -9,14 +9,19 @@ import {
   CallIndirect,
   CallInstruction,
   ConstInstr,
+  GlobalGetInstruction,
+  GlobalSetInstruction,
   IfInstruction,
+  LoadInstruction,
   LoopInstruction,
   ReturnBranch,
+  StoreInstruction,
   WasmInstruction,
 } from '../wasm/wasm_instruction';
 import { WASM } from '../wasm';
 import { wasmOpcodeFromStr, WasmCode, WasmOpcode } from '../wasm/wasm_opcode';
 import { IsOpcodeWasmVersion1 } from '../wasm/wasm_versions';
+import assert from 'assert';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const decode = require('@webassemblyjs/wasm-parser');
@@ -321,7 +326,7 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
           `Handle case in 'get_global' where args has more than one element ${obj.args}`,
         ];
       }
-      op = new WasmInstruction(WasmCode.GlobalGet, obj.args[0].value);
+      op = new GlobalGetInstruction(obj.args[0].value);
       break;
     }
     case 'set_global': {
@@ -330,7 +335,7 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
           `Handle case in 'set_global' where args has more than one element ${obj.args}`,
         ];
       }
-      op = new WasmInstruction(WasmCode.GlobalSet, obj.args[0].value);
+      op = new GlobalSetInstruction(obj.args[0].value);
       break;
     }
     case 'drop': {
@@ -554,11 +559,6 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
     case 'promote/f32':
     case 'reinterpret/i32':
     case 'reinterpret/i64':
-    case 'load':
-    case 'store':
-    case 'store8':
-    case 'store16':
-    case 'store32':
     case 'div_s':
     case 'demote/f64':
     case 'reinterpret/f64':
@@ -574,12 +574,6 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
     case 'extend_s/i32':
     case 'rem_u':
     case 'rem_s':
-    case 'load8_u':
-    case 'load8_s':
-    case 'load16_u':
-    case 'load16_s':
-    case 'load32_u':
-    case 'load32_s':
     case 'shr_s':
     case 'rotl':
     case 'rotr':
@@ -608,6 +602,61 @@ function parseInstruction(obj: any): WasmInstruction | string[] | undefined {
         return [errorOrNr];
       }
       op = new WasmInstruction(errorOrNr);
+      break;
+    }
+    case 'load':
+    case 'load8_u':
+    case 'load8_s':
+    case 'load16_u':
+    case 'load16_s':
+    case 'load32_u':
+    case 'load32_s': {
+      let opcode = `${obj.id}`;
+      if (obj.object !== undefined) {
+        opcode = obj.object + `.${obj.id}`;
+      }
+      const errorOrNr: string | WasmOpcode = tryToOpcodeOrErrorMsg(opcode);
+      if (typeof errorOrNr === 'string') {
+        return [errorOrNr];
+      }
+
+      const offsetStr = obj.namedArgs.offset.value;
+      assert(
+        offsetStr !== undefined,
+        `load instruction '${obj.id}' has no offset`,
+      );
+      const offset = Number(offsetStr);
+      assert(
+        !isNaN(offset),
+        `the offset of load instruction could not convert to number given '${offsetStr}'`,
+      );
+      op = new LoadInstruction(errorOrNr, offset);
+      break;
+    }
+    case 'store':
+    case 'store8':
+    case 'store16':
+    case 'store32': {
+      let opcode = `${obj.id}`;
+      if (obj.object !== undefined) {
+        opcode = obj.object + `.${obj.id}`;
+      }
+      const errorOrNr: string | WasmOpcode = tryToOpcodeOrErrorMsg(opcode);
+      if (typeof errorOrNr === 'string') {
+        return [errorOrNr];
+      }
+
+      const offsetStr = obj.namedArgs.offset.value;
+      assert(
+        offsetStr !== undefined,
+        `load instruction '${obj.id}' has no offset`,
+      );
+      const offset = Number(offsetStr);
+      assert(
+        !isNaN(offset),
+        `the offset of load instruction could not convert to number given '${offsetStr}'`,
+      );
+      op = new StoreInstruction(errorOrNr, offset);
       break;
     }
     default: {

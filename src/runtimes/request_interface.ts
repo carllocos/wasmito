@@ -1,10 +1,18 @@
 import { type Channel } from '../communication/channel_interface';
-import { RequestsManager } from '../communication/requests_manager';
-import { errorCodeToMessage } from './error_codes';
+import { IDGenerator, RequestID } from '../communication/id_generator';
 import {
-  getInstructionFromString,
-  type Instruction,
-} from './wasmito_vm/requests/instructions';
+  CommandError,
+  RequestsManager,
+} from '../communication/requests_manager';
+import { createLogger } from '../logger/logger';
+import {
+  isSubscriptionMessage,
+  RequestMessage,
+  SubscribeResponse,
+} from './request_msg';
+import { type Instruction } from './wasmito_vm/requests/instructions';
+
+const logger = createLogger('RequestManager');
 
 export enum SubscriptionParseOutcome {
   Successful,
@@ -12,127 +20,147 @@ export enum SubscriptionParseOutcome {
 }
 
 export class APIRequestInvalidParse extends Error {}
+const idGenerator = new IDGenerator();
 
 export abstract class APIRequest<R> {
+  public readonly id: RequestID;
+  abstract readonly instruction: Instruction;
+  private _response: RequestMessage | undefined;
+  private _parsed: R | undefined;
+
+  private _resolved: boolean;
+  private _rejected: boolean;
+  public promise: any;
+  private resolver: ((value: R | PromiseLike<R>) => void) | undefined;
+  private rejector: ((reason?: any) => void) | undefined;
+
+  private cb?: () => void;
+
+  constructor() {
+    this.id = idGenerator.newID();
+    this.promise = new Promise((resolve, reject) => {
+      this.resolver = resolve;
+      this.rejector = reject;
+    });
+
+    this._resolved = false;
+    this._rejected = false;
+  }
+
   abstract description(): string;
   abstract getData(): string;
-  abstract parse(input: string): R;
-  abstract handleSubscriptionData(data: string): SubscriptionParseOutcome;
+  abstract parse(input: string): R; // TODO remove
+  abstract processAck(ack: RequestMessage): R;
+  abstract processSubscriptionData(
+    sub: SubscribeResponse,
+  ): Promise<SubscriptionParseOutcome>;
+
   abstract isSubscriptionClosed(): boolean;
+
+  serializeID(): string {
+    return idGenerator.serialiseIDToLEBHex(this.id);
+  }
+
+  get responseMessage(): RequestMessage {
+    if (this._response === undefined) {
+      throw new Error(`Request has not been send`);
+    }
+    return this._response;
+  }
+
+  get responseContent(): R {
+    if (this._parsed === undefined) {
+      throw new Error(`request has no response content`);
+    }
+    return this._parsed;
+  }
+
+  hasResponse(): boolean {
+    return this._response !== undefined;
+  }
+
+  registerTimeout(timeoutMs?: number) {
+    // TODO use timeout
+    if (timeoutMs !== undefined) {
+      setTimeout(() => {
+        this.timedout(timeoutMs);
+      }, timeoutMs);
+    }
+  }
+
+  isResolved(): boolean {
+    return this._rejected || this._resolved;
+  }
+
+  timedout(timeoutMs: number): void {
+    if (!this._rejected && !this._resolved) {
+      const errMsg = `Request ${this.description()} timedout after ${
+        timeoutMs
+      } ms while waiting for reply`;
+      logger.error(errMsg);
+      this.requestRejector(new CommandError(errMsg));
+    }
+  }
+
+  async processRequestMessage(
+    msg: RequestMessage,
+  ): Promise<SubscriptionParseOutcome> {
+    if (this._rejected) return SubscriptionParseOutcome.Failed;
+
+    if (this._resolved) {
+      if (isSubscriptionMessage(msg)) {
+        // case we may feed data to a subscription
+        // if(this.isSubscriptionClosed()){}
+        return await this.processSubscriptionData(msg);
+      }
+      return SubscriptionParseOutcome.Failed;
+    } else {
+      return this.processRequestAck(msg);
+    }
+  }
+
+  private processRequestAck(msg: RequestMessage): SubscriptionParseOutcome {
+    try {
+      const parsed = this.processAck(msg);
+      this._response = msg;
+      this._parsed = parsed;
+      this.requestResolver(parsed);
+      return SubscriptionParseOutcome.Successful;
+    } catch (_err) {
+      return SubscriptionParseOutcome.Failed;
+    }
+  }
+
+  private requestResolver(v: R): void {
+    if (!this._resolved && !this._rejected) {
+      this._resolved = true;
+      if (this.cb !== undefined) {
+        this.cb();
+      }
+      this.resolver!(v);
+    }
+  }
+
+  private requestRejector(v?: any): void {
+    if (!this._resolved && !this._rejected) {
+      this._rejected = true;
+      this.rejector!(v);
+    }
+  }
 }
 
 export abstract class APIRequestNoSubscription<R> extends APIRequest<R> {
-  override handleSubscriptionData(_data: string): SubscriptionParseOutcome {
-    return SubscriptionParseOutcome.Failed;
-  }
   override isSubscriptionClosed(): boolean {
     return true;
   }
-}
 
-export enum ResponseType {
-  SuccessResponse = '01',
-  ErrorResponse = '02',
-  SubscriptionResponse = '03',
-}
-
-export function getResponseTypeFromString(
-  str: string,
-): ResponseType | undefined {
-  switch (str) {
-    case '01':
-      return ResponseType.SuccessResponse;
-    case '02':
-      return ResponseType.ErrorResponse;
-    case '03':
-      return ResponseType.SubscriptionResponse;
-    default:
-      return undefined;
+  override async processSubscriptionData(
+    _sub: SubscribeResponse,
+  ): Promise<SubscriptionParseOutcome> {
+    throw new Error(
+      `No subscription supported in request '${this.description()}'`,
+    );
   }
-}
-
-export interface ResponseJSONMessage {
-  interrupt: string;
-  kind: string;
-  error_code?: string;
-  sub?: any;
-}
-
-export interface RequestMessage {
-  interrupt: Instruction;
-  responseType: ResponseType;
-  error_code?: number;
-  error_msg?: string;
-  sub?: any;
-}
-
-export function isSuccessfulMessage(reply: RequestMessage): boolean {
-  return reply.responseType === ResponseType.SuccessResponse;
-}
-
-export function isErrorMessage(reply: RequestMessage): reply is RequestMessage {
-  return reply.responseType === ResponseType.ErrorResponse;
-}
-
-export function isSubscriptionMessage(
-  msg: RequestMessage,
-): msg is RequestMessage {
-  return (
-    msg.responseType === ResponseType.SubscriptionResponse &&
-    msg.sub !== undefined &&
-    msg.error_code === undefined &&
-    msg.error_msg === undefined
-  );
-}
-
-function createMessageFromJSON(content: any): RequestMessage | undefined {
-  let obj: ResponseJSONMessage | undefined;
-  if (typeof content === 'string') {
-    try {
-      obj = JSON.parse(content);
-    } catch (_e) {
-      return undefined;
-    }
-  }
-  if (obj === undefined) {
-    return undefined;
-  }
-  const instr = getInstructionFromString(obj.interrupt);
-  const responseType = getResponseTypeFromString(obj.kind);
-  if (instr === undefined || responseType === undefined) {
-    return undefined;
-  }
-
-  const response: RequestMessage = {
-    interrupt: instr,
-    responseType,
-  };
-
-  if (obj.error_code !== undefined) {
-    const errorCode = parseInt(obj.error_code);
-    if (
-      isNaN(errorCode) ||
-      response.responseType !== ResponseType.ErrorResponse
-    ) {
-      return undefined;
-    }
-    response.error_code = errorCode;
-    response.error_msg = errorCodeToMessage(errorCode);
-    return response;
-  } else if (obj.sub !== undefined) {
-    if (responseType !== ResponseType.SubscriptionResponse) {
-      return undefined;
-    }
-    response.sub = obj.sub;
-    return response;
-  } else if (responseType === ResponseType.SuccessResponse) {
-    return response;
-  }
-  return undefined;
-}
-
-export function createRequestMessage(obj: any): RequestMessage | undefined {
-  return createMessageFromJSON(obj);
 }
 
 export async function sendRequest<T>(

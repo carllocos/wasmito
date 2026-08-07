@@ -1,4 +1,3 @@
-import { resolve } from 'path';
 import { WasmitoBackendVM } from '../../src/runtimes/wasmito_vm/wasmito_vm';
 import { WasmModule } from '../../src/webassembly/wasm/wasm_module';
 import { WasmAnalysis } from '../../src/tool_api/wasm_analysis';
@@ -8,27 +7,29 @@ import {
 } from '../../src/tool_api/interrupts';
 import { WasmInstruction } from '../../src/webassembly/wasm/wasm_instruction';
 import { exit } from 'process';
+import { copyClock, LogicalClock, newLogicalClock } from './logical_clock';
+import { logRecord, logRecordings, Record } from './record_item';
+
 import {
-  copyClock,
-  LogicalClock,
-  logRecord,
-  logRecordings,
-  newLogicalClock,
-  type Record,
-} from './logical_clock';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { spawnDevVM, spawnMCUVM } from '../spawn_vm';
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  connectToExistingMCUVM,
+  spawnDevVM,
+} from '../spawn_vm';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { BoardBaudRate } from '../../src/util/serial_port';
+import { RecordWriter } from './store_record';
+import { WASM } from '../../src/webassembly/wasm';
 
 function recordInterrupt(interrupt: ReadOnlyInterrupt): void {
   logicalClock.interrupts += 1;
   const record: Record = {
     topic: interrupt.topic,
     payload: interrupt.payload,
+    pin: WASM.interruptTopicToPinNumber(interrupt.topic),
     clock: copyClock(logicalClock),
   };
   records.push(record);
+  recordsWriter?.writeRecord(record);
   logRecord(record);
 }
 
@@ -42,24 +43,22 @@ function recordInstr(i: WasmInstruction, args: ReadOnlyWasmValue[]): void {
     clock: copyClock(logicalClock),
   };
   records.push(record);
+  recordsWriter?.writeRecord(record);
   logRecord(record);
 }
 
 const logicalClock: LogicalClock = newLogicalClock();
 const records: Record[] = [];
+let recordsWriter: RecordWriter | undefined;
 
-async function main(): Promise<void> {
-  const wasmPath = resolve(
-    './app_examples/assemblyscript/toggle_led/wasm/toggle_led.wasm',
-  );
+export async function main(csvFile: string, wasmPath: string): Promise<void> {
+  recordsWriter = new RecordWriter(csvFile);
   const wasm = new WasmModule(wasmPath);
-  // uncomment next to run analysis on local VM
-  const vmConnection = await spawnDevVM(wasm);
-  // uncomment next to run analysis on MCU VM
-  // const vmConnection = await spawnMCUVM(wasm, {
+  // uncomment the following to target a MCU
+  // const vmConnection = await connectToExistingMCUVM(wasm, {
   //   vmConfig: {
   //     pauseOnStart: true, // pause the VM on deploy of the Wasm module
-  //     serialPort: '/dev/cu.usbserial-8952FFEE8B',
+  //     serialPort: '/dev/cu.usbserial-F551D69EA8',
   //     baudrate: BoardBaudRate.BD_115200,
   //     fqbn: {
   //       boardName: 'M5Stick-C',
@@ -67,25 +66,25 @@ async function main(): Promise<void> {
   //     },
   //   },
   // });
+  const vmConnection = await spawnDevVM(wasm);
   const analysis = new WasmAnalysis(wasm, vmConnection);
   for (const f of wasm.functions) {
     for (const i of f.allInstructions) {
-      // register advice just before executing Wasm instruction i
       analysis.before(i, recordInstr);
     }
   }
 
-  //register advice on before handling interrupt
   analysis.beforeHandlingInterrupt(recordInterrupt);
 
-  await analysis.deploy();
-  await analysis.run();
-  const recordSecs = 10;
+  const deployInBulk = false;
+  await analysis.deploy(deployInBulk);
+  const recordSecs = 20;
   stopRecording(vmConnection, analysis, recordSecs);
-
   // The following is optional
   // if you comment, no interrupt will be simulated
-  simulateInterruptEverySecond(vmConnection, 37, 5);
+  // simulateInterruptEverySecond(vmConnection, 37, 5);
+
+  await analysis.run();
 }
 
 /**
@@ -104,6 +103,7 @@ function stopRecording(
     await vm.pause();
     await analysis.remove();
     await vm.close();
+    await recordsWriter?.close();
     logRecordings(records);
     exit(0);
   }, ms);
@@ -117,18 +117,15 @@ function stopRecording(
  * @param nrOfInterrupts nr of interrupts to simulate
  * @returns
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function simulateInterruptEverySecond(
   vm: WasmitoBackendVM,
   pin: number,
-  nrOfInterrupts: number,
+  nrInterrupts: number,
 ): void {
-  if (nrOfInterrupts <= 0) return;
-
-  const sleepTime = 1000;
+  if (nrInterrupts <= 0) return;
   setTimeout(async () => {
     await vm.simulateInterrupt(pin);
-    simulateInterruptEverySecond(vm, pin, nrOfInterrupts - 1);
-  }, sleepTime);
+    simulateInterruptEverySecond(vm, pin, nrInterrupts - 1);
+  }, 1000);
 }
-
-main().catch(console.error);

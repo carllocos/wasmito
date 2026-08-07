@@ -6,6 +6,7 @@ import {
   FactoryArgs,
 } from '../src/platforms/platformbuilder_factory';
 import { WasmitoBackendVM } from '../src/runtimes/wasmito_vm/wasmito_vm';
+import { SourceMap } from '../src/source_mappers/source_map';
 import { WasmModule } from '../src/webassembly/wasm/wasm_module';
 
 /**
@@ -14,12 +15,13 @@ import { WasmModule } from '../src/webassembly/wasm/wasm_module';
  * @returns
  */
 export async function spawnDevVM(
-  wasm: WasmModule | LanguageAdaptor,
+  wasm: WasmModule | LanguageAdaptor | SourceMap,
 ): Promise<WasmitoBackendVM> {
   const dm = new DeviceManager();
   if (wasm instanceof LanguageAdaptor) return await dm.spawnDevelopmentVM(wasm);
 
-  const la = LanguageAdaptor.emptyAdaptor(wasm.wasmPath);
+  const w = wasm instanceof SourceMap ? wasm.wasm : wasm;
+  const la = LanguageAdaptor.emptyAdaptor(w);
   return await dm.spawnDevelopmentVM(la);
 }
 
@@ -33,7 +35,7 @@ export async function connectToExistingDevVM(
   toolPort: number,
 ): Promise<WasmitoBackendVM> {
   const dm = new DeviceManager();
-  const la = LanguageAdaptor.emptyAdaptor(wasm.wasmPath);
+  const la = LanguageAdaptor.emptyAdaptor(wasm);
   const p = await createDevPlatform({ vmConfig: { toolPort: toolPort } });
   return await dm.connectToExistingDevVM(la, p, 3000);
 }
@@ -49,9 +51,7 @@ export async function spawnMCUVM(
   vmArgs: FactoryArgs,
 ): Promise<WasmitoBackendVM> {
   const la =
-    wasm instanceof LanguageAdaptor
-      ? wasm
-      : LanguageAdaptor.emptyAdaptor(wasm.wasmPath);
+    wasm instanceof LanguageAdaptor ? wasm : LanguageAdaptor.emptyAdaptor(wasm);
   const dm = new DeviceManager();
   const platform = await createArduinoPlatform(vmArgs);
   return dm.spawnHardwareVM(la, platform);
@@ -68,9 +68,7 @@ export async function connectToExistingMCUVM(
   vmArgs: FactoryArgs,
 ): Promise<WasmitoBackendVM> {
   const la =
-    wasm instanceof LanguageAdaptor
-      ? wasm
-      : LanguageAdaptor.emptyAdaptor(wasm.wasmPath);
+    wasm instanceof LanguageAdaptor ? wasm : LanguageAdaptor.emptyAdaptor(wasm);
   const dm = new DeviceManager();
   const platform = await createArduinoPlatform(vmArgs);
   return dm.connectToExistingMCUVM(la, platform);

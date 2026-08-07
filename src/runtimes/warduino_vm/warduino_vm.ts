@@ -110,8 +110,7 @@ export class WARDuinoRuntimeAPI implements RuntimeToolAPI {
 
   async run(timeout?: number): Promise<boolean> {
     const req = new RunRequest();
-    const resp = await this.sendRequest(req, timeout);
-    return resp === 'GO!';
+    return await this.sendRequest(req, timeout);
   }
 
   async inspectPC(timeout?: number): Promise<number> {
@@ -178,7 +177,7 @@ export class WARDuinoRuntimeAPI implements RuntimeToolAPI {
   loadWasmState(state: WasmState, timeout?: number): Promise<void> {
     throw new Error('To implement');
   }
-  resolveEvent(timeout?: number): Promise<void> {
+  resolveEvent(timeout?: number): Promise<boolean> {
     throw new Error('To implement');
   }
   unregisterFuncForProxyCall(

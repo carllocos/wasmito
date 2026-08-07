@@ -4,16 +4,19 @@ import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
 } from '../../request_interface';
+import { RequestMessage } from '../../request_msg';
 import { Instruction } from './instructions';
 
 export class UpdateStackValueRequest extends APIRequestNoSubscription<boolean> {
   private stackIdx: number;
   private value: WASM.Value;
+  readonly instruction: Instruction;
 
   constructor(stackIdx: number, value: WASM.Value) {
     super();
     this.stackIdx = stackIdx;
     this.value = value;
+    this.instruction = Instruction.updateStackValue;
   }
 
   description(): string {
@@ -26,13 +29,15 @@ export class UpdateStackValueRequest extends APIRequestNoSubscription<boolean> {
       includeIndex: false,
       includeType: false,
     });
-    return `${Instruction.updateStackValue}${idx}${encoding}\n`;
+    return `${this.instruction}${this.serializeID()}${idx}${encoding}\n`;
   }
 
-  parse(input: string): boolean {
-    if (input === `StackValue ${this.stackIdx} changed`) {
-      return true;
-    }
+  parse(_input: string): boolean {
     throw new APIRequestInvalidParse('No ack for Pause');
+  }
+
+  processAck(ack: RequestMessage): boolean {
+    if (ack.interrupt !== this.instruction) return false;
+    return true;
   }
 }

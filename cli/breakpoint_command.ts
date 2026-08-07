@@ -2,10 +2,8 @@ import { type Command } from 'commander';
 import { ClientSideSocket } from '../src/communication/client_socket';
 import { Breakpoint } from '../src/debugger/breakpoint';
 import { StateRequest } from '../src/runtimes/wasmito_vm/requests/inspect_request';
-import {
-  isSuccessfulMessage,
-  sendRequest,
-} from '../src/runtimes/request_interface';
+import { sendRequest } from '../src/runtimes/request_interface';
+import { isSuccessfulMessage } from '../src/runtimes/request_msg';
 
 export function registerBreakpointRequestCommand(program: Command): void {
   program

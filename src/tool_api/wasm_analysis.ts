@@ -1,15 +1,17 @@
 import assert from 'assert';
 import { WasmitoBackendVM } from '../runtimes/wasmito_vm/wasmito_vm';
 import {
+  callbackMappingToPinInterruptHandler,
+  PinInterruptHandler,
   ReadOnlyInterrupt,
   ReadOnlyWasmValue,
   WritableInterrupt,
   WritableWasmValue,
 } from './interrupts';
-import { GroupHooks } from './group_hooks';
+import { GroupHooks, InstrMoment } from './group_hooks';
 import { createLogger, Logger } from '../logger/logger';
-import { createCallbackNoArgs, instruction } from './util/analyse_instruction';
-import { interrupt } from './util/analyse_interrupts';
+import { instruction, runAdvicesInstruction } from './util/analyse_instruction';
+import { interrupt, runAdvicesInterrupt } from './util/analyse_interrupts';
 import { LanguageAdaptor } from '../language_adaptors';
 import {
   SourceCFGNode,
@@ -18,13 +20,20 @@ import {
 import { StateRequest } from '../runtimes/wasmito_vm/requests/inspect_request';
 import { WasmModule } from '../webassembly/wasm/wasm_module';
 import {
+  CallInstruction,
   WasmAddress,
   WasmInstruction,
 } from '../webassembly/wasm/wasm_instruction';
 import { WasmCode, WasmOpcode } from '../webassembly/wasm/wasm_opcode';
 import { WasmState } from '../webassembly/wasm';
-import { assertFatalHookError, Hook } from '../hooks/hook';
+import { Hook, SubscriptionContent } from '../hooks/hook';
 import { InspectStateHook } from '../hooks/hook_inspect_state';
+import { SourceMap } from '../source_mappers/source_map';
+import { WASMFunction } from '../webassembly/wasm/wasm_function';
+import { isErrorMessage } from '../runtimes/request_msg';
+import { APIRequest, HookOnAddrSubContent } from '../runtimes';
+import { HookOnErrorSubContent } from '../runtimes/wasmito_vm/requests/hook_on_error';
+import { AdvicesRegistery } from './util/advices_registery';
 
 export interface AnalysisConfig {
   name: string;
@@ -34,32 +43,75 @@ export interface AnalysisConfig {
 export class WasmAnalysis {
   public readonly wasm: WasmModule;
   private vm: WasmitoBackendVM;
-  private groups: GroupHooks[];
   private _logger: Logger;
   private maxTimeoutMs: number;
+  private _sourceMap?: SourceMap;
   private _adaptor?: LanguageAdaptor;
+  private envFuncForPinInterrupt: number;
+  private analysisResolver: any;
+  private userOnFinishCB: any;
+  private _advices: AdvicesRegistery;
+
+  private _hookOnErrorAction:
+    | InspectStateHook<HookOnErrorSubContent>
+    | undefined;
 
   constructor(
-    wasm: WasmModule | LanguageAdaptor,
+    wasm: WasmModule | SourceMap | LanguageAdaptor,
     vm: WasmitoBackendVM,
     config?: AnalysisConfig,
   ) {
     if (wasm instanceof WasmModule) {
       this.wasm = wasm;
+    } else if (wasm instanceof SourceMap) {
+      this.wasm = wasm.wasm;
+      this._sourceMap = wasm;
     } else {
       this._adaptor = wasm;
       this.wasm = wasm.sourceMap.wasm;
+      this._sourceMap = wasm.sourceMap;
     }
     this.vm = vm;
-    this.groups = [];
     this._logger = createLogger(config?.name ?? 'WasmAnalyse');
     this.maxTimeoutMs = config?.maxTimeoutMs ?? 30000;
+    this.envFuncForPinInterrupt = this.findEnvFuncForPinInterrupt();
+    this._advices = new AdvicesRegistery();
+    this._advices.registerAdviceInstructionCallback(
+      runAdvicesInstruction(
+        this._advices,
+        this.vm,
+        this.maxTimeoutMs,
+        this.wasm,
+      ),
+    );
+    this._advices.registerAdviceInterruptCallback(
+      runAdvicesInterrupt(this._advices, this.vm, this.maxTimeoutMs),
+    );
   }
-  private addGroup(g: GroupHooks | undefined): GroupHooks | undefined {
-    if (g !== undefined) {
-      this.groups.push(g);
+
+  private assertInterruptAdvicesRegister(
+    registeredAdvices: number,
+    typeHook: string,
+  ): void {
+    assert(
+      registeredAdvices > 0,
+      `failed to register advice upon '${typeHook}'`,
+    );
+  }
+
+  private assertInstructionAdviceRegister(
+    registeredAdvices: number,
+    moment: string,
+  ): void {
+    assert(registeredAdvices > 0, `Failed to register ${moment} advice`);
+  }
+
+  private findEnvFuncForPinInterrupt(): number {
+    for (const func of this.wasm.importFuncs) {
+      if (func.fullName.includes('subscribe_interrupt')) return func.id;
     }
-    return g;
+    this._logger.debug(`No subscribe env function found in the given module`);
+    return -1;
   }
 
   /*
@@ -67,79 +119,130 @@ export class WasmAnalysis {
    *
    */
   before<I extends WasmInstruction>(
-    instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
+    instr:
+      | I
+      | WasmAddress
+      | WasmOpcode
+      | WasmCode.MultipleOpcode
+      | WASMFunction,
     cb:
       | ((instr: I, args: ReadOnlyWasmValue[], vm: WasmitoBackendVM) => void)
+      | ((
+          instr: I,
+          args: ReadOnlyWasmValue[],
+          vm: WasmitoBackendVM,
+        ) => Promise<void>)
       | ((instr: I, args: ReadOnlyWasmValue[]) => void)
+      | ((instr: I, args: ReadOnlyWasmValue[]) => Promise<void>)
       | ((vm: WasmitoBackendVM) => void)
-      | (() => void),
-  ): GroupHooks | undefined {
+      | ((vm: WasmitoBackendVM) => Promise<void>)
+      | (() => void)
+      | (() => Promise<void>),
+  ): this {
     const mutate = false;
-    return this.addGroup(
+    const moment = 'before';
+    this.assertInstructionAdviceRegister(
       instruction<I>(
-        'before',
+        this._advices,
+        moment,
         instr,
         this.wasm,
-        this.vm,
         this.maxTimeoutMs,
         cb,
         mutate,
       ),
+      moment,
     );
+    return this;
   }
 
   beforeMut<I extends WasmInstruction>(
-    instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
+    instr:
+      | I
+      | WasmAddress
+      | WasmOpcode
+      | WasmCode.MultipleOpcode
+      | WASMFunction,
     cb:
       | ((
           instr: I,
           args: WritableWasmValue[],
           vm: WasmitoBackendVM,
         ) => WritableWasmValue[])
-      | ((instr: I, args: WritableWasmValue[]) => WritableWasmValue[]),
-  ): GroupHooks | undefined {
+      | ((
+          instr: I,
+          args: WritableWasmValue[],
+          vm: WasmitoBackendVM,
+        ) => Promise<WritableWasmValue[]>)
+      | ((instr: I, args: WritableWasmValue[]) => WritableWasmValue[])
+      | ((instr: I, args: WritableWasmValue[]) => Promise<WritableWasmValue[]>),
+  ): this {
     const mutate = true;
-    return this.addGroup(
+    const moment = 'before';
+    this.assertInstructionAdviceRegister(
       instruction<I>(
-        'before',
+        this._advices,
+        moment,
         instr,
         this.wasm,
-        this.vm,
         this.maxTimeoutMs,
         cb,
         mutate,
       ),
+      moment,
     );
+    return this;
   }
 
   after<I extends WasmInstruction>(
-    instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
+    instr:
+      | I
+      | WasmAddress
+      | WasmOpcode
+      | WasmCode.MultipleOpcode
+      | WASMFunction,
     cb:
       | ((
           instr: I,
           result: ReadOnlyWasmValue | undefined,
           vm: WasmitoBackendVM,
         ) => void)
+      | ((
+          instr: I,
+          result: ReadOnlyWasmValue | undefined,
+          vm: WasmitoBackendVM,
+        ) => Promise<void>)
       | ((instr: I, result: ReadOnlyWasmValue | undefined) => void)
+      | ((instr: I, result: ReadOnlyWasmValue | undefined) => Promise<void>)
       | ((vm: WasmitoBackendVM) => void)
-      | (() => void),
-  ): GroupHooks | undefined {
+      | ((vm: WasmitoBackendVM) => Promise<void>)
+      | (() => void)
+      | (() => Promise<void>),
+  ): this {
     const mutate = false;
-    return this.addGroup(
+    const moment = 'after';
+    this.assertInstructionAdviceRegister(
       instruction<I>(
-        'after',
+        this._advices,
+        moment,
         instr,
         this.wasm,
-        this.vm,
         this.maxTimeoutMs,
         cb,
         mutate,
       ),
+      moment,
     );
+    return this;
   }
 
   afterMut<I extends WasmInstruction>(
-    instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
+    instr:
+      | I
+      | WasmAddress
+      | WasmOpcode
+      | WasmCode.MultipleOpcode
+      | WASMFunction,
     cb:
       | ((
           instr: I,
@@ -149,125 +252,173 @@ export class WasmAnalysis {
       | ((
           instr: I,
           result: WritableWasmValue | undefined,
-        ) => WritableWasmValue | undefined),
-  ): GroupHooks | undefined {
+          vm: WasmitoBackendVM,
+        ) => Promise<WritableWasmValue | undefined>)
+      | ((
+          instr: I,
+          result: WritableWasmValue | undefined,
+        ) => WritableWasmValue | undefined)
+      | ((
+          instr: I,
+          result: WritableWasmValue | undefined,
+        ) => Promise<WritableWasmValue | undefined>),
+  ): this {
     const mutate = true;
-    return this.addGroup(
+    const moment = 'after';
+    this.assertInstructionAdviceRegister(
       instruction<I>(
-        'after',
+        this._advices,
+        moment,
         instr,
         this.wasm,
-        this.vm,
         this.maxTimeoutMs,
         cb,
         mutate,
       ),
+      moment,
     );
+    return this;
+  }
+
+  async close() {
+    await this.vm.close();
   }
 
   onNewInterrupt(
     cb:
       | ((ev: ReadOnlyInterrupt, vm: WasmitoBackendVM) => void)
+      | ((ev: ReadOnlyInterrupt, vm: WasmitoBackendVM) => Promise<void>)
       | ((ev: ReadOnlyInterrupt) => void)
-      | (() => void),
-  ): GroupHooks {
+      | ((ev: ReadOnlyInterrupt) => Promise<void>)
+      | (() => void)
+      | (() => Promise<void>),
+  ): this {
     const mutate = false;
-    const gh = this.addGroup(
-      interrupt(
-        this.vm,
-        this.maxTimeoutMs,
-        'onNewInterrupt',
-        mutate,
-        mutate,
-        cb,
-      ),
+    const groupType = 'onNewInterrupt';
+    this.assertInterruptAdvicesRegister(
+      interrupt(this._advices, groupType, mutate, cb, this.maxTimeoutMs),
+      groupType,
     );
-    assert(gh !== undefined, 'failed to hook upon `onNewInterrupt`');
-    return gh;
+    return this;
   }
 
   onNewInterruptMut(
     cb:
       | ((ev: WritableInterrupt, vm: WasmitoBackendVM) => WritableInterrupt)
+      | ((
+          ev: WritableInterrupt,
+          vm: WasmitoBackendVM,
+        ) => Promise<WritableInterrupt>)
       | ((ev: WritableInterrupt) => WritableInterrupt)
-      | (() => void),
-  ): GroupHooks {
+      | ((ev: WritableInterrupt) => Promise<WritableInterrupt>)
+      | (() => void)
+      | (() => Promise<void>),
+  ): this {
     const mutate = true;
-    const gh = this.addGroup(
-      interrupt(
-        this.vm,
-        this.maxTimeoutMs,
-        'onNewInterrupt',
-        mutate,
-        mutate,
-        cb,
-      ),
+    const groupType = 'onNewInterrupt';
+    this.assertInterruptAdvicesRegister(
+      interrupt(this._advices, groupType, mutate, cb, this.maxTimeoutMs),
+      groupType,
     );
-    assert(gh !== undefined, 'failed to hook upon `onNewInterruptMut`');
-    return gh;
+    return this;
   }
 
   beforeHandlingInterrupt(
     cb:
       | ((ev: ReadOnlyInterrupt, vm: WasmitoBackendVM) => void)
+      | ((ev: ReadOnlyInterrupt, vm: WasmitoBackendVM) => Promise<void>)
       | ((ev: ReadOnlyInterrupt) => void)
-      | (() => void),
-  ): GroupHooks {
+      | ((ev: ReadOnlyInterrupt) => Promise<void>)
+      | (() => void)
+      | (() => Promise<void>),
+  ): this {
     const mutate = false;
-    const gh = this.addGroup(
-      interrupt(
-        this.vm,
-        this.maxTimeoutMs,
-        'beforeInterruptHandled',
-        mutate,
-        mutate,
-        cb,
-      ),
+    const groupType = 'beforeInterruptHandled';
+    this.assertInterruptAdvicesRegister(
+      interrupt(this._advices, groupType, mutate, cb, this.maxTimeoutMs),
+      groupType,
     );
-    assert(gh !== undefined, 'failed to hook upon `beforeInterruptHandled`');
-    return gh;
+    return this;
   }
 
   beforeHandlingInterruptMut(
     cb:
       | ((ev: WritableInterrupt, vm: WasmitoBackendVM) => WritableInterrupt)
+      | ((
+          ev: WritableInterrupt,
+          vm: WasmitoBackendVM,
+        ) => Promise<WritableInterrupt>)
       | ((ev: WritableInterrupt) => WritableInterrupt)
+      | ((ev: WritableInterrupt) => Promise<WritableInterrupt>)
+      | (() => Promise<void>)
       | (() => void),
-  ): GroupHooks {
+  ): this {
     const mutate = true;
-    const gh = this.addGroup(
-      interrupt(
-        this.vm,
-        this.maxTimeoutMs,
-        'beforeInterruptHandled',
-        mutate,
-        mutate,
-        cb,
-      ),
+    const groupType = 'beforeInterruptHandled';
+    this.assertInterruptAdvicesRegister(
+      interrupt(this._advices, groupType, mutate, cb, this.maxTimeoutMs),
+      groupType,
     );
-    assert(gh !== undefined, 'failed to hook upon `beforeInterruptHandledMut`');
-    return gh;
+    return this;
   }
 
   afterHandlingInterrupt(
     cb:
       | ((ev: ReadOnlyInterrupt) => void)
+      | ((ev: ReadOnlyInterrupt) => Promise<void>)
       | ((ev: ReadOnlyInterrupt, vm: WasmitoBackendVM) => void)
-      | (() => void),
-  ): GroupHooks {
+      | ((ev: ReadOnlyInterrupt, vm: WasmitoBackendVM) => Promise<void>)
+      | (() => void)
+      | (() => Promise<void>),
+  ): this {
     const mutate = false;
-    const gh = this.addGroup(
-      interrupt(
-        this.vm,
-        this.maxTimeoutMs,
-        'afterHandlingInterrupt',
-        mutate,
-        mutate,
-        cb,
-      ),
+    const groupType = 'afterHandlingInterrupt';
+    this.assertInterruptAdvicesRegister(
+      interrupt(this._advices, groupType, mutate, cb, this.maxTimeoutMs),
+      groupType,
     );
-    assert(gh !== undefined, 'failed to hook upon `afterHandlingInterrupt`');
-    return gh;
+    return this;
+  }
+
+  onPinInterruptHandlerUpdateMut(
+    cb:
+      | ((handlers: PinInterruptHandler[], vm: WasmitoBackendVM) => void)
+      | ((
+          handlers: PinInterruptHandler[],
+          vm: WasmitoBackendVM,
+        ) => Promise<void>),
+  ): boolean {
+    const calls = this.wasm.getCallInstructions(this.envFuncForPinInterrupt);
+    for (const call of calls)
+      this.afterMut(call, this.askInterruptHandlers(cb));
+    return calls.length > 0;
+  }
+
+  private askInterruptHandlers(
+    cb:
+      | ((handlers: PinInterruptHandler[], vm: WasmitoBackendVM) => void)
+      | ((
+          handlers: PinInterruptHandler[],
+          vm: WasmitoBackendVM,
+        ) => Promise<void>),
+  ) {
+    return async (
+      _c: CallInstruction,
+      _r: WritableWasmValue | undefined,
+      vm: WasmitoBackendVM,
+    ): Promise<WritableWasmValue | undefined> => {
+      const state = new StateRequest();
+      state.includeCallbackMappings();
+      state.includeTable();
+      const s = await vm.inspect(state);
+      const tbl = s.table;
+      assert(tbl !== undefined);
+      const handlers = s.callbackMappings.map((cbm) => {
+        return callbackMappingToPinInterruptHandler(this.wasm, tbl, cbm);
+      });
+      await cb(handlers, vm);
+      return _r;
+    };
   }
 
   onNodeEntry(
@@ -301,36 +452,44 @@ export class WasmAnalysis {
     // const reachableInstrs = node.incomingEdges.map(SourceCFGEdgeToInstruction);
     const reachableInstrs = [sourceNodeFirstInstruction(node)];
     assert(reachableInstrs.length > 0);
-    const g = new GroupHooks('before');
+    const moment = 'before';
+    const g = new GroupHooks(moment);
     for (const i of reachableInstrs) {
       const [actions, actionToSubscribe] = createActionsNode(i, cb.length);
-      const newCB = createCallbackNode(node, this.vm, this.wasm, i, cb);
+      const newCB = createCallbackNode(node, this.vm, this.wasm, i, moment, cb);
       actionToSubscribe.subscribe(newCB);
       g.addInstructionActions(i, actions);
     }
-    const gh = this.addGroup(g);
-    assert(gh !== undefined, 'failed to hook upon `onNodeEntry`');
-    return gh;
+    throw new Error('TODO');
+    // const gh = this.addGroup(g);
+    // assert(gh !== undefined, 'failed to hook upon `onNodeEntry`');
+    // return gh;
   }
 
-  onError(_cb: (...args: any[]) => any): GroupHooks {
-    throw new Error(`TODO`);
+  onError(
+    cb:
+      | ((i: WasmInstruction | undefined, errorMsg: string) => void)
+      | ((i: WasmInstruction | undefined, errorMsg: string) => Promise<void>),
+  ): this {
+    const inspectAction = new InspectStateHook<HookOnErrorSubContent>();
+    inspectAction.includePC().includeException();
+    inspectAction.subscribe(
+      (sub: SubscriptionContent<HookOnErrorSubContent, WasmState>) => {
+        const wasmState = sub.sub;
+        let instr: WasmInstruction | undefined;
+        if (wasmState.pc !== undefined) {
+          instr = this.wasm.getInstruction(wasmState.pc);
+        }
+        assert(
+          wasmState.exception !== undefined && wasmState.exception !== '',
+          'No exception send by VM',
+        );
+        cb(instr, wasmState.exception);
+      },
+    );
 
-    // async function closeOnError(
-    //   wasm: WasmModule,
-    //   vmConnection: WasmitoBackendVM,
-    // ): Promise<void> {
-    //   const inspectAction = new InspectStateHook().includePC().includeException();
-    //   inspectAction.subscribe((wasmState) => {
-    //     assert(wasmState.pc !== undefined);
-    //     const instr = wasm.getInstruction(wasmState.pc);
-    //     assert(instr !== undefined);
-    //     console.log(
-    //       `Exception occurred at 0x${instr.startAddress} ${instr.name}: ${wasmState.exception}\n`,
-    //     );
-    //   });
-    //   await hookOnError([inspectAction], vmConnection);
-    // }
+    this._hookOnErrorAction = inspectAction;
+    return this;
   }
 
   aroundFunction(_cb: (...args: any[]) => any): GroupHooks {
@@ -347,89 +506,139 @@ export class WasmAnalysis {
     throw new Error('TODO');
   }
 
-  private assertValidGroups(): GroupHooks[] {
-    const gps = this.groups.filter((g) => !g.deployed);
-    assert(gps.length > 0, `No hooks registed to deploy`);
-    for (const g of gps) {
-      assert(g.actions.length > 0, 'No action registered for group');
+  async deploy(): Promise<void>;
+  async deploy(timeoutMs: number): Promise<void>;
+  async deploy(deployInBulk: boolean): Promise<void>;
+  async deploy(deployInBulk: boolean, timeoutMs: number): Promise<void>;
+  async deploy(...args: any[]): Promise<void> {
+    this.onFinish(); // TODO find a way to put as last
+
+    let deployInBulk: boolean = true;
+    let timeoutMs: number | undefined = undefined;
+    switch (args.length) {
+      case 2:
+        deployInBulk = args[0];
+        timeoutMs = args[1];
+        break;
+      case 1:
+        if (typeof args[0] === 'boolean') {
+          deployInBulk = args[0];
+        } else if (typeof args[0] === 'number') {
+          timeoutMs = args[0];
+        }
+        break;
     }
-    return gps;
+    await this.deployRequests(
+      this._advices.instructionsRequest,
+      deployInBulk,
+      timeoutMs,
+    );
+    await this.deployRequests(
+      this._advices.interruptRequests,
+      deployInBulk,
+      timeoutMs,
+    );
+
+    if (this._hookOnErrorAction === undefined) {
+      this.onError(this.logError.bind(this));
+    }
+
+    await this.deployOnError();
   }
 
-  async deploy(timeoutMs?: number): Promise<void> {
-    const gps = this.assertValidGroups();
-    for (const g of gps) {
-      if (g.instructions.length > 0) {
-        await this.deployOnInstructions(g, timeoutMs);
-      } else {
-        await this.deployOnInterrupts(g, timeoutMs);
-      }
-    }
+  private async deployOnError() {
+    assert(
+      this._hookOnErrorAction !== undefined,
+      'No hook registered for on error',
+    );
+    const s = await this.vm.addHookOnError(this._hookOnErrorAction);
+    if (!s) throw new Error(`Failed to register hook On error`);
+  }
+
+  private logError(i: WasmInstruction | undefined, exception: string): void {
+    console.error(
+      `error occurred in VM at instr=${i?.name} addr=${i?.startAddress}:${exception}`,
+    );
   }
 
   async remove(): Promise<void> {}
 
-  private async deployOnInterrupts(
-    g: GroupHooks,
-    timeoutMs?: number,
+  private async deployRequests(
+    reqs: APIRequest<any>[],
+    inBulk: boolean,
+    timeoutPerRequestMs?: number,
   ): Promise<void> {
-    let cb;
-    switch (g.mode) {
-      case 'onNewInterrupt':
-        cb = this.vm.addHookOnNewEvent.bind(this.vm);
-        break;
-      case 'beforeInterruptHandled':
-        cb = this.vm.addHookOnEventHandling.bind(this.vm);
-        break;
-      // case 'afterHandlingInterrupt':
-      default:
-        throw new Error(`unsupported moment ${g.mode}`);
-    }
-    for (const a of g.actions) {
-      const success = await cb(a, timeoutMs);
-      if (!success) {
-        throw new Error(
-          `failed to add action '${a.description()}' onNewInterrupt`,
-        );
+    await this.vm.sendRequests(reqs, inBulk, timeoutPerRequestMs);
+    for (const req of reqs) {
+      const response = req.responseMessage;
+      if (isErrorMessage(response)) {
+        const msg = `Failed to register hook '${req.description()}'. Reason: ${response.error_msg} (error code ${response.error_code}))`;
+        this._logger.error(msg);
+        throw new Error(msg);
       }
     }
+    return;
   }
 
-  private async deployOnInstructions(
-    g: GroupHooks,
-    timeoutMs?: number,
-  ): Promise<void> {
-    for (const i of g.instructions) {
-      for (const a of g.getInstructionActions(i)) {
-        const added = await this.vm.addHookOnAddr(
-          i.startAddress,
-          a,
-          g.internalInstructionMode,
-          timeoutMs,
-        );
-        if (!added) {
-          throw new Error(
-            `failed to register action '${a.description}' on instr '${i.name}' at address '${i.startAddress}'}`,
-          );
-        }
+  async run<T>(onComplete: (() => Promise<T>) | (() => T)): Promise<T>;
+  async run<T>(
+    onComplete:
+      | (() => Promise<T>)
+      | (() => T)
+      | ((vm: WasmitoBackendVM) => Promise<T>)
+      | ((vm: WasmitoBackendVM) => T),
+    timeoutMs: number,
+  ): Promise<T>;
+  async run(timeoutMs: number): Promise<void>;
+  async run(): Promise<void>;
+  async run(...args: any[]): Promise<void> {
+    let timeoutMs: number | undefined;
+    // eslint-disable-next-line no-async-promise-executor
+    return new Promise(async (resolve) => {
+      switch (args.length) {
+        case 0:
+          break;
+        case 1:
+          if (typeof args[0] === 'number') {
+            timeoutMs = args[0];
+          } else if (typeof args[0] === 'function') {
+            this.userOnFinishCB = args[0];
+          } else {
+            throw new Error(`invalid arguments`);
+          }
+          break;
+        default:
+          if (typeof args[0] !== 'function' || typeof args[1] !== 'number') {
+            throw new Error(`invalid arguments`);
+          }
+          this.userOnFinishCB = args[0];
+          timeoutMs = args[1];
+          break;
       }
-    }
-    g.deployed = true;
+      this.analysisResolver = resolve;
+
+      await this.vm.run(timeoutMs);
+    });
   }
 
-  async run(timeoutMs?: number): Promise<void> {
-    await this.vm.run(timeoutMs);
+  private onFinish(): void {
+    const mainFunc = this.wasm.getMainFunction();
+    this.after(mainFunc, async (vm: WasmitoBackendVM) => {
+      let v = undefined;
+      if (this.userOnFinishCB !== undefined) v = await this.userOnFinishCB(vm);
+      await vm.close();
+      this.analysisResolver(v);
+    });
   }
 }
 
 function createActionsNode(
   instr: WasmInstruction,
   cbNrOfArgs: number,
-): [Hook[], InspectStateHook] {
+): [Hook[], InspectStateHook<HookOnAddrSubContent>] {
   const hooks: Hook[] = [];
-  const inspectAction = new InspectStateHook(
+  const inspectAction = new InspectStateHook<HookOnAddrSubContent>(
     new StateRequest(),
-    instr.startAddress,
   );
   inspectAction.includePC();
   switch (cbNrOfArgs) {
@@ -452,78 +661,107 @@ function createActionsNode(
   return [hooks, inspectAction];
 }
 
-//   cb: (
-//     n: SourceCFGNode,
-//     instr: WasmInstruction,
-//     args: ReadOnlyWasmValue[],
-//     vm: WasmitoBackendVM,
-//   ) => void,
-//   cb: (
-//     n: SourceCFGNode,
-//     instr: WasmInstruction,
-//     args: ReadOnlyWasmValue[],
-//   ) => void,
 function createCallbackNode(
-  node: SourceCFGNode,
-  vm: WasmitoBackendVM,
-  mod: WasmModule,
-  instr: WasmInstruction,
-  cb: (...args: any[]) => any,
-): (s: WasmState) => void {
-  switch (cb.length) {
-    case 0:
-    case 1:
-      return createCallbackNoArgs(vm, cb);
-    case 2:
-      return callbackArgs(node, mod, instr, false, vm, cb);
-    case 3:
-    case 4:
-      return callbackArgs(node, mod, instr, true, vm, cb);
-    default:
-      throw new Error(`Callback has incorrect number of arguments`);
-  }
+  _node: SourceCFGNode,
+  _vm: WasmitoBackendVM,
+  _mod: WasmModule,
+  _instr: WasmInstruction,
+  _moment: InstrMoment,
+  _cb: (...args: any[]) => any,
+): (s: SubscriptionContent<HookOnAddrSubContent, WasmState>) => void {
+  throw new Error();
+  // switch (cb.length) {
+  //   case 0:
+  //   case 1:
+  //     return createCallbackNoArgs(vm, instr, moment, cb);
+  //   case 2:
+  //     return callbackArgs(node, mod, instr, false, vm, cb);
+  //   case 3:
+  //   case 4:
+  //     return callbackArgs(node, mod, instr, true, vm, cb);
+  //   default:
+  //     throw new Error(`Callback has incorrect number of arguments`);
+  // }
 }
 
-function callbackArgs(
-  node: SourceCFGNode,
-  mod: WasmModule,
-  instr: WasmInstruction,
-  includeInstrArgs: boolean,
-  vm: WasmitoBackendVM,
-  cb: (...args: any[]) => any,
-): (s: WasmState) => void {
-  return (s: WasmState) => {
-    assertFatalHookError(s.pc !== undefined, 'pc is empty');
-    const i = mod.getInstruction(s.pc);
-    assertFatalHookError(
-      i !== undefined,
-      `No instruction found for address ${s.pc}`,
-    );
+// function callbackArgs(
+//   node: SourceCFGNode,
+//   mod: WasmModule,
+//   instr: WasmInstruction,
+//   includeInstrArgs: boolean,
+//   vm: WasmitoBackendVM,
+//   cb: (...args: any[]) => any,
+// ): (s: WasmState) => void {
+//   return (s: WasmState) => {
+//     assertFatalHookError(s.pc !== undefined, 'pc is empty');
+//     const i = mod.getInstruction(s.pc);
+//     assertFatalHookError(
+//       i !== undefined,
+//       `No instruction found for address ${s.pc}`,
+//     );
 
-    assertFatalHookError(
-      i.signature.nrArgs === instr.signature.nrArgs,
-      `mismatch between expect args of instr ${i.name} and ${instr.name}`,
-    );
+//     assertFatalHookError(
+//       i.signature.nrArgs === instr.signature.nrArgs,
+//       `mismatch between expect args of instr ${i.name} and ${instr.name}`,
+//     );
 
-    let args: WritableWasmValue[] | ReadOnlyWasmValue[] = [];
-    if (includeInstrArgs && i.signature.nrArgs > 0) {
-      assertFatalHookError(
-        s.stack !== undefined,
-        'VM failed to provide the stack needed to construct args',
-      );
-      assertFatalHookError(
-        s.stack.length >= i.signature.nrArgs,
-        `Stack is expected to have #${i.signature.nrArgs} values but has ${s.stack.length} to reconstruct args for '${i.name}' inst at addr ${i.startAddress}`,
-      );
+//     let args: WritableWasmValue[] | ReadOnlyWasmValue[] = [];
+//     if (includeInstrArgs && i.signature.nrArgs > 0) {
+//       assertFatalHookError(
+//         s.stack !== undefined,
+//         'VM failed to provide the stack needed to construct args',
+//       );
+//       assertFatalHookError(
+//         s.stack.length >= i.signature.nrArgs,
+//         `Stack is expected to have #${i.signature.nrArgs} values but has ${s.stack.length} to reconstruct args for '${i.name}' inst at addr ${i.startAddress}`,
+//       );
 
-      const vals = s.stack.slice(-i.signature.nrArgs);
-      args = vals.map((v) => new ReadOnlyWasmValue(v));
-    }
+//       const vals = s.stack.slice(-i.signature.nrArgs);
+//       args = vals.map((v) => new ReadOnlyWasmValue(v));
+//     }
 
-    const newArgs = cb(node, i, args, vm);
-    assertFatalHookError(
-      newArgs === undefined,
-      `Registered callback should not return any value as no update is expected`,
-    );
-  };
-}
+//     const newArgs = cb(node, i, args, vm);
+//     assertFatalHookError(
+//       newArgs === undefined,
+//       `Registered callback should not return any value as no update is expected`,
+//     );
+//   };
+// }
+// private async deployOnInterrupt(
+//   reqs: HookOnEventRequest[],
+//   deployInBulk: boolean,
+//   timeoutMs?: number,
+// ): Promise<void> {
+// for (let idx = 0; idx < gps.length; idx++) {
+//   this._logger.debug(
+//     `Deploying Interrupt Group #${idx + 1} out of #${gps.length}`,
+//   );
+//   await this.deployOnInterrupts(gps[idx], timeoutMs);
+// }
+// return;
+// }
+// private async deployOnInterrupts(
+//   g: GroupHooks,
+//   timeoutMs?: number,
+// ): Promise<void> {
+//   let cb;
+//   switch (g.mode) {
+//     case 'onNewInterrupt':
+//       cb = this.vm.addHookOnNewEvent.bind(this.vm);
+//       break;
+//     case 'beforeInterruptHandled':
+//       cb = this.vm.addHookOnEventHandling.bind(this.vm);
+//       break;
+//     // case 'afterHandlingInterrupt':
+//     default:
+//       throw new Error(`unsupported moment ${g.mode}`);
+//   }
+//   for (const a of g.actions) {
+//     const success = await cb(a, timeoutMs);
+//     if (!success) {
+//       throw new Error(
+//         `failed to add action '${a.description()}' onNewInterrupt`,
+//       );
+//     }
+//   }
+// }

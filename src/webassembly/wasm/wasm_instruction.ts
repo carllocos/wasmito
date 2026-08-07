@@ -1,5 +1,7 @@
+import assert from 'assert';
 import { WASM } from '../wasm';
 import { PlaceholderType, WasmType } from './opcode_type';
+import { WASMFunction } from './wasm_function';
 import {
   WasmOpcodeBlock,
   WasmOpcodeBr,
@@ -35,6 +37,8 @@ export class WasmInstruction {
   public endAddress: number;
   private _subInstructions: WasmInstruction[];
   private _allSubInstructions: WasmInstruction[];
+  private _enclosingFunc: WASMFunction | undefined;
+  private _indexInFunction: number | undefined;
 
   constructor(
     opcode: WasmOpcode,
@@ -55,6 +59,31 @@ export class WasmInstruction {
     this.immediate = immediate;
     this._subInstructions = [];
     this._allSubInstructions = [];
+  }
+
+  set enclosingFunction(f: WASMFunction) {
+    if (this._enclosingFunc !== undefined) {
+      throw new Error(`You cannot reassign the enclosing func`);
+    }
+    this._enclosingFunc = f;
+  }
+
+  getEnclosingFunction(): WASMFunction {
+    if (this._enclosingFunc === undefined)
+      throw new Error(`Instr has no enclosing function assigned`);
+    return this._enclosingFunc;
+  }
+
+  getIndexInFunction(): number {
+    if (this._indexInFunction === undefined) {
+      this._indexInFunction =
+        this.getEnclosingFunction().getInstructionIndex(this);
+    }
+    assert(
+      this._indexInFunction >= 0,
+      `Instr is not part of the enclosing function`,
+    );
+    return this._indexInFunction;
   }
 
   get subInstructions(): WasmInstruction[] {
@@ -83,6 +112,14 @@ export class WasmInstruction {
     if (this._signature instanceof PlaceholderType) {
       this._signature = new WasmType(type.nrArgs, type.nrResults, type.id);
     }
+  }
+
+  equals(other: WasmInstruction): boolean {
+    return (
+      this === other ||
+      (this.startAddress === other.startAddress &&
+        equalOpcodes(this.opcode, other.opcode))
+    );
   }
 
   hasOpcode(opcode: WasmOpcode): boolean {
@@ -561,4 +598,104 @@ export function isTableSet(instr: WasmInstruction): boolean {
   return equalOpcodes(instr.opcode, WasmCode.TableSet);
 }
 
-export class GlobalGetInstruction extends WasmInstruction {}
+export class GlobalGetInstruction extends WasmInstruction {
+  private _idx: number;
+  constructor(idx: number) {
+    super(WasmCode.GlobalGet, idx);
+    this._idx = idx;
+  }
+
+  get index(): number {
+    return this._idx;
+  }
+}
+
+export function isGlobalGetInstruction(
+  i: WasmInstruction,
+): i is GlobalGetInstruction {
+  return i instanceof GlobalGetInstruction;
+}
+
+export class GlobalSetInstruction extends WasmInstruction {
+  private _idx: number;
+  constructor(idx: number) {
+    super(WasmCode.GlobalSet, idx);
+    this._idx = idx;
+  }
+
+  get index(): number {
+    return this._idx;
+  }
+}
+
+export function isGlobalSetInstruction(
+  i: WasmInstruction,
+): i is GlobalSetInstruction {
+  return i instanceof GlobalSetInstruction;
+}
+
+export class LoadInstruction extends WasmInstruction {
+  readonly offset: number;
+
+  constructor(opcode: WasmOpcode, offset: number) {
+    super(opcode);
+    this.offset = offset;
+  }
+
+  targetValueSize(): number {
+    return memoryTargetValueSize(this);
+  }
+}
+
+export function isLoadInstruction(i: any): i is LoadInstruction {
+  return i instanceof LoadInstruction;
+}
+
+export class StoreInstruction extends WasmInstruction {
+  readonly offset: number;
+
+  constructor(opcode: WasmOpcode, offset: number) {
+    super(opcode);
+    this.offset = offset;
+  }
+
+  targetValueSize(): number {
+    return memoryTargetValueSize(this);
+  }
+}
+
+export function isStoreInstruction(i: any): i is StoreInstruction {
+  return i instanceof StoreInstruction;
+}
+
+function memoryTargetValueSize(i: LoadInstruction | StoreInstruction): number {
+  switch (getWasmOpcodeNr(i.opcode)) {
+    case getWasmOpcodeNr(WasmCode.F32Load):
+    case getWasmOpcodeNr(WasmCode.I32Load8S):
+    case getWasmOpcodeNr(WasmCode.I32Load8U):
+    case getWasmOpcodeNr(WasmCode.I32Load16S):
+    case getWasmOpcodeNr(WasmCode.I32Load16U):
+    case getWasmOpcodeNr(WasmCode.I32Load):
+    case getWasmOpcodeNr(WasmCode.I32Store):
+    case getWasmOpcodeNr(WasmCode.F32Store):
+    case getWasmOpcodeNr(WasmCode.I32Store8):
+    case getWasmOpcodeNr(WasmCode.I32Store16):
+      return 4;
+    case getWasmOpcodeNr(WasmCode.I64Load):
+    case getWasmOpcodeNr(WasmCode.I64Load8S):
+    case getWasmOpcodeNr(WasmCode.I64Load8U):
+    case getWasmOpcodeNr(WasmCode.I64Load16S):
+    case getWasmOpcodeNr(WasmCode.I64Load16U):
+    case getWasmOpcodeNr(WasmCode.I64Load32S):
+    case getWasmOpcodeNr(WasmCode.I64Load32U):
+    case getWasmOpcodeNr(WasmCode.F64Load):
+    case getWasmOpcodeNr(WasmCode.I64Store):
+    case getWasmOpcodeNr(WasmCode.I64Store8):
+    case getWasmOpcodeNr(WasmCode.I64Store16):
+    case getWasmOpcodeNr(WasmCode.I64Store32):
+    case getWasmOpcodeNr(WasmCode.F64Store):
+      return 8;
+    default:
+      throw new Error(`Provided a non Load or Store Instruction`);
+  }
+}

@@ -5,7 +5,9 @@ import {
   HookKind,
   HookWithSubscription,
   HookWithoutSubscription,
+  SubscriptionContent,
 } from './hook';
+import { encodeEventAsBinary } from '../runtimes/wasmito_vm/requests/inject_event_request';
 
 export class EventRemoveHook extends HookWithoutSubscription {
   constructor() {
@@ -22,7 +24,10 @@ export class EventRemoveHook extends HookWithoutSubscription {
   }
 }
 
-export class EventInspectHook extends HookWithSubscription<WASM.Event> {
+export class EventInspectHook<HookMetaData> extends HookWithSubscription<
+  HookMetaData,
+  WASM.Event
+> {
   constructor() {
     super(HookKind.EventInspect);
     // this.parseSubscriptionData = this.deserializeSubscriptionMessage.bind(this);
@@ -37,7 +42,10 @@ export class EventInspectHook extends HookWithSubscription<WASM.Event> {
     return 'EventInspect';
   }
 
-  parseSubscriptionData(data: any): WASM.Event {
+  parseSubscriptionData(
+    msg: SubscriptionContent<HookMetaData, any>,
+  ): SubscriptionContent<HookMetaData, WASM.Event> {
+    const data = msg.sub;
     if (typeof data !== 'string') {
       throw new APIRequestInvalidParse(
         'no subscription reply for EventInspectHook',
@@ -56,6 +64,40 @@ export class EventInspectHook extends HookWithSubscription<WASM.Event> {
         'no subscription reply for EventInspectHook',
       );
     }
-    return ev;
+    return {
+      msg: msg.msg,
+      metadata: msg.metadata,
+      sub: ev,
+    };
+  }
+}
+
+export class AddEventHook extends HookWithoutSubscription {
+  readonly topic: string;
+  readonly payload: string;
+  constructor(topic: string, payload: string) {
+    super(HookKind.EventAdd);
+    this.topic = topic;
+    this.payload = payload;
+  }
+
+  serializeBinary(): string {
+    return `${this.kind}${encodeEventAsBinary(this.topic, this.payload)}`;
+  }
+
+  description(): string {
+    return `AddEventAction Event(topic=${this.topic},payload=${this.payload})`;
+  }
+}
+
+export class AddEventPinHook extends AddEventHook {
+  readonly pin: number;
+  constructor(pin: number) {
+    super(`interrupt_${pin}`, '');
+    this.pin = pin;
+  }
+
+  description(): string {
+    return `AddEventPinAction Event(topic=${this.topic},payload=${this.payload})`;
   }
 }

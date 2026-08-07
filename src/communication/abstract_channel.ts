@@ -11,7 +11,7 @@ export abstract class AbstractChannel implements Channel {
   private readonly removedListeners: Set<(data: string) => void>;
   protected logger: Logger;
 
-  private writeListeners: Subscription<string | Uint8Array>;
+  private writeListeners: Subscription<string, string | Uint8Array>;
 
   constructor(channelName: string) {
     this.channelName = channelName;
@@ -28,7 +28,7 @@ export abstract class AbstractChannel implements Channel {
   public abstract write(
     data: any,
     cb?: ((err?: Error | null | undefined) => void) | undefined,
-  ): boolean;
+  ): Promise<boolean>;
 
   addOnWriteListener(callback: (data: string | Uint8Array) => void): void {
     this.writeListeners.subscribe(callback, false);
@@ -68,11 +68,11 @@ export abstract class AbstractChannel implements Channel {
   private handleLines(lines: string[]): void {
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
-      this.listeners.forEach((listener) => {
+      for (const listener of this.listeners) {
         if (!this.removedListeners.has(listener)) {
           listener(line);
         }
-      });
+      }
     }
   }
 
@@ -85,7 +85,6 @@ export abstract class AbstractChannel implements Channel {
       if (line.length > 0 && line.charAt(line.length - 1) === '\r') {
         line = line.slice(0, line.length - 1);
       }
-      this.logger.debug(line);
       lines.push(line);
       idx = this.dataBuffered.indexOf('\n');
     }

@@ -91,8 +91,7 @@ export class WARDuinoRuntimeAPI implements RuntimeDebugAPI {
 
   async run(timeout?: number): Promise<boolean> {
     const req = new RunRequest();
-    const resp = await this.sendRequest(req, timeout);
-    return resp === 'GO!';
+    return await this.sendRequest(req, timeout);
   }
 
   async inspectPC(timeout?: number): Promise<number> {
@@ -107,8 +106,7 @@ export class WARDuinoRuntimeAPI implements RuntimeDebugAPI {
 
   async step(timeout?: number): Promise<boolean> {
     const req = new StepRequest();
-    const resp = await this.sendRequest(req, timeout);
-    return resp === 'STEP!';
+    return await this.sendRequest(req, timeout);
   }
 
   async startRuntime(_timeout: number): Promise<boolean> {

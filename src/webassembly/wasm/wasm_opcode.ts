@@ -225,7 +225,7 @@ function multipleWasmOpcodeToSingleOpcodes(
         WasmCode.I64Load16S,
         WasmCode.I64Load16U,
         WasmCode.I64Load32S,
-        WasmCode.I64LoadU,
+        WasmCode.I64Load32U,
       ];
 
     case WasmCode.MultipleOpcode.Store:
@@ -1282,7 +1282,7 @@ export namespace WasmCode {
     undefined,
     new WasmType(1, 1),
   ];
-  export const I64LoadU: WasmOpcode = [
+  export const I64Load32U: WasmOpcode = [
     'i64.load32_u',
     0x35,
     undefined,
@@ -1498,7 +1498,7 @@ export const WasmOpcodes: WasmOpcode[] = [
   WasmCode.I64Load16S,
   WasmCode.I64Load16U,
   WasmCode.I64Load32S,
-  WasmCode.I64LoadU,
+  WasmCode.I64Load32U,
 
   WasmCode.I32Store,
   WasmCode.I64Store,

@@ -6,6 +6,12 @@ import { Instruction } from './instructions';
 import { WasmStack } from '../../../webassembly/wasm_stack';
 import { serializeUInt16BE } from '../../../util/encoder';
 import { WasmState, type WASM } from '../../../webassembly/wasm';
+import {
+  isRequestMessage,
+  isSuccessfulMessage,
+  RequestMessage,
+  ResponseType,
+} from '../../request_msg';
 
 export enum InspectableState {
   pcState = '01',
@@ -28,12 +34,14 @@ export interface StackInpsectResponse {
 }
 
 export class InspectStack extends APIRequestNoSubscription<WasmStack> {
+  readonly instruction = Instruction.Inspect;
+
   description(): string {
     return `InspectStack`;
   }
 
   getData(): string {
-    return `${Instruction.Inspect}${InspectableState.stackState}\n`;
+    return `${this.instruction}${this.serializeID()}${InspectableState.stackState}\n`;
   }
 
   parse(input: string): WasmStack {
@@ -44,6 +52,20 @@ export class InspectStack extends APIRequestNoSubscription<WasmStack> {
     } catch (e) {
       throw new APIRequestInvalidParse('No response for inspect stack');
     }
+  }
+
+  processAck(ack: RequestMessage): WasmStack {
+    if (isSuccessfulMessage(ack, this.instruction)) {
+      try {
+        const resp: StackInpsectResponse = JSON.parse(ack.sub);
+        return new WasmStack(resp.stack);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (e) {
+        throw new APIRequestInvalidParse('No response for inspect stack');
+      }
+    }
+
+    throw new APIRequestInvalidParse('No response for inspect');
   }
 }
 
@@ -80,10 +102,11 @@ export class StateRequest
   extends APIRequestNoSubscription<WasmState>
   implements WasmStateI<StateRequest>
 {
-  private state: string[] = [];
+  readonly instruction = Instruction.Inspect;
+  private state: Set<string> = new Set();
 
   public includeAll(): StateRequest {
-    this.state = [];
+    this.state = new Set();
     const allStates = Object.values(InspectableState) as string[];
     allStates
       .filter((s) => !isNaN(parseInt(s, 16)))
@@ -94,7 +117,11 @@ export class StateRequest
   }
 
   public isRequestEmpty(): boolean {
-    return this.state.length === 0;
+    return this.state.size === 0;
+  }
+
+  public doesInclude(s: InspectableState): boolean {
+    return this.state.has(s);
   }
 
   public includePC(): StateRequest {
@@ -162,16 +189,26 @@ export class StateRequest
     return this;
   }
 
-  public generateInterrupt(): string {
-    this.state.sort();
-    const numberBytes = serializeUInt16BE(this.state.length);
-    const stateToReq = this.state.join('');
+  public generateInterrupt(
+    includeInterruptNr: boolean,
+    includeID: boolean,
+  ): string {
+    const states = Array.from(this.state).sort();
+    const numberBytes = serializeUInt16BE(states.length);
+    const stateToReq = states.join('');
     if (stateToReq === '') {
       throw new Error(
         'StateInspectRequest should request at least one state kind. It is currently empty',
       );
     }
-    return `${Instruction.Inspect}${numberBytes}${stateToReq}`;
+    let d = '';
+    if (includeInterruptNr) {
+      d += this.instruction;
+    }
+    if (includeID) {
+      d += this.serializeID();
+    }
+    return `${d}${numberBytes}${stateToReq}`;
   }
 
   description(): string {
@@ -179,13 +216,14 @@ export class StateRequest
   }
 
   getData(): string {
-    return `${this.generateInterrupt()}\n`;
+    const includeID = true;
+    const includeInterruptNr = true;
+    return `${this.generateInterrupt(includeInterruptNr, includeID)}\n`;
   }
 
   private pushState(s: string): void {
-    const present = this.state.find((s2) => s === s2);
-    if (present === undefined) {
-      this.state.push(s);
+    if (!this.state.has(s)) {
+      this.state.add(s);
     }
   }
 
@@ -201,9 +239,23 @@ export class StateRequest
     return new WasmState(response, line);
   }
 
+  processAck(ack: RequestMessage): WasmState {
+    if (isRequestMessage(ack, this.instruction)) {
+      if (ack.responseType === ResponseType.SuccessResponse) {
+        this.assertAllRequestedStateArePresent(ack.sub);
+        return new WasmState(ack.sub, '');
+      }
+    }
+
+    throw new APIRequestInvalidParse(`StateRequest got invalid state`);
+  }
+
   private assertAllRequestedStateArePresent(response: any): void {
-    for (let i = 0; i < this.state.length; i++) {
-      const s = this.state[i];
+    if (typeof response !== 'object') {
+      throw new Error('invalid state');
+    }
+
+    for (const s of this.state.values()) {
       if (s === InspectableState.pcState && response.pc === undefined) {
         throw new Error('invalid state');
       } else if (

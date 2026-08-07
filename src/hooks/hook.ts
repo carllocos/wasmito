@@ -9,6 +9,8 @@ import {
 import { type LogicalClock } from './logicalclock';
 import { createLogger, Logger } from '../logger/logger';
 import { ISubscription, Subscription } from './isubscribe';
+import { SubscriptionParseOutcome } from '../runtimes/request_interface';
+import { SubscribeResponse } from '../runtimes/request_msg';
 
 export enum HookKind {
   RemoteCall = '01',
@@ -23,8 +25,10 @@ export enum HookKind {
   EventAdd = '12',
 }
 
-export type SubscriptionHook<SubscriptionType> =
-  ISubscription<SubscriptionType>;
+export type SubscriptionHook<UnPasedSubData, ParsedType> = ISubscription<
+  UnPasedSubData,
+  ParsedType
+>;
 
 export abstract class Hook {
   public readonly kind: HookKind;
@@ -67,18 +71,32 @@ export abstract class Hook {
   abstract serializeBinary(): string;
 }
 
+export interface SubscriptionContent<M, S> {
+  msg: SubscribeResponse;
+  metadata: M;
+  sub: S;
+}
+
 export abstract class HookWithoutSubscription extends Hook {}
 
-export abstract class HookWithSubscription<SubscriptionType>
+const hookLogger = createLogger('SubscriptionHook');
+export abstract class HookWithSubscription<HookMetaData, SubscriptionType>
   extends Hook
-  implements SubscriptionHook<SubscriptionType>
+  implements
+    SubscriptionHook<
+      SubscriptionContent<HookMetaData, any>,
+      SubscriptionContent<HookMetaData, SubscriptionType>
+    >
 {
-  private subscriptions: Subscription<SubscriptionType>;
+  private subscriptions: Subscription<
+    SubscribeResponse,
+    SubscriptionContent<HookMetaData, SubscriptionType>
+  >;
   protected logger: Logger;
 
   constructor(kind: HookKind, logger?: Logger) {
     super(kind);
-    this.logger = logger ?? createLogger('SubscriptionHook');
+    this.logger = logger ?? hookLogger;
     this.subscriptions = new Subscription(
       this.parseSubscriptionData.bind(this),
       this.logger,
@@ -86,30 +104,44 @@ export abstract class HookWithSubscription<SubscriptionType>
   }
 
   public subscribe(
-    callback: (data: SubscriptionType) => void,
+    callback:
+      | ((data: SubscriptionContent<HookMetaData, SubscriptionType>) => void)
+      | ((
+          data: SubscriptionContent<HookMetaData, SubscriptionType>,
+        ) => Promise<void>),
     oneTimeSubscription: boolean = false,
   ): void {
     this.subscriptions.subscribe(callback, oneTimeSubscription);
   }
 
-  public unSubscribe(callback: (data: SubscriptionType) => void): void {
+  public unSubscribe(
+    callback:
+      | ((data: SubscriptionContent<HookMetaData, SubscriptionType>) => void)
+      | ((
+          data: SubscriptionContent<HookMetaData, SubscriptionType>,
+        ) => Promise<void>),
+  ): void {
     this.subscriptions.unSubscribe(callback);
   }
 
-  onSubscriptionData(value: SubscriptionType): void {
-    this.subscriptions.onSubscriptionData(value);
+  async onSubscriptionData(
+    value: SubscriptionContent<HookMetaData, SubscriptionType>,
+  ): Promise<void> {
+    await this.subscriptions.onSubscriptionData(value);
   }
 
   clearSubscriptions(): void {
     this.subscriptions.clearSubscriptions();
   }
 
-  abstract parseSubscriptionData(input: any): SubscriptionType;
+  abstract parseSubscriptionData(
+    data: SubscriptionContent<HookMetaData, any>,
+  ): SubscriptionContent<HookMetaData, SubscriptionType>;
 }
 
-export function isHookWithSubscription<SubscriptionType>(
+export function isHookWithSubscription<HookMetada, SubscriptionType>(
   h: Hook,
-): h is HookWithSubscription<SubscriptionType> {
+): h is HookWithSubscription<HookMetada, SubscriptionType> {
   return h instanceof HookWithSubscription;
 }
 
@@ -130,11 +162,11 @@ export function assertFatalHookError(
   }
 }
 
-export function parseHookContent(
+export async function parseHookContentAndRunListeners<M>(
+  msg: SubscriptionContent<M, any>,
   hooks: Hook[],
-  content: any,
   _logger?: Logger,
-): boolean {
+): Promise<boolean> {
   let oneSuccessfulParse = false;
   for (let i = 0; i < hooks.length; i++) {
     const hook = hooks[i];
@@ -143,7 +175,7 @@ export function parseHookContent(
       let successfulParse = false;
       oneSuccessfulParse = successfulParse || oneSuccessfulParse;
       try {
-        parsed = hook.parseSubscriptionData(content);
+        parsed = hook.parseSubscriptionData(msg);
         successfulParse = true;
       } catch (_e) {
         // empty
@@ -151,10 +183,25 @@ export function parseHookContent(
 
       if (successfulParse) {
         // Perhaps catch the error?
-        hook.onSubscriptionData(parsed);
+        await hook.onSubscriptionData(parsed);
         return successfulParse;
       }
     }
   }
   return oneSuccessfulParse;
+}
+
+export async function runHooksAndListeners<M>(
+  msg: SubscriptionContent<M, any>,
+  hooks: Hook[],
+  logger?: Logger,
+): Promise<SubscriptionParseOutcome> {
+  const successFulParse = await parseHookContentAndRunListeners(
+    msg,
+    hooks,
+    logger,
+  );
+  return successFulParse
+    ? SubscriptionParseOutcome.Successful
+    : SubscriptionParseOutcome.Failed;
 }

@@ -106,4 +106,15 @@ export class WASMFunction {
   instructionsFromOpcode(opcode: WasmOpcode): WasmInstruction[] {
     return this.allInstructions.filter((i) => i.hasOpcode(opcode));
   }
+
+  getInstructionIndex(instr: WasmInstruction): number {
+    if (!this.isAddressInFunction(instr.startAddress)) return -1;
+
+    for (let idx = 0; idx < this.allInstructions.length; idx++) {
+      const i = this.allInstructions[idx];
+      if (i.equals(instr)) return idx;
+    }
+
+    return -1;
+  }
 }

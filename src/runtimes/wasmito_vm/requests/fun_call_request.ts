@@ -1,11 +1,13 @@
+import assert from 'assert';
 import { createLogger } from '../../../logger/logger';
 import { WASM } from '../../../webassembly/wasm';
 import { Instruction, getInstructionFromString } from './instructions';
 import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
-  ResponseType,
 } from '../../request_interface';
+import { decodeLEB128, hexStringToUint8Array } from '../../../util/decoder';
+import { RequestMessage, ResponseType } from '../../request_msg';
 
 const logger = createLogger('FunCallRequest');
 
@@ -36,7 +38,8 @@ export abstract class FunCallRequest<R> extends APIRequestNoSubscription<R> {
   }
 
   getData(): string {
-    return this.encodeRemoteCallRequest();
+    throw new Error(`TODO fix ID of calls at VM side`);
+    // return this.encodeRemoteCallRequest();
   }
 
   override isSubscriptionClosed(): boolean {
@@ -46,10 +49,11 @@ export abstract class FunCallRequest<R> extends APIRequestNoSubscription<R> {
   abstract parse(input: string): R;
 
   encodeRemoteCallRequest(): string {
-    // format: interrupt | LEB32 funcid | args | newline | null termination
+    // format: interrupt | LEB ID request| LEB32 funcid | args | newline | null termination
     // interrupt
     let encoding = '';
-    encoding += this.isProxyCall ? Instruction.ProxyCall : Instruction.FuncCall;
+    encoding += this.instruction;
+    encoding += this.serializeID();
 
     // funcid
     encoding += WASM.leb128(this.funcToCall);
@@ -103,6 +107,8 @@ export function isProxyCallSuccessfulResponse(
 }
 
 export class ProxyCallRequest extends FunCallRequest<ProxyCallResponse> {
+  readonly instruction = Instruction.ProxyCall;
+
   constructor(funcToCall: number, args: WASM.Value[]) {
     super(funcToCall, args, true);
   }
@@ -113,6 +119,10 @@ export class ProxyCallRequest extends FunCallRequest<ProxyCallResponse> {
       throw new APIRequestInvalidParse(`No response for ${this.description()}`);
     }
     return response;
+  }
+
+  processAck(_ack: RequestMessage): ProxyCallResponse {
+    throw new Error('Method not implemented.');
   }
 
   decodeHexaStringResponse(hexaInput: string): ProxyCallResponse | undefined {
@@ -235,6 +245,8 @@ function errorCodeMessage(errorCode: number): string | undefined {
 }
 
 export class RemoteCallRequest extends FunCallRequest<ProxyCallResponse> {
+  readonly instruction = Instruction.FuncCall;
+
   constructor(funcToCall: number, args: WASM.Value[]) {
     super(funcToCall, args, false);
   }
@@ -245,6 +257,10 @@ export class RemoteCallRequest extends FunCallRequest<ProxyCallResponse> {
       throw new APIRequestInvalidParse(`No response for ${this.description()}`);
     }
     return response;
+  }
+
+  processAck(_ack: RequestMessage): ProxyCallResponse {
+    throw new Error('Method not implemented.');
   }
 
   private decodeHexaStringResponse(
@@ -314,7 +330,35 @@ export class RemoteCallRequest extends FunCallRequest<ProxyCallResponse> {
       if (hasResultValue === '00') {
         return response;
       } else if (hasResultValue === '01') {
-        throw Error(`TODO read resultValue MSG from hexaInput`);
+        const encodedTypeAndValue = hexaInput.slice(4, hexaInput.length);
+        // 2 chars for the type
+        const typeInHex = encodedTypeAndValue.slice(0, 2).toLowerCase();
+        const valueType = WASM.hexToType.get(typeInHex);
+        assert(
+          valueType !== undefined,
+          `the encoded Wasm Type '${typeInHex}' returned from the call is not a Wasm type`,
+        );
+
+        const encodedValue = encodedTypeAndValue.slice(
+          2,
+          encodedTypeAndValue.length,
+        );
+        const buffer = hexStringToUint8Array(encodedValue);
+        assert(
+          buffer !== undefined,
+          `the encoded WasmValue '${encodedValue}' returned from the call is not a valid hex string`,
+        );
+        const decodedValue = decodeLEB128(buffer);
+        assert(
+          decodedValue !== undefined,
+          `the encoded WasmValue '${encodedValue}' returned from the call could not be decoded`,
+        );
+
+        response.resultValue = {
+          type: valueType,
+          value: decodedValue.value,
+        };
+        return response;
       } else {
         return undefined;
       }

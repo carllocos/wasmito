@@ -1,6 +1,6 @@
 import os from 'os';
 import * as path from 'path';
-import fs, { readFileSync } from 'fs';
+import fs, { readFileSync, readdirSync } from 'fs';
 import { getGlobalLogger } from '../logger/logger';
 import { createHash } from 'crypto';
 
@@ -188,4 +188,18 @@ export function copyFile(file1: string, file2: string): void {
 export function sanitizeFilename(filename: string): string {
   // eslint-disable-next-line no-useless-escape
   return filename.replace(/[\/\\:*?"<>|]/g, '_');
+}
+export function findFilesWithExtension(
+  dirPath: string,
+  extension: string,
+): string[] {
+  const normalizedExtension = extension.startsWith('.')
+    ? extension
+    : `.${extension}`;
+
+  return readdirSync(dirPath, { withFileTypes: true })
+    .filter(
+      (entry) => entry.isFile() && entry.name.endsWith(normalizedExtension),
+    )
+    .map((entry) => path.join(dirPath, entry.name));
 }

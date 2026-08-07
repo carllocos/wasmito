@@ -10,10 +10,10 @@ export class MockSerialConnection implements Channel {
     this.channelName = 'mockChannel';
   }
 
-  write(
+  async write(
     data: any,
     cb?: ((err?: Error | null | undefined) => void) | undefined,
-  ): boolean {
+  ): Promise<boolean> {
     return true;
   }
 

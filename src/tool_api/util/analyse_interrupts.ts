@@ -1,86 +1,94 @@
-import { assertFatalHookError } from '../../hooks/hook';
-import { EventInspectHook } from '../../hooks/hook_event';
-import { InspectStateHook } from '../../hooks/hook_inspect_state';
-import { PauseVMHook } from '../../hooks/hook_run_pause';
+import { assertFatalHookError, SubscriptionContent } from '../../hooks/hook';
 import { getGlobalLogger } from '../../logger/logger';
 import { WasmitoBackendVM } from '../../runtimes/wasmito_vm/wasmito_vm';
 import { WASM } from '../../webassembly/wasm';
 import { ReadOnlyInterrupt, WritableInterrupt } from '../interrupts';
-import { GroupHooks, InstrMoment } from '../group_hooks';
+import {
+  HookOnEventContent,
+  HookOnEventMoment,
+} from '../../runtimes/wasmito_vm/requests/hook_on_event_request';
+import { AdvicesRegistery } from './advices_registery';
 
-export function interrupt(
+function convertEvent(
+  writable: boolean,
+  ev: ReadOnlyInterrupt | WritableInterrupt,
+): ReadOnlyInterrupt | WritableInterrupt {
+  return writable
+    ? new WritableInterrupt(ev.topic, ev.payload)
+    : new ReadOnlyInterrupt(ev.topic, ev.payload);
+}
+
+export function runAdvicesInterrupt(
+  advicesContainer: AdvicesRegistery,
   vm: WasmitoBackendVM,
   maxTimeoutMs: number,
+): (data: SubscriptionContent<HookOnEventContent, WASM.Event>) => void {
+  return async (sub: SubscriptionContent<HookOnEventContent, WASM.Event>) => {
+    await advicesContainer.waitForPendingInterruptAdvices();
+    const moment = sub.metadata.moment;
+    const advices = advicesContainer.getInterruptAdvices(moment);
+    let ev: ReadOnlyInterrupt | WritableInterrupt = new ReadOnlyInterrupt(
+      sub.sub,
+    );
+    let mutated = false;
+    for (const [advice, mutate] of advices) {
+      mutated = mutated || mutate;
+      ev = convertEvent(mutate, ev);
+      const newEvent = await advice(ev as any, vm);
+      if (mutate) {
+        assertUpdateEvent(newEvent, mutate);
+        ev = newEvent as any;
+      }
+    }
+
+    if (mutated) {
+      getGlobalLogger().warn(`TODO update event`);
+      await vm.run(maxTimeoutMs);
+    }
+    advicesContainer.interruptAdvicesCompleted();
+  };
+}
+
+function assertUpdateEvent(
+  ev: WritableInterrupt | ReadOnlyInterrupt | undefined | void,
+  expectedUpdate: boolean,
+) {
+  if (expectedUpdate) {
+    assertFatalHookError(
+      ev instanceof WritableInterrupt,
+      `Expected Wasm.Event to be of type WritableInterrupt`,
+    );
+    return;
+  }
+  assertFatalHookError(
+    ev === undefined,
+    'A non mutable advice should return nothing',
+  );
+}
+
+function convertToHookEventMoment(m: string): HookOnEventMoment {
+  switch (m) {
+    case 'onNewInterrupt':
+      return HookOnEventMoment.onNewEvent;
+    case 'beforeInterruptHandled':
+      return HookOnEventMoment.beforeEventHandled;
+    case 'afterHandlingInterrupt':
+      return HookOnEventMoment.afterEventHandled;
+    default:
+      throw new Error(`Unsupported on interrupt advice ${m}`);
+  }
+}
+
+export function interrupt(
+  advices: AdvicesRegistery,
   moment:
     | 'onNewInterrupt'
     | 'beforeInterruptHandled'
     | 'afterHandlingInterrupt',
   mutate: boolean,
-  writableInterrupt: boolean,
   cb: (...args: any[]) => any,
-): GroupHooks {
-  switch (cb.length) {
-    case 0:
-      return createNewInterruptCallbackNoArgs(moment, mutate, cb);
-    case 1:
-    case 2:
-      return createNewInterruptCallbackArgs(
-        moment,
-        vm,
-        maxTimeoutMs,
-        mutate,
-        writableInterrupt,
-        cb,
-      );
-    default:
-      throw new Error(`provided invalid callback`);
-  }
-}
-
-function createNewInterruptCallbackNoArgs(
-  interruptMoment: InstrMoment,
-  updateState: boolean,
-  cb: () => void,
-): GroupHooks {
-  const g = new GroupHooks(interruptMoment);
-  if (updateState) {
-    g.addInterruptAction(new PauseVMHook());
-  }
-  const si = new InspectStateHook().includePC();
-  si.subscribe((_s) => {
-    cb();
-  });
-  g.addInterruptAction(si);
-  return g;
-}
-
-function createNewInterruptCallbackArgs(
-  moment: InstrMoment,
-  vm: WasmitoBackendVM,
-  maxTimeoutMs: number,
-  mutate: boolean,
-  writableInterrupt: boolean,
-  cb: (...args: any[]) => any,
-): GroupHooks {
-  const g = new GroupHooks(moment);
-  if (mutate) {
-    g.addInterruptAction(new PauseVMHook());
-  }
-  const si = new EventInspectHook();
-  si.subscribe((e: WASM.Event) => {
-    const ev = writableInterrupt
-      ? new WritableInterrupt(e)
-      : new ReadOnlyInterrupt(e);
-    const newEvent = cb(ev, vm);
-    if (mutate) {
-      assertFatalHookError(
-        newEvent instanceof WritableInterrupt,
-        'onNewInterrupt should return a writable Event',
-      );
-      getGlobalLogger().error(`TODO update event`);
-      vm.run(maxTimeoutMs);
-    }
-  });
-  g.addInterruptAction(si);
-  return g;
+  _maxTimeoutMs: number, // TODO use
+): number {
+  const m = convertToHookEventMoment(moment);
+  return advices.addInterruptAdvice(m, mutate, cb);
 }

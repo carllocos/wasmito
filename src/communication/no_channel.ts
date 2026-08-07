@@ -11,10 +11,10 @@ import { type Channel } from './channel_interface';
 export class NoChannel implements Channel {
   readonly channelName: string = 'NoChannel';
 
-  write(
+  async write(
     data: any,
     cb?: ((err?: Error | null | undefined) => void) | undefined,
-  ): boolean {
+  ): Promise<boolean> {
     throw Error(
       'NoChannel has no implementation and serves only as transition channel',
     );

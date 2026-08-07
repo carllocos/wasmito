@@ -4,14 +4,22 @@ import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
 } from '../../request_interface';
+import {
+  isRequestMessage,
+  RequestMessage,
+  ResponseType,
+} from '../../request_msg';
 
-export class UpdateWasmModuleRequest extends APIRequestNoSubscription<string> {
+export class UpdateWasmModuleRequest extends APIRequestNoSubscription<boolean> {
   private readonly wasmBuffer: Buffer;
   private readonly wasm: Uint8Array;
+
+  readonly instruction: Instruction;
   constructor(wasm: Buffer) {
     super();
     this.wasmBuffer = wasm;
     this.wasm = new Uint8Array(wasm);
+    this.instruction = Instruction.UpdateWasmModule;
   }
 
   description(): string {
@@ -23,12 +31,16 @@ export class UpdateWasmModuleRequest extends APIRequestNoSubscription<string> {
     const sizeBuffer = Buffer.allocUnsafe(4);
     sizeBuffer.writeUint32BE(this.wasm.length);
     const wasmHex = this.wasmBuffer.toString('hex');
-    return `${Instruction.UpdateWasmModule}${sizeHex}${wasmHex}\n`;
+    return `${this.instruction}${this.serializeID()}${sizeHex}${wasmHex}\n`;
   }
 
-  override parse(input: string): string {
-    if (input === 'CHANGE Module!') {
-      return input;
+  override parse(_input: string): boolean {
+    throw new APIRequestInvalidParse('No ack for update wasm module');
+  }
+
+  processAck(ack: RequestMessage): boolean {
+    if (isRequestMessage(ack, this.instruction)) {
+      return ack.responseType === ResponseType.SuccessResponse;
     }
     throw new APIRequestInvalidParse('No ack for update wasm module');
   }

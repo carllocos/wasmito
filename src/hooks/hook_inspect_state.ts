@@ -1,107 +1,112 @@
 import { type WasmState } from '../webassembly/wasm';
 import {
+  InspectableState,
   StateRequest,
   WasmStateI,
 } from '../runtimes/wasmito_vm/requests/inspect_request';
-import { HookKind, HookWithSubscription } from './hook';
+import { HookKind, HookWithSubscription, SubscriptionContent } from './hook';
 
-export class InspectStateHook
-  extends HookWithSubscription<WasmState>
-  implements WasmStateI<InspectStateHook>
+export class InspectStateHook<HookMetadata>
+  extends HookWithSubscription<HookMetadata, WasmState>
+  implements WasmStateI<InspectStateHook<HookMetadata>>
 {
   private readonly _stateToInspect: StateRequest;
-  public readonly wasmAddress?: number;
-  constructor(
-    stateRequest: StateRequest = new StateRequest(),
-    wasmAddress?: number,
-  ) {
+  constructor(stateRequest: StateRequest = new StateRequest()) {
     super(HookKind.StateToInspect);
     this._stateToInspect = stateRequest;
-    this.wasmAddress = wasmAddress;
-    if (this.wasmAddress !== undefined) {
-      this._stateToInspect.includePC(); // include pc is mandatory
-    }
+    this._stateToInspect.includePC(); // include pc is mandatory
   }
 
   get stateToInspect(): StateRequest {
     return this._stateToInspect;
   }
 
+  public doesInclude(s: InspectableState): boolean {
+    return this._stateToInspect.doesInclude(s);
+  }
+
   public serializeBinary(): string {
-    return `${this.kind}${this.stateToInspect.generateInterrupt()}`;
+    const includeInterruptNr = false;
+    const includeID = false;
+    return `${this.kind}${this.stateToInspect.generateInterrupt(includeInterruptNr, includeID)}`;
   }
 
   description(): string {
-    const postfix =
-      this.wasmAddress !== undefined ? `on addr ${this.wasmAddress}` : '';
-    return `State Inspecting ${postfix}`;
+    return `State Inspecting`;
   }
 
-  parseSubscriptionData(input: any): WasmState {
-    return this.stateToInspect.parse(input);
+  parseSubscriptionData(
+    msg: SubscriptionContent<HookMetadata, any>,
+  ): SubscriptionContent<HookMetadata, WasmState> {
+    const parsed = this.stateToInspect.parse(msg.sub);
+    return {
+      msg: msg.msg,
+      metadata: msg.metadata,
+      sub: parsed,
+    };
   }
 
-  includePC(): InspectStateHook {
+  includePC(): this {
     this._stateToInspect.includePC();
     return this;
   }
 
-  includeStack(): InspectStateHook {
+  includeStack(): this {
     this._stateToInspect.includeStack();
     return this;
   }
 
-  includeCallstack(): InspectStateHook {
+  includeCallstack(): this {
     this._stateToInspect.includeCallstack();
     return this;
   }
 
-  includeGlobals(): InspectStateHook {
+  includeGlobals(): this {
     this._stateToInspect.includeGlobals();
     return this;
   }
 
-  includeMemory(): InspectStateHook {
+  includeMemory(): this {
     this._stateToInspect.includeMemory();
     return this;
   }
 
-  includeTable(): InspectStateHook {
+  includeTable(): this {
     this._stateToInspect.includeTable();
     return this;
   }
 
-  includeBranchingTable(): InspectStateHook {
+  includeBranchingTable(): this {
     this._stateToInspect.includeBranchingTable();
     return this;
   }
 
-  includeBreakpoints(): InspectStateHook {
+  includeBreakpoints(): this {
     this._stateToInspect.includeBreakpoints();
     return this;
   }
 
-  includeCallbackMappings(): InspectStateHook {
+  includeCallbackMappings(): this {
     this._stateToInspect.includeCallbackMappings();
     return this;
   }
 
-  includeEvents(): InspectStateHook {
+  includeEvents(): this {
     this._stateToInspect.includeEvents();
     return this;
   }
 
-  includeException(): InspectStateHook {
+  includeException(): this {
     this._stateToInspect.includeException();
     return this;
   }
 
-  includeLogicalClock(): InspectStateHook {
+  includeLogicalClock(): this {
     this._stateToInspect.includeLogicalClock();
     return this;
   }
 
-  includeHeapFree(): InspectStateHook {
+  includeHeapFree(): this {
     this._stateToInspect.includeHeapFree();
     return this;
   }

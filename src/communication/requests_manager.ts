@@ -1,9 +1,7 @@
-import { getGlobalLogger } from '../logger/logger';
-import {
-  SubscriptionParseOutcome,
-  type APIRequest,
-} from '../runtimes/request_interface';
+import { type APIRequest } from '../runtimes/request_interface';
 import { type Channel } from './channel_interface';
+import { RequestID } from './id_generator';
+import { createRequestMessage } from '../runtimes/request_msg';
 
 export class CommandError extends Error {
   constructor(message: string) {
@@ -13,127 +11,42 @@ export class CommandError extends Error {
   }
 }
 
-class SendRequest<T> {
-  public readonly request: APIRequest<T>;
-  private _resolved: boolean;
-  private _rejected: boolean;
-  private readonly resolver: any;
-  private readonly rejector: any;
-
-  constructor(request: APIRequest<T>, resolver: any, rejector: any) {
-    this.request = request;
-    this._resolved = false;
-    this._rejected = false;
-    this.resolver = resolver;
-    this.rejector = rejector;
-  }
-
-  private requestResolver(v: T): void {
-    if (!this.resolved && !this.rejected) {
-      this._resolved = true;
-      this.resolver(v);
-    }
-  }
-
-  private requestRejector(v?: any): void {
-    if (!this.resolved && !this.rejected) {
-      this._rejected = true;
-      this.rejector(v);
-    }
-  }
-
-  get resolved(): boolean {
-    return this._resolved;
-  }
-
-  get rejected(): boolean {
-    return this._rejected;
-  }
-
-  async send(connection: Channel, timeoutMs?: number): Promise<void> {
-    try {
-      const d = this.request.getData();
-      const successful = await connection.send(d);
-      if (!successful) {
-        this.requestRejector(
-          new CommandError('could not send content to channel'),
-        );
-        return;
-      }
-
-      if (timeoutMs !== undefined) {
-        setTimeout(() => {
-          this.timedout(timeoutMs);
-        }, timeoutMs);
-      }
-    } catch (e) {
-      this.requestRejector(e);
-    }
-  }
-
-  completed(): boolean {
-    return (
-      this.rejected || (this.resolved && this.request.isSubscriptionClosed())
-    );
-  }
-
-  timedout(timeoutMs: number): void {
-    if (!this.rejected && !this.resolved) {
-      const errMsg = `Request ${this.request.description()} timedout after ${
-        timeoutMs
-      } ms while waiting for reply`;
-      getGlobalLogger().error(errMsg);
-      this.requestRejector(new CommandError(errMsg));
-    }
-  }
-
-  processNewData(data: string): SubscriptionParseOutcome {
-    // case we may feed data to a subscription
-    if (this.rejected) return SubscriptionParseOutcome.Failed;
-
-    if (this.resolved) {
-      return this.processSubscriptionData(data);
-    } else {
-      return this.processRequestAck(data);
-    }
-  }
-
-  private processRequestAck(data: string): SubscriptionParseOutcome {
-    try {
-      const parsed = this.request.parse(data);
-      this.requestResolver(parsed);
-      return SubscriptionParseOutcome.Successful;
-    } catch (_err) {
-      return SubscriptionParseOutcome.Failed;
-    }
-  }
-
-  private processSubscriptionData(data: string): SubscriptionParseOutcome {
-    if (this.request.isSubscriptionClosed())
-      return SubscriptionParseOutcome.Failed;
-    return this.request.handleSubscriptionData(data);
-  }
-}
-
 export class RequestsManager {
   private connection?: Channel;
-  private requests: Array<SendRequest<any>>;
+  private requests: Map<RequestID, APIRequest<any>>;
+
+  private _resolveBulk: ((value: void | PromiseLike<void>) => void) | undefined;
+  private _waitingForAcksBulk: Set<number> = new Set();
 
   constructor() {
-    this.requests = [];
+    this.requests = new Map<RequestID, APIRequest<any>>();
   }
 
-  onRequestData(data: string): void {
-    // remove completed requests
-    this.requests = this.requests.filter((req) => !req.completed());
-    if (this.requests.length === 0) {
-      this.connection?.removeOnData(this.onRequestData.bind(this));
-      return;
+  async onRequestData(data: string): Promise<void> {
+    const msg = createRequestMessage(data);
+    if (msg === undefined) return;
+
+    const req = this.requests.get(msg.id);
+    if (req === undefined) {
+      throw new Error(
+        `No request handler registered for response with id '${msg.id}'. Response: ${data}`,
+      );
     }
 
-    for (const req of this.requests) {
-      const dataProcessed = req.processNewData(data);
-      if (dataProcessed === SubscriptionParseOutcome.Successful) break;
+    await req.processRequestMessage(msg);
+    if (this.requests.size === 0) {
+      // TODO fix remove bug
+      this.connection?.removeOnData(this.onRequestData.bind(this));
+    }
+    if (req.isResolved()) {
+      if (this._waitingForAcksBulk.has(req.id)) {
+        this._waitingForAcksBulk.delete(req.id);
+      }
+      if (this._waitingForAcksBulk.size === 0) {
+        if (this._resolveBulk !== undefined) {
+          this._resolveBulk();
+        }
+      }
     }
     return;
   }
@@ -141,16 +54,112 @@ export class RequestsManager {
   async sendRequest<T>(
     connection: Channel,
     request: APIRequest<T>,
-    timeoutMs?: number,
+    timeoutMs: number | undefined = undefined, // TODO handle timeouts
+    bulkRequests: boolean = true,
   ): Promise<T> {
-    return new Promise<T>((resolve, reject) => {
-      this.connection = connection;
-      const req = new SendRequest(request, resolve, reject);
-      if (this.requests.length == 0) {
-        this.connection.addOnData(this.onRequestData.bind(this));
+    await this.sendRequests(connection, [request], bulkRequests, timeoutMs);
+    return request.responseContent;
+  }
+
+  async sendRequests<T>(
+    connection: Channel,
+    requests: Array<APIRequest<T>>,
+    bulkRequests: boolean,
+    _timeoutMs?: number,
+  ): Promise<void> {
+    if (bulkRequests) {
+      await this.sendInBulk(connection, requests, _timeoutMs);
+    } else {
+      await this.sendInSequence(connection, requests, _timeoutMs);
+    }
+  }
+
+  private async sendSubRequests(
+    connection: Channel,
+    requests: APIRequest<any>[],
+    start: number,
+    end: number,
+    _timeoutMs?: number,
+  ): Promise<void> {
+    let data = '';
+    for (let idx = start; idx < end && idx < requests.length; idx++) {
+      const request = requests[idx];
+      if (this.requests.has(request.id)) {
+        const oldReq = this.requests.get(request.id)!;
+        throw new Error(
+          `two requests send with identical id '${request.id}'.\nOld Request: '${oldReq.description()}'\nCurrent Request:'${request.description()}'`,
+        );
       }
-      this.requests.push(req);
-      req.send(this.connection, timeoutMs);
+
+      data += request.getData();
+      this._waitingForAcksBulk.add(request.id);
+      this.requests.set(request.id, request);
+    }
+
+    const p = new Promise((resolve) => {
+      this._resolveBulk = resolve;
     });
+
+    const successful = await connection.send(data);
+    if (!successful) {
+      throw new CommandError(
+        `could not send content of multiple requests to channel. Content: '${data}'`,
+      );
+    }
+    await p;
+  }
+
+  private async sendInBulk<T>(
+    connection: Channel,
+    requests: Array<APIRequest<T>>,
+    _timeoutMs?: number,
+  ): Promise<void> {
+    this.connection = connection;
+    if (this.requests.size === 0)
+      this.connection.addOnData(this.onRequestData.bind(this));
+
+    const maxRequests = 10000;
+    let startIdx = 0;
+    while (startIdx < requests.length) {
+      await this.sendSubRequests(
+        connection,
+        requests,
+        startIdx,
+        startIdx + maxRequests,
+        _timeoutMs,
+      );
+      startIdx += maxRequests;
+    }
+  }
+
+  async sendInSequence<T>(
+    connection: Channel,
+    requests: Array<APIRequest<T>>,
+    _timeoutMs?: number,
+  ): Promise<void> {
+    // TODO fix
+    this.connection = connection;
+
+    if (this.requests.size === 0)
+      this.connection.addOnData(this.onRequestData.bind(this));
+
+    for (const request of requests) {
+      const data = request.getData();
+      if (this.requests.has(request.id)) {
+        const oldReq = this.requests.get(request.id)!;
+        throw new Error(
+          `two requests send with identical id '${request.id}'.\nOld Request: '${oldReq.description()}'\nCurrent Request:'${request.description()}'`,
+        );
+      }
+
+      this.requests.set(request.id, request);
+      const successful = await connection.send(data);
+      if (!successful) {
+        throw new CommandError(
+          `could not send content of multiple requests to channel. Content: '${data}'`,
+        );
+      }
+      await request.promise;
+    }
   }
 }

@@ -8,8 +8,14 @@ import {
   APIRequestInvalidParse,
   APIRequestNoSubscription,
 } from '../../request_interface';
+import {
+  isRequestMessage,
+  RequestMessage,
+  ResponseType,
+} from '../../request_msg';
 
 export class PushEventRequest extends APIRequestNoSubscription<boolean> {
+  readonly instruction = Instruction.PushEvent;
   private readonly topic: string;
   private readonly payload: string;
   private _binaryEncode: boolean;
@@ -30,35 +36,17 @@ export class PushEventRequest extends APIRequestNoSubscription<boolean> {
   }
 
   getData(): string {
-    if (this._binaryEncode) {
-      return this.getDataBinaryEncoding();
-    } else {
-      return this.getDataAsJSON();
+    const encoding = this._binaryEncode
+      ? encodeEventAsBinary(this.topic, this.payload)
+      : encodeEventAsJSON(this.topic, this.payload);
+    return `${this.instruction}${this.serializeID()}${encoding}\n`;
+  }
+  override processAck(ack: RequestMessage): boolean {
+    if (isRequestMessage(ack, this.instruction)) {
+      return ack.responseType === ResponseType.SuccessResponse;
     }
-  }
 
-  private getDataAsJSON(): string {
-    const obj = { topic: this.topic, payload: this.payload };
-    const hexEvent = encodeJSONToHexString(obj);
-    return `${Instruction.PushEvent}${hexEvent}\n`;
-  }
-
-  private getDataBinaryEncoding(): string {
-    return `${Instruction.PushEvent}${this.binaryEncodeTopic()}${this.binaryEncodePayload()}\n`;
-  }
-
-  binaryEncodeTopic(): string {
-    // format: size topic (LEB) | topic hex
-    const size = encodeToHexLEB128(this.topic.length);
-    const t = encodeStringToHex(this.topic);
-    return `${size}${t}`;
-  }
-
-  binaryEncodePayload(): string {
-    // format: size payload (LEB) | payload hex
-    const size = encodeToHexLEB128(this.payload.length);
-    const p = encodeStringToHex(this.payload);
-    return `${size}${p}`;
+    throw new APIRequestInvalidParse('no response for InjectEventRequest');
   }
 
   parse(input: string): boolean {
@@ -73,4 +61,27 @@ export class MockPinInterruptRequest extends PushEventRequest {
   constructor(pin: number) {
     super(`interrupt_${pin}`, '');
   }
+}
+
+export function encodeEventAsJSON(topic: string, payload: string): string {
+  const obj = { topic: topic, payload: payload };
+  return encodeJSONToHexString(obj);
+}
+
+export function encodeEventAsBinary(topic: string, payload: string): string {
+  return `${binaryEncodeTopic(topic)}${binaryEncodePayload(payload)}`;
+}
+
+function binaryEncodeTopic(topic: string): string {
+  // format: size topic (LEB) | topic hex
+  const size = encodeToHexLEB128(topic.length);
+  const t = encodeStringToHex(topic);
+  return `${size}${t}`;
+}
+
+function binaryEncodePayload(payload: string): string {
+  // format: size payload (LEB) | payload hex
+  const size = encodeToHexLEB128(payload.length);
+  const p = encodeStringToHex(payload);
+  return `${size}${p}`;
 }

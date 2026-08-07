@@ -15,10 +15,6 @@ export class WasmType {
     this._returnTypes = [];
   }
 
-  get args(): WASM.Type[] {
-    return this._args;
-  }
-
   set args(a: WASM.Type[]) {
     this._args = a;
     this._nrArgs = a.length;

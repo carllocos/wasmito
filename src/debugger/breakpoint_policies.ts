@@ -1,13 +1,17 @@
-import { RemoveHookOnWasmAddrRequest } from '../runtimes/wasmito_vm/requests/hook_on_wasm_addr_request';
+import {
+  HookOnAddrSubContent,
+  RemoveHookOnWasmAddrRequest,
+} from '../runtimes/wasmito_vm/requests/hook_on_wasm_addr_request';
 import { type Breakpoint } from './breakpoint';
 import { createLogger, Logger } from '../logger/logger';
 import { InspectStateHook } from '../hooks/hook_inspect_state';
 import { type WasmState } from '../webassembly';
 import { type WasmitoBackendVM } from '../runtimes/wasmito_vm/wasmito_vm';
-import { isSuccessfulMessage } from '../runtimes/request_interface';
+import { isSuccessfulMessage } from '../runtimes/request_msg';
 import { StateRequest } from '../runtimes/wasmito_vm/requests/inspect_request';
 import { PauseVMHook } from '../hooks/hook_run_pause';
 import { type SourceCodeLocation } from '../source_mappers';
+import { SubscriptionContent } from '../hooks/hook';
 
 export abstract class BreakpointPolicy {
   protected readonly vm: WasmitoBackendVM;
@@ -178,11 +182,15 @@ export class BreakpointDefaultPolicy extends BreakpointPolicy {
 export class SingleStopBreakpointPolicy extends BreakpointPolicy {
   readonly logger: Logger = createLogger('SingleStopBreakpointPolicy');
 
-  private readonly removeAllBreakpointsCallback: (state: WasmState) => void;
+  private readonly removeAllBreakpointsCallback: (
+    sub: SubscriptionContent<HookOnAddrSubContent, WasmState>,
+  ) => void;
 
   constructor(vm: WasmitoBackendVM) {
     super(vm);
-    this.removeAllBreakpointsCallback = (_state: WasmState) => {
+    this.removeAllBreakpointsCallback = (
+      _state: SubscriptionContent<HookOnAddrSubContent, WasmState>,
+    ) => {
       this.removeAllBreakpoints();
     };
   }
@@ -249,7 +257,7 @@ export class RemoveAndProceedBreakpointPolicy extends BreakpointPolicy {
 
   private readonly removeBPOnReachMap: Map<
     Breakpoint,
-    (state: WasmState) => void
+    (sub: SubscriptionContent<HookOnAddrSubContent, WasmState>) => void
   >;
 
   constructor(vm: WasmitoBackendVM) {
@@ -294,8 +302,10 @@ export class RemoveAndProceedBreakpointPolicy extends BreakpointPolicy {
 
   private createRemoveBPOnReachCallback(
     bp: Breakpoint,
-  ): (state: WasmState) => void {
-    const cb = (_: WasmState): void => {
+  ): (sub: SubscriptionContent<HookOnAddrSubContent, WasmState>) => void {
+    const cb = (
+      _: SubscriptionContent<HookOnAddrSubContent, WasmState>,
+    ): void => {
       this.vm
         .removeBreakpoint(bp, this.MAX_DEFAULT_TIMEOUT)
         .then((removed) => {

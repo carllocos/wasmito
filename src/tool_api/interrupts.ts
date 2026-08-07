@@ -1,65 +1,99 @@
+import assert from 'assert';
 import { WASM } from '../webassembly/wasm';
+import { WASMFunction, WasmModule } from '../webassembly';
 
 export class WritableInterrupt {
-  private _ev: WASM.Event;
+  private _topic: string;
+  private _payload: string;
 
-  constructor(ev: WASM.Event) {
-    this._ev = ev;
+  constructor(topic: string, payload: string);
+  constructor(ev: WASM.Event);
+  constructor(...args: any[]) {
+    if (args.length === 2) {
+      this._topic = args[0];
+      this._payload = args[1];
+    } else {
+      this._topic = args[0].topic;
+      this._payload = args[0].payload;
+    }
   }
 
   get topic(): string {
-    return this._ev.topic;
+    return this._topic;
   }
 
   set topic(t: string) {
-    this._ev.topic = t;
+    this._topic = t;
   }
 
   get payload(): string {
-    return this._ev.payload;
+    return this._payload;
   }
 
   set payload(p: string) {
-    this._ev.payload = p;
+    this._payload = p;
   }
 }
 
 export class ReadOnlyInterrupt {
-  private _ev: WASM.Event;
+  private _topic: string;
+  private _payload: string;
 
-  constructor(ev: WASM.Event) {
-    this._ev = ev;
+  constructor(topic: string, payload: string);
+  constructor(ev: WASM.Event);
+  constructor(...args: any[]) {
+    if (args.length === 2) {
+      this._topic = args[0];
+      this._payload = args[1];
+    } else {
+      this._topic = args[0].topic;
+      this._payload = args[0].payload;
+    }
   }
 
   get topic(): string {
-    return this._ev.topic;
+    return this._topic;
   }
 
   get payload(): string {
-    return this._ev.payload;
+    return this._payload;
   }
 }
 
 export class ReadOnlyWasmValue {
-  protected v: WASM.Value;
-  constructor(v: WASM.Value) {
-    this.v = v;
+  private _value: number;
+  private _type: WASM.Type;
+  private _stackIdx: number;
+
+  constructor(type: WASM.Type, value: number, stackIdx = -1) {
+    this._value = value;
+    this._type = type;
+    this._stackIdx = stackIdx;
   }
 
   get type(): WASM.Type {
-    return this.v.type;
+    return this._type;
   }
 
   get value(): number {
-    return this.v.value;
+    return this._value;
+  }
+
+  get stackIdx(): number {
+    if (this._stackIdx < 0) {
+      throw new Error(`No Stack Index set for ReadableWasmValue`);
+    }
+    return this._stackIdx;
   }
 }
 
 export class WritableWasmValue {
-  protected v: WASM.Value;
+  private _value: number;
+  private _type: WASM.Type;
   private _stackIdx: number;
-  constructor(v: WASM.Value, stackIdx = -1) {
-    this.v = v;
+  constructor(type: WASM.Type, value: number, stackIdx = -1) {
+    this._value = value;
+    this._type = type;
     this._stackIdx = stackIdx;
   }
 
@@ -71,15 +105,51 @@ export class WritableWasmValue {
   }
 
   get type(): WASM.Type {
-    return this.v.type;
+    return this._type;
   }
 
   get value(): number {
-    return this.v.value;
+    return this._value;
   }
 
   set value(n: number) {
     // TODO validate assignment
-    this.v.value = n;
+    this._value = n;
   }
+}
+
+export interface PinInterruptHandler extends WASM.CallbackMapping {
+  pin: number;
+  handlers: WASMFunction[];
+}
+
+export function callbackMappingToPinInterruptHandler(
+  wasm: WasmModule,
+  table: WASM.Table,
+  cbm: WASM.CallbackMapping,
+): PinInterruptHandler {
+  const pin = WASM.interruptTopicToPinNumber(cbm.callbackid);
+  assert(
+    pin !== undefined,
+    `Failed to convert topic '${cbm.callbackid}' to a pin number`,
+  );
+
+  const funcs: WASMFunction[] = [];
+  for (const idx of cbm.tableIndexes) {
+    const funID = table.elements[idx];
+    assert(funID !== undefined, `No function found for table index ${idx}`);
+    const f = wasm.getFunction(funID);
+    assert(
+      f !== undefined,
+      `No function found in the Wasm module with ID ${funID}`,
+    );
+    funcs.push(f);
+  }
+
+  return {
+    callbackid: cbm.callbackid,
+    tableIndexes: cbm.tableIndexes,
+    pin,
+    handlers: funcs,
+  };
 }

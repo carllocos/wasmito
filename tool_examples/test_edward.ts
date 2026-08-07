@@ -13,6 +13,8 @@ import {
 } from '../src/platforms';
 import { LanguageAdaptor } from '../src/language_adaptors/language_adaptor';
 import { resolve } from 'path';
+import { SubscriptionContent } from '../src/hooks/hook';
+import { HookOnAddrSubContent } from '../src/runtimes/wasmito_vm/requests/hook_on_wasm_addr_request';
 
 export async function callLedcSetup(vm: WasmitoBackendVM): Promise<void> {
   const funcLEDCSetup = 5;
@@ -64,9 +66,11 @@ export async function testEventHook(
     { source: '', linenr: 88, colnr: 0, name: '', address: 0 },
     new StateRequest().includePC(),
   );
-  bp.subscribe((_state: WasmState) => {
-    console.log('breakpoint reached');
-  });
+  bp.subscribe(
+    (_state: SubscriptionContent<HookOnAddrSubContent, WasmState>) => {
+      console.log('breakpoint reached');
+    },
+  );
   const added = await vm.addBreakpoint(bp);
   if (!added) {
     return;

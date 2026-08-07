@@ -20,7 +20,7 @@ export class ShareChannel implements Channel {
   private _serverPort: number;
   private readonly logger: Logger;
   private clients: net.Socket[];
-  private writeListeners: Subscription<string | Uint8Array>;
+  private writeListeners: Subscription<string, string | Uint8Array>;
 
   readonly channelName: string;
 
@@ -54,11 +54,11 @@ export class ShareChannel implements Channel {
     return await this.channelToShare.close(timedout);
   }
 
-  public write(
+  public async write(
     data: string | Uint8Array,
     cb?: ((err?: Error | null | undefined) => void) | undefined,
-  ): boolean {
-    const s = this.channelToShare.write(data, cb);
+  ): Promise<boolean> {
+    const s = await this.channelToShare.write(data, cb);
     if (s) this.writeListeners.onSubscriptionData(data);
     return s;
   }

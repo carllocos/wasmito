@@ -1,7 +1,6 @@
 import assert from 'assert';
 import { Hook } from '../hooks/hook';
 import { HookOnWasmAddrMoment } from '../runtimes/wasmito_vm/requests/hook_on_wasm_addr_request';
-import { WasmState } from '../webassembly';
 import { WasmInstruction } from '../webassembly/wasm/wasm_instruction';
 
 export enum WasmMode {
@@ -45,14 +44,12 @@ function isInstructionMoment(m: InstrMoment): boolean {
 export class GroupHooks {
   private _mode: InstrMoment;
   private _deployed: boolean;
-  private listener: ((s: WasmState) => void) | undefined;
-  private instructionActions: Map<WasmInstruction, Hook[]>;
+  private instructionActions: Map<number, Hook[]>;
   private interruptActions: Hook[];
 
-  constructor(mode: InstrMoment, listener?: (s: WasmState) => void) {
+  constructor(mode: InstrMoment) {
     this._mode = mode;
     this._deployed = false;
-    this.listener = listener;
     this.instructionActions = new Map();
     this.interruptActions = [];
   }
@@ -69,18 +66,18 @@ export class GroupHooks {
     }
   }
 
-  get instructions(): WasmInstruction[] {
+  get instructions(): number[] {
     return Array.from(this.instructionActions.keys());
   }
 
   addInstructionActions(i: WasmInstruction, actions: Hook[]): void {
-    const acts = this.instructionActions.get(i) ?? [];
+    const acts = this.instructionActions.get(i.startAddress) ?? [];
     acts.push(...actions);
-    this.instructionActions.set(i, acts);
+    this.instructionActions.set(i.startAddress, acts);
   }
 
   getInstructionActions(i: WasmInstruction): Hook[] {
-    return this.instructionActions.get(i) ?? [];
+    return this.instructionActions.get(i.startAddress) ?? [];
   }
 
   get deployed(): boolean {
@@ -107,14 +104,5 @@ export class GroupHooks {
   get internalInterruptMode(): number {
     assert(!isInstructionMoment(this._mode), 'mode was not set for interrupt');
     return 0;
-  }
-
-  subscribe(cb: (s: WasmState) => void): void {
-    this.listener = cb;
-  }
-
-  subscription(): (s: WasmState) => void {
-    assert(this.listener !== undefined);
-    return this.listener;
   }
 }
