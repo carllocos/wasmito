@@ -595,6 +595,14 @@ export class WasmAnalysis {
       }
       this.analysisResolve = resolve;
       this.analysisReject = reject;
+      if (timeoutMs !== undefined) {
+        setTimeout(() => {
+          if (!this.analysisResolved) {
+            this.analysisReject!(`timeout after ${timeoutMs} ms`);
+            this.vm.close();
+          }
+        }, timeoutMs);
+      }
 
       await this.vm.run(timeoutMs);
     });
