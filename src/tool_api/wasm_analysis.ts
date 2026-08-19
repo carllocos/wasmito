@@ -48,7 +48,9 @@ export class WasmAnalysis {
   private _sourceMap?: SourceMap;
   private _adaptor?: LanguageAdaptor;
   private envFuncForPinInterrupt: number;
-  private analysisResolver: any;
+  private analysisResolved: boolean;
+  private analysisResolve: any;
+  private analysisReject: ((reason?: any) => void) | undefined;
   private userOnFinishCB: any;
   private _advices: AdvicesRegistery;
 
@@ -87,23 +89,13 @@ export class WasmAnalysis {
     this._advices.registerAdviceInterruptCallback(
       runAdvicesInterrupt(this._advices, this.vm, this.maxTimeoutMs),
     );
+    this.analysisReject = undefined;
+    this.analysisResolved = false;
   }
 
-  private assertInterruptAdvicesRegister(
-    registeredAdvices: number,
-    typeHook: string,
-  ): void {
-    assert(
-      registeredAdvices > 0,
-      `failed to register advice upon '${typeHook}'`,
-    );
-  }
-
-  private assertInstructionAdviceRegister(
-    registeredAdvices: number,
-    moment: string,
-  ): void {
-    assert(registeredAdvices > 0, `Failed to register ${moment} advice`);
+  private onAdviceFailure(er: any) {
+    const errMsg = er instanceof Error ? er.message : `${er}`;
+    this.closeWithError(errMsg);
   }
 
   private findEnvFuncForPinInterrupt(): number {
@@ -579,7 +571,7 @@ export class WasmAnalysis {
   async run(...args: any[]): Promise<void> {
     let timeoutMs: number | undefined;
     // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (resolve) => {
+    return new Promise(async (resolve, reject) => {
       switch (args.length) {
         case 0:
           break;
@@ -600,7 +592,8 @@ export class WasmAnalysis {
           timeoutMs = args[1];
           break;
       }
-      this.analysisResolver = resolve;
+      this.analysisResolve = resolve;
+      this.analysisReject = reject;
 
       await this.vm.run(timeoutMs);
     });
@@ -612,7 +605,8 @@ export class WasmAnalysis {
       let v = undefined;
       if (this.userOnFinishCB !== undefined) v = await this.userOnFinishCB(vm);
       await vm.close();
-      this.analysisResolver(v);
+      this.analysisResolve(v);
+      this.analysisResolved = true;
     });
   }
 }
