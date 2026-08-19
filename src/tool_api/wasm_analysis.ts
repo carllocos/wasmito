@@ -141,17 +141,14 @@ export class WasmAnalysis {
   ): this {
     const mutate = false;
     const moment = 'before';
-    this.assertInstructionAdviceRegister(
-      instruction<I>(
-        this._advices,
-        moment,
-        instr,
-        this.wasm,
-        this.maxTimeoutMs,
-        cb,
-        mutate,
-      ),
+    instruction<I>(
+      this._advices,
       moment,
+      instr,
+      this.wasm,
+      this.maxTimeoutMs,
+      cb,
+      mutate,
     );
     return this;
   }
@@ -179,17 +176,14 @@ export class WasmAnalysis {
   ): this {
     const mutate = true;
     const moment = 'before';
-    this.assertInstructionAdviceRegister(
-      instruction<I>(
-        this._advices,
-        moment,
-        instr,
-        this.wasm,
-        this.maxTimeoutMs,
-        cb,
-        mutate,
-      ),
+    instruction<I>(
+      this._advices,
       moment,
+      instr,
+      this.wasm,
+      this.maxTimeoutMs,
+      cb,
+      mutate,
     );
     return this;
   }
@@ -221,17 +215,14 @@ export class WasmAnalysis {
   ): this {
     const mutate = false;
     const moment = 'after';
-    this.assertInstructionAdviceRegister(
-      instruction<I>(
-        this._advices,
-        moment,
-        instr,
-        this.wasm,
-        this.maxTimeoutMs,
-        cb,
-        mutate,
-      ),
+    instruction<I>(
+      this._advices,
       moment,
+      instr,
+      this.wasm,
+      this.maxTimeoutMs,
+      cb,
+      mutate,
     );
     return this;
   }
@@ -265,17 +256,14 @@ export class WasmAnalysis {
   ): this {
     const mutate = true;
     const moment = 'after';
-    this.assertInstructionAdviceRegister(
-      instruction<I>(
-        this._advices,
-        moment,
-        instr,
-        this.wasm,
-        this.maxTimeoutMs,
-        cb,
-        mutate,
-      ),
+    instruction<I>(
+      this._advices,
       moment,
+      instr,
+      this.wasm,
+      this.maxTimeoutMs,
+      cb,
+      mutate,
     );
     return this;
   }
@@ -295,10 +283,7 @@ export class WasmAnalysis {
   ): this {
     const mutate = false;
     const groupType = 'onNewInterrupt';
-    this.assertInterruptAdvicesRegister(
-      interrupt(this._advices, groupType, mutate, cb, this.maxTimeoutMs),
-      groupType,
-    );
+    interrupt(this._advices, groupType, mutate, cb, this.maxTimeoutMs);
     return this;
   }
 
@@ -316,10 +301,7 @@ export class WasmAnalysis {
   ): this {
     const mutate = true;
     const groupType = 'onNewInterrupt';
-    this.assertInterruptAdvicesRegister(
-      interrupt(this._advices, groupType, mutate, cb, this.maxTimeoutMs),
-      groupType,
-    );
+    interrupt(this._advices, groupType, mutate, cb, this.maxTimeoutMs);
     return this;
   }
 
@@ -334,10 +316,7 @@ export class WasmAnalysis {
   ): this {
     const mutate = false;
     const groupType = 'beforeInterruptHandled';
-    this.assertInterruptAdvicesRegister(
-      interrupt(this._advices, groupType, mutate, cb, this.maxTimeoutMs),
-      groupType,
-    );
+    interrupt(this._advices, groupType, mutate, cb, this.maxTimeoutMs);
     return this;
   }
 
@@ -355,10 +334,7 @@ export class WasmAnalysis {
   ): this {
     const mutate = true;
     const groupType = 'beforeInterruptHandled';
-    this.assertInterruptAdvicesRegister(
-      interrupt(this._advices, groupType, mutate, cb, this.maxTimeoutMs),
-      groupType,
-    );
+    interrupt(this._advices, groupType, mutate, cb, this.maxTimeoutMs);
     return this;
   }
 
@@ -373,10 +349,7 @@ export class WasmAnalysis {
   ): this {
     const mutate = false;
     const groupType = 'afterHandlingInterrupt';
-    this.assertInterruptAdvicesRegister(
-      interrupt(this._advices, groupType, mutate, cb, this.maxTimeoutMs),
-      groupType,
-    );
+    interrupt(this._advices, groupType, mutate, cb, this.maxTimeoutMs);
     return this;
   }
 
