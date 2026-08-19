@@ -2,7 +2,6 @@
  ** This is an implementation of the Safe heap analysis as provided by Wastrumentation
  ** Original source file found in: https://github.com/aaronmunsters/wastrumentation/blob/main/benchmarking-node/input-analyses/rust/safe-heap/src/lib.rs
  ***/
-import assert from 'assert';
 import { WasmModule } from '../../src/webassembly/wasm/wasm_module';
 import { WasmAnalysis } from '../../src/tool_api/wasm_analysis';
 import { WritableWasmValue } from '../../src/tool_api/interrupts';
@@ -14,12 +13,20 @@ import { WasmCode } from '../../src/webassembly/wasm/wasm_opcode';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { spawnDevVM, spawnMCUVM } from '../spawn_vm';
 import { createLogger } from '../../src/logger/logger';
+import {
+  BenchmarkMeasurement,
+  FailedMeasurement,
+  logMeasurement,
+  TimeoutConfig,
+} from '../../src/util/benchmark_util';
 
-function logTime(start: number, end: number, msg: string) {
-  const diff = end - start;
-  logger.info(
-    `${msg} Took ${diff} ms, ${diff / 1000} secs, ${diff / 1000 / 60} mins`,
-  );
+function assertSafeHeap(
+  condition: unknown,
+  message: string,
+): asserts condition {
+  if (!condition) {
+    throw new Error(message);
+  }
 }
 
 function boundCheck(index: number, bytes: number, offset: number): void {
@@ -27,12 +34,12 @@ function boundCheck(index: number, bytes: number, offset: number): void {
   const lastByteAddr = addr + bytes;
   const memoryPageSize = 2 ** 16;
   console.log(`bound check- index ${index}, bytes ${bytes}, offset ${offset}`);
-  assert(lastByteAddr <= memoryPageSize, 'memory overflow');
+  assertSafeHeap(lastByteAddr <= memoryPageSize, 'memory overflow');
 }
 
 function alignmentCheck(index: number, size: number): void {
   console.log(`alignmentCheck ${index}, size ${size}`);
-  assert((index & (size - 1)) === 0);
+  assertSafeHeap((index & (size - 1)) === 0, 'alignment check fails');
 }
 
 function safeLoad(
@@ -57,11 +64,19 @@ function safeStore(
 
 const logger = createLogger('SafeHeapAnalysis');
 
-export async function analyse(wasmPath: string): Promise<void> {
+export async function analyse(
+  wasmPath: string,
+  timeouts: TimeoutConfig,
+): Promise<BenchmarkMeasurement> {
   logger.info(`parsing Wasm module '${wasmPath}'`);
   const startTimeParse = Date.now();
   const wasm = new WasmModule(wasmPath);
-  logTime(startTimeParse, Date.now(), 'Wasm Parsing');
+  const parseTime = logMeasurement(
+    logger,
+    startTimeParse,
+    Date.now(),
+    'Wasm Parsing',
+  );
 
   logger.info(`spawning & connecting to WARDuino...`);
   const vmConnection = await spawnDevVM(wasm); // for local VM
@@ -72,13 +87,47 @@ export async function analyse(wasmPath: string): Promise<void> {
   const startTimeRegister = Date.now();
   analysis.beforeMut(WasmCode.MultipleOpcode.Load, safeLoad);
   analysis.beforeMut(WasmCode.MultipleOpcode.Store, safeStore);
-  logTime(startTimeRegister, Date.now(), 'Registering Advices');
+  const registerTime = logMeasurement(
+    logger,
+    startTimeRegister,
+    Date.now(),
+    'Registering Advices',
+  );
 
   logger.info(`Deploying Hooks...`);
   const startTimeDeploy = Date.now();
   await analysis.deploy();
-  logTime(startTimeDeploy, Date.now(), 'Deploy Hooks');
+  const deployTime = logMeasurement(
+    logger,
+    startTimeDeploy,
+    Date.now(),
+    'Deploy Hooks',
+  );
 
   logger.info(`running WARDuino`);
-  await analysis.run();
+  const analysisStartTime = Date.now();
+  try {
+    await analysis.run(timeouts.timeoutMsAnalysisRun);
+    const analysisTime = logMeasurement(
+      logger,
+      analysisStartTime,
+      Date.now(),
+      'Analysis Completion',
+    );
+    return {
+      wasmParsingMs: parseTime,
+      advicesRegistrationMs: registerTime,
+      advicesDeploymentMs: deployTime,
+      analysisRunMs: analysisTime,
+    };
+  } catch (e) {
+    const errMsg = e instanceof Error ? e.message : e;
+    const f: FailedMeasurement = {
+      errorParsing: `${parseTime}`,
+      errorRegister: `${parseTime}`,
+      errorDeploy: `${parseTime}`,
+      errorRun: `${errMsg}`,
+    };
+    return f;
+  }
 }
