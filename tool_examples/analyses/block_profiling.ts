@@ -12,6 +12,12 @@ import { connectToExistingDevVM, spawnDevVM, spawnMCUVM } from '../spawn_vm';
 import { TargetVMConfig } from './target_vm';
 import { WasmCode } from '../../src/webassembly/wasm/wasm_opcode';
 import { createLogger } from '../../src/logger/logger';
+import {
+  BenchmarkMeasurement,
+  FailedMeasurement,
+  logMeasurement,
+  TimeoutConfig,
+} from '../../src/util/benchmark_util';
 
 const blockCount = new Map<number, Map<number, number>>();
 function addBlockEnter(
@@ -43,18 +49,19 @@ export function getCount(
 
 const logger = createLogger('BlockProfilingAnalysis');
 
-function logTime(start: number, end: number, msg: string) {
-  const diff = end - start;
-  logger.info(
-    `${msg} Took ${diff} ms, ${diff / 1000} secs, ${diff / 1000 / 60} mins`,
-  );
-}
-
-export async function analyse(wasmPath: string): Promise<void> {
+export async function analyse(
+  wasmPath: string,
+  timeouts: TimeoutConfig,
+): Promise<BenchmarkMeasurement> {
   logger.info(`parsing Wasm module '${wasmPath}'`);
   const startTimeParse = Date.now();
   const wasm = new WasmModule(wasmPath);
-  logTime(startTimeParse, Date.now(), 'Wasm Parsing');
+  const parseTime = logMeasurement(
+    logger,
+    startTimeParse,
+    Date.now(),
+    'Wasm Parsing',
+  );
 
   logger.info(`spawning & connecting to WARDuino...`);
   const vmConnection = await spawnDevVM(wasm); // for local VM
@@ -70,11 +77,46 @@ export async function analyse(wasmPath: string): Promise<void> {
   analysis.before(WasmCode.CallIndirect, addBlockEnter);
   analysis.before(WasmCode.Block, addBlockEnter);
   analysis.before(WasmCode.Loop, addBlockEnter);
-  logTime(startTimeRegister, Date.now(), 'Registering Advices');
+  const registerTime = logMeasurement(
+    logger,
+    startTimeRegister,
+    Date.now(),
+    'Registering Advices',
+  );
   logger.info(`deploying advices...`);
   const startTimeDeploy = Date.now();
   await analysis.deploy();
-  logTime(startTimeDeploy, Date.now(), 'Deploy Hooks');
+  const deployTime = logMeasurement(
+    logger,
+    startTimeDeploy,
+    Date.now(),
+    'Deploy Hooks',
+  );
   logger.info(`running WARDuino`);
-  await analysis.run();
+  const startAnalysis = Date.now();
+  try {
+    await analysis.run(timeouts.timeoutMsAnalysisRun);
+    const analysisTime = logMeasurement(
+      logger,
+      startAnalysis,
+      Date.now(),
+      'Analysis Run',
+    );
+    const m: BenchmarkMeasurement = {
+      wasmParsingMs: parseTime,
+      advicesRegistrationMs: registerTime,
+      advicesDeploymentMs: deployTime,
+      analysisRunMs: analysisTime,
+    };
+    return m;
+  } catch (e) {
+    const errMsg = e instanceof Error ? e.message : e;
+    const f: FailedMeasurement = {
+      errorParsing: `${parseTime}`,
+      errorRegister: `${parseTime}`,
+      errorDeploy: `${parseTime}`,
+      errorRun: `${errMsg}`,
+    };
+    return f;
+  }
 }

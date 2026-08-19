@@ -12,14 +12,13 @@ import { spawnDevVM, spawnMCUVM } from '../spawn_vm';
 import { TargetVMConfig } from './target_vm';
 import { WasmCode } from '../../src/webassembly/wasm/wasm_opcode';
 import { createLogger } from '../../src/logger/logger';
+import {
+  BenchmarkMeasurement,
+  FailedMeasurement,
+  logMeasurement,
+  TimeoutConfig,
+} from '../../src/util/benchmark_util';
 const logger = createLogger('CallGraphAnalysis');
-
-function logTime(start: number, end: number, msg: string) {
-  const diff = end - start;
-  logger.info(
-    `${msg} Took ${diff} ms, ${diff / 1000} secs, ${diff / 1000 / 60} mins`,
-  );
-}
 
 function getFunctionName(wasm: WasmModule, fid: number): string {
   const f = wasm.getFunctionOrError(fid);
@@ -28,16 +27,22 @@ function getFunctionName(wasm: WasmModule, fid: number): string {
   return `${fid}`;
 }
 
-export async function analyse(wasmPath: string): Promise<void> {
+export async function analyse(
+  wasmPath: string,
+  timeouts: TimeoutConfig,
+): Promise<BenchmarkMeasurement> {
   logger.info(`Parsing WasmModule '${wasmPath}'`);
   const startTimeParse = Date.now();
   const wasm = new WasmModule(wasmPath);
-  logTime(startTimeParse, Date.now(), 'Wasm Parsing');
+  const parseTime = logMeasurement(
+    logger,
+    startTimeParse,
+    Date.now(),
+    'Wasm Parsing',
+  );
 
   logger.info(`spawning & connection to WARDuino...`);
   const vmConnection = await spawnDevVM(wasm); // for local VM
-  // const vmConnection = await spawnMCUVM(wasm, TargetVMConfig); // for MCU VM
-
   const analysis = new WasmAnalysis(wasm, vmConnection);
   const callgraph = new Set<string>();
 
@@ -53,13 +58,47 @@ export async function analyse(wasmPath: string): Promise<void> {
       callgraph.add(edge);
     },
   );
-  logTime(startTimeRegister, Date.now(), 'Registering Advices');
+  const registerTime = logMeasurement(
+    logger,
+    startTimeRegister,
+    Date.now(),
+    'Registering Advices',
+  );
 
   logger.info(`Deploying Hooks...`);
   const startTimeDeploy = Date.now();
   await analysis.deploy();
-  logTime(startTimeDeploy, Date.now(), 'Deploy Hooks');
+  const deployTime = logMeasurement(
+    logger,
+    startTimeDeploy,
+    Date.now(),
+    'Deploy Hooks',
+  );
 
   logger.info(`running VM`);
-  await analysis.run();
+  const analysisStartTime = Date.now();
+  try {
+    await analysis.run(timeouts.timeoutMsAnalysisRun);
+    const analysisTime = logMeasurement(
+      logger,
+      analysisStartTime,
+      Date.now(),
+      'Analysis Completion',
+    );
+    return {
+      wasmParsingMs: parseTime,
+      advicesRegistrationMs: registerTime,
+      advicesDeploymentMs: deployTime,
+      analysisRunMs: analysisTime,
+    };
+  } catch (e) {
+    const errMsg = e instanceof Error ? e.message : e;
+    const f: FailedMeasurement = {
+      errorParsing: `${parseTime}`,
+      errorRegister: `${parseTime}`,
+      errorDeploy: `${parseTime}`,
+      errorRun: `${errMsg}`,
+    };
+    return f;
+  }
 }
