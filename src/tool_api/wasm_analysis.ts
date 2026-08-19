@@ -84,6 +84,7 @@ export class WasmAnalysis {
         this.vm,
         this.maxTimeoutMs,
         this.wasm,
+        this.onAdviceFailure.bind(this),
       ),
     );
     this._advices.registerAdviceInterruptCallback(

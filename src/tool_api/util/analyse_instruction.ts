@@ -278,6 +278,7 @@ export function runAdvicesInstruction(
   vm: WasmitoBackendVM,
   maxTimeoutMs: number,
   mod: WasmModule,
+  onAdviceFailure: (reason?: any) => void,
 ): (
   sub: SubscriptionContent<HookOnAddrSubContent, WasmState>,
 ) => Promise<void> {
@@ -301,12 +302,17 @@ export function runAdvicesInstruction(
       mutated = mutate || mutated;
       argsCB = prepareArgsCB(stackArgs, argsCB, mutate);
       let newArgs;
-      if (isNoArgAdvice(advice)) {
-        await advice();
-      } else if (isVMArgAdvice(advice)) {
-        await advice(vm);
-      } else {
-        newArgs = await advice(i, argsCB as any, vm);
+      try {
+        if (isNoArgAdvice(advice)) {
+          await advice();
+        } else if (isVMArgAdvice(advice)) {
+          await advice(vm);
+        } else {
+          newArgs = await advice(i, argsCB as any, vm);
+        }
+      } catch (e) {
+        onAdviceFailure(e);
+        return;
       }
       // assertArgsValidity(stackArgs, newArgs, mutate);
       if (mutate) argsCB = newArgs as any;
