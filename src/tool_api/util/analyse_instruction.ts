@@ -234,16 +234,14 @@ type StackArgs = WASMValueIndexed[] | WASMValueIndexed | undefined;
 
 function copyArgsFromStack(
   i: WasmInstruction,
-  stack: WASMValueIndexed[] | undefined,
+  stack: WASMValueIndexed[],
   moment: HookOnWasmAddrMoment,
 ): StackArgs {
-  if (stack === undefined) return [];
-
   const signature = i.signature;
   switch (moment) {
     case HookOnWasmAddrMoment.HookBefore: {
       assertFatalHookError(
-        signature.nrArgs > 0 && stack.length >= signature.nrArgs,
+        stack.length >= signature.nrArgs,
         `VM failed to provide the stack needed to construct args. Expected stack size ${signature.nrArgs}. Given stack size ${stack.length}`,
       );
       return stack.slice(-i.signature.nrArgs).map((v: WASMValueIndexed) => {
@@ -257,9 +255,12 @@ function copyArgsFromStack(
 
     case HookOnWasmAddrMoment.HookAfter: {
       assertFatalHookError(
-        signature.nrResults > 0 && stack.length >= signature.nrResults,
+        stack.length >= signature.nrResults,
         `Stack has not the expected number of values to read result for instr '${i.name}'`,
       );
+
+      if (stack.length === 0) return undefined;
+
       const v = stack[stack.length - 1];
       return {
         type: v.type,
@@ -292,7 +293,7 @@ export function runAdvicesInstruction(
     const moment = metadata.moment;
     const advices = advicesContainer.getAdvices(moment, metadata.addr);
     const wasmState = sub.sub;
-    const stackArgs = copyArgsFromStack(i, wasmState.stack, moment);
+    const stackArgs = copyArgsFromStack(i, wasmState.stack ?? [], moment);
     let mutated = false;
     let argsCB: AdviceArgsCB;
     for (let adviceIdx = 0; adviceIdx < advices.length; adviceIdx++) {
