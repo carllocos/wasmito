@@ -342,9 +342,7 @@ function prepareArgsCB(
   adviceArgs: AdviceArgsCB,
   mutate: boolean,
 ): AdviceArgsCB {
-  if (stackArgs === undefined) {
-    return undefined;
-  }
+  if (stackArgs === undefined) return undefined;
 
   if (adviceArgs === undefined) {
     const args = stackToAdviceArgs(
