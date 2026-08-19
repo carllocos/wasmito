@@ -458,6 +458,7 @@ export class WasmAnalysis {
           'No exception send by VM',
         );
         cb(instr, wasmState.exception);
+        this.logVMError(instr, wasmState.exception);
       },
     );
 
@@ -513,7 +514,7 @@ export class WasmAnalysis {
     );
 
     if (this._hookOnErrorAction === undefined) {
-      this.onError(this.logError.bind(this));
+      this.onError(this.logVMError.bind(this));
     }
 
     await this.deployOnError();
@@ -528,10 +529,21 @@ export class WasmAnalysis {
     if (!s) throw new Error(`Failed to register hook On error`);
   }
 
-  private logError(i: WasmInstruction | undefined, exception: string): void {
-    console.error(
-      `error occurred in VM at instr=${i?.name} addr=${i?.startAddress}:${exception}`,
-    );
+  private logVMError(i: WasmInstruction | undefined, exception: string): void {
+    const errMsg =
+      i !== undefined
+        ? `error occurred in VM at instr=${i?.name} addr=${i?.startAddress}:${exception}`
+        : `error occurred in VM:${exception}`;
+    this.closeWithError(errMsg);
+  }
+
+  private closeWithError(exception: string): void {
+    this._logger.error(exception);
+    if (this.analysisReject !== undefined) {
+      this.analysisReject(exception);
+      this.analysisResolved = true;
+    }
+    this.vm.close();
   }
 
   async remove(): Promise<void> {}
