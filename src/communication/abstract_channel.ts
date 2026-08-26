@@ -44,6 +44,8 @@ export abstract class AbstractChannel implements Channel {
 
   public abstract open(timeout?: number): Promise<boolean>;
 
+  public abstract isOpen(): boolean;
+
   public abstract close(timeout?: number): Promise<boolean>;
 
   public abstract send(data: string): Promise<boolean>;

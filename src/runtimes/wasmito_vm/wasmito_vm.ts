@@ -96,6 +96,10 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
 
   abstract close(timeout?: number): Promise<boolean>;
 
+  isClosed(): boolean {
+    return !this.channel.isOpen();
+  }
+
   async connect(timeout?: number): Promise<boolean> {
     const opened = await this.channel.open(timeout);
     if (opened) {

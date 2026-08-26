@@ -50,6 +50,10 @@ export class ShareChannel implements Channel {
     return await this.channelToShare.open();
   }
 
+  isOpen(): boolean {
+    return this.channelToShare.isOpen();
+  }
+
   async close(timedout?: number): Promise<boolean> {
     return await this.channelToShare.close(timedout);
   }

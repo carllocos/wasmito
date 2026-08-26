@@ -40,6 +40,12 @@ export class NoChannel implements Channel {
     );
   }
 
+  isOpen(): boolean {
+    throw Error(
+      'NoChannel has no implementation and serves only as transition channel',
+    );
+  }
+
   async send(data: string): Promise<boolean> {
     throw Error(
       'NoChannel has no implementation and serves only as transition channel',

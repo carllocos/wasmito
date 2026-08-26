@@ -178,4 +178,7 @@ export class SerialConnection implements Channel {
       return await timeoutPromise(p, timedout);
     }
   }
+  isOpen(): boolean {
+    return this.port?.isOpen ?? false;
+  }
 }
