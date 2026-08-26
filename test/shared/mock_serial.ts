@@ -33,6 +33,10 @@ export class MockSerialConnection implements Channel {
     return true;
   }
 
+  isOpen(): boolean {
+    return true;
+  }
+
   async send(data: string): Promise<boolean> {
     return true;
   }

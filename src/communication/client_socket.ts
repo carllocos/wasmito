@@ -60,6 +60,10 @@ export class ClientSideSocket extends AbstractChannel {
     return false;
   }
 
+  public isOpen(): boolean {
+    return this.connection !== undefined && !this.connection.closed;
+  }
+
   public async send(data: string): Promise<boolean> {
     return await this.write(data);
   }
