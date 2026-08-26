@@ -23,6 +23,7 @@ import {
   WritableInterrupt,
   WritableWasmValue,
 } from '../interrupts';
+import { Mutex } from './mutex';
 
 export type AdviceBefore<I extends WasmInstruction> =
   | ((
@@ -177,10 +178,8 @@ export class AdvicesRegistery {
   private readonly eventInspect: EventInspectHook<HookOnEventContent>;
   private readonly pauseVMHook: PauseVMHook;
 
-  private _promiseResolvingInterruptAdvices: Promise<void> | undefined;
-  private _interruptAdvicesResolver:
-    | ((value: void | PromiseLike<void>) => void)
-    | undefined;
+  readonly mutexInstructions = new Mutex();
+  readonly mutexInterrupts = new Mutex();
 
   constructor() {
     this._reqs = [];
@@ -218,8 +217,6 @@ export class AdvicesRegistery {
     this.advicesOnNewInterrupt = [];
     this.advicesBeforeInterrupt = [];
     this.advicesAfterInterrupt = [];
-    this._promiseResolvingInterruptAdvices = undefined;
-    this._interruptAdvicesResolver = undefined;
   }
 
   get instructionsRequest(): HookOnWasmAddrRequest[] {
@@ -228,24 +225,6 @@ export class AdvicesRegistery {
 
   get interruptRequests(): HookOnEventRequest[] {
     return this._reqsEvents;
-  }
-
-  interruptAdvicesCompleted() {
-    assert(
-      this._interruptAdvicesResolver !== undefined,
-      'interruptAdvices resolver was not set',
-    );
-    this._promiseResolvingInterruptAdvices = undefined;
-    this._interruptAdvicesResolver();
-  }
-
-  async waitForPendingInterruptAdvices(): Promise<void> {
-    if (this._promiseResolvingInterruptAdvices !== undefined)
-      return this._promiseResolvingInterruptAdvices;
-    this._promiseResolvingInterruptAdvices = new Promise((resolve) => {
-      this._interruptAdvicesResolver = resolve;
-    });
-    return undefined;
   }
 
   getInstrStateMap(moment: HookOnWasmAddrMoment): Map<number, number> {
