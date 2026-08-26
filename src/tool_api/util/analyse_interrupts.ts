@@ -24,28 +24,28 @@ export function runAdvicesInterrupt(
   maxTimeoutMs: number,
 ): (data: SubscriptionContent<HookOnEventContent, WASM.Event>) => void {
   return async (sub: SubscriptionContent<HookOnEventContent, WASM.Event>) => {
-    await advicesContainer.waitForPendingInterruptAdvices();
-    const moment = sub.metadata.moment;
-    const advices = advicesContainer.getInterruptAdvices(moment);
-    let ev: ReadOnlyInterrupt | WritableInterrupt = new ReadOnlyInterrupt(
-      sub.sub,
-    );
-    let mutated = false;
-    for (const [advice, mutate] of advices) {
-      mutated = mutated || mutate;
-      ev = convertEvent(mutate, ev);
-      const newEvent = await advice(ev as any, vm);
-      if (mutate) {
-        assertUpdateEvent(newEvent, mutate);
-        ev = newEvent as any;
+    return advicesContainer.mutexInterrupts.runExclusive(async () => {
+      const moment = sub.metadata.moment;
+      const advices = advicesContainer.getInterruptAdvices(moment);
+      let ev: ReadOnlyInterrupt | WritableInterrupt = new ReadOnlyInterrupt(
+        sub.sub,
+      );
+      let mutated = false;
+      for (const [advice, mutate] of advices) {
+        mutated = mutated || mutate;
+        ev = convertEvent(mutate, ev);
+        const newEvent = await advice(ev as any, vm);
+        if (mutate) {
+          assertUpdateEvent(newEvent, mutate);
+          ev = newEvent as any;
+        }
       }
-    }
 
-    if (mutated) {
-      getGlobalLogger().warn(`TODO update event`);
-      await vm.run(maxTimeoutMs);
-    }
-    advicesContainer.interruptAdvicesCompleted();
+      if (mutated) {
+        getGlobalLogger().warn(`TODO update event`);
+        await vm.run(maxTimeoutMs);
+      }
+    });
   };
 }
 

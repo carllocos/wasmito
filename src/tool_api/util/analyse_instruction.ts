@@ -283,56 +283,58 @@ export function runAdvicesInstruction(
   sub: SubscriptionContent<HookOnAddrSubContent, WasmState>,
 ) => Promise<void> {
   return async (sub: SubscriptionContent<HookOnAddrSubContent, WasmState>) => {
-    const metadata = sub.metadata;
-    assert(isHookOnAddrSubContent(metadata), `no valid subscribe msg`);
-    const i = mod.getInstruction(metadata.addr);
-    assertFatalHookError(
-      i !== undefined,
-      `No instruction found for address ${metadata.addr}`,
-    );
+    return advicesContainer.mutexInstructions.runExclusive(async () => {
+      const metadata = sub.metadata;
+      assert(isHookOnAddrSubContent(metadata), `no valid subscribe msg`);
+      const i = mod.getInstruction(metadata.addr);
+      assertFatalHookError(
+        i !== undefined,
+        `No instruction found for address ${metadata.addr}`,
+      );
 
-    const moment = metadata.moment;
-    const advices = advicesContainer.getAdvices(moment, metadata.addr);
-    const wasmState = sub.sub;
-    const stackArgs = copyArgsFromStack(i, wasmState.stack ?? [], moment);
-    let mutated = false;
-    let argsCB: AdviceArgsCB;
-    for (let adviceIdx = 0; adviceIdx < advices.length; adviceIdx++) {
-      const [advice, mutate] = advices[adviceIdx];
-      mutated = mutate || mutated;
-      argsCB = prepareArgsCB(stackArgs, argsCB, mutate);
-      let newArgs;
-      try {
-        if (isNoArgAdvice(advice)) {
-          await advice();
-        } else if (isVMArgAdvice(advice)) {
-          await advice(vm);
-        } else {
-          newArgs = await advice(i, argsCB as any, vm);
+      const moment = metadata.moment;
+      const advices = advicesContainer.getAdvices(moment, metadata.addr);
+      const wasmState = sub.sub;
+      const stackArgs = copyArgsFromStack(i, wasmState.stack ?? [], moment);
+      let mutated = false;
+      let argsCB: AdviceArgsCB;
+      for (let adviceIdx = 0; adviceIdx < advices.length; adviceIdx++) {
+        const [advice, mutate] = advices[adviceIdx];
+        mutated = mutate || mutated;
+        argsCB = prepareArgsCB(stackArgs, argsCB, mutate);
+        let newArgs;
+        try {
+          if (isNoArgAdvice(advice)) {
+            await advice();
+          } else if (isVMArgAdvice(advice)) {
+            await advice(vm);
+          } else {
+            newArgs = await advice(i, argsCB as any, vm);
+          }
+        } catch (e) {
+          onAdviceFailure(e);
+          return;
         }
-      } catch (e) {
-        onAdviceFailure(e);
-        return;
+        // assertArgsValidity(stackArgs, newArgs, mutate);
+        if (mutate) argsCB = newArgs as any;
       }
-      // assertArgsValidity(stackArgs, newArgs, mutate);
-      if (mutate) argsCB = newArgs as any;
-    }
-    if (mutated) {
-      if (argsCB !== undefined) {
-        let as: ReadOnlyWasmValue[] | WritableWasmValue[];
-        if (argsCB instanceof Array) {
-          as = argsCB;
-        } else if (argsCB instanceof ReadOnlyWasmValue) {
-          as = [argsCB];
-        } else {
-          as = [argsCB];
+      if (mutated) {
+        if (argsCB !== undefined) {
+          let as: ReadOnlyWasmValue[] | WritableWasmValue[];
+          if (argsCB instanceof Array) {
+            as = argsCB;
+          } else if (argsCB instanceof ReadOnlyWasmValue) {
+            as = [argsCB];
+          } else {
+            as = [argsCB];
+          }
+          const success = await updateArgsStack(as, vm);
+          assert(success, 'failed to update the stack with new values');
         }
-        const success = await updateArgsStack(as, vm);
-        assert(success, 'failed to update the stack with new values');
+        logger.debug('Resume execution on VM');
+        await vm.run(maxTimeoutMs);
       }
-      logger.debug('Resume execution on VM');
-      await vm.run(maxTimeoutMs);
-    }
+    });
   };
 }
 
