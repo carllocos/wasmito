@@ -244,22 +244,15 @@ export class AdvicesRegistery {
     i: WasmInstruction,
   ): InspectStateHook<HookOnAddrSubContent> {
     let m: string = '';
-    if (cbArgs <= 1) {
-      m =
-        moment === HookOnWasmAddrMoment.HookBefore
-          ? this.beforeNoStack
-          : this.afterNoStack;
-    } else {
-      switch (moment) {
-        case HookOnWasmAddrMoment.HookBefore:
-          m = i.signature.nrArgs > 0 ? this.beforeStack : this.beforeNoStack;
-          break;
-        case HookOnWasmAddrMoment.HookAfter:
-          m = i.signature.nrResults > 0 ? this.afterStack : this.afterNoStack;
-          break;
-        default:
-          throw new Error(`TODO case around`);
-      }
+    switch (moment) {
+      case HookOnWasmAddrMoment.HookBefore:
+        m = i.signature.nrArgs > 0 ? this.beforeStack : this.beforeNoStack;
+        break;
+      case HookOnWasmAddrMoment.HookAfter:
+        m = i.signature.nrResults > 0 ? this.afterStack : this.afterNoStack;
+        break;
+      default:
+        throw new Error(`TODO case around`);
     }
 
     const h = this.states.get(m);
