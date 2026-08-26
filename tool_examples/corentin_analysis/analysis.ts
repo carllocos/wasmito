@@ -31,7 +31,7 @@ async function main(): Promise<void> {
   const analyseMaxTimeSecs = 10; // stop analysis after this many seconds
 
   const wasmPath = resolve(
-    './app_examples/assemblyscript/toggle_led/wasm/toggle_led.wasm',
+    './app_examples/assemblyscript/policy_evaluation/policy_5_correct_3/wasm/app.wasm',
   );
   const wasm = new WasmModule(wasmPath);
 
@@ -51,6 +51,7 @@ async function main(): Promise<void> {
     },
   });
 
+  // Running analysis without reflashing to the MCU
   // const vmConnection = await connectToExistingMCUVM(wasm, {
   //   vmConfig: {
   //     pauseOnStart: true, // pause the VM on deploy of the Wasm module
@@ -76,7 +77,6 @@ async function main(): Promise<void> {
   // Add a callback before every instruction
   for (const f of wasm.functions) {
     for (const i of f.allInstructions) {
-      // analysis.before(i, showInstruction);
       analysis.before(i, sendToBrigadier(f));
     }
   }
@@ -97,9 +97,8 @@ function sendCallInstructionToBrigadier(f: WASMFunction, i: CallInstruction, arg
     socket.emit('wasmInstruction', {
       name: "primitive_call",
       args: args.map(arg => arg.value),
-      function_name: f.name,
+      function_name: primitiveName,
       function_address: f.startAddress,
-      primitiveFunction: primitiveName
     });
   } else {
     socket.emit('wasmInstruction', {
