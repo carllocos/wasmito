@@ -163,7 +163,8 @@ export class AdvicesRegistery {
   private readonly afterStack = 'afters';
   private readonly instrBeforeState: Map<number, number>;
   private readonly instrAfterState: Map<number, number>;
-  private readonly instrPause: Set<number>;
+  private readonly instrPauseBefore: Set<number>;
+  private readonly instrPauseAfter: Set<number>;
   private readonly pauseHook: PauseVMHook; // TOFO make general
   private readonly states: Map<string, InspectStateHook<HookOnAddrSubContent>>;
   private readonly advicesBefore: AdviceMap = new Map();
@@ -188,7 +189,8 @@ export class AdvicesRegistery {
 
     this.instrBeforeState = new Map<number, number>();
     this.instrAfterState = new Map<number, number>();
-    this.instrPause = new Set<number>();
+    this.instrPauseBefore = new Set<number>();
+    this.instrPauseAfter = new Set<number>();
     this.pauseHook = new PauseVMHook();
     this.states = new Map([
       [
@@ -235,6 +237,17 @@ export class AdvicesRegistery {
         return this.instrAfterState;
       default:
         throw new Error(`no instruction Map`);
+    }
+  }
+
+  getPausedAddresses(moment: HookOnWasmAddrMoment): Set<number> {
+    switch (moment) {
+      case HookOnWasmAddrMoment.HookBefore:
+        return this.instrPauseBefore;
+      case HookOnWasmAddrMoment.HookAfter:
+        return this.instrPauseAfter;
+      default:
+        throw new Error(`no instr paused set`);
     }
   }
 
@@ -347,12 +360,16 @@ export class AdvicesRegistery {
         req.hook = state;
       }
 
-      if (mutate && !this.instrPause.has(i.startAddress)) {
-        const pauseReq = new HookOnWasmAddrRequest(i.startAddress, hm).addHook(
-          this.pauseHook,
-        );
-        this._reqs.push(pauseReq);
-        this.instrPause.add(i.startAddress);
+      if (mutate) {
+        const pausedAddresses = this.getPausedAddresses(hm);
+        if (!pausedAddresses.has(i.startAddress)) {
+          const pauseReq = new HookOnWasmAddrRequest(
+            i.startAddress,
+            hm,
+          ).addHook(this.pauseHook);
+          this._reqs.push(pauseReq);
+          pausedAddresses.add(i.startAddress);
+        }
       }
       advicesRegistered += this.storeInstructionAdvice(
         hm,
