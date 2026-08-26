@@ -299,6 +299,8 @@ export function runAdvicesInstruction(
       let mutated = false;
       let argsCB: AdviceArgsCB;
       for (let adviceIdx = 0; adviceIdx < advices.length; adviceIdx++) {
+        if (vm.isClosed()) break;
+
         const [advice, mutate] = advices[adviceIdx];
         mutated = mutate || mutated;
         argsCB = prepareArgsCB(stackArgs, argsCB, mutate);
@@ -318,7 +320,7 @@ export function runAdvicesInstruction(
         // assertArgsValidity(stackArgs, newArgs, mutate);
         if (mutate) argsCB = newArgs as any;
       }
-      if (mutated) {
+      if (mutated && !vm.isClosed()) {
         if (argsCB !== undefined) {
           let as: ReadOnlyWasmValue[] | WritableWasmValue[];
           if (argsCB instanceof Array) {
