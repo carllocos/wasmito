@@ -17,6 +17,7 @@ import {
   ResponseType,
   SubscribeResponse,
 } from '../../request_msg';
+import { JSONParse } from 'json-with-bigint';
 
 const logger = createLogger('HookOnError');
 
@@ -46,7 +47,7 @@ export class HookOnErrorSubsriptionMessage {
   }
 
   private parseJSONString(data: string): any {
-    const parsed = JSON.parse(data);
+    const parsed = JSONParse(data);
     if (
       parsed.interrupt !== Instruction.HookOnError ||
       parsed.kind !== ResponseType.SubscriptionResponse
@@ -55,7 +56,7 @@ export class HookOnErrorSubsriptionMessage {
     }
     let subContent: any = {};
     if (typeof parsed.sub === 'string') {
-      subContent = JSON.parse(parsed.sub);
+      subContent = JSONParse(parsed.sub);
     } else if (typeof parsed.sub === 'object') {
       subContent = parsed.sub;
     } else if (parsed.sub === undefined) {

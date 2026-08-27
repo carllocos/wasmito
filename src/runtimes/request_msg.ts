@@ -10,6 +10,7 @@ import {
   Instruction,
 } from './wasmito_vm/requests/instructions';
 import { getExceptionMsgFromErrorCode } from './wasmito_vm/requests/request_error_code';
+import { JSONParse } from 'json-with-bigint';
 
 const logger = getGlobalLogger();
 
@@ -128,7 +129,7 @@ function createMessageFromJSON(content: any): RequestMessage | undefined {
   let obj;
   if (typeof content === 'string') {
     try {
-      obj = JSON.parse(content);
+      obj = JSONParse(content);
     } catch (_e) {
       return undefined;
     }
