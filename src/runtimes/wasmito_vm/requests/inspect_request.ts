@@ -12,6 +12,7 @@ import {
   RequestMessage,
   ResponseType,
 } from '../../request_msg';
+import { JSONParse } from 'json-with-bigint';
 
 export enum InspectableState {
   pcState = '01',
@@ -46,7 +47,7 @@ export class InspectStack extends APIRequestNoSubscription<WasmStack> {
 
   parse(input: string): WasmStack {
     try {
-      const resp: StackInpsectResponse = JSON.parse(input);
+      const resp: StackInpsectResponse = JSONParse(input);
       return new WasmStack(resp.stack);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
@@ -57,7 +58,7 @@ export class InspectStack extends APIRequestNoSubscription<WasmStack> {
   processAck(ack: RequestMessage): WasmStack {
     if (isSuccessfulMessage(ack, this.instruction)) {
       try {
-        const resp: StackInpsectResponse = JSON.parse(ack.sub);
+        const resp: StackInpsectResponse = JSONParse(ack.sub);
         return new WasmStack(resp.stack);
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (e) {
@@ -230,7 +231,7 @@ export class StateRequest
   public parse(line: any): any {
     let response: any = {};
     if (typeof line === 'string') {
-      response = JSON.parse(line);
+      response = JSONParse(line);
     } else if (typeof line === 'object') {
       response = line;
     }

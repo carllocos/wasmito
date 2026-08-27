@@ -1,3 +1,5 @@
+import { JSONParse } from 'json-with-bigint';
+
 export function encodeLEB128(value: number): number[] {
   const result: number[] = [];
 
@@ -140,7 +142,7 @@ export function encodeStringToHex(s: string): string {
 export function encodeJSONToHexString(v: any): string {
   let obj: object = {};
   if (typeof v === 'string') {
-    obj = JSON.parse(v);
+    obj = JSONParse(v);
   } else if (typeof v === 'object') {
     obj = v;
   } else {

@@ -18,6 +18,7 @@ import {
   isSubscriptionMessage,
   isSuccessfulMessage,
 } from '../../../src/runtimes/request_msg';
+import { JSONParse } from 'json-with-bigint';
 
 export class WasmitoRuntimeDBGAPI implements RuntimeDebugAPI {
   runtimeName: string;
@@ -56,7 +57,7 @@ export class WasmitoRuntimeDBGAPI implements RuntimeDebugAPI {
     try {
       let subContent: any = {};
       if (typeof msg.sub === 'string') {
-        subContent = JSON.parse(msg.sub);
+        subContent = JSONParse(msg.sub);
       } else if (typeof msg.sub === 'object') {
         subContent = msg.sub;
       }

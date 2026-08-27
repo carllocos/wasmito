@@ -11,6 +11,7 @@ import {
 } from '../../request_msg';
 import { Instruction, getInstructionFromString } from './instructions';
 import { type Hook } from '../../../hooks/hook';
+import { JSONParse } from 'json-with-bigint';
 
 export interface AroundFunctionJSONResponse {
   interrupt: string;
@@ -130,7 +131,7 @@ export class AroundFunctionRequest extends APIRequestNoSubscription<AroundHookRe
     const err = new APIRequestInvalidParse(
       'No reply for AroundFunctionRequest',
     );
-    const obj = JSON.parse(input);
+    const obj = JSONParse(input);
     if (isAroundFunctionJSONResponse(obj)) {
       const reply = createAroundFunctionResponse(obj);
       if (reply === undefined) {

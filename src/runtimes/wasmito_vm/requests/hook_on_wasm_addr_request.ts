@@ -17,6 +17,7 @@ import {
   SubscribeResponse,
 } from '../../request_msg';
 import assert from 'assert';
+import { JSONParse } from 'json-with-bigint';
 
 export enum HookOnWasmAddrMoment {
   HookBefore = '01',
@@ -183,7 +184,7 @@ function parseSubContentMessage(
   try {
     let subContent: any = {};
     if (typeof sub === 'string') {
-      subContent = JSON.parse(sub);
+      subContent = JSONParse(sub);
     } else if (typeof sub === 'object') {
       subContent = sub;
     }
