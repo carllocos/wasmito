@@ -15,7 +15,7 @@ export function encodeLEB128(value: number): number[] {
   return result;
 }
 
-export function encodeSLEB128(value: number): Uint8Array {
+export function encodeSignedSmallLEB128(value: number): Uint8Array {
   if (!Number.isInteger(value)) {
     throw new Error('Value must be an integer');
   }
@@ -45,7 +45,9 @@ export function encodeToHexLEB128(
   value: number,
   signed: boolean = false,
 ): string {
-  const bytes = signed ? Array.from(encodeSLEB128(value)) : encodeLEB128(value);
+  const bytes = signed
+    ? Array.from(encodeSignedSmallLEB128(value))
+    : encodeLEB128(value);
   const hexString = bytes
     .map((byte) => byte.toString(16).padStart(2, '0'))
     .join('');
