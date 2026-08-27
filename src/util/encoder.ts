@@ -48,6 +48,10 @@ export function encodeToHexLEB128(
   const bytes = signed
     ? Array.from(encodeSignedSmallLEB128(value))
     : encodeLEB128(value);
+  return numberBufferToHexString(bytes);
+}
+
+export function numberBufferToHexString(bytes: number[]) {
   const hexString = bytes
     .map((byte) => byte.toString(16).padStart(2, '0'))
     .join('');
