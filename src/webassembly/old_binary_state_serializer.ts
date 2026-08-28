@@ -589,8 +589,8 @@ export class StateBinaryEncoder {
     let type = -1;
     let v = '';
     let typeStr = '';
-    switch (val.type) {
-      case WASM.Type.i32:
+    switch (true) {
+      case WASM.isI32Const(val):
         if (val.value < 0) {
           v = HexaEncoderSerializeInt32LE(val.value);
         } else {
@@ -600,19 +600,19 @@ export class StateBinaryEncoder {
         typeStr = 'i32';
         break;
 
-      case WASM.Type.i64:
+      case WASM.isI64Const(val):
         throw new Error(`unsporrted i64 numbers bigint`);
       // Following code is commented due to the error and should normally be called for bigint
       // v = HexaEncoderSerializeBigUInt64LE(val.value as bigint);
       // type = 1;
       // typeStr = 'i64';
       // break;
-      case WASM.Type.f32:
+      case WASM.isF32Const(val):
         v = HexaEncoderSerializeFloatLE(val.value);
         type = 2;
         typeStr = 'f32';
         break;
-      case WASM.Type.f64:
+      case WASM.isF64Const(val):
         v = HexaEncoderSerializeDoubleLE(val.value);
         type = 3;
         typeStr = 'f64';
