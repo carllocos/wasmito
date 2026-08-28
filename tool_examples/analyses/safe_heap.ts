@@ -19,6 +19,7 @@ import {
   logMeasurement,
   TimeoutConfig,
 } from '../../src/util/benchmark_util';
+import { WASM } from '../../src/webassembly/wasm';
 
 function assertSafeHeap(
   condition: unknown,
@@ -29,17 +30,24 @@ function assertSafeHeap(
   }
 }
 
-function boundCheck(index: number, bytes: number, offset: number): void {
-  const addr = offset + index; //offset is the statically encoded offset, index the dynamic stack offset
-  const lastByteAddr = addr + bytes;
+function boundCheck(
+  index: number | bigint,
+  bytes: number,
+  offset: number,
+): void {
+  const addr = WASM.Arithmetic.add(offset, index); //offset is the statically encoded offset, index the dynamic stack offset
+  const lastByteAddr = WASM.Arithmetic.add(addr, bytes);
   const memoryPageSize = 2 ** 16;
   console.log(`bound check- index ${index}, bytes ${bytes}, offset ${offset}`);
   assertSafeHeap(lastByteAddr <= memoryPageSize, 'memory overflow');
 }
 
-function alignmentCheck(index: number, size: number): void {
+function alignmentCheck(index: number | bigint, size: number): void {
   console.log(`alignmentCheck ${index}, size ${size}`);
-  assertSafeHeap((index & (size - 1)) === 0, 'alignment check fails');
+  assertSafeHeap(
+    WASM.Arithmetic.bitAnd(index, size - 1) === 0,
+    'alignment check fails',
+  );
 }
 
 function safeLoad(

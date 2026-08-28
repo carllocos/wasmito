@@ -21,12 +21,13 @@ import {
   sourceCodeLocationToString,
   SourceMap,
 } from '../../src/source_mappers/source_map';
+import { WASM } from '../../src/webassembly/wasm';
 
 const reportedErrorsGlobals = new Set<number>();
 function logOrderViolation(
   sourceMap: SourceMap,
   i: GlobalGetInstruction | LoadInstruction,
-  rangeRead: number[] = [],
+  rangeRead: Array<number | bigint> = [],
 ): void {
   let logText = '';
   if (isGlobalGetInstruction(i)) {
@@ -46,8 +47,8 @@ function logOrderViolation(
 }
 
 function isRangeInitialised(
-  range: number[],
-  initialisedMemory: Array<[number, number]>,
+  range: Array<number | bigint>,
+  initialisedMemory: Array<[number | bigint, number | bigint]>,
 ): boolean {
   let initialised = false;
   for (const [start, end] of initialisedMemory) {
@@ -81,13 +82,16 @@ function detectOrderViolation(
     },
   );
 
-  const initialisedMemory: Array<[number, number]> = [];
+  const initialisedMemory: Array<[number | bigint, number | bigint]> = [];
   analysis.before(
     WasmCode.MultipleOpcode.Store,
     (i: StoreInstruction, args: ReadOnlyWasmValue[]) => {
       const bytesWritten = i.targetValueSize();
-      const memaddr = i.offset + args[1].value;
-      const range: [number, number] = [memaddr, memaddr + bytesWritten];
+      const memaddr = WASM.Arithmetic.add(i.offset, args[1].value);
+      const range: [number | bigint, number | bigint] = [
+        memaddr,
+        WASM.Arithmetic.add(memaddr, bytesWritten),
+      ];
       initialisedMemory.push(range);
     },
   );
@@ -95,9 +99,9 @@ function detectOrderViolation(
   analysis.before(
     WasmCode.MultipleOpcode.Load,
     (i: LoadInstruction, args: ReadOnlyWasmValue[]) => {
-      const addr = i.offset + args[0].value;
+      const addr = WASM.Arithmetic.add(i.offset, args[0].value);
       const bytesRead = i.targetValueSize();
-      const rangeRead = [addr, addr + bytesRead];
+      const rangeRead = [addr, WASM.Arithmetic.add(addr, bytesRead)];
       const initialised = isRangeInitialised(rangeRead, initialisedMemory);
       if (!initialised) logOrderViolation(sourceMap, i, rangeRead);
     },

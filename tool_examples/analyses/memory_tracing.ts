@@ -22,17 +22,20 @@ import {
   logMeasurement,
   TimeoutConfig,
 } from '../../src/util/benchmark_util';
-
+import { WASM } from '../../src/webassembly/wasm';
 const logger = createLogger('MemoryTracingAnalysis');
 
-type Access = [number, WasmInstruction, number, boolean];
+type Access = [number, WasmInstruction, number | bigint, boolean];
 const accesses: Access[] = [];
 function access(
   instr: LoadInstruction | StoreInstruction,
   args: ReadOnlyWasmValue[],
 ): void {
   const fid = instr.getEnclosingFunction().id;
-  const addr = instr.offset + args[isLoadInstruction(instr) ? 0 : 1].value;
+  const addr = WASM.Arithmetic.add(
+    instr.offset,
+    args[isLoadInstruction(instr) ? 0 : 1].value,
+  );
   const a: Access = [fid, instr, addr, isStoreInstruction(instr)];
   accesses.push(a);
   console.log(`Function ${fid} instruction ${instr.getIndexInFunction()}`);

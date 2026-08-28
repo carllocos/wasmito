@@ -59,7 +59,7 @@ export class StoreTrace {
   private readonly writer: WriteCSV;
   private readonly befores: Map<
     number,
-    [number, WasmInstruction, string, number[]]
+    [number, WasmInstruction, string, Array<number | bigint>]
   >;
 
   constructor(output: string, bufferSize: number) {
@@ -100,7 +100,7 @@ export class StoreTrace {
       );
       return;
     }
-    const operands: number[] = [];
+    const operands: Array<number | bigint> = [];
     if (opcode.immediate !== undefined) {
       operands.push(opcode.immediate);
     }

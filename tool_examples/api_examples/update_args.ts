@@ -8,6 +8,7 @@ import { CallInstruction } from '../../src/webassembly/wasm/wasm_instruction';
 import { spawnDevVM, spawnMCUVM } from '../spawn_vm';
 
 import { BoardBaudRate } from '../../src/util/serial_port';
+import { WASM } from '../../src/webassembly/wasm';
 
 /**
  * In this example, we increase the sleep time between each blink with 500 ms
@@ -36,7 +37,7 @@ async function main(): Promise<void> {
   });
 
   const analysis = new WasmAnalysis(wasm, vmConnection);
-  let newDelay = 0;
+  let newDelay: number | bigint = 0;
   const delayIncreaseMS = 500;
   const maxDelayMS = 7000;
   const delayCalls = wasm.getCallInstructions('delay');
@@ -49,7 +50,11 @@ async function main(): Promise<void> {
         args: WritableWasmValue[],
       ): WritableWasmValue[] => {
         // args[0].value is always 1000 so increase at each call
-        newDelay += args[0].value + delayIncreaseMS;
+        newDelay = WASM.Arithmetic.add(
+          newDelay,
+          args[0].value,
+          delayIncreaseMS,
+        );
         if (newDelay > maxDelayMS) {
           // reset the delay
           newDelay = 0;

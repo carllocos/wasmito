@@ -26,6 +26,7 @@ import {
   sourceCodeLocationToString,
   SourceMap,
 } from '../../src/source_mappers/source_map';
+import { WASM } from '../../src/webassembly';
 
 async function detectOrderViolation(
   analysis: WasmAnalysis,
@@ -66,13 +67,16 @@ async function detectOrderViolation(
     },
   );
 
-  const initialisedMemory: Array<[number, number]> = [];
+  const initialisedMemory: Array<[number | bigint, number | bigint]> = [];
   analysis.before(
     WasmCode.MultipleOpcode.Load,
     (i: LoadInstruction, args: ReadOnlyWasmValue[]) => {
       const addr = args[0].value;
       const bytesRead = i.targetValueSize();
-      const rangeRead = [i.offset + addr, i.offset + addr + bytesRead];
+      const rangeRead = [
+        WASM.Arithmetic.add(i.offset, addr),
+        WASM.Arithmetic.add(i.offset, addr, bytesRead),
+      ];
       console.log(`Loading memory range [${rangeRead[0]},${rangeRead[1]}]`);
       let initialised = false;
       for (const [start, end] of initialisedMemory) {
@@ -92,8 +96,11 @@ async function detectOrderViolation(
     WasmCode.MultipleOpcode.Store,
     (i: StoreInstruction, args: ReadOnlyWasmValue[]) => {
       const bytesWritten = i.targetValueSize();
-      const memaddr = i.offset + args[1].value;
-      const range: [number, number] = [memaddr, memaddr + bytesWritten];
+      const memaddr = WASM.Arithmetic.add(i.offset, args[1].value);
+      const range: [number | bigint, number | bigint] = [
+        memaddr,
+        WASM.Arithmetic.add(memaddr, bytesWritten),
+      ];
       console.log(`Storing memory range [${range[0]},${range[1]}]`);
       initialisedMemory.push(range);
     },
