@@ -22,9 +22,9 @@ const logger = createLogger('DenanAnalysis');
 
 function denan(v: WritableWasmValue): WritableWasmValue {
   console.log(`Try denan: ${WASM.typeToString(v.type)}.const ${v.value}`);
-  switch (v.type) {
-    case WASM.Type.f32:
-    case WASM.Type.f64:
+  switch (true) {
+    case WritableWasmValue.isF32Const(v):
+    case WritableWasmValue.isF64Const(v):
       if (isNaN(v.value)) {
         v.value = 0.0;
         console.log(`Denan to ${v.value}`);

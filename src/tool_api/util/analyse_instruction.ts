@@ -370,8 +370,8 @@ function stackToAdviceArgs(
   write: boolean,
 ): ReadOnlyWasmValue[] | WritableWasmValue[] {
   if (write)
-    return args.map((a) => new WritableWasmValue(a.type, a.value, a.idx));
-  else return args.map((a) => new ReadOnlyWasmValue(a.type, a.value, a.idx));
+    return args.map((a) => WritableWasmValue.new(a.type, a.value, a.idx));
+  else return args.map((a) => ReadOnlyWasmValue.new(a.type, a.value, a.idx));
 }
 
 function adviceArgToAdviceArg(
@@ -384,12 +384,12 @@ function adviceArgToAdviceArg(
 
   if (args instanceof WritableWasmValue) {
     if (toWrite) return args;
-    else return new ReadOnlyWasmValue(args.type, args.value, args.stackIdx);
+    else return ReadOnlyWasmValue.new(args.type, args.value, args.stackIdx);
   }
 
   if (args instanceof ReadOnlyWasmValue) {
     if (toWrite)
-      return new WritableWasmValue(args.type, args.value, args.stackIdx);
+      return WritableWasmValue.new(args.type, args.value, args.stackIdx);
     else return args;
   }
 
@@ -399,14 +399,14 @@ function adviceArgToAdviceArg(
     if (toWrite) return args;
     const newArgs: ReadOnlyWasmValue[] = [];
     for (const arg of args)
-      newArgs.push(new ReadOnlyWasmValue(arg.type, arg.value, arg.stackIdx));
+      newArgs.push(ReadOnlyWasmValue.new(arg.type, arg.value, arg.stackIdx));
     return newArgs;
   } else {
     if (!toWrite) return args;
     const newArgs: WritableWasmValue[] = [];
 
     for (const arg of args)
-      newArgs.push(new WritableWasmValue(arg.type, arg.value, arg.stackIdx));
+      newArgs.push(WritableWasmValue.new(arg.type, arg.value, arg.stackIdx));
     return newArgs;
   }
 }

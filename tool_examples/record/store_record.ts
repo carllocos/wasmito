@@ -51,7 +51,7 @@ function stringToWasmValue(s: string): ReadOnlyWasmValue {
     type,
     value,
   };
-  return new ReadOnlyWasmValue(wasmValue.type, wasmValue.value);
+  return ReadOnlyWasmValue.new(wasmValue.type, wasmValue.value);
 }
 
 function stringToWasmValues(values: string): ReadOnlyWasmValue[] {
