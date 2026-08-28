@@ -138,6 +138,9 @@ export abstract class APIRequest<R> {
         this.cb();
       }
       this.resolver!(v);
+      this.promise = undefined;
+      this.resolver = undefined;
+      this.rejector = undefined;
     }
   }
 
@@ -145,6 +148,9 @@ export abstract class APIRequest<R> {
     if (!this._resolved && !this._rejected) {
       this._rejected = true;
       this.rejector!(v);
+      this.promise = undefined;
+      this.resolver = undefined;
+      this.rejector = undefined;
     }
   }
 }
