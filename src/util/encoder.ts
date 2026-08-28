@@ -105,10 +105,13 @@ export function numberBufferToHexString(bytes: number[]) {
   return hexString;
 }
 
-export function floatToSinglePrecisionBuffer(num: number): ArrayBuffer {
-  const buffer = new ArrayBuffer(4);
+function floatToSinglePrecisionBuffer(num: number, f32: boolean): ArrayBuffer {
+  const buffer = new ArrayBuffer(f32 ? 4 : 8);
   const view = new DataView(buffer);
-  view.setFloat32(0, num, true); // The 'true' argument indicates little-endian byte order.
+
+  // The 'true' argument of setFloat indicates little-endian byte order.
+  if (f32) view.setFloat32(0, num, true);
+  else view.setFloat64(0, num, true);
   return buffer;
 }
 
@@ -121,8 +124,15 @@ export function bufferToHexString(buffer: ArrayBuffer): string {
   return hex;
 }
 
-export function floatToHexString(float: number): string {
-  const buf = floatToSinglePrecisionBuffer(float);
+export function float32ToHexString(float: number): string {
+  const f32 = true;
+  const buf = floatToSinglePrecisionBuffer(float, f32);
+  return bufferToHexString(buf);
+}
+
+export function float64ToHexString(float: number): string {
+  const f32 = false;
+  const buf = floatToSinglePrecisionBuffer(float, f32);
   return bufferToHexString(buf);
 }
 
