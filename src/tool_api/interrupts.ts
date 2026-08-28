@@ -61,11 +61,11 @@ export class ReadOnlyInterrupt {
 }
 
 export class ReadOnlyWasmValue {
-  private _value: number;
+  private _value: number | bigint;
   private _type: WASM.Type;
   private _stackIdx: number;
 
-  constructor(type: WASM.Type, value: number, stackIdx = -1) {
+  constructor(type: WASM.Type, value: number | bigint, stackIdx = -1) {
     this._value = value;
     this._type = type;
     this._stackIdx = stackIdx;
@@ -75,7 +75,7 @@ export class ReadOnlyWasmValue {
     return this._type;
   }
 
-  get value(): number {
+  get value(): number | bigint {
     return this._value;
   }
 
@@ -88,10 +88,10 @@ export class ReadOnlyWasmValue {
 }
 
 export class WritableWasmValue {
-  private _value: number;
+  private _value: number | bigint;
   private _type: WASM.Type;
   private _stackIdx: number;
-  constructor(type: WASM.Type, value: number, stackIdx = -1) {
+  constructor(type: WASM.Type, value: number | bigint, stackIdx = -1) {
     this._value = value;
     this._type = type;
     this._stackIdx = stackIdx;
@@ -108,11 +108,11 @@ export class WritableWasmValue {
     return this._type;
   }
 
-  get value(): number {
+  get value(): number | bigint {
     return this._value;
   }
 
-  set value(n: number) {
+  set value(n: number | bigint) {
     // TODO validate assignment
     this._value = n;
   }
