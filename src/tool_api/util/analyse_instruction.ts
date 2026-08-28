@@ -416,7 +416,7 @@ async function updateArgsStack(
   vm: WasmitoBackendVM,
 ): Promise<boolean> {
   for (const arg of args) {
-    const s = await vm.updateStackValue(arg.stackIdx, arg);
+    const s = await vm.updateStackValue(arg.stackIdx, arg.toWasmValue());
     if (!s) return false;
   }
   return true;
