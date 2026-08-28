@@ -102,7 +102,6 @@ export interface Section {
 }
 
 export interface ParsedModule {
-  ast: any;
   elements: ModuleElement[];
   exportedFuncs: FunExport[];
   funcImports: ModuleFuncImport[];
@@ -812,7 +811,6 @@ export function parseWasmModule(wasmPath: string): [ParsedModule, string[]] {
       tableExports,
       elements,
       globals,
-      ast: mod,
       sections,
       wasmBuffer: binary,
     };
