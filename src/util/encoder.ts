@@ -43,6 +43,51 @@ export function encodeSignedSmallLEB128(value: number): Uint8Array {
   return Uint8Array.from(bytes);
 }
 
+export function encodeSignedBigIntLEB128(value: bigint): Uint8Array {
+  const bytes: number[] = [];
+  let more = true;
+
+  while (more) {
+    let byte = Number(value & 0x7fn);
+    value >>= 7n;
+
+    // Sign bit of the current 7-bit payload.
+    const signBitSet = (byte & 0x40) !== 0;
+
+    // Stop when the remaining value is consistent with the sign.
+    if ((value === 0n && !signBitSet) || (value === -1n && signBitSet)) {
+      more = false;
+    } else {
+      byte |= 0x80;
+    }
+
+    bytes.push(byte);
+  }
+
+  return Uint8Array.from(bytes);
+}
+
+export function encodeUnsignedBigIntLEB128(value: bigint): Uint8Array {
+  if (value < 0n) {
+    throw new RangeError('Unsigned LEB128 cannot encode negative values');
+  }
+
+  const bytes: number[] = [];
+
+  do {
+    let byte = Number(value & 0x7fn);
+    value >>= 7n;
+
+    if (value !== 0n) {
+      byte |= 0x80;
+    }
+
+    bytes.push(byte);
+  } while (value !== 0n);
+
+  return Uint8Array.from(bytes);
+}
+
 export function encodeToHexLEB128(
   value: number,
   signed: boolean = false,
