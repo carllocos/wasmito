@@ -356,6 +356,35 @@ export namespace WASM {
       result.push((byte_ | 0x80).toString(16).padStart(2, '0'));
     }
   }
+
+  export namespace Arithmetic {
+    export function add(...args: (number | bigint)[]): number | bigint {
+      const useBigInt = args.some((arg) => typeof arg === 'bigint');
+      let r = useBigInt ? BigInt(0) : 0;
+      for (const a of args) {
+        if (typeof r === 'bigint') {
+          r = r + BigInt(a);
+        } else {
+          r = r + Number(a);
+        }
+      }
+      return r;
+    }
+
+    export function bitAnd(...args: (number | bigint)[]): number | bigint {
+      const useBigInt = args.some((arg) => typeof arg === 'bigint');
+      let r = useBigInt ? BigInt(args[0]) : args[0];
+      for (let idx = 1; idx < args.length; idx++) {
+        const a = args[idx];
+        if (typeof r === 'bigint') {
+          r = BigInt(r) & BigInt(a);
+        } else {
+          r = Number(r) & Number(a);
+        }
+      }
+      return r;
+    }
+  }
 }
 
 export interface WASMValueIndexed extends WASM.Value {
