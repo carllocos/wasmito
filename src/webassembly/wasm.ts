@@ -2,7 +2,13 @@ import assert from 'assert';
 import { LogicalClock } from '../hooks/logicalclock';
 import { createLogger } from '../logger/logger';
 import { decodeLEB128, hexStringToUint8Array } from '../util/decoder';
-import { encodeToHexLEB128, floatToHexString } from '../util/encoder';
+import {
+  encodeSignedBigIntLEB128,
+  encodeSignedSmallLEB128,
+  float32ToHexString,
+  float64ToHexString,
+  numberBufferToHexString,
+} from '../util/encoder';
 import fs from 'fs';
 
 const logger = createLogger('WASM');
@@ -161,16 +167,28 @@ export namespace WASM {
         encodedValue += hexType;
       }
     }
-    switch (value.type) {
-      case Type.i32:
-      case Type.i64:
-        encodedValue += encodeToHexLEB128(value.value, true);
+
+    switch (true) {
+      case WASM.isI32Const(value):
+        return numberBufferToHexString(
+          Array.from(encodeSignedSmallLEB128(value.value)),
+        );
+      case WASM.isI64Const(value): {
+        return numberBufferToHexString(
+          Array.from(
+            typeof value.value === 'bigint' ||
+              value.value > MAX_I32_CONST_VALUE ||
+              value.value < MIN_I32_CONST_VALUE
+              ? encodeSignedBigIntLEB128(BigInt(value.value))
+              : encodeSignedSmallLEB128(value.value),
+          ),
+        );
+      }
+      case WASM.isF32Const(value):
+        encodedValue += float32ToHexString(value.value);
         break;
-      case Type.f32:
-        encodedValue += floatToHexString(value.value);
-        break;
-      case Type.f64:
-        logger.error('encodingWasmValue with unsupported value type F64');
+      case WASM.isF64Const(value):
+        encodedValue += float64ToHexString(value.value);
         break;
       default:
         logger.error(`encodingWasmValue with unexisting value type`);
