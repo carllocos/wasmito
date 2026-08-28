@@ -36,7 +36,7 @@ describe('Test after', function () {
   it('after fac(5) should give argument 120', async () => {
     const mainFunc = wasm.getMainFunction();
     const callFac = mainFunc.allInstructions[1];
-    let facResult: number | undefined;
+    let facResult: bigint | number | undefined;
     analysis.after(
       callFac,
       (_i: WasmInstruction, result: ReadOnlyWasmValue | undefined) => {

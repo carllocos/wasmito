@@ -31,8 +31,8 @@ describe('Test before Mutability', function () {
     const mainFunc = wasm.getMainFunction();
     const callFac = mainFunc.allInstructions[1];
 
-    let val1: number | undefined;
-    let val2: number | undefined;
+    let val1: bigint | number | undefined;
+    let val2: bigint | number | undefined;
     analysis.beforeMut(
       callFac,
       (_i: WasmInstruction, args: WritableWasmValue[]) => {

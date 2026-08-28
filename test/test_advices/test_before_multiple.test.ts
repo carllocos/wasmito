@@ -47,10 +47,10 @@ describe('Test Multiple before advices on same Instruction', function () {
   it('change before fac(5) to fac(1) then to fac(3)', async () => {
     const mainFunc = wasm.getMainFunction();
     const callFac = mainFunc.allInstructions[1];
-    let val1: number | undefined;
-    let val2: number | undefined;
-    let val3: number | undefined;
-    let val4: number | undefined;
+    let val1: bigint | number | undefined;
+    let val2: bigint | number | undefined;
+    let val3: bigint | number | undefined;
+    let val4: bigint | number | undefined;
 
     analysis.beforeMut(
       callFac,
@@ -96,10 +96,10 @@ describe('Test Multiple before advices on same Instruction', function () {
   it('read argument fac(5) and then change to fac(1) then read argument', async () => {
     const mainFunc = wasm.getMainFunction();
     const callFac = mainFunc.allInstructions[1];
-    let val1: number | undefined;
-    let val2: number | undefined;
-    let val3: number | undefined;
-    let val4: number | undefined;
+    let val1: bigint | number | undefined;
+    let val2: bigint | number | undefined;
+    let val3: bigint | number | undefined;
+    let val4: bigint | number | undefined;
 
     analysis.before(
       callFac,
@@ -143,10 +143,10 @@ describe('Test Multiple before advices on same Instruction', function () {
   it('write argument fac(5) to fac(2), then read argument, and read argument', async () => {
     const mainFunc = wasm.getMainFunction();
     const callFac = mainFunc.allInstructions[1];
-    let val1: number | undefined;
-    let val2: number | undefined;
-    let val3: number | undefined;
-    let val4: number | undefined;
+    let val1: bigint | number | undefined;
+    let val2: bigint | number | undefined;
+    let val3: bigint | number | undefined;
+    let val4: bigint | number | undefined;
 
     analysis.beforeMut(
       callFac,

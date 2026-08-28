@@ -48,10 +48,10 @@ describe('Test Multiple after advices on same Instruction', function () {
     const mainFunc = wasm.getMainFunction();
     const i32ConstFacArg = mainFunc.allInstructions[0];
     const callFac = mainFunc.allInstructions[1];
-    let val1: number | undefined;
-    let val2: number | undefined;
-    let val3: number | undefined;
-    let val4: number | undefined;
+    let val1: bigint | number | undefined;
+    let val2: bigint | number | undefined;
+    let val3: bigint | number | undefined;
+    let val4: bigint | number | undefined;
 
     analysis.afterMut(
       i32ConstFacArg,
@@ -98,10 +98,10 @@ describe('Test Multiple after advices on same Instruction', function () {
     const mainFunc = wasm.getMainFunction();
     const i32ConstFacArg = mainFunc.allInstructions[0];
     const callFac = mainFunc.allInstructions[1];
-    let val1: number | undefined;
-    let val2: number | undefined;
-    let val3: number | undefined;
-    let val4: number | undefined;
+    let val1: bigint | number | undefined;
+    let val2: bigint | number | undefined;
+    let val3: bigint | number | undefined;
+    let val4: bigint | number | undefined;
 
     analysis.after(
       i32ConstFacArg,
@@ -148,10 +148,10 @@ describe('Test Multiple after advices on same Instruction', function () {
     const mainFunc = wasm.getMainFunction();
     const i32ConstFacArg = mainFunc.allInstructions[0];
     const callFac = mainFunc.allInstructions[1];
-    let val1: number | undefined;
-    let val2: number | undefined;
-    let val3: number | undefined;
-    let val4: number | undefined;
+    let val1: bigint | number | undefined;
+    let val2: bigint | number | undefined;
+    let val3: bigint | number | undefined;
+    let val4: bigint | number | undefined;
 
     analysis.afterMut(
       i32ConstFacArg,

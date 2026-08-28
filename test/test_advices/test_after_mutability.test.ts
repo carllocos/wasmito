@@ -31,8 +31,8 @@ describe('Test after Mutability', function () {
     const i32ConstFacArg = mainFunc.allInstructions[0];
     const callFac = mainFunc.allInstructions[1];
 
-    let val1: number | undefined;
-    let val2: number | undefined;
+    let val1: bigint | number | undefined;
+    let val2: bigint | number | undefined;
     analysis.afterMut(
       i32ConstFacArg,
       (_i: WasmInstruction, arg: WritableWasmValue | undefined) => {
