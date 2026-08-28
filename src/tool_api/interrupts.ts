@@ -85,6 +85,13 @@ export class ReadOnlyWasmValue {
     }
     return this._stackIdx;
   }
+
+  toWasmValue(): WASM.Value {
+    return {
+      value: this.value,
+      type: this.type,
+    };
+  }
 }
 
 export class WritableWasmValue {
@@ -115,6 +122,13 @@ export class WritableWasmValue {
   set value(n: number | bigint) {
     // TODO validate assignment
     this._value = n;
+  }
+
+  toWasmValue(): WASM.Value {
+    return {
+      value: this.value,
+      type: this.type,
+    };
   }
 }
 
