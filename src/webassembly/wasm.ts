@@ -19,6 +19,12 @@ export namespace WASM {
     unknown,
   }
 
+  export function isWasmType(t: unknown): t is Type {
+    if (typeof t === 'number') return Object.values(Type).includes(t);
+    else if (typeof t === 'string') return typing.has(t);
+    return false;
+  }
+
   export function typeToString(wasmType: Type): string | undefined {
     switch (wasmType) {
       case Type.f32:
@@ -78,15 +84,60 @@ export namespace WASM {
 
   export interface Value {
     type: Type;
+    value: number | bigint;
+  }
+
+  export interface I32Const extends Value {
+    type: Type.i32;
     value: number;
   }
 
-  export function isWasmValue(obj: any): boolean {
+  export interface I64Const extends Value {
+    type: Type.i64;
+  }
+
+  export interface F32Const extends Value {
+    type: Type.f32;
+    value: number;
+  }
+
+  export interface F64Const extends Value {
+    type: Type.f64;
+    value: number;
+  }
+
+  export function isWasmValue(obj: any): obj is Value {
     return (
       typeof obj === 'object' &&
-      obj.type !== undefined &&
-      typing.get(obj.type) !== undefined &&
-      obj.value !== undefined &&
+      isWasmType(obj.type) &&
+      (typeof obj.value === 'number' || typeof obj.value === 'bigint')
+    );
+  }
+
+  export function isI32Const(obj: any): obj is I32Const {
+    return (
+      isWasmValue(obj) &&
+      obj.type === WASM.Type.i32 &&
+      typeof obj.value === 'number'
+    );
+  }
+
+  export function isI64Const(obj: any): obj is I64Const {
+    return isWasmValue(obj) && obj.type === WASM.Type.i64;
+  }
+
+  export function isF32Const(obj: any): obj is F32Const {
+    return (
+      isWasmValue(obj) &&
+      obj.type === WASM.Type.f32 &&
+      typeof obj.value === 'number'
+    );
+  }
+
+  export function isF64Const(obj: any): obj is F64Const {
+    return (
+      isWasmValue(obj) &&
+      obj.type === WASM.Type.f64 &&
       typeof obj.value === 'number'
     );
   }
