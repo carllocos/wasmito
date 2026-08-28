@@ -30,18 +30,18 @@ describe('Test Multiple after advices on same Instruction', function () {
   it('registering multiple advices after fac(5) should execute each once', async () => {
     const mainFunc = wasm.getMainFunction();
     const callFac = mainFunc.allInstructions[1];
-    let adviceOneCalled = 0;
-    let adviceTwoCalled = 0;
-    let adviceThreeCalled = 0;
+    let adviceOneCalled = 1;
+    let adviceTwoCalled = 2;
+    let adviceThreeCalled = 3;
     analysis.after(callFac, () => adviceOneCalled++);
     analysis.after(callFac, () => adviceTwoCalled++);
     analysis.after(callFac, () => adviceThreeCalled++);
 
     await analysis.deploy();
     await analysis.run();
-    expect(adviceOneCalled).equal(1);
-    expect(adviceTwoCalled).equal(1);
-    expect(adviceThreeCalled).equal(1);
+    expect(adviceOneCalled).equal(2);
+    expect(adviceTwoCalled).equal(3);
+    expect(adviceThreeCalled).equal(4);
   });
 
   it('change before fac(5) to fac(1) then to fac(3)', async () => {
