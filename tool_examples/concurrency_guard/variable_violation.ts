@@ -29,6 +29,7 @@ import {
   SourceMap,
 } from '../../src/source_mappers/source_map';
 import { WASMFunction } from '../../src/webassembly/wasm/wasm_function';
+import { WASM } from '../../src/webassembly/wasm';
 
 function logGlobalViolation(
   read: GlobalGetInstruction,
@@ -86,23 +87,26 @@ function _globalReads(
 }
 
 // type WriteInstruction = GlobalSetInstruction | StoreInstruction;
-const memoryWritten: [number, number][] = [];
+const memoryWritten: [number | bigint, number | bigint][] = [];
 const globalsWritten: GlobalSetInstruction[] = [];
-const memoryRead: [LoadInstruction, number, number][] = [];
+const memoryRead: [LoadInstruction, number | bigint, number | bigint][] = [];
 const globalsGet: GlobalGetInstruction[] = [];
 let sourceMap: SourceMap | undefined;
 
 function registerWrite(
   i: GlobalSetInstruction | StoreInstruction,
   args: ReadOnlyWasmValue[],
-): [number, number] {
+): [number | bigint, number | bigint] {
   if (isGlobalSetInstruction(i)) {
     globalsWritten.push(i);
     return [-1, -1];
   }
   const bytesWritten = i.targetValueSize();
-  const memaddr = i.offset + args[1].value;
-  const range: [number, number] = [memaddr, memaddr + bytesWritten];
+  const memaddr = WASM.Arithmetic.add(i.offset, args[1].value);
+  const range: [number | bigint, number | bigint] = [
+    memaddr,
+    WASM.Arithmetic.add(memaddr, bytesWritten),
+  ];
   memoryWritten.push(range);
   return range;
 }
@@ -111,11 +115,11 @@ const alreadyReported = new Set<string>();
 
 function logMemoryViolation(
   write: StoreInstruction,
-  startWrite: number,
-  endWrite: number,
+  startWrite: number | bigint,
+  endWrite: number | bigint,
   read: LoadInstruction,
-  startRead: number,
-  endRead: number,
+  startRead: number | bigint,
+  endRead: number | bigint,
 ): void {
   const key = `${startRead},${endRead},${startWrite},${endWrite}`;
   if (alreadyReported.has(key)) return;
@@ -177,8 +181,8 @@ function registerRead(
     globalsGet.push(i);
   } else {
     const bytesRead = i.targetValueSize();
-    const memaddr = i.offset + args[0].value;
-    memoryRead.push([i, memaddr, memaddr + bytesRead]);
+    const memaddr = WASM.Arithmetic.add(i.offset, args[0].value);
+    memoryRead.push([i, memaddr, WASM.Arithmetic.add(memaddr, bytesRead)]);
   }
 }
 
