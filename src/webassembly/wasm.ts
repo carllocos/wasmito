@@ -392,7 +392,7 @@ function parseWasmValueIndex(sv: any): WASMValueIndexed {
     throw new Error(`Stack value type received inexisting type ${sv.type}`);
   }
   const v = sv.value;
-  if (typeof v !== 'number') {
+  if (typeof v !== 'number' && typeof v !== 'bigint') {
     throw new Error(`Stack value expected to be a number got ${v}`);
   }
   return {
