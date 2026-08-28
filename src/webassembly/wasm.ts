@@ -142,6 +142,9 @@ export namespace WASM {
     );
   }
 
+  const MAX_I32_CONST_VALUE = 2147483647;
+  const MIN_I32_CONST_VALUE = -2147483648;
+
   export interface EncodingWasmValueOptions {
     includeType: boolean;
     includeIndex: boolean;
