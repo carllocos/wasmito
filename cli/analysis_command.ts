@@ -76,7 +76,7 @@ export function registerAnalysisCommand(program: Command): void {
       '1',
     )
     .option(
-      '-s,--store <csv_file_path>',
+      '--csv <csv_file_path>',
       `Path to where to store the results`,
       'measurements.csv',
     )
@@ -106,7 +106,7 @@ export function registerAnalysisCommand(program: Command): void {
         `running analysis '${analysisToRun.map((a) => a[0]).join(', ')}' on modules: ${modules.join(', ')}`,
       );
 
-      const csvFilePath = options.store;
+      const csvFilePath = options.csv;
       const nrOfRuns = Number(options.nrRuns);
       if (isNaN(nrOfRuns) || nrOfRuns < 0)
         program.error('nr of runs is not a valid number');
