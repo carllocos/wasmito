@@ -22,6 +22,7 @@ import {
   BenchmarkMeasurements,
   writeLastMeasurementToFile,
   FailedMeasurement,
+  csvFileHasHeader,
 } from '../src/util/benchmark_util';
 
 const logger = getGlobalLogger();
@@ -132,7 +133,7 @@ export function registerAnalysisCommand(program: Command): void {
         `nr of runs ${nrOfRuns}, nr of warmup ${nrOfWarmups}, advice registration timeout ms ${timeouts.timeoutMsRegisterAdvices}, advice deployment timeout ms ${timeouts.timeoutMsDeploy}, analysis execution timeout ms ${timeouts.timeoutMsAnalysisRun}`,
       );
 
-      let addHeader = true;
+      let addHeader = !csvFileHasHeader(csvFilePath);
       for (const [a, analyse] of analysisToRun) {
         for (const wasmPath of modules) {
           const measurements: BenchmarkMeasurements = {

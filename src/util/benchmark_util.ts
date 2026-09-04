@@ -60,6 +60,22 @@ const cvsHeader = [
   'run',
   'total',
 ];
+
+export function csvFileHasHeader(csvFilePath: string): boolean {
+  if (!fs.existsSync(csvFilePath)) return false;
+
+  const stat = fs.statSync(csvFilePath);
+  if (stat.size === 0) return false;
+
+  const fd = fs.openSync(csvFilePath, 'r');
+  const buffer = Buffer.alloc(Math.min(stat.size, 4096));
+  const bytesRead = fs.readSync(fd, buffer, 0, buffer.length, 0);
+  fs.closeSync(fd);
+
+  const firstLine = buffer.toString('utf-8', 0, bytesRead).split('\n')[0];
+  return firstLine.trim() === cvsHeader.join(',');
+}
+
 export function writeLastMeasurementToFile(
   bms: BenchmarkMeasurements,
   addHeader: boolean,
