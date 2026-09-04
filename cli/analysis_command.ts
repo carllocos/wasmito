@@ -69,11 +69,6 @@ export function registerAnalysisCommand(program: Command): void {
     .option(
       '-n,--nr-runs <nr of runs>',
       `The number of runs for the analysis`,
-      '3',
-    )
-    .option(
-      '-w,--warmup-runs <nr of warmup runs>',
-      `The number of warm runs for the analysis`,
       '1',
     )
     .option(
@@ -111,9 +106,6 @@ export function registerAnalysisCommand(program: Command): void {
       const nrOfRuns = Number(options.nrRuns);
       if (isNaN(nrOfRuns) || nrOfRuns < 0)
         program.error('nr of runs is not a valid number');
-      const nrOfWarmups = Number(options.warmupRuns);
-      if (isNaN(nrOfWarmups) || nrOfWarmups >= nrOfRuns)
-        program.error('nr of warmups is not a valid number');
       const timeoutMsRegisterAdvices = Number(options.timeoutRegister) * 1000;
       const timeoutMsDeployAdvices = Number(options.timeoutDeploy) * 1000;
       const timeoutMsAnalysisRun = Number(options.timeoutExecution) * 1000;
@@ -130,7 +122,7 @@ export function registerAnalysisCommand(program: Command): void {
       };
 
       logger.info(
-        `nr of runs ${nrOfRuns}, nr of warmup ${nrOfWarmups}, advice registration timeout ms ${timeouts.timeoutMsRegisterAdvices}, advice deployment timeout ms ${timeouts.timeoutMsDeploy}, analysis execution timeout ms ${timeouts.timeoutMsAnalysisRun}`,
+        `nr of runs ${nrOfRuns}, advice registration timeout ms ${timeouts.timeoutMsRegisterAdvices}, advice deployment timeout ms ${timeouts.timeoutMsDeploy}, analysis execution timeout ms ${timeouts.timeoutMsAnalysisRun}`,
       );
 
       let addHeader = !csvFileHasHeader(csvFilePath);
@@ -145,15 +137,9 @@ export function registerAnalysisCommand(program: Command): void {
           };
           for (let idx = 0; idx < nrOfRuns; idx++) {
             try {
-              if (idx < nrOfWarmups) {
-                logger.info(
-                  `[WARMUP ${idx + 1}/${nrOfWarmups}] Running analysis '${a}' for wasm '${wasmPath}'`,
-                );
-              } else {
-                logger.info(
-                  `[RUN ${idx - nrOfWarmups + 1}/${nrOfRuns - nrOfWarmups}] Running analysis '${a}' for wasm '${wasmPath}'`,
-                );
-              }
+              logger.info(
+                `[RUN ${idx + 1}/${nrOfRuns}] Running analysis '${a}' for wasm '${wasmPath}'`,
+              );
               const startTimeParse = Date.now();
               const run = await analyse(wasmPath, timeouts);
               const totalTime = logMeasurement(
@@ -162,17 +148,15 @@ export function registerAnalysisCommand(program: Command): void {
                 Date.now(),
                 `Analysis ${a} Total Time`,
               );
-              if (idx >= nrOfWarmups) {
-                measurements.measurements.push(run);
-                measurements.totalTimes.push(totalTime);
-                try {
-                  writeLastMeasurementToFile(measurements, addHeader);
-                  addHeader = false;
-                } catch (err) {
-                  logger.error(
-                    `Error writing to file ${measurements.csvFilePath}. ${err}`,
-                  );
-                }
+              measurements.measurements.push(run);
+              measurements.totalTimes.push(totalTime);
+              try {
+                writeLastMeasurementToFile(measurements, addHeader);
+                addHeader = false;
+              } catch (err) {
+                logger.error(
+                  `Error writing to file ${measurements.csvFilePath}. ${err}`,
+                );
               }
             } catch (e) {
               const errMsg = e instanceof Error ? e.message : e;
