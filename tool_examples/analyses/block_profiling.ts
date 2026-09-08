@@ -31,7 +31,9 @@ function addBlockEnter(
   const count = funCounts.get(idx) ?? 0;
   funCounts.set(idx, count + 1);
   blockCount.set(func.id, funCounts);
-  console.log(`Function ${func.id} Instruction ${idx}`);
+  console.log(
+    `In function ${func.id} instr ${instr.startAddress} NAME=${instr.name}`,
+  );
   return;
 }
 
