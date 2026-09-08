@@ -18,6 +18,7 @@ export function registerWasmModuleCommand(program: Command): void {
       '--strip-custom <path-to-stripped.wasm>',
       `remove the custom section and store to given path`,
     )
+    .option('-p,--print-instr <address>')
     .action(async (wasmPath, options) => {
       const logger = getGlobalLogger();
       if (!isFilePath(wasmPath)) {
@@ -41,6 +42,21 @@ export function registerWasmModuleCommand(program: Command): void {
           const stripped = stripConfig.strip(buffer);
           logger.info(`storing stripped Wasm to '${stripPath}'`);
           writeFileSync(stripPath, stripped);
+        }
+        const printInstr = options.printInstr;
+        if (printInstr !== undefined) {
+          const addr = Number(printInstr);
+          if (isNaN(addr)) {
+            program.error(`provided instr addr is not a number ${printInstr}`);
+          }
+          const i = m.getInstruction(addr);
+          if (i === undefined) {
+            console.log(`no instruction found at address ${addr}`);
+          } else {
+            console.log(
+              `0x${i.startAddress.toString(16)} (${i?.startAddress}) ${i.name}`,
+            );
+          }
         }
       } catch (e) {
         let errMsg = '';
