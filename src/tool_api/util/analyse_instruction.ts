@@ -1,6 +1,7 @@
 import assert from 'assert';
 import { WasmitoBackendVM } from '../../runtimes/wasmito_vm/wasmito_vm';
 import {
+  isLoopInstruction,
   WasmAddress,
   WasmInstruction,
 } from '../../webassembly/wasm/wasm_instruction';
@@ -19,6 +20,7 @@ import {
 } from '../../runtimes/wasmito_vm/requests/hook_on_wasm_addr_request';
 import {
   AdvicesRegistery,
+  InstructionHookTarget,
   isNoArgAdvice,
   isVMArgAdvice,
 } from './advices_registery';
@@ -28,7 +30,7 @@ export function getInstructions<I extends WasmInstruction>(
   wasm: WasmModule,
   instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode | WASMFunction,
   moment: InstrMoment,
-): WasmInstruction[] {
+): InstructionHookTarget[] {
   let instrs: WasmInstruction[] = [];
   let i: WasmInstruction | undefined;
   if (typeof instr === 'number') {
@@ -54,7 +56,20 @@ export function getInstructions<I extends WasmInstruction>(
   if (i !== undefined) {
     instrs.push(i);
   }
-  return instrs;
+  return instrs.map((r) => toInstructionHookTarget(r, moment));
+}
+
+function toInstructionHookTarget(
+  i: WasmInstruction,
+  moment: InstrMoment,
+): InstructionHookTarget {
+  if (moment === 'before' && isLoopInstruction(i)) {
+    return {
+      hookAddr: i.subInstructions[0].startAddress,
+      reportAddr: i.startAddress,
+    };
+  }
+  return { hookAddr: i.startAddress, reportAddr: i.startAddress };
 }
 
 export function instruction<I extends WasmInstruction>(
@@ -216,7 +231,7 @@ export function instruction<I extends WasmInstruction>(
 ): number {
   const instrs = getInstructions(wasm, instr, moment);
   const hm = instrMomentToHookMoment(moment);
-  return advices.addInstructionsAdvice(hm, instrs, mutate, cb);
+  return advices.addInstructionsAdvice(hm, instrs, mutate, cb, wasm);
 }
 
 function instrMomentToHookMoment(m: InstrMoment): HookOnWasmAddrMoment {
@@ -295,13 +310,22 @@ export function runAdvicesInstruction(
       const moment = metadata.moment;
       const advices = advicesContainer.getAdvices(moment, metadata.addr);
       const wasmState = sub.sub;
-      const stackArgs = copyArgsFromStack(i, wasmState.stack ?? [], moment);
+      const firstReportInstr = mod.getInstruction(advices[0][2]);
+      assertFatalHookError(
+        firstReportInstr !== undefined,
+        `No instruction found for address ${advices[0][2]}`,
+      );
+      const stackArgs = copyArgsFromStack(
+        firstReportInstr,
+        wasmState.stack ?? [],
+        moment,
+      );
       let mutated = false;
       let argsCB: AdviceArgsCB;
       for (let adviceIdx = 0; adviceIdx < advices.length; adviceIdx++) {
         if (vm.isClosed()) break;
 
-        const [advice, mutate] = advices[adviceIdx];
+        const [advice, mutate, reportAddr] = advices[adviceIdx];
         mutated = mutate || mutated;
         argsCB = prepareArgsCB(stackArgs, argsCB, mutate);
         let newArgs;
@@ -311,7 +335,12 @@ export function runAdvicesInstruction(
           } else if (isVMArgAdvice(advice)) {
             await advice(vm);
           } else {
-            newArgs = await advice(i, argsCB as any, vm);
+            const reportInstr = mod.getInstruction(reportAddr);
+            assertFatalHookError(
+              reportInstr !== undefined,
+              `No instruction found for address ${reportAddr}`,
+            );
+            newArgs = await advice(reportInstr, argsCB as any, vm);
           }
         } catch (e) {
           onAdviceFailure(e);

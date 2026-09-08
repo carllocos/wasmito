@@ -15,6 +15,7 @@ import {
 import { assertFatalHookError, SubscriptionContent } from '../../hooks/hook';
 import { WASM, WasmState } from '../../webassembly/wasm';
 import { WasmInstruction } from '../../webassembly/wasm/wasm_instruction';
+import { WasmModule } from '../../webassembly/wasm/wasm_module';
 import { InspectableState } from '../../runtimes/wasmito_vm/requests/inspect_request';
 import { WasmitoBackendVM } from '../../runtimes/wasmito_vm/wasmito_vm';
 import {
@@ -101,8 +102,13 @@ export function isVMArgAdvice<I extends WasmInstruction>(
   return advice.length === 1;
 }
 
-type AdviceArray = Array<[Advice<WasmInstruction>, boolean]>;
+type AdviceArray = Array<[Advice<WasmInstruction>, boolean, number]>;
 type AdviceMap = Map<number, AdviceArray>;
+
+export interface InstructionHookTarget {
+  hookAddr: number;
+  reportAddr: number;
+}
 
 export type AdviceOnNewInterrupt =
   | ((ev: ReadOnlyInterrupt, vm: WasmitoBackendVM) => void)
@@ -333,26 +339,32 @@ export class AdvicesRegistery {
 
   addInstructionsAdvice(
     hm: HookOnWasmAddrMoment,
-    instrs: WasmInstruction[],
+    instrs: InstructionHookTarget[],
     mutate: boolean,
     cb: (...args: any[]) => any,
+    wasm: WasmModule,
   ) {
     if (instrs.length === 0) return 0;
 
     const sm = this.getInstrStateMap(hm);
     let advicesRegistered = 0;
-    for (const i of instrs) {
-      let stateIdx = sm.get(i.startAddress);
+    for (const { hookAddr, reportAddr } of instrs) {
+      let stateIdx = sm.get(hookAddr);
       let req: HookOnWasmAddrRequest | undefined;
       if (stateIdx !== undefined) {
         req = this._reqs[stateIdx];
       } else {
-        req = new HookOnWasmAddrRequest(i.startAddress, hm);
+        req = new HookOnWasmAddrRequest(hookAddr, hm);
         stateIdx = this._reqs.push(req) - 1;
-        sm.set(i.startAddress, stateIdx);
+        sm.set(hookAddr, stateIdx);
       }
 
-      const state = this.getInspectState(hm, cb.length, i);
+      const reportInstr = wasm.getInstruction(reportAddr);
+      assert(
+        reportInstr !== undefined,
+        `no instruction found for report address ${reportAddr}`,
+      );
+      const state = this.getInspectState(hm, cb.length, reportInstr);
       if (
         req.hook === undefined ||
         state.doesInclude(InspectableState.stackState)
@@ -362,20 +374,20 @@ export class AdvicesRegistery {
 
       if (mutate) {
         const pausedAddresses = this.getPausedAddresses(hm);
-        if (!pausedAddresses.has(i.startAddress)) {
-          const pauseReq = new HookOnWasmAddrRequest(
-            i.startAddress,
-            hm,
-          ).addHook(this.pauseHook);
+        if (!pausedAddresses.has(hookAddr)) {
+          const pauseReq = new HookOnWasmAddrRequest(hookAddr, hm).addHook(
+            this.pauseHook,
+          );
           this._reqs.push(pauseReq);
-          pausedAddresses.add(i.startAddress);
+          pausedAddresses.add(hookAddr);
         }
       }
       advicesRegistered += this.storeInstructionAdvice(
         hm,
-        i.startAddress,
+        hookAddr,
         cb,
         mutate,
+        reportAddr,
       );
     }
     return advicesRegistered;
@@ -386,6 +398,7 @@ export class AdvicesRegistery {
     addr: number,
     cb: Advice<WasmInstruction>,
     mutable: boolean,
+    reportAddr: number,
   ): number {
     let advices: AdviceMap | undefined;
     switch (moment) {
@@ -403,7 +416,20 @@ export class AdvicesRegistery {
 
     const ads = advices.get(addr) ?? [];
     const sizeBefore = ads.length;
-    ads.push([cb, mutable]);
+    const entry: [Advice<WasmInstruction>, boolean, number] = [
+      cb,
+      mutable,
+      reportAddr,
+    ];
+    if (reportAddr !== addr) {
+      let insertIdx = 0;
+      while (insertIdx < ads.length && ads[insertIdx][2] !== addr) {
+        insertIdx++;
+      }
+      ads.splice(insertIdx, 0, entry);
+    } else {
+      ads.push(entry);
+    }
     advices.set(addr, ads);
     return ads.length - sizeBefore;
   }
