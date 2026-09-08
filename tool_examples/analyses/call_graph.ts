@@ -20,13 +20,6 @@ import {
 } from '../../src/util/benchmark_util';
 const logger = createLogger('CallGraphAnalysis');
 
-function getFunctionName(wasm: WasmModule, fid: number): string {
-  const f = wasm.getFunctionOrError(fid);
-  if (f.exportName !== '') return f.exportName;
-  if (f.name === '') return f.name;
-  return `${fid}`;
-}
-
 export async function analyse(
   wasmPath: string,
   timeouts: TimeoutConfig,
