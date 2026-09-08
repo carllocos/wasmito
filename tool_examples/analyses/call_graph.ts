@@ -51,10 +51,10 @@ export async function analyse(
   analysis.before(
     WasmCode.Call,
     (call: CallInstruction, _args: ReadOnlyWasmValue[]): void => {
-      const caller = getFunctionName(wasm, wasm.getEnclosingFunction(call).id);
-      const callee = getFunctionName(wasm, call.calledFunc);
+      const caller = wasm.getEnclosingFunction(call).id;
+      const callee = call.calledFunc;
       const edge = `${caller} -> ${callee}`;
-      console.log(`Call: ${edge} `);
+      console.log(edge);
       callgraph.add(edge);
     },
   );
