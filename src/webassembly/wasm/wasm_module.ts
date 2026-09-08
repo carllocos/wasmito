@@ -3,12 +3,13 @@ import { WasmType } from './opcode_type';
 import { WASM } from '../wasm';
 import { WASMFunction, type WasmLocal } from './wasm_function';
 import {
-  type ModuleElement,
-  type ModuleTableImport,
+  type ElementSource,
+  type FuncExportSource,
   type ParsedModule,
   parseWasmModule,
   type Section,
-  type TableExport,
+  type TableExportSource,
+  type TableImportSource,
 } from '../parsers/wasm_module_parser';
 import {
   CallInstruction,
@@ -42,9 +43,9 @@ export class WasmModule {
   private readonly _instructions: WasmInstruction[];
   private readonly _globalInstructions: WasmInstruction[];
   private readonly _sections: Section[];
-  public readonly tableImports: ModuleTableImport[];
-  public readonly tableExports: TableExport[];
-  public readonly elements: ModuleElement[];
+  public readonly tableImports: TableImportSource[];
+  public readonly tableExports: TableExportSource[];
+  public readonly elements: ElementSource[];
 
   constructor(wasmPath: string) {
     const [mod, errors] = parseWasmModule(wasmPath);
@@ -56,10 +57,10 @@ export class WasmModule {
     }
     this.wasmPath = wasmPath;
     this._sections = createSections(mod);
-    this._functions = createWasmFunctions(wasmPath, mod);
+    this._functions = createWasmFunctions(mod);
     this.importFuncs = createImportedFunctions(mod);
     this.globals = createWasmGlobals(mod);
-    this.types = createWasmTypes(mod);
+    this.types = mod.types;
     this.wasmBuffer = mod.wasmBuffer;
     this._globalInstructions = retrieveGlobalInstructions(mod);
     this._instructions = retrieveAllInstructions(mod, this.functions);
@@ -287,7 +288,7 @@ export class WasmModule {
     return calls.filter((c) => c.funIdx === funID);
   }
   public getStartFunction(): WASMFunction | undefined {
-    const funcs = this.getFunctions(['_start']);
+    const funcs = this.getMainFunctions();
     if (funcs.length === 0) return undefined;
     assert(
       funcs.length === 1,
@@ -429,17 +430,14 @@ export class WasmModule {
   }
 }
 
-function createWasmTypes(mod: ParsedModule): WasmType[] {
-  return mod.types;
+function createSections(mod: ParsedModule): Section[] {
+  return mod.sections.sort((a, b) => {
+    return a.startAddress - b.startAddress;
+  });
 }
 
 function createWasmGlobals(mod: ParsedModule): WasmGlobal[] {
   return mod.globals.map((g, globalID) => {
-    const t = WASM.typing.get(g.globalType.valtype);
-    if (t === undefined) {
-      throw new Error(`Could not convert ${g.globalType.valtype} to WASM type`);
-    }
-
     let initValue = 0;
     let found = false;
     for (const i of g.init) {
@@ -456,119 +454,49 @@ function createWasmGlobals(mod: ParsedModule): WasmGlobal[] {
     return {
       index: globalID,
       name: g.name ?? `global${globalID}`,
-      type: t,
-      mutable: g.globalType.mutability !== 'const',
+      type: g.type,
+      mutable: g.mutable,
       value: initValue,
-      startAddress: g.loc.start.column,
-      endAddress: g.loc.end.column,
+      startAddress: g.startAddress,
+      endAddress: g.endAddress,
       initInstrs: g.init,
     };
   });
 }
 
-function createSections(mod: ParsedModule): Section[] {
-  return mod.sections.sort((a, b) => {
-    return a.startAddress - b.startAddress;
-  });
-}
-
-function createWasmFunctions(
-  wasmPath: string,
-  mod: ParsedModule,
-): WASMFunction[] {
-  const allLocalTypes = getLocalsTypes(wasmPath);
-  const funcs: WASMFunction[] = [];
-  for (let i = 0; i < mod.funcs.length; i++) {
-    const fun = mod.funcs[i];
-
-    // funcName might not be available
-    const funcName = mod.funcNames.find((fn) => {
-      return fn.value === fun.name.value;
+function createWasmFunctions(mod: ParsedModule): WASMFunction[] {
+  return mod.funcs.map((f) => {
+    const funExported: FuncExportSource | undefined = mod.exportedFuncs.find(
+      (ef) => ef.funcIndex === f.id,
+    );
+    const locals: WasmLocal[] = f.locals.map((l) => {
+      return {
+        index: l.index,
+        name: l.name,
+        type: l.type,
+        mutable: true,
+        value: 0,
+      };
     });
-
-    const funExported = mod.exportedFuncs.find((ef) => {
-      return (
-        ef.name === fun.name.value ||
-        (fun.id !== undefined && ef.id === fun.id) ||
-        (ef.innerName !== undefined && ef.innerName === fun.name.value)
-      );
-    });
-
-    // The following tries to derive the funID
-    // from different sources from the parsed module
-    let funID = -1;
-    if (fun.id !== undefined) {
-      funID = fun.id;
-    } else if (funcName !== undefined) {
-      funID = funcName.index;
-    } else {
-      // try to derive from fun name
-      if (funExported?.id === undefined) {
-        throw new Error(
-          `Could not derive identifier for Fun with name ${fun.name.value}`,
-        );
-      }
-      funID = funExported.id;
-    }
-
-    const localTypes = allLocalTypes.get(funID);
-    const locals: WasmLocal[] = mod.localsNames
-      .filter((l) => {
-        return l.functionIndex === funID;
-      })
-      .map((l) => {
-        const local = localTypes?.find((lt) => lt.index === l.localIndex);
-        let t: undefined | WASM.Type;
-        if (local !== undefined) {
-          const newType = WASM.typing.get(local.type);
-          if (newType === undefined) {
-            throw new Error(`Could not convert ${local.type} to WASM type`);
-          }
-          t = newType;
-        }
-        // else {
-        //   logger.warn(
-        //     `Failed to find type of local index ${l.localIndex} named '${l.value}' of function id ${funID}`,
-        //   );
-        // }
-        return {
-          index: l.localIndex,
-          name: l.value,
-          type: t,
-          mutable: true,
-          value: 0,
-        };
-      });
-
-    let exportName = '';
-    if (funExported?.innerName !== undefined) {
-      exportName = funExported.name;
-    } else if (funExported?.name !== undefined) {
-      exportName = funExported.name;
-    }
-    const f = new WASMFunction(
-      fun.name.value,
-      funID,
-      fun.body,
-      fun.signature,
+    return new WASMFunction(
+      f.name,
+      f.id,
+      f.body,
+      f.type,
       locals,
       funExported !== undefined,
-      exportName,
+      funExported?.name ?? '',
     );
-    funcs.push(f);
-  }
-  return funcs;
+  });
 }
 
 function createImportedFunctions(mod: ParsedModule): WASMFunction[] {
   const imports: WASMFunction[] = mod.funcImports.map((i, importID) => {
-    const sign = i.descr.signature;
-    const t = new WasmType(sign.params.length, sign.results.length);
     const exported = false;
-    const f = new WASMFunction(i.name, importID, [], t, [], exported);
-    f.startAddress = i.loc.start.column;
-    f.endAddress = i.loc.end.column;
-    f.fullName = i.descr.id;
+    const f = new WASMFunction(i.name, importID, [], i.type, [], exported);
+    f.startAddress = i.startAddress;
+    f.endAddress = i.endAddress;
+    f.fullName = i.name;
     return f;
   });
   return imports;
@@ -592,19 +520,4 @@ function retrieveGlobalInstructions(mod: ParsedModule): WasmInstruction[] {
   return mod.globals.flatMap((g) => {
     return g.init.flatMap((i) => [i].concat(i.allSubInstructions));
   });
-}
-
-export interface VariableInfo {
-  index: number;
-  name: string;
-  type: string; // todo use real type
-  mutable: boolean;
-  value: string; // todo use real value
-}
-
-/*
- * The Wasm module parser library does not retrieve the types of the locals so we need to retrieve that
- */
-function getLocalsTypes(_wasmFilePath: string): Map<number, VariableInfo[]> {
-  return new Map();
 }
