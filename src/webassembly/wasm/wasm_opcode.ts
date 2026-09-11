@@ -146,7 +146,6 @@ function multipleWasmOpcodeToSingleOpcodes(
       ];
     case WasmCode.MultipleOpcode.Unary:
       return [
-        WasmCode.Drop,
         WasmCode.I32Eqz,
         WasmCode.I64Eqz,
 
