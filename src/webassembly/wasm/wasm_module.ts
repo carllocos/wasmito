@@ -46,6 +46,7 @@ export class WasmModule {
   public readonly tableImports: TableImportSource[];
   public readonly tableExports: TableExportSource[];
   public readonly elements: ElementSource[];
+  public readonly initialMemoryPages: number;
 
   constructor(wasmPath: string) {
     const [mod, errors] = parseWasmModule(wasmPath);
@@ -68,6 +69,7 @@ export class WasmModule {
     this.tableImports = mod.tableImports;
     this.tableExports = mod.tableExports;
     this.elements = mod.elements;
+    this.initialMemoryPages = mod.initialMemoryPages;
   }
 
   getMainFunction(): WASMFunction {

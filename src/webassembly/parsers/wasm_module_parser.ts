@@ -134,6 +134,7 @@ interface RustModuleJson {
   tableExports: RustTableExportJson[];
   elements: RustElementJson[];
   localNames: RustLocalNameEntryJson[];
+  initialMemoryPages: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -228,6 +229,7 @@ export interface ParsedModule {
   tableExports: TableExportSource[];
   elements: ElementSource[];
   wasmBuffer: Buffer;
+  initialMemoryPages: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -515,6 +517,7 @@ export function parseWasmModule(wasmPath: string): [ParsedModule, string[]] {
     tableExports,
     elements,
     wasmBuffer,
+    initialMemoryPages: raw.initialMemoryPages,
   };
   return [mod, errors];
 }
