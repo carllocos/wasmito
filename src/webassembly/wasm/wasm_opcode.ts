@@ -250,7 +250,7 @@ function multipleWasmOpcodeToSingleOpcodes(
     case WasmCode.MultipleOpcode.Global:
       return [WasmCode.GlobalGet, WasmCode.GlobalSet];
     case WasmCode.MultipleOpcode.Local:
-      return [WasmCode.LocalGet, WasmCode.LocalSet];
+      return [WasmCode.LocalGet, WasmCode.LocalSet, WasmCode.LocalTee];
   }
 }
 
