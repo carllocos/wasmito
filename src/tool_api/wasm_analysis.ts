@@ -50,6 +50,7 @@ export class WasmAnalysis {
   private envFuncForPinInterrupt: number;
   private analysisResolved: boolean;
   private analysisResolve: any;
+  private timeoutRun: NodeJS.Timeout | undefined;
   private analysisReject: ((reason?: any) => void) | undefined;
   private userOnFinishCB: any;
   private _advices: AdvicesRegistery;
@@ -536,6 +537,9 @@ export class WasmAnalysis {
       this.analysisReject(exception);
       this.analysisResolved = true;
     }
+    if (this.timeoutRun !== undefined) {
+      this.timeoutRun.close();
+    }
     this.vm.close();
   }
 
@@ -596,7 +600,7 @@ export class WasmAnalysis {
       this.analysisResolve = resolve;
       this.analysisReject = reject;
       if (timeoutMs !== undefined) {
-        setTimeout(() => {
+        this.timeoutRun = setTimeout(() => {
           if (!this.analysisResolved) {
             this.analysisReject!(`timeout after ${timeoutMs} ms`);
             this.vm.close();
@@ -616,6 +620,9 @@ export class WasmAnalysis {
       await vm.close();
       this.analysisResolve(v);
       this.analysisResolved = true;
+      if (this.timeoutRun !== undefined) {
+        this.timeoutRun.close();
+      }
     });
   }
 }
