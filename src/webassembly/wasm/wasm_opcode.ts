@@ -271,6 +271,13 @@ export namespace WasmCode {
     return multipleWasmOpcodeToSingleOpcodes(m);
   }
 
+  export enum Struct {
+    Func = -100,
+  }
+  export function isStructOpcode(v: any): v is WasmCode.Struct {
+    return Object.values(WasmCode.Struct).includes(v);
+  }
+
   export const Unreachable: WasmOpcode = [
     'unreachable',
     WasmOpcodeUnreachable,
