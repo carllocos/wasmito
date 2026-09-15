@@ -371,6 +371,12 @@ export class BlockInstruction extends WasmInstruction {
   }
 }
 
+export function isBlockInstruction(i: WasmInstruction): i is BlockInstruction {
+  return (
+    equalOpcodes(i.opcode, WasmCode.Block) && i instanceof BlockInstruction
+  );
+}
+
 export class CallInstruction extends WasmInstruction {
   public readonly funIdx: number;
   public readonly funcName: string;
