@@ -315,6 +315,13 @@ export class IfInstruction extends WasmInstruction {
     return this.alternative.length > 0;
   }
 
+  getEndInstruction(): WasmInstruction {
+    const lastBranch = this.hasAlternativeBlock()
+      ? this.alternative
+      : this.consequence;
+    return lastBranch[lastBranch.length - 1];
+  }
+
   public override toJSONObj(): object {
     const obj: any = super.toJSONObj();
     obj.label = this.label;
@@ -350,6 +357,10 @@ export class BlockInstruction extends WasmInstruction {
         `Last instruction of block instruction is expected to be an 'end' isntruction got ${lastInstr.name}'`,
       );
     }
+  }
+
+  getEndInstruction(): WasmInstruction {
+    return this.subInstructions[this.subInstructions.length - 1];
   }
 
   public override toJSONObj(): object {
@@ -460,6 +471,10 @@ export class LoopInstruction extends WasmInstruction {
         `Last instruction of Loop subInstructions is expected to be an 'end' instruction got ${lastInstr.name}'`,
       );
     }
+  }
+
+  getEndInstruction(): WasmInstruction {
+    return this.subInstructions[this.subInstructions.length - 1];
   }
 
   public override toJSONObj(): object {
