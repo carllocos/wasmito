@@ -34,9 +34,13 @@ function denan(v: WritableWasmValue): WritableWasmValue {
 }
 
 function denanResult(
-  _instr: WasmInstruction,
+  instr: WasmInstruction,
   result: WritableWasmValue | undefined,
 ): WritableWasmValue | undefined {
+  const f = instr.getEnclosingFunction();
+  console.log(
+    `After In function ${f.id} instr ${instr.startAddress} NAME=${instr.name}`,
+  );
   if (result === undefined) return undefined;
   return denan(result);
 }
