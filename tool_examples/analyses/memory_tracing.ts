@@ -38,7 +38,7 @@ function access(
   );
   const a: Access = [fid, instr, addr, isStoreInstruction(instr)];
   accesses.push(a);
-  console.log(`Function ${fid} instruction ${instr.getIndexInFunction()}`);
+  console.log(`In function ${fid} instr ${instr.startAddress}`);
 }
 
 export async function analyse(

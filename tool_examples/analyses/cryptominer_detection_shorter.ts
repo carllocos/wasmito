@@ -51,7 +51,7 @@ export async function analyse(
     WasmCode.MultipleOpcode.Binary,
     (instr: WasmInstruction, _args: ReadOnlyWasmValue[]): void => {
       console.log(
-        `In function ${instr.getEnclosingFunction().id} instr ${instr.getIndexInFunction()}`,
+        `In function ${instr.getEnclosingFunction().id} instr ${instr.startAddress}`,
       );
       switch (getWasmOpcodeNr(instr.opcode)) {
         case getWasmOpcodeNr(WasmCode.I32Add):
