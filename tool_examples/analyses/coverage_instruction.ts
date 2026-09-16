@@ -15,6 +15,7 @@ import {
   logMeasurement,
   FailedMeasurement,
 } from '../../src/util/benchmark_util';
+import { WasmCode } from '../../src/webassembly/wasm/wasm_opcode';
 
 const logger = createLogger('CoverageInstrAnalysis');
 export async function analyse(
@@ -43,16 +44,61 @@ export async function analyse(
     console.log(
       `In function ${f.id} instr ${instr.startAddress} NAME=${instr.name}`,
     );
+  };
+
+  const cbAfter = (
+    instr: WasmInstruction,
+    _result: ReadOnlyWasmValue | undefined,
+  ): void => {
+    const f = instr.getEnclosingFunction();
+    const s = coverage.get(f.id) ?? new Set<number>();
+    const newS = s.add(instr.startAddress);
+    coverage.set(f.id, newS);
+    console.log(
+      `In function ${f.id} instr ${instr.startAddress} NAME=${instr.name}`,
     );
   };
 
   logger.info(`Registering Advices...`);
   const startTimeRegister = Date.now();
-  for (const f of wasm.functions) {
-    for (const i of f.allInstructions) {
-      analysis.before(i, cb);
-    }
-  }
+
+  analysis.before(WasmCode.If, cb);
+  analysis.after(WasmCode.If, cbAfter);
+
+  analysis.before(WasmCode.Br, cb);
+  analysis.before(WasmCode.BrIf, cb);
+  analysis.before(WasmCode.BrTable, cb);
+
+  analysis.before(WasmCode.Select, cb);
+
+  analysis.before(WasmCode.Call, cb);
+  analysis.after(WasmCode.Call, cbAfter);
+  analysis.before(WasmCode.CallIndirect, cb);
+  analysis.after(WasmCode.CallIndirect, cbAfter);
+
+  analysis.before(WasmCode.MultipleOpcode.Unary, cb);
+  analysis.before(WasmCode.MultipleOpcode.Binary, cb);
+
+  analysis.before(WasmCode.Drop, cb);
+
+  analysis.before(WasmCode.Return, cb);
+
+  analysis.before(WasmCode.MultipleOpcode.Const, cb);
+
+  analysis.before(WasmCode.MultipleOpcode.Local, cb);
+  analysis.before(WasmCode.MultipleOpcode.Global, cb);
+
+  analysis.before(WasmCode.MultipleOpcode.Load, cb);
+  analysis.before(WasmCode.MultipleOpcode.Store, cb);
+
+  analysis.before(WasmCode.MemorySize, cb);
+  analysis.before(WasmCode.MemoryGrow, cb);
+
+  analysis.before(WasmCode.Block, cb);
+  analysis.after(WasmCode.Block, cbAfter);
+  analysis.before(WasmCode.Loop, cb);
+  analysis.after(WasmCode.Loop, cbAfter);
+
   const registerTime = logMeasurement(
     logger,
     startTimeRegister,
