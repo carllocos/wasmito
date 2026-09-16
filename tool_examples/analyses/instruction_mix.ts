@@ -25,7 +25,21 @@ function increaseCount(
   _args: ReadOnlyWasmValue[],
 ): void {
   counts.set(instr.name, (counts.get(instr.name) ?? 0) + 1);
-  console.log(`${instr.name} (#${counts.get(instr.name)})`);
+  const fid = instr.getEnclosingFunction().id;
+  console.log(
+    `In function ${fid} instr ${instr.startAddress} NAME=${instr.name}`,
+  );
+}
+
+function increaseCountAfter(
+  instr: WasmInstruction,
+  _args: ReadOnlyWasmValue | undefined,
+): void {
+  counts.set(instr.name, (counts.get(instr.name) ?? 0) + 1);
+  const fid = instr.getEnclosingFunction().id;
+  console.log(
+    `In function ${fid} instr ${instr.startAddress} NAME=${instr.name}`,
+  );
 }
 
 const logger = createLogger('InstructionMixAnalysis');
@@ -52,30 +66,45 @@ export async function analyse(
   logger.info(`Registering Advices...`);
   // hooks that correspond direclty to one instruction
   const startTimeRegister = Date.now();
-  analysis.before(WasmCode.NOP, increaseCount);
-  analysis.before(WasmCode.Unreachable, increaseCount);
   analysis.before(WasmCode.If, increaseCount);
+  analysis.after(WasmCode.If, increaseCountAfter);
+
   analysis.before(WasmCode.Br, increaseCount);
   analysis.before(WasmCode.BrIf, increaseCount);
   analysis.before(WasmCode.BrTable, increaseCount);
-  analysis.before(WasmCode.Drop, increaseCount);
+
   analysis.before(WasmCode.Select, increaseCount);
-  analysis.before(WasmCode.MemorySize, increaseCount);
-  analysis.before(WasmCode.MemoryGrow, increaseCount);
+
+  analysis.before(WasmCode.Call, increaseCount);
+  analysis.after(WasmCode.Call, increaseCountAfter);
+  analysis.before(WasmCode.CallIndirect, increaseCount);
+  analysis.after(WasmCode.CallIndirect, increaseCountAfter);
 
   // Hooks that correspond to multiple instructions
   analysis.before(WasmCode.MultipleOpcode.Unary, increaseCount);
   analysis.before(WasmCode.MultipleOpcode.Binary, increaseCount);
-  analysis.before(WasmCode.MultipleOpcode.Load, increaseCount);
-  analysis.before(WasmCode.MultipleOpcode.Store, increaseCount);
+
+  analysis.before(WasmCode.Drop, increaseCount);
+
+  analysis.before(WasmCode.Return, increaseCount);
+
+  analysis.before(WasmCode.MultipleOpcode.Const, increaseCount);
+
   analysis.before(WasmCode.MultipleOpcode.Local, increaseCount);
   analysis.before(WasmCode.MultipleOpcode.Global, increaseCount);
 
+  analysis.before(WasmCode.MultipleOpcode.Load, increaseCount);
+  analysis.before(WasmCode.MultipleOpcode.Store, increaseCount);
+
+  analysis.before(WasmCode.MemorySize, increaseCount);
+  analysis.before(WasmCode.MemoryGrow, increaseCount);
+
+  analysis.before(WasmCode.Block, increaseCount);
+  analysis.after(WasmCode.Block, increaseCountAfter);
+  analysis.before(WasmCode.Loop, increaseCount);
+  analysis.after(WasmCode.Loop, increaseCountAfter);
+
   // Special cases
-  analysis.before(WasmCode.Call, increaseCount);
-  analysis.before(WasmCode.CallIndirect, increaseCount);
-  analysis.before(WasmCode.MultipleOpcode.Const, increaseCount);
-  analysis.before(WasmCode.Return, increaseCount);
   // analysis.begin(...) // TODO begin
   const registerTime = logMeasurement(
     logger,
