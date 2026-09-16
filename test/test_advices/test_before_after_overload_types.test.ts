@@ -37,9 +37,12 @@ function typeChecksOnly(
       f.id;
     },
   );
-  analysis.after(fn, (f: WASMFunction, _result: ReadOnlyWasmValue | undefined) => {
-    f.id;
-  });
+  analysis.after(
+    fn,
+    (f: WASMFunction, _result: ReadOnlyWasmValue | undefined) => {
+      f.id;
+    },
+  );
   analysis.beforeMut(fn, (f: WASMFunction, args: WritableWasmValue[]) => {
     f.id;
     return args;

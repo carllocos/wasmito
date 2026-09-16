@@ -28,14 +28,11 @@ describe('Hooking directly on a WASMFunction and on WasmCode.Struct.Func', funct
     const factorial = wasm.getFunction(0)!;
     const seenArgs: number[] = [];
     let seenFunc: WASMFunction | undefined;
-    analysis.before(
-      factorial,
-      (f: any, args: ReadOnlyWasmValue[]) => {
-        seenFunc = f;
-        expect(args.length).to.equal(1);
-        seenArgs.push(Number(args[0].value));
-      },
-    );
+    analysis.before(factorial, (f: any, args: ReadOnlyWasmValue[]) => {
+      seenFunc = f;
+      expect(args.length).to.equal(1);
+      seenArgs.push(Number(args[0].value));
+    });
     await analysis.deploy();
     await analysis.run();
 
@@ -178,9 +175,7 @@ describe('`after` a WASMFunction that exits through an early `return`', function
   });
 
   it('the VM still executes the function`s own closing `end`, so `after` still fires exactly once per call, with the right result, whether the call took the early-`return` path or the natural fall-through path', async () => {
-    const absFunc = wasm.functions.find(
-      (f) => f.name === 'abs_early_return',
-    )!;
+    const absFunc = wasm.functions.find((f) => f.name === 'abs_early_return')!;
     // `abs_early_return`'s body ends with a plain `end` instruction, not
     // the `return` inside its `if`: `after` this WASMFunction hooks that
     // trailing `end`, exactly like it would for any other function.
