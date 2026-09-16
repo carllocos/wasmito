@@ -21,18 +21,17 @@ import { InspectStateHook } from '../../src/hooks/hook_inspect_state';
  * tests confirm that hypothesis directly against `AdvicesRegistery`,
  * independently of any real VM.
  */
-function includesStack(
-  registery: AdvicesRegistery,
-  hookAddr: number,
-): boolean {
+function includesStack(registery: AdvicesRegistery, hookAddr: number): boolean {
   const req = registery.instructionsRequest.find(
     (r) => r.wasmAddr === hookAddr,
   );
   expect(req, `no request registered for hookAddr ${hookAddr}`).to.not.equal(
     undefined,
   );
-  expect(req!.hook, `request for hookAddr ${hookAddr} has no hook`).to.not
-    .equal(undefined);
+  expect(
+    req!.hook,
+    `request for hookAddr ${hookAddr} has no hook`,
+  ).to.not.equal(undefined);
   const hook = req!.hook as InspectStateHook<unknown>;
   return hook.doesInclude(InspectableState.stackState);
 }
