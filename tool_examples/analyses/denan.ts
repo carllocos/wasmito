@@ -74,8 +74,8 @@ export async function analyse(
   logger.info(`Registering Advices...`);
   const startTimeRegister = Date.now();
   analysis.afterMut(WasmCode.MultipleOpcode.Const, denanResult);
-  analysis.afterMut(WasmCode.LocalGet, denanResult);
-  analysis.afterMut(WasmCode.GlobalGet, denanResult);
+  analysis.afterMut(WasmCode.MultipleOpcode.Local, denanResult);
+  analysis.afterMut(WasmCode.MultipleOpcode.Global, denanResult);
   analysis.afterMut(WasmCode.MultipleOpcode.Load, denanResult);
   analysis.afterMut(WasmCode.MultipleOpcode.Store, denanResult);
   analysis.afterMut(WasmCode.MultipleOpcode.Unary, denanResult);
