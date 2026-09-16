@@ -54,11 +54,11 @@ export function logMeasurement(
 const cvsHeader = [
   'analysis',
   'wasm',
-  'parsing',
-  'register',
-  'deploy',
-  'run',
-  'total',
+  'parsing_ms',
+  'register_ms',
+  'deploy_ms',
+  'run_ms',
+  'total_ms',
 ];
 
 export function csvFileHasHeader(csvFilePath: string): boolean {
