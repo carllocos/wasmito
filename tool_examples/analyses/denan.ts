@@ -17,6 +17,7 @@ import {
   logMeasurement,
   TimeoutConfig,
 } from '../../src/util/benchmark_util';
+import { WASMFunction } from '../../src/webassembly/wasm/wasm_function';
 
 const logger = createLogger('DenanAnalysis');
 
@@ -45,11 +46,13 @@ function denanResult(
   return denan(result);
 }
 
-function denanArgs(
-  _instr: WasmInstruction,
-  args: WritableWasmValue[],
-): WritableWasmValue[] {
-  return args.map(denan);
+function denanResultCall(
+  func: WASMFunction,
+  result: WritableWasmValue | undefined,
+): WritableWasmValue | undefined {
+  console.log(`After call func ${func.id}`);
+  if (result === undefined) return undefined;
+  return denan(result);
 }
 
 export async function analyse(
@@ -80,8 +83,7 @@ export async function analyse(
   analysis.afterMut(WasmCode.MultipleOpcode.Store, denanResult);
   analysis.afterMut(WasmCode.MultipleOpcode.Unary, denanResult);
   analysis.afterMut(WasmCode.MultipleOpcode.Binary, denanResult);
-  analysis.beforeMut(WasmCode.Call, denanArgs);
-  analysis.afterMut(WasmCode.Call, denanResult);
+  analysis.afterMut(WasmCode.Struct.Func, denanResultCall);
 
   const registerTime = logMeasurement(
     logger,
