@@ -4,10 +4,14 @@
  ***/
 import { WasmModule } from '../../src/webassembly/wasm/wasm_module';
 import { WasmAnalysis } from '../../src/tool_api/wasm_analysis';
-import { WritableWasmValue } from '../../src/tool_api/interrupts';
+import {
+  ReadOnlyWasmValue,
+  WritableWasmValue,
+} from '../../src/tool_api/interrupts';
 import {
   LoadInstruction,
   StoreInstruction,
+  WasmInstruction,
 } from '../../src/webassembly/wasm/wasm_instruction';
 import { WasmCode } from '../../src/webassembly/wasm/wasm_opcode';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -20,12 +24,42 @@ import {
   TimeoutConfig,
 } from '../../src/util/benchmark_util';
 import { WASM } from '../../src/webassembly/wasm';
+import assert from 'assert';
+
+const logger = createLogger('SafeHeapAnalysis');
+const memoryPageSize = 2 ** 16;
+let currentMemoryPages = 0;
+let addPages = 0;
+
+function recordMemoryGrow(_instr: WasmInstruction, args: ReadOnlyWasmValue[]) {
+  addPages = args[0].value as number;
+}
+
+function addMemPages(
+  _instr: WasmInstruction,
+  success: ReadOnlyWasmValue | undefined,
+) {
+  assert(success !== undefined);
+  if (success.value !== -1) {
+    currentMemoryPages += addPages;
+    addPages = 0;
+  }
+}
+
+function updateCurrentMemPages(
+  _instr: WasmInstruction,
+  currentSize: ReadOnlyWasmValue | undefined,
+) {
+  assert(currentSize !== undefined);
+  currentMemoryPages = currentSize.value as number;
+}
 
 function assertSafeHeap(
   condition: unknown,
   message: string,
 ): asserts condition {
   if (!condition) {
+    console.log('trap thrown');
     throw new Error(message);
   }
 }
@@ -36,14 +70,20 @@ function boundCheck(
   offset: number,
 ): void {
   const addr = WASM.Arithmetic.add(offset, index); //offset is the statically encoded offset, index the dynamic stack offset
-  const lastByteAddr = WASM.Arithmetic.add(addr, bytes);
-  const memoryPageSize = 2 ** 16;
-  console.log(`bound check- index ${index}, bytes ${bytes}, offset ${offset}`);
-  assertSafeHeap(lastByteAddr <= memoryPageSize, 'memory overflow');
+  const lastTargetByte = WASM.Arithmetic.add(addr, bytes);
+  console.log(
+    `bounds_check(index=${index}, bytes=${bytes},offset=${offset}, target=${lastTargetByte})`,
+  );
+
+  assertSafeHeap(lastTargetByte != 0, 'not zero');
+  assertSafeHeap(
+    lastTargetByte <= currentMemoryPages * memoryPageSize,
+    'memory overflow',
+  );
 }
 
 function alignmentCheck(index: number | bigint, size: number): void {
-  console.log(`alignmentCheck ${index}, size ${size}`);
+  console.log(`aligment_check(index=${index}, size=${size})`);
   assertSafeHeap(
     WASM.Arithmetic.bitAnd(index, size - 1) === 0,
     'alignment check fails',
@@ -54,7 +94,10 @@ function safeLoad(
   load: LoadInstruction,
   args: WritableWasmValue[],
 ): WritableWasmValue[] {
-  console.log(`load instr addr=${load.startAddress}`);
+  const f = load.getEnclosingFunction();
+  console.log(
+    `In function ${f.id} instr ${load.startAddress} NAME=${load.name}`,
+  );
   boundCheck(args[0].value, load.targetValueSize(), load.offset);
   alignmentCheck(args[0].value, load.targetValueSize());
   return args;
@@ -64,13 +107,14 @@ function safeStore(
   store: StoreInstruction,
   args: WritableWasmValue[],
 ): WritableWasmValue[] {
-  console.log(`store instr addr=${store.startAddress}`);
-  boundCheck(args[1].value, store.targetValueSize(), store.offset);
-  alignmentCheck(args[1].value, store.targetValueSize());
+  const f = store.getEnclosingFunction();
+  console.log(
+    `In function ${f.id} instr ${store.startAddress} NAME=${store.name}`,
+  );
+  boundCheck(args[0].value, store.targetValueSize(), store.offset);
+  alignmentCheck(args[0].value, store.targetValueSize());
   return args;
 }
-
-const logger = createLogger('SafeHeapAnalysis');
 
 export async function analyse(
   wasmPath: string,
@@ -89,10 +133,14 @@ export async function analyse(
   logger.info(`spawning & connecting to WARDuino...`);
   const vmConnection = await spawnDevVM(wasm); // for local VM
   // const vmConnection = await spawnMCUVM(wasm, TargetVMConfig); // for MCU VM
+  currentMemoryPages = wasm.initialMemoryPages;
   const analysis = new WasmAnalysis(wasm, vmConnection);
 
   logger.info(`Registering Advices...`);
   const startTimeRegister = Date.now();
+  analysis.before(WasmCode.MemoryGrow, recordMemoryGrow);
+  analysis.after(WasmCode.MemoryGrow, addMemPages);
+  analysis.after(WasmCode.MemorySize, updateCurrentMemPages);
   analysis.beforeMut(WasmCode.MultipleOpcode.Load, safeLoad);
   analysis.beforeMut(WasmCode.MultipleOpcode.Store, safeStore);
   const registerTime = logMeasurement(
