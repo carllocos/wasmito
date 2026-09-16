@@ -41,7 +41,8 @@ export async function analyse(
     const newS = s.add(instr.startAddress);
     coverage.set(f.id, newS);
     console.log(
-      `function ${f.id} index ${instr.getIndexInFunction()} (counts #${newS.size})`,
+      `In function ${f.id} instr ${instr.startAddress} NAME=${instr.name}`,
+    );
     );
   };
 
