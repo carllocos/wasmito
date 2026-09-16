@@ -9,7 +9,6 @@ import { WasmInstruction } from '../../src/webassembly/wasm/wasm_instruction';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { connectToExistingDevVM, spawnDevVM, spawnMCUVM } from '../spawn_vm';
 import { WasmCode } from '../../src/webassembly/wasm/wasm_opcode';
-import { WASM } from '../../src/webassembly/wasm';
 import { createLogger } from '../../src/logger/logger';
 import {
   BenchmarkMeasurement,
@@ -22,14 +21,10 @@ import { WASMFunction } from '../../src/webassembly/wasm/wasm_function';
 const logger = createLogger('DenanAnalysis');
 
 function denan(v: WritableWasmValue): WritableWasmValue {
-  console.log(`Try denan: ${WASM.typeToString(v.type)}.const ${v.value}`);
   switch (true) {
     case WritableWasmValue.isF32Const(v):
     case WritableWasmValue.isF64Const(v):
-      if (isNaN(v.value)) {
-        v.value = 0.0;
-        console.log(`Denan to ${v.value}`);
-      }
+      if (isNaN(v.value)) v.value = 0.0;
   }
   return v;
 }
