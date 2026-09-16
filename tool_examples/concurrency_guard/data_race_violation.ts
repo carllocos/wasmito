@@ -21,7 +21,6 @@ import { Module } from 'wasmito-tools';
 import {
   createTempDirectory,
   getAbsolutePath,
-  getFileName,
   pathJoin,
 } from '../../src/util/file_util';
 
