@@ -112,13 +112,28 @@ export class WasmAnalysis {
    * Register a callback to be executed `before` the given `instr` is executed on the VM.
    *
    */
+  before(
+    instr: WASMFunction | WasmCode.Struct,
+    cb:
+      | ((
+          f: WASMFunction,
+          args: ReadOnlyWasmValue[],
+          vm: WasmitoBackendVM,
+        ) => void)
+      | ((
+          f: WASMFunction,
+          args: ReadOnlyWasmValue[],
+          vm: WasmitoBackendVM,
+        ) => Promise<void>)
+      | ((f: WASMFunction, args: ReadOnlyWasmValue[]) => void)
+      | ((f: WASMFunction, args: ReadOnlyWasmValue[]) => Promise<void>)
+      | ((vm: WasmitoBackendVM) => void)
+      | ((vm: WasmitoBackendVM) => Promise<void>)
+      | (() => void)
+      | (() => Promise<void>),
+  ): this;
   before<I extends WasmInstruction>(
-    instr:
-      | I
-      | WasmAddress
-      | WasmOpcode
-      | WasmCode.MultipleOpcode
-      | WASMFunction,
+    instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
     cb:
       | ((instr: I, args: ReadOnlyWasmValue[], vm: WasmitoBackendVM) => void)
       | ((
@@ -132,6 +147,16 @@ export class WasmAnalysis {
       | ((vm: WasmitoBackendVM) => Promise<void>)
       | (() => void)
       | (() => Promise<void>),
+  ): this;
+  before<I extends WasmInstruction>(
+    instr:
+      | I
+      | WasmAddress
+      | WasmOpcode
+      | WasmCode.MultipleOpcode
+      | WasmCode.Struct
+      | WASMFunction,
+    cb: (...args: any[]) => any,
   ): this {
     const mutate = false;
     const moment = 'before';
@@ -147,13 +172,27 @@ export class WasmAnalysis {
     return this;
   }
 
+  beforeMut(
+    instr: WASMFunction | WasmCode.Struct,
+    cb:
+      | ((
+          f: WASMFunction,
+          args: WritableWasmValue[],
+          vm: WasmitoBackendVM,
+        ) => WritableWasmValue[])
+      | ((
+          f: WASMFunction,
+          args: WritableWasmValue[],
+          vm: WasmitoBackendVM,
+        ) => Promise<WritableWasmValue[]>)
+      | ((f: WASMFunction, args: WritableWasmValue[]) => WritableWasmValue[])
+      | ((
+          f: WASMFunction,
+          args: WritableWasmValue[],
+        ) => Promise<WritableWasmValue[]>),
+  ): this;
   beforeMut<I extends WasmInstruction>(
-    instr:
-      | I
-      | WasmAddress
-      | WasmOpcode
-      | WasmCode.MultipleOpcode
-      | WASMFunction,
+    instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
     cb:
       | ((
           instr: I,
@@ -167,6 +206,16 @@ export class WasmAnalysis {
         ) => Promise<WritableWasmValue[]>)
       | ((instr: I, args: WritableWasmValue[]) => WritableWasmValue[])
       | ((instr: I, args: WritableWasmValue[]) => Promise<WritableWasmValue[]>),
+  ): this;
+  beforeMut<I extends WasmInstruction>(
+    instr:
+      | I
+      | WasmAddress
+      | WasmOpcode
+      | WasmCode.MultipleOpcode
+      | WasmCode.Struct
+      | WASMFunction,
+    cb: (...args: any[]) => any,
   ): this {
     const mutate = true;
     const moment = 'before';
@@ -182,13 +231,31 @@ export class WasmAnalysis {
     return this;
   }
 
+  after(
+    instr: WASMFunction | WasmCode.Struct,
+    cb:
+      | ((
+          f: WASMFunction,
+          result: ReadOnlyWasmValue | undefined,
+          vm: WasmitoBackendVM,
+        ) => void)
+      | ((
+          f: WASMFunction,
+          result: ReadOnlyWasmValue | undefined,
+          vm: WasmitoBackendVM,
+        ) => Promise<void>)
+      | ((f: WASMFunction, result: ReadOnlyWasmValue | undefined) => void)
+      | ((
+          f: WASMFunction,
+          result: ReadOnlyWasmValue | undefined,
+        ) => Promise<void>)
+      | ((vm: WasmitoBackendVM) => void)
+      | ((vm: WasmitoBackendVM) => Promise<void>)
+      | (() => void)
+      | (() => Promise<void>),
+  ): this;
   after<I extends WasmInstruction>(
-    instr:
-      | I
-      | WasmAddress
-      | WasmOpcode
-      | WasmCode.MultipleOpcode
-      | WASMFunction,
+    instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
     cb:
       | ((
           instr: I,
@@ -206,6 +273,16 @@ export class WasmAnalysis {
       | ((vm: WasmitoBackendVM) => Promise<void>)
       | (() => void)
       | (() => Promise<void>),
+  ): this;
+  after<I extends WasmInstruction>(
+    instr:
+      | I
+      | WasmAddress
+      | WasmOpcode
+      | WasmCode.MultipleOpcode
+      | WasmCode.Struct
+      | WASMFunction,
+    cb: (...args: any[]) => any,
   ): this {
     const mutate = false;
     const moment = 'after';
@@ -221,13 +298,30 @@ export class WasmAnalysis {
     return this;
   }
 
+  afterMut(
+    instr: WASMFunction | WasmCode.Struct,
+    cb:
+      | ((
+          f: WASMFunction,
+          result: WritableWasmValue | undefined,
+          vm: WasmitoBackendVM,
+        ) => WritableWasmValue | undefined)
+      | ((
+          f: WASMFunction,
+          result: WritableWasmValue | undefined,
+          vm: WasmitoBackendVM,
+        ) => Promise<WritableWasmValue | undefined>)
+      | ((
+          f: WASMFunction,
+          result: WritableWasmValue | undefined,
+        ) => WritableWasmValue | undefined)
+      | ((
+          f: WASMFunction,
+          result: WritableWasmValue | undefined,
+        ) => Promise<WritableWasmValue | undefined>),
+  ): this;
   afterMut<I extends WasmInstruction>(
-    instr:
-      | I
-      | WasmAddress
-      | WasmOpcode
-      | WasmCode.MultipleOpcode
-      | WASMFunction,
+    instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode,
     cb:
       | ((
           instr: I,
@@ -247,6 +341,16 @@ export class WasmAnalysis {
           instr: I,
           result: WritableWasmValue | undefined,
         ) => Promise<WritableWasmValue | undefined>),
+  ): this;
+  afterMut<I extends WasmInstruction>(
+    instr:
+      | I
+      | WasmAddress
+      | WasmOpcode
+      | WasmCode.MultipleOpcode
+      | WasmCode.Struct
+      | WASMFunction,
+    cb: (...args: any[]) => any,
   ): this {
     const mutate = true;
     const moment = 'after';

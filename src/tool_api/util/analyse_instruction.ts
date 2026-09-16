@@ -1,6 +1,8 @@
 import assert from 'assert';
 import { WasmitoBackendVM } from '../../runtimes/wasmito_vm/wasmito_vm';
 import {
+  isBlockInstruction,
+  isIfInstruction,
   isLoopInstruction,
   WasmAddress,
   WasmInstruction,
@@ -20,43 +22,89 @@ import {
 } from '../../runtimes/wasmito_vm/requests/hook_on_wasm_addr_request';
 import {
   AdvicesRegistery,
+  encodeFunctionReportAddr,
   InstructionHookTarget,
   isNoArgAdvice,
   isVMArgAdvice,
+  resolveReportTarget,
+  signatureOf,
 } from './advices_registery';
 
 const logger = getGlobalLogger();
 export function getInstructions<I extends WasmInstruction>(
   wasm: WasmModule,
-  instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode | WASMFunction,
+  instr:
+    | I
+    | WasmAddress
+    | WasmOpcode
+    | WasmCode.MultipleOpcode
+    | WasmCode.Struct
+    | WASMFunction,
   moment: InstrMoment,
 ): InstructionHookTarget[] {
   let instrs: WasmInstruction[] = [];
   let i: WasmInstruction | undefined;
+  let targets: InstructionHookTarget[] = [];
   if (typeof instr === 'number') {
     if (instr >= 0) {
       i = wasm.getInstruction(instr);
-    } else {
+    } else if (WasmCode.isStructOpcode(instr)) {
+      targets = [...targets, ...structHookTargets(wasm, instr, moment)];
+    } else if (WasmCode.isMultipleOpcode(instr)) {
       // group of instructions
       for (const op of WasmCode.toSingleOpcodes(instr)) {
         instrs = [...instrs, ...wasm.instructionsFromOpcode(op)]; // trick to avoid stack exhaustion
       }
+    } else {
+      throw new Error(`unsupported numeric instr code ${instr}`);
     }
   } else if (instr instanceof WasmInstruction) {
     i = wasm.getInstruction(instr.startAddress);
   } else if (instr instanceof WASMFunction) {
-    if (moment === 'before') {
-      throw new Error(`unsupported`);
-    }
-    const endInstr = instr.body[instr.body.length - 1];
-    instrs.push(endInstr);
+    targets.push(functionHookTarget(instr, moment));
   } else {
     wasm.instructionsFromOpcode(instr).forEach((i) => instrs.push(i));
   }
   if (i !== undefined) {
     instrs.push(i);
   }
-  return instrs.map((r) => toInstructionHookTarget(r, moment));
+  return targets.concat(instrs.map((r) => toInstructionHookTarget(r, moment)));
+}
+
+/*
+ * Builds the hook target for a `WASMFunction`: the hook itself is placed on
+ * the first (`before`) or last (`after`) instruction of the function's body,
+ * but what gets reported to the advice callback is the function itself
+ * (together with the stack values matching its own signature), not that
+ * boundary instruction.
+ */
+function functionHookTarget(
+  f: WASMFunction,
+  moment: InstrMoment,
+): InstructionHookTarget {
+  assert(
+    f.body.length > 0,
+    `Cannot hook function '${f.name}' since it has an empty body`,
+  );
+  const boundaryInstr =
+    moment === 'before' ? f.body[0] : f.body[f.body.length - 1];
+  return {
+    hookAddr: boundaryInstr.startAddress,
+    reportAddr: encodeFunctionReportAddr(f.id),
+  };
+}
+
+function structHookTargets(
+  wasm: WasmModule,
+  structCode: WasmCode.Struct,
+  moment: InstrMoment,
+): InstructionHookTarget[] {
+  switch (structCode) {
+    case WasmCode.Struct.Func:
+      return wasm.functions.map((f) => functionHookTarget(f, moment));
+    default:
+      throw new Error(`unsupported struct code ${structCode}`);
+  }
 }
 
 function toInstructionHookTarget(
@@ -69,13 +117,29 @@ function toInstructionHookTarget(
       reportAddr: i.startAddress,
     };
   }
+  if (
+    moment === 'after' &&
+    (isLoopInstruction(i) || isBlockInstruction(i) || isIfInstruction(i))
+  ) {
+    const endInstr = i.getEndInstruction();
+    return {
+      hookAddr: endInstr.startAddress,
+      reportAddr: i.startAddress,
+    };
+  }
   return { hookAddr: i.startAddress, reportAddr: i.startAddress };
 }
 
 export function instruction<I extends WasmInstruction>(
   advices: AdvicesRegistery,
   moment: 'before',
-  instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode | WASMFunction,
+  instr:
+    | I
+    | WasmAddress
+    | WasmOpcode
+    | WasmCode.MultipleOpcode
+    | WasmCode.Struct
+    | WASMFunction,
   wasm: WasmModule,
   maxTimeoutMs: number,
   cb:
@@ -96,7 +160,13 @@ export function instruction<I extends WasmInstruction>(
 export function instruction<I extends WasmInstruction>(
   advices: AdvicesRegistery,
   moment: 'before',
-  instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode | WASMFunction,
+  instr:
+    | I
+    | WasmAddress
+    | WasmOpcode
+    | WasmCode.MultipleOpcode
+    | WasmCode.Struct
+    | WASMFunction,
   wasm: WasmModule,
   maxTimeoutMs: number,
   cb:
@@ -117,7 +187,13 @@ export function instruction<I extends WasmInstruction>(
 export function instruction<I extends WasmInstruction>(
   advices: AdvicesRegistery,
   moment: 'after',
-  instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode | WASMFunction,
+  instr:
+    | I
+    | WasmAddress
+    | WasmOpcode
+    | WasmCode.MultipleOpcode
+    | WasmCode.Struct
+    | WASMFunction,
   wasm: WasmModule,
   maxTimeoutMs: number,
   cb:
@@ -142,7 +218,13 @@ export function instruction<I extends WasmInstruction>(
 export function instruction<I extends WasmInstruction>(
   advices: AdvicesRegistery,
   moment: 'after',
-  instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode | WASMFunction,
+  instr:
+    | I
+    | WasmAddress
+    | WasmOpcode
+    | WasmCode.MultipleOpcode
+    | WasmCode.Struct
+    | WASMFunction,
   wasm: WasmModule,
   maxTimeoutMs: number,
   cb:
@@ -169,7 +251,13 @@ export function instruction<I extends WasmInstruction>(
 export function instruction<I extends WasmInstruction>(
   advices: AdvicesRegistery,
   moment: InstrMoment,
-  instr: I | WasmAddress | WasmOpcode | WasmCode.MultipleOpcode | WASMFunction,
+  instr:
+    | I
+    | WasmAddress
+    | WasmOpcode
+    | WasmCode.MultipleOpcode
+    | WasmCode.Struct
+    | WASMFunction,
   wasm: WasmModule,
   maxTimeoutMs: number,
   cb:
@@ -248,18 +336,44 @@ function instrMomentToHookMoment(m: InstrMoment): HookOnWasmAddrMoment {
 type StackArgs = WASMValueIndexed[] | WASMValueIndexed | undefined;
 
 function copyArgsFromStack(
-  i: WasmInstruction,
+  target: WasmInstruction | WASMFunction,
   stack: WASMValueIndexed[],
   moment: HookOnWasmAddrMoment,
 ): StackArgs {
-  const signature = i.signature;
+  const signature = signatureOf(target);
   switch (moment) {
     case HookOnWasmAddrMoment.HookBefore: {
       assertFatalHookError(
         stack.length >= signature.nrArgs,
         `VM failed to provide the stack needed to construct args. Expected stack size ${signature.nrArgs}. Given stack size ${stack.length}`,
       );
-      return stack.slice(-i.signature.nrArgs).map((v: WASMValueIndexed) => {
+      /*
+       * For a plain instruction, `before` reports the top of the real
+       * operand stack: the args it is about to consume sit at the end.
+       * For a WASMFunction (or WasmCode.Struct.Func, which resolves to one),
+       * the VM instead reports every active call frame's locals
+       * concatenated (oldest/outermost first), each frame laid out as its
+       * own params followed by its own declared locals. The current
+       * (innermost) frame is therefore the LAST `target.locals.length`
+       * entries of the reported stack, and that frame's params are the
+       * first `nrArgs` entries within that slice -- not simply the last
+       * `nrArgs` entries of the whole array (which, for a recursive call,
+       * would belong to an outer frame, and for a function with locals of
+       * its own, would be those locals instead of the actual params).
+       */
+      let args: WASMValueIndexed[];
+      if (target instanceof WASMFunction) {
+        const frameWidth = target.locals.length;
+        assertFatalHookError(
+          stack.length >= frameWidth,
+          `VM failed to provide the current call frame for '${target.name}'. Expected at least ${frameWidth} entries (params + locals), given ${stack.length}`,
+        );
+        const frameStart = stack.length - frameWidth;
+        args = stack.slice(frameStart, frameStart + signature.nrArgs);
+      } else {
+        args = stack.slice(-signature.nrArgs);
+      }
+      return args.map((v: WASMValueIndexed) => {
         return {
           type: v.type,
           value: v.value,
@@ -271,7 +385,7 @@ function copyArgsFromStack(
     case HookOnWasmAddrMoment.HookAfter: {
       assertFatalHookError(
         stack.length >= signature.nrResults,
-        `Stack has not the expected number of values to read result for instr '${i.name}'`,
+        `Stack has not the expected number of values to read result for '${target.name}'`,
       );
 
       if (stack.length === 0) return undefined;
@@ -310,13 +424,9 @@ export function runAdvicesInstruction(
       const moment = metadata.moment;
       const advices = advicesContainer.getAdvices(moment, metadata.addr);
       const wasmState = sub.sub;
-      const firstReportInstr = mod.getInstruction(advices[0][2]);
-      assertFatalHookError(
-        firstReportInstr !== undefined,
-        `No instruction found for address ${advices[0][2]}`,
-      );
+      const firstReportTarget = resolveReportTarget(mod, advices[0][2]);
       const stackArgs = copyArgsFromStack(
-        firstReportInstr,
+        firstReportTarget,
         wasmState.stack ?? [],
         moment,
       );
@@ -335,12 +445,8 @@ export function runAdvicesInstruction(
           } else if (isVMArgAdvice(advice)) {
             await advice(vm);
           } else {
-            const reportInstr = mod.getInstruction(reportAddr);
-            assertFatalHookError(
-              reportInstr !== undefined,
-              `No instruction found for address ${reportAddr}`,
-            );
-            newArgs = await advice(reportInstr, argsCB as any, vm);
+            const reportTarget = resolveReportTarget(mod, reportAddr);
+            newArgs = await advice(reportTarget as any, argsCB as any, vm);
           }
         } catch (e) {
           onAdviceFailure(e);

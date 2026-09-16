@@ -16,6 +16,8 @@ import { assertFatalHookError, SubscriptionContent } from '../../hooks/hook';
 import { WASM, WasmState } from '../../webassembly/wasm';
 import { WasmInstruction } from '../../webassembly/wasm/wasm_instruction';
 import { WasmModule } from '../../webassembly/wasm/wasm_module';
+import { WASMFunction } from '../../webassembly/wasm/wasm_function';
+import { WasmType } from '../../webassembly/wasm/opcode_type';
 import { InspectableState } from '../../runtimes/wasmito_vm/requests/inspect_request';
 import { WasmitoBackendVM } from '../../runtimes/wasmito_vm/wasmito_vm';
 import {
@@ -108,6 +110,52 @@ type AdviceMap = Map<number, AdviceArray>;
 export interface InstructionHookTarget {
   hookAddr: number;
   reportAddr: number;
+}
+
+/*
+ * A `reportAddr` is normally the (non-negative) address of the instruction that
+ * should be reported to the user's advice callback. Some hook targets, however,
+ * report a whole `WASMFunction` rather than a specific instruction (e.g. a hook
+ * registered on a `WASMFunction` reports the function itself, together with the
+ * stack arguments/results derived from its own signature). Such targets encode
+ * the function's id as a negative `reportAddr` so that regular instruction
+ * addresses (always >= 0) and function identifiers never collide.
+ */
+export function encodeFunctionReportAddr(funcId: number): number {
+  return -(funcId + 1);
+}
+
+export function decodeFunctionReportAddr(reportAddr: number): number {
+  return -(reportAddr + 1);
+}
+
+export function isFunctionReportAddr(reportAddr: number): boolean {
+  return reportAddr < 0;
+}
+
+export function resolveReportTarget(
+  wasm: WasmModule,
+  reportAddr: number,
+): WasmInstruction | WASMFunction {
+  if (isFunctionReportAddr(reportAddr)) {
+    const funcId = decodeFunctionReportAddr(reportAddr);
+    const f = wasm.getFunction(funcId);
+    assertFatalHookError(
+      f !== undefined,
+      `no function found with id ${funcId}`,
+    );
+    return f;
+  }
+  const i = wasm.getInstruction(reportAddr);
+  assertFatalHookError(
+    i !== undefined,
+    `no instruction found for report address ${reportAddr}`,
+  );
+  return i;
+}
+
+export function signatureOf(target: WasmInstruction | WASMFunction): WasmType {
+  return target instanceof WASMFunction ? target.type : target.signature;
 }
 
 export type AdviceOnNewInterrupt =
@@ -260,15 +308,16 @@ export class AdvicesRegistery {
   getInspectState(
     moment: HookOnWasmAddrMoment,
     cbArgs: number,
-    i: WasmInstruction,
+    target: WasmInstruction | WASMFunction,
   ): InspectStateHook<HookOnAddrSubContent> {
     let m: string = '';
+    const signature = signatureOf(target);
     switch (moment) {
       case HookOnWasmAddrMoment.HookBefore:
-        m = i.signature.nrArgs > 0 ? this.beforeStack : this.beforeNoStack;
+        m = signature.nrArgs > 0 ? this.beforeStack : this.beforeNoStack;
         break;
       case HookOnWasmAddrMoment.HookAfter:
-        m = i.signature.nrResults > 0 ? this.afterStack : this.afterNoStack;
+        m = signature.nrResults > 0 ? this.afterStack : this.afterNoStack;
         break;
       default:
         throw new Error(`TODO case around`);
@@ -359,12 +408,8 @@ export class AdvicesRegistery {
         sm.set(hookAddr, stateIdx);
       }
 
-      const reportInstr = wasm.getInstruction(reportAddr);
-      assert(
-        reportInstr !== undefined,
-        `no instruction found for report address ${reportAddr}`,
-      );
-      const state = this.getInspectState(hm, cb.length, reportInstr);
+      const reportTarget = resolveReportTarget(wasm, reportAddr);
+      const state = this.getInspectState(hm, cb.length, reportTarget);
       if (
         req.hook === undefined ||
         state.doesInclude(InspectableState.stackState)
