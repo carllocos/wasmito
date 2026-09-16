@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 import { expect } from 'chai';
 import { WasmAnalysis } from '../../src/tool_api/wasm_analysis';
 import { WASMFunction } from '../../src/webassembly/wasm/wasm_function';
@@ -67,29 +68,29 @@ function typeChecksOnly(
   );
 
   // @ts-expect-error a WASMFunction target's callback must take a WASMFunction, not a WasmInstruction
-  analysis.before(fn, (i: WasmInstruction, _args: ReadOnlyWasmValue[]) => {});
+  analysis.before(fn, (_i: WasmInstruction, _args: ReadOnlyWasmValue[]) => {});
 
   // @ts-expect-error same for `after`
   analysis.after(
     fn,
-    (i: WasmInstruction, _result: ReadOnlyWasmValue | undefined) => {},
+    (_i: WasmInstruction, _result: ReadOnlyWasmValue | undefined) => {},
   );
 
   // @ts-expect-error same for `beforeMut`
-  analysis.beforeMut(fn, (i: WasmInstruction, args: WritableWasmValue[]) => {
+  analysis.beforeMut(fn, (_i: WasmInstruction, args: WritableWasmValue[]) => {
     return args;
   });
 
   // @ts-expect-error same for `afterMut`
   analysis.afterMut(
     fn,
-    (i: WasmInstruction, result: WritableWasmValue | undefined) => {
+    (_i: WasmInstruction, result: WritableWasmValue | undefined) => {
       return result;
     },
   );
 
   // @ts-expect-error a plain instruction target's callback must take a WasmInstruction, not a WASMFunction
-  analysis.before(instr, (f: WASMFunction, _args: ReadOnlyWasmValue[]) => {});
+  analysis.before(instr, (_f: WASMFunction, _args: ReadOnlyWasmValue[]) => {});
 
   // NOTE on a residual gap: `WasmCode.Struct` (like `WasmCode.MultipleOpcode`)
   // is a *numeric* enum, and every numeric enum member is structurally a
@@ -102,7 +103,7 @@ function typeChecksOnly(
   // widening:
   analysis.before(
     WasmCode.Struct.Func,
-    (i: WasmInstruction, _args: ReadOnlyWasmValue[]) => {},
+    (_i: WasmInstruction, _args: ReadOnlyWasmValue[]) => {},
   );
 }
 
