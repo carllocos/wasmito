@@ -692,28 +692,30 @@ export function isStoreInstruction(i: any): i is StoreInstruction {
 function memoryTargetValueSize(i: LoadInstruction | StoreInstruction): number {
   switch (getWasmOpcodeNr(i.opcode)) {
     case getWasmOpcodeNr(WasmCode.F32Load):
-    case getWasmOpcodeNr(WasmCode.I32Load8S):
-    case getWasmOpcodeNr(WasmCode.I32Load8U):
-    case getWasmOpcodeNr(WasmCode.I32Load16S):
-    case getWasmOpcodeNr(WasmCode.I32Load16U):
     case getWasmOpcodeNr(WasmCode.I32Load):
     case getWasmOpcodeNr(WasmCode.I32Store):
     case getWasmOpcodeNr(WasmCode.F32Store):
-    case getWasmOpcodeNr(WasmCode.I32Store8):
-    case getWasmOpcodeNr(WasmCode.I32Store16):
-      return 4;
-    case getWasmOpcodeNr(WasmCode.I64Load):
-    case getWasmOpcodeNr(WasmCode.I64Load8S):
-    case getWasmOpcodeNr(WasmCode.I64Load8U):
-    case getWasmOpcodeNr(WasmCode.I64Load16S):
-    case getWasmOpcodeNr(WasmCode.I64Load16U):
     case getWasmOpcodeNr(WasmCode.I64Load32S):
     case getWasmOpcodeNr(WasmCode.I64Load32U):
+    case getWasmOpcodeNr(WasmCode.I64Store32):
+      return 4;
+    case getWasmOpcodeNr(WasmCode.I32Load8S):
+    case getWasmOpcodeNr(WasmCode.I32Load8U):
+    case getWasmOpcodeNr(WasmCode.I32Store8):
+    case getWasmOpcodeNr(WasmCode.I64Load8S):
+    case getWasmOpcodeNr(WasmCode.I64Load8U):
+    case getWasmOpcodeNr(WasmCode.I64Store8):
+      return 1;
+    case getWasmOpcodeNr(WasmCode.I32Load16S):
+    case getWasmOpcodeNr(WasmCode.I32Load16U):
+    case getWasmOpcodeNr(WasmCode.I32Store16):
+    case getWasmOpcodeNr(WasmCode.I64Load16S):
+    case getWasmOpcodeNr(WasmCode.I64Load16U):
+    case getWasmOpcodeNr(WasmCode.I64Store16):
+      return 2;
+    case getWasmOpcodeNr(WasmCode.I64Load):
     case getWasmOpcodeNr(WasmCode.F64Load):
     case getWasmOpcodeNr(WasmCode.I64Store):
-    case getWasmOpcodeNr(WasmCode.I64Store8):
-    case getWasmOpcodeNr(WasmCode.I64Store16):
-    case getWasmOpcodeNr(WasmCode.I64Store32):
     case getWasmOpcodeNr(WasmCode.F64Store):
       return 8;
     default:
