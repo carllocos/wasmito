@@ -350,19 +350,23 @@ function copyArgsFromStack(
       /*
        * For a plain instruction, `before` reports the top of the real
        * operand stack: the args it is about to consume sit at the end.
-       * For a WASMFunction (or WasmCode.Struct.Func, which resolves to one),
-       * the VM instead reports every active call frame's locals
-       * concatenated (oldest/outermost first), each frame laid out as its
-       * own params followed by its own declared locals. The current
-       * (innermost) frame is therefore the LAST `target.locals.length`
-       * entries of the reported stack, and that frame's params are the
-       * first `nrArgs` entries within that slice -- not simply the last
-       * `nrArgs` entries of the whole array (which, for a recursive call,
-       * would belong to an outer frame, and for a function with locals of
-       * its own, would be those locals instead of the actual params).
+       * For a WASMFunction (or WasmCode.Struct.Func, which resolves to one)
+       * that takes arguments, the VM instead reports every active call
+       * frame's locals concatenated (oldest/outermost first), each frame
+       * laid out as its own params followed by its own declared locals. The
+       * current (innermost) frame is therefore the LAST
+       * `target.locals.length` entries of the reported stack, and that
+       * frame's params are the first `nrArgs` entries within that slice --
+       * not simply the last `nrArgs` entries of the whole array (which, for
+       * a recursive call, would belong to an outer frame, and for a
+       * function with locals of its own, would be those locals instead of
+       * the actual params). The stack is only requested (see
+       * `getInspectState`) when the WASMFunction takes arguments, so this
+       * frame-aware slicing only applies in that case; a zero-arg
+       * WASMFunction (with or without locals) always reports no args.
        */
       let args: WASMValueIndexed[];
-      if (target instanceof WASMFunction) {
+      if (target instanceof WASMFunction && signature.nrArgs > 0) {
         const frameWidth = target.locals.length;
         assertFatalHookError(
           stack.length >= frameWidth,
