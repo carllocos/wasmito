@@ -156,6 +156,42 @@ describe('`before` a WASMFunction that declares its own locals', function () {
   });
 });
 
+describe('`before` a WASMFunction with no args that declares its own locals', function () {
+  let wasm: WasmModule;
+  let vmConnection: WasmitoBackendVM;
+  let analysis: WasmAnalysis;
+  this.timeout(0);
+
+  before('Parse Module', async () => {
+    const wasmPath = path.resolve(
+      './test/data/wat/no_args_with_locals/no_args_with_locals.wasm',
+    );
+    wasm = new WasmModule(wasmPath);
+  });
+
+  beforeEach(async () => {
+    vmConnection = await spawnDevVM(wasm);
+    analysis = new WasmAnalysis(wasm, vmConnection);
+  });
+
+  it('reports zero args without failing to locate the call frame', async () => {
+    const answer = wasm.functions.find((f) => f.name === 'answer')!;
+    let seenArgs: ReadOnlyWasmValue[] | undefined;
+    analysis.before(answer, (_f: any, args: ReadOnlyWasmValue[]) => {
+      seenArgs = args;
+    });
+    await analysis.deploy();
+    await analysis.run();
+
+    // `answer` takes no params but declares a local. Even though its
+    // signature reports 0 args, the VM's reported stack still has to be
+    // requested (and sliced past the frame's local) to locate the current
+    // call frame -- a signature with `nrArgs === 0` must not be mistaken
+    // for "no stack needed" when the function has locals of its own.
+    expect(seenArgs).to.deep.equal([]);
+  });
+});
+
 describe('`after` a WASMFunction that exits through an early `return`', function () {
   let wasm: WasmModule;
   let vmConnection: WasmitoBackendVM;
