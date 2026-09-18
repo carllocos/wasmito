@@ -273,6 +273,9 @@ export namespace WasmCode {
 
   export enum Struct {
     Func = -100,
+    Block = -101,
+    Loop = -102,
+    If = -103,
   }
   export function isStructOpcode(v: any): v is WasmCode.Struct {
     return Object.values(WasmCode.Struct).includes(v);

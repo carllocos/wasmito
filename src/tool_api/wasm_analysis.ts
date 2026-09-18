@@ -113,7 +113,7 @@ export class WasmAnalysis {
    *
    */
   before(
-    instr: WASMFunction | WasmCode.Struct,
+    instr: WASMFunction | WasmCode.Struct.Func,
     cb:
       | ((
           f: WASMFunction,
@@ -173,7 +173,7 @@ export class WasmAnalysis {
   }
 
   beforeMut(
-    instr: WASMFunction | WasmCode.Struct,
+    instr: WASMFunction | WasmCode.Struct.Func,
     cb:
       | ((
           f: WASMFunction,
@@ -232,7 +232,7 @@ export class WasmAnalysis {
   }
 
   after(
-    instr: WASMFunction | WasmCode.Struct,
+    instr: WASMFunction | WasmCode.Struct.Func,
     cb:
       | ((
           f: WASMFunction,
@@ -299,7 +299,7 @@ export class WasmAnalysis {
   }
 
   afterMut(
-    instr: WASMFunction | WasmCode.Struct,
+    instr: WASMFunction | WasmCode.Struct.Func,
     cb:
       | ((
           f: WASMFunction,

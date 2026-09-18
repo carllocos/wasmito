@@ -66,8 +66,8 @@ export async function analyse(
   logger.info(`Registering Advices...`);
   // hooks that correspond direclty to one instruction
   const startTimeRegister = Date.now();
-  analysis.before(WasmCode.If, increaseCount);
-  analysis.after(WasmCode.If, increaseCountAfter);
+  analysis.before(WasmCode.Struct.If, increaseCount);
+  analysis.after(WasmCode.Struct.If, increaseCountAfter);
 
   analysis.before(WasmCode.Br, increaseCount);
   analysis.before(WasmCode.BrIf, increaseCount);
@@ -99,10 +99,10 @@ export async function analyse(
   analysis.before(WasmCode.MemorySize, increaseCount);
   analysis.before(WasmCode.MemoryGrow, increaseCount);
 
-  analysis.before(WasmCode.Block, increaseCount);
-  analysis.after(WasmCode.Block, increaseCountAfter);
-  analysis.before(WasmCode.Loop, increaseCount);
-  analysis.after(WasmCode.Loop, increaseCountAfter);
+  analysis.before(WasmCode.Struct.Block, increaseCount);
+  analysis.after(WasmCode.Struct.Block, increaseCountAfter);
+  analysis.before(WasmCode.Struct.Loop, increaseCount);
+  analysis.after(WasmCode.Struct.Loop, increaseCountAfter);
 
   // Special cases
   // analysis.begin(...) // TODO begin
