@@ -68,7 +68,12 @@ export function getInstructions<I extends WasmInstruction>(
   if (i !== undefined) {
     instrs.push(i);
   }
-  return targets.concat(instrs.map((r) => toInstructionHookTarget(r, moment)));
+  return targets.concat(
+    instrs.map((r) => ({
+      hookAddr: r.startAddress,
+      reportAddr: r.startAddress,
+    })),
+  );
 }
 
 /*
@@ -102,12 +107,38 @@ function structHookTargets(
   switch (structCode) {
     case WasmCode.Struct.Func:
       return wasm.functions.map((f) => functionHookTarget(f, moment));
+    case WasmCode.Struct.Block:
+      return wasm
+        .instructionsFromOpcode(WasmCode.Block)
+        .map((i) => structuralControlHookTarget(i, moment));
+    case WasmCode.Struct.Loop:
+      return wasm
+        .instructionsFromOpcode(WasmCode.Loop)
+        .map((i) => structuralControlHookTarget(i, moment));
+    case WasmCode.Struct.If:
+      return wasm
+        .instructionsFromOpcode(WasmCode.If)
+        .map((i) => structuralControlHookTarget(i, moment));
     default:
       throw new Error(`unsupported struct code ${structCode}`);
   }
 }
 
-function toInstructionHookTarget(
+/*
+ * Builds the hook target for the whole Block/Loop/If *structure*, as
+ * opposed to its own opcode instruction: `before` a Loop is pinned to the
+ * first instruction of its body (so it fires on every iteration), and
+ * `after` any of the three is pinned to the structure's matching `end` (for
+ * an If, whichever branch was actually taken) -- so it fires once the whole
+ * structure (all loop iterations included) has finished -- but all report
+ * the Block/Loop/If instruction itself. This is what
+ * `WasmCode.Struct.Block`/`WasmCode.Struct.Loop`/`WasmCode.Struct.If`
+ * resolve to; a plain `WasmCode.Block`/`WasmCode.Loop`/`WasmCode.If` (or a
+ * direct instance) hooks its own opcode instruction instead (see
+ * `getInstructions`, which maps every other instruction directly onto its
+ * own address).
+ */
+function structuralControlHookTarget(
   i: WasmInstruction,
   moment: InstrMoment,
 ): InstructionHookTarget {
@@ -555,8 +586,20 @@ async function updateArgsStack(
   vm: WasmitoBackendVM,
 ): Promise<boolean> {
   for (const arg of args) {
+    // console.log(
+    //   `{idx:${arg.stackIdx},type:${WASM.typeToString(arg.type)},value:${arg.value}}`,
+    // );
     const s = await vm.updateStackValue(arg.stackIdx, arg.toWasmValue());
     if (!s) return false;
+    // const newS = await vm.inspect(new StateRequest().includeStack());
+    // const stack = newS.stack;
+    // assert(stack !== undefined);
+    // const v = stack[arg.stackIdx];
+    // assert(v.idx === arg.stackIdx);
+    // assert(v.type === arg.type);
+    // if (v.value !== arg.value) {
+    //   assert(v.value === arg.value);
+    // }
   }
   return true;
 }

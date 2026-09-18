@@ -77,8 +77,8 @@ export async function analyse(
   analysis.before(WasmCode.Else, addBlockEnter);
   analysis.before(WasmCode.Call, addBlockEnter);
   analysis.before(WasmCode.CallIndirect, addBlockEnter);
-  analysis.before(WasmCode.Block, addBlockEnter);
-  analysis.before(WasmCode.Loop, addBlockEnter);
+  analysis.before(WasmCode.Struct.Block, addBlockEnter);
+  analysis.before(WasmCode.Struct.Loop, addBlockEnter);
   const registerTime = logMeasurement(
     logger,
     startTimeRegister,

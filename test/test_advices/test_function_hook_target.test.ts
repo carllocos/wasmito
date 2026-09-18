@@ -85,26 +85,35 @@ describe('`before` a WASMFunction whose first body instruction is itself a Loop'
     expect(isLoopInstruction(loopy.body[0])).to.equal(true);
   });
 
-  it('pins the hook to the Loop`s own address, unlike a direct `before` hook on that same Loop', () => {
+  it('pins the hook to the Loop`s own address, same as a direct `before` hook on that same Loop, unlike `WasmCode.Struct.Loop`', () => {
     const loopInstr = loopy.body[0];
 
-    // A direct `before` hook on the Loop instruction itself gets redirected
-    // to its first sub-instruction (see `toInstructionHookTarget`), so it
-    // fires on every iteration.
+    // A direct `before` hook on the Loop instruction itself is pinned to
+    // its own opcode address (see `toInstructionHookTarget`), so it fires
+    // exactly once, at function entry.
     const [directLoopTarget] = getInstructions(wasm, loopInstr, 'before');
-    expect(directLoopTarget.hookAddr).to.equal(
-      loopInstr.subInstructions[0].startAddress,
-    );
+    expect(directLoopTarget.hookAddr).to.equal(loopInstr.startAddress);
 
-    // Hooking `before` the whole function must NOT go through that
-    // redirection: it should fire exactly once per call (function entry),
-    // pinned to the Loop's own opcode address, not to its first
-    // sub-instruction (which would fire on every iteration instead).
+    // Hooking `before` the whole function is pinned to that same Loop's
+    // own opcode address for the same reason: the function's first body
+    // instruction just happens to be that Loop.
     const [functionTarget] = getInstructions(wasm, loopy, 'before');
     expect(functionTarget.hookAddr).to.equal(loopInstr.startAddress);
-    expect(functionTarget.hookAddr).to.not.equal(directLoopTarget.hookAddr);
+    expect(functionTarget.hookAddr).to.equal(directLoopTarget.hookAddr);
     expect(functionTarget.reportAddr).to.equal(
       encodeFunctionReportAddr(loopy.id),
     );
+
+    // Only `WasmCode.Struct.Loop` redirects `before` to the first
+    // sub-instruction of the Loop's body, so it fires on every iteration.
+    const [structLoopTarget] = getInstructions(
+      wasm,
+      WasmCode.Struct.Loop,
+      'before',
+    );
+    expect(structLoopTarget.hookAddr).to.equal(
+      loopInstr.subInstructions[0].startAddress,
+    );
+    expect(structLoopTarget.hookAddr).to.not.equal(directLoopTarget.hookAddr);
   });
 });

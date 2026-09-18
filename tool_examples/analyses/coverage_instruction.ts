@@ -62,8 +62,8 @@ export async function analyse(
   logger.info(`Registering Advices...`);
   const startTimeRegister = Date.now();
 
-  analysis.before(WasmCode.If, cb);
-  analysis.after(WasmCode.If, cbAfter);
+  analysis.before(WasmCode.Struct.If, cb);
+  analysis.after(WasmCode.Struct.If, cbAfter);
 
   analysis.before(WasmCode.Br, cb);
   analysis.before(WasmCode.BrIf, cb);
@@ -94,10 +94,10 @@ export async function analyse(
   analysis.before(WasmCode.MemorySize, cb);
   analysis.before(WasmCode.MemoryGrow, cb);
 
-  analysis.before(WasmCode.Block, cb);
-  analysis.after(WasmCode.Block, cbAfter);
-  analysis.before(WasmCode.Loop, cb);
-  analysis.after(WasmCode.Loop, cbAfter);
+  analysis.before(WasmCode.Struct.Block, cb);
+  analysis.after(WasmCode.Struct.Block, cbAfter);
+  analysis.before(WasmCode.Struct.Loop, cb);
+  analysis.after(WasmCode.Struct.Loop, cbAfter);
 
   const registerTime = logMeasurement(
     logger,
