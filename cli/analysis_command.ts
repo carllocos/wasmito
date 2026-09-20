@@ -15,7 +15,7 @@ import { analyse as analyseInstructionMix } from '../tool_examples/analyses/inst
 import { analyse as analyseMemoryTracing } from '../tool_examples/analyses/memory_tracing';
 import { analyse as analyseSafeHeap } from '../tool_examples/analyses/safe_heap';
 import { analyse as analyseNone } from '../tool_examples/analyses/no_analysis';
-import { analyse as analyseCallgraphCounts } from '../tool_examples/analyses/call_graph_counts';
+// import { analyse as analyseCallgraphCounts } from '../tool_examples/analyses/call_graph_counts';
 import { analyse as analyseBranches } from '../tool_examples/analyses/branches';
 import {
   TimeoutConfig,
@@ -45,7 +45,7 @@ const analyses: Array<AnalysisRun> = [
   ['instruction-mix', analyseInstructionMix],
   ['memory-trace', analyseMemoryTracing],
   ['safe-heap', analyseSafeHeap],
-  ['call-graph-counts', analyseCallgraphCounts],
+  // ['call-graph-counts', analyseCallgraphCounts],
   ['branches', analyseBranches],
 ];
 
