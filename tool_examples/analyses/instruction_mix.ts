@@ -19,12 +19,12 @@ import {
   TimeoutConfig,
 } from '../../src/util/benchmark_util';
 
-const counts = new Map<string, number>();
+const counts = new Map<number, number>();
 function increaseCount(
   instr: WasmInstruction,
   _args: ReadOnlyWasmValue[],
 ): void {
-  counts.set(instr.name, (counts.get(instr.name) ?? 0) + 1);
+  counts.set(instr.startAddress, (counts.get(instr.startAddress) ?? 0) + 1);
   const fid = instr.getEnclosingFunction().id;
   console.log(
     `In function ${fid} instr ${instr.startAddress} NAME=${instr.name}`,
@@ -35,7 +35,7 @@ function increaseCountAfter(
   instr: WasmInstruction,
   _args: ReadOnlyWasmValue | undefined,
 ): void {
-  counts.set(instr.name, (counts.get(instr.name) ?? 0) + 1);
+  counts.set(instr.startAddress, (counts.get(instr.startAddress) ?? 0) + 1);
   const fid = instr.getEnclosingFunction().id;
   console.log(
     `In function ${fid} instr ${instr.startAddress} NAME=${instr.name}`,
@@ -104,8 +104,6 @@ export async function analyse(
   analysis.before(WasmCode.Struct.Loop, increaseCount);
   analysis.after(WasmCode.Struct.Loop, increaseCountAfter);
 
-  // Special cases
-  // analysis.begin(...) // TODO begin
   const registerTime = logMeasurement(
     logger,
     startTimeRegister,
