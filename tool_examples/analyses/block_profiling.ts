@@ -18,8 +18,12 @@ import {
   logMeasurement,
   TimeoutConfig,
 } from '../../src/util/benchmark_util';
+import { WASMFunction } from '../../src/webassembly/wasm/wasm_function';
+
+const logger = createLogger('BlockProfiling');
 
 const blockCount = new Map<number, Map<number, number>>();
+
 function addBlockEnter(
   instr: WasmInstruction,
   _args: ReadOnlyWasmValue[],
@@ -31,25 +35,25 @@ function addBlockEnter(
   const count = funCounts.get(idx) ?? 0;
   funCounts.set(idx, count + 1);
   blockCount.set(func.id, funCounts);
-  console.log(
-    `In function ${func.id} instr ${instr.startAddress} NAME=${instr.name}`,
-  );
-  return;
 }
 
-export function getCount(
-  wasm: WasmModule,
-  fid: number,
-  instrIdx: number,
-): number {
-  const f = wasm.getFunction(fid);
-  if (f === undefined) return 0;
-  const i = f.allInstructions[instrIdx];
-  if (i === undefined) return 0;
-  return blockCount.get(f.id)?.get(instrIdx) ?? 0;
+function addFuncEnter(func: WASMFunction, _args: ReadOnlyWasmValue[]): void {
+  // const instr = func.allInstructions[0];
+  const idx = 0;
+  // const idx = instr.startAddress;
+  const funCounts = blockCount.get(func.id) ?? new Map();
+  const count = funCounts.get(idx) ?? 0;
+  funCounts.set(idx, count + 1);
+  blockCount.set(func.id, funCounts);
 }
 
-const logger = createLogger('BlockProfilingAnalysis');
+function csvLog() {
+  console.log('fid,pc,counts');
+  for (const [fid, countsFunc] of blockCount.entries()) {
+    for (const [pc, counts] of countsFunc.entries())
+      console.log(`${fid},${pc}, ${counts}`);
+  }
+}
 
 export async function analyse(
   wasmPath: string,
@@ -73,10 +77,9 @@ export async function analyse(
   const analysis = new WasmAnalysis(wasm, vmConnection);
   logger.info(`registering advices...`);
   const startTimeRegister = Date.now();
+  analysis.before(WasmCode.Struct.Func, addFuncEnter);
   analysis.before(WasmCode.If, addBlockEnter);
   analysis.before(WasmCode.Else, addBlockEnter);
-  analysis.before(WasmCode.Call, addBlockEnter);
-  analysis.before(WasmCode.CallIndirect, addBlockEnter);
   analysis.before(WasmCode.Struct.Block, addBlockEnter);
   analysis.before(WasmCode.Struct.Loop, addBlockEnter);
   const registerTime = logMeasurement(
@@ -97,7 +100,7 @@ export async function analyse(
   logger.info(`running WARDuino`);
   const startAnalysis = Date.now();
   try {
-    await analysis.run(timeouts.timeoutMsAnalysisRun);
+    await analysis.run(csvLog, timeouts.timeoutMsAnalysisRun);
     const analysisTime = logMeasurement(
       logger,
       startAnalysis,
