@@ -9,11 +9,11 @@ import { getGlobalLogger } from '../src/logger/logger';
 import { analyse as analyseCallgraph } from '../tool_examples/analyses/call_graph';
 import { analyse as analyseBlocks } from '../tool_examples/analyses/block_profiling';
 import { analyse as analyseInstrCoverage } from '../tool_examples/analyses/coverage_instruction';
-import { analyse as analyseCryptomining } from '../tool_examples/analyses/cryptominer_detection_shorter';
-import { analyse as analyseDenan } from '../tool_examples/analyses/denan';
-import { analyse as analyseInstructionMix } from '../tool_examples/analyses/instruction_mix';
+// import { analyse as analyseCryptomining } from '../tool_examples/analyses/cryptominer_detection_shorter';
+// import { analyse as analyseDenan } from '../tool_examples/analyses/denan';
+// import { analyse as analyseInstructionMix } from '../tool_examples/analyses/instruction_mix';
 import { analyse as analyseMemoryTracing } from '../tool_examples/analyses/memory_tracing';
-import { analyse as analyseSafeHeap } from '../tool_examples/analyses/safe_heap';
+// import { analyse as analyseSafeHeap } from '../tool_examples/analyses/safe_heap';
 import { analyse as analyseNone } from '../tool_examples/analyses/no_analysis';
 // import { analyse as analyseCallgraphCounts } from '../tool_examples/analyses/call_graph_counts';
 import { analyse as analyseBranches } from '../tool_examples/analyses/branches';
@@ -42,12 +42,11 @@ const analyses: Array<AnalysisRun> = [
   ['block-profiling', analyseBlocks],
   ['call-graph', analyseCallgraph],
   ['coverage-instruction', analyseInstrCoverage],
-  ['cryptomining', analyseCryptomining],
-  ['denan', analyseDenan],
-  ['instruction-mix', analyseInstructionMix],
+  // ['cryptomining', analyseCryptomining],
+  // ['denan', analyseDenan],
+  // ['instruction-mix', analyseInstructionMix],
   ['memory-trace', analyseMemoryTracing],
-  ['safe-heap', analyseSafeHeap],
-  // ['call-graph-counts', analyseCallgraphCounts],
+  // ['safe-heap', analyseSafeHeap],
   ['branches', analyseBranches],
   ['instruction-count', anaylseInstrCounts],
   ['hotness', analyseHotness],
