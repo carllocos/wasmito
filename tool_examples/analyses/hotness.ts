@@ -1,0 +1,103 @@
+/***
+ ** This is an implementation of Whamm's Hotness analysis
+ ** Original source file found in:
+ ** github.com/ejrgilbert/whamm/blob/master/tests/scripts/paper_eval/hotness/hotness-hw.mm
+ **
+ ***/
+import { WasmModule } from '../../src/webassembly/wasm/wasm_module';
+import { WasmAnalysis } from '../../src/tool_api/wasm_analysis';
+import { ReadOnlyWasmValue } from '../../src/tool_api/interrupts';
+import { WasmInstruction } from '../../src/webassembly/wasm/wasm_instruction';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { spawnDevVM, spawnMCUVM } from '../spawn_vm';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { TargetVMConfig } from './target_vm';
+import { createLogger } from '../../src/logger/logger';
+import {
+  BenchmarkMeasurement,
+  FailedMeasurement,
+  logMeasurement,
+  TimeoutConfig,
+} from '../../src/util/benchmark_util';
+const logger = createLogger('hotness');
+
+const counts = new Map<number, number>();
+function increaseCount(
+  instr: WasmInstruction,
+  _args: ReadOnlyWasmValue[],
+): void {
+  counts.set(instr.startAddress, (counts.get(instr.startAddress) ?? 0) + 1);
+}
+
+export async function analyse(
+  wasmPath: string,
+  timeouts: TimeoutConfig,
+): Promise<BenchmarkMeasurement> {
+  logger.info(`parsing Wasm module '${wasmPath}'`);
+  const startTimeParse = Date.now();
+  const wasm = new WasmModule(wasmPath);
+  const parseTime = logMeasurement(
+    logger,
+    startTimeParse,
+    Date.now(),
+    'Wasm Parsing',
+  );
+
+  logger.info(`spawning & connecting to WARDuino...`);
+  const vmConnection = await spawnDevVM(wasm); // for local VM
+  // const vmConnection = await spawnMCUVM(wasm, TargetVMConfig); // for MCU VM
+  const analysis = new WasmAnalysis(wasm, vmConnection);
+
+  logger.info(`Registering Advices...`);
+  // hooks that correspond direclty to one instruction
+  const startTimeRegister = Date.now();
+  for (const f of wasm.functions) {
+    for (const i of f.allInstructions) {
+      analysis.before(i, increaseCount);
+    }
+  }
+
+  const registerTime = logMeasurement(
+    logger,
+    startTimeRegister,
+    Date.now(),
+    'Registering Advices',
+  );
+
+  logger.info(`Deploying Hooks...`);
+  const startTimeDeploy = Date.now();
+  await analysis.deploy();
+  const deployTime = logMeasurement(
+    logger,
+    startTimeDeploy,
+    Date.now(),
+    'Deploy Hooks',
+  );
+
+  logger.info(`running WARDuino`);
+  const analysisStartTime = Date.now();
+  try {
+    await analysis.run(timeouts.timeoutMsAnalysisRun);
+    const analysisTime = logMeasurement(
+      logger,
+      analysisStartTime,
+      Date.now(),
+      'Analysis Completion',
+    );
+    return {
+      wasmParsingMs: parseTime,
+      advicesRegistrationMs: registerTime,
+      advicesDeploymentMs: deployTime,
+      analysisRunMs: analysisTime,
+    };
+  } catch (e) {
+    const errMsg = e instanceof Error ? e.message : e;
+    const f: FailedMeasurement = {
+      errorParsing: `${parseTime}`,
+      errorRegister: `${parseTime}`,
+      errorDeploy: `${parseTime}`,
+      errorRun: `${errMsg}`,
+    };
+    return f;
+  }
+}
