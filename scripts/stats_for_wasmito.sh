@@ -5,7 +5,12 @@
 # and compares every analysis against the "no-analysis" baseline to show how
 # much slower each analysis is on each wasm module.
 #
-# Usage: stats_for_runs.sh <csv-file> [output-dir]
+# Usage: stats_for_runs.sh <csv-file> [output-dir] [--verbose]
+#
+#   --verbose: by default only the total_ms metric is displayed. With
+#              --verbose, all metrics (parsing, register, deploy, run, total)
+#              are displayed. The optional CSV output always contains all
+#              metrics regardless of this flag.
 #
 #   csv-file: a CSV with header:
 #             analysis,wasm,parsing_ms,register_ms,deploy_ms,run_ms,total_ms
@@ -33,7 +38,9 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$REPO_ROOT"
 
 usage() {
-    echo "Usage: $(basename "$0") <csv-file> [output-dir]" >&2
+    echo "Usage: $(basename "$0") <csv-file> [output-dir] [--verbose]" >&2
+    echo "  --verbose:  also show parsing, register, deploy and run metrics" >&2
+    echo "              (by default only total_ms is displayed)." >&2
     echo "  csv-file:   CSV with header:" >&2
     echo "              analysis,wasm,parsing_ms,register_ms,deploy_ms,run_ms,total_ms" >&2
     echo "  output-dir: optional. If given, writes:" >&2
@@ -42,13 +49,23 @@ usage() {
     echo "              there, in addition to printing tables to stdout." >&2
 }
 
-if [ "$#" -lt 1 ] || [ "$#" -gt 2 ]; then
+VERBOSE=0
+POSITIONAL=()
+for arg in "$@"; do
+    if [ "$arg" = "--verbose" ]; then
+        VERBOSE=1
+    else
+        POSITIONAL+=("$arg")
+    fi
+done
+
+if [ "${#POSITIONAL[@]}" -lt 1 ] || [ "${#POSITIONAL[@]}" -gt 2 ]; then
     usage
     exit 1
 fi
 
-CSV_FILE="$1"
-OUTPUT_DIR="${2:-}"
+CSV_FILE="${POSITIONAL[0]}"
+OUTPUT_DIR="${POSITIONAL[1]:-}"
 
 if [ ! -f "$CSV_FILE" ]; then
     echo "Error: csv file '$CSV_FILE' does not exist" >&2
@@ -64,7 +81,7 @@ if [ -n "$OUTPUT_DIR" ]; then
     mkdir -p "$OUTPUT_DIR"
 fi
 
-python3 - "$CSV_FILE" "$OUTPUT_DIR" <<'PYEOF'
+python3 - "$CSV_FILE" "$OUTPUT_DIR" "$VERBOSE" <<'PYEOF'
 import csv
 import statistics
 import sys
@@ -75,6 +92,10 @@ REQUIRED_COLUMNS = ["analysis", "wasm"] + METRICS
 
 csv_path = sys.argv[1]
 output_dir = sys.argv[2] if len(sys.argv) > 2 else ""
+verbose = len(sys.argv) > 3 and sys.argv[3] == "1"
+
+# Metrics shown in the printed tables. The CSV output always has every metric.
+DISPLAY_METRICS = METRICS if verbose else ["total_ms"]
 
 with open(csv_path, newline="") as f:
     reader = csv.DictReader(f)
@@ -159,7 +180,7 @@ print(header)
 print("  " + "-" * (len(header) - 2))
 for wasm in wasm_names:
     for analysis in sorted_analyses(groups[wasm]):
-        for metric in METRICS:
+        for metric in DISPLAY_METRICS:
             s = stats_of(groups[wasm][analysis][metric])
             print(
                 f"  {wasm:<{wasm_col_width}} {analysis:<20} {metric:<12} {s['count']:>6} "
@@ -208,10 +229,11 @@ for wasm in wasm_names:
                 pct = None
                 ratio_str = f"{'n/a':>29}"
                 pct_str = f"{'n/a':>11}"
-            print(
-                f"  {wasm:<{wasm_col_width}} {analysis:<20} {metric:<12} {baseline_mean:>13.2f} "
-                f"{analysis_mean:>13.2f} {diff:>10.2f} {ratio_str} {pct_str}"
-            )
+            if metric in DISPLAY_METRICS:
+                print(
+                    f"  {wasm:<{wasm_col_width}} {analysis:<20} {metric:<12} {baseline_mean:>13.2f} "
+                    f"{analysis_mean:>13.2f} {diff:>10.2f} {ratio_str} {pct_str}"
+                )
             comparison_rows.append(
                 (wasm, analysis, metric, baseline_mean, analysis_mean, diff, ratio, pct)
             )
