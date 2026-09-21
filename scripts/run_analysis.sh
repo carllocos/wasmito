@@ -15,13 +15,14 @@ ANALYSES=(
   block-profiling
   call-graph
   coverage-instruction
-  cryptomining
-  denan
-  instruction-mix
   memory-trace
-  safe-heap
   branches
+  instruction-count
+  hotness
 )
+
+# Timeout in seconds for the execution of each analysis (10 minutes).
+EXECUTION_TIMEOUT_SECONDS=600
 
 usage() {
   echo "Usage: $0 <wasm-dir-or-file> <output-dir> [analysis] [repetitions]" >&2
@@ -116,7 +117,7 @@ for analysis in "${ANALYSES_TO_RUN[@]}"; do
 
       echo "Running analysis '$analysis' on '$wasm_file' (run $run/$REPETITIONS) -> '$all_file'"
       start_ms="$(node -e 'console.log(Date.now())')"
-      node "$CLI" analysis "$analysis" "$wasm_file" --csv "$csv_file" 2>&1 | tee "$all_file"
+      node "$CLI" analysis "$analysis" "$wasm_file" --csv "$csv_file" --te "$EXECUTION_TIMEOUT_SECONDS" 2>&1 | tee "$all_file"
       end_ms="$(node -e 'console.log(Date.now())')"
       elapsed_ms="$((end_ms - start_ms))"
 
