@@ -1,11 +1,11 @@
 /***
- ** This is an implementation of Wasabi's analysis
- ** Original source file found in: github.com/aaronmunsters/wasabi/tree/master/examples/analyses
+ ** This is an implementation based on Whamm's call graph
+ ** Original source file found in: github.com/ejrgilbert/whamm/blob/master/tests/scripts/paper_eval/call_graph/call_graph.mm
  ***/
 import { WasmModule } from '../../src/webassembly/wasm/wasm_module';
 import { WasmAnalysis } from '../../src/tool_api/wasm_analysis';
 import { ReadOnlyWasmValue } from '../../src/tool_api/interrupts';
-import { CallInstruction } from '../../src/webassembly/wasm/wasm_instruction';
+import { WasmInstruction } from '../../src/webassembly/wasm/wasm_instruction';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { spawnDevVM, spawnMCUVM } from '../spawn_vm';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -18,7 +18,31 @@ import {
   logMeasurement,
   TimeoutConfig,
 } from '../../src/util/benchmark_util';
+import { WASMFunction } from '../../src/webassembly/wasm/wasm_function';
 const logger = createLogger('CallGraphAnalysis');
+
+const callGraph = new Map<number, Map<number, number>>();
+let caller = -1;
+
+function onCalleeEntry(callee: WASMFunction, _args: ReadOnlyWasmValue[]): void {
+  if (caller >= 0) {
+    const counts = callGraph.get(caller) ?? new Map();
+    counts.set(callee.id, (counts.get(callee.id) ?? 0) + 1);
+    callGraph.set(caller, counts);
+  }
+}
+
+function onCall(call: WasmInstruction, _args: ReadOnlyWasmValue[]): void {
+  caller = call.getEnclosingFunction().id;
+}
+
+function csvLogGraph() {
+  console.log('key ((i32,i32)), val (i32)');
+  for (const [caller, calleeCounts] of callGraph.entries()) {
+    for (const [callee, counts] of calleeCounts.entries())
+      console.log(`(${caller},${callee}), ${counts}`);
+  }
+}
 
 export async function analyse(
   wasmPath: string,
@@ -37,20 +61,13 @@ export async function analyse(
   logger.info(`spawning & connection to WARDuino...`);
   const vmConnection = await spawnDevVM(wasm); // for local VM
   const analysis = new WasmAnalysis(wasm, vmConnection);
-  const callgraph = new Set<string>();
 
   logger.info(`Registering Advices...`);
   const startTimeRegister = Date.now();
-  analysis.before(
-    WasmCode.Call,
-    (call: CallInstruction, _args: ReadOnlyWasmValue[]): void => {
-      const caller = wasm.getEnclosingFunction(call).id;
-      const callee = call.calledFunc;
-      const edge = `${caller} -> ${callee}`;
-      console.log(edge);
-      callgraph.add(edge);
-    },
-  );
+  analysis.before(WasmCode.Call, onCall);
+  analysis.before(WasmCode.CallIndirect, onCall);
+  analysis.before(WasmCode.Struct.Func, onCalleeEntry);
+
   const registerTime = logMeasurement(
     logger,
     startTimeRegister,
@@ -71,7 +88,7 @@ export async function analyse(
   logger.info(`running VM`);
   const analysisStartTime = Date.now();
   try {
-    await analysis.run(timeouts.timeoutMsAnalysisRun);
+    await analysis.run(csvLogGraph, timeouts.timeoutMsAnalysisRun);
     const analysisTime = logMeasurement(
       logger,
       analysisStartTime,
