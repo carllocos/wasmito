@@ -17,6 +17,8 @@ import { analyse as analyseSafeHeap } from '../tool_examples/analyses/safe_heap'
 import { analyse as analyseNone } from '../tool_examples/analyses/no_analysis';
 // import { analyse as analyseCallgraphCounts } from '../tool_examples/analyses/call_graph_counts';
 import { analyse as analyseBranches } from '../tool_examples/analyses/branches';
+import { analyse as anaylseInstrCounts } from '../tool_examples/analyses/instruction_count';
+import { analyse as analyseHotness } from '../tool_examples/analyses/hotness';
 import {
   TimeoutConfig,
   BenchmarkMeasurement,
@@ -47,6 +49,8 @@ const analyses: Array<AnalysisRun> = [
   ['safe-heap', analyseSafeHeap],
   // ['call-graph-counts', analyseCallgraphCounts],
   ['branches', analyseBranches],
+  ['instruction-count', anaylseInstrCounts],
+  ['hotness', analyseHotness],
 ];
 
 async function unusedFunc(
