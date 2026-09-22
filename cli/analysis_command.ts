@@ -19,6 +19,7 @@ import { analyse as analyseNone } from '../tool_examples/analyses/no_analysis';
 import { analyse as analyseBranches } from '../tool_examples/analyses/branches';
 import { analyse as anaylseInstrCounts } from '../tool_examples/analyses/instruction_count';
 import { analyse as analyseHotness } from '../tool_examples/analyses/hotness';
+import { analyse as analyseIMix } from '../tool_examples/analyses/imix';
 import {
   TimeoutConfig,
   BenchmarkMeasurement,
@@ -50,6 +51,7 @@ const analyses: Array<AnalysisRun> = [
   ['branches', analyseBranches],
   ['instruction-count', anaylseInstrCounts],
   ['hotness', analyseHotness],
+  ['imix', analyseIMix],
 ];
 
 async function unusedFunc(
