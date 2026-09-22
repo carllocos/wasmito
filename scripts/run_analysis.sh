@@ -132,6 +132,11 @@ for analysis in "${ANALYSES_TO_RUN[@]}"; do
         > "$output_file" || true
 
       echo "Total time: ${elapsed_ms} ms" | tee -a "$all_file"
+
+      if [ -f "$csv_file" ] && tail -n 1 "$csv_file" | grep -qi "timeout"; then
+        echo "Timeout detected in '$csv_file' for analysis '$analysis' on '$wasm_file' (run $run/$REPETITIONS). Stopping remaining runs." >&2
+        exit 1
+      fi
     done
   done
 done
