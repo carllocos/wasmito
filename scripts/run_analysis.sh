@@ -12,13 +12,14 @@ cd "$REPO_ROOT"
 
 ANALYSES=(
   no-analysis
-  block-profiling
-  call-graph
-  coverage-instruction
-  memory-trace
   branches
-  instruction-count
+  icount
+  imix
   hotness
+  mem_access
+  basic-block
+  instr-coverage
+  call-graph
 )
 
 # Timeout in seconds for the execution of each analysis (10 minutes).
