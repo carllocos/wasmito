@@ -1,21 +1,30 @@
 #!/bin/sh
 #
-# Usage: wizeng_run.sh <wasm-module-or-dir> <output-dir> [optimise|no-opt] <num-runs> [timeout-seconds] [whamm-module]
+# Usage: wizeng_run.sh <x86-64|jvm> <wasm-module-or-dir> <output-dir> [optimise|no-opt] <num-runs> [timeout-seconds] [whamm-module]
 #
-# Runs a Wasm module with wizeng.jvm and always reports its execution time
+# Runs a Wasm module with wizeng and always reports its execution time
 # in milliseconds.
+#
+# <x86-64|jvm> selects which wizeng build to use: "jvm" runs wizeng.jvm,
+# "x86-64" runs wizeng.x86-64-linux (Wizard's native x86-64 target).
 #
 # If <wasm-module-or-dir> is a directory, every *.wasm file directly inside
 # it (non-recursive) is run in turn, each producing its own set of result
 # files as described below.
 #
-# NOTE: this build of wizeng.jvm only registers the "v3-int" execution
-# mode (the slow interpreter) -- the optimizing/JIT tiers (jit/spc/lazy/dyn)
+# NOTE: the wizeng.jvm build only registers the "v3-int" execution mode
+# (the slow interpreter) -- the optimizing/JIT tiers (jit/spc/lazy/dyn)
 # only exist in Wizard's native x86-64 target, not the JVM one, so there is
-# no wizeng flag that turns on "all optimisations" here. --fast-functions
-# is the only performance-related toggle this build exposes (it makes
+# no wizeng flag that turns on "all optimisations" there. --fast-functions
+# is the only performance-related toggle the jvm build exposes (it makes
 # functions exported with a `fast:` name prefix run as fast functions), so
-# that's what "optimise" enables; both modes otherwise run the interpreter.
+# that's what "optimise" enables on jvm; both modes otherwise run the
+# interpreter.
+#
+# On the x86-64 build, "no-opt" disables all optimisations by selecting
+# the interpreter-only execution mode (--mode=int), and "optimise" selects
+# the SPC JIT tier (--mode=jit); --fast-functions is set to true/false the
+# same way as on jvm in both cases.
 #
 # When <whamm-module> is provided, a Wasm module is not run directly.
 # Instead, as in wei_run.sh, <whamm-module> is treated as a whamm
@@ -59,18 +68,34 @@
 # <output-dir>/benchmark.csv (the per-module .output and .all files are still
 # written separately).
 
-MODULE_ARG=$1
-OUT_DIR=$2
-OPT_MODE=$3
-NUM_RUNS=$4
-TIMEOUT_SECS=${5:-30}
-WHAMM_FILE=$6
-CORE="/Users/crojcas/Documents/projects/whamm/target/wasm32-wasip1/release/whamm_core.wasm"
+TARGET=$1
+MODULE_ARG=$2
+OUT_DIR=$3
+OPT_MODE=$4
+NUM_RUNS=$5
+TIMEOUT_SECS=${6:-30}
+WHAMM_FILE=$7
+# Resolved from the current working directory so the script is portable
+# across machines; it must be run from the whamm project root.
+CORE="$(pwd)/target/wasm32-wasip1/release/whamm_core.wasm"
 
-if [ -z "$MODULE_ARG" ] || [ -z "$OUT_DIR" ] || [ -z "$NUM_RUNS" ]; then
-    echo "Usage: $0 <wasm-module-or-dir> <output-dir> [optimise|no-opt] <num-runs> [timeout-seconds] [whamm-module]" >&2
+if [ -z "$TARGET" ] || [ -z "$MODULE_ARG" ] || [ -z "$OUT_DIR" ] || [ -z "$NUM_RUNS" ]; then
+    echo "Usage: $0 <x86-64|jvm> <wasm-module-or-dir> <output-dir> [optimise|no-opt] <num-runs> [timeout-seconds] [whamm-module]" >&2
     exit 1
 fi
+
+case "$TARGET" in
+    jvm)
+        WIZENG_BIN="wizeng.jvm"
+        ;;
+    x86-64)
+        WIZENG_BIN="wizeng.x86-64-linux"
+        ;;
+    *)
+        echo "Unknown target '$TARGET': expected 'x86-64' or 'jvm'" >&2
+        exit 1
+        ;;
+esac
 
 if command -v timeout >/dev/null 2>&1; then
     TIMEOUT_BIN=timeout
@@ -84,9 +109,11 @@ fi
 case "$OPT_MODE" in
     optimise)
         FAST_FUNCTIONS_FLAG="--fast-functions=true"
+        X86_MODE_FLAG="--mode=jit"
         ;;
     no-opt|"")
         FAST_FUNCTIONS_FLAG="--fast-functions=false"
+        X86_MODE_FLAG="--mode=int"
         ;;
     *)
         echo "Unknown option '$OPT_MODE': expected 'optimise' or 'no-opt'" >&2
@@ -145,16 +172,30 @@ run_module() {
         # Stream stdout/stderr to the terminal as the command runs while also
         # capturing it in $RUN_TMP. A plain pipe would hide the command's exit
         # status (no pipefail in POSIX sh), so it is saved via $STATUS_TMP.
-        if [ -n "$WHAMM_FILE" ]; then
-            {
-                "$TIMEOUT_BIN" "$TIMEOUT_SECS" wizeng.jvm --env=TO_CONSOLE=true --expose=wizeng $FAST_FUNCTIONS_FLAG --monitors="$WHAMM_FILE+$CORE" "$MODULE" 2>&1
-                echo $? > "$STATUS_TMP"
-            } | tee "$RUN_TMP"
+        if [ "$TARGET" = "x86-64" ]; then
+            if [ -n "$WHAMM_FILE" ]; then
+                {
+                    "$TIMEOUT_BIN" "$TIMEOUT_SECS" "$WIZENG_BIN" --env=TO_CONSOLE=true --expose=wizeng $X86_MODE_FLAG $FAST_FUNCTIONS_FLAG --monitors="$WHAMM_FILE+$CORE" "$MODULE" 2>&1
+                    echo $? > "$STATUS_TMP"
+                } | tee "$RUN_TMP"
+            else
+                {
+                    "$TIMEOUT_BIN" "$TIMEOUT_SECS" "$WIZENG_BIN" $X86_MODE_FLAG $FAST_FUNCTIONS_FLAG "$MODULE" 2>&1
+                    echo $? > "$STATUS_TMP"
+                } | tee "$RUN_TMP"
+            fi
         else
-            {
-                "$TIMEOUT_BIN" "$TIMEOUT_SECS" wizeng.jvm --mode=v3-int $FAST_FUNCTIONS_FLAG "$MODULE" 2>&1
-                echo $? > "$STATUS_TMP"
-            } | tee "$RUN_TMP"
+            if [ -n "$WHAMM_FILE" ]; then
+                {
+                    "$TIMEOUT_BIN" "$TIMEOUT_SECS" "$WIZENG_BIN" --env=TO_CONSOLE=true --expose=wizeng $FAST_FUNCTIONS_FLAG --monitors="$WHAMM_FILE+$CORE" "$MODULE" 2>&1
+                    echo $? > "$STATUS_TMP"
+                } | tee "$RUN_TMP"
+            else
+                {
+                    "$TIMEOUT_BIN" "$TIMEOUT_SECS" "$WIZENG_BIN" --mode=v3-int $FAST_FUNCTIONS_FLAG "$MODULE" 2>&1
+                    echo $? > "$STATUS_TMP"
+                } | tee "$RUN_TMP"
+            fi
         fi
         RUN_STATUS=$(cat "$STATUS_TMP")
 
