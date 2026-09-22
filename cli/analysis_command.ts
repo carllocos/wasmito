@@ -40,18 +40,18 @@ type AnalysisRun = [
 const analyses: Array<AnalysisRun> = [
   [ALL_ANALYSIS, unusedFunc],
   ['no-analysis', analyseNone],
-  ['block-profiling', analyseBlocks],
+  ['branches', analyseBranches],
+  ['icount', anaylseInstrCounts],
+  ['imix', analyseIMix],
+  ['hotness', analyseHotness],
+  ['mem_access', analyseMemoryTracing],
+  ['basic-block', analyseBlocks],
+  ['instr-coverage', analyseInstrCoverage],
   ['call-graph', analyseCallgraph],
-  ['coverage-instruction', analyseInstrCoverage],
   // ['cryptomining', analyseCryptomining],
   // ['denan', analyseDenan],
   // ['instruction-mix', analyseInstructionMix],
-  ['memory-trace', analyseMemoryTracing],
   // ['safe-heap', analyseSafeHeap],
-  ['branches', analyseBranches],
-  ['instruction-count', anaylseInstrCounts],
-  ['hotness', analyseHotness],
-  ['imix', analyseIMix],
 ];
 
 async function unusedFunc(
