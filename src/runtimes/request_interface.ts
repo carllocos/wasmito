@@ -20,6 +20,18 @@ export enum SubscriptionParseOutcome {
 }
 
 export class APIRequestInvalidParse extends Error {}
+
+const enum RequestStatus {
+  Pending,
+  Resolved,
+  Rejected,
+}
+
+interface PendingPromise<R> {
+  promise: Promise<R>;
+  resolve: (value: R) => void;
+  reject: (reason?: any) => void;
+}
 const idGenerator = new IDGenerator();
 
 export abstract class APIRequest<R> {
@@ -28,23 +40,18 @@ export abstract class APIRequest<R> {
   private _response: RequestMessage | undefined;
   private _parsed: R | undefined;
 
-  private _resolved: boolean;
-  private _rejected: boolean;
-  public promise: any;
-  private resolver: ((value: R | PromiseLike<R>) => void) | undefined;
-  private rejector: ((reason?: any) => void) | undefined;
-
-  private cb?: () => void;
+  private _status: RequestStatus;
+  private _settle: PendingPromise<R> | undefined;
+  private _rejectReason: any;
 
   constructor() {
     this.id = idGenerator.newID();
-    this.promise = new Promise((resolve, reject) => {
-      this.resolver = resolve;
-      this.rejector = reject;
-    });
-
-    this._resolved = false;
-    this._rejected = false;
+    this._status = RequestStatus.Pending;
+    this._response = undefined;
+    this._parsed = undefined;
+    this._settle = undefined;
+    this._rejectReason = undefined;
+  }
   }
 
   abstract description(): string;
@@ -89,11 +96,11 @@ export abstract class APIRequest<R> {
   }
 
   isResolved(): boolean {
-    return this._rejected || this._resolved;
+    return this._status !== RequestStatus.Pending;
   }
 
   timedout(timeoutMs: number): void {
-    if (!this._rejected && !this._resolved) {
+    if (this._status === RequestStatus.Pending) {
       const errMsg = `Request ${this.description()} timedout after ${
         timeoutMs
       } ms while waiting for reply`;
@@ -105,9 +112,10 @@ export abstract class APIRequest<R> {
   async processRequestMessage(
     msg: RequestMessage,
   ): Promise<SubscriptionParseOutcome> {
-    if (this._rejected) return SubscriptionParseOutcome.Failed;
+    if (this._status === RequestStatus.Rejected)
+      return SubscriptionParseOutcome.Failed;
 
-    if (this._resolved) {
+    if (this._status === RequestStatus.Resolved) {
       if (isSubscriptionMessage(msg)) {
         // case we may feed data to a subscription
         // if(this.isSubscriptionClosed()){}
@@ -132,25 +140,19 @@ export abstract class APIRequest<R> {
   }
 
   private requestResolver(v: R): void {
-    if (!this._resolved && !this._rejected) {
-      this._resolved = true;
-      if (this.cb !== undefined) {
-        this.cb();
-      }
-      this.resolver!(v);
-      this.promise = undefined;
-      this.resolver = undefined;
-      this.rejector = undefined;
+    if (this._status === RequestStatus.Pending) {
+      this._status = RequestStatus.Resolved;
+      this._settle?.resolve(v);
+      this._settle = undefined;
     }
   }
 
   private requestRejector(v?: any): void {
-    if (!this._resolved && !this._rejected) {
-      this._rejected = true;
-      this.rejector!(v);
-      this.promise = undefined;
-      this.resolver = undefined;
-      this.rejector = undefined;
+    if (this._status === RequestStatus.Pending) {
+      this._status = RequestStatus.Rejected;
+      this._rejectReason = v;
+      this._settle?.reject(v);
+      this._settle = undefined;
     }
   }
 }
