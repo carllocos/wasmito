@@ -26,6 +26,14 @@ import {
 
 export type WasmAddress = number;
 
+/*
+ * Share one frozen empty array between instructions without label and subinstructions
+ */
+const EMPTY_INSTRUCTIONS: WasmInstruction[] = Object.freeze(
+  [],
+) as unknown as WasmInstruction[];
+const EMPTY_LABELS: string[] = Object.freeze([]) as unknown as string[];
+
 export class WasmInstruction {
   public readonly opcode: WasmOpcode;
   public readonly name: string;
@@ -36,7 +44,7 @@ export class WasmInstruction {
   public startAddress: number;
   public endAddress: number;
   private _subInstructions: WasmInstruction[];
-  private _allSubInstructions: WasmInstruction[];
+  private _allSubInstructions: WasmInstruction[] | undefined;
   private _enclosingFunc: WASMFunction | undefined;
   private _indexInFunction: number | undefined;
 
@@ -55,10 +63,17 @@ export class WasmInstruction {
       throw Error(`inexistent opcode type for ${this.name}`);
     }
     this._signature = t;
-    this.args = opcodeLabels ?? [];
+    this.args =
+      opcodeLabels === undefined || opcodeLabels.length === 0
+        ? EMPTY_LABELS
+        : opcodeLabels;
     this.immediate = immediate;
-    this._subInstructions = [];
-    this._allSubInstructions = [];
+    this._subInstructions = EMPTY_INSTRUCTIONS;
+    this._allSubInstructions = undefined;
+    // lazily computed after parsing.
+    // define fields here so V8 keeps them in-object
+    this._enclosingFunc = undefined;
+    this._indexInFunction = undefined;
   }
 
   set enclosingFunction(f: WASMFunction) {
@@ -91,16 +106,20 @@ export class WasmInstruction {
   }
 
   set subInstructions(ins: WasmInstruction[]) {
-    this._subInstructions = ins;
-    let allSubIns: WasmInstruction[] = [];
-    for (const i of this._subInstructions) {
-      allSubIns.push(i);
-      allSubIns = allSubIns.concat(i.allSubInstructions);
-    }
-    this._allSubInstructions = allSubIns;
+    this._subInstructions = ins.length === 0 ? EMPTY_INSTRUCTIONS : ins;
+    this._allSubInstructions = undefined;
   }
 
   get allSubInstructions(): WasmInstruction[] {
+    if (this._allSubInstructions === undefined) {
+      if (this._subInstructions.length === 0) {
+        this._allSubInstructions = EMPTY_INSTRUCTIONS;
+      } else {
+        const allSubIns: WasmInstruction[] = [];
+        collectSubInstructions(this, allSubIns);
+        this._allSubInstructions = allSubIns;
+      }
+    }
     return this._allSubInstructions;
   }
 
@@ -145,6 +164,16 @@ export class WasmInstruction {
 
   public toJSON(): string {
     return JSON.stringify(this.toJSONObj());
+  }
+}
+
+function collectSubInstructions(
+  instr: WasmInstruction,
+  acc: WasmInstruction[],
+): void {
+  for (const i of instr.subInstructions) {
+    acc.push(i);
+    collectSubInstructions(i, acc);
   }
 }
 
