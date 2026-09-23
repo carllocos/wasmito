@@ -122,7 +122,7 @@ csv_file="$OUTPUT_DIR/benchmark.csv"
 
 # Must match the header written by writeLastMeasurementToFile in
 # src/util/benchmark_util.ts.
-CSV_HEADER="analysis,wasm,parsing_ms,register_ms,deploy_ms,run_ms,total_ms"
+CSV_HEADER="analysis,wasm,parsing_ms,spawn_ms,register_ms,deploy_ms,run_ms,total_ms"
 
 # Returns success if the node output in the given file shows that node ran
 # out of heap memory.
@@ -133,7 +133,7 @@ is_out_of_heap() {
 # Appends an out-of-heap row to the CSV file. Like the CLI, rows are
 # prefixed with a newline unless the header still has to be written.
 write_out_of_heap_row() {
-  local row="$1,$2,out-of-heap,out-of-heap,out-of-heap,out-of-heap,out-of-heap"
+  local row="$1,$2,out-of-heap,out-of-heap,out-of-heap,out-of-heap,out-of-heap,out-of-heap"
   if [ -s "$csv_file" ] && [ "$(head -n 1 "$csv_file")" = "$CSV_HEADER" ]; then
     printf '\n%s' "$row" >> "$csv_file"
   else
