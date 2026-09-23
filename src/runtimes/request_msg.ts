@@ -215,10 +215,14 @@ function createMessageFromHexaString(
   const decoded = decodeLEB128(buff);
   if (decoded === undefined) return undefined;
 
+  // v8 optimisation: optional fields declared upfront to store in-object
   const response: RequestMessage = {
     id: decoded.value,
     interrupt,
     responseType,
+    error_code: undefined,
+    error_msg: undefined,
+    sub: undefined,
   };
 
   idx = idx + decoded.bytesRead * 2;
