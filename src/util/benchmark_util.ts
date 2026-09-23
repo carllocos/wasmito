@@ -11,6 +11,7 @@ export interface TimeoutConfig {
 export type BenchmarkMeasurement = SuccessMeasurement | FailedMeasurement;
 export interface SuccessMeasurement {
   wasmParsingMs: number;
+  vmSpawnMs: number;
   advicesRegistrationMs: number;
   advicesDeploymentMs: number;
   analysisRunMs: number;
@@ -18,6 +19,7 @@ export interface SuccessMeasurement {
 
 export interface FailedMeasurement {
   errorParsing: string;
+  errorSpawn: string;
   errorRegister: string;
   errorDeploy: string;
   errorRun: string;
@@ -55,6 +57,7 @@ const cvsHeader = [
   'analysis',
   'wasm',
   'parsing_ms',
+  'spawn_ms',
   'register_ms',
   'deploy_ms',
   'run_ms',
@@ -89,10 +92,17 @@ export function writeLastMeasurementToFile(
   const m = bms.measurements[bms.measurements.length - 1];
   const csvRow: string[] = [bms.analysisName, bms.wasm];
   if (isFailedMeasurement(m)) {
-    csvRow.push(m.errorParsing, m.errorRegister, m.errorDeploy, m.errorRun);
+    csvRow.push(
+      m.errorParsing,
+      m.errorSpawn,
+      m.errorRegister,
+      m.errorDeploy,
+      m.errorRun,
+    );
   } else if (isSuccessMeasurement(m)) {
     csvRow.push(
       `${m.wasmParsingMs}`,
+      `${m.vmSpawnMs}`,
       `${m.advicesRegistrationMs}`,
       `${m.advicesDeploymentMs}`,
       `${m.analysisRunMs}`,
