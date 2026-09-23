@@ -96,7 +96,6 @@ export function writeLastMeasurementToFile(
       `${m.advicesRegistrationMs}`,
       `${m.advicesDeploymentMs}`,
       `${m.analysisRunMs}`,
-      `${bms.totalTimes[bms.totalTimes.length - 1]}`,
     );
   }
   csvRow.push(`${bms.totalTimes[bms.totalTimes.length - 1]}`);
