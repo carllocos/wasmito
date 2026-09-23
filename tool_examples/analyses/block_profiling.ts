@@ -70,11 +70,18 @@ export async function analyse(
   );
 
   logger.info(`spawning & connecting to WARDuino...`);
+  const startTimeSpawn = Date.now();
   const vmConnection = await spawnDevVM(wasm); // for local VM
   // const vmConnection = await connectToExistingDevVM(wasm, 8192); // for local VM
   // const vmConnection = await spawnMCUVM(wasm, TargetVMConfig); // for MCU VM
 
   const analysis = new WasmAnalysis(wasm, vmConnection);
+  const spawnTime = logMeasurement(
+    logger,
+    startTimeSpawn,
+    Date.now(),
+    'Spawning VM',
+  );
   logger.info(`registering advices...`);
   const startTimeRegister = Date.now();
   analysis.before(WasmCode.Struct.Func, addFuncEnter);
@@ -109,6 +116,7 @@ export async function analyse(
     );
     const m: BenchmarkMeasurement = {
       wasmParsingMs: parseTime,
+      vmSpawnMs: spawnTime,
       advicesRegistrationMs: registerTime,
       advicesDeploymentMs: deployTime,
       analysisRunMs: analysisTime,
@@ -118,6 +126,7 @@ export async function analyse(
     const errMsg = e instanceof Error ? e.message : e;
     const f: FailedMeasurement = {
       errorParsing: `${parseTime}`,
+      errorSpawn: `${spawnTime}`,
       errorRegister: `${parseTime}`,
       errorDeploy: `${parseTime}`,
       errorRun: `${errMsg}`,

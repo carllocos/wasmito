@@ -39,9 +39,16 @@ export async function analyse(
   );
 
   logger.info(`spawning & connecting to WARDuino...`);
+  const startTimeSpawn = Date.now();
   const vmConnection = await spawnDevVM(wasm); // for local VM
   // const vmConnection = await spawnMCUVM(wasm, TargetVMConfig); // for MCU VM
   const analysis = new WasmAnalysis(wasm, vmConnection);
+  const spawnTime = logMeasurement(
+    logger,
+    startTimeSpawn,
+    Date.now(),
+    'Spawning VM',
+  );
 
   const counts = new Map<number, number>();
 
@@ -99,6 +106,7 @@ export async function analyse(
     );
     return {
       wasmParsingMs: parseTime,
+      vmSpawnMs: spawnTime,
       advicesRegistrationMs: registerTime,
       advicesDeploymentMs: deployTime,
       analysisRunMs: analysisTime,
@@ -107,6 +115,7 @@ export async function analyse(
     const errMsg = e instanceof Error ? e.message : e;
     const f: FailedMeasurement = {
       errorParsing: `${parseTime}`,
+      errorSpawn: `${spawnTime}`,
       errorRegister: `${parseTime}`,
       errorDeploy: `${parseTime}`,
       errorRun: `${errMsg}`,
