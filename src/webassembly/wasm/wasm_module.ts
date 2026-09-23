@@ -47,6 +47,7 @@ export class WasmModule {
   public readonly tableExports: TableExportSource[];
   public readonly elements: ElementSource[];
   public readonly initialMemoryPages: number;
+  private _functionsByAddr: WASMFunction[] | undefined | null = null;
 
   constructor(wasmPath: string) {
     const [mod, errors] = parseWasmModule(wasmPath);
@@ -98,19 +99,47 @@ export class WasmModule {
   }
 
   getInstruction(addr: number): WasmInstruction | undefined {
-    for (const f of this.functions) {
-      if (addr < f.startAddress || f.endAddress <= addr) {
-        continue;
+    const funcs = this.sortFunctionsByAddress();
+    if (funcs === undefined) {
+      // function ranges overlap (should not happen for valid modules)
+      for (const f of this.functions) {
+        if (addr < f.startAddress || f.endAddress <= addr) continue;
+        const i = findInstructionByStartAddress(f.allInstructions, addr);
+        if (i !== undefined) return i;
       }
-      for (const i of f.allInstructions) {
-        // for instead of find to reduce memory
-        if (i.startAddress === addr) {
-          return i;
-        }
-      }
+      return undefined;
     }
 
-    return undefined;
+    // binary search function belonging to instr with `addr`
+    let lo = 0;
+    let hi = funcs.length;
+    while (lo < hi) {
+      const mid = (lo + hi) >>> 1; // the middle between low and high
+      if (funcs[mid].startAddress <= addr) lo = mid + 1;
+      else hi = mid;
+    }
+    // the only candidate is the last function starting at or before `addr`
+    if (lo === 0) return undefined;
+    const f = funcs[lo - 1];
+    if (f.endAddress <= addr) return undefined;
+    return findInstructionByStartAddress(f.allInstructions, addr);
+  }
+
+  private sortFunctionsByAddress(): WASMFunction[] | undefined {
+    if (this._functionsByAddr === null) {
+      const funcs = this.functions
+        .filter((f) => f.allInstructions.length > 0)
+        .sort((f1, f2) => f1.startAddress - f2.startAddress);
+      let overlap = false;
+      for (let idx = 1; idx < funcs.length; idx++) {
+        if (funcs[idx].startAddress < funcs[idx - 1].endAddress) {
+          overlap = true;
+          break;
+        }
+      }
+      this._functionsByAddr = overlap ? undefined : funcs;
+    }
+    return this._functionsByAddr;
   }
 
   instructionsFromOpcode(opcode: WasmOpcode): WasmInstruction[] {
@@ -430,6 +459,22 @@ export class WasmModule {
       imports,
     };
   }
+}
+
+// binary search for the instr with startAddress `addr`
+function findInstructionByStartAddress(
+  sortedInstrs: WasmInstruction[],
+  addr: number,
+): WasmInstruction | undefined {
+  let lo = 0;
+  let hi = sortedInstrs.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >>> 1; // middle between low and high
+    if (sortedInstrs[mid].startAddress < addr) lo = mid + 1;
+    else hi = mid;
+  }
+  const i = sortedInstrs[lo];
+  return i !== undefined && i.startAddress === addr ? i : undefined;
 }
 
 function createSections(mod: ParsedModule): Section[] {
