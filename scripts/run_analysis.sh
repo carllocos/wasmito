@@ -16,10 +16,16 @@ ANALYSES=(
   icount
   imix
   hotness
+  cache_sim
   mem_access
+  loop_tracer
   basic-block
   instr-coverage
   call-graph
+  cryptomining
+  denan
+  instruction-mix
+  safe-heap
 )
 
 # Timeout in seconds for the execution of each analysis (10 minutes).
