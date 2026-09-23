@@ -47,6 +47,7 @@ export class RequestsManager {
 
     await req.processRequestMessage(msg);
     if (req.isResolved()) {
+      if (req.isSubscriptionClosed()) this.requests.delete(req.id);
       if (this._waitingForAcksBulk.has(req.id)) {
         this._waitingForAcksBulk.delete(req.id);
       }
