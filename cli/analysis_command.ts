@@ -78,16 +78,7 @@ export function registerAnalysisCommand(program: Command): void {
       '<wasm>',
       'one wasm module or directory containing modules for which to run the analysis',
     )
-    .option(
-      '-n,--nr-runs <nr of runs>',
-      `The number of runs for the analysis`,
-      '1',
-    )
-    .option(
-      '--csv <csv_file_path>',
-      `Path to where to store the results`,
-      'measurements.csv',
-    )
+    .option('--csv <csv_file_path>', `Path to where to store the results`)
     .option(
       '--tr,--timeout-register <seconds>',
       `Timeout in seconds for the register of hooks`,
@@ -114,10 +105,8 @@ export function registerAnalysisCommand(program: Command): void {
         `running analysis '${analysisToRun.map((a) => a[0]).join(', ')}' on modules: ${modules.join(', ')}`,
       );
 
+      const writeToCSV = options.csv !== undefined;
       const csvFilePath = options.csv;
-      const nrOfRuns = Number(options.nrRuns);
-      if (isNaN(nrOfRuns) || nrOfRuns < 0)
-        program.error('nr of runs is not a valid number');
       const timeoutMsRegisterAdvices = Number(options.timeoutRegister) * 1000;
       const timeoutMsDeployAdvices = Number(options.timeoutDeploy) * 1000;
       const timeoutMsAnalysisRun = Number(options.timeoutExecution) * 1000;
@@ -134,10 +123,10 @@ export function registerAnalysisCommand(program: Command): void {
       };
 
       logger.info(
-        `nr of runs ${nrOfRuns}, advice registration timeout ms ${timeouts.timeoutMsRegisterAdvices}, advice deployment timeout ms ${timeouts.timeoutMsDeploy}, analysis execution timeout ms ${timeouts.timeoutMsAnalysisRun}`,
+        `advice registration timeout ms ${timeouts.timeoutMsRegisterAdvices}, advice deployment timeout ms ${timeouts.timeoutMsDeploy}, analysis execution timeout ms ${timeouts.timeoutMsAnalysisRun}`,
       );
 
-      let addHeader = !csvFileHasHeader(csvFilePath);
+      let addHeader = writeToCSV ? !csvFileHasHeader(csvFilePath) : false;
       for (const [a, analyse] of analysisToRun) {
         for (const wasmPath of modules) {
           const measurements: BenchmarkMeasurements = {
@@ -147,21 +136,19 @@ export function registerAnalysisCommand(program: Command): void {
             measurements: [],
             totalTimes: [],
           };
-          for (let idx = 0; idx < nrOfRuns; idx++) {
-            try {
-              logger.info(
-                `[RUN ${idx + 1}/${nrOfRuns}] Running analysis '${a}' for wasm '${wasmPath}'`,
-              );
-              const startTimeParse = Date.now();
-              const run = await analyse(wasmPath, timeouts);
-              const totalTime = logMeasurement(
-                logger,
-                startTimeParse,
-                Date.now(),
-                `Analysis ${a} Total Time`,
-              );
-              measurements.measurements.push(run);
-              measurements.totalTimes.push(totalTime);
+          try {
+            logger.info(`Running analysis '${a}' for wasm '${wasmPath}'`);
+            const startTimeParse = Date.now();
+            const run = await analyse(wasmPath, timeouts);
+            const totalTime = logMeasurement(
+              logger,
+              startTimeParse,
+              Date.now(),
+              `Analysis ${a} Total Time`,
+            );
+            measurements.measurements.push(run);
+            measurements.totalTimes.push(totalTime);
+            if (writeToCSV) {
               try {
                 writeLastMeasurementToFile(measurements, addHeader);
                 addHeader = false;
@@ -170,20 +157,22 @@ export function registerAnalysisCommand(program: Command): void {
                   `Error writing to file ${measurements.csvFilePath}. ${err}`,
                 );
               }
-            } catch (e) {
-              const errMsg = e instanceof Error ? e.message : e;
-              const failedMeasument: FailedMeasurement = {
-                errorParsing: '',
-                errorRegister: '',
-                errorDeploy: '',
-                errorRun: `${errMsg}`,
-              };
-              measurements.measurements.push(failedMeasument);
-              measurements.totalTimes.push(-100);
-              writeLastMeasurementToFile(measurements, addHeader);
-              addHeader = false;
-              break;
             }
+          } catch (e) {
+            const errMsg = e instanceof Error ? e.message : e;
+            const failedMeasument: FailedMeasurement = {
+              errorParsing: '',
+              errorRegister: '',
+              errorDeploy: '',
+              errorRun: `${errMsg}`,
+            };
+            measurements.measurements.push(failedMeasument);
+            measurements.totalTimes.push(-100);
+            if (writeToCSV) {
+              writeLastMeasurementToFile(measurements, addHeader);
+            }
+            addHeader = false;
+            break;
           }
         }
       }
