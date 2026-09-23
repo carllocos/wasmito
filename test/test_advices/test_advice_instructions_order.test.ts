@@ -33,10 +33,10 @@ describe('Test order advices Instructions (registery)', function () {
       hookedAddr,
     );
     expect(advices.length).equal(2);
-    expect(advices[0][0]).equal(loopCb);
-    expect(advices[0][2]).equal(loopAddr);
-    expect(advices[1][0]).equal(blockCb);
-    expect(advices[1][2]).equal(hookedAddr);
+    expect(advices[0].advice).equal(loopCb);
+    expect(advices[0].reportAddr).equal(loopAddr);
+    expect(advices[1].advice).equal(blockCb);
+    expect(advices[1].reportAddr).equal(hookedAddr);
   });
 
   it('keeps the redirected advice first when it was registered before the direct advice', () => {
@@ -64,8 +64,8 @@ describe('Test order advices Instructions (registery)', function () {
       hookedAddr,
     );
     expect(advices.length).equal(2);
-    expect(advices[0][0]).equal(loopCb);
-    expect(advices[1][0]).equal(blockCb);
+    expect(advices[0].advice).equal(loopCb);
+    expect(advices[1].advice).equal(blockCb);
   });
 
   it('preserves registration order among multiple direct advices, all placed after the redirected advice', () => {
@@ -101,9 +101,9 @@ describe('Test order advices Instructions (registery)', function () {
       hookedAddr,
     );
     expect(advices.length).equal(3);
-    expect(advices[0][0]).equal(loopCb);
-    expect(advices[1][0]).equal(blockCb1);
-    expect(advices[2][0]).equal(blockCb2);
+    expect(advices[0].advice).equal(loopCb);
+    expect(advices[1].advice).equal(blockCb1);
+    expect(advices[2].advice).equal(blockCb2);
   });
 
   it('does not reorder advices registered on unrelated addresses', () => {
@@ -136,8 +136,8 @@ describe('Test order advices Instructions (registery)', function () {
       otherAddr,
     );
     expect(advicesA.length).equal(1);
-    expect(advicesA[0][0]).equal(cbA);
+    expect(advicesA[0].advice).equal(cbA);
     expect(advicesB.length).equal(1);
-    expect(advicesB[0][0]).equal(cbB);
+    expect(advicesB[0].advice).equal(cbB);
   });
 });

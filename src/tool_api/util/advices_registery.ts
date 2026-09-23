@@ -104,7 +104,12 @@ export function isVMArgAdvice<I extends WasmInstruction>(
   return advice.length === 1;
 }
 
-type AdviceArray = Array<[Advice<WasmInstruction>, boolean, number]>;
+export interface AdviceEntry {
+  advice: Advice<WasmInstruction>;
+  mutate: boolean;
+  reportAddr: number;
+}
+type AdviceArray = AdviceEntry[];
 type AdviceMap = Map<number, AdviceArray>;
 
 export interface InstructionHookTarget {
@@ -459,16 +464,20 @@ export class AdvicesRegistery {
         throw new Error(`TODO`);
     }
 
-    const ads = advices.get(addr) ?? [];
+    const entry: AdviceEntry = {
+      advice: cb,
+      mutate: mutable,
+      reportAddr: reportAddr,
+    };
+    const ads = advices.get(addr);
+    if (ads === undefined) {
+      advices.set(addr, [entry]);
+      return 1;
+    }
     const sizeBefore = ads.length;
-    const entry: [Advice<WasmInstruction>, boolean, number] = [
-      cb,
-      mutable,
-      reportAddr,
-    ];
     if (reportAddr !== addr) {
       let insertIdx = 0;
-      while (insertIdx < ads.length && ads[insertIdx][2] !== addr) {
+      while (insertIdx < ads.length && ads[insertIdx].reportAddr !== addr) {
         insertIdx++;
       }
       ads.splice(insertIdx, 0, entry);
