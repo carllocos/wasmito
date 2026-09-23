@@ -20,6 +20,7 @@ import { analyse as analyseBranches } from '../tool_examples/analyses/branches';
 import { analyse as anaylseInstrCounts } from '../tool_examples/analyses/instruction_count';
 import { analyse as analyseHotness } from '../tool_examples/analyses/hotness';
 import { analyse as analyseIMix } from '../tool_examples/analyses/imix';
+import { analyse as analyseCacheSim } from '../tool_examples/analyses/cache_simulator/cache_simulator';
 import { analyse as analyseLoopTracer } from '../tool_examples/analyses/loop_tracer/loop_tracer';
 import {
   TimeoutConfig,
@@ -45,6 +46,7 @@ const analyses: Array<AnalysisRun> = [
   ['icount', anaylseInstrCounts],
   ['imix', analyseIMix],
   ['hotness', analyseHotness],
+  ['cache_sim', analyseCacheSim],
   ['mem_access', analyseMemoryTracing],
   ['loop_tracer', analyseLoopTracer],
   ['basic-block', analyseBlocks],
