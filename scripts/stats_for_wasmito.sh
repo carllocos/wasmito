@@ -13,7 +13,7 @@
 #              metrics regardless of this flag.
 #
 #   csv-file: a CSV with header:
-#             analysis,wasm,parsing_ms,register_ms,deploy_ms,run_ms,total_ms
+#             analysis,wasm,parsing_ms,spawn_ms,register_ms,deploy_ms,run_ms,total_ms
 #             One row per run; multiple rows for the same (analysis, wasm)
 #             pair are treated as repeated runs and aggregated together.
 #
@@ -39,10 +39,10 @@ cd "$REPO_ROOT"
 
 usage() {
     echo "Usage: $(basename "$0") <csv-file> [output-dir] [--verbose]" >&2
-    echo "  --verbose:  also show parsing, register, deploy and run metrics" >&2
+    echo "  --verbose:  also show parsing, spawn, register, deploy and run metrics" >&2
     echo "              (by default only total_ms is displayed)." >&2
     echo "  csv-file:   CSV with header:" >&2
-    echo "              analysis,wasm,parsing_ms,register_ms,deploy_ms,run_ms,total_ms" >&2
+    echo "              analysis,wasm,parsing_ms,spawn_ms,register_ms,deploy_ms,run_ms,total_ms" >&2
     echo "  output-dir: optional. If given, writes:" >&2
     echo "                stats_per_module_analysis.csv" >&2
     echo "                comparison_vs_baseline.csv" >&2
@@ -87,7 +87,7 @@ import statistics
 import sys
 
 BASELINE = "no-analysis"
-METRICS = ["parsing_ms", "register_ms", "deploy_ms", "run_ms", "total_ms"]
+METRICS = ["parsing_ms", "spawn_ms", "register_ms", "deploy_ms", "run_ms", "total_ms"]
 REQUIRED_COLUMNS = ["analysis", "wasm"] + METRICS
 
 csv_path = sys.argv[1]
