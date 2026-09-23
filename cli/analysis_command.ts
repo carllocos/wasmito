@@ -162,6 +162,7 @@ export function registerAnalysisCommand(program: Command): void {
             const errMsg = e instanceof Error ? e.message : e;
             const failedMeasument: FailedMeasurement = {
               errorParsing: '',
+              errorSpawn: '',
               errorRegister: '',
               errorDeploy: '',
               errorRun: `${errMsg}`,
