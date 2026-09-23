@@ -1,4 +1,4 @@
-import { createLogger, Logger } from '../../../logger/logger';
+import { createLogger } from '../../../logger/logger';
 import { encodeToHexLEB128 } from '../../../util/encoder';
 import {
   APIRequest,
@@ -39,7 +39,6 @@ const logger = createLogger('HookOnWasmAddrRequest');
 
 export class HookOnWasmAddrRequest extends APIRequest<RequestMessage> {
   readonly instruction = Instruction.HookOnWasmAddr;
-  private readonly logger: Logger;
   public readonly wasmAddr;
   private _hook: Hook | undefined;
   private moment: HookOnWasmAddrMoment;
@@ -51,7 +50,6 @@ export class HookOnWasmAddrRequest extends APIRequest<RequestMessage> {
     this.wasmAddr = wasmAddr;
     this.moment = moment ?? HookOnWasmAddrMoment.HookBefore;
     this.isaddRequest = true;
-    this.logger = logger;
     this.subscriptionActive = true;
   }
 
@@ -78,7 +76,7 @@ export class HookOnWasmAddrRequest extends APIRequest<RequestMessage> {
       this._hook = hook;
     } else {
       const errMsg = `Cannot asisgn multiple hooks`;
-      this.logger.error(errMsg);
+      logger.error(errMsg);
       throw new Error(errMsg);
     }
     return this;
@@ -132,7 +130,7 @@ export class HookOnWasmAddrRequest extends APIRequest<RequestMessage> {
       metadata: content,
       sub: content.val,
     };
-    return await runHooksAndListeners(m, [this._hook], this.logger);
+    return await runHooksAndListeners(m, [this._hook], logger);
   }
 
   override isSubscriptionClosed(): boolean {
