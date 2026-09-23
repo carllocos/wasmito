@@ -127,7 +127,7 @@ export function createRequestMessage(content: any): RequestMessage | undefined {
 
 function createMessageFromJSON(content: any): RequestMessage | undefined {
   let obj;
-  if (typeof content === 'string') {
+  if (typeof content === 'string' && content.trimStart().startsWith('{')) {
     try {
       obj = JSONParse(content);
     } catch (_e) {
