@@ -40,10 +40,11 @@ export async function analyse(
   logger.info(`Registering Advices...`);
 
   let count = 0;
+  const countInstr = () => count++;
   const startTimeRegister = Date.now();
   for (const f of wasm.functions) {
     for (const i of f.allInstructions) {
-      analysis.before(i, () => count++);
+      analysis.before(i, countInstr);
     }
   }
 
