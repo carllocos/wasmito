@@ -459,7 +459,7 @@ export function runAdvicesInstruction(
       const moment = metadata.moment;
       const advices = advicesContainer.getAdvices(moment, metadata.addr);
       const wasmState = sub.sub;
-      const firstReportTarget = resolveReportTarget(mod, advices[0][2]);
+      const firstReportTarget = resolveReportTarget(mod, advices[0].reportAddr);
       const stackArgs = copyArgsFromStack(
         firstReportTarget,
         wasmState.stack ?? [],
@@ -470,7 +470,7 @@ export function runAdvicesInstruction(
       for (let adviceIdx = 0; adviceIdx < advices.length; adviceIdx++) {
         if (vm.isClosed()) break;
 
-        const [advice, mutate, reportAddr] = advices[adviceIdx];
+        const { advice, mutate, reportAddr } = advices[adviceIdx];
         mutated = mutate || mutated;
         argsCB = prepareArgsCB(stackArgs, argsCB, mutate);
         let newArgs;
