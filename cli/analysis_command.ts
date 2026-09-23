@@ -9,13 +9,12 @@ import { getGlobalLogger } from '../src/logger/logger';
 import { analyse as analyseCallgraph } from '../tool_examples/analyses/call_graph';
 import { analyse as analyseBlocks } from '../tool_examples/analyses/block_profiling';
 import { analyse as analyseInstrCoverage } from '../tool_examples/analyses/coverage_instruction';
-// import { analyse as analyseCryptomining } from '../tool_examples/analyses/cryptominer_detection_shorter';
-// import { analyse as analyseDenan } from '../tool_examples/analyses/denan';
-// import { analyse as analyseInstructionMix } from '../tool_examples/analyses/instruction_mix';
+import { analyse as analyseCryptomining } from '../tool_examples/analyses/cryptominer_detection_shorter';
+import { analyse as analyseDenan } from '../tool_examples/analyses/denan';
+import { analyse as analyseInstructionMix } from '../tool_examples/analyses/instruction_mix';
 import { analyse as analyseMemoryTracing } from '../tool_examples/analyses/memory_tracing';
-// import { analyse as analyseSafeHeap } from '../tool_examples/analyses/safe_heap';
+import { analyse as analyseSafeHeap } from '../tool_examples/analyses/safe_heap';
 import { analyse as analyseNone } from '../tool_examples/analyses/no_analysis';
-// import { analyse as analyseCallgraphCounts } from '../tool_examples/analyses/call_graph_counts';
 import { analyse as analyseBranches } from '../tool_examples/analyses/branches';
 import { analyse as anaylseInstrCounts } from '../tool_examples/analyses/instruction_count';
 import { analyse as analyseHotness } from '../tool_examples/analyses/hotness';
@@ -52,10 +51,10 @@ const analyses: Array<AnalysisRun> = [
   ['basic-block', analyseBlocks],
   ['instr-coverage', analyseInstrCoverage],
   ['call-graph', analyseCallgraph],
-  // ['cryptomining', analyseCryptomining],
-  // ['denan', analyseDenan],
-  // ['instruction-mix', analyseInstructionMix],
-  // ['safe-heap', analyseSafeHeap],
+  ['cryptomining', analyseCryptomining],
+  ['denan', analyseDenan],
+  ['instruction-mix', analyseInstructionMix],
+  ['safe-heap', analyseSafeHeap],
 ];
 
 async function unusedFunc(
