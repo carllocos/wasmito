@@ -17,9 +17,21 @@ export class RequestsManager {
 
   private _resolveBulk: ((value: void | PromiseLike<void>) => void) | undefined;
   private _waitingForAcksBulk: Set<number> = new Set();
+  private readonly onDataListener: (data: string) => Promise<void>;
+  private listeningOn: Channel | undefined;
 
   constructor() {
     this.requests = new Map<RequestID, APIRequest<any>>();
+    this.onDataListener = this.onRequestData.bind(this);
+  }
+
+  private listenTo(connection: Channel): void {
+    this.connection = connection;
+    if (this.listeningOn === connection) return;
+    if (this.listeningOn !== undefined)
+      this.listeningOn.removeOnData(this.onDataListener);
+    connection.addOnData(this.onDataListener);
+    this.listeningOn = connection;
   }
 
   async onRequestData(data: string): Promise<void> {
@@ -34,10 +46,6 @@ export class RequestsManager {
     }
 
     await req.processRequestMessage(msg);
-    if (this.requests.size === 0) {
-      // TODO fix remove bug
-      this.connection?.removeOnData(this.onRequestData.bind(this));
-    }
     if (req.isResolved()) {
       if (this._waitingForAcksBulk.has(req.id)) {
         this._waitingForAcksBulk.delete(req.id);
@@ -114,9 +122,7 @@ export class RequestsManager {
     requests: Array<APIRequest<T>>,
     _timeoutMs?: number,
   ): Promise<void> {
-    this.connection = connection;
-    if (this.requests.size === 0)
-      this.connection.addOnData(this.onRequestData.bind(this));
+    this.listenTo(connection);
 
     const maxRequests = 10000;
     let startIdx = 0;
@@ -137,11 +143,7 @@ export class RequestsManager {
     requests: Array<APIRequest<T>>,
     _timeoutMs?: number,
   ): Promise<void> {
-    // TODO fix
-    this.connection = connection;
-
-    if (this.requests.size === 0)
-      this.connection.addOnData(this.onRequestData.bind(this));
+    this.listenTo(connection);
 
     for (const request of requests) {
       const data = request.getData();
