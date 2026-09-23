@@ -30,6 +30,8 @@ usage() {
   echo "  wasm-dir-or-file: either a directory containing one or more .wasm" >&2
   echo "                    files, or the path to a single .wasm file" >&2
   echo "  analysis: one of: ${ANALYSES[*]}, or 'all'" >&2
+  echo "            multiple analyses can be given comma-separated," >&2
+  echo "            e.g. 'call-graph,imix'" >&2
   echo "            if omitted or 'all', all of the above are run" >&2
   echo "  repetitions: positive integer (>= 1), number of times each" >&2
   echo "               analysis is run per wasm module. Defaults to 1" >&2
@@ -57,19 +59,31 @@ if ! [[ "$REPETITIONS" =~ ^[0-9]+$ ]] || [ "$REPETITIONS" -lt 1 ]; then
 fi
 
 if [ -n "$ANALYSIS_ARG" ] && [ "$ANALYSIS_ARG" != "all" ]; then
-  found=0
-  for a in "${ANALYSES[@]}"; do
-    if [ "$a" = "$ANALYSIS_ARG" ]; then
-      found=1
-      break
+  IFS=',' read -r -a REQUESTED_ANALYSES <<< "$ANALYSIS_ARG"
+  ANALYSES_TO_RUN=()
+  for requested in "${REQUESTED_ANALYSES[@]}"; do
+    # Allow whitespace around the commas, e.g. 'call-graph, imix'.
+    requested="$(echo "$requested" | xargs)"
+    [ -z "$requested" ] && continue
+    found=0
+    for a in "${ANALYSES[@]}"; do
+      if [ "$a" = "$requested" ]; then
+        found=1
+        break
+      fi
+    done
+    if [ "$found" -eq 0 ]; then
+      echo "Error: unknown analysis '$requested'" >&2
+      usage
+      exit 1
     fi
+    ANALYSES_TO_RUN+=("$requested")
   done
-  if [ "$found" -eq 0 ]; then
-    echo "Error: unknown analysis '$ANALYSIS_ARG'" >&2
+  if [ "${#ANALYSES_TO_RUN[@]}" -eq 0 ]; then
+    echo "Error: no analysis given in '$ANALYSIS_ARG'" >&2
     usage
     exit 1
   fi
-  ANALYSES_TO_RUN=("$ANALYSIS_ARG")
 else
   ANALYSES_TO_RUN=("${ANALYSES[@]}")
 fi
@@ -100,6 +114,27 @@ fi
 mkdir -p "$OUTPUT_DIR"
 csv_file="$OUTPUT_DIR/benchmark.csv"
 
+# Must match the header written by writeLastMeasurementToFile in
+# src/util/benchmark_util.ts.
+CSV_HEADER="analysis,wasm,parsing_ms,register_ms,deploy_ms,run_ms,total_ms"
+
+# Returns success if the node output in the given file shows that node ran
+# out of heap memory.
+is_out_of_heap() {
+  grep -qE 'JavaScript heap out of memory|Reached heap limit' "$1"
+}
+
+# Appends an out-of-heap row to the CSV file. Like the CLI, rows are
+# prefixed with a newline unless the header still has to be written.
+write_out_of_heap_row() {
+  local row="$1,$2,out-of-heap,out-of-heap,out-of-heap,out-of-heap,out-of-heap"
+  if [ -s "$csv_file" ] && [ "$(head -n 1 "$csv_file")" = "$CSV_HEADER" ]; then
+    printf '\n%s' "$row" >> "$csv_file"
+  else
+    printf '%s\n%s' "$CSV_HEADER" "$row" >> "$csv_file"
+  fi
+}
+
 for analysis in "${ANALYSES_TO_RUN[@]}"; do
   analysis_dir="$OUTPUT_DIR/$analysis"
   mkdir -p "$analysis_dir"
@@ -118,7 +153,12 @@ for analysis in "${ANALYSES_TO_RUN[@]}"; do
 
       echo "Running analysis '$analysis' on '$wasm_file' (run $run/$REPETITIONS) -> '$all_file'"
       start_ms="$(node -e 'console.log(Date.now())')"
+      # Do not let a crashing node process (e.g. out of heap memory) abort the
+      # whole script because of `set -e`/`pipefail`; capture its exit status.
+      set +e
       node "$CLI" analysis "$analysis" "$wasm_file" --csv "$csv_file" --te "$EXECUTION_TIMEOUT_SECONDS" 2>&1 | tee "$all_file"
+      node_status="${PIPESTATUS[0]}"
+      set -e
       end_ms="$(node -e 'console.log(Date.now())')"
       elapsed_ms="$((end_ms - start_ms))"
 
@@ -133,6 +173,12 @@ for analysis in "${ANALYSES_TO_RUN[@]}"; do
         > "$output_file" || true
 
       echo "Total time: ${elapsed_ms} ms" | tee -a "$all_file"
+
+      if [ "$node_status" -ne 0 ] && is_out_of_heap "$all_file"; then
+        echo "Out of heap memory detected for analysis '$analysis' on '$wasm_file' (run $run/$REPETITIONS). Skipping remaining runs for this module/analysis." >&2
+        write_out_of_heap_row "$analysis" "$(basename "$wasm_file")"
+        break
+      fi
 
       if [ -f "$csv_file" ] && tail -n 1 "$csv_file" | grep -qi "timeout"; then
         echo "Timeout detected in '$csv_file' for analysis '$analysis' on '$wasm_file' (run $run/$REPETITIONS). Skipping remaining runs for this module/analysis." >&2
