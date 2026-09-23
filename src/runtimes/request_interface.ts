@@ -52,6 +52,22 @@ export abstract class APIRequest<R> {
     this._settle = undefined;
     this._rejectReason = undefined;
   }
+
+  get promise(): Promise<R> {
+    if (this._status === RequestStatus.Resolved)
+      return Promise.resolve(this._parsed as R);
+    if (this._status === RequestStatus.Rejected)
+      return Promise.reject(this._rejectReason);
+    if (this._settle === undefined) {
+      let resolve!: (value: R) => void;
+      let reject!: (reason?: any) => void;
+      const promise = new Promise<R>((res, rej) => {
+        resolve = res;
+        reject = rej;
+      });
+      this._settle = { promise, resolve, reject };
+    }
+    return this._settle.promise;
   }
 
   abstract description(): string;
