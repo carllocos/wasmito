@@ -45,14 +45,21 @@
 # and analysis rather than stopping.
 #
 # Results are written to [output-dir], named after each Wasm module's
-# basename (e.g. fib.wasm -> fib.*), same as wizeng_run.sh:
+# basename (e.g. fib.wasm -> fib.*), same as wizeng_run.sh, except each run
+# is now labelled with the analysis and module it belongs to (e.g.
+# "=== run 2 - call_graph factorial.wasm ==="), since these files can be
+# harder to tell apart once errors interrupt a sequence of runs:
 #   [output-dir]/fib.<analysis>.output  the wizeng output of every run
 #   [output-dir]/fib.<analysis>.all     same, with each run's execution
-#                                        time (or timeout notice) appended
+#                                        time (or timeout/error notice)
+#                                        appended
 #   [output-dir]/benchmark.csv          one row per run (all modules and
-#                                        analyses): wasm_module,analysis,time_ms
+#                                        analyses): analysis,wasm_module,time_ms
 #                                        ("analysis" is "none" for the
-#                                        baseline, or the monitor's basename)
+#                                        baseline, or the monitor's basename;
+#                                        "time_ms" is TIMEOUT or ERROR when
+#                                        the run timed out or wizeng exited
+#                                        with a non-zero status)
 
 MODULE_ARG=$1
 OUT_DIR=${2:-times}
@@ -158,6 +165,9 @@ run_module() {
 
     I=1
     while [ "$I" -le "$NUM_RUNS" ]; do
+        RUN_TAG="run $I - $ANALYSIS_TAG $(basename "$MODULE")"
+        echo "=== $RUN_TAG ==="
+
         START_MS=$(python3 -c 'import time; print(int(time.time() * 1000))')
 
         # Stream stdout/stderr to the terminal as the command runs while also
@@ -194,22 +204,30 @@ run_module() {
         ELAPSED_MS=$((END_MS - START_MS))
 
         {
-            echo "=== run $I ==="
+            echo "=== $RUN_TAG ==="
             cat "$RUN_TMP"
         } >> "$OUTPUT_FILE"
 
         if [ "$RUN_STATUS" -eq 124 ]; then
             echo "wizeng execution timed out after ${TIMEOUT_SECS}s" >&2
             {
-                echo "=== run $I ==="
+                echo "=== $RUN_TAG ==="
                 cat "$RUN_TMP"
                 echo "wizeng execution timed out after ${TIMEOUT_SECS}s"
             } >> "$ALL_FILE"
             TIME_VALUE="TIMEOUT"
+        elif [ "$RUN_STATUS" -ne 0 ]; then
+            echo "wizeng execution failed with exit status $RUN_STATUS" >&2
+            {
+                echo "=== $RUN_TAG ==="
+                cat "$RUN_TMP"
+                echo "wizeng execution failed with exit status $RUN_STATUS"
+            } >> "$ALL_FILE"
+            TIME_VALUE="ERROR"
         else
             echo "wizeng execution time: $ELAPSED_MS ms"
             {
-                echo "=== run $I ==="
+                echo "=== $RUN_TAG ==="
                 cat "$RUN_TMP"
                 echo "wizeng execution time: $ELAPSED_MS ms"
             } >> "$ALL_FILE"
@@ -217,9 +235,9 @@ run_module() {
         fi
 
         if [ ! -f "$CSV_FILE" ]; then
-            echo "wasm_module,analysis,time_ms" > "$CSV_FILE"
+            echo "analysis,wasm_module,time_ms" > "$CSV_FILE"
         fi
-        echo "$(basename "$MODULE"),$ANALYSIS,$TIME_VALUE" >> "$CSV_FILE"
+        echo "$ANALYSIS_TAG,$(basename "$MODULE"),$TIME_VALUE" >> "$CSV_FILE"
 
         if [ "$RUN_STATUS" -eq 124 ]; then
             # Skip the remaining runs for this (module, analysis) combination,
@@ -252,14 +270,12 @@ run_all_modules() {
 
 # Baseline: run wizard without any whamm analysis attached.
 WHAMM_FILE=""
-ANALYSIS="none"
 ANALYSIS_TAG="none"
 LIBS_MONITORS=""
 run_all_modules
 
 for WHAMM_FILE in "$WHAMM_DIR"/*.wasm; do
     [ -f "$WHAMM_FILE" ] || continue
-    ANALYSIS=$(basename "$WHAMM_FILE")
     ANALYSIS_TAG=$(basename "$WHAMM_FILE" .wasm)
     case "$ANALYSIS_TAG" in
         cache_sim)
