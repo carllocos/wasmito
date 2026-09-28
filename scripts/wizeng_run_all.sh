@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Usage: wizeng_run_all.sh <wasm-module-or-dir> [output-dir] [num-runs] [timeout-seconds] [x86-64|jvm]
+# Usage: wizeng_run_all.sh <wasm-module-or-dir> [output-dir] [num-runs] [timeout-seconds] [x86-64|jvm] [optimise|no-optimise]
 #
 # Benchmarks every whamm analysis monitor compiled by wei_compile_all.sh
 # (monitors/*.wasm) against <wasm-module-or-dir>, plus a baseline run with
@@ -15,9 +15,25 @@
 # they are loaded here the same way wizeng_lib_run.sh does: the matching
 # lib is appended to wizeng's --monitors list after whamm_core.wasm.
 #
-# All optimisations are always disabled (equivalent to the no-opt option
-# of wizeng_run.sh / wizeng_lib_run.sh): --mode=int on x86-64, and
-# --fast-functions=false on both targets.
+# [optimise|no-optimise] toggles every optimisation wizeng exposes.
+# Defaults to no-optimise.
+#
+#   x86-64, optimise:    --mode=jit (pre-compile everything with the SPC
+#                        JIT, falling back to the interpreter), plus
+#                        every compiler tuning flag explicitly set to true:
+#                          --fast-functions --inline-global-access
+#                          --intrinsify-count-probes --intrinsify-operand-probes
+#                          --intrinsify-whamm-probes --intrinsify-memory-probes
+#                          --compile-whamm-modules --inline-whamm-probes
+#   x86-64, no-optimise: --mode=int (fast interpreter only) and every flag
+#                        above set to false. --compile-whamm-modules must be
+#                        turned off explicitly: it defaults to true and
+#                        would otherwise JIT-compile the whamm monitor
+#                        modules even in --mode=int.
+#   jvm:                 the jvm build has no JIT tiers and does not accept
+#                        the compiler tuning flags, so the only toggle is
+#                        --fast-functions=true/false; both modes run the
+#                        v3 interpreter.
 #
 # All paths are relative to the current working directory, which must be
 # the whamm repo root, so this script is portable across machines.
@@ -39,6 +55,8 @@
 #
 # [x86-64|jvm] selects which wizeng build to use, exactly as the first
 # argument of wizeng_run.sh / wizeng_lib_run.sh. Defaults to x86-64.
+# It must be given (e.g. as the default "x86-64") in order to pass
+# [optimise|no-optimise] after it.
 #
 # If a run times out, the remaining runs for that (module, analysis)
 # combination are skipped, but the script continues on to the next module
@@ -66,6 +84,7 @@ OUT_DIR=${2:-times}
 NUM_RUNS=${3:-35}
 TIMEOUT_SECS=${4:-600}
 TARGET=${5:-x86-64}
+OPT_MODE=${6:-no-optimise}
 WHAMM_DIR="monitors"
 CORE="$(pwd)/target/wasm32-wasip1/release/whamm_core.wasm"
 
@@ -75,7 +94,7 @@ CACHE_LIB="tests/libs/cache/cache.wasm"
 LOOP_TRACER_LIB="tests/libs/loop_tracer/tracer.wasm"
 
 if [ -z "$MODULE_ARG" ]; then
-    echo "Usage: $0 <wasm-module-or-dir> [output-dir] [num-runs] [timeout-seconds] [x86-64|jvm]" >&2
+    echo "Usage: $0 <wasm-module-or-dir> [output-dir] [num-runs] [timeout-seconds] [x86-64|jvm] [optimise|no-optimise]" >&2
     exit 1
 fi
 
@@ -101,9 +120,36 @@ else
     exit 1
 fi
 
-# Always run with all optimisations disabled (no-opt).
-FAST_FUNCTIONS_FLAG="--fast-functions=false"
-X86_MODE_FLAG="--mode=int"
+# Compiler tuning flags only exist in the x86-64 build (the jvm build
+# rejects them), so they are only passed there.
+X86_COMPILER_OPTS="inline-global-access intrinsify-count-probes intrinsify-operand-probes intrinsify-whamm-probes intrinsify-memory-probes compile-whamm-modules inline-whamm-probes"
+
+case "$OPT_MODE" in
+    optimise)
+        OPT_VALUE=true
+        X86_MODE_FLAG="--mode=jit"
+        ;;
+    no-optimise)
+        OPT_VALUE=false
+        X86_MODE_FLAG="--mode=int"
+        ;;
+    *)
+        echo "Unknown option '$OPT_MODE': expected 'optimise' or 'no-optimise'" >&2
+        exit 1
+        ;;
+esac
+
+FAST_FUNCTIONS_FLAG="--fast-functions=$OPT_VALUE"
+X86_OPT_FLAGS="$X86_MODE_FLAG $FAST_FUNCTIONS_FLAG"
+for OPT in $X86_COMPILER_OPTS; do
+    X86_OPT_FLAGS="$X86_OPT_FLAGS --$OPT=$OPT_VALUE"
+done
+
+if [ "$TARGET" = "x86-64" ]; then
+    echo "wizeng optimisation flags ($OPT_MODE): $X86_OPT_FLAGS"
+else
+    echo "wizeng optimisation flags ($OPT_MODE): --mode=v3-int $FAST_FUNCTIONS_FLAG"
+fi
 
 case "$NUM_RUNS" in
     ''|*[!0-9]*)
@@ -176,12 +222,12 @@ run_module() {
         if [ "$TARGET" = "x86-64" ]; then
             if [ -n "$WHAMM_FILE" ]; then
                 {
-                    "$TIMEOUT_BIN" "$TIMEOUT_SECS" "$WIZENG_BIN" --env=TO_CONSOLE=true --expose=wizeng $X86_MODE_FLAG $FAST_FUNCTIONS_FLAG --monitors="$WHAMM_FILE+$CORE$LIBS_MONITORS" "$MODULE" 2>&1
+                    "$TIMEOUT_BIN" "$TIMEOUT_SECS" "$WIZENG_BIN" --env=TO_CONSOLE=true --expose=wizeng $X86_OPT_FLAGS --monitors="$WHAMM_FILE+$CORE$LIBS_MONITORS" "$MODULE" 2>&1
                     echo $? > "$STATUS_TMP"
                 } | tee "$RUN_TMP"
             else
                 {
-                    "$TIMEOUT_BIN" "$TIMEOUT_SECS" "$WIZENG_BIN" $X86_MODE_FLAG $FAST_FUNCTIONS_FLAG "$MODULE" 2>&1
+                    "$TIMEOUT_BIN" "$TIMEOUT_SECS" "$WIZENG_BIN" $X86_OPT_FLAGS "$MODULE" 2>&1
                     echo $? > "$STATUS_TMP"
                 } | tee "$RUN_TMP"
             fi
