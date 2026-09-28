@@ -58,9 +58,10 @@
 # It must be given (e.g. as the default "x86-64") in order to pass
 # [optimise|no-optimise] after it.
 #
-# If a run times out, the remaining runs for that (module, analysis)
-# combination are skipped, but the script continues on to the next module
-# and analysis rather than stopping.
+# If a run times out or fails (wizeng exits with a non-zero status), the
+# remaining runs for that (module, analysis) combination are skipped, but
+# the script continues on to the next module and analysis rather than
+# stopping.
 #
 # Results are written to [output-dir], named after each Wasm module's
 # basename (e.g. fib.wasm -> fib.*), same as wizeng_run.sh, except each run
@@ -285,9 +286,10 @@ run_module() {
         fi
         echo "$ANALYSIS_TAG,$(basename "$MODULE"),$TIME_VALUE" >> "$CSV_FILE"
 
-        if [ "$RUN_STATUS" -eq 124 ]; then
-            # Skip the remaining runs for this (module, analysis) combination,
-            # but let the caller continue on to the next module/analysis.
+        if [ "$RUN_STATUS" -ne 0 ]; then
+            # The run timed out or errored: skip the remaining runs for this
+            # (module, analysis) combination, but let the caller continue on
+            # to the next module/analysis.
             break
         fi
 
