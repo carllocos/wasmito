@@ -368,7 +368,7 @@ if filter_analysis == BASELINE:
 else:
     header = (
         f"  {'Analysis':<{analysis_col_width}} {'Wasm':<{wasm_col_width}} {'Metric':<12} {'Baseline(ms)':>13} "
-        f"{'Analysis(ms)':>13} {'Diff(ms)':>11} {'Slowdown (analysis/baseline)':>29} {'Overhead%':>11}"
+        f"{'Analysis(ms)':>13} {'Diff(ms)':>11} {'Slowdown (Analysis(ms) / Baseline(ms))':>38} {'Overhead%':>11}"
     )
     print(header)
     print("  " + "-" * (len(header) - 2))
@@ -378,10 +378,10 @@ else:
             continue
         printed_any = True
         if isinstance(ratio, str):
-            ratio_str = f"{ratio:>29}"
+            ratio_str = f"{ratio:>38}"
             pct_str = f"{pct:>11}"
         else:
-            ratio_str = f"{ratio:>28.2f}x" if ratio is not None else f"{'n/a':>29}"
+            ratio_str = f"{ratio:>37.2f}x" if ratio is not None else f"{'n/a':>38}"
             pct_str = f"{pct:>10.1f}%" if pct is not None else f"{'n/a':>11}"
         print(
             f"  {analysis:<{analysis_col_width}} {wasm:<{wasm_col_width}} {metric:<12} {fmt(baseline_mean, 13)} "
