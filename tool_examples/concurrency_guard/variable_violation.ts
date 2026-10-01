@@ -253,16 +253,23 @@ async function main(): Promise<void> {
 export async function analyse(
   wasmPath: string,
   timeouts: TimeoutConfig,
+  loadSourceMap?: () => Promise<SourceMap>,
 ): Promise<BenchmarkMeasurement> {
   memoryWritten.length = 0;
   globalsWritten.length = 0;
   memoryRead.length = 0;
   globalsGet.length = 0;
   alreadyReported.clear();
-  return runAnalysis(logger, wasmPath, timeouts, (analysis, sm) => {
-    sourceMap = sm;
-    registerAdvices(analysis);
-  });
+  return runAnalysis(
+    logger,
+    wasmPath,
+    timeouts,
+    loadSourceMap,
+    (analysis, sm) => {
+      sourceMap = sm;
+      registerAdvices(analysis);
+    },
+  );
 }
 
 if (require.main === module) {

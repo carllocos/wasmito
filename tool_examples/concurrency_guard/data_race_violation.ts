@@ -127,9 +127,10 @@ async function main(watPath: string): Promise<void> {
 export async function analyse(
   wasmPath: string,
   timeouts: TimeoutConfig,
+  loadSourceMap?: () => Promise<SourceMap>,
 ): Promise<BenchmarkMeasurement> {
   alreadLogged.clear();
-  return runAnalysis(logger, wasmPath, timeouts, detectDataRace);
+  return runAnalysis(logger, wasmPath, timeouts, loadSourceMap, detectDataRace);
 }
 
 if (require.main === module) {

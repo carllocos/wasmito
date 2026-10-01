@@ -141,9 +141,16 @@ async function main(wasmPath: string, sourceMapPath: string): Promise<void> {
 export async function analyse(
   wasmPath: string,
   timeouts: TimeoutConfig,
+  loadSourceMap?: () => Promise<SourceMap>,
 ): Promise<BenchmarkMeasurement> {
   reportedErrorsGlobals.clear();
-  return runAnalysis(logger, wasmPath, timeouts, detectOrderViolation);
+  return runAnalysis(
+    logger,
+    wasmPath,
+    timeouts,
+    loadSourceMap,
+    detectOrderViolation,
+  );
 }
 
 if (require.main === module) {
