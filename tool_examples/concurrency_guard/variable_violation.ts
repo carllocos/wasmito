@@ -7,7 +7,6 @@ import {
   GlobalSetInstruction,
   isGlobalGetInstruction,
   isGlobalSetInstruction,
-  isStoreInstruction,
   LoadInstruction,
   StoreInstruction,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -22,7 +21,6 @@ import {
   sourceCodeLocationToString,
   SourceMap,
 } from '../../src/source_mappers/source_map';
-import { WASMFunction } from '../../src/webassembly/wasm/wasm_function';
 import { WASM } from '../../src/webassembly/wasm';
 import { createLogger } from '../../src/logger/logger';
 import {
@@ -62,19 +60,6 @@ function logGlobalViolation(
   }
 
   console.log(`[Variable Violation Detected] ${logText}`);
-}
-
-function globalWrites(
-  f: WASMFunction,
-): (GlobalSetInstruction | StoreInstruction)[] {
-  const instrs = f.instructionsFromOpcode(WasmCode.GlobalSet);
-  WasmCode.toSingleOpcodes(WasmCode.MultipleOpcode.Store)
-    .flatMap((opcode) => f.instructionsFromOpcode(opcode))
-    .forEach((i) => instrs.push(i));
-  // filter is only needed to satisfy type system
-  return instrs.filter(
-    (i) => isStoreInstruction(i) || isGlobalSetInstruction(i),
-  );
 }
 
 const memoryWritten: [number | bigint, number | bigint][] = [];
@@ -176,22 +161,26 @@ function registerRead(
   }
 }
 
+const handlersRegistered = new Set<number>();
+
+function checkViolationInHandler(
+  i: GlobalSetInstruction | StoreInstruction,
+  args: ReadOnlyWasmValue[],
+): void {
+  if (!handlersRegistered.has(i.getEnclosingFunction().id)) return;
+  checkViolation(i, args);
+}
+
 function registerAdvices(analysis: WasmAnalysis): void {
   analysis.before(WasmCode.GlobalGet, registerRead);
   analysis.before(WasmCode.MultipleOpcode.Load, registerRead);
 
-  const handlersRegistered = new Set<number>();
-  analysis.onPinInterruptHandlerUpdateMut(async (handlersInfo, _vm) => {
+  analysis.before(WasmCode.GlobalSet, checkViolationInHandler);
+  analysis.before(WasmCode.MultipleOpcode.Store, checkViolationInHandler);
+  analysis.onPinInterruptHandlerUpdateMut((handlersInfo, _vm) => {
     handlersInfo
       .flatMap((h) => h.handlers)
-      .filter((f) => !handlersRegistered.has(f.id))
-      .forEach(async (f) => {
-        for (const instr of globalWrites(f))
-          analysis.before(instr, checkViolation);
-
-        handlersRegistered.add(f.id);
-      });
-    await analysis.deploy();
+      .forEach((f) => handlersRegistered.add(f.id));
   });
 }
 
@@ -205,6 +194,7 @@ export async function analyse(
   memoryRead.length = 0;
   globalsGet.length = 0;
   alreadyReported.clear();
+  handlersRegistered.clear();
 
   logger.info(`parsing Wasm module '${wasmPath}'`);
   const startTimeParse = Date.now();
