@@ -101,13 +101,13 @@ function logMemoryViolation(
   alreadyReported.add(key);
 
   let writeTxt = `address 0x${write.startAddress.toString(16)}`;
-  let readTxt = `address 0x${write.startAddress.toString(16)}`;
+  let readTxt = `address 0x${read.startAddress.toString(16)}`;
   if (sourceMap !== undefined) {
     const t1 = sourceMap
       .getOriginalPositionFor(write.startAddress)
       .map(sourceCodeLocationToString)
       .join(', ');
-    writeTxt = `${t1} ${writeTxt}]`;
+    writeTxt = `${t1} ${writeTxt}`;
 
     const t2 = sourceMap
       .getOriginalPositionFor(read.startAddress)
