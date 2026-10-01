@@ -17,15 +17,20 @@ import {
   DebugStandard,
   readSourceMap,
 } from '../../src/source_mappers/source_map_builder';
-import {
-  sourceCodeLocationToString,
-  SourceMap,
-} from '../../src/source_mappers/source_map';
+import { SourceMap } from '../../src/source_mappers/source_map';
 import { WASM } from '../../src/webassembly/wasm';
+import { createLogger } from '../../src/logger/logger';
+import {
+  BenchmarkMeasurement,
+  TimeoutConfig,
+} from '../../src/util/benchmark_util';
+import { locationToString, runAnalysis } from './run_analysis';
+
+const logger = createLogger('OrderViolation');
 
 const reportedErrorsGlobals = new Set<number>();
 function logOrderViolation(
-  sourceMap: SourceMap,
+  sourceMap: SourceMap | undefined,
   i: GlobalGetInstruction | LoadInstruction,
   rangeRead: Array<number | bigint> = [],
 ): void {
@@ -39,10 +44,7 @@ function logOrderViolation(
     logText = `instruction '0x${i.startAddress.toString(16)}: ${i.name}' reads unitiliased memory range [${rangeRead[0]},${rangeRead[1]}]`;
   }
 
-  const posStr = sourceMap
-    .getOriginalPositionFor(i.startAddress)
-    .map(sourceCodeLocationToString)
-    .join(', ');
+  const posStr = locationToString(sourceMap, i.startAddress);
   console.log(`[Order Violation Detected] ${logText} at ${posStr}`);
 }
 
@@ -62,7 +64,7 @@ function isRangeInitialised(
 
 function detectOrderViolation(
   analysis: WasmAnalysis,
-  sourceMap: SourceMap,
+  sourceMap: SourceMap | undefined,
 ): void {
   const initialisedGlobals = new Set<number>(
     analysis.wasm.globals.filter((g) => g.value > 0).map((g) => g.index),
@@ -136,11 +138,21 @@ async function main(wasmPath: string, sourceMapPath: string): Promise<void> {
   await analysis.run();
 }
 
-main(
-  resolve(
-    `./app_examples/assemblyscript/toggle_led_bug/wasm/order_violation.wasm`,
-  ),
-  resolve(
-    `./app_examples/assemblyscript/toggle_led_bug/wasm/order_violation.wasm.map`,
-  ),
-);
+export async function analyse(
+  wasmPath: string,
+  timeouts: TimeoutConfig,
+): Promise<BenchmarkMeasurement> {
+  reportedErrorsGlobals.clear();
+  return runAnalysis(logger, wasmPath, timeouts, detectOrderViolation);
+}
+
+if (require.main === module) {
+  main(
+    resolve(
+      `./app_examples/assemblyscript/toggle_led_bug/wasm/order_violation.wasm`,
+    ),
+    resolve(
+      `./app_examples/assemblyscript/toggle_led_bug/wasm/order_violation.wasm.map`,
+    ),
+  );
+}

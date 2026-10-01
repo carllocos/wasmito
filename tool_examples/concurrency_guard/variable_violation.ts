@@ -30,6 +30,14 @@ import {
 } from '../../src/source_mappers/source_map';
 import { WASMFunction } from '../../src/webassembly/wasm/wasm_function';
 import { WASM } from '../../src/webassembly/wasm';
+import { createLogger } from '../../src/logger/logger';
+import {
+  BenchmarkMeasurement,
+  TimeoutConfig,
+} from '../../src/util/benchmark_util';
+import { runAnalysis } from './run_analysis';
+
+const logger = createLogger('VariableViolation');
 
 function logGlobalViolation(
   read: GlobalGetInstruction,
@@ -186,7 +194,7 @@ function registerRead(
   }
 }
 
-async function detectViarableViolation(analysis: WasmAnalysis): Promise<void> {
+function registerAdvices(analysis: WasmAnalysis): void {
   analysis.before(WasmCode.GlobalGet, registerRead);
   analysis.before(WasmCode.MultipleOpcode.Load, registerRead);
 
@@ -208,7 +216,10 @@ async function detectViarableViolation(analysis: WasmAnalysis): Promise<void> {
       });
     await analysis.deploy();
   });
+}
 
+async function detectViarableViolation(analysis: WasmAnalysis): Promise<void> {
+  registerAdvices(analysis);
   await analysis.deploy();
   await analysis.run();
 }
@@ -239,4 +250,21 @@ async function main(): Promise<void> {
   await detectViarableViolation(analysis);
 }
 
-main();
+export async function analyse(
+  wasmPath: string,
+  timeouts: TimeoutConfig,
+): Promise<BenchmarkMeasurement> {
+  memoryWritten.length = 0;
+  globalsWritten.length = 0;
+  memoryRead.length = 0;
+  globalsGet.length = 0;
+  alreadyReported.clear();
+  return runAnalysis(logger, wasmPath, timeouts, (analysis, sm) => {
+    sourceMap = sm;
+    registerAdvices(analysis);
+  });
+}
+
+if (require.main === module) {
+  main();
+}

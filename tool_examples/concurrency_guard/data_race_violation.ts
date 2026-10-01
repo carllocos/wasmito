@@ -11,10 +11,7 @@ import {
   DebugStandard,
   readSourceMap,
 } from '../../src/source_mappers/source_map_builder';
-import {
-  sourceCodeLocationToString,
-  SourceMap,
-} from '../../src/source_mappers/source_map';
+import { SourceMap } from '../../src/source_mappers/source_map';
 import { WASM } from '../../src/webassembly/wasm';
 import { readFileSync, writeFileSync } from 'fs';
 import { Module } from 'wasmito-tools';
@@ -23,6 +20,14 @@ import {
   getAbsolutePath,
   pathJoin,
 } from '../../src/util/file_util';
+import { createLogger } from '../../src/logger/logger';
+import {
+  BenchmarkMeasurement,
+  TimeoutConfig,
+} from '../../src/util/benchmark_util';
+import { locationToString, runAnalysis } from './run_analysis';
+
+const logger = createLogger('DataRaceViolation');
 
 type WasmNumber = number | bigint;
 type MemRange = [WasmNumber, WasmNumber];
@@ -30,7 +35,7 @@ type MemRange = [WasmNumber, WasmNumber];
 const alreadLogged = new Set<string>();
 
 function logPossibleDataRace(
-  sourceMap: SourceMap,
+  sourceMap: SourceMap | undefined,
   i: StoreInstruction,
   range1: MemRange,
   range2: MemRange,
@@ -39,10 +44,7 @@ function logPossibleDataRace(
   const r2 = range1[0] > range2[0] ? range1 : range2;
   const logText = `instruction '0x${i.startAddress.toString(16)}: ${i.name}' causes possible data range in memory ranges [${r1[0]},${r1[1]}] and [${r2[0]},${r2[1]}]`;
 
-  const posStr = sourceMap
-    .getOriginalPositionFor(i.startAddress)
-    .map(sourceCodeLocationToString)
-    .join(', ');
+  const posStr = locationToString(sourceMap, i.startAddress);
   const logStr = `[Data Race Detected] ${logText} at ${posStr}`;
   if (!alreadLogged.has(logStr)) {
     console.log(logStr);
@@ -63,7 +65,10 @@ function getNeighbourRange(
   return undefined;
 }
 
-function detectDataRace(analysis: WasmAnalysis, sourceMap: SourceMap): void {
+function detectDataRace(
+  analysis: WasmAnalysis,
+  sourceMap: SourceMap | undefined,
+): void {
   const ranges: Array<MemRange> = [];
   analysis.before(
     WasmCode.MultipleOpcode.Store,
@@ -119,4 +124,14 @@ async function main(watPath: string): Promise<void> {
   await analysis.run();
 }
 
-main(resolve(`./test/data/wat/race_temp/race_temp.wat`));
+export async function analyse(
+  wasmPath: string,
+  timeouts: TimeoutConfig,
+): Promise<BenchmarkMeasurement> {
+  alreadLogged.clear();
+  return runAnalysis(logger, wasmPath, timeouts, detectDataRace);
+}
+
+if (require.main === module) {
+  main(resolve(`./test/data/wat/race_temp/race_temp.wat`));
+}
