@@ -1,4 +1,3 @@
-import { resolve } from 'path';
 import { WasmAnalysis } from '../../src/tool_api/wasm_analysis';
 import { ReadOnlyWasmValue } from '../../src/tool_api/interrupts';
 import { StoreInstruction } from '../../src/webassembly/wasm/wasm_instruction';
@@ -8,26 +7,31 @@ import { connectToExistingMCUVM, spawnDevVM, spawnMCUVM } from '../spawn_vm';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { BoardBaudRate } from '../../src/util/serial_port';
 import {
-  DebugStandard,
-  readSourceMap,
-} from '../../src/source_mappers/source_map_builder';
-import { SourceMap } from '../../src/source_mappers/source_map';
+  sourceCodeLocationToString,
+  SourceMap,
+} from '../../src/source_mappers/source_map';
 import { WASM } from '../../src/webassembly/wasm';
-import { readFileSync, writeFileSync } from 'fs';
-import { Module } from 'wasmito-tools';
-import {
-  createTempDirectory,
-  getAbsolutePath,
-  pathJoin,
-} from '../../src/util/file_util';
 import { createLogger } from '../../src/logger/logger';
 import {
   BenchmarkMeasurement,
+  FailedMeasurement,
+  logMeasurement,
   TimeoutConfig,
 } from '../../src/util/benchmark_util';
-import { locationToString, runAnalysis } from './run_analysis';
+import { WasmModule } from '../../src/webassembly/wasm/wasm_module';
 
 const logger = createLogger('DataRaceViolation');
+
+function locationToString(
+  sourceMap: SourceMap | undefined,
+  address: number,
+): string {
+  if (sourceMap === undefined) return `address 0x${address.toString(16)}`;
+  return sourceMap
+    .getOriginalPositionFor(address)
+    .map(sourceCodeLocationToString)
+    .join(', ');
+}
 
 type WasmNumber = number | bigint;
 type MemRange = [WasmNumber, WasmNumber];
@@ -89,50 +93,80 @@ function detectDataRace(
   );
 }
 
-async function main(watPath: string): Promise<void> {
-  const wat = readFileSync(watPath, 'utf-8');
-  const wasm = Module.from_wat(watPath, wat);
-  const outputDirectory = getAbsolutePath(
-    createTempDirectory('dataRaceWasmito'),
-  );
-  const wasmPath = pathJoin(outputDirectory, 'target_module.wasm');
-  writeFileSync(wasmPath, wasm.bytes);
-  const sourceMap = await readSourceMap(
-    DebugStandard.DWARF,
-    wasmPath,
-    wasmPath,
-    {
-      relativePaths: true,
-    },
-  );
-
-  //   const vmConnection = await connectToExistingMCUVM(sourceMap.wasm, {
-  //     vmConfig: {
-  //       pauseOnStart: true, // pause the VM on deploy of the Wasm module
-  //       serialPort: '/dev/cu.usbserial-8952FFEE8B',
-  //       baudrate: BoardBaudRate.BD_115200,
-  //       fqbn: {
-  //         boardName: 'M5Stick-C',
-  //         fqbn: 'm5stack:esp32:m5stick-c',
-  //       },
-  //     },
-  //   });
-  const vmConnection = await spawnDevVM(sourceMap.wasm);
-  const analysis = new WasmAnalysis(sourceMap.wasm, vmConnection);
-  detectDataRace(analysis, sourceMap);
-  await analysis.deploy();
-  await analysis.run();
-}
-
 export async function analyse(
   wasmPath: string,
   timeouts: TimeoutConfig,
   loadSourceMap?: () => Promise<SourceMap>,
 ): Promise<BenchmarkMeasurement> {
   alreadLogged.clear();
-  return runAnalysis(logger, wasmPath, timeouts, loadSourceMap, detectDataRace);
-}
+  logger.info(`parsing Wasm module '${wasmPath}'`);
+  const startTimeParse = Date.now();
+  const sourceMap = await loadSourceMap?.();
+  const wasm = sourceMap?.wasm ?? new WasmModule(wasmPath);
+  const parseTime = logMeasurement(
+    logger,
+    startTimeParse,
+    Date.now(),
+    'Wasm Parsing',
+  );
 
-if (require.main === module) {
-  main(resolve(`./test/data/wat/race_temp/race_temp.wat`));
+  logger.info(`spawning & connecting to WARDuino...`);
+  const startTimeSpawn = Date.now();
+  const vmConnection = await spawnDevVM(wasm);
+  const analysis = new WasmAnalysis(sourceMap ?? wasm, vmConnection);
+  const spawnTime = logMeasurement(
+    logger,
+    startTimeSpawn,
+    Date.now(),
+    'Spawning VM',
+  );
+
+  logger.info(`Registering Advices...`);
+  const startTimeRegister = Date.now();
+  detectDataRace(analysis, sourceMap);
+  const registerTime = logMeasurement(
+    logger,
+    startTimeRegister,
+    Date.now(),
+    'Registering Advices',
+  );
+
+  logger.info(`Deploying Hooks...`);
+  const startTimeDeploy = Date.now();
+  await analysis.deploy();
+  const deployTime = logMeasurement(
+    logger,
+    startTimeDeploy,
+    Date.now(),
+    'Deploy Hooks',
+  );
+
+  logger.info(`running WARDuino`);
+  const analysisStartTime = Date.now();
+  try {
+    await analysis.run(timeouts.timeoutMsAnalysisRun);
+    const analysisTime = logMeasurement(
+      logger,
+      analysisStartTime,
+      Date.now(),
+      'Analysis Completion',
+    );
+    return {
+      wasmParsingMs: parseTime,
+      vmSpawnMs: spawnTime,
+      advicesRegistrationMs: registerTime,
+      advicesDeploymentMs: deployTime,
+      analysisRunMs: analysisTime,
+    };
+  } catch (e) {
+    const errMsg = e instanceof Error ? e.message : e;
+    const f: FailedMeasurement = {
+      errorParsing: `${parseTime}`,
+      errorSpawn: `${spawnTime}`,
+      errorRegister: `${registerTime}`,
+      errorDeploy: `${deployTime}`,
+      errorRun: `${errMsg}`,
+    };
+    return f;
+  }
 }

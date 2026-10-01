@@ -1,4 +1,3 @@
-import { resolve } from 'path';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { WasmitoBackendVM } from '../../src/runtimes/wasmito_vm/wasmito_vm';
 import { WasmAnalysis } from '../../src/tool_api/wasm_analysis';
@@ -8,7 +7,6 @@ import {
   GlobalSetInstruction,
   isGlobalGetInstruction,
   isGlobalSetInstruction,
-  isLoadInstruction,
   isStoreInstruction,
   LoadInstruction,
   StoreInstruction,
@@ -21,10 +19,6 @@ import { spawnDevVM, spawnMCUVM } from '../spawn_vm';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { BoardBaudRate } from '../../src/util/serial_port';
 import {
-  DebugStandard,
-  readSourceMap,
-} from '../../src/source_mappers/source_map_builder';
-import {
   sourceCodeLocationToString,
   SourceMap,
 } from '../../src/source_mappers/source_map';
@@ -33,9 +27,11 @@ import { WASM } from '../../src/webassembly/wasm';
 import { createLogger } from '../../src/logger/logger';
 import {
   BenchmarkMeasurement,
+  FailedMeasurement,
+  logMeasurement,
   TimeoutConfig,
 } from '../../src/util/benchmark_util';
-import { runAnalysis } from './run_analysis';
+import { WasmModule } from '../../src/webassembly/wasm/wasm_module';
 
 const logger = createLogger('VariableViolation');
 
@@ -81,20 +77,6 @@ function globalWrites(
   );
 }
 
-function _globalReads(
-  f: WASMFunction,
-): (GlobalGetInstruction | LoadInstruction)[] {
-  const instrs = f.instructionsFromOpcode(WasmCode.GlobalGet);
-  WasmCode.toSingleOpcodes(WasmCode.MultipleOpcode.Load)
-    .flatMap((opcode) => f.instructionsFromOpcode(opcode))
-    .forEach((i) => instrs.push(i));
-  // filter is only needed to satisfy type system
-  return instrs.filter(
-    (i) => isLoadInstruction(i) || isGlobalGetInstruction(i),
-  );
-}
-
-// type WriteInstruction = GlobalSetInstruction | StoreInstruction;
 const memoryWritten: [number | bigint, number | bigint][] = [];
 const globalsWritten: GlobalSetInstruction[] = [];
 const memoryRead: [LoadInstruction, number | bigint, number | bigint][] = [];
@@ -204,11 +186,6 @@ function registerAdvices(analysis: WasmAnalysis): void {
       .flatMap((h) => h.handlers)
       .filter((f) => !handlersRegistered.has(f.id))
       .forEach(async (f) => {
-        // for (const instr of globalReads(f))
-        //   console.log(
-        //     `TODO remove read instructions of func #${f.id} at addr ${instr.startAddress}`,
-        //   );
-
         for (const instr of globalWrites(f))
           analysis.before(instr, checkViolation);
 
@@ -216,38 +193,6 @@ function registerAdvices(analysis: WasmAnalysis): void {
       });
     await analysis.deploy();
   });
-}
-
-async function detectViarableViolation(analysis: WasmAnalysis): Promise<void> {
-  registerAdvices(analysis);
-  await analysis.deploy();
-  await analysis.run();
-}
-
-async function main(): Promise<void> {
-  const wasmName = 'single_variable/wasm/single_variable.wasm';
-  // const wasmName = 'single_variable/wasm/single_variable_fix.wasm';
-  // const wasmName = 'multi_variable/wasm/multi_variable.wasm';
-  // const wasmName = 'multi_variable/wasm/multi_variable_fix.wasm';
-
-  const wasmPath = resolve(`./app_examples/assemblyscript/${wasmName}`);
-  const sourceMapPath = resolve(
-    `./app_examples/assemblyscript/${wasmName}.map`,
-  );
-
-  sourceMap = await readSourceMap(
-    DebugStandard.SourceMapSpec,
-    wasmPath,
-    sourceMapPath,
-    {
-      relativePaths: true,
-      columnOffset: 1,
-    },
-  );
-
-  const vmConnection = await spawnDevVM(sourceMap.wasm);
-  const analysis = new WasmAnalysis(sourceMap, vmConnection);
-  await detectViarableViolation(analysis);
 }
 
 export async function analyse(
@@ -260,18 +205,75 @@ export async function analyse(
   memoryRead.length = 0;
   globalsGet.length = 0;
   alreadyReported.clear();
-  return runAnalysis(
-    logger,
-    wasmPath,
-    timeouts,
-    loadSourceMap,
-    (analysis, sm) => {
-      sourceMap = sm;
-      registerAdvices(analysis);
-    },
-  );
-}
 
-if (require.main === module) {
-  main();
+  logger.info(`parsing Wasm module '${wasmPath}'`);
+  const startTimeParse = Date.now();
+  sourceMap = await loadSourceMap?.();
+  const wasm = sourceMap?.wasm ?? new WasmModule(wasmPath);
+  const parseTime = logMeasurement(
+    logger,
+    startTimeParse,
+    Date.now(),
+    'Wasm Parsing',
+  );
+
+  logger.info(`spawning & connecting to WARDuino...`);
+  const startTimeSpawn = Date.now();
+  const vmConnection = await spawnDevVM(wasm);
+  const analysis = new WasmAnalysis(sourceMap ?? wasm, vmConnection);
+  const spawnTime = logMeasurement(
+    logger,
+    startTimeSpawn,
+    Date.now(),
+    'Spawning VM',
+  );
+
+  logger.info(`Registering Advices...`);
+  const startTimeRegister = Date.now();
+  registerAdvices(analysis);
+  const registerTime = logMeasurement(
+    logger,
+    startTimeRegister,
+    Date.now(),
+    'Registering Advices',
+  );
+
+  logger.info(`Deploying Hooks...`);
+  const startTimeDeploy = Date.now();
+  await analysis.deploy();
+  const deployTime = logMeasurement(
+    logger,
+    startTimeDeploy,
+    Date.now(),
+    'Deploy Hooks',
+  );
+
+  logger.info(`running WARDuino`);
+  const analysisStartTime = Date.now();
+  try {
+    await analysis.run(timeouts.timeoutMsAnalysisRun);
+    const analysisTime = logMeasurement(
+      logger,
+      analysisStartTime,
+      Date.now(),
+      'Analysis Completion',
+    );
+    return {
+      wasmParsingMs: parseTime,
+      vmSpawnMs: spawnTime,
+      advicesRegistrationMs: registerTime,
+      advicesDeploymentMs: deployTime,
+      analysisRunMs: analysisTime,
+    };
+  } catch (e) {
+    const errMsg = e instanceof Error ? e.message : e;
+    const f: FailedMeasurement = {
+      errorParsing: `${parseTime}`,
+      errorSpawn: `${spawnTime}`,
+      errorRegister: `${registerTime}`,
+      errorDeploy: `${deployTime}`,
+      errorRun: `${errMsg}`,
+    };
+    return f;
+  }
 }

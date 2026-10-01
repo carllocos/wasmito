@@ -1,4 +1,3 @@
-import { resolve } from 'path';
 import { WasmAnalysis } from '../../src/tool_api/wasm_analysis';
 import { ReadOnlyWasmValue } from '../../src/tool_api/interrupts';
 import {
@@ -11,22 +10,32 @@ import {
 import { WasmCode } from '../../src/webassembly/wasm/wasm_opcode';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { connectToExistingMCUVM, spawnDevVM, spawnMCUVM } from '../spawn_vm';
-
-import { BoardBaudRate } from '../../src/util/serial_port';
 import {
-  DebugStandard,
-  readSourceMap,
-} from '../../src/source_mappers/source_map_builder';
-import { SourceMap } from '../../src/source_mappers/source_map';
+  sourceCodeLocationToString,
+  SourceMap,
+} from '../../src/source_mappers/source_map';
 import { WASM } from '../../src/webassembly/wasm';
 import { createLogger } from '../../src/logger/logger';
 import {
   BenchmarkMeasurement,
+  FailedMeasurement,
+  logMeasurement,
   TimeoutConfig,
 } from '../../src/util/benchmark_util';
-import { locationToString, runAnalysis } from './run_analysis';
+import { WasmModule } from '../../src/webassembly/wasm/wasm_module';
 
 const logger = createLogger('OrderViolation');
+
+function locationToString(
+  sourceMap: SourceMap | undefined,
+  address: number,
+): string {
+  if (sourceMap === undefined) return `address 0x${address.toString(16)}`;
+  return sourceMap
+    .getOriginalPositionFor(address)
+    .map(sourceCodeLocationToString)
+    .join(', ');
+}
 
 const reportedErrorsGlobals = new Set<number>();
 function logOrderViolation(
@@ -110,56 +119,80 @@ function detectOrderViolation(
   );
 }
 
-async function main(wasmPath: string, sourceMapPath: string): Promise<void> {
-  const sourceMap = await readSourceMap(
-    DebugStandard.SourceMapSpec,
-    wasmPath,
-    sourceMapPath,
-    {
-      relativePaths: true,
-      columnOffset: 1,
-    },
-  );
-
-  const vmConnection = await connectToExistingMCUVM(sourceMap.wasm, {
-    vmConfig: {
-      pauseOnStart: true, // pause the VM on deploy of the Wasm module
-      serialPort: '/dev/cu.usbserial-8952FFEE8B',
-      baudrate: BoardBaudRate.BD_115200,
-      fqbn: {
-        boardName: 'M5Stick-C',
-        fqbn: 'm5stack:esp32:m5stick-c',
-      },
-    },
-  });
-  const analysis = new WasmAnalysis(sourceMap.wasm, vmConnection);
-  detectOrderViolation(analysis, sourceMap);
-  await analysis.deploy();
-  await analysis.run();
-}
-
 export async function analyse(
   wasmPath: string,
   timeouts: TimeoutConfig,
   loadSourceMap?: () => Promise<SourceMap>,
 ): Promise<BenchmarkMeasurement> {
   reportedErrorsGlobals.clear();
-  return runAnalysis(
+  logger.info(`parsing Wasm module '${wasmPath}'`);
+  const startTimeParse = Date.now();
+  const sourceMap = await loadSourceMap?.();
+  const wasm = sourceMap?.wasm ?? new WasmModule(wasmPath);
+  const parseTime = logMeasurement(
     logger,
-    wasmPath,
-    timeouts,
-    loadSourceMap,
-    detectOrderViolation,
+    startTimeParse,
+    Date.now(),
+    'Wasm Parsing',
   );
-}
 
-if (require.main === module) {
-  main(
-    resolve(
-      `./app_examples/assemblyscript/toggle_led_bug/wasm/order_violation.wasm`,
-    ),
-    resolve(
-      `./app_examples/assemblyscript/toggle_led_bug/wasm/order_violation.wasm.map`,
-    ),
+  logger.info(`spawning & connecting to WARDuino...`);
+  const startTimeSpawn = Date.now();
+  const vmConnection = await spawnDevVM(wasm);
+  const analysis = new WasmAnalysis(sourceMap ?? wasm, vmConnection);
+  const spawnTime = logMeasurement(
+    logger,
+    startTimeSpawn,
+    Date.now(),
+    'Spawning VM',
   );
+
+  logger.info(`Registering Advices...`);
+  const startTimeRegister = Date.now();
+  detectOrderViolation(analysis, sourceMap);
+  const registerTime = logMeasurement(
+    logger,
+    startTimeRegister,
+    Date.now(),
+    'Registering Advices',
+  );
+
+  logger.info(`Deploying Hooks...`);
+  const startTimeDeploy = Date.now();
+  await analysis.deploy();
+  const deployTime = logMeasurement(
+    logger,
+    startTimeDeploy,
+    Date.now(),
+    'Deploy Hooks',
+  );
+
+  logger.info(`running WARDuino`);
+  const analysisStartTime = Date.now();
+  try {
+    await analysis.run(timeouts.timeoutMsAnalysisRun);
+    const analysisTime = logMeasurement(
+      logger,
+      analysisStartTime,
+      Date.now(),
+      'Analysis Completion',
+    );
+    return {
+      wasmParsingMs: parseTime,
+      vmSpawnMs: spawnTime,
+      advicesRegistrationMs: registerTime,
+      advicesDeploymentMs: deployTime,
+      analysisRunMs: analysisTime,
+    };
+  } catch (e) {
+    const errMsg = e instanceof Error ? e.message : e;
+    const f: FailedMeasurement = {
+      errorParsing: `${parseTime}`,
+      errorSpawn: `${spawnTime}`,
+      errorRegister: `${registerTime}`,
+      errorDeploy: `${deployTime}`,
+      errorRun: `${errMsg}`,
+    };
+    return f;
+  }
 }
