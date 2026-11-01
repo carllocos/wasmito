@@ -27,9 +27,9 @@ import { analyse as analyseHotness } from '../tool_examples/analyses/hotness';
 import { analyse as analyseIMix } from '../tool_examples/analyses/imix';
 import { analyse as analyseCacheSim } from '../tool_examples/analyses/cache_simulator/cache_simulator';
 import { analyse as analyseLoopTracer } from '../tool_examples/analyses/loop_tracer/loop_tracer';
-import { analyse as analyseDataRaceViolation } from '../tool_examples/concurrency_guard/data_race_violation';
-import { analyse as analyseOrderViolation } from '../tool_examples/concurrency_guard/order_violation';
-import { analyse as analyseVariableViolation } from '../tool_examples/concurrency_guard/variable_violation';
+import { analyse as analyseDataRaceViolation } from '../tool_examples/analyses/data_race_violation';
+import { analyse as analyseOrderViolation } from '../tool_examples/analyses/order_violation';
+import { analyse as analyseVariableViolation } from '../tool_examples/analyses/variable_violation';
 import {
   TimeoutConfig,
   BenchmarkMeasurement,
