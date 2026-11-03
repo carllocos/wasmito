@@ -106,8 +106,8 @@ export class InspectStateHook<HookMetadata>
     return this;
   }
 
-  includeHeapFree(): this {
-    this._stateToInspect.includeHeapFree();
+  includeHeapUsed(): this {
+    this._stateToInspect.includeHeapUsed();
     return this;
   }
 }

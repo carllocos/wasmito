@@ -431,7 +431,7 @@ function parseWasmValueIndex(sv: any): WASMValueIndexed {
   };
 }
 
-function parseHeapFree(v: any): number {
+function parseHeapUsed(v: any): number {
   if (typeof v !== 'object') {
     throw new Error(`heap usage should be an object`);
   }
@@ -462,7 +462,7 @@ export class WasmState {
   events?: WASM.Event[];
   exception?: string;
   logicalClock?: LogicalClock;
-  heapFree?: number;
+  heapUsed?: number;
 
   private readonly _jsonString?: string;
 
@@ -615,7 +615,7 @@ export class WasmState {
     }
 
     if (args.heap !== undefined) {
-      this.heapFree = parseHeapFree(args.heap);
+      this.heapUsed = parseHeapUsed(args.heap);
     }
   }
 
@@ -638,7 +638,7 @@ export class WasmState {
       this.br_table !== undefined &&
       this.callbacks !== undefined &&
       this.events !== undefined &&
-      this.heapFree !== undefined
+      this.heapUsed !== undefined
     );
   }
 

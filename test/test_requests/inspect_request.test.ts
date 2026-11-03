@@ -80,9 +80,9 @@ describe('Inspect Request', () => {
 
   it('Inspecting Heap Used', async () => {
     const request = new StateRequest();
-    request.includeHeapFree();
+    request.includeHeapUsed();
     const s = await vm?.inspect(request);
-    expect(s?.heapFree).to.not.equal(undefined);
+    expect(s?.heapUsed).to.not.equal(undefined);
   });
 
   after(async () => {
