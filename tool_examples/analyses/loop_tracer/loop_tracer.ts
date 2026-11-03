@@ -27,6 +27,7 @@ import {
 } from '../../../src/util/benchmark_util';
 import path from 'path';
 import { WASMFunction } from '../../../src/webassembly/wasm/wasm_function';
+import { HeapUsageProbe } from '../../../src/util/heap_usage_probe';
 
 const logger = createLogger('LoopTracerAnalysis');
 
@@ -95,6 +96,8 @@ function onFunCall(f: WASMFunction, _args: ReadOnlyWasmValue[]): void {
 export async function analyse(
   wasmPath: string,
   timeouts: TimeoutConfig,
+  _loadSourceMap?: unknown,
+  heapProbe?: HeapUsageProbe,
 ): Promise<BenchmarkMeasurement> {
   logger.info(`loading tracer library '${tracerLibPath}'`);
   await loadTracerLib();
@@ -137,6 +140,7 @@ export async function analyse(
   );
 
   logger.info(`Deploying Hooks...`);
+  if (heapProbe) await heapProbe.beforeDeploy(vmConnection);
   const startTimeDeploy = Date.now();
   await analysis.deploy();
   const deployTime = logMeasurement(
@@ -145,6 +149,7 @@ export async function analyse(
     Date.now(),
     'Deploy Hooks',
   );
+  if (heapProbe) await heapProbe.afterDeploy(vmConnection);
 
   logger.info(`running WARDuino`);
   const analysisStartTime = Date.now();

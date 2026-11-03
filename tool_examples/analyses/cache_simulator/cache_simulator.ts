@@ -25,6 +25,7 @@ import {
 } from '../../../src/util/benchmark_util';
 import { WasmCode } from '../../../src/webassembly/wasm/wasm_opcode';
 import path from 'path';
+import { HeapUsageProbe } from '../../../src/util/heap_usage_probe';
 
 const logger = createLogger('CacheSimulatorAnalysis');
 
@@ -70,6 +71,8 @@ function logStats(): void {
 export async function analyse(
   wasmPath: string,
   timeouts: TimeoutConfig,
+  _loadSourceMap?: unknown,
+  heapProbe?: HeapUsageProbe,
 ): Promise<BenchmarkMeasurement> {
   logger.info(`loading cache library '${cacheLibPath}'`);
   const cacheLib = await loadWasiLibrary(cacheLibPath);
@@ -111,6 +114,7 @@ export async function analyse(
   );
 
   logger.info(`Deploying Hooks...`);
+  if (heapProbe) await heapProbe.beforeDeploy(vmConnection);
   const startTimeDeploy = Date.now();
   await analysis.deploy();
   const deployTime = logMeasurement(
@@ -119,6 +123,7 @@ export async function analyse(
     Date.now(),
     'Deploy Hooks',
   );
+  if (heapProbe) await heapProbe.afterDeploy(vmConnection);
 
   logger.info(`running WARDuino`);
   const analysisStartTime = Date.now();

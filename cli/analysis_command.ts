@@ -39,6 +39,12 @@ import {
   FailedMeasurement,
   csvFileHasHeader,
 } from '../src/util/benchmark_util';
+import {
+  HeapUsageProbe,
+  heapCsvFileHasHeader,
+  logHeapUsage,
+  writeHeapUsageToFile,
+} from '../src/util/heap_usage_probe';
 
 const logger = getGlobalLogger();
 
@@ -49,6 +55,7 @@ type AnalysisRun = [
     wasmPath: string,
     timeouts: TimeoutConfig,
     loadSourceMap?: () => Promise<SourceMap>,
+    heapProbe?: HeapUsageProbe,
   ) => Promise<BenchmarkMeasurement>,
 ];
 const analyses: Array<AnalysisRun> = [
@@ -122,6 +129,10 @@ export function registerAnalysisCommand(program: Command): void {
       '-s, --source-spec <path-to-source-spec>',
       `read the debugging information from the given path to a Source Map Spec.`,
     )
+    .option(
+      '--heap-usage [heap_csv_file_path]',
+      `measure the VM heap usage (bytes) right before and after deploying the hooks. The measurements happen outside the timed sections. Results are logged and, if a path is given, appended to that CSV file (separate from --csv).`,
+    )
     .action(async (analysis, wasm, options) => {
       const [modules, errMsg] = findModules(wasm);
       if (errMsg !== '') {
@@ -189,6 +200,11 @@ export function registerAnalysisCommand(program: Command): void {
       );
 
       let addHeader = writeToCSV ? !csvFileHasHeader(csvFilePath) : false;
+      const measureHeap = options.heapUsage !== undefined;
+      const heapCsvFilePath: string | undefined =
+        typeof options.heapUsage === 'string' ? options.heapUsage : undefined;
+      let addHeapHeader =
+        heapCsvFilePath !== undefined && !heapCsvFileHasHeader(heapCsvFilePath);
       for (const [a, analyse] of analysisToRun) {
         for (const wasmPath of modules) {
           const measurements: BenchmarkMeasurements = {
@@ -201,7 +217,15 @@ export function registerAnalysisCommand(program: Command): void {
           try {
             logger.info(`Running analysis '${a}' for wasm '${wasmPath}'`);
             const startTimeParse = Date.now();
-            const run = await analyse(wasmPath, timeouts, loadSourceMap);
+            const heapProbe = measureHeap
+              ? new HeapUsageProbe(timeouts.timeoutMsDeploy)
+              : undefined;
+            const run = await analyse(
+              wasmPath,
+              timeouts,
+              loadSourceMap,
+              heapProbe,
+            );
             const totalTime = logMeasurement(
               logger,
               startTimeParse,
@@ -210,6 +234,26 @@ export function registerAnalysisCommand(program: Command): void {
             );
             measurements.measurements.push(run);
             measurements.totalTimes.push(totalTime);
+            if (heapProbe !== undefined) {
+              const hm = heapProbe.measurement;
+              logHeapUsage(logger, `Analysis ${a}`, hm);
+              if (heapCsvFilePath !== undefined) {
+                try {
+                  writeHeapUsageToFile(
+                    heapCsvFilePath,
+                    a,
+                    measurements.wasm,
+                    hm,
+                    addHeapHeader,
+                  );
+                  addHeapHeader = false;
+                } catch (err) {
+                  logger.error(
+                    `Error writing heap usage to file ${heapCsvFilePath}. ${err}`,
+                  );
+                }
+              }
+            }
             if (writeToCSV) {
               try {
                 writeLastMeasurementToFile(measurements, addHeader);

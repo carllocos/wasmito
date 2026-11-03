@@ -19,6 +19,7 @@ import {
   TimeoutConfig,
 } from '../../src/util/benchmark_util';
 import { WASMFunction } from '../../src/webassembly/wasm/wasm_function';
+import { HeapUsageProbe } from '../../src/util/heap_usage_probe';
 const logger = createLogger('CallGraphAnalysis');
 
 const callGraph = new Map<number, Map<number, number>>();
@@ -47,6 +48,8 @@ function csvLogGraph() {
 export async function analyse(
   wasmPath: string,
   timeouts: TimeoutConfig,
+  _loadSourceMap?: unknown,
+  heapProbe?: HeapUsageProbe,
 ): Promise<BenchmarkMeasurement> {
   logger.info(`Parsing WasmModule '${wasmPath}'`);
   const startTimeParse = Date.now();
@@ -83,6 +86,7 @@ export async function analyse(
   );
 
   logger.info(`Deploying Hooks...`);
+  if (heapProbe) await heapProbe.beforeDeploy(vmConnection);
   const startTimeDeploy = Date.now();
   await analysis.deploy();
   const deployTime = logMeasurement(
@@ -91,6 +95,7 @@ export async function analyse(
     Date.now(),
     'Deploy Hooks',
   );
+  if (heapProbe) await heapProbe.afterDeploy(vmConnection);
 
   logger.info(`running VM`);
   const analysisStartTime = Date.now();

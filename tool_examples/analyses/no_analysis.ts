@@ -8,12 +8,15 @@ import {
   logMeasurement,
   TimeoutConfig,
 } from '../../src/util/benchmark_util';
+import { HeapUsageProbe } from '../../src/util/heap_usage_probe';
 
 const logger = createLogger('No Analysis');
 
 export async function analyse(
   wasmPath: string,
   timeouts: TimeoutConfig,
+  _loadSourceMap?: unknown,
+  heapProbe?: HeapUsageProbe,
 ): Promise<BenchmarkMeasurement> {
   logger.info(`parsing Wasm module '${wasmPath}'`);
   const startTimeParse = Date.now();
@@ -45,6 +48,7 @@ export async function analyse(
     'Registering Advices',
   );
   logger.info(`deploying advices...`);
+  if (heapProbe) await heapProbe.beforeDeploy(vmConnection);
   const startTimeDeploy = Date.now();
   await analysis.deploy();
   const deployTime = logMeasurement(
@@ -53,6 +57,7 @@ export async function analyse(
     Date.now(),
     'Deploy Hooks',
   );
+  if (heapProbe) await heapProbe.afterDeploy(vmConnection);
   logger.info(`running WARDuino`);
   const startAnalysis = Date.now();
   try {

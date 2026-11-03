@@ -19,6 +19,7 @@ import {
   TimeoutConfig,
 } from '../../src/util/benchmark_util';
 import { WasmModule } from '../../src/webassembly/wasm/wasm_module';
+import { HeapUsageProbe } from '../../src/util/heap_usage_probe';
 
 const logger = createLogger('DataRaceViolation');
 
@@ -97,6 +98,7 @@ export async function analyse(
   wasmPath: string,
   timeouts: TimeoutConfig,
   loadSourceMap?: () => Promise<SourceMap>,
+  heapProbe?: HeapUsageProbe,
 ): Promise<BenchmarkMeasurement> {
   alreadLogged.clear();
   logger.info(`parsing Wasm module '${wasmPath}'`);
@@ -132,6 +134,7 @@ export async function analyse(
   );
 
   logger.info(`Deploying Hooks...`);
+  if (heapProbe) await heapProbe.beforeDeploy(vmConnection);
   const startTimeDeploy = Date.now();
   await analysis.deploy();
   const deployTime = logMeasurement(
@@ -140,6 +143,7 @@ export async function analyse(
     Date.now(),
     'Deploy Hooks',
   );
+  if (heapProbe) await heapProbe.afterDeploy(vmConnection);
 
   logger.info(`running WARDuino`);
   const analysisStartTime = Date.now();
