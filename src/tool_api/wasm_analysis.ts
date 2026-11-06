@@ -366,6 +366,112 @@ export class WasmAnalysis {
     return this;
   }
 
+  /*
+   * Register a callback that runs `around` (i.e. instead of) the given
+   * `instr`. The VM pauses right before `instr` executes and calls `cb` with
+   * the arguments `instr` would consume. The value returned by `cb` becomes
+   * the result of `instr` (return `undefined` when `instr` produces no
+   * result). The original `instr` is skipped: the VM pops its arguments,
+   * pushes the returned value and continues with the code that follows:
+   *  - a WASMFunction (or `WasmCode.Struct.Func`): the function immediately
+   *    returns the value to its caller, its body is not executed.
+   *  - a block, loop or if (or their `WasmCode.Struct.*`): the whole
+   *    structure is skipped up to its matching `end`.
+   *  - any other instruction: execution continues with the next instruction.
+   *
+   * `else` and `end` cannot be replaced. When several `around` callbacks are
+   * registered on the same instruction, they all run and the last value
+   * returned (ignoring `undefined`) is used.
+   */
+  around(
+    instr: WASMFunction | WasmCode.Struct.Func,
+    cb:
+      | ((
+          f: WASMFunction,
+          args: WritableWasmValue[],
+          vm: WasmitoBackendVM,
+        ) => WritableWasmValue | undefined | void)
+      | ((
+          f: WASMFunction,
+          args: WritableWasmValue[],
+          vm: WasmitoBackendVM,
+        ) => Promise<WritableWasmValue | undefined | void>)
+      | ((
+          f: WASMFunction,
+          args: WritableWasmValue[],
+        ) => WritableWasmValue | undefined | void)
+      | ((
+          f: WASMFunction,
+          args: WritableWasmValue[],
+        ) => Promise<WritableWasmValue | undefined | void>)
+      | ((vm: WasmitoBackendVM) => WritableWasmValue | undefined | void)
+      | ((
+          vm: WasmitoBackendVM,
+        ) => Promise<WritableWasmValue | undefined | void>)
+      | (() => WritableWasmValue | undefined | void)
+      | (() => Promise<WritableWasmValue | undefined | void>),
+  ): this;
+  around<I extends WasmInstruction>(
+    instr:
+      | I
+      | WasmAddress
+      | WasmOpcode
+      | WasmCode.MultipleOpcode
+      | WasmCode.Struct.Block
+      | WasmCode.Struct.Loop
+      | WasmCode.Struct.If,
+    cb:
+      | ((
+          instr: I,
+          args: WritableWasmValue[],
+          vm: WasmitoBackendVM,
+        ) => WritableWasmValue | undefined | void)
+      | ((
+          instr: I,
+          args: WritableWasmValue[],
+          vm: WasmitoBackendVM,
+        ) => Promise<WritableWasmValue | undefined | void>)
+      | ((
+          instr: I,
+          args: WritableWasmValue[],
+        ) => WritableWasmValue | undefined | void)
+      | ((
+          instr: I,
+          args: WritableWasmValue[],
+        ) => Promise<WritableWasmValue | undefined | void>)
+      | ((vm: WasmitoBackendVM) => WritableWasmValue | undefined | void)
+      | ((
+          vm: WasmitoBackendVM,
+        ) => Promise<WritableWasmValue | undefined | void>)
+      | (() => WritableWasmValue | undefined | void)
+      | (() => Promise<WritableWasmValue | undefined | void>),
+  ): this;
+  around<I extends WasmInstruction>(
+    instr:
+      | I
+      | WasmAddress
+      | WasmOpcode
+      | WasmCode.MultipleOpcode
+      | WasmCode.Struct
+      | WASMFunction,
+    cb: (...args: any[]) => any,
+  ): this {
+    // around always pauses the VM: the result has to be handed back before
+    // execution can continue
+    const mutate = true;
+    const moment = 'around';
+    instruction<I>(
+      this._advices,
+      moment,
+      instr,
+      this.wasm,
+      this.maxTimeoutMs,
+      cb,
+      mutate,
+    );
+    return this;
+  }
+
   async close() {
     await this.vm.close();
   }
