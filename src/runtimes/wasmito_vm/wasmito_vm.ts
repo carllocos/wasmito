@@ -51,6 +51,11 @@ import { Logger } from '../../logger/logger';
 import { MockPinInterruptRequest } from './requests/inject_event_request';
 import { RequestsManager } from '../../communication/requests_manager';
 import { UpdateStackValueRequest } from './requests/update_stack_value';
+import {
+  HookAroundKind,
+  HookAroundResultRequest,
+  hookAroundResultErrors,
+} from './requests/hook_around_result_request';
 
 export abstract class WasmitoBackendVM implements RuntimeToolAPI {
   private _channel: Channel;
@@ -176,6 +181,26 @@ export abstract class WasmitoBackendVM implements RuntimeToolAPI {
   ): Promise<boolean> {
     const req = new UpdateStackValueRequest(stackIdx, value);
     return await this.sendRequest(req);
+  }
+
+  async completeAround(
+    wasmAddr: number,
+    kind: HookAroundKind,
+    nrArgs: number,
+    result?: WASM.Value,
+    timeout?: number,
+  ): Promise<void> {
+    const req = new HookAroundResultRequest(wasmAddr, kind, nrArgs, result);
+    const success = await this.sendRequest(req, timeout);
+    if (!success) {
+      const code = req.responseMessage?.error_code;
+      const reason =
+        (code !== undefined ? hookAroundResultErrors.get(code) : undefined) ??
+        `error code ${code}`;
+      throw new this.ErrorClass(
+        `Failed to apply around result on addr ${wasmAddr}: ${reason}`,
+      );
+    }
   }
 
   functionsProxied(): Set<WASMFunction> {
