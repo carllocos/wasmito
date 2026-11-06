@@ -282,6 +282,21 @@ export function instruction<I extends WasmInstruction>(
 ): number;
 export function instruction<I extends WasmInstruction>(
   advices: AdvicesRegistery,
+  moment: 'around',
+  instr:
+    | I
+    | WasmAddress
+    | WasmOpcode
+    | WasmCode.MultipleOpcode
+    | WasmCode.Struct
+    | WASMFunction,
+  wasm: WasmModule,
+  maxTimeoutMs: number,
+  cb: (...args: any[]) => any,
+  mutate: true,
+): number;
+export function instruction<I extends WasmInstruction>(
+  advices: AdvicesRegistery,
   moment: InstrMoment,
   instr:
     | I
