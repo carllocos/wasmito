@@ -479,6 +479,19 @@ export function runAdvicesInstruction(
       const moment = metadata.moment;
       const advices = advicesContainer.getAdvices(moment, metadata.addr);
       const wasmState = sub.sub;
+      if (moment === HookOnWasmAddrMoment.HookAround) {
+        await runAroundAdvices(
+          advicesContainer,
+          advices,
+          metadata.addr,
+          wasmState,
+          vm,
+          maxTimeoutMs,
+          mod,
+          onAdviceFailure,
+        );
+        return;
+      }
       const firstReportTarget = resolveReportTarget(mod, advices[0].reportAddr);
       const stackArgs = copyArgsFromStack(
         firstReportTarget,
@@ -528,6 +541,82 @@ export function runAdvicesInstruction(
       }
     });
   };
+}
+
+async function runAroundAdvices(
+  advicesContainer: AdvicesRegistery,
+  advices: AdviceEntry[],
+  hookAddr: number,
+  wasmState: WasmState,
+  vm: WasmitoBackendVM,
+  maxTimeoutMs: number,
+  mod: WasmModule,
+  onAdviceFailure: (reason?: any) => void,
+): Promise<void> {
+  const target = resolveReportTarget(mod, advices[0].reportAddr);
+  const signature = signatureOf(target);
+  let stack = wasmState.stack ?? [];
+  if (
+    signature.nrArgs > 0 &&
+    advicesContainer.hasMutatingAdvices(
+      HookOnWasmAddrMoment.HookBefore,
+      hookAddr,
+    )
+  ) {
+    // mutating `before` advices on this address may have updated the
+    // arguments after the VM reported them for `around`
+    const s = await vm.inspect(new StateRequest().includeStack());
+    stack = s.stack ?? [];
+  }
+  const stackArgs = copyArgsFromStack(
+    target,
+    stack,
+    HookOnWasmAddrMoment.HookAround,
+  ) as WASMValueIndexed[];
+  const args = stackToAdviceArgs(stackArgs, true) as WritableWasmValue[];
+
+  let result: ReadOnlyWasmValue | WritableWasmValue | undefined;
+  try {
+    for (const { advice, reportAddr } of advices) {
+      if (vm.isClosed()) return;
+      let r: unknown;
+      if (isNoArgAdvice(advice)) {
+        r = await advice();
+      } else if (isVMArgAdvice(advice)) {
+        r = await advice(vm);
+      } else {
+        const reportTarget = resolveReportTarget(mod, reportAddr);
+        const ad = advice as any;
+        r = await ad(reportTarget, args, vm);
+      }
+      if (r === undefined) continue;
+      if (!(r instanceof WritableWasmValue || r instanceof ReadOnlyWasmValue)) {
+        throw new Error(
+          `'around' advice on '${target.name}' must return a WasmValue or undefined`,
+        );
+      }
+      result = r;
+    }
+    if (vm.isClosed()) return;
+
+    assertAroundResult(target, result);
+    const kind =
+      target instanceof WASMFunction
+        ? HookAroundKind.Function
+        : HookAroundKind.Instruction;
+    await vm.completeAround(
+      hookAddr,
+      kind,
+      aroundNrArgs(target),
+      result?.toWasmValue(),
+      maxTimeoutMs,
+    );
+  } catch (e) {
+    onAdviceFailure(e);
+    return;
+  }
+  logger.debug('Resume execution on VM after around');
+  await vm.run(maxTimeoutMs);
 }
 
 function aroundNrArgs(target: WasmInstruction | WASMFunction): number {
