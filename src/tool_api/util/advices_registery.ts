@@ -532,6 +532,18 @@ export class AdvicesRegistery {
         throw new Error('no moment advices');
     }
   }
+
+  hasAdvices(moment: HookOnWasmAddrMoment, addr: number): boolean {
+    return (this.advicesMap(moment).get(addr)?.length ?? 0) > 0;
+  }
+
+  hasMutatingAdvices(moment: HookOnWasmAddrMoment, addr: number): boolean {
+    return (this.advicesMap(moment).get(addr) ?? []).some((a) => a.mutate);
+  }
+
+
+  getAdvices(moment: HookOnWasmAddrMoment, addr: number): AdviceArray {
+    const advices = this.advicesMap(moment).get(addr);
     assertFatalHookError(
       advices !== undefined && advices.length > 0,
       `no ${moment} advices registed on addr ${addr}`,
