@@ -14,6 +14,7 @@ export enum Instruction {
   HookOnWasmAddr = '51',
   HookOnEvent = '52',
   HookOnError = '53',
+  HookAroundResult = '54',
 
   LoadSnapshot = '62',
 
