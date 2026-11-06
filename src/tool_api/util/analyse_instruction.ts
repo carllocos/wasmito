@@ -1,6 +1,7 @@
 import assert from 'assert';
 import { WasmitoBackendVM } from '../../runtimes/wasmito_vm/wasmito_vm';
 import {
+  CallIndirect,
   isBlockInstruction,
   isIfInstruction,
   isLoopInstruction,
@@ -11,7 +12,7 @@ import { WasmModule } from '../../webassembly/wasm/wasm_module';
 import { WasmCode, WasmOpcode } from '../../webassembly/wasm/wasm_opcode';
 import { ReadOnlyWasmValue, WritableWasmValue } from '../interrupts';
 import { InstrMoment } from '../group_hooks';
-import { WasmState, WASMValueIndexed } from '../../webassembly/wasm';
+import { WASM, WasmState, WASMValueIndexed } from '../../webassembly/wasm';
 import { assertFatalHookError, SubscriptionContent } from '../../hooks/hook';
 import { getGlobalLogger } from '../../logger/logger';
 import { WASMFunction } from '../../webassembly/wasm/wasm_function';
@@ -527,6 +528,48 @@ export function runAdvicesInstruction(
       }
     });
   };
+}
+
+function aroundNrArgs(target: WasmInstruction | WASMFunction): number {
+  if (target instanceof WASMFunction) return 0;
+  // the signature of call_indirect excludes the table index operand
+  const tblIndex = target instanceof CallIndirect ? 1 : 0;
+  return target.signature.nrArgs + tblIndex;
+}
+
+function assertAroundResult(
+  target: WasmInstruction | WASMFunction,
+  result: ReadOnlyWasmValue | WritableWasmValue | undefined,
+): void {
+  if (
+    !(target instanceof WASMFunction) &&
+    (isBlockInstruction(target) ||
+      isLoopInstruction(target) ||
+      isIfInstruction(target))
+  ) {
+    // the result type of a block is validated by the VM
+    return;
+  }
+  const signature = signatureOf(target);
+  if (signature.nrResults === 0) {
+    if (result !== undefined) {
+      throw new Error(
+        `'around' advice on '${target.name}' returned a value but '${target.name}' produces no result`,
+      );
+    }
+    return;
+  }
+  if (result === undefined) {
+    throw new Error(
+      `'around' advice on '${target.name}' must return a value since '${target.name}' produces a result`,
+    );
+  }
+  const expected = signature.returnTypes[0];
+  if (expected !== undefined && expected !== result.type) {
+    throw new Error(
+      `'around' advice on '${target.name}' returned a ${WASM.typeToString(result.type)} but a ${WASM.typeToString(expected)} is expected`,
+    );
+  }
 }
 
 type AdviceArgsCB =
