@@ -431,6 +431,9 @@ export class AdvicesRegistery {
     const sm = this.getInstrStateMap(hm);
     let advicesRegistered = 0;
     for (const { hookAddr, reportAddr } of instrs) {
+      if (hm === HookOnWasmAddrMoment.HookAround) {
+        this.assertAroundKindConsistent(hookAddr, reportAddr, wasm);
+      }
       let stateIdx = sm.get(hookAddr);
       let req: HookOnWasmAddrRequest | undefined;
       if (stateIdx !== undefined) {
@@ -541,6 +544,26 @@ export class AdvicesRegistery {
     return (this.advicesMap(moment).get(addr) ?? []).some((a) => a.mutate);
   }
 
+  /*
+   * An around on a WASMFunction and an around on the function's first
+   * instruction both hook the same address but replace different code (the
+   * whole function vs that single instruction), so they cannot be combined.
+   */
+  private assertAroundKindConsistent(
+    hookAddr: number,
+    reportAddr: number,
+    wasm: WasmModule,
+  ): void {
+    const existing = this.advicesAround.get(hookAddr) ?? [];
+    if (existing.length === 0) return;
+    const isFunc = isFunctionReportAddr(reportAddr);
+    if (existing.some((e) => isFunctionReportAddr(e.reportAddr) !== isFunc)) {
+      const target = resolveReportTarget(wasm, reportAddr);
+      throw new Error(
+        `Cannot register 'around' on '${target.name}' at addr ${hookAddr}: an 'around' replacing ${isFunc ? 'the single instruction' : 'the whole function'} is already registered on that address`,
+      );
+    }
+  }
 
   getAdvices(moment: HookOnWasmAddrMoment, addr: number): AdviceArray {
     const advices = this.advicesMap(moment).get(addr);
