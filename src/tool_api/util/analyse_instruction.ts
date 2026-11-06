@@ -78,7 +78,8 @@ export function getInstructions<I extends WasmInstruction>(
 
 /*
  * Builds the hook target for a `WASMFunction`: the hook itself is placed on
- * the first (`before`) or last (`after`) instruction of the function's body,
+ * the first (`before`, `around`) or last (`after`) instruction of the
+ * function's body,
  * but what gets reported to the advice callback is the function itself
  * (together with the stack values matching its own signature), not that
  * boundary instruction.
@@ -92,7 +93,7 @@ function functionHookTarget(
     `Cannot hook function '${f.name}' since it has an empty body`,
   );
   const boundaryInstr =
-    moment === 'before' ? f.body[0] : f.body[f.body.length - 1];
+    moment === 'after' ? f.body[f.body.length - 1] : f.body[0];
   return {
     hookAddr: boundaryInstr.startAddress,
     reportAddr: encodeFunctionReportAddr(f.id),
