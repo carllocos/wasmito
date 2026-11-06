@@ -359,8 +359,10 @@ function instrMomentToHookMoment(m: InstrMoment): HookOnWasmAddrMoment {
       return HookOnWasmAddrMoment.HookBefore;
     case 'after':
       return HookOnWasmAddrMoment.HookAfter;
+    case 'around':
+      return HookOnWasmAddrMoment.HookAround;
     default:
-      throw new Error(`TODO`);
+      throw new Error(`unsupported instruction moment ${m}`);
   }
 }
 
