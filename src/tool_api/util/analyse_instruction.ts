@@ -24,6 +24,7 @@ import {
   isHookOnAddrSubContent,
 } from '../../runtimes/wasmito_vm/requests/hook_on_wasm_addr_request';
 import {
+  AdviceEntry,
   AdvicesRegistery,
   encodeFunctionReportAddr,
   InstructionHookTarget,
