@@ -86,9 +86,26 @@ export type AdviceAfter<I extends WasmInstruction> =
       result: WritableWasmValue | undefined,
     ) => Promise<WritableWasmValue | undefined>);
 
+export type AdviceAroundResult =
+  | WritableWasmValue
+  | undefined
+  | void
+  | Promise<WritableWasmValue | undefined | void>;
+
+export type AdviceAround<I extends WasmInstruction> =
+  | ((
+      instr: I,
+      args: WritableWasmValue[],
+      vm: WasmitoBackendVM,
+    ) => AdviceAroundResult)
+  | ((instr: I, args: WritableWasmValue[]) => AdviceAroundResult)
+  | ((vm: WasmitoBackendVM) => AdviceAroundResult)
+  | (() => AdviceAroundResult);
+
 export type Advice<I extends WasmInstruction> =
   | AdviceBefore<I>
   | AdviceAfter<I>
+  | AdviceAround<I>
   | AdviceNoArgs
   | AdviceVMArg;
 
@@ -222,12 +239,15 @@ export class AdvicesRegistery {
   private readonly afterStack = 'afters';
   private readonly instrBeforeState: Map<number, number>;
   private readonly instrAfterState: Map<number, number>;
+  private readonly instrAroundState: Map<number, number>;
   private readonly instrPauseBefore: Set<number>;
   private readonly instrPauseAfter: Set<number>;
+  private readonly instrPauseAround: Set<number>;
   private readonly pauseHook: PauseVMHook; // TOFO make general
   private readonly states: Map<string, InspectStateHook<HookOnAddrSubContent>>;
   private readonly advicesBefore: AdviceMap = new Map();
   private readonly advicesAfter: AdviceMap = new Map();
+  private readonly advicesAround: AdviceMap = new Map();
 
   // for interrupts
   private readonly _reqsEvents: HookOnEventRequest[];
@@ -245,11 +265,14 @@ export class AdvicesRegistery {
     this._reqs = [];
     this.advicesBefore = new Map();
     this.advicesAfter = new Map();
+    this.advicesAround = new Map();
 
     this.instrBeforeState = new Map<number, number>();
     this.instrAfterState = new Map<number, number>();
+    this.instrAroundState = new Map<number, number>();
     this.instrPauseBefore = new Set<number>();
     this.instrPauseAfter = new Set<number>();
+    this.instrPauseAround = new Set<number>();
     this.pauseHook = new PauseVMHook();
     this.states = new Map([
       [
@@ -294,6 +317,8 @@ export class AdvicesRegistery {
         return this.instrBeforeState;
       case HookOnWasmAddrMoment.HookAfter:
         return this.instrAfterState;
+      case HookOnWasmAddrMoment.HookAround:
+        return this.instrAroundState;
       default:
         throw new Error(`no instruction Map`);
     }
@@ -305,6 +330,8 @@ export class AdvicesRegistery {
         return this.instrPauseBefore;
       case HookOnWasmAddrMoment.HookAfter:
         return this.instrPauseAfter;
+      case HookOnWasmAddrMoment.HookAround:
+        return this.instrPauseAround;
       default:
         throw new Error(`no instr paused set`);
     }
@@ -319,13 +346,14 @@ export class AdvicesRegistery {
     const signature = signatureOf(target);
     switch (moment) {
       case HookOnWasmAddrMoment.HookBefore:
+      case HookOnWasmAddrMoment.HookAround:
         m = signature.nrArgs > 0 ? this.beforeStack : this.beforeNoStack;
         break;
       case HookOnWasmAddrMoment.HookAfter:
         m = signature.nrResults > 0 ? this.afterStack : this.afterNoStack;
         break;
       default:
-        throw new Error(`TODO case around`);
+        throw new Error(`unsupported hook moment ${moment}`);
     }
 
     const h = this.states.get(m);
@@ -460,8 +488,12 @@ export class AdvicesRegistery {
         advices = this.advicesAfter;
         break;
       }
+      case HookOnWasmAddrMoment.HookAround: {
+        advices = this.advicesAround;
+        break;
+      }
       default:
-        throw new Error(`TODO`);
+        throw new Error(`unsupported hook moment ${moment}`);
     }
 
     const entry: AdviceEntry = {
@@ -488,19 +520,18 @@ export class AdvicesRegistery {
     return ads.length - sizeBefore;
   }
 
-  getAdvices(moment: HookOnWasmAddrMoment, addr: number): AdviceArray {
-    let m: AdviceMap | undefined;
+  private advicesMap(moment: HookOnWasmAddrMoment): AdviceMap {
     switch (moment) {
       case HookOnWasmAddrMoment.HookBefore:
-        m = this.advicesBefore;
-        break;
+        return this.advicesBefore;
       case HookOnWasmAddrMoment.HookAfter:
-        m = this.advicesAfter;
-        break;
+        return this.advicesAfter;
+      case HookOnWasmAddrMoment.HookAround:
+        return this.advicesAround;
       default:
         throw new Error('no moment advices');
     }
-    const advices = m.get(addr);
+  }
     assertFatalHookError(
       advices !== undefined && advices.length > 0,
       `no ${moment} advices registed on addr ${addr}`,
