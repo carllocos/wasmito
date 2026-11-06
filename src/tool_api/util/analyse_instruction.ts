@@ -13,6 +13,8 @@ import { WasmCode, WasmOpcode } from '../../webassembly/wasm/wasm_opcode';
 import { ReadOnlyWasmValue, WritableWasmValue } from '../interrupts';
 import { InstrMoment } from '../group_hooks';
 import { WASM, WasmState, WASMValueIndexed } from '../../webassembly/wasm';
+import { StateRequest } from '../../runtimes/wasmito_vm/requests/inspect_request';
+import { HookAroundKind } from '../../runtimes/wasmito_vm/requests/hook_around_result_request';
 import { assertFatalHookError, SubscriptionContent } from '../../hooks/hook';
 import { getGlobalLogger } from '../../logger/logger';
 import { WASMFunction } from '../../webassembly/wasm/wasm_function';
@@ -536,8 +538,16 @@ export function runAdvicesInstruction(
           const success = await updateArgsStack(as, vm);
           assert(success, 'failed to update the stack with new values');
         }
-        logger.debug('Resume execution on VM');
-        await vm.run(maxTimeoutMs);
+        const aroundPending =
+          moment === HookOnWasmAddrMoment.HookBefore &&
+          advicesContainer.hasAdvices(
+            HookOnWasmAddrMoment.HookAround,
+            metadata.addr,
+          );
+        if (!aroundPending) {
+          logger.debug('Resume execution on VM');
+          await vm.run(maxTimeoutMs);
+        }
       }
     });
   };
