@@ -375,7 +375,8 @@ function copyArgsFromStack(
 ): StackArgs {
   const signature = signatureOf(target);
   switch (moment) {
-    case HookOnWasmAddrMoment.HookBefore: {
+    case HookOnWasmAddrMoment.HookBefore:
+    case HookOnWasmAddrMoment.HookAround: {
       assertFatalHookError(
         stack.length >= signature.nrArgs,
         `VM failed to provide the stack needed to construct args. Expected stack size ${signature.nrArgs}. Given stack size ${stack.length}`,
