@@ -30,6 +30,7 @@ import { analyse as analyseLoopTracer } from '../tool_examples/analyses/loop_tra
 import { analyse as analyseDataRaceViolation } from '../tool_examples/analyses/data_race_violation';
 import { analyse as analyseOrderViolation } from '../tool_examples/analyses/order_violation';
 import { analyse as analyseVariableViolation } from '../tool_examples/analyses/variable_violation';
+import { analyse as analyseTaint } from '../tool_examples/analyses/taint_analysis';
 import {
   TimeoutConfig,
   BenchmarkMeasurement,
@@ -75,6 +76,7 @@ const analyses: Array<AnalysisRun> = [
   ['denan', analyseDenan],
   ['instruction-mix', analyseInstructionMix],
   ['safe-heap', analyseSafeHeap],
+  ['taint', analyseTaint],
   ['data-race-violation', analyseDataRaceViolation],
   ['order-violation', analyseOrderViolation],
   ['variable-violation', analyseVariableViolation],
