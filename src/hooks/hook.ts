@@ -1,12 +1,4 @@
-import {
-  type HookSchedule,
-  ScheduleAways,
-  ScheduleOnTimeStamp,
-  ScheduleOnce,
-  ScheduleBeforeTimeStamp,
-  ScheduleAfterTimeStamp,
-} from './schedule';
-import { type LogicalClock } from './logicalclock';
+import { type HookSchedule, ScheduleAways, ScheduleOnce } from './schedule';
 import { createLogger, Logger } from '../logger/logger';
 import { ISubscription, Subscription } from './isubscribe';
 import { SubscriptionParseOutcome } from '../runtimes/request_interface';
@@ -43,27 +35,8 @@ export abstract class Hook {
     return this;
   }
 
-  scheduleBefore(logicalClock: LogicalClock): Hook {
-    this.schedule = new ScheduleBeforeTimeStamp(logicalClock);
-    return this;
-  }
-
-  scheduleAfter(logicalClock: LogicalClock): Hook {
-    this.schedule = new ScheduleAfterTimeStamp(logicalClock);
-    return this;
-  }
-
-  scheduleOn(logicalClock: LogicalClock): Hook {
-    this.schedule = new ScheduleOnTimeStamp(logicalClock);
-    return this;
-  }
-
-  scheduleOnce(logicalClock?: LogicalClock): Hook {
-    if (logicalClock !== undefined) {
-      this.schedule = new ScheduleOnTimeStamp(logicalClock);
-    } else {
-      this.schedule = new ScheduleOnce();
-    }
+  scheduleOnce(): Hook {
+    this.schedule = new ScheduleOnce();
     return this;
   }
 
