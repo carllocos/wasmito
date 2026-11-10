@@ -31,6 +31,7 @@ import { analyse as analyseDataRaceViolation } from '../tool_examples/analyses/d
 import { analyse as analyseOrderViolation } from '../tool_examples/analyses/order_violation';
 import { analyse as analyseVariableViolation } from '../tool_examples/analyses/variable_violation';
 import { analyse as analyseTaint } from '../tool_examples/analyses/taint_analysis';
+import { analyse as analyseForward } from '../tool_examples/analyses/forward';
 import {
   TimeoutConfig,
   BenchmarkMeasurement,
@@ -77,6 +78,7 @@ const analyses: Array<AnalysisRun> = [
   ['instruction-mix', analyseInstructionMix],
   ['safe-heap', analyseSafeHeap],
   ['taint', analyseTaint],
+  ['forward', analyseForward],
   ['data-race-violation', analyseDataRaceViolation],
   ['order-violation', analyseOrderViolation],
   ['variable-violation', analyseVariableViolation],
