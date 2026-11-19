@@ -9,6 +9,7 @@ import { getFreePort, isPortInUse } from '../../util/socket_util';
 import { type Channel } from '../../communication';
 import { type DevVMPlatform } from '../../platforms';
 import { LanguageAdaptor } from '../../language_adaptors';
+import { killVMProcess, VMMemoryProbe } from '../../util/vm_memory_probe';
 
 export class WasmitoDevVMError extends Error {
   constructor(message: string) {
@@ -36,7 +37,8 @@ export class WasmitoDevVM extends WasmitoBackendVM {
   async close(timeout?: number): Promise<boolean> {
     this.logger.info('closing VM');
     const closedChannel = await this.channel.close(timeout);
-    const closedProcess = this.process?.kill() ?? true;
+    const closedProcess =
+      this.process !== undefined ? killVMProcess(this.process) : true;
     this.logger.debug(
       closedChannel
         ? 'VM channel successfully closed'
@@ -101,7 +103,15 @@ export class WasmitoDevVM extends WasmitoBackendVM {
     this.logger.info(
       `starting DevelopmentVM process ${spawnCommand} ${processArgs.join(' ')}`,
     );
-    const childProcess = spawn(spawnCommand, processArgs);
+    // With --vm-memory, the VM runs under `time` (see VMMemoryProbe).
+    const memoryProbe = VMMemoryProbe.current;
+    const wrapped = memoryProbe?.wrapCommand(spawnCommand, processArgs);
+    const childProcess = wrapped
+      ? spawn(wrapped.command, wrapped.args)
+      : spawn(spawnCommand, processArgs);
+    if (memoryProbe && wrapped) {
+      memoryProbe.track(childProcess, wrapped.reportFile);
+    }
     childProcess.stdout.on('data', (data) => {
       this.logger.debug(`(stdout) ${data}`);
     });
@@ -134,7 +144,7 @@ export class WasmitoDevVM extends WasmitoBackendVM {
         `Failed to connect to local DevelopmentVM at port ${this.platform.config.vmConfig.toolPort}`,
       );
       this.logger.error('Killing local DevelopmentVM process');
-      childProcess.kill();
+      killVMProcess(childProcess);
       throw new this.ErrorClass('timed out connecting to DevVM process');
     }
 

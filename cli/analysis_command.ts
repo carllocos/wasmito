@@ -47,8 +47,18 @@ import {
   logHeapUsage,
   writeHeapUsageToFile,
 } from '../src/util/heap_usage_probe';
+import {
+  VMMemoryProbe,
+  VMMemoryMeasurement,
+  logVMMemory,
+  vmMemoryCsvFileHasHeader,
+  writeVMMemoryToFile,
+} from '../src/util/vm_memory_probe';
 
 const logger = getGlobalLogger();
+
+// How long to wait for the VM to exit (and `time` to report) after a run.
+const VM_EXIT_TIMEOUT_MS = 10_000;
 
 const ALL_ANALYSIS = 'all';
 type AnalysisRun = [
@@ -137,6 +147,10 @@ export function registerAnalysisCommand(program: Command): void {
       '--heap-usage [heap_csv_file_path]',
       `measure the VM heap usage (bytes) right before and after deploying the hooks. The measurements happen outside the timed sections. Results are logged and, if a path is given, appended to that CSV file (separate from --csv).`,
     )
+    .option(
+      '--vm-memory <vm_memory_csv_file_path>',
+      `measure the memory used by the spawned WARDuino VM process: run it under /usr/bin/time (-v on Linux, -l on macOS) and append its maximum resident set size (kbytes) to that CSV file (separate from --csv), with columns analysis,wasm,status,max_rss_kbytes.`,
+    )
     .action(async (analysis, wasm, options) => {
       const [modules, errMsg] = findModules(wasm);
       if (errMsg !== '') {
@@ -209,6 +223,47 @@ export function registerAnalysisCommand(program: Command): void {
         typeof options.heapUsage === 'string' ? options.heapUsage : undefined;
       let addHeapHeader =
         heapCsvFilePath !== undefined && !heapCsvFileHasHeader(heapCsvFilePath);
+      const vmMemoryCsvFilePath: string | undefined = options.vmMemory;
+      let vmMemoryProbe: VMMemoryProbe | undefined;
+      if (vmMemoryCsvFilePath !== undefined) {
+        try {
+          vmMemoryProbe = VMMemoryProbe.enable();
+        } catch (err) {
+          program.error(`${err instanceof Error ? err.message : err}`);
+        }
+      }
+      let addVMMemoryHeader =
+        vmMemoryCsvFilePath !== undefined &&
+        !vmMemoryCsvFileHasHeader(vmMemoryCsvFilePath);
+      // Waits for the VM of the last run to exit and appends what `time` reported.
+      const recordVMMemory = async (
+        analysisName: string,
+        wasm: string,
+        status: 'ok' | 'error',
+      ): Promise<void> => {
+        if (vmMemoryProbe === undefined || vmMemoryCsvFilePath === undefined)
+          return;
+        const m: VMMemoryMeasurement = await vmMemoryProbe.collect(
+          VM_EXIT_TIMEOUT_MS,
+          logger,
+        );
+        logVMMemory(logger, `Analysis ${analysisName}`, m);
+        try {
+          writeVMMemoryToFile(
+            vmMemoryCsvFilePath,
+            analysisName,
+            wasm,
+            status,
+            m,
+            addVMMemoryHeader,
+          );
+          addVMMemoryHeader = false;
+        } catch (err) {
+          logger.error(
+            `Error writing VM memory to file ${vmMemoryCsvFilePath}. ${err}`,
+          );
+        }
+      };
       for (const [a, analyse] of analysisToRun) {
         for (const wasmPath of modules) {
           const measurements: BenchmarkMeasurements = {
@@ -238,6 +293,11 @@ export function registerAnalysisCommand(program: Command): void {
             );
             measurements.measurements.push(run);
             measurements.totalTimes.push(totalTime);
+            await recordVMMemory(
+              a,
+              measurements.wasm,
+              'errorRun' in run ? 'error' : 'ok',
+            );
             if (heapProbe !== undefined) {
               const hm = heapProbe.measurement;
               logHeapUsage(logger, `Analysis ${a}`, hm);
@@ -279,6 +339,7 @@ export function registerAnalysisCommand(program: Command): void {
             };
             measurements.measurements.push(failedMeasument);
             measurements.totalTimes.push(-100);
+            await recordVMMemory(a, measurements.wasm, 'error');
             if (writeToCSV) {
               writeLastMeasurementToFile(measurements, addHeader);
             }
